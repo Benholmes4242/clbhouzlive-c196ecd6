@@ -15,8 +15,10 @@ import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { MediaGridItem } from './MediaGridItem';
+import { LazyMediaGridItem } from './LazyMediaGridItem';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -151,6 +153,14 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     () => adaptExploreContentToMediaItems(filteredItems),
     [filteredItems]
   );
+
+  // Lazy loading: only mount grid items in/near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: mediaItems.length,
+    initialVisible: 8, // First 2 rows on mobile (4) or 1 row on desktop (4)
+    preloadViewports: 2,
+    estimatedRowHeight: 150, // Smaller tiles = shorter rows
+  });
 
   // Phase 1 Fix #4: Memoized click handler
   const handleMediaClick = useCallback((item: NewMediaItem) => {
@@ -377,18 +387,33 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         </div>
       )}
 
-      {/* Square Media Grid - 2 columns mobile, 4 desktop */}
+      {/* Square Media Grid - 2 columns mobile, 4 desktop with lazy loading */}
       {filteredItems.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-muted/30">
-          {mediaItems.map((item, index) => (
-            <MediaGridItem
-              key={item.id}
-              item={item}
-              onClick={handleMediaClick}
-              // Show overflow count on 4th tile (index 3) if there's more
-              overflowCount={index === visibleCount - 1 && overflowCount > 0 ? overflowCount : undefined}
-            />
-          ))}
+          {mediaItems.map((item, index) => {
+            const isVisible = visibleIndices.has(index);
+            
+            // Render placeholder for tiles not yet visible
+            if (!isVisible) {
+              return (
+                <LazyMediaGridItem
+                  key={`placeholder-${item.id}`}
+                  index={index}
+                  registerTile={registerTile}
+                />
+              );
+            }
+            
+            return (
+              <MediaGridItem
+                key={item.id}
+                item={item}
+                onClick={handleMediaClick}
+                // Show overflow count on 4th tile (index 3) if there's more
+                overflowCount={index === visibleCount - 1 && overflowCount > 0 ? overflowCount : undefined}
+              />
+            );
+          })}
         </div>
       )}
 

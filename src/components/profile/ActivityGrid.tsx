@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 
 export type LayoutHint = 'square' | 'tall' | 'wide';
 
@@ -96,6 +97,14 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
     });
   }, [groupedItems]);
 
+  // Lazy loading: only mount grid items in/near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: displayItems.length,
+    initialVisible: 9, // First 3 rows (9 items for 3-column grid)
+    preloadViewports: 2,
+    estimatedRowHeight: 120,
+  });
+
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -116,6 +125,20 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
       )}
     >
       {displayItems.map((item, index) => {
+        const isVisible = visibleIndices.has(index);
+        
+        // Render placeholder for tiles not yet visible
+        if (!isVisible) {
+          return (
+            <div
+              key={`placeholder-${item.id}`}
+              ref={(el) => el && registerTile(index, el)}
+              data-lazy-index={index}
+              className="relative aspect-square bg-muted/20"
+            />
+          );
+        }
+        
         const isVideo = item.type === 'video';
         const isHovered = hoveredId === item.id;
         const stackCount = (item as any)._stackCount;

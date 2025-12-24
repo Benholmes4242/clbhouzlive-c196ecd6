@@ -4,6 +4,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { useLocation } from 'react-router-dom';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 
 interface PhotosGridProps {
   items: ExploreContentItem[];
@@ -128,6 +129,14 @@ export default function PhotosGrid({
 
   const columns = isMobile ? 3 : 4;
 
+  // Lazy loading: only render items in/near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: items.length,
+    initialVisible: columns * 3, // First 3 rows
+    preloadViewports: 2,
+    estimatedRowHeight: 150,
+  });
+
   return (
     <>
       {/* Masonry Grid - CSS columns approach for simplicity */}
@@ -139,7 +148,23 @@ export default function PhotosGrid({
           rowGap: '0px'
         }}
       >
-        {items.map((item, index) => (
+        {items.map((item, index) => {
+          const isVisible = visibleIndices.has(index);
+          
+          // Render placeholder for items not yet visible
+          if (!isVisible) {
+            return (
+              <div
+                key={`placeholder-${item.id}-${index}`}
+                ref={(el) => el && registerTile(index, el)}
+                data-lazy-index={index}
+                className="relative break-inside-avoid mb-0 aspect-square bg-muted/20"
+                style={{ display: 'inline-block', width: '100%' }}
+              />
+            );
+          }
+          
+          return (
           <div
             key={`${item.id}-${index}`}
             className="relative break-inside-avoid mb-0"
@@ -226,7 +251,8 @@ export default function PhotosGrid({
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Infinite scroll sentinel */}
