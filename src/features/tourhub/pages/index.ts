@@ -1,0 +1,6 @@
+export { TourHubHomePage } from './TourHubHomePage';
+export { TourHubLivePage } from './TourHubLivePage';
+export { TourHubTourPage } from './TourHubTourPage';
+export { TourHubEventPage } from './TourHubEventPage';
+export { TourHubPlayerPage } from './TourHubPlayerPage';
+export { TourHubRankingsPage } from './TourHubRankingsPage';
