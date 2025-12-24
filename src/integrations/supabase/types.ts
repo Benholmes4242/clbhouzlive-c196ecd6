@@ -5620,6 +5620,8 @@ export type Database = {
           contact_person_name: string | null
           cover_photo_url: string | null
           created_at: string | null
+          creator_only: boolean
+          deleted_at: string | null
           desktop_crop_height: number | null
           desktop_crop_width: number | null
           desktop_crop_x: number | null
@@ -5712,6 +5714,8 @@ export type Database = {
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
+          creator_only?: boolean
+          deleted_at?: string | null
           desktop_crop_height?: number | null
           desktop_crop_width?: number | null
           desktop_crop_x?: number | null
@@ -5804,6 +5808,8 @@ export type Database = {
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
+          creator_only?: boolean
+          deleted_at?: string | null
           desktop_crop_height?: number | null
           desktop_crop_width?: number | null
           desktop_crop_x?: number | null

@@ -91,7 +91,8 @@ const Settings = () => {
         {isPersonalProfile && user && (
           <CreatorModeToggle 
             userId={user.id} 
-            isCreator={(profile as any)?.is_creator || false} 
+            isCreator={(profile as any)?.is_creator || false}
+            creatorOnly={(profile as any)?.creator_only || false}
           />
         )}
         

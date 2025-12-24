@@ -68,3 +68,6 @@ verify_jwt = true
 
 [functions.business-access-request-decide]
 verify_jwt = true
+
+[functions.delete-account]
+verify_jwt = true
