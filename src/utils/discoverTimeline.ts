@@ -351,7 +351,7 @@ export function disable() {
   console.log('%c[DiscoverTiming] Disabled', 'color: #666');
 }
 
-// Expose to window for console access
+// Expose to window for console access immediately on module load
 if (typeof window !== 'undefined') {
   (window as any).__discoverTiming = {
     enable,
@@ -360,4 +360,5 @@ if (typeof window !== 'undefined') {
     getEvents,
     clearEvents,
   };
+  console.log('[DiscoverTiming] Module loaded, window.__discoverTiming available');
 }
