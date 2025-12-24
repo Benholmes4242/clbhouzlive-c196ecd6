@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
-
-// Rotating prestige lines
-const PRESTIGE_LINES = [
-  "St Andrews. Pinehurst. Royal Melbourne.",
-  "Golfers tracking rounds worldwide.",
-  "A place for every round you remember.",
-];
 
 interface AuthHeroScreenProps {
   onAppleSignIn: () => void;
@@ -26,20 +19,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   onLoginClick,
   submitting,
 }) => {
-  const [prestigeIndex, setPrestigeIndex] = useState(0);
-  const [prestigeVisible, setPrestigeVisible] = useState(true);
-
-  // Rotate prestige lines every 5 seconds with cross-fade
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPrestigeVisible(false);
-      setTimeout(() => {
-        setPrestigeIndex((prev) => (prev + 1) % PRESTIGE_LINES.length);
-        setPrestigeVisible(true);
-      }, 400);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="fixed inset-0 flex flex-col">
@@ -91,7 +70,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-[48px] w-auto relative z-10"
+            className="h-[53px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
             <span 
@@ -115,25 +94,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             Your home of golf.
           </h1>
           <p 
-            className="text-[15px] text-white/70 max-w-[280px] mb-6"
+            className="text-[15px] text-white/70 max-w-[280px]"
             style={{ 
               fontFamily: 'SF Pro Text, system-ui, sans-serif',
               lineHeight: '1.5',
             }}
           >
             Everything you play. Everything you remember.
-          </p>
-          
-          {/* Rotating prestige line */}
-          <p 
-            className="text-[13px] text-white/45 max-w-[300px] transition-opacity duration-[400ms]"
-            style={{ 
-              fontFamily: 'SF Pro Text, system-ui, sans-serif',
-              fontStyle: 'italic',
-              opacity: prestigeVisible ? 1 : 0,
-            }}
-          >
-            {PRESTIGE_LINES[prestigeIndex]}
           </p>
         </div>
         
