@@ -61,7 +61,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
   const handleNavigate = (path: string) => {
-    navigate(path);
+    // Respect creator_only mode for profile navigation
+    if (path === '/profile' && userProfile?.creator_only && user?.id) {
+      navigate(`/creator/${user.id}`);
+    } else {
+      navigate(path);
+    }
     onClose();
   };
 

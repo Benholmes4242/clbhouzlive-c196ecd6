@@ -26,6 +26,10 @@ interface SettingsToggleRowProps {
   showDivider?: boolean;
   /** Beta badge */
   isBeta?: boolean;
+  /** Indented sub-row styling (extra 14px left padding) */
+  isIndented?: boolean;
+  /** Helper note shown below the row when toggle is ON */
+  helperNote?: string;
 }
 
 /**
@@ -44,56 +48,86 @@ export function SettingsToggleRow({
   isLast = false,
   showDivider = true,
   isBeta = false,
+  isIndented = false,
+  helperNote,
 }: SettingsToggleRowProps) {
+  const showHelper = helperNote && checked;
+
   return (
-    <div
-      className={cn(
-        'relative flex items-center justify-between w-full max-w-full box-border',
-        'min-h-[52px] md:min-h-[56px]',
-        'px-[14px] py-[12px]',
-        disabled && 'opacity-50',
-        isFirst && 'rounded-t-[12px]',
-        isLast && 'rounded-b-[12px]',
-      )}
-    >
-      {/* Left content - min-width:0 prevents text from pushing layout wider */}
-      <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
-        {icon && (
-          <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
-            {icon}
-          </div>
+    <div className={cn(isLast && 'rounded-b-[12px]')}>
+      <div
+        className={cn(
+          'relative flex items-center justify-between w-full max-w-full box-border',
+          'min-h-[52px] md:min-h-[56px]',
+          'py-[12px]',
+          isIndented ? 'pl-[28px] pr-[14px]' : 'px-[14px]',
+          disabled && 'opacity-50',
+          isFirst && 'rounded-t-[12px]',
+          isLast && !showHelper && 'rounded-b-[12px]',
         )}
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <span className="text-[15px] font-semibold text-[#1F2428] truncate overflow-hidden text-ellipsis">
-              {title}
-            </span>
-            {isBeta && <SettingsBadge>Beta</SettingsBadge>}
+      >
+        {/* Left content - min-width:0 prevents text from pushing layout wider */}
+        <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
+          {icon && (
+            <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
+              {icon}
+            </div>
+          )}
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="text-[15px] font-semibold text-[#1F2428] truncate overflow-hidden text-ellipsis">
+                {title}
+              </span>
+              {isBeta && <SettingsBadge>Beta</SettingsBadge>}
+            </div>
+            {subtitle && (
+              <p className="text-[13px] font-normal text-[#5E666D] truncate overflow-hidden text-ellipsis mt-0.5">
+                {subtitle}
+              </p>
+            )}
           </div>
-          {subtitle && (
-            <p className="text-[13px] font-normal text-[#5E666D] truncate overflow-hidden text-ellipsis mt-0.5">
-              {subtitle}
-            </p>
+        </div>
+
+        {/* Toggle - slate/neutral colors */}
+        <div className="flex-shrink-0 ml-3">
+          <Switch
+            checked={checked}
+            onCheckedChange={onCheckedChange}
+            disabled={disabled || isLoading}
+            className="data-[state=checked]:bg-[#3A3F46] data-[state=unchecked]:bg-[#EDEFF2]"
+          />
+        </div>
+
+        {/* Divider */}
+        {showDivider && !isLast && !showHelper && (
+          <div 
+            className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
+            style={{ background: 'rgba(31,36,40,0.06)' }}
+          />
+        )}
+      </div>
+
+      {/* Helper note when toggle is ON */}
+      {showHelper && (
+        <div 
+          className={cn(
+            'px-[14px] pb-[12px] -mt-1',
+            isIndented && 'pl-[28px]'
+          )}
+        >
+          <p className="text-[12px] text-[#97A1AA]">{helperNote}</p>
+          {/* Divider below helper */}
+          {showDivider && !isLast && (
+            <div 
+              className="mt-3 h-[1px] -mx-[14px]"
+              style={{ 
+                background: 'rgba(31,36,40,0.06)',
+                marginLeft: isIndented ? '-28px' : '-14px',
+                marginRight: '-14px'
+              }}
+            />
           )}
         </div>
-      </div>
-
-      {/* Toggle - slate/neutral colors */}
-      <div className="flex-shrink-0 ml-3">
-        <Switch
-          checked={checked}
-          onCheckedChange={onCheckedChange}
-          disabled={disabled || isLoading}
-          className="data-[state=checked]:bg-[#3A3F46] data-[state=unchecked]:bg-[#EDEFF2]"
-        />
-      </div>
-
-      {/* Divider */}
-      {showDivider && !isLast && (
-        <div 
-          className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-          style={{ background: 'rgba(31,36,40,0.06)' }}
-        />
       )}
     </div>
   );

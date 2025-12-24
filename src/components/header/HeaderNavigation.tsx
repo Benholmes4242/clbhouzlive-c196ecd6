@@ -89,10 +89,29 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
   // Business intro modal state
   const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
 
+  // Fetch profile to check creator_only
+  const { data: profile } = useQuery({
+    queryKey: ['profile-creator-only', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('creator_only')
+        .eq('id', user.id)
+        .single();
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+  });
+
   const handleProfileClick = () => {
     onInteraction?.();
     if (!user) {
       navigate('/auth');
+    } else if (profile?.creator_only) {
+      // Respect creator_only mode - route to creator page
+      navigate(`/creator/${user.id}`);
     } else {
       navigate('/profile');
     }
