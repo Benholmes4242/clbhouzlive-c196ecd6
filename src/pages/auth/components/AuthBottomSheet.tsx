@@ -22,18 +22,25 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/60 z-40 transition-opacity"
+        style={{ backdropFilter: 'blur(4px)' }}
         onClick={onClose}
       />
       
-      {/* Sheet */}
+      {/* Sheet - using glass system matching Clubhouse header/footer */}
       <div 
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50",
-          "bg-[#1A1D21] rounded-t-[28px]",
+          "rounded-t-[28px]",
           "transform transition-transform duration-300 ease-out",
           "pb-safe",
           isOpen ? "translate-y-0" : "translate-y-full"
         )}
+        style={{
+          background: 'rgba(10, 10, 10, 0.78)',
+          backdropFilter: 'blur(22px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.55)',
+        }}
       >
         {/* Handle bar */}
         <div className="flex justify-center pt-3 pb-2">
@@ -47,7 +54,10 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+            }}
           >
             <X className="w-4 h-4 text-white/70" />
           </button>

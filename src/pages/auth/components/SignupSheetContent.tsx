@@ -120,6 +120,15 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
     }
   };
 
+  // Input styling helper
+  const getInputBorderColor = (state: boolean | null, isUsername: boolean = false) => {
+    if (isUsername) {
+      if (state === true) return '1px solid #2F9E44';
+      if (state === false) return '1px solid #E03131';
+    }
+    return '1px solid rgba(255, 255, 255, 0.08)';
+  };
+
   return (
     <div className="space-y-4">
       {/* Back button and email display */}
@@ -127,7 +136,8 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         <button
           onClick={onBack}
           disabled={submitting}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+          style={{ background: 'rgba(255, 255, 255, 0.08)' }}
         >
           <ArrowLeft className="w-4 h-4 text-white/70" />
         </button>
@@ -149,10 +159,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Username"
             disabled={submitting}
-            className="w-full h-[52px] px-4 pr-10 rounded-2xl bg-white/10 border text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+            className="w-full h-[52px] px-4 pr-10 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
             style={{
-              borderColor: usernameAvailable === true ? '#2F9E44' : 
-                usernameAvailable === false ? '#E03131' : 'rgba(255,255,255,0.2)',
+              background: 'rgba(255, 255, 255, 0.06)',
+              border: getInputBorderColor(usernameAvailable, true),
             }}
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -178,7 +188,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
                   key={suggestion}
                   type="button"
                   onClick={() => handleChipClick(suggestion)}
-                  className="px-3 py-1.5 rounded-full bg-white/10 text-white text-[13px] hover:bg-white/20 transition-colors"
+                  className="px-3 py-1.5 rounded-full text-white text-[13px] transition-colors"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                  }}
                 >
                   @{suggestion}
                 </button>
@@ -203,7 +216,11 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Create password"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-[15px] focus:outline-none focus:border-white/40 transition-colors"
+          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          style={{
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: passwordError ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+          }}
           autoComplete="new-password"
         />
         {passwordError && (
@@ -216,6 +233,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
       </div>
       
+      {/* Submit button - white, black text */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}

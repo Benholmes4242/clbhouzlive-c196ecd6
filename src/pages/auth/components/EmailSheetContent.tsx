@@ -52,7 +52,11 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Email address"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-[15px] focus:outline-none focus:border-white/40 transition-colors"
+          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          style={{
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: emailError ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+          }}
           autoComplete="email"
         />
         {emailError && (
@@ -60,6 +64,7 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
         )}
       </div>
       
+      {/* Continue button - white, black text */}
       <button
         onClick={onContinue}
         disabled={isDisabled}

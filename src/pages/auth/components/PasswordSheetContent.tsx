@@ -44,7 +44,8 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         <button
           onClick={onBack}
           disabled={submitting}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+          style={{ background: 'rgba(255, 255, 255, 0.08)' }}
         >
           <ArrowLeft className="w-4 h-4 text-white/70" />
         </button>
@@ -64,7 +65,11 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Password"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-[15px] focus:outline-none focus:border-white/40 transition-colors"
+          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          style={{
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: passwordError ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+          }}
           autoComplete="current-password"
         />
         {passwordError && (
@@ -72,6 +77,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         )}
       </div>
       
+      {/* Submit button - white, black text */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
@@ -80,7 +86,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         {submitting ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
-          'Enter clbhouz'
+          'Enter clubhouse'
         )}
       </button>
       
