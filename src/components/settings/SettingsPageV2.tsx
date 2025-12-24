@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, Mail, AtSign, Sparkles, EyeOff, ExternalLink, 
   ShieldBan, Bell, Lock, HelpCircle, MessageSquare, 
-  Headphones, FileText, Shield, ScrollText, Trash2, ArrowLeft 
+  Headphones, FileText, Shield, ScrollText, Trash2, ArrowLeft,
+  Smartphone
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -11,6 +12,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { 
   SettingsSection, 
   SettingsChevronRow, 
@@ -52,6 +54,9 @@ export function SettingsPageV2() {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading, error, fetchProfile } = useProfileData();
+  
+  // Push notifications
+  const { state: pushState, isRegistering: isPushRegistering, enable: enablePush, disable: disablePush } = usePushNotifications();
 
   // Creator mode state
   const [isCreator, setIsCreator] = React.useState(false);
@@ -329,13 +334,33 @@ export function SettingsPageV2() {
 
         {/* ========== NOTIFICATIONS ========== */}
         <SettingsSection title="Notifications">
+          {/* Push notifications toggle - only show if available */}
+          {pushState !== 'unavailable' && (
+            <SettingsToggleRow
+              icon={<Smartphone className="w-[18px] h-[18px]" />}
+              title="Push notifications"
+              subtitle={pushState === 'enabled' ? 'Enabled on this device.' : 'Get alerts when something important happens.'}
+              checked={pushState === 'enabled'}
+              onCheckedChange={async (checked) => {
+                if (checked) {
+                  await enablePush();
+                } else {
+                  await disablePush();
+                }
+              }}
+              disabled={isPushRegistering || pushState === 'denied'}
+              isLoading={isPushRegistering}
+              isFirst
+              helperNote={pushState === 'denied' ? 'Permission denied. Enable in device settings.' : undefined}
+            />
+          )}
           <SettingsChevronRow
             icon={<Bell className="w-[18px] h-[18px]" />}
             title="In-app notifications"
             subtitle="Choose what you're notified about."
             onClick={() => setShowNotificationsSheet(true)}
             isBeta
-            isFirst
+            isFirst={pushState === 'unavailable'}
             isLast
           />
         </SettingsSection>
