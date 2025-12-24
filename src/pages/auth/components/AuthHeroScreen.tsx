@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 // Toggle wordmark visibility
-const SHOW_WORDMARK = true;
+const SHOW_WORDMARK = false;
 
 interface AuthHeroScreenProps {
   onAppleSignIn: () => void;
@@ -44,7 +44,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-11 w-auto"
+            className="h-[52px] w-auto"
           />
           {SHOW_WORDMARK && (
             <span 
