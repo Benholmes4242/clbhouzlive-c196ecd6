@@ -236,7 +236,13 @@ const Clubhouse = () => {
     <PageRoot 
       ref={clubhouseRootRef} 
       className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
-      style={{ "--bg-page": "#0F0F0F", position: 'relative', isolation: 'isolate', zIndex: 0 } as React.CSSProperties}
+      style={{ 
+        "--bg-page": "#0F0F0F", 
+        position: 'relative', 
+        isolation: 'isolate', 
+        zIndex: 0,
+        paddingTop: 'env(safe-area-inset-top)'
+      } as React.CSSProperties}
     >
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
