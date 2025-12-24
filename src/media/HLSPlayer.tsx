@@ -392,9 +392,30 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         video.canPlayType('application/vnd.apple.mpegURL') !== '' ||
         video.canPlayType('application/x-mpegURL') !== '';
       
+      console.log('[HLSPlayer] PLAYBACK_PATH', {
+        mediaId: mediaId?.slice(0, 8),
+        canPlayNatively,
+        isIOS,
+        isM3u8: src.includes('.m3u8'),
+        path: (canPlayNatively || !src.includes('.m3u8')) ? 'NATIVE' : 'HLS.js',
+      });
+      
       if (canPlayNatively || !src.includes('.m3u8')) {
-        // Native playback
+        // Native playback - add timing logs
+        console.log('[HLSPlayer] NATIVE_START', { mediaId: mediaId?.slice(0, 8) });
         video.src = src;
+        
+        // Track native loading events
+        const nativeLoadStart = performance.now();
+        const onLoadedData = () => {
+          console.log('[HLSPlayer] NATIVE_LOADED_DATA', {
+            mediaId: mediaId?.slice(0, 8),
+            timeMs: (performance.now() - nativeLoadStart).toFixed(0),
+            readyState: video.readyState,
+            duration: video.duration?.toFixed(2),
+          });
+        };
+        video.addEventListener('loadeddata', onLoadedData, { once: true });
         
         // Apply start time
         if (startTime && startTime > 0) {
