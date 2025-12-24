@@ -268,12 +268,14 @@ export function SettingsPageV2() {
             {isCreator && (
               <>
                 <SettingsToggleRow
-                  icon={<EyeOff className="w-[18px] h-[18px]" />}
+                  icon={<EyeOff className="w-[16px] h-[16px]" />}
                   title="Use creator page only"
                   subtitle="Hides your personal profile. People will only see your creator page."
                   checked={creatorOnly}
                   onCheckedChange={handleCreatorOnlyToggle}
                   disabled={isUpdatingCreator}
+                  isIndented
+                  helperNote="Your personal profile is hidden."
                 />
                 <SettingsChevronRow
                   icon={<ExternalLink className="w-[18px] h-[18px]" />}
