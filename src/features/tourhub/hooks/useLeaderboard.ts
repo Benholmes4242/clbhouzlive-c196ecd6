@@ -36,38 +36,22 @@ export function useLeaderboard(tour: string | undefined, eventId: string | undef
         return null;
       }
       
-      // Call the resolver edge function
-      const { data: fnData, error: fnError } = await supabase.functions.invoke('tourhub-resolver', {
-        method: 'GET',
-        body: null,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      // Call the resolver edge function (POST body avoids query param issues)
+      const { data, error } = await supabase.functions.invoke('tourhub-resolver', {
+        method: 'POST',
+        body: { tour, event: eventId },
       });
 
-      // If invoke doesn't support query params, fall back to fetch
-      const response = await fetch(
-        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/tourhub-resolver?tour=${encodeURIComponent(tour)}&event=${encodeURIComponent(eventId)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        // Don't throw on 404 - event just not found
-        if (response.status === 404) {
-          return null;
-        }
-        throw new Error(`Resolver error: ${response.status}`);
+      if (error) {
+        const status = (error as any)?.context?.status;
+        if (status === 404) return null;
+        throw new Error(`Resolver error: ${status || 'unknown'}`);
       }
 
-      const data = await response.json();
+      const dataObj = data as any;
       
       // Normalize the response
-      const leaders = (data.leaders || []).map((l: Record<string, unknown>) => ({
+      const leaders = (dataObj.leaders || []).map((l: Record<string, unknown>) => ({
         position: String(l.pos || l.position || '-'),
         athleteId: l.athleteId ? String(l.athleteId) : undefined,
         playerName: String(l.name || l.playerName || 'Unknown'),
@@ -76,16 +60,16 @@ export function useLeaderboard(tour: string | undefined, eventId: string | undef
         thru: l.thru ? String(l.thru) : '-',
       }));
 
-      const status = data.status as keyof typeof EMPTY_MESSAGES || 'upcoming';
+      const status = (dataObj.status as keyof typeof EMPTY_MESSAGES) || 'upcoming';
 
       return {
-        tour: data.tour || tour,
-        espn_event_id: data.espnEventId || eventId,
+        tour: dataObj.tour || tour,
+        espn_event_id: dataObj.espnEventId || eventId,
         leaders,
-        fetched_at: data.generatedAt || new Date().toISOString(),
+        fetched_at: dataObj.generatedAt || new Date().toISOString(),
         round: null,
-        status: data.status || null,
-        message: leaders.length === 0 ? (data.message || EMPTY_MESSAGES[status]) : undefined,
+        status: dataObj.status || null,
+        message: leaders.length === 0 ? (dataObj.message || EMPTY_MESSAGES[status]) : undefined,
       } as LeaderboardSnapshot;
     },
     staleTime: 30 * 1000, // 30 seconds for live data
