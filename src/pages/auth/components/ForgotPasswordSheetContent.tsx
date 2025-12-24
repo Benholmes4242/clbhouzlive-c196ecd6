@@ -40,7 +40,10 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
     return (
       <div className="space-y-4 text-center py-4">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-[#2F9E44]/20 flex items-center justify-center">
+          <div 
+            className="w-16 h-16 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(47, 158, 68, 0.15)' }}
+          >
             <CheckCircle className="w-8 h-8 text-[#2F9E44]" />
           </div>
         </div>
@@ -50,7 +53,12 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
         </p>
         <button
           onClick={onBack}
-          className="w-full h-[52px] flex items-center justify-center rounded-full bg-white/10 text-white font-medium text-[15px] border border-white/20 transition-all active:scale-[0.98] hover:bg-white/15 mt-4"
+          className="w-full h-[52px] flex items-center justify-center rounded-full font-medium text-[15px] transition-all active:scale-[0.98] mt-4"
+          style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: 'white',
+          }}
         >
           Back to login
         </button>
@@ -65,7 +73,8 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
         <button
           onClick={onBack}
           disabled={submitting}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+          style={{ background: 'rgba(255, 255, 255, 0.08)' }}
         >
           <ArrowLeft className="w-4 h-4 text-white/70" />
         </button>
@@ -85,7 +94,11 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
           onKeyDown={handleKeyDown}
           placeholder="Email address"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-[15px] focus:outline-none focus:border-white/40 transition-colors"
+          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          style={{
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: errorMessage ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+          }}
           autoComplete="email"
         />
         {errorMessage && (
@@ -93,6 +106,7 @@ const ForgotPasswordSheetContent: React.FC<ForgotPasswordSheetContentProps> = ({
         )}
       </div>
       
+      {/* Submit button - white, black text */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
