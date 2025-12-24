@@ -492,13 +492,14 @@ html, body, #root {
   padding-top: 0 !important;
 }
 
-/* Ensure all headers are anchored flush to viewport top - applies to ALL pages */
+/* Ensure all headers respect safe-area but stay anchored to viewport top */
 .chrome-header,
 header[data-chrome="header"],
 header.global-header,
 [data-hides-on-scroll] {
   margin-top: 0 !important;
-  top: 0 !important;
+  /* Use safe-area offset on real devices, 0 in browser preview */
+  top: var(--sat, 0px) !important;
 }
 
 /* Override any container-level spacing that might create gaps above header */
