@@ -498,8 +498,8 @@ header[data-chrome="header"],
 header.global-header,
 [data-hides-on-scroll] {
   margin-top: 0 !important;
-  /* Use safe-area offset on real devices, 0 in browser preview */
-  top: var(--sat, 0px) !important;
+  /* Headers sit at top: 0, content inside gets safe-area padding */
+  top: 0 !important;
 }
 
 /* Override any container-level spacing that might create gaps above header */
