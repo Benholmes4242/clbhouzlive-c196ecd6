@@ -1,6 +1,7 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 export type StatusVariant = "success" | "warning" | "error" | "default" | "muted";
@@ -15,6 +16,11 @@ interface AdminListCardProps {
   };
   onClick?: () => void;
   className?: string;
+  // Bulk selection props
+  selectMode?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+  selectable?: boolean;
 }
 
 const statusVariantClasses: Record<StatusVariant, string> = {
@@ -32,20 +38,47 @@ export function AdminListCard({
   status,
   onClick,
   className,
+  selectMode = false,
+  selected = false,
+  onSelect,
+  selectable = true,
 }: AdminListCardProps) {
+  const handleClick = () => {
+    if (selectMode && selectable && onSelect) {
+      onSelect();
+    } else if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card p-4 transition-colors active:bg-accent/50",
-        onClick && "cursor-pointer",
+        "rounded-lg border bg-card p-4 transition-colors",
+        (onClick || (selectMode && selectable)) && "cursor-pointer active:bg-accent/50",
+        selectMode && selected && "ring-2 ring-primary bg-primary/5",
+        selectMode && !selectable && "opacity-50",
         className
       )}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
+      onClick={handleClick}
+      role={(onClick || selectMode) ? "button" : undefined}
+      tabIndex={(onClick || selectMode) ? 0 : undefined}
     >
-      <div className="flex items-start justify-between gap-3">
-        {/* Left: Content */}
+      <div className="flex items-start gap-3">
+        {/* Checkbox in select mode */}
+        {selectMode && (
+          <div className="shrink-0 pt-0.5">
+            <Checkbox
+              checked={selected}
+              disabled={!selectable}
+              onCheckedChange={() => onSelect?.()}
+              onClick={(e) => e.stopPropagation()}
+              className="h-5 w-5"
+            />
+          </div>
+        )}
+
+        {/* Content */}
         <div className="flex-1 min-w-0 space-y-2">
           {/* Primary line */}
           <div className="font-medium text-sm truncate">{primary}</div>
@@ -77,8 +110,8 @@ export function AdminListCard({
           )}
         </div>
 
-        {/* Right: Chevron */}
-        {onClick && (
+        {/* Right: Chevron (only when not in select mode) */}
+        {!selectMode && onClick && (
           <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
         )}
       </div>
