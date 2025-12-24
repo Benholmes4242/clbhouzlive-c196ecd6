@@ -418,9 +418,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         }
         
         const hls = new Hls({
-          maxBufferLength: 6,
+          // Performance: Start with lowest quality for fast first frame
+          startLevel: 0, // Force lowest quality initially (then adapt up)
+          
+          // Buffer settings for fast startup
+          maxBufferLength: 10, // Buffer 10 seconds ahead
+          maxMaxBufferLength: 20,
           backBufferLength: 4,
-          startLevel: -1, // Auto quality
+          
+          // Fast quality switching - start with low estimate
+          abrEwmaDefaultEstimate: 500000, // Start with 500kbps estimate
+          
+          // Faster error recovery
+          fragLoadingTimeOut: 10000,
+          manifestLoadingTimeOut: 10000,
         });
         
         hls.on(Hls.Events.ERROR, (_, data) => {
@@ -435,9 +446,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           if (!mountedRef.current) return;
           
           const parseTime = performance.now();
-          console.log('[HLSPlayer] MANIFEST_PARSED - calling startLoad()', {
+          
+          // Log available quality levels
+          const levels = hls.levels?.map((l, i) => ({
+            index: i,
+            width: l.width,
+            height: l.height,
+            bitrateKbps: Math.round((l.bitrate || 0) / 1000),
+          }));
+          
+          console.log('[HLSPlayer] MANIFEST_PARSED', {
             mediaId: mediaId?.slice(0, 8),
-            levels: hls.levels?.length,
+            levels,
+            currentLevel: hls.currentLevel,
+            startLevel: hls.startLevel,
             readyState: video.readyState,
             timestamp: parseTime.toFixed(1),
           });
@@ -465,24 +487,51 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           }
         });
         
-        // Diagnostic: Track when fragments start loading
-        hls.on(Hls.Events.FRAG_LOADING, (_, data) => {
-          console.log('[HLSPlayer] FRAG_LOADING', {
+        // Log quality level switches
+        hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+          const level = hls.levels?.[data.level];
+          console.log('[HLSPlayer] LEVEL_SWITCHED', {
             mediaId: mediaId?.slice(0, 8),
-            sn: data.frag.sn,
-            type: data.frag.type,
-            start: data.frag.start?.toFixed(2),
-            duration: data.frag.duration?.toFixed(2),
+            level: data.level,
+            width: level?.width,
+            height: level?.height,
+            bitrateKbps: level?.bitrate ? Math.round(level.bitrate / 1000) : 'N/A',
             timestamp: performance.now().toFixed(1),
           });
         });
         
-        // Diagnostic: Track when fragments complete loading
+        // Diagnostic: Track when fragments start loading with detailed info
+        hls.on(Hls.Events.FRAG_LOADING, (_, data) => {
+          console.log('[HLSPlayer] FRAG_LOADING', {
+            mediaId: mediaId?.slice(0, 8),
+            segmentNumber: data.frag.sn,
+            duration: data.frag.duration?.toFixed(2) + 's',
+            level: data.frag.level,
+            type: data.frag.type,
+            url: data.frag.url?.slice(-50),
+            timestamp: performance.now().toFixed(1),
+          });
+        });
+        
+        // Diagnostic: Track when fragments complete loading with size/bitrate
         hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+          const stats = data.frag.stats;
+          const bytesLoaded = stats?.total || 0;
+          const loadingStart = stats?.loading?.start || 0;
+          const loadingEnd = stats?.loading?.end || 0;
+          const timeToLoad = loadingEnd - loadingStart;
+          const bitrate = data.frag.duration > 0 
+            ? Math.round((bytesLoaded * 8) / (data.frag.duration * 1000)) 
+            : 0;
+          
           console.log('[HLSPlayer] FRAG_LOADED', {
             mediaId: mediaId?.slice(0, 8),
-            sn: data.frag.sn,
-            duration: data.frag.duration?.toFixed(2),
+            segmentNumber: data.frag.sn,
+            duration: data.frag.duration?.toFixed(2) + 's',
+            sizeKB: (bytesLoaded / 1024).toFixed(1),
+            loadTimeMs: timeToLoad.toFixed(0),
+            bitrateKbps: bitrate,
+            level: data.frag.level,
             timestamp: performance.now().toFixed(1),
           });
         });
