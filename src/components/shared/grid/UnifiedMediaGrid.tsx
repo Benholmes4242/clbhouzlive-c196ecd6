@@ -2,10 +2,12 @@ import React, { useMemo, useRef, useEffect, useCallback, useLayoutEffect } from 
 import { UnifiedMediaGridProps, UnifiedMediaItem, GRID_GAP_PX } from './types';
 import { buildUnifiedLayout, markAutoplayCandidates } from './layoutUtils';
 import UnifiedMediaTile from './UnifiedMediaTile';
+import LazyTilePlaceholder from './LazyTilePlaceholder';
 import { useMediaAutoplay } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logGridMount, logGridDataReady } from '@/utils/gridAuditTimeline';
+import { useLazyTiles } from './useLazyTiles';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_GRID = true;
@@ -115,18 +117,38 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     return buildUnifiedLayout(processedItems);
   }, [processedItems]);
 
-  // Build flat index map for proper item indexing
-  const itemIndexMap = useMemo(() => {
+  // Build flat index map and flat item list for proper indexing + lazy loading
+  const { itemIndexMap, flatItems } = useMemo(() => {
     const map = new Map<string, number>();
+    const flat: Array<{ item: UnifiedMediaItem; variant: 'portrait' | 'landscape' }> = [];
     let flatIndex = 0;
     layoutRows.forEach(row => {
+      const variant = row.type === 'landscape' ? 'landscape' : 'portrait';
       row.items.forEach(item => {
         map.set(item.id, flatIndex);
+        flat.push({ item, variant });
         flatIndex++;
       });
     });
-    return map;
+    return { itemIndexMap: map, flatItems: flat };
   }, [layoutRows]);
+
+  // Lazy loading: only mount tiles in/near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: flatItems.length,
+    initialVisible: 6, // First 3 rows (6 portrait tiles or mix)
+    preloadViewports: 2,
+    estimatedRowHeight: 250,
+  });
+  
+  // Log lazy loading stats
+  useEffect(() => {
+    logGrid('LAZY_TILES_UPDATE', {
+      totalItems: flatItems.length,
+      visibleCount: visibleIndices.size,
+      visibleIndices: Array.from(visibleIndices).slice(0, 10), // First 10 for brevity
+    });
+  }, [flatItems.length, visibleIndices]);
 
   // Infinite scroll handler
   useEffect(() => {
@@ -193,42 +215,37 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     <>
       <div ref={gridRef} className="pb-4">
         <div className="grid grid-cols-2" style={{ gap: `${GRID_GAP_PX}px` }}>
-          {layoutRows.map((row, rowIndex) => {
-            if (row.type === 'landscape') {
-              const item = row.items[0];
-              const flatIndex = itemIndexMap.get(item.id) ?? 0;
+          {flatItems.map(({ item, variant }, flatIndex) => {
+            const isVisible = visibleIndices.has(flatIndex);
+            const isLandscape = variant === 'landscape';
+            
+            // Render placeholder for tiles not yet visible
+            // This prevents all 19+ videos from mounting/loading simultaneously
+            if (!isVisible) {
               return (
-                <UnifiedMediaTile
-                  key={`landscape-${item.id}-${rowIndex}`}
-                  item={item}
-                  config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
-                  variant="landscape"
+                <LazyTilePlaceholder
+                  key={`placeholder-${item.id}-${flatIndex}`}
                   index={flatIndex}
-                  onPress={handleItemClick}
-                  onAuthorClick={handleAuthorClick}
-                  registerVideo={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
+                  variant={variant}
+                  registerTile={registerTile}
                 />
               );
             }
-
-            // Portrait pair
-            return row.items.map((item, itemIndex) => {
-              const flatIndex = itemIndexMap.get(item.id) ?? 0;
-              return (
-                <UnifiedMediaTile
-                  key={`portrait-${item.id}-${rowIndex}-${itemIndex}`}
-                  item={item}
-                  config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
-                  variant="portrait"
-                  index={flatIndex}
-                  onPress={handleItemClick}
-                  onAuthorClick={handleAuthorClick}
-                  registerVideo={registerMedia}
-                  isPlaying={playingIds.has(item.postId)}
-                />
-              );
-            });
+            
+            // Render actual tile for visible items
+            return (
+              <UnifiedMediaTile
+                key={`tile-${item.id}-${flatIndex}`}
+                item={item}
+                config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
+                variant={variant}
+                index={flatIndex}
+                onPress={handleItemClick}
+                onAuthorClick={handleAuthorClick}
+                registerVideo={registerMedia}
+                isPlaying={playingIds.has(item.postId)}
+              />
+            );
           })}
         </div>
       </div>
