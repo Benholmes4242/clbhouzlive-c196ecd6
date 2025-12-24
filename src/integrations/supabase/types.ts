@@ -5118,6 +5118,123 @@ export type Database = {
         }
         Relationships: []
       }
+      tourhub_events: {
+        Row: {
+          course_name: string | null
+          created_at: string
+          end_date: string | null
+          espn_event_id: string
+          event_url: string | null
+          id: string
+          last_fetched_at: string
+          location: string | null
+          logo_url: string | null
+          name: string
+          start_date: string | null
+          status: string
+          tour: string
+          updated_at: string
+        }
+        Insert: {
+          course_name?: string | null
+          created_at?: string
+          end_date?: string | null
+          espn_event_id: string
+          event_url?: string | null
+          id?: string
+          last_fetched_at?: string
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          start_date?: string | null
+          status?: string
+          tour: string
+          updated_at?: string
+        }
+        Update: {
+          course_name?: string | null
+          created_at?: string
+          end_date?: string | null
+          espn_event_id?: string
+          event_url?: string | null
+          id?: string
+          last_fetched_at?: string
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          start_date?: string | null
+          status?: string
+          tour?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tourhub_leaderboard_snapshots: {
+        Row: {
+          espn_event_id: string
+          fetched_at: string
+          id: string
+          payload: Json
+          round: number | null
+          status: string | null
+          tour: string
+        }
+        Insert: {
+          espn_event_id: string
+          fetched_at?: string
+          id?: string
+          payload: Json
+          round?: number | null
+          status?: string | null
+          tour: string
+        }
+        Update: {
+          espn_event_id?: string
+          fetched_at?: string
+          id?: string
+          payload?: Json
+          round?: number | null
+          status?: string | null
+          tour?: string
+        }
+        Relationships: []
+      }
+      tourhub_players: {
+        Row: {
+          bio: string | null
+          country: string | null
+          created_at: string
+          espn_athlete_id: string | null
+          headshot_url: string | null
+          id: string
+          name: string | null
+          payload: Json | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          espn_athlete_id?: string | null
+          headshot_url?: string | null
+          id?: string
+          name?: string | null
+          payload?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          espn_athlete_id?: string | null
+          headshot_url?: string | null
+          id?: string
+          name?: string | null
+          payload?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -6726,6 +6843,17 @@ export type Database = {
           season_slug: string | null
           total_xp: number | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      tourhub_leaderboard_latest: {
+        Row: {
+          espn_event_id: string | null
+          fetched_at: string | null
+          payload: Json | null
+          round: number | null
+          status: string | null
+          tour: string | null
         }
         Relationships: []
       }
