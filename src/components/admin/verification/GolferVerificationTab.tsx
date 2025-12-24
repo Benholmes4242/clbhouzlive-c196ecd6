@@ -32,6 +32,9 @@ import { Link } from 'react-router-dom';
 import GolferDiscoverTab from './GolferDiscoverTab';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { GolferVerificationCard, GolferVerificationBottomSheet } from './mobile';
+import { AdminEmptyState } from '@/components/admin/mobile';
 
 // Show bypass button in non-production environments
 const ENABLE_BYPASS = import.meta.env.MODE !== 'production';
@@ -71,6 +74,7 @@ const BENJAMIN_HOLMES_USER_ID = '6a5bcbb9-c22c-4655-ad8e-088b2858ca3e';
 
 const GolferVerificationTab = () => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -83,6 +87,7 @@ const GolferVerificationTab = () => {
   const [inviteNote, setInviteNote] = useState('');
   const [inviteReason, setInviteReason] = useState('');
   const [selectedGolfer, setSelectedGolfer] = useState<SearchResult | null>(null);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
 
   const { data: currentUser } = useQuery({
     queryKey: ['current-user'],
@@ -673,59 +678,99 @@ const GolferVerificationTab = () => {
           <GolferDiscoverTab />
         </TabsContent>
 
-        <TabsContent value="pending" className="mt-4 space-y-4">
-          <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>
+        <TabsContent value="pending" className="mt-4 space-y-3">
+          {!isMobile && <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>}
           {pendingRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <User className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No pending requests</h3>
-              <p className="text-muted-foreground text-sm mt-1">All caught up! Pending requests will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={User} title="No pending requests" description="All caught up!" />
+          ) : isMobile ? (
+            pendingRequests.map(request => (
+              <GolferVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : pendingRequests.map(request => renderRequestCard(request, true))}
         </TabsContent>
 
-        <TabsContent value="invited" className="mt-4 space-y-4">
-          <p className="text-sm text-muted-foreground">Golfers who have been invited but haven't submitted their request yet.</p>
+        <TabsContent value="invited" className="mt-4 space-y-3">
+          {!isMobile && <p className="text-sm text-muted-foreground">Golfers who have been invited but haven't submitted their request yet.</p>}
           {invitedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <UserPlus className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No pending invites</h3>
-              <p className="text-muted-foreground text-sm mt-1">Invited golfers will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={UserPlus} title="No pending invites" description="Invited golfers will appear here." />
+          ) : isMobile ? (
+            invitedRequests.map(request => (
+              <GolferVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : invitedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
 
-        <TabsContent value="approved" className="mt-4 space-y-4">
+        <TabsContent value="approved" className="mt-4 space-y-3">
           {approvedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <CheckCircle className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No verified golfers</h3>
-              <p className="text-muted-foreground text-sm mt-1">Verified golfers will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={CheckCircle} title="No verified golfers" description="Verified golfers will appear here." />
+          ) : isMobile ? (
+            approvedRequests.map(request => (
+              <GolferVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : approvedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
 
-        <TabsContent value="rejected" className="mt-4 space-y-4">
+        <TabsContent value="rejected" className="mt-4 space-y-3">
           {rejectedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <XCircle className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No declined golfers</h3>
-              <p className="text-muted-foreground text-sm mt-1">Golfers who declined verification will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={XCircle} title="No declined golfers" description="Golfers who declined verification will appear here." />
+          ) : isMobile ? (
+            rejectedRequests.map(request => (
+              <GolferVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : rejectedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
 
-        <TabsContent value="revoked" className="mt-4 space-y-4">
-          <p className="text-sm text-muted-foreground">Golfers whose verification has been removed by an admin.</p>
+        <TabsContent value="revoked" className="mt-4 space-y-3">
+          {!isMobile && <p className="text-sm text-muted-foreground">Golfers whose verification has been removed by an admin.</p>}
           {revokedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Trash2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No revoked verifications</h3>
-              <p className="text-muted-foreground text-sm mt-1">Golfers whose verification was removed will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={Trash2} title="No revoked verifications" description="Golfers whose verification was removed will appear here." />
+          ) : isMobile ? (
+            revokedRequests.map(request => (
+              <GolferVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : revokedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
       </Tabs>
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <GolferVerificationBottomSheet
+          request={selectedRequest}
+          open={mobileSheetOpen}
+          onClose={() => { setMobileSheetOpen(false); setSelectedRequest(null); }}
+          myReview={selectedRequest ? myReviewsByRequest.get(selectedRequest.id) : undefined}
+          onApprove={() => selectedRequest && submitReviewMutation.mutate({ requestId: selectedRequest.id, decision: 'approved' })}
+          onReject={(reason) => selectedRequest && submitReviewMutation.mutate({ requestId: selectedRequest.id, decision: 'rejected', note: reason })}
+          onRemove={selectedRequest?.status === 'approved' ? (note) => selectedRequest && removeVerificationMutation.mutate({ userId: selectedRequest.user_id, note }) : undefined}
+          onReinvite={selectedRequest?.status === 'declined' || selectedRequest?.status === 'rejected' ? () => selectedRequest && reinviteMutation.mutate({ requestId: selectedRequest.id }) : undefined}
+          processing={processing}
+        />
+      )}
 
       {/* Invite Modal - improved layout with better scroll and sticky footer */}
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
