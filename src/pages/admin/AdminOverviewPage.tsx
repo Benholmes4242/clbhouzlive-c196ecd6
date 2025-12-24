@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Users, UserCheck, Shield, ShieldAlert, AlertCircle, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { supabase } from "@/integrations/supabase/client";
+import { 
+  Users, 
+  UserCheck, 
+  Shield, 
+  ShieldAlert, 
+  AlertTriangle,
+  ClipboardCheck,
+  Clock,
+  Mail,
+} from "lucide-react";
+
+import { AdminOverviewHeader } from "@/components/admin/overview/AdminOverviewHeader";
+import { MetricTile } from "@/components/admin/overview/MetricTile";
+import { ActionQueueCard } from "@/components/admin/overview/ActionQueueCard";
+import { RecentActivityList } from "@/components/admin/overview/RecentActivityList";
+import { QuickActionsGrid } from "@/components/admin/overview/QuickActionsGrid";
+import { track } from "@/lib/telemetry";
 
 type Metrics = {
   total_users: number;
@@ -17,174 +28,195 @@ type Metrics = {
   expiring_7d: number;
 };
 
+type QueueCounts = {
+  pendingVerifications: number | null;
+  pendingInvites: number | null;
+  expiringAdmins: number | null;
+};
+
 export function AdminOverviewPage() {
-  const [metrics, setMetrics] = useState<Metrics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  
+  // Metrics state
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [metricsLoading, setMetricsLoading] = useState(true);
+  const [metricsError, setMetricsError] = useState<string | null>(null);
+
+  // Queue counts (derived from metrics + additional queries)
+  const [queues, setQueues] = useState<QueueCounts>({
+    pendingVerifications: null,
+    pendingInvites: null,
+    expiringAdmins: null,
+  });
+  const [queuesLoading, setQueuesLoading] = useState(true);
+  const [queuesError, setQueuesError] = useState<string | null>(null);
 
   useEffect(() => {
+    track("admin_overview_opened");
     loadMetrics();
+    loadQueues();
   }, []);
 
   const loadMetrics = async () => {
+    setMetricsLoading(true);
+    setMetricsError(null);
     try {
       const { data, error } = await supabase.rpc("admin_overview_metrics");
       if (error) throw error;
       if (data && data.length > 0) {
         setMetrics(data[0]);
       }
-    } catch (error) {
-      console.error("Failed to load metrics:", error);
+    } catch (e: any) {
+      console.error("[AdminOverview] Metrics failed:", e);
+      setMetricsError("Failed to load metrics");
     } finally {
-      setLoading(false);
+      setMetricsLoading(false);
     }
   };
 
-  if (loading || !metrics) {
-    return (
-      <div className="min-h-screen overflow-x-hidden flex items-center justify-center">
-        <div className="text-sm text-muted-foreground">Loading dashboard...</div>
-      </div>
-    );
-  }
+  const loadQueues = async () => {
+    setQueuesLoading(true);
+    setQueuesError(null);
+    try {
+      // Parallel fetch for queue counts
+      const [businessVerif, golferVerif, invites, expiringAdmins] = await Promise.all([
+        supabase
+          .from("business_verification_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
+        supabase
+          .from("golfer_verification_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
+        supabase
+          .from("admin_invitations")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
+        supabase
+          .from("admin_memberships")
+          .select("user_id", { count: "exact", head: true })
+          .not("expires_at", "is", null)
+          .gte("expires_at", new Date().toISOString())
+          .lte("expires_at", new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()),
+      ]);
+
+      setQueues({
+        pendingVerifications: (businessVerif.count ?? 0) + (golferVerif.count ?? 0),
+        pendingInvites: invites.count ?? 0,
+        expiringAdmins: expiringAdmins.count ?? 0,
+      });
+    } catch (e: any) {
+      console.error("[AdminOverview] Queues failed:", e);
+      setQueuesError("Failed to load queues");
+    } finally {
+      setQueuesLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <div className="flex items-center gap-3">
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="md:hidden h-10 w-10"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <AdminSidebar onNavigate={() => setMobileMenuOpen(false)} />
-            </SheetContent>
-          </Sheet>
-          <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-sm text-muted-foreground">System overview and metrics</p>
+      <AdminOverviewHeader />
+
+      <div className="space-y-6">
+        {/* Today Snapshot - Horizontal scroll on mobile, grid on desktop */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Today Snapshot</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible sm:pb-0">
+            <MetricTile
+              label="Total Users"
+              value={metrics?.total_users ?? null}
+              icon={Users}
+              loading={metricsLoading}
+              error={!!metricsError}
+              subtitle="All registered"
+              onClick={() => navigate("/admin/users")}
+            />
+            <MetricTile
+              label="Signed in (7d)"
+              value={metrics?.active_7d ?? null}
+              icon={UserCheck}
+              loading={metricsLoading}
+              error={!!metricsError}
+              subtitle={metrics ? `${((metrics.active_7d / Math.max(metrics.total_users, 1)) * 100).toFixed(0)}% of total` : undefined}
+              tooltip="Based on authentication sign-ins in the last 7 days"
+            />
+            <MetricTile
+              label="Full Admins"
+              value={metrics?.panel_full_admins ?? null}
+              icon={Shield}
+              loading={metricsLoading}
+              error={!!metricsError}
+              subtitle={metrics ? `${metrics.panel_limited_admins} limited` : undefined}
+              onClick={() => navigate("/admin/admins")}
+            />
+            <MetricTile
+              label="Pending Invites"
+              value={metrics?.invites_pending ?? null}
+              icon={ShieldAlert}
+              loading={metricsLoading}
+              error={!!metricsError}
+              subtitle={metrics?.invites_pending ? "Awaiting acceptance" : "No pending"}
+              onClick={() => navigate("/admin/invites")}
+            />
+            <MetricTile
+              label="Expiring (7d)"
+              value={metrics?.expiring_7d ?? null}
+              icon={AlertTriangle}
+              loading={metricsLoading}
+              error={!!metricsError}
+              subtitle="Admin memberships"
+              onClick={() => navigate("/admin/admins")}
+            />
           </div>
-        </div>
+        </section>
 
-        {/* Warning banners */}
-        {metrics.expiring_7d > 0 && (
-          <Card className="border-amber-500/30 bg-amber-500/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
-                    {metrics.expiring_7d} admin membership{metrics.expiring_7d > 1 ? 's' : ''} expiring within 7 days
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-shrink-0"
-                  onClick={() => navigate("/admin/admins")}
-                >
-                  View
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Action Queues */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Action Queues</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <ActionQueueCard
+              title="Pending Verifications"
+              count={queues.pendingVerifications}
+              description="Business & golfer verification requests"
+              ctaLabel="Review Verifications"
+              ctaPath="/admin/verification"
+              icon={ClipboardCheck}
+              loading={queuesLoading}
+              error={!!queuesError}
+            />
+            <ActionQueueCard
+              title="Admin Invites Pending"
+              count={queues.pendingInvites}
+              description="Invitations awaiting acceptance"
+              ctaLabel="View Invites"
+              ctaPath="/admin/invites"
+              icon={Mail}
+              loading={queuesLoading}
+              error={!!queuesError}
+            />
+            <ActionQueueCard
+              title="Expiring Admin Access"
+              count={queues.expiringAdmins}
+              description="Memberships expiring within 7 days"
+              ctaLabel="Review Admins"
+              ctaPath="/admin/admins"
+              icon={Clock}
+              loading={queuesLoading}
+              error={!!queuesError}
+            />
+          </div>
+        </section>
 
-        {/* Metrics grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/users")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Users
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.total_users.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">All registered users</p>
-            </CardContent>
-          </Card>
+        {/* Recent Admin Activity */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Recent Activity</h2>
+          <RecentActivityList />
+        </section>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Active (7d)
-              </CardTitle>
-              <UserCheck className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.active_7d.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {metrics.total_users > 0 
-                  ? `${((metrics.active_7d / metrics.total_users) * 100).toFixed(1)}% of total`
-                  : 'No users yet'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/admins")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Full Admins
-              </CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.panel_full_admins}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {metrics.panel_limited_admins} limited admin{metrics.panel_limited_admins !== 1 ? 's' : ''}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/admin/invites")}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Pending Invites
-              </CardTitle>
-              <ShieldAlert className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.invites_pending}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {metrics.invites_pending > 0 ? 'Awaiting acceptance' : 'No pending invites'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate("/admin/users")}>
-                <Users className="mr-2 h-4 w-4" />
-                Manage Users
-              </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate("/admin/admins")}>
-                <Shield className="mr-2 h-4 w-4" />
-                Manage Admins
-              </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate("/admin/invites")}>
-                <ShieldAlert className="mr-2 h-4 w-4" />
-                View Invites
-              </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={loadMetrics}>
-                Refresh Metrics
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Quick Actions */}
+        <section>
+          <QuickActionsGrid />
+        </section>
       </div>
     </div>
   );
