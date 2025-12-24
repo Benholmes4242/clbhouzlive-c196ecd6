@@ -30,7 +30,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNearbyTestTools } from '@/features/nearby/hooks/useNearbyTestTools';
+import {
+  EmailChangeSheet,
+  BlockedUsersSheet,
+  NotificationsSheet,
+  PasswordChangeSheet,
+} from './sheets';
 
 /**
  * SettingsPageV2 - World-class settings redesign
@@ -43,7 +48,6 @@ export function SettingsPageV2() {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading, error, fetchProfile } = useProfileData();
-  const { isAllowedTester } = useNearbyTestTools();
 
   // Creator mode state
   const [isCreator, setIsCreator] = React.useState(false);
@@ -56,6 +60,12 @@ export function SettingsPageV2() {
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
   const [isDeleting, setIsDeleting] = React.useState(false);
+
+  // Bottom sheet states
+  const [showEmailSheet, setShowEmailSheet] = React.useState(false);
+  const [showBlockedSheet, setShowBlockedSheet] = React.useState(false);
+  const [showNotificationsSheet, setShowNotificationsSheet] = React.useState(false);
+  const [showPasswordSheet, setShowPasswordSheet] = React.useState(false);
 
   // Sync creator state from profile
   React.useEffect(() => {
@@ -235,7 +245,7 @@ export function SettingsPageV2() {
             icon={<Mail className="w-[18px] h-[18px]" />}
             title="Email"
             subtitle={maskEmail(user.email)}
-            onClick={() => navigate('/settings/email')}
+            onClick={() => setShowEmailSheet(true)}
           />
           <SettingsRow
             icon={<AtSign className="w-[18px] h-[18px]" />}
@@ -303,7 +313,7 @@ export function SettingsPageV2() {
             icon={<ShieldBan className="w-[18px] h-[18px]" />}
             title="Blocked users"
             subtitle="Manage people you've blocked."
-            onClick={() => navigate('/settings/blocked')}
+            onClick={() => setShowBlockedSheet(true)}
             isFirst
             isLast
           />
@@ -315,7 +325,7 @@ export function SettingsPageV2() {
             icon={<Bell className="w-[18px] h-[18px]" />}
             title="In-app notifications"
             subtitle="Choose what you're notified about."
-            onClick={() => navigate('/settings/notifications')}
+            onClick={() => setShowNotificationsSheet(true)}
             isBeta
             isFirst
             isLast
@@ -328,7 +338,7 @@ export function SettingsPageV2() {
             icon={<Lock className="w-[18px] h-[18px]" />}
             title="Password"
             subtitle="Update your password."
-            onClick={() => navigate('/settings/password')}
+            onClick={() => setShowPasswordSheet(true)}
             isFirst
             isLast
           />
@@ -399,20 +409,28 @@ export function SettingsPageV2() {
             isLast
           />
         </SettingsSection>
-
-        {/* ========== DEVELOPER (testers only) ========== */}
-        {isAllowedTester && (
-          <SettingsSection title="Developer" collapsible defaultCollapsed>
-            <SettingsChevronRow
-              title="Nearby test tools"
-              subtitle="Internal testing controls."
-              onClick={() => navigate('/settings/dev-nearby')}
-              isFirst
-              isLast
-            />
-          </SettingsSection>
-        )}
       </div>
+
+      {/* ========== BOTTOM SHEETS ========== */}
+      <EmailChangeSheet 
+        open={showEmailSheet} 
+        onOpenChange={setShowEmailSheet}
+        currentEmail={user?.email || ''}
+      />
+      <BlockedUsersSheet 
+        open={showBlockedSheet} 
+        onOpenChange={setShowBlockedSheet}
+        userId={user?.id || ''}
+      />
+      <NotificationsSheet 
+        open={showNotificationsSheet} 
+        onOpenChange={setShowNotificationsSheet}
+        userId={user?.id || ''}
+      />
+      <PasswordChangeSheet 
+        open={showPasswordSheet} 
+        onOpenChange={setShowPasswordSheet}
+      />
 
       {/* ========== MODALS ========== */}
       
