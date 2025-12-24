@@ -27,7 +27,7 @@ import {
 } from '@/utils/bootTimeline';
 
 // ============ Debug Logging ============
-import { DEBUG_HLS_PLAYER } from '@/media/debug';
+import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
 const getTimestamp = () => performance.now().toFixed(2);
 const logDebug = (event: string, data?: any) => {
   if (DEBUG_HLS_PLAYER) {
@@ -386,21 +386,26 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       } catch {}
       
       // Check if native HLS supported (iOS/Safari)
-      const canPlayNatively =
+      // Can be overridden with FORCE_HLS_JS for debugging
+      const canPlayNatively = !FORCE_HLS_JS && (
         isIOS ||
         video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
         video.canPlayType('application/vnd.apple.mpegURL') !== '' ||
-        video.canPlayType('application/x-mpegURL') !== '';
+        video.canPlayType('application/x-mpegURL') !== ''
+      );
+      
+      const useHlsJs = !canPlayNatively && src.includes('.m3u8');
       
       console.log('[HLSPlayer] PLAYBACK_PATH', {
         mediaId: mediaId?.slice(0, 8),
         canPlayNatively,
+        forceHlsJs: FORCE_HLS_JS,
         isIOS,
         isM3u8: src.includes('.m3u8'),
-        path: (canPlayNatively || !src.includes('.m3u8')) ? 'NATIVE' : 'HLS.js',
+        path: useHlsJs ? 'HLS.js' : 'NATIVE',
       });
       
-      if (canPlayNatively || !src.includes('.m3u8')) {
+      if (!useHlsJs) {
         // Native playback - add timing logs
         console.log('[HLSPlayer] NATIVE_START', { mediaId: mediaId?.slice(0, 8) });
         video.src = src;
