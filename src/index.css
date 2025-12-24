@@ -101,7 +101,11 @@ html.lightbox-open {
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
-  
+
+  /* Back-compat aliases (used by useChromeAnchors) */
+  --safe-top: var(--sat);
+  --safe-bottom: var(--sab);
+
   --radius-tile: 18px;
   
   /* ========================================
@@ -458,7 +462,7 @@ html.lightbox-open {
   padding-right: var(--sar);
   
   /* Ensure background extends behind safe areas */
-  background-color: hsl(var(--bg-page));
+  background-color: var(--bg-page);
 }
 
 /* Fade mask utility for horizontal scroll rails */
@@ -499,7 +503,7 @@ header.global-header,
 
 /* Override any container-level spacing that might create gaps above header */
 body > div:first-child,
-#root > div:first-child {
+#root > div:first-child:not(.app-shell) {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
