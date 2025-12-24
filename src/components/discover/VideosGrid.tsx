@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -7,6 +7,7 @@ import { ChannelSuggestionCard } from './ChannelSuggestionCard';
 import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 import ShortsInlineBlock from './ShortsInlineBlock';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
+import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -40,6 +41,25 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     setShortsViewerOpen(true);
   };
 
+  // Use interleaved feed if provided, otherwise filter videos
+  const itemsToRender = useMemo(() => {
+    return interleavedFeed 
+      ? interleavedFeed 
+      : content.filter(item => item.type === 'video').map(video => ({
+          kind: 'video' as const,
+          id: video.id,
+          data: video
+        }));
+  }, [interleavedFeed, content]);
+  
+  // Lazy loading - only mount items near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: itemsToRender.length,
+    initialVisible: 4, // First 4 videos visible
+    preloadViewports: 2,
+    estimatedRowHeight: 300,
+  });
+
   // Intersection observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -63,15 +83,6 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Use interleaved feed if provided, otherwise filter videos
-  const itemsToRender = interleavedFeed 
-    ? interleavedFeed 
-    : content.filter(item => item.type === 'video').map(video => ({
-        kind: 'video' as const,
-        id: video.id,
-        data: video
-      }));
-
   if (itemsToRender.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -90,9 +101,10 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   return (
     <>
       {isCinematicMode ? (
-        // Landscape cards layout - full width edge to edge
+        // Landscape cards layout - full width edge to edge with lazy loading
         <div className="flex flex-col gap-3 pb-4">
           {itemsToRender.map((item, index) => {
+            // Channel suggestions and shorts blocks always render (non-video content)
             if (item.kind === 'channel_suggestion') {
               return (
                 <ChannelSuggestionCard
@@ -109,26 +121,36 @@ const VideosGrid: React.FC<VideosGridProps> = ({
                   key={item.id}
                   shorts={item.data}
                   blockId={item.id}
-                  onShortClick={(short, index) => handleShortClick(short, item.data as ExploreContentItem[], index)}
+                  onShortClick={(short, idx) => handleShortClick(short, item.data as ExploreContentItem[], idx)}
                 />
               );
             }
             
+            // Video items use lazy loading
             return (
-              <ShortCardWithObserver
+              <div
                 key={`${activeTab}-${item.id}`}
-                item={item.data as ExploreContentItem}
-                onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
-                variant="landscape"
-                gridPosition={index}
-              />
+                ref={(el) => registerTile(index, el)}
+                data-lazy-index={index}
+              >
+                {visibleIndices.has(index) ? (
+                  <ShortCardWithObserver
+                    item={item.data as ExploreContentItem}
+                    onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
+                    variant="landscape"
+                    gridPosition={index}
+                  />
+                ) : (
+                  <div className="w-full aspect-video bg-muted animate-pulse rounded-lg" />
+                )}
+              </div>
             );
           })}
         </div>
       ) : (
-        // Original grid layout for other tabs
+        // Original grid layout for other tabs with lazy loading
         <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
-          {itemsToRender.map((item) => {
+          {itemsToRender.map((item, index) => {
             if (item.kind === 'channel_suggestion') {
               return (
                 <ChannelSuggestionCard
@@ -145,19 +167,28 @@ const VideosGrid: React.FC<VideosGridProps> = ({
                   <ShortsInlineBlock
                     shorts={item.data}
                     blockId={item.id}
-                    onShortClick={(short, index) => handleShortClick(short, item.data as ExploreContentItem[], index)}
+                    onShortClick={(short, idx) => handleShortClick(short, item.data as ExploreContentItem[], idx)}
                   />
                 </div>
               );
             }
             
             return (
-              <VideoExploreCard
+              <div
                 key={`${activeTab}-${item.id}`}
-                item={item.data as ExploreContentItem}
-                onMediaClick={onMediaClick}
-                compact={isShorts}
-              />
+                ref={(el) => registerTile(index, el)}
+                data-lazy-index={index}
+              >
+                {visibleIndices.has(index) ? (
+                  <VideoExploreCard
+                    item={item.data as ExploreContentItem}
+                    onMediaClick={onMediaClick}
+                    compact={isShorts}
+                  />
+                ) : (
+                  <div className="aspect-[9/16] bg-muted animate-pulse rounded-lg" />
+                )}
+              </div>
             );
           })}
         </div>

@@ -1,6 +1,7 @@
 /**
  * BusinessActivityFeed - Premium activity feed with Activity/Tagged sub-tabs
  * Phase 1-6 implementation for business profile posts
+ * Now with lazy loading to prevent all videos mounting at once
  */
 
 import React, { useState, useCallback, useMemo, useLayoutEffect, useRef } from 'react';
@@ -17,6 +18,7 @@ import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMediaAutoplay } from '@/media';
+import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { cn } from '@/lib/utils';
 import { Image as ImageIcon, Plus, Users, RefreshCw } from 'lucide-react';
 import BusinessPostCard from './BusinessPostCard';
@@ -70,6 +72,27 @@ export function BusinessActivityFeed({
 
   const canManage = membership?.canManage ?? false;
   const hasPreloadedFirst = useRef(false);
+  
+  // Get filtered posts count for lazy loading
+  const filteredPostsCount = useMemo(() => {
+    const source = feedTab === 'activity' ? (posts || []) : (taggedPosts || []);
+    return source.filter((post) => {
+      if (activeFilter === 'all') return true;
+      const hasVideo = post.post_media?.some((m) => m.media_type === 'video');
+      const hasImage = post.post_media?.some((m) => m.media_type === 'image');
+      if (activeFilter === 'videos') return hasVideo;
+      if (activeFilter === 'images') return hasImage;
+      return true;
+    }).length;
+  }, [feedTab, posts, taggedPosts, activeFilter]);
+  
+  // Lazy loading - only mount posts near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: filteredPostsCount,
+    initialVisible: 3, // First 3 posts visible immediately
+    preloadViewports: 2,
+    estimatedRowHeight: 400, // Posts are tall
+  });
 
   // Eager preload first video's HLS manifest on mount
   useLayoutEffect(() => {
@@ -325,27 +348,67 @@ export function BusinessActivityFeed({
           <div className="flex flex-col gap-3 md:gap-4 py-3 md:py-4">
             {feedTab === 'activity' ? (
               filteredPosts.map((post, index) => (
-                <BusinessPostCard
+                <div
                   key={post.id}
-                  post={post as BusinessPost}
-                  businessId={businessId}
-                  businessName={businessName}
-                  businessLogo={businessLogo}
-                  followerCount={followerCount}
-                  canManage={canManage}
-                  registerVideo={registerMedia}
-                  isPlaying={playingIds.has(post.id)}
-                  videoIndex={index}
-                />
+                  ref={(el) => registerTile(index, el)}
+                  data-lazy-index={index}
+                >
+                  {visibleIndices.has(index) ? (
+                    <BusinessPostCard
+                      post={post as BusinessPost}
+                      businessId={businessId}
+                      businessName={businessName}
+                      businessLogo={businessLogo}
+                      followerCount={followerCount}
+                      canManage={canManage}
+                      registerVideo={registerMedia}
+                      isPlaying={playingIds.has(post.id)}
+                      videoIndex={index}
+                    />
+                  ) : (
+                    <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                      <div className="p-4 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-sq-sm bg-muted" />
+                          <div className="space-y-2">
+                            <div className="h-4 w-32 bg-muted rounded" />
+                            <div className="h-3 w-24 bg-muted rounded" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-48 bg-muted" />
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
-              filteredPosts.map((post) => (
-                <TaggedPostCard
+              filteredPosts.map((post, index) => (
+                <div
                   key={post.id}
-                  post={post as any}
-                  canManage={canManage}
-                  onHide={handleHideTaggedPost}
-                />
+                  ref={(el) => registerTile(index, el)}
+                  data-lazy-index={index}
+                >
+                  {visibleIndices.has(index) ? (
+                    <TaggedPostCard
+                      post={post as any}
+                      canManage={canManage}
+                      onHide={handleHideTaggedPost}
+                    />
+                  ) : (
+                    <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                      <div className="p-4 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-muted" />
+                          <div className="space-y-2">
+                            <div className="h-4 w-32 bg-muted rounded" />
+                            <div className="h-3 w-24 bg-muted rounded" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-48 bg-muted" />
+                    </div>
+                  )}
+                </div>
               ))
             )}
           </div>
