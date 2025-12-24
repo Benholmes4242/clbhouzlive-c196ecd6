@@ -20,6 +20,20 @@ interface CompactHeaderProps {
  * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
  * On other pages: Uses useScrollDirection for scroll-based hide/show
+ * 
+ * ⚠️ HEADER SAFE-AREA BEHAVIOR - DO NOT REGRESS ⚠️
+ * 
+ * CLUBHOUSE PAGE (/clubhouse or /):
+ *   - Header background extends INTO the safe area (notch)
+ *   - Uses: paddingTop: env(safe-area-inset-top), height: calc(56px + env(safe-area-inset-top))
+ *   - This allows the header bg to sit flush to the very top of the screen
+ * 
+ * ALL OTHER PAGES (Discover, Tour, Courses, etc.):
+ *   - Header uses standard h-14 (56px) height with NO safe-area padding
+ *   - Safe-area is handled by the PageRoot component instead
+ * 
+ * This distinction was intentionally designed and MUST be preserved.
+ * See lines 96, 104-105 for the conditional implementation.
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
