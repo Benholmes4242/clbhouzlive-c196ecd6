@@ -4,44 +4,115 @@
  */
 
 /**
- * Preloads both the manifest and attempts to preload the first segment.
- * This reduces Time To First Frame (TTFF) significantly.
+ * Preloads both the manifest and attempts to preload the first TWO segments.
+ * Uses aggressive caching and parallel fetches to reduce Time To First Frame (TTFF).
  */
 export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
+  const startTime = performance.now();
+  
   try {
-    // Fetch manifest first
-    const response = await fetch(hlsUrl, { 
+    // Fetch manifest with aggressive caching
+    const manifestResponse = await fetch(hlsUrl, { 
       method: 'GET',
-      // Use cors mode so we can read the response for segment parsing
       mode: 'cors',
       credentials: 'omit',
+      cache: 'force-cache', // Use cache if available
     });
     
-    if (!response.ok) return;
+    if (!manifestResponse.ok) {
+      console.warn('[HLSPreload] Manifest fetch failed:', manifestResponse.status);
+      return;
+    }
     
-    const manifestText = await response.text();
+    const manifestText = await manifestResponse.text();
+    const manifestTime = performance.now();
     
-    // Parse manifest to find first segment URL
+    console.log('[HLSPreload] Manifest loaded', {
+      url: hlsUrl.slice(-40),
+      time: (manifestTime - startTime).toFixed(0) + 'ms',
+    });
+    
+    // Parse manifest to find segment URLs
     const lines = manifestText.split('\n');
-    const firstSegmentLine = lines.find(line => 
+    const segmentLines = lines.filter(line => 
       (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) && 
       !line.startsWith('#')
     );
     
-    if (firstSegmentLine) {
-      // Construct full segment URL relative to manifest
-      const segmentUrl = new URL(firstSegmentLine.trim(), hlsUrl).href;
+    if (segmentLines.length === 0) {
+      // This might be a master playlist - need to fetch the variant playlist first
+      const variantLine = lines.find(line => line.endsWith('.m3u8') && !line.startsWith('#'));
+      if (variantLine) {
+        const variantUrl = new URL(variantLine.trim(), hlsUrl).href;
+        console.log('[HLSPreload] Found variant playlist, fetching...', variantLine.slice(-30));
+        
+        // Fetch variant playlist
+        const variantResponse = await fetch(variantUrl, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
+          cache: 'force-cache',
+        });
+        
+        if (variantResponse.ok) {
+          const variantText = await variantResponse.text();
+          const variantLines = variantText.split('\n');
+          const variantSegments = variantLines.filter(line => 
+            (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) && 
+            !line.startsWith('#')
+          );
+          
+          if (variantSegments.length > 0) {
+            // Preload first two segments in parallel
+            const segmentsToPreload = variantSegments.slice(0, 2);
+            await preloadSegments(segmentsToPreload, variantUrl, startTime);
+          }
+        }
+      }
+      return;
+    }
+    
+    // Preload first two segments in parallel
+    const segmentsToPreload = segmentLines.slice(0, 2);
+    await preloadSegments(segmentsToPreload, hlsUrl, startTime);
+    
+  } catch (e) {
+    console.error('[HLSPreload] Failed:', e);
+  }
+};
+
+/**
+ * Preload multiple segments in parallel
+ */
+async function preloadSegments(
+  segmentLines: string[], 
+  baseUrl: string, 
+  startTime: number
+): Promise<void> {
+  const segmentPromises = segmentLines.map(async (segmentLine, index) => {
+    try {
+      const segmentUrl = new URL(segmentLine.trim(), baseUrl).href;
       
-      // Preload first segment in background (don't await)
-      fetch(segmentUrl, { 
+      const segmentResponse = await fetch(segmentUrl, { 
         method: 'GET', 
         mode: 'cors',
         credentials: 'omit',
-      }).catch(() => {
-        // Silently ignore segment preload failures
+        cache: 'force-cache',
       });
+      
+      if (segmentResponse.ok) {
+        // Actually read the body to ensure it's cached
+        await segmentResponse.arrayBuffer();
+        
+        console.log(`[HLSPreload] Segment ${index + 1} loaded`, {
+          time: (performance.now() - startTime).toFixed(0) + 'ms',
+        });
+      }
+    } catch {
+      // Silently ignore individual segment failures
     }
-  } catch {
-    // Fail silently – this is a best-effort optimisation
-  }
-};
+  });
+  
+  // Wait for all segments to load (but don't block)
+  await Promise.allSettled(segmentPromises);
+}

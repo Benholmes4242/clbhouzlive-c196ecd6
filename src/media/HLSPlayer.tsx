@@ -434,15 +434,23 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           if (!mountedRef.current) return;
           
-          logDebug('HLS_MANIFEST_PARSED', {
+          const parseTime = performance.now();
+          console.log('[HLSPlayer] MANIFEST_PARSED - calling startLoad()', {
+            mediaId: mediaId?.slice(0, 8),
             levels: hls.levels?.length,
             readyState: video.readyState,
-            mediaId: mediaId?.slice(0, 8)
+            timestamp: parseTime.toFixed(1),
           });
           
           // CRITICAL: Immediately start loading video segments to reduce TTFF
-          // This fixes the 3.1s delay between manifest parsed and video ready
           hls.startLoad(-1);
+          
+          console.log('[HLSPlayer] startLoad(-1) called', {
+            mediaId: mediaId?.slice(0, 8),
+            loadLevel: hls.loadLevel,
+            autoLevelEnabled: hls.autoLevelEnabled,
+            timestamp: performance.now().toFixed(1),
+          });
           
           // Apply start time after manifest loaded
           if (startTime && startTime > 0) {
@@ -455,9 +463,37 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               video.currentTime = 0.001;
             } catch {}
           }
-          
-          // DO NOT call safePlay() directly - MediaRuntime handles playback
-          // Just mark as ready, MediaRuntime will call play via requestPlay()
+        });
+        
+        // Diagnostic: Track when fragments start loading
+        hls.on(Hls.Events.FRAG_LOADING, (_, data) => {
+          console.log('[HLSPlayer] FRAG_LOADING', {
+            mediaId: mediaId?.slice(0, 8),
+            sn: data.frag.sn,
+            type: data.frag.type,
+            start: data.frag.start?.toFixed(2),
+            duration: data.frag.duration?.toFixed(2),
+            timestamp: performance.now().toFixed(1),
+          });
+        });
+        
+        // Diagnostic: Track when fragments complete loading
+        hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+          console.log('[HLSPlayer] FRAG_LOADED', {
+            mediaId: mediaId?.slice(0, 8),
+            sn: data.frag.sn,
+            duration: data.frag.duration?.toFixed(2),
+            timestamp: performance.now().toFixed(1),
+          });
+        });
+        
+        // Diagnostic: Track buffer appending for discover hero
+        hls.on(Hls.Events.BUFFER_APPENDED, (_, data) => {
+          console.log('[HLSPlayer] BUFFER_APPENDED', {
+            mediaId: mediaId?.slice(0, 8),
+            type: data.type,
+            timestamp: performance.now().toFixed(1),
+          });
         });
         
         hls.attachMedia(video);

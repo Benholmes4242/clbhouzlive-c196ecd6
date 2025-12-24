@@ -48,6 +48,7 @@ function findHeroCandidate(content: ExploreContentItem[] | null): ExploreContent
  */
 export function useHeroPreload(content: ExploreContentItem[] | null): void {
   const preloadedIdRef = useRef<string | null>(null);
+  const preloadStartedRef = useRef(false); // Prevent duplicate preloads from race conditions
   
   useEffect(() => {
     if (!content || content.length === 0) return;
@@ -55,8 +56,17 @@ export function useHeroPreload(content: ExploreContentItem[] | null): void {
     const heroCandidate = findHeroCandidate(content);
     if (!heroCandidate) return;
     
-    // Don't preload the same video twice
-    if (preloadedIdRef.current === heroCandidate.id) return;
+    // STRICT: Don't preload if already started for this ID
+    if (preloadedIdRef.current === heroCandidate.id) {
+      console.log('[HeroPreload] Skipping duplicate preload', heroCandidate.id.slice(0, 8));
+      return;
+    }
+    
+    // Double-check with started flag to prevent race conditions
+    if (preloadStartedRef.current && preloadedIdRef.current) {
+      console.log('[HeroPreload] Already started, ignoring duplicate call');
+      return;
+    }
     
     const mediaUrl = heroCandidate.media?.[0]?.media_url || heroCandidate.src;
     if (!mediaUrl) return;
@@ -64,19 +74,20 @@ export function useHeroPreload(content: ExploreContentItem[] | null): void {
     const uid = uidFromNode({ src: mediaUrl });
     if (!uid) return;
     
-    // Mark as preloaded BEFORE starting (prevents race conditions)
+    // Mark BEFORE starting (prevent race conditions)
     preloadedIdRef.current = heroCandidate.id;
+    preloadStartedRef.current = true;
     
     // Start preloading manifest immediately
     const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+    
+    console.log('[HeroPreload] Starting preload', {
+      id: heroCandidate.id.slice(0, 8),
+      uid: uid.slice(0, 8),
+      timestamp: performance.now().toFixed(1),
+    });
+    
     logHeroPreloadManifest(heroCandidate.id);
     preloadHlsManifest(hlsUrl);
-    
-    if (import.meta.env.DEV) {
-      console.log('[HeroPreload] Started preloading hero manifest', {
-        id: heroCandidate.id.slice(0, 8),
-        uid: uid.slice(0, 8),
-      });
-    }
   }, [content]);
 }
