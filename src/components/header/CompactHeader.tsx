@@ -93,14 +93,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
+          isClubhouseRoute ? "" : "h-14",
           className
         )}
         style={{
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          paddingTop: 'env(safe-area-inset-top)',
-          height: 'calc(56px + env(safe-area-inset-top))',
+          // Only Clubhouse gets safe-area padding (header bg extends into notch)
+          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : undefined,
+          height: isClubhouseRoute ? 'calc(56px + env(safe-area-inset-top))' : undefined,
           borderBottom: isSeamless ? 'none' : `1px solid ${getBorder()}`,
           boxShadow: isSeamless || isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
