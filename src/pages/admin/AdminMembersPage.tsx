@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Shield, Users as UsersIcon } from "lucide-react";
+import { Loader2, Shield, Users as UsersIcon, RefreshCw, AlertTriangle, ArrowUp, ArrowDown, X, Clock, History } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { AdminListCard, AdminBottomSheet, AdminListSkeleton, AdminEmptyState, type StatusVariant } from "@/components/admin/mobile";
+import { formatDistanceToNow } from "date-fns";
 
 type Membership = {
   user_id: string;
@@ -33,6 +36,7 @@ type AuditEntry = {
 export function AdminMembersPage() {
   const [rows, setRows] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [auditFor, setAuditFor] = useState<string | null>(null);
   const [auditRows, setAuditRows] = useState<AuditEntry[]>([]);
   const [confirmAction, setConfirmAction] = useState<{
@@ -42,13 +46,19 @@ export function AdminMembersPage() {
   } | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+
+  // Mobile state
+  const [selectedMember, setSelectedMember] = useState<Membership | null>(null);
 
   const load = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await adminRoleManage<{ data: Membership[] }>("list_admins");
       setRows(res.data || []);
     } catch (error: any) {
+      setError("Failed to load admins");
       toast({
         title: "Error",
         description: `Failed to load admins: ${error.message}`,
@@ -91,6 +101,7 @@ export function AdminMembersPage() {
       await adminRoleManage("downgrade", { user_id, notes });
       toast({ title: "Success", description: "Admin downgraded to limited" });
       track("admin_role_downgraded", { target_user_id: user_id });
+      setSelectedMember(null);
       await load();
     } catch (error: any) {
       const message = error?.message || "Failed to downgrade admin";
@@ -107,6 +118,7 @@ export function AdminMembersPage() {
       await adminRoleManage("revoke", { user_id, notes });
       toast({ title: "Success", description: "Admin access revoked" });
       track("admin_role_revoked", { target_user_id: user_id });
+      setSelectedMember(null);
       await load();
     } catch (error: any) {
       const message = error?.message || "Failed to revoke admin role";
@@ -122,6 +134,7 @@ export function AdminMembersPage() {
     try {
       await adminRoleManage("set_expiry", { user_id, expires_at, notes });
       toast({ title: "Success", description: "Expiry date set" });
+      setSelectedMember(null);
       await load();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -132,68 +145,10 @@ export function AdminMembersPage() {
     try {
       await adminRoleManage("clear_expiry", { user_id, notes });
       toast({ title: "Success", description: "Expiry date cleared" });
+      setSelectedMember(null);
       await load();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
-  };
-
-  // Bulk operations
-  const bulkGrantLimited = async () => {
-    try {
-      await adminRoleManage("grant_limited_bulk", { user_ids: Array.from(selected) });
-      toast({ title: "Success", description: `Granted limited access to ${selected.size} admins` });
-      track("admin_bulk_action", { action: "grant_limited_bulk", count: selected.size });
-      setSelected(new Set());
-      await load();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
-  };
-
-  const bulkGrantFull = async () => {
-    try {
-      await adminRoleManage("grant_full_bulk", { user_ids: Array.from(selected) });
-      toast({ title: "Success", description: `Granted full access to ${selected.size} admins` });
-      track("admin_bulk_action", { action: "grant_full_bulk", count: selected.size });
-      setSelected(new Set());
-      await load();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
-  };
-
-  const bulkDowngrade = async () => {
-    try {
-      await adminRoleManage("downgrade_bulk", { user_ids: Array.from(selected) });
-      toast({ title: "Success", description: `Downgraded ${selected.size} admins to limited` });
-      track("admin_bulk_action", { action: "downgrade_bulk", count: selected.size });
-      setSelected(new Set());
-      await load();
-    } catch (error: any) {
-      const message = error?.message || "Failed to downgrade admins";
-      toast({
-        title: message.includes("last full admin") ? "Cannot downgrade" : "Error",
-        description: message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const bulkRevoke = async () => {
-    try {
-      await adminRoleManage("revoke_bulk", { user_ids: Array.from(selected) });
-      toast({ title: "Success", description: `Revoked access for ${selected.size} admins` });
-      track("admin_bulk_action", { action: "revoke_bulk", count: selected.size });
-      setSelected(new Set());
-      await load();
-    } catch (error: any) {
-      const message = error?.message || "Failed to revoke admin roles";
-      toast({
-        title: message.includes("last full admin") ? "Cannot revoke" : "Error",
-        description: message,
-        variant: "destructive",
-      });
     }
   };
 
@@ -205,14 +160,6 @@ export function AdminMembersPage() {
       newSelected.add(user_id);
     }
     setSelected(newSelected);
-  };
-
-  const toggleSelectAll = () => {
-    if (selected.size === rows.length) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(rows.map(r => r.user_id)));
-    }
   };
 
   const selectedIds = Array.from(selected);
@@ -247,6 +194,20 @@ export function AdminMembersPage() {
     return Math.floor(diff / (1000*60*60*24));
   };
 
+  // Get status for member
+  const getMemberStatus = (member: Membership): { label: string; variant: StatusVariant } => {
+    if (member.expires_at) {
+      const days = daysUntil(member.expires_at);
+      if (days !== null && days < 0) {
+        return { label: "Expired", variant: "error" };
+      }
+      if (days !== null && days < 7) {
+        return { label: `Expires in ${days}d`, variant: "warning" };
+      }
+    }
+    return { label: member.role === "full" ? "Full Admin" : "Limited", variant: member.role === "full" ? "default" : "muted" };
+  };
+
   // Toast for expiring admins on load
   useEffect(() => {
     if (expiringSoon.length > 0 && !loading) {
@@ -260,18 +221,22 @@ export function AdminMembersPage() {
   return (
     <div className="min-h-screen overflow-x-hidden">
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <div>
-          <h1 className="text-xl font-semibold flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Admin Members
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Panel admins & roles (Full admins only).
-          </p>
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Admin Members
+            </h1>
+            <p className="text-sm text-muted-foreground">Panel admins & roles (Full admins only).</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={load} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
         </div>
 
-        {/* Bulk actions bar (sticky for mobile) */}
-        {selected.size > 0 && (
+        {/* Bulk actions bar (desktop only) */}
+        {selected.size > 0 && !isMobile && (
           <div className="sticky top-0 z-20 mb-3 flex items-center justify-between rounded-md border p-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="text-sm">
               <strong>{selected.size}</strong> selected
@@ -308,21 +273,6 @@ export function AdminMembersPage() {
               </Button>
               <Button
                 size="sm"
-                variant="outline"
-                onClick={() => setConfirmAction({
-                  action: async () => {
-                    await adminRoleManage("downgrade_bulk", { user_ids: selectedIds });
-                    await load();
-                    clearSelection();
-                  },
-                  title: "Downgrade (Bulk)?",
-                  message: `Downgrade ${selected.size} users to limited admin.`,
-                })}
-              >
-                Downgrade
-              </Button>
-              <Button
-                size="sm"
                 variant="destructive"
                 onClick={() => setConfirmAction({
                   action: async () => {
@@ -342,305 +292,323 @@ export function AdminMembersPage() {
 
         {/* Expiry warning banner */}
         {expiringSoon.length > 0 && (
-          <div className="rounded border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-100">
-            ⚠️ {expiringSoon.length} admin{expiringSoon.length > 1 ? 's' : ''} expiring within 7 days.
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-100 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            {expiringSoon.length} admin{expiringSoon.length > 1 ? 's' : ''} expiring within 7 days.
           </div>
         )}
 
-      {/* Quick-add by User ID or email */}
-      <AddMemberInline
-        onGrantLimited={grantLimited}
-        onGrantFull={grantFull}
-      />
+        {/* Quick-add by User ID or email */}
+        <AddMemberInline onGrantLimited={grantLimited} onGrantFull={grantFull} />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UsersIcon className="h-4 w-4" />
-              Current Admin Members
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center p-8">
+        {/* Error state */}
+        {error && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 flex items-center justify-between">
+            <p className="text-sm text-destructive">{error}</p>
+            <Button variant="outline" size="sm" onClick={load}>Retry</Button>
+          </div>
+        )}
+
+        {/* Members list */}
+        {loading ? (
+          isMobile ? (
+            <AdminListSkeleton count={4} />
+          ) : (
+            <Card>
+              <CardContent className="py-8 flex items-center justify-center">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 <span className="ml-2 text-sm text-muted-foreground">Loading…</span>
-              </div>
-            ) : rows.length === 0 ? (
-              <div className="p-12 text-center space-y-3">
-                <div className="text-sm font-medium">No admin members yet</div>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  Use the form above to grant admin access by entering a user ID or email address.
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Desktop table view */}
-                <div className="hidden sm:block overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="border-b bg-muted/50">
-                      <tr>
-                        <th className="text-left p-3 font-medium w-12">
+              </CardContent>
+            </Card>
+          )
+        ) : rows.length === 0 ? (
+          <AdminEmptyState 
+            icon={Shield} 
+            title="No admin members yet" 
+            description="Use the form above to grant admin access."
+          />
+        ) : isMobile ? (
+          /* Mobile: Card list */
+          <div className="space-y-3">
+            {rows.map((member) => (
+              <AdminListCard
+                key={member.user_id}
+                primary={member.user_id.slice(0, 8) + "…" + member.user_id.slice(-4)}
+                secondary={member.role === "full" ? "Full Admin" : "Limited Admin"}
+                metadata={[
+                  { label: "Granted", value: formatDistanceToNow(new Date(member.created_at), { addSuffix: true }) },
+                  ...(member.expires_at ? [{ label: "Expires", value: new Date(member.expires_at).toLocaleDateString() }] : []),
+                ]}
+                status={getMemberStatus(member)}
+                onClick={() => setSelectedMember(member)}
+              />
+            ))}
+          </div>
+        ) : (
+          /* Desktop: Table */
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UsersIcon className="h-4 w-4" />
+                Current Admin Members
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="border-b bg-muted/50">
+                    <tr>
+                      <th className="text-left p-3 font-medium w-12">
+                        <Checkbox
+                          checked={rows.length > 0 && rows.every((r) => selected.has(r.user_id))}
+                          onCheckedChange={(v) => {
+                            if (v) {
+                              setSelected(new Set(rows.map(r => r.user_id)));
+                            } else {
+                              setSelected(new Set());
+                            }
+                          }}
+                          aria-label="Select all"
+                        />
+                      </th>
+                      <th className="text-left p-3 font-medium">User ID</th>
+                      <th className="text-left p-3 font-medium">Role</th>
+                      <th className="text-left p-3 font-medium">Expires</th>
+                      <th className="text-left p-3 font-medium">Notes</th>
+                      <th className="text-left p-3 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map(r => (
+                      <tr key={r.user_id} className="border-b last:border-0">
+                        <td className="p-3">
                           <Checkbox
-                            checked={rows.length > 0 && rows.every((r) => selected.has(r.user_id))}
-                            onCheckedChange={(v) => {
-                              if (v) {
-                                setSelected(new Set(rows.map(r => r.user_id)));
-                              } else {
-                                setSelected(new Set());
-                              }
-                            }}
-                            aria-label="Select all"
+                            checked={selected.has(r.user_id)}
+                            onCheckedChange={(v) => toggleSelect(r.user_id)}
+                            aria-label={`Select ${r.user_id}`}
                           />
-                        </th>
-                        <th className="text-left p-3 font-medium">User ID</th>
-                        <th className="text-left p-3 font-medium">Role</th>
-                        <th className="text-left p-3 font-medium">Expires</th>
-                        <th className="text-left p-3 font-medium">Notes</th>
-                        <th className="text-left p-3 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map(r => (
-                        <tr key={r.user_id} className="border-b last:border-0">
-                          <td className="p-3">
-                            <Checkbox
-                              checked={selected.has(r.user_id)}
-                              onCheckedChange={(v) => {
-                                if (v) {
-                                  setSelected(new Set([...selected, r.user_id]));
-                                } else {
-                                  const newSelected = new Set(selected);
-                                  newSelected.delete(r.user_id);
-                                  setSelected(newSelected);
-                                }
-                              }}
-                              aria-label={`Select ${r.user_id}`}
-                            />
-                          </td>
-                          <td className="p-3 font-mono text-xs">{r.user_id.slice(0, 8)}…</td>
-                          <td className="p-3">
-                            <Badge variant={r.role === "full" ? "destructive" : "default"}>
-                              {r.role}
-                            </Badge>
-                          </td>
-                          <td className="p-3">
-                            {r.expires_at ? (
-                              <div className="flex items-center gap-2">
-                                <span>{new Date(r.expires_at).toLocaleString()}</span>
-                                {(() => {
-                                  const d = daysUntil(r.expires_at);
-                                  if (d === null || d < 0) return null;
-                                  const urgent = d < 3;
-                                  return (
-                                    <span className={`text-xs px-2 py-0.5 rounded ${urgent ? "bg-destructive text-destructive-foreground" : "bg-amber-500/15 text-amber-600 dark:text-amber-400"}`}>
-                                      {d}d left
-                                    </span>
-                                  );
-                                })()}
-                              </div>
-                            ) : "—"}
-                          </td>
-                          <td className="p-3 max-w-xs truncate">{r.notes ?? "—"}</td>
-                          <td className="p-3">
-                            <div className="flex flex-wrap gap-1">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                onClick={() => openAudit(r.user_id)}
-                              >
-                                Audit
-                              </Button>
-                              {r.role === "full" ? (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  disabled={isLastFullAdmin(r.user_id)}
-                                  onClick={() => setConfirmAction({
-                                    action: () => downgrade(r.user_id),
-                                    title: "Downgrade to Limited?",
-                                    message: isLastFullAdmin(r.user_id)
-                                      ? "Cannot downgrade the last full admin. Promote another admin to full first."
-                                      : `This will restrict ${r.user_id.slice(0, 8)}… to read-only access.`
-                                  })}
-                                  title={isLastFullAdmin(r.user_id) ? "Cannot downgrade the last full admin" : ""}
-                                >
-                                  Downgrade
-                                </Button>
-                              ) : (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  onClick={() => grantFull(r.user_id)}
-                                >
-                                  Upgrade
-                                </Button>
-                              )}
-                              <Button 
-                                size="sm" 
-                                variant="destructive"
-                                disabled={isLastFullAdmin(r.user_id)}
-                                onClick={() => setConfirmAction({
-                                  action: () => revoke(r.user_id),
-                                  title: "Revoke admin access?",
-                                  message: isLastFullAdmin(r.user_id)
-                                    ? "Cannot revoke the last full admin. Promote another admin to full first."
-                                    : `This will remove all admin permissions for ${r.user_id.slice(0, 8)}…`
-                                })}
-                                title={isLastFullAdmin(r.user_id) ? "Cannot revoke the last full admin" : ""}
-                              >
-                                Revoke
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                onClick={() => {
-                                  const expires = prompt("Expiry ISO (e.g., 2026-01-01T00:00:00Z):");
-                                  if (expires) setExpiry(r.user_id, expires);
-                                }}
-                              >
-                                Set Expiry
-                              </Button>
-                              {r.expires_at && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  onClick={() => clearExpiry(r.user_id)}
-                                >
-                                  Clear Expiry
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Mobile card view */}
-                <div className="sm:hidden space-y-3">
-                  {rows.map(r => (
-                    <div key={r.user_id} className="rounded-sq-sm border p-4 space-y-3">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              checked={selected.has(r.user_id)}
-                              onChange={() => toggleSelect(r.user_id)}
-                              className="rounded border-border"
-                            />
-                            <span className="text-xs font-mono text-muted-foreground break-all">
-                              {r.user_id}
-                            </span>
-                          </div>
-                          <Badge variant={r.role === "full" ? "destructive" : "default"} className="text-xs">
+                        </td>
+                        <td className="p-3 font-mono text-xs">{r.user_id.slice(0, 8)}…</td>
+                        <td className="p-3">
+                          <Badge variant={r.role === "full" ? "destructive" : "default"}>
                             {r.role}
                           </Badge>
-                        </div>
-                        {r.expires_at && (
-                          <div className="text-xs text-muted-foreground">
-                            Expires: {new Date(r.expires_at).toLocaleString()}
-                          </div>
-                        )}
-                        {r.notes && (
-                          <div className="text-xs text-muted-foreground">
-                            Notes: {r.notes}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-col gap-2 pt-2 border-t">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="w-full justify-center h-9"
-                          onClick={() => openAudit(r.user_id)}
-                        >
-                          View Audit Log
-                        </Button>
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                          {r.role === "full" ? (
+                        </td>
+                        <td className="p-3">
+                          {r.expires_at ? (
+                            <div className="flex items-center gap-2">
+                              <span>{new Date(r.expires_at).toLocaleString()}</span>
+                              {(() => {
+                                const d = daysUntil(r.expires_at);
+                                if (d === null || d < 0) return null;
+                                const urgent = d < 3;
+                                return (
+                                  <span className={`text-xs px-2 py-0.5 rounded ${urgent ? "bg-destructive text-destructive-foreground" : "bg-amber-500/15 text-amber-600 dark:text-amber-400"}`}>
+                                    {d}d left
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          ) : "—"}
+                        </td>
+                        <td className="p-3 max-w-xs truncate">{r.notes ?? "—"}</td>
+                        <td className="p-3">
+                          <div className="flex flex-wrap gap-1">
+                            <Button size="sm" variant="outline" onClick={() => openAudit(r.user_id)}>
+                              Audit
+                            </Button>
+                            {r.role === "full" ? (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                disabled={isLastFullAdmin(r.user_id)}
+                                onClick={() => setConfirmAction({
+                                  action: () => downgrade(r.user_id),
+                                  title: "Downgrade to Limited?",
+                                  message: isLastFullAdmin(r.user_id)
+                                    ? "Cannot downgrade the last full admin."
+                                    : `This will restrict ${r.user_id.slice(0, 8)}… to read-only access.`
+                                })}
+                              >
+                                Downgrade
+                              </Button>
+                            ) : (
+                              <Button size="sm" variant="outline" onClick={() => grantFull(r.user_id)}>
+                                Upgrade
+                              </Button>
+                            )}
                             <Button 
                               size="sm" 
-                              variant="outline"
-                              className="h-9"
+                              variant="destructive"
                               disabled={isLastFullAdmin(r.user_id)}
                               onClick={() => setConfirmAction({
-                                action: () => downgrade(r.user_id),
-                                title: "Downgrade to Limited?",
+                                action: () => revoke(r.user_id),
+                                title: "Revoke admin access?",
                                 message: isLastFullAdmin(r.user_id)
-                                  ? "Cannot downgrade the last full admin. Promote another admin to full first."
-                                  : `This will restrict to read-only access.`
+                                  ? "Cannot revoke the last full admin."
+                                  : `This will remove all admin permissions for ${r.user_id.slice(0, 8)}…`
                               })}
                             >
-                              Downgrade
+                              Revoke
                             </Button>
-                          ) : (
                             <Button 
                               size="sm" 
-                              variant="outline"
-                              className="h-9"
-                              onClick={() => grantFull(r.user_id)}
+                              variant="outline" 
+                              onClick={() => {
+                                const expires = prompt("Expiry ISO (e.g., 2026-01-01T00:00:00Z):");
+                                if (expires) setExpiry(r.user_id, expires);
+                              }}
                             >
-                              Upgrade to Full
+                              Set Expiry
                             </Button>
-                          )}
-                          
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            className="h-9"
-                            disabled={isLastFullAdmin(r.user_id)}
-                            onClick={() => setConfirmAction({
-                              action: () => revoke(r.user_id),
-                              title: "Revoke admin access?",
-                              message: isLastFullAdmin(r.user_id)
-                                ? "Cannot revoke the last full admin. Promote another admin to full first."
-                                : `This will remove all admin permissions.`
-                            })}
-                          >
-                            Revoke Access
-                          </Button>
-                        </div>
+                            {r.expires_at && (
+                              <Button size="sm" variant="outline" onClick={() => clearExpiry(r.user_id)}>
+                                Clear Expiry
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          className="w-full h-9"
-                          onClick={() => {
-                            const expires = prompt("Expiry ISO (e.g., 2026-01-01T00:00:00Z):");
-                            if (expires) setExpiry(r.user_id, expires);
-                          }}
-                        >
-                          {r.expires_at ? 'Update Expiry' : 'Set Expiry'}
-                        </Button>
+        {/* Mobile Bottom Sheet */}
+        <AdminBottomSheet
+          open={!!selectedMember}
+          onClose={() => setSelectedMember(null)}
+          title={selectedMember ? `${selectedMember.user_id.slice(0, 8)}…${selectedMember.user_id.slice(-4)}` : "Admin Details"}
+          subtitle={selectedMember?.role === "full" ? "Full Admin" : "Limited Admin"}
+          actions={
+            selectedMember && (
+              <div className="space-y-2">
+                {/* Role actions */}
+                {selectedMember.role === "full" ? (
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    disabled={isLastFullAdmin(selectedMember.user_id)}
+                    onClick={() => {
+                      setConfirmAction({
+                        action: () => downgrade(selectedMember.user_id),
+                        title: "Downgrade to Limited?",
+                        message: "This will restrict to read-only access."
+                      });
+                    }}
+                  >
+                    <ArrowDown className="h-4 w-4 mr-2" />
+                    Downgrade to Limited
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => grantFull(selectedMember.user_id)}
+                  >
+                    <ArrowUp className="h-4 w-4 mr-2" />
+                    Upgrade to Full
+                  </Button>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const expires = prompt("Expiry ISO (e.g., 2026-01-01T00:00:00Z):");
+                    if (expires) setExpiry(selectedMember.user_id, expires);
+                  }}
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  {selectedMember.expires_at ? "Update Expiry" : "Set Expiry"}
+                </Button>
 
-                        {r.expires_at && (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="w-full h-9"
-                            onClick={() => clearExpiry(r.user_id)}
-                          >
-                            Clear Expiry
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                {selectedMember.expires_at && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => clearExpiry(selectedMember.user_id)}
+                  >
+                    <Clock className="h-4 w-4 mr-2" />
+                    Clear Expiry
+                  </Button>
+                )}
+
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    openAudit(selectedMember.user_id);
+                    setSelectedMember(null);
+                  }}
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  View Audit Log
+                </Button>
+
+                {/* Destructive action separated */}
+                <div className="pt-2 border-t">
+                  <Button 
+                    variant="destructive" 
+                    className="w-full justify-start"
+                    disabled={isLastFullAdmin(selectedMember.user_id)}
+                    onClick={() => {
+                      setConfirmAction({
+                        action: () => revoke(selectedMember.user_id),
+                        title: "Revoke admin access?",
+                        message: "This will remove all admin permissions."
+                      });
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Revoke Access
+                  </Button>
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+              </div>
+            )
+          }
+        >
+          {selectedMember && (
+            <div className="space-y-3">
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-sm text-muted-foreground">User ID</span>
+                <span className="text-sm font-mono">{selectedMember.user_id}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-sm text-muted-foreground">Role</span>
+                <Badge variant={selectedMember.role === "full" ? "destructive" : "default"}>
+                  {selectedMember.role}
+                </Badge>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-sm text-muted-foreground">Granted</span>
+                <span className="text-sm">{new Date(selectedMember.created_at).toLocaleString()}</span>
+              </div>
+              {selectedMember.expires_at && (
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-sm text-muted-foreground">Expires</span>
+                  <span className={`text-sm ${daysUntil(selectedMember.expires_at)! < 7 ? "text-amber-600" : ""}`}>
+                    {new Date(selectedMember.expires_at).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {selectedMember.notes && (
+                <div className="py-2">
+                  <span className="text-sm text-muted-foreground block mb-1">Notes</span>
+                  <span className="text-sm">{selectedMember.notes}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </AdminBottomSheet>
 
-      {/* Audit drawer/modal */}
-      {auditFor && (
-        <AuditModal onClose={() => setAuditFor(null)} title={`Audit for ${auditFor}`} rows={auditRows} />
-      )}
+        {/* Audit drawer/modal */}
+        {auditFor && (
+          <AuditModal onClose={() => setAuditFor(null)} title={`Audit for ${auditFor}`} rows={auditRows} />
+        )}
 
         {/* Confirmation modal */}
         {confirmAction && (
@@ -681,7 +649,6 @@ function AddMemberInline(props: {
     try {
       let userId = input.trim();
       
-      // If input looks like email, resolve to UUID
       if (input.includes("@")) {
         const resolved = await getUserIdByEmail(input);
         if (!resolved) {
@@ -706,31 +673,35 @@ function AddMemberInline(props: {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="text-base">Add Admin Member</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Input
             className="flex-1 text-sm"
-            placeholder="Enter user ID (UUID) or email address"
+            placeholder="Enter user ID (UUID) or email"
             value={input}
             onChange={e => setInput(e.target.value)}
             disabled={loading}
           />
-          <Button 
-            onClick={() => handleGrant("limited")}
-            disabled={!input || loading}
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Grant Limited"}
-          </Button>
-          <Button 
-            onClick={() => handleGrant("full")}
-            disabled={!input || loading}
-            variant="destructive"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Grant Full"}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              className="flex-1 sm:flex-none"
+              variant="outline"
+              onClick={() => handleGrant("limited")}
+              disabled={!input || loading}
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Grant Limited"}
+            </Button>
+            <Button 
+              className="flex-1 sm:flex-none"
+              onClick={() => handleGrant("full")}
+              disabled={!input || loading}
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Grant Full"}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -740,8 +711,8 @@ function AddMemberInline(props: {
 /** Audit modal */
 function AuditModal({ title, rows, onClose }: { title: string; rows: AuditEntry[]; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <Card className="w-[680px] max-h-[70vh] overflow-auto">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-2xl max-h-[70vh] overflow-auto">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">{title}</CardTitle>
@@ -752,7 +723,7 @@ function AuditModal({ title, rows, onClose }: { title: string; rows: AuditEntry[
           {rows.length === 0 ? (
             <div className="text-sm text-muted-foreground text-center py-4">No audit entries.</div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b bg-muted/50">
                   <tr>
