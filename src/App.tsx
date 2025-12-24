@@ -136,6 +136,7 @@ const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").the
 const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
 const VerificationsPage = lazy(() => import("./pages/admin/VerificationsPage"));
 const AdminBusinessDirectoryPage = lazy(() => import("./pages/admin/AdminBusinessDirectoryPage"));
+const AdminAuditPage = lazy(() => import("./pages/admin/AdminAuditPage"));
 
 // Legacy admin pages
 const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
@@ -344,6 +345,11 @@ function AppRoutes() {
           <Route path="businesses" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminBusinessDirectoryPage /></Suspense>
+            </PanelGuard>
+          } />
+          <Route path="audit" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><AdminAuditPage /></Suspense>
             </PanelGuard>
           } />
           

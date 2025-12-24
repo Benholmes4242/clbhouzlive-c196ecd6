@@ -84,6 +84,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   // FULL ADMIN — match the legacy set + new admin pages
   const fullMenu = [
     { to: "/admin/overview",      label: "Overview" },
+    { to: "/admin/audit",         label: "Audit Log" },
     { to: "/admin/users",         label: "User Management" },
     { to: "/admin/businesses",    label: "Business Directory" },
     { to: "/admin/verification", label: "Verification", badge: pendingVerificationCount, tooltip: "There are verification requests awaiting review." },
