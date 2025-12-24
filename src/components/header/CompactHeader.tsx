@@ -37,8 +37,19 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isDiscoverRoute = location.pathname.startsWith('/discover');
   
-  // Routes that should use sticky positioning (no safe-area padding in header)
+  // Routes that should use sticky positioning
   const useStickyHeader = isClubhouseRoute || isDiscoverRoute;
+
+  // Safe-area handling:
+  // - Clubhouse: header background should cover the iOS status-bar area, while content sits below it.
+  // - Discover: keep current behavior (no extra safe-area padding inside header)
+  // - Others: fixed header uses safe-area padding (if applicable)
+  const headerSafeAreaTop = isClubhouseRoute
+    ? 'env(safe-area-inset-top)'
+    : useStickyHeader
+      ? '0px'
+      : 'env(safe-area-inset-top)';
+  const headerHeight = isClubhouseRoute ? `calc(56px + ${headerSafeAreaTop})` : undefined;
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -103,13 +114,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          paddingTop: useStickyHeader ? '0px' : 'env(safe-area-inset-top)',
+          paddingTop: headerSafeAreaTop,
+          height: headerHeight,
           borderBottom: isSeamless ? 'none' : `1px solid ${getBorder()}`,
           boxShadow: isSeamless || isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
       >
-        <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
+        <div className={cn(
+          "mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl",
+          isClubhouseRoute ? "h-14" : "h-full"
+        )}>
           {/* Left: Logo icon (mobile) + wordmark (desktop) */}
           <button
             type="button"
