@@ -42,6 +42,13 @@ function parseLeaders(competitors: any[]): any[] {
     const athlete = c?.athlete ?? {};
     const linescores = Array.isArray(c?.linescores) ? c.linescores : [];
 
+    // Today field varies by tour - try multiple paths
+    const today = safeStr(c?.todaysScore?.displayValue) 
+      || safeStr(c?.todayScore?.displayValue)
+      || safeStr(c?.today?.displayValue)
+      || safeStr(c?.statistics?.find?.((s: any) => s?.name === "today")?.displayValue)
+      || null;
+
     return {
       athleteId: safeStr(athlete?.id),
       name: safeStr(athlete?.displayName) || safeStr(athlete?.shortName),
@@ -49,7 +56,7 @@ function parseLeaders(competitors: any[]): any[] {
       headshotUrl: safeStr(athlete?.headshot?.href),
       pos: safeStr(c?.position?.displayName) || safeStr(c?.position?.pos),
       score: safeStr(c?.score?.displayValue) || safeStr(c?.score?.value),
-      today: safeStr(c?.todaysScore?.displayValue) || null,
+      today,
       thru: safeStr(c?.status?.period) || safeStr(c?.status?.displayValue) || safeStr(c?.status?.detail),
       rounds: linescores.map((ls: any) => safeStr(ls?.value || ls?.displayValue)).filter(Boolean),
     };
@@ -93,12 +100,49 @@ serve(async (req) => {
       return jsonResponse({ error: "Missing event param" }, 400, 5);
     }
 
+    // Step 1: Validate event exists via scoreboard
+    const scoreboardUrl = `https://site.api.espn.com/apis/site/v2/sports/golf/${tour}/scoreboard`;
+    console.log(`[tourhub-leaderboard] Validating event ${eventId} exists via scoreboard...`);
+    
+    const scoreboardResult = await tryFetch(scoreboardUrl);
+    let eventExists = false;
+    let eventName: string | null = null;
+    let eventStatus: "upcoming" | "live" | "complete" = "upcoming";
+
+    if (scoreboardResult.ok && scoreboardResult.data) {
+      const sbEvents = Array.isArray(scoreboardResult.data?.events) ? scoreboardResult.data.events : [];
+      const sbMatch = sbEvents.find((e: any) => String(e?.id) === eventId);
+      if (sbMatch) {
+        eventExists = true;
+        eventName = safeStr(sbMatch?.name) || safeStr(sbMatch?.shortName);
+        const comp = sbMatch?.competitions?.[0] ?? {};
+        eventStatus = pickStatus(comp);
+        console.log(`[tourhub-leaderboard] Event ${eventId} found in scoreboard: ${eventName}`);
+      }
+    }
+
+    // If event doesn't exist in scoreboard, return 404
+    if (!eventExists) {
+      console.warn(`[tourhub-leaderboard] Event ${eventId} not found in scoreboard - invalid event ID`);
+      return jsonResponse(
+        {
+          error: "Event not found",
+          tour,
+          eventId,
+          message: "Invalid event ID - event does not exist.",
+        },
+        404,
+        60
+      );
+    }
+
+    // Step 2: Try to get leaderboard data
     let matchEvent: any = null;
     let fetchSource = "";
 
     // Strategy 1: Try event-specific leaderboard endpoint
     const eventSpecificUrl = `https://site.api.espn.com/apis/site/v2/sports/golf/${tour}/leaderboard?event=${eventId}`;
-    console.log(`[tourhub-leaderboard] Strategy 1: Trying event-specific URL for ${tour}/${eventId}...`);
+    console.log(`[tourhub-leaderboard] Strategy 1: Trying event-specific leaderboard...`);
     
     const eventSpecificResult = await tryFetch(eventSpecificUrl);
     if (eventSpecificResult.ok && eventSpecificResult.data) {
@@ -110,10 +154,10 @@ serve(async (req) => {
       }
     }
 
-    // Strategy 2: Fall back to generic leaderboard and find the event
+    // Strategy 2: Fall back to generic leaderboard
     if (!matchEvent) {
       const genericUrl = `https://site.api.espn.com/apis/site/v2/sports/golf/${tour}/leaderboard`;
-      console.log(`[tourhub-leaderboard] Strategy 2: Trying generic leaderboard for ${tour}...`);
+      console.log(`[tourhub-leaderboard] Strategy 2: Trying generic leaderboard...`);
       
       const genericResult = await tryFetch(genericUrl);
       if (genericResult.ok && genericResult.data) {
@@ -122,24 +166,20 @@ serve(async (req) => {
         if (matchEvent) {
           fetchSource = "generic-feed";
           console.log(`[tourhub-leaderboard] Strategy 2 succeeded`);
-        } else {
-          console.log(`[tourhub-leaderboard] Event ${eventId} not found in generic feed (${events.length} events available)`);
         }
-      } else {
-        console.log(`[tourhub-leaderboard] Generic leaderboard fetch failed or returned no data`);
       }
     }
 
-    // Strategy 3: No leaderboard data available - return 200 with empty leaders
+    // Strategy 3: Event exists but no leaderboard data available yet → 200 with empty leaders
     if (!matchEvent) {
-      console.log(`[tourhub-leaderboard] No leaderboard data available for ${tour}/${eventId} - returning empty response`);
+      console.log(`[tourhub-leaderboard] Event ${eventId} exists but no leaderboard data yet - returning 200 with empty leaders`);
       return jsonResponse(
         {
           tour,
           espnEventId: eventId,
           generatedAt: new Date().toISOString(),
-          status: "upcoming",
-          name: null,
+          status: eventStatus,
+          name: eventName,
           leaders: [],
           message: "Leaderboard not available yet.",
         },
@@ -168,7 +208,7 @@ serve(async (req) => {
         espnEventId: eventId,
         generatedAt: new Date().toISOString(),
         status,
-        name: safeStr(matchEvent?.name) || safeStr(matchEvent?.shortName),
+        name: safeStr(matchEvent?.name) || safeStr(matchEvent?.shortName) || eventName,
         leaders,
       },
       200,
