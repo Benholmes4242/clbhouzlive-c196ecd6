@@ -9,14 +9,14 @@ import { Button } from '@/components/ui/button';
 import { SettingsSkeleton } from './ui';
 
 interface BlockedUser {
-  id: string;
+  blocked_id: string;
   blocked_at: string;
   blocked_user: {
     id: string;
     username: string | null;
     display_name: string | null;
-    avatar_url: string | null;
-  };
+    profile_photo_url: string | null;
+  } | null;
 }
 
 /**
@@ -44,14 +44,14 @@ export function BlockedUsersPage() {
     try {
       const { data, error } = await supabase
         .from('user_blocks')
-        .select('id, created_at, blocked_user_id')
-        .eq('blocker_user_id', user.id)
+        .select('blocked_id, created_at')
+        .eq('blocker_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
       // Fetch blocked user profiles separately
-      const blockedUserIds = (data || []).map(b => b.blocked_user_id);
+      const blockedUserIds = (data || []).map(b => b.blocked_id);
       if (blockedUserIds.length === 0) {
         setBlockedUsers([]);
         setIsLoading(false);
@@ -60,20 +60,15 @@ export function BlockedUsersPage() {
 
       const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, username, display_name, avatar_url')
+        .select('id, username, display_name, profile_photo_url')
         .in('id', blockedUserIds);
 
       const profileMap = new Map((profiles || []).map(p => [p.id, p]));
       
-      const mapped = (data || []).map(block => ({
-        id: block.id,
+      const mapped: BlockedUser[] = (data || []).map(block => ({
+        blocked_id: block.blocked_id,
         blocked_at: block.created_at,
-        blocked_user: profileMap.get(block.blocked_user_id) || {
-          id: block.blocked_user_id,
-          username: null,
-          display_name: null,
-          avatar_url: null,
-        }
+        blocked_user: profileMap.get(block.blocked_id) || null
       }));
 
       setBlockedUsers(mapped);
@@ -85,17 +80,19 @@ export function BlockedUsersPage() {
     }
   };
 
-  const handleUnblock = async (blockId: string, username: string | null) => {
-    setUnblockingId(blockId);
+  const handleUnblock = async (blockedId: string, username: string | null) => {
+    if (!user) return;
+    setUnblockingId(blockedId);
     try {
       const { error } = await supabase
         .from('user_blocks')
         .delete()
-        .eq('id', blockId);
+        .eq('blocker_id', user.id)
+        .eq('blocked_id', blockedId);
 
       if (error) throw error;
 
-      setBlockedUsers((prev) => prev.filter((b) => b.id !== blockId));
+      setBlockedUsers((prev) => prev.filter((b) => b.blocked_id !== blockedId));
       toast.success(`Unblocked ${username || 'user'}`);
     } catch (err) {
       console.error('[BlockedUsers] unblock error:', err);
@@ -145,7 +142,7 @@ export function BlockedUsersPage() {
           >
             {blockedUsers.map((block, idx) => (
               <div 
-                key={block.id}
+                key={block.blocked_id}
                 className="relative flex items-center justify-between px-[14px] py-[12px] min-h-[56px]"
               >
                 <div className="flex items-center gap-3">
@@ -153,9 +150,9 @@ export function BlockedUsersPage() {
                   <div 
                     className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden"
                   >
-                    {block.blocked_user?.avatar_url ? (
+                    {block.blocked_user?.profile_photo_url ? (
                       <img 
-                        src={block.blocked_user.avatar_url} 
+                        src={block.blocked_user.profile_photo_url} 
                         alt="" 
                         className="w-full h-full object-cover"
                       />
@@ -178,11 +175,11 @@ export function BlockedUsersPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleUnblock(block.id, block.blocked_user?.username)}
-                  disabled={unblockingId === block.id}
+                  onClick={() => handleUnblock(block.blocked_id, block.blocked_user?.username ?? null)}
+                  disabled={unblockingId === block.blocked_id}
                   className="bg-white/5 border-white/10 text-white hover:bg-white/10"
                 >
-                  {unblockingId === block.id ? 'Unblocking...' : 'Unblock'}
+                  {unblockingId === block.blocked_id ? 'Unblocking...' : 'Unblock'}
                 </Button>
 
                 {/* Divider */}
