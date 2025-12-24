@@ -220,7 +220,7 @@ export function SettingsPageV2() {
     <PageRoot className="min-h-screen bg-[#F8FAFC] w-full max-w-full overflow-x-hidden box-border">
       <SettingsHeader onBack={() => navigate(-1)} />
       
-      <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28 space-y-3 box-border overflow-hidden">
+      <div className="w-full max-w-full py-6 pb-28 space-y-3 box-border overflow-hidden">
         
         {/* ========== ACCOUNT ========== */}
         <SettingsSection title="Account">

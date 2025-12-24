@@ -65,8 +65,6 @@ export function SettingsRow({
         'transition-colors duration-[120ms]',
         isClickable && 'cursor-pointer hover:bg-[rgba(31,36,40,0.03)] active:bg-[rgba(31,36,40,0.05)]',
         disabled && 'opacity-50 cursor-not-allowed',
-        isFirst && 'rounded-t-[12px]',
-        isLast && 'rounded-b-[12px]',
       )}
     >
       {/* Left content - min-width:0 prevents text from pushing layout wider */}

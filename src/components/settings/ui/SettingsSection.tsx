@@ -36,7 +36,7 @@ export function SettingsSection({
       <button
         type="button"
         className={cn(
-          'w-full text-left px-3.5 flex items-center justify-between mb-2',
+          'w-full text-left px-4 flex items-center justify-between mb-2',
           collapsible && 'cursor-pointer'
         )}
         onClick={() => collapsible && setIsCollapsed(!isCollapsed)}
@@ -55,13 +55,13 @@ export function SettingsSection({
         )}
       </button>
 
-      {/* Panel container - full width, no shadow */}
+      {/* Panel container - full width, edge to edge, no rounded corners */}
       {!isCollapsed && (
         <div
           className={cn(
             'w-full max-w-full box-border',
-            'rounded-[16px] overflow-hidden',
-            'border border-[rgba(31,36,40,0.06)]',
+            'overflow-hidden',
+            'border-y border-[rgba(31,36,40,0.06)]',
             'bg-[#FAFAFB]'
           )}
         >
