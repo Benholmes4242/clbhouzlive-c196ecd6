@@ -35,6 +35,10 @@ import {
   BlockedUsersSheet,
   NotificationsSheet,
   PasswordChangeSheet,
+  HelpCentreSheet,
+  ReportProblemSheet,
+  ContactSupportSheet,
+  LegalSheet,
 } from './sheets';
 
 /**
@@ -66,6 +70,10 @@ export function SettingsPageV2() {
   const [showBlockedSheet, setShowBlockedSheet] = React.useState(false);
   const [showNotificationsSheet, setShowNotificationsSheet] = React.useState(false);
   const [showPasswordSheet, setShowPasswordSheet] = React.useState(false);
+  const [showHelpSheet, setShowHelpSheet] = React.useState(false);
+  const [showReportSheet, setShowReportSheet] = React.useState(false);
+  const [showContactSheet, setShowContactSheet] = React.useState(false);
+  const [showLegalSheet, setShowLegalSheet] = React.useState<'terms' | 'privacy' | 'guidelines' | null>(null);
 
   // Sync creator state from profile
   React.useEffect(() => {
@@ -350,23 +358,20 @@ export function SettingsPageV2() {
             icon={<HelpCircle className="w-[18px] h-[18px]" />}
             title="Help centre"
             subtitle="Answers to common questions."
-            onClick={() => window.open('https://help.clbhouz.com', '_blank')}
-            isExternal
+            onClick={() => setShowHelpSheet(true)}
             isFirst
           />
           <SettingsChevronRow
             icon={<MessageSquare className="w-[18px] h-[18px]" />}
             title="Report a problem"
             subtitle="Tell us what's not working."
-            onClick={() => window.open('mailto:support@clbhouz.com?subject=Problem Report', '_blank')}
-            isExternal
+            onClick={() => setShowReportSheet(true)}
           />
           <SettingsChevronRow
             icon={<Headphones className="w-[18px] h-[18px]" />}
             title="Contact support"
             subtitle="Get in touch with the team."
-            onClick={() => window.open('mailto:support@clbhouz.com', '_blank')}
-            isExternal
+            onClick={() => setShowContactSheet(true)}
             isLast
           />
         </SettingsSection>
@@ -377,23 +382,20 @@ export function SettingsPageV2() {
             icon={<FileText className="w-[18px] h-[18px]" />}
             title="Terms of Service"
             subtitle="Read the terms."
-            onClick={() => window.open('/terms', '_blank')}
-            isExternal
+            onClick={() => setShowLegalSheet('terms')}
             isFirst
           />
           <SettingsChevronRow
             icon={<Shield className="w-[18px] h-[18px]" />}
             title="Privacy Policy"
             subtitle="How we handle your data."
-            onClick={() => window.open('/privacy', '_blank')}
-            isExternal
+            onClick={() => setShowLegalSheet('privacy')}
           />
           <SettingsChevronRow
             icon={<ScrollText className="w-[18px] h-[18px]" />}
             title="Community Guidelines"
             subtitle="What's allowed on Clbhouz."
-            onClick={() => window.open('/guidelines', '_blank')}
-            isExternal
+            onClick={() => setShowLegalSheet('guidelines')}
             isLast
           />
         </SettingsSection>
@@ -431,8 +433,25 @@ export function SettingsPageV2() {
         open={showPasswordSheet} 
         onOpenChange={setShowPasswordSheet}
       />
+      <HelpCentreSheet 
+        open={showHelpSheet} 
+        onOpenChange={setShowHelpSheet}
+      />
+      <ReportProblemSheet 
+        open={showReportSheet} 
+        onOpenChange={setShowReportSheet}
+        userId={user?.id || ''}
+      />
+      <ContactSupportSheet 
+        open={showContactSheet} 
+        onOpenChange={setShowContactSheet}
+      />
+      <LegalSheet 
+        open={showLegalSheet !== null} 
+        onOpenChange={(open) => !open && setShowLegalSheet(null)}
+        type={showLegalSheet || 'terms'}
+      />
 
-      {/* ========== MODALS ========== */}
       
       {/* Enable creator-only confirmation */}
       <AlertDialog open={showCreatorOnlyConfirm} onOpenChange={setShowCreatorOnlyConfirm}>
