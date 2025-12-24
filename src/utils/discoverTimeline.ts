@@ -361,12 +361,33 @@ export function disable() {
 
 // Expose to window for console access immediately on module load
 if (typeof window !== 'undefined') {
-  (window as any).__discoverTiming = {
+  const api = {
     enable,
     disable,
     printSummary,
     getEvents,
     clearEvents,
   };
-  console.log('[DiscoverTiming] Module loaded, window.__discoverTiming available');
+
+  // Attach inside the app iframe
+  (window as any).__discoverTiming = api;
+
+  // Also try to attach to parent/top so it works even if DevTools is focused on the outer frame.
+  try {
+    if (window.parent && window.parent !== window) {
+      (window.parent as any).__discoverTiming = api;
+    }
+  } catch {
+    // ignore (cross-origin)
+  }
+
+  try {
+    if (window.top && window.top !== window) {
+      (window.top as any).__discoverTiming = api;
+    }
+  } catch {
+    // ignore (cross-origin)
+  }
+
+  console.log('[DiscoverTiming] Module loaded, __discoverTiming available');
 }
