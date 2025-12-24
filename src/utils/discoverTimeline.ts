@@ -1,3 +1,6 @@
+// Immediately log that this module is being parsed
+console.log('[DiscoverTiming] Module parsing started');
+
 /**
  * Discover Page Video Startup Timeline
  * Tracks timing from navigation → first video playing
