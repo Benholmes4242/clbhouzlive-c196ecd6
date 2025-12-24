@@ -54,7 +54,7 @@ export function SettingsToggleRow({
   const showHelper = helperNote && checked;
 
   return (
-    <div className={cn(isLast && 'rounded-b-[12px]')}>
+    <div className="w-full">
       <div
         className={cn(
           'relative flex items-center justify-between w-full max-w-full box-border',
@@ -62,8 +62,6 @@ export function SettingsToggleRow({
           'py-[12px]',
           isIndented ? 'pl-[28px] pr-[14px]' : 'px-[14px]',
           disabled && 'opacity-50',
-          isFirst && 'rounded-t-[12px]',
-          isLast && !showHelper && 'rounded-b-[12px]',
         )}
       >
         {/* Left content - min-width:0 prevents text from pushing layout wider */}
