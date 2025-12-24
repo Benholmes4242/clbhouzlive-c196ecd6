@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, Mail, AtSign, Sparkles, EyeOff, ExternalLink, 
   ShieldBan, Bell, Lock, HelpCircle, MessageSquare, 
-  Headphones, FileText, Shield, ScrollText, Trash2 
+  Headphones, FileText, Shield, ScrollText, Trash2, ArrowLeft 
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -31,12 +31,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNearbyTestTools } from '@/features/nearby/hooks/useNearbyTestTools';
-import { ArrowLeft } from 'lucide-react';
 
 /**
  * SettingsPageV2 - World-class settings redesign
  * 
- * Dark glass design matching Clubhouse aesthetic.
+ * Light theme with global blue-grey background + slate text hierarchy.
  * Only functional controls are shown.
  */
 export function SettingsPageV2() {
@@ -184,7 +183,7 @@ export function SettingsPageV2() {
   // Loading state
   if (loading) {
     return (
-      <PageRoot className="min-h-screen bg-[#0A0A0A]">
+      <PageRoot className="min-h-screen bg-[#F8FAFC]">
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28">
           <SettingsSkeleton />
@@ -196,14 +195,14 @@ export function SettingsPageV2() {
   // Error state
   if (error) {
     return (
-      <PageRoot className="min-h-screen bg-[#0A0A0A]">
+      <PageRoot className="min-h-screen bg-[#F8FAFC]">
         <SettingsHeader onBack={() => navigate(-1)} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
-            <span className="text-red-400 text-base">Error loading settings</span>
+            <span className="text-red-600 text-base">Error loading settings</span>
             <button 
               onClick={() => window.location.reload()} 
-              className="block mx-auto text-sm text-white/50 hover:text-white"
+              className="block mx-auto text-sm text-[#5E666D] hover:text-[#1F2428]"
             >
               Try refreshing the page
             </button>
@@ -218,7 +217,7 @@ export function SettingsPageV2() {
   const isPersonalProfile = profile?.profile_type !== 'business';
 
   return (
-    <PageRoot className="min-h-screen bg-[#0A0A0A]">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <SettingsHeader onBack={() => navigate(-1)} />
       
       <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28 space-y-[18px] md:space-y-[22px]">
@@ -245,7 +244,7 @@ export function SettingsPageV2() {
             isLocked
             isLast
             rightContent={
-              <span className="text-[13px] text-white/40">
+              <span className="text-[13px] text-[#97A1AA]">
                 @{profile?.username || 'not set'}
               </span>
             }
@@ -382,7 +381,7 @@ export function SettingsPageV2() {
         {/* ========== DANGER ZONE ========== */}
         <SettingsSection title="Danger Zone">
           <SettingsChevronRow
-            icon={<Trash2 className="w-[18px] h-[18px] text-red-400" />}
+            icon={<Trash2 className="w-[18px] h-[18px] text-red-500" />}
             title="Delete account"
             subtitle="Permanently remove your profile from Clbhouz."
             onClick={() => setShowDeleteConfirm(true)}
@@ -409,24 +408,25 @@ export function SettingsPageV2() {
       
       {/* Enable creator-only confirmation */}
       <AlertDialog open={showCreatorOnlyConfirm} onOpenChange={setShowCreatorOnlyConfirm}>
-        <AlertDialogContent className="bg-[#1A1A1A] border-white/10">
+        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white flex items-center gap-2">
+            <AlertDialogTitle className="text-[#1F2428] flex items-center gap-2">
               <EyeOff className="w-5 h-5" />
               Hide your personal profile?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/60">
-              When enabled, your personal profile won't be visible. Your posts and mentions will link to your creator page instead.
+            <AlertDialogDescription className="text-[#5E666D] space-y-2">
+              <span className="block">When enabled, your personal profile won't be visible. Your posts and mentions will link to your creator page instead.</span>
+              <span className="block text-[#97A1AA] text-[12px]">You can switch back at any time.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white/10 border-white/10 text-white hover:bg-white/20">
+            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => confirmCreatorOnly(true)}
               disabled={isUpdatingCreator}
-              className="bg-white text-black hover:bg-white/90"
+              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
             >
               {isUpdatingCreator ? 'Enabling...' : 'Enable creator-only'}
             </AlertDialogAction>
@@ -436,23 +436,23 @@ export function SettingsPageV2() {
 
       {/* Disable creator-only confirmation */}
       <AlertDialog open={showDisableCreatorOnlyConfirm} onOpenChange={setShowDisableCreatorOnlyConfirm}>
-        <AlertDialogContent className="bg-[#1A1A1A] border-white/10">
+        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">
+            <AlertDialogTitle className="text-[#1F2428]">
               Show your personal profile again?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/60">
+            <AlertDialogDescription className="text-[#5E666D]">
               Your personal profile will become visible again, alongside your creator page.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white/10 border-white/10 text-white hover:bg-white/20">
+            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => confirmCreatorOnly(false)}
               disabled={isUpdatingCreator}
-              className="bg-white text-black hover:bg-white/90"
+              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
             >
               {isUpdatingCreator ? 'Updating...' : 'Show personal profile'}
             </AlertDialogAction>
@@ -462,33 +462,33 @@ export function SettingsPageV2() {
 
       {/* Delete account confirmation */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent className="bg-[#1A1A1A] border-white/10">
+        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-400 flex items-center gap-2">
+            <AlertDialogTitle className="text-red-600 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
               Delete your account?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/60 space-y-3">
+            <AlertDialogDescription className="text-[#5E666D] space-y-3">
               <p>
                 This removes your profile from Clbhouz. Some content may remain anonymised.
               </p>
               <div className="space-y-2 pt-2">
-                <Label htmlFor="delete-confirm" className="text-white/80">
-                  Type <strong className="text-white">DELETE</strong> to confirm:
+                <Label htmlFor="delete-confirm" className="text-[#5E666D]">
+                  Type <strong className="text-[#1F2428]">DELETE</strong> to confirm:
                 </Label>
                 <Input
                   id="delete-confirm"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="Type DELETE here"
-                  className="bg-white/5 border-white/10 text-white font-mono"
+                  className="bg-[#FAFAFB] border-[rgba(31,36,40,0.1)] text-[#1F2428] font-mono placeholder:text-[#97A1AA]"
                 />
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel 
-              className="bg-white/10 border-white/10 text-white hover:bg-white/20"
+              className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]"
               onClick={() => setDeleteConfirmText('')}
             >
               Cancel
@@ -507,28 +507,30 @@ export function SettingsPageV2() {
   );
 }
 
-// ========== SETTINGS HEADER ==========
+// ========== SETTINGS HEADER (Light frosted glass) ==========
 
 function SettingsHeader({ onBack }: { onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3 border-b border-white/5"
+      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
       style={{
-        background: 'rgba(10,10,10,0.85)',
-        backdropFilter: 'blur(22px)',
-        WebkitBackdropFilter: 'blur(22px)',
+        background: 'rgba(248,250,252,0.85)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderBottom: '1px solid rgba(31,36,40,0.06)',
+        boxShadow: '0 6px 18px rgba(31,36,40,0.06)',
         paddingTop: 'max(env(safe-area-inset-top), 12px)',
       }}
     >
       <button
         onClick={onBack}
-        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
       >
-        <ArrowLeft className="w-5 h-5 text-white" />
+        <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
       </button>
       <div>
-        <h1 className="text-lg font-semibold text-white">Settings</h1>
-        <p className="text-[13px] text-white/50">Manage your account, creator identity and preferences.</p>
+        <h1 className="text-lg font-semibold text-[#1F2428]">Settings</h1>
+        <p className="text-[13px] text-[#5E666D]">Manage your account, creator identity and preferences.</p>
       </div>
     </header>
   );

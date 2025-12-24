@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 /**
- * EmailSettingsPage - Change email detail screen
+ * EmailSettingsPage - Change email detail screen (Light theme)
  */
 export function EmailSettingsPage() {
   const navigate = useNavigate();
@@ -79,49 +79,50 @@ export function EmailSettingsPage() {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-[#0A0A0A]">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <header 
-        className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3 border-b border-white/5"
+        className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
         style={{
-          background: 'rgba(10,10,10,0.85)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
+          background: 'rgba(248,250,252,0.85)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(31,36,40,0.06)',
+          boxShadow: '0 6px 18px rgba(31,36,40,0.06)',
           paddingTop: 'max(env(safe-area-inset-top), 12px)',
         }}
       >
         <button
           onClick={() => navigate('/settings')}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
         </button>
-        <h1 className="text-lg font-semibold text-white">Change email</h1>
+        <h1 className="text-lg font-semibold text-[#1F2428]">Change email</h1>
       </header>
 
       <div className="max-w-md mx-auto px-4 md:px-6 py-8">
         <div className="space-y-6">
           {/* Info */}
           <div 
-            className="flex items-start gap-3 p-4 rounded-[14px] border border-white/5"
-            style={{ background: 'rgba(255,255,255,0.03)' }}
+            className="flex items-start gap-3 p-4 rounded-[14px] border border-[rgba(31,36,40,0.06)] bg-[#FAFAFB]"
           >
-            <Mail className="w-4 h-4 text-white/40 mt-0.5 flex-shrink-0" />
-            <p className="text-[13px] text-white/50 leading-relaxed">
+            <Mail className="w-4 h-4 text-[#97A1AA] mt-0.5 flex-shrink-0" />
+            <p className="text-[13px] text-[#5E666D] leading-relaxed">
               You'll need to confirm the new email address.
             </p>
           </div>
 
           {/* Current email */}
           <div className="space-y-2">
-            <Label className="text-white/60">Current email</Label>
-            <div className="px-4 py-3 rounded-[12px] bg-white/5 border border-white/10 text-white/50 text-[15px]">
+            <Label className="text-[#5E666D]">Current email</Label>
+            <div className="px-4 py-3 rounded-[12px] bg-[#EDEFF2] border border-[rgba(31,36,40,0.06)] text-[#97A1AA] text-[15px]">
               {maskEmail(user?.email)}
             </div>
           </div>
 
           {/* New email */}
           <div className="space-y-2">
-            <Label htmlFor="new-email" className="text-white/80">
+            <Label htmlFor="new-email" className="text-[#1F2428]">
               New email address
             </Label>
             <Input
@@ -130,14 +131,14 @@ export function EmailSettingsPage() {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="Enter new email"
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] placeholder:text-[#97A1AA]"
               disabled={isUpdating}
             />
           </div>
 
           {/* Confirm email */}
           <div className="space-y-2">
-            <Label htmlFor="confirm-email" className="text-white/80">
+            <Label htmlFor="confirm-email" className="text-[#1F2428]">
               Confirm new email
             </Label>
             <Input
@@ -146,20 +147,20 @@ export function EmailSettingsPage() {
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
               placeholder="Confirm new email"
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] placeholder:text-[#97A1AA]"
               disabled={isUpdating}
             />
           </div>
 
           {/* Validation messages */}
           {newEmail && !isValidEmail(newEmail) && (
-            <p className="text-[13px] text-red-400">Please enter a valid email address</p>
+            <p className="text-[13px] text-red-600">Please enter a valid email address</p>
           )}
           {newEmail && confirmEmail && newEmail !== confirmEmail && (
-            <p className="text-[13px] text-red-400">Email addresses don't match</p>
+            <p className="text-[13px] text-red-600">Email addresses don't match</p>
           )}
           {newEmail === user?.email && (
-            <p className="text-[13px] text-white/40">This is your current email address</p>
+            <p className="text-[13px] text-[#97A1AA]">This is your current email address</p>
           )}
 
           {/* Submit */}
@@ -167,7 +168,7 @@ export function EmailSettingsPage() {
             type="button"
             onClick={() => setShowConfirm(true)}
             disabled={!isValid || isUpdating}
-            className="w-full bg-white text-black hover:bg-white/90 disabled:opacity-50"
+            className="w-full bg-[#1F2428] text-white hover:bg-[#2A3038] disabled:opacity-50"
           >
             {isUpdating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Send confirmation email
@@ -177,22 +178,22 @@ export function EmailSettingsPage() {
 
       {/* Confirmation dialog */}
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="bg-[#1A1A1A] border-white/10">
+        <AlertDialogContent className="bg-white border-[rgba(31,36,40,0.1)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Change email address</AlertDialogTitle>
-            <AlertDialogDescription className="text-white/60">
-              Your email will be updated to <strong className="text-white">{newEmail}</strong>.
+            <AlertDialogTitle className="text-[#1F2428]">Change email address</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#5E666D]">
+              Your email will be updated to <strong className="text-[#1F2428]">{newEmail}</strong>.
               You'll need to sign in again with your new email address.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white/10 border-white/10 text-white hover:bg-white/20">
+            <AlertDialogCancel className="bg-[#EDEFF2] border-transparent text-[#1F2428] hover:bg-[#E4E6E9]">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleSubmit}
               disabled={isUpdating}
-              className="bg-white text-black hover:bg-white/90"
+              className="bg-[#1F2428] text-white hover:bg-[#2A3038]"
             >
               {isUpdating ? 'Sending...' : 'Change email now'}
             </AlertDialogAction>

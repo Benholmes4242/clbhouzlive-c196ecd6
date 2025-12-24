@@ -20,7 +20,7 @@ interface BlockedUser {
 }
 
 /**
- * BlockedUsersPage - Manage blocked users
+ * BlockedUsersPage - Manage blocked users (Light theme)
  */
 export function BlockedUsersPage() {
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ export function BlockedUsersPage() {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[#0A0A0A]">
+      <PageRoot className="min-h-screen bg-[#F8FAFC]">
         <DetailHeader onBack={() => navigate('/settings')} />
         <div className="max-w-2xl mx-auto px-4 md:px-6 py-6">
           <SettingsSkeleton sections={[{ title: 'Blocked users', rows: 3 }]} />
@@ -114,31 +114,25 @@ export function BlockedUsersPage() {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[#0A0A0A]">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <DetailHeader onBack={() => navigate('/settings')} />
       
       <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28">
         {blockedUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div 
-              className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-              style={{ background: 'rgba(255,255,255,0.05)' }}
+              className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-[#EDEFF2]"
             >
-              <ShieldBan className="w-8 h-8 text-white/30" />
+              <ShieldBan className="w-8 h-8 text-[#97A1AA]" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-1">No blocked users</h3>
-            <p className="text-[13px] text-white/50">
+            <h3 className="text-lg font-semibold text-[#1F2428] mb-1">No blocked users</h3>
+            <p className="text-[13px] text-[#5E666D]">
               When you block someone, they'll appear here.
             </p>
           </div>
         ) : (
           <div 
-            className="rounded-[18px] overflow-hidden border border-white/5"
-            style={{
-              background: 'rgba(10,10,10,0.78)',
-              backdropFilter: 'blur(22px)',
-              WebkitBackdropFilter: 'blur(22px)',
-            }}
+            className="rounded-[16px] overflow-hidden border border-[rgba(31,36,40,0.06)] bg-[#FAFAFB]"
           >
             {blockedUsers.map((block, idx) => (
               <div 
@@ -148,7 +142,7 @@ export function BlockedUsersPage() {
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
                   <div 
-                    className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden"
+                    className="w-10 h-10 rounded-full bg-[#EDEFF2] flex items-center justify-center overflow-hidden"
                   >
                     {block.blocked_user?.profile_photo_url ? (
                       <img 
@@ -157,17 +151,17 @@ export function BlockedUsersPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-white/40 text-sm font-medium">
+                      <span className="text-[#97A1AA] text-sm font-medium">
                         {(block.blocked_user?.display_name || block.blocked_user?.username || '?')[0].toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div>
-                    <p className="text-[15px] font-semibold text-white">
+                    <p className="text-[15px] font-semibold text-[#1F2428]">
                       {block.blocked_user?.display_name || block.blocked_user?.username || 'Unknown user'}
                     </p>
                     {block.blocked_user?.username && (
-                      <p className="text-[13px] text-white/50">@{block.blocked_user.username}</p>
+                      <p className="text-[13px] text-[#5E666D]">@{block.blocked_user.username}</p>
                     )}
                   </div>
                 </div>
@@ -177,7 +171,7 @@ export function BlockedUsersPage() {
                   variant="outline"
                   onClick={() => handleUnblock(block.blocked_id, block.blocked_user?.username ?? null)}
                   disabled={unblockingId === block.blocked_id}
-                  className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                  className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
                 >
                   {unblockingId === block.blocked_id ? 'Unblocking...' : 'Unblock'}
                 </Button>
@@ -186,7 +180,7 @@ export function BlockedUsersPage() {
                 {idx < blockedUsers.length - 1 && (
                   <div 
                     className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-                    style={{ background: 'rgba(255,255,255,0.06)' }}
+                    style={{ background: 'rgba(31,36,40,0.06)' }}
                   />
                 )}
               </div>
@@ -201,21 +195,23 @@ export function BlockedUsersPage() {
 function DetailHeader({ onBack }: { onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3 border-b border-white/5"
+      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
       style={{
-        background: 'rgba(10,10,10,0.85)',
-        backdropFilter: 'blur(22px)',
-        WebkitBackdropFilter: 'blur(22px)',
+        background: 'rgba(248,250,252,0.85)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderBottom: '1px solid rgba(31,36,40,0.06)',
+        boxShadow: '0 6px 18px rgba(31,36,40,0.06)',
         paddingTop: 'max(env(safe-area-inset-top), 12px)',
       }}
     >
       <button
         onClick={onBack}
-        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
       >
-        <ArrowLeft className="w-5 h-5 text-white" />
+        <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
       </button>
-      <h1 className="text-lg font-semibold text-white">Blocked users</h1>
+      <h1 className="text-lg font-semibold text-[#1F2428]">Blocked users</h1>
     </header>
   );
 }

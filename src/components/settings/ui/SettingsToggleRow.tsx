@@ -29,7 +29,8 @@ interface SettingsToggleRowProps {
 }
 
 /**
- * SettingsToggleRow - Row with toggle switch on the right
+ * SettingsToggleRow - Row with toggle switch on the right (light theme)
+ * Toggle uses slate/neutral colors (no orange)
  */
 export function SettingsToggleRow({
   icon,
@@ -58,32 +59,32 @@ export function SettingsToggleRow({
       {/* Left content */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {icon && (
-          <div className="flex-shrink-0 w-[18px] h-[18px] text-white/70">
+          <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
             {icon}
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-white truncate">
+            <span className="text-[15px] font-semibold text-[#1F2428] truncate">
               {title}
             </span>
             {isBeta && <SettingsBadge>Beta</SettingsBadge>}
           </div>
           {subtitle && (
-            <p className="text-[13px] font-normal text-white/60 truncate mt-0.5">
+            <p className="text-[13px] font-normal text-[#5E666D] truncate mt-0.5">
               {subtitle}
             </p>
           )}
         </div>
       </div>
 
-      {/* Toggle */}
+      {/* Toggle - slate/neutral colors */}
       <div className="flex-shrink-0 ml-3">
         <Switch
           checked={checked}
           onCheckedChange={onCheckedChange}
           disabled={disabled || isLoading}
-          className="data-[state=checked]:bg-white/90 data-[state=unchecked]:bg-white/20"
+          className="data-[state=checked]:bg-[#3A3F46] data-[state=unchecked]:bg-[#EDEFF2]"
         />
       </div>
 
@@ -91,7 +92,7 @@ export function SettingsToggleRow({
       {showDivider && !isLast && (
         <div 
           className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
+          style={{ background: 'rgba(31,36,40,0.06)' }}
         />
       )}
     </div>

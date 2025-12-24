@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { SettingsSection } from './ui';
 
 /**
- * DevNearbySettingsPage - Developer tools for Nearby feature testing
+ * DevNearbySettingsPage - Developer tools for Nearby feature testing (Light theme)
  * Only accessible to authorized testers
  */
 export function DevNearbySettingsPage() {
@@ -30,23 +30,25 @@ export function DevNearbySettingsPage() {
   if (!isAllowedTester) return null;
 
   return (
-    <PageRoot className="min-h-screen bg-[#0A0A0A]">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <header 
-        className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3 border-b border-white/5"
+        className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
         style={{
-          background: 'rgba(10,10,10,0.85)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
+          background: 'rgba(248,250,252,0.85)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(31,36,40,0.06)',
+          boxShadow: '0 6px 18px rgba(31,36,40,0.06)',
           paddingTop: 'max(env(safe-area-inset-top), 12px)',
         }}
       >
         <button
           onClick={() => navigate('/settings')}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
         </button>
-        <h1 className="text-lg font-semibold text-white">Nearby Test Tools</h1>
+        <h1 className="text-lg font-semibold text-[#1F2428]">Nearby Test Tools</h1>
       </header>
 
       <div className="max-w-md mx-auto px-4 md:px-6 py-6 pb-28 space-y-6">
@@ -55,7 +57,7 @@ export function DevNearbySettingsPage() {
             <Button
               onClick={spawnTestGolferNearMe}
               variant="outline"
-              className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10"
+              className="w-full bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
             >
               📍 Spawn Test Golfer Near Me
             </Button>
@@ -65,7 +67,7 @@ export function DevNearbySettingsPage() {
                 onClick={() => setTestGolferOpenToPlay(true)}
                 variant="outline"
                 size="sm"
-                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
               >
                 🟢 Set Open to Play
               </Button>
@@ -73,7 +75,7 @@ export function DevNearbySettingsPage() {
                 onClick={() => setTestGolferOpenToPlay(false)}
                 variant="outline"
                 size="sm"
-                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
               >
                 ⚪ Clear Open to Play
               </Button>
@@ -82,7 +84,7 @@ export function DevNearbySettingsPage() {
             <Button
               onClick={makeTestGolferStale}
               variant="outline"
-              className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10"
+              className="w-full bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
             >
               ⏰ Make Stale (10+ mins ago)
             </Button>
@@ -92,7 +94,7 @@ export function DevNearbySettingsPage() {
                 onClick={blockTestGolfer}
                 variant="outline"
                 size="sm"
-                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
               >
                 🚫 Block Test Golfer
               </Button>
@@ -100,14 +102,14 @@ export function DevNearbySettingsPage() {
                 onClick={unblockTestGolfer}
                 variant="outline"
                 size="sm"
-                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                className="bg-white border-[rgba(31,36,40,0.1)] text-[#1F2428] hover:bg-[rgba(31,36,40,0.03)]"
               >
                 ✅ Unblock Test Golfer
               </Button>
             </div>
 
-            <p className="text-xs text-white/40 mt-4">
-              Test User ID: <code className="bg-white/10 px-1 py-0.5 rounded text-white/60">00000000-0000-0000-0000-000000000001</code>
+            <p className="text-xs text-[#97A1AA] mt-4">
+              Test User ID: <code className="bg-[#EDEFF2] px-1 py-0.5 rounded text-[#5E666D]">00000000-0000-0000-0000-000000000001</code>
             </p>
           </div>
         </SettingsSection>
