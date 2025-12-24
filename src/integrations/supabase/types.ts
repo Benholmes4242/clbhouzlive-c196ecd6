@@ -5947,6 +5947,39 @@ export type Database = {
           },
         ]
       }
+      user_push_devices: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          last_seen_at: string | null
+          platform: string
+          provider: string
+          provider_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_seen_at?: string | null
+          platform: string
+          provider?: string
+          provider_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_seen_at?: string | null
+          platform?: string
+          provider?: string
+          provider_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_relationships: {
         Row: {
           created_at: string
