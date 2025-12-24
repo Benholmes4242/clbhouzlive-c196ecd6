@@ -92,3 +92,9 @@ verify_jwt = false
 
 [functions.tourhub-livegolf]
 verify_jwt = false
+
+[functions.tourhub-resolver]
+verify_jwt = false
+
+[functions.tourhub-sync-enrich]
+verify_jwt = false

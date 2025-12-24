@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Radio, Calendar, Trophy } from 'lucide-react';
+import { Radio, Calendar, Trophy, ArrowRight } from 'lucide-react';
 import {
   TourHubShell,
   TourSwitcherPills,
@@ -14,13 +14,14 @@ import {
   HeroSkeleton,
   EventCardSkeleton,
 } from '../components';
-import { useTourEvents, useLiveEvents, useLeaderboard } from '../hooks';
+import { useTourEvents, useLiveEvents, useLeaderboard, useUpcomingEvents } from '../hooks';
 import { useTourSelection } from '../hooks/useTourSelection';
 
 export function TourHubHomePage() {
   const { selectedTour, setSelectedTour } = useTourSelection();
   const { data: tourEvents, isLoading, error, refetch } = useTourEvents(selectedTour);
   const { data: liveEvents } = useLiveEvents();
+  const { data: nextEvents } = useUpcomingEvents(5); // Fallback: next 5 events across all tours
   
   // Get hero event - live first, then next upcoming
   const heroEvent = useMemo(() => {
@@ -39,16 +40,17 @@ export function TourHubHomePage() {
     heroEvent?.espn_event_id || ''
   );
   
-  // Filter events by status
-  const { thisWeek, completed } = useMemo(() => {
-    if (!tourEvents) return { thisWeek: [], completed: [] };
+  // Filter events by status - "This Week" = events starting within 7 days
+  const { thisWeek, completed, showNextEvents, nextEventsToShow } = useMemo(() => {
+    if (!tourEvents) return { thisWeek: [], completed: [], showNextEvents: false, nextEventsToShow: [] };
     
     const now = new Date();
-    const twoWeeksLater = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const oneWeekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     
+    // This Week: events starting within 7 days
     const thisWeek = tourEvents.filter(e => 
       (e.status === 'upcoming' || e.status === 'live') &&
-      new Date(e.start_date) <= twoWeeksLater
+      new Date(e.start_date) <= oneWeekLater
     ).slice(0, 6);
     
     const completed = tourEvents
@@ -56,8 +58,12 @@ export function TourHubHomePage() {
       .slice(-6)
       .reverse();
     
-    return { thisWeek, completed };
-  }, [tourEvents]);
+    // If no events this week, show "Next Events" fallback
+    const showNextEvents = thisWeek.length === 0;
+    const nextEventsToShow = showNextEvents && nextEvents ? nextEvents.slice(0, 5) : [];
+    
+    return { thisWeek, completed, showNextEvents, nextEventsToShow };
+  }, [tourEvents, nextEvents]);
   
   if (error) {
     return (
@@ -125,6 +131,7 @@ export function TourHubHomePage() {
                 <MiniLeaderboard 
                   leaders={heroLeaderboard?.leaders || []} 
                   limit={5}
+                  emptyMessage={heroLeaderboard?.message}
                 />
                 {heroLeaderboard?.fetched_at && (
                   <LastUpdatedPill 
@@ -144,18 +151,19 @@ export function TourHubHomePage() {
         )}
       </section>
       
-      {/* This Week */}
+      {/* This Week / Next Events */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2">
             <Calendar className="w-5 h-5 text-text-tertiary" />
-            This Week
+            {showNextEvents ? 'Next Events' : 'This Week'}
           </h2>
           <Link 
             to={`/tourhub/tour/${selectedTour}`}
-            className="text-body-sm text-primary-accent hover:underline"
+            className="text-body-sm text-primary-accent hover:underline flex items-center gap-1"
           >
             View all
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
         
@@ -163,6 +171,24 @@ export function TourHubHomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <EventCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : showNextEvents && nextEventsToShow.length > 0 ? (
+          // Fallback: Next Events across all tours
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {nextEventsToShow.map(event => (
+              <EventCard
+                key={event.id}
+                id={event.id}
+                name={event.name}
+                tour={event.tour}
+                status={event.status as any}
+                startDate={event.start_date}
+                endDate={event.end_date}
+                courseName={event.course_name}
+                location={event.location}
+                espnEventId={event.espn_event_id}
+              />
             ))}
           </div>
         ) : thisWeek.length > 0 ? (
