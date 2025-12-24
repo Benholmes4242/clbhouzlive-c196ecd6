@@ -440,6 +440,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             mediaId: mediaId?.slice(0, 8)
           });
           
+          // CRITICAL: Immediately start loading video segments to reduce TTFF
+          // This fixes the 3.1s delay between manifest parsed and video ready
+          hls.startLoad(-1);
+          
           // Apply start time after manifest loaded
           if (startTime && startTime > 0) {
             video.currentTime = startTime;
