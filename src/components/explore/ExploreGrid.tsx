@@ -13,6 +13,7 @@ import { FILTER_TYPES } from './types';
 import { createMobileGridLayoutWithDeduplication, createDesktopGridLayoutWithDeduplication } from '@/utils/postPlacementUtils';
 import { PlacementConfig } from './types/PostPlacementTypes';
 import { __DEV__, devlog, devtable } from '@/utils/log';
+import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 
 /**
  * Hook to track when the app window/tab regains focus or visibility
@@ -241,6 +242,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       ? createMobileGridLayoutWithDeduplication(content, placementConfig).gridItems
       : createDesktopGridLayoutWithDeduplication(content, placementConfig).gridItems;
   }, [isMobile, content, placementConfig.maxSections, placementConfig.isPortraitMedia]);
+  
+  // Lazy loading - only mount grid items near viewport
+  const { visibleIndices, registerTile } = useLazyTiles({
+    totalItems: gridItems.length,
+    initialVisible: isMobile ? 9 : 12, // First 3 rows mobile (3x3), 3 rows desktop (4x3)
+    preloadViewports: 2,
+    estimatedRowHeight: isMobile ? 120 : 180,
+  });
   
   // DEBUG: Log grid layout keys (first 20) - stable dependency
   useEffect(() => {
@@ -922,44 +931,73 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
         `}</style>
         {gridItems.map((gridItem, index) => {
           const isAboveTheFold = index < ABOVE_THE_FOLD_COUNT;
+          const isVisible = visibleIndices.has(index);
           
           if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridRow: 'span 2' }}>
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isPortrait={true}
-                  isAboveTheFold={isAboveTheFold}
-                />
+              <div 
+                key={gridItem.key} 
+                className="row-span-2 overflow-hidden self-stretch" 
+                style={{ gridRow: 'span 2' }}
+                ref={(el) => registerTile(index, el)}
+                data-lazy-index={index}
+              >
+                {isVisible ? (
+                  <ExploreContentCard 
+                    item={gridItem.item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                    isPortrait={true}
+                    isAboveTheFold={isAboveTheFold}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted animate-pulse" />
+                )}
               </div>
             );
           } else if (gridItem.type === 'hero') {
             return (
-              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isFeatured={true}
-                  isAboveTheFold={isAboveTheFold}
-                />
+              <div 
+                key={gridItem.key} 
+                className="col-span-2 row-span-2 aspect-square"
+                ref={(el) => registerTile(index, el)}
+                data-lazy-index={index}
+              >
+                {isVisible ? (
+                  <ExploreContentCard 
+                    item={gridItem.item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                    isFeatured={true}
+                    isAboveTheFold={isAboveTheFold}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted animate-pulse" />
+                )}
               </div>
             );
           } else {
             // Square card
             return (
-              <div key={gridItem.key} className="aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isAboveTheFold={isAboveTheFold}
-                />
+              <div 
+                key={gridItem.key} 
+                className="aspect-square"
+                ref={(el) => registerTile(index, el)}
+                data-lazy-index={index}
+              >
+                {isVisible ? (
+                  <ExploreContentCard 
+                    item={gridItem.item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                    isAboveTheFold={isAboveTheFold}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted animate-pulse" />
+                )}
               </div>
             );
           }
