@@ -100,8 +100,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          // Always apply safe-area padding on all routes
-          paddingTop: 'env(safe-area-inset-top)',
+          paddingTop: isDiscoverRoute ? '0px' : 'env(safe-area-inset-top)',
           borderBottom: isSeamless ? 'none' : `1px solid ${getBorder()}`,
           boxShadow: isSeamless || isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
