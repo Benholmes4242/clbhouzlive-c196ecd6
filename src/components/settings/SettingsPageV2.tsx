@@ -536,7 +536,7 @@ function SettingsHeader({ onBack }: { onBack: () => void }) {
           Settings
         </h1>
         <p className="text-center text-sm text-[#5E666D]/70">
-          Manage your account, creator identity and preferences.
+          Manage your account, creator identity<br />and preferences.
         </p>
       </div>
     </header>
