@@ -138,8 +138,25 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const tour = (url.searchParams.get("tour") || "pga").trim();
-    const eventId = (url.searchParams.get("event") || "").trim();
+    let tour = (url.searchParams.get("tour") || "").trim();
+    let eventId = (url.searchParams.get("event") || "").trim();
+
+    // Also support POST/JSON body for supabase.functions.invoke
+    // Body shape: { tour: "pga", event: "401..." }
+    if (!eventId) {
+      try {
+        const contentType = req.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+          tour = safeStr(body.tour || body.tourId || tour).trim();
+          eventId = safeStr(body.event || body.espnEventId || body.espn_event_id || "").trim();
+        }
+      } catch (_err) {
+        // ignore
+      }
+    }
+
+    if (!tour) tour = "pga";
 
     console.log(`[tourhub-resolver] Request: tour=${tour}, event=${eventId}`);
 
