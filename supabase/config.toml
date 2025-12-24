@@ -89,3 +89,6 @@ verify_jwt = false
 
 [functions.tourhub-slashgolf]
 verify_jwt = false
+
+[functions.tourhub-livegolf]
+verify_jwt = false
