@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
-import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
+import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
@@ -260,7 +260,7 @@ const Clubhouse = () => {
 
         {/* Always render feed when posts exist (skeleton handles loading UI) */}
         {posts.length > 0 ? (
-          <ClubhouseVerticalFeed
+          <ClubhouseVerticalGrid
             posts={posts}
             onLike={handleLike}
             onLoadMore={loadMore}
