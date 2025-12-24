@@ -372,7 +372,7 @@ if (typeof window !== 'undefined') {
   // Attach inside the app iframe
   (window as any).__discoverTiming = api;
 
-  // Also try to attach to parent/top so it works even if DevTools is focused on the outer frame.
+  // Also try to attach to parent/top (may fail due to cross-origin in Lovable editor)
   try {
     if (window.parent && window.parent !== window) {
       (window.parent as any).__discoverTiming = api;
@@ -388,6 +388,30 @@ if (typeof window !== 'undefined') {
   } catch {
     // ignore (cross-origin)
   }
+
+  // Cross-origin safe bridge: allow the Lovable editor frame to control timing via postMessage
+  const MSG_TYPE = '__DISCOVER_TIMING__';
+  window.addEventListener('message', (event) => {
+    const data = (event as MessageEvent).data as any;
+    if (!data || data.type !== MSG_TYPE) return;
+
+    switch (data.action) {
+      case 'enable':
+        enable();
+        break;
+      case 'disable':
+        disable();
+        break;
+      case 'clear':
+        clearEvents();
+        break;
+      case 'printSummary':
+        printSummary();
+        break;
+      default:
+        console.warn('[DiscoverTiming] Unknown action:', data.action);
+    }
+  });
 
   console.log('[DiscoverTiming] Module loaded, __discoverTiming available');
 }
