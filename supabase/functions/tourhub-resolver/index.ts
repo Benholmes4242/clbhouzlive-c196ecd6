@@ -91,7 +91,7 @@ async function getEventFromDB(tour: string, espnEventId: string) {
 async function getLatestSnapshotFromDB(tour: string, espnEventId: string) {
   const { data, error } = await sb
     .from("tourhub_leaderboard_latest")
-    .select("espn_event_id,tour,status,name,generated_at,leaders")
+    .select("espn_event_id,tour,status,payload,fetched_at")
     .eq("tour", tour)
     .eq("espn_event_id", espnEventId)
     .maybeSingle();
@@ -99,6 +99,17 @@ async function getLatestSnapshotFromDB(tour: string, espnEventId: string) {
   if (error) {
     console.error("[tourhub-resolver] Error fetching snapshot from DB:", error);
     throw error;
+  }
+  
+  // Extract leaders from payload
+  if (data?.payload) {
+    const payload = data.payload as Record<string, unknown>;
+    return {
+      ...data,
+      name: payload.name as string | null,
+      leaders: payload.leaders as unknown[] | null,
+      generated_at: data.fetched_at,
+    };
   }
   return data;
 }
