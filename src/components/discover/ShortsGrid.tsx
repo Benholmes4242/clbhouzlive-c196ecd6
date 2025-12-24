@@ -1,7 +1,12 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ExploreContentItem } from '@/components/explore/types';
-import { UnifiedMediaGrid, UnifiedGridConfig, exploreItemsToUnified, UnifiedMediaItem } from '@/components/shared/grid';
+import { 
+  UniversalMediaGrid, 
+  UniversalGridConfig, 
+  UniversalMediaItem,
+  exploreItemsToUniversal 
+} from '@/components/grid';
 
 // Extended type to include clustering metadata
 interface ClusteredExploreItem extends ExploreContentItem {
@@ -19,17 +24,23 @@ interface ShortsGridProps {
   currentUserId?: string;
 }
 
-// Grid config for Watch page
-const WATCH_GRID_CONFIG: UnifiedGridConfig = {
+// Grid config for Watch page using UniversalMediaGrid
+const WATCH_GRID_CONFIG: UniversalGridConfig = {
+  layout: 'portrait-grid',
+  columns: 2,
+  autoplayPattern: 'every-nth',
+  autoplayNth: 3,
+  maxConcurrent: 2,
+  surface: 'shorts',
+  lazyLoad: true,
+  preloadViewports: 2,
+  initialVisible: 6,
   showCreator: true,
-  showLikes: false, // Likes removed from tile overlays
+  showLikes: false,
+  showDuration: true,
   infiniteScroll: true,
-  pageSize: 24,
-  autoplayEnabled: true,
-  maxAutoplay: 2,
-  playThreshold: 0.4,      // Play when 40% visible
-  pauseThreshold: 0.6,     // Pause when 60% out of view
-  surface: 'watch', // Watch surface - tap opens Shorts Player
+  playThreshold: 0.4,
+  pauseThreshold: 0.25,
 };
 
 /**
@@ -48,7 +59,7 @@ function CourseClusterHeader({ courseName }: { courseName: string }) {
 
 /**
  * ShortsGrid - Watch page grid wrapper
- * Uses UnifiedMediaGrid with Watch-specific config
+ * Uses UniversalMediaGrid with Watch-specific config
  * 
  * Supports course clustering - when items have _clusterHeader,
  * renders a section header before them.
@@ -67,8 +78,12 @@ export default function ShortsGrid({
 }: ShortsGridProps) {
   const navigate = useNavigate();
   
+  // Keep reference to original items for lookup
+  const itemsRef = React.useRef(items);
+  itemsRef.current = items;
+  
   // Extract cluster headers and their positions
-  const clusterHeaders = React.useMemo(() => {
+  const clusterHeaders = useMemo(() => {
     const headers: { index: number; courseName: string }[] = [];
     items.forEach((item, index) => {
       if (item._clusterHeader) {
@@ -79,18 +94,17 @@ export default function ShortsGrid({
   }, [items]);
   
   // Convert items to unified format (stripping the cluster metadata)
-  const unifiedItems = React.useMemo(() => {
-    return exploreItemsToUnified(items);
+  const unifiedItems = useMemo(() => {
+    return exploreItemsToUniversal(items);
   }, [items]);
 
   // Handle item click - passes index for Shorts Player entry
-  const handleItemClick = useCallback((unifiedItem: UnifiedMediaItem, index: number) => {
-    const originalItem = items.find(item => item.id === unifiedItem.id);
+  const handleItemClick = useCallback((unifiedItem: UniversalMediaItem, index: number) => {
+    const originalItem = itemsRef.current.find(item => item.id === unifiedItem.id);
     if (originalItem) {
-      // Pass the index for proper Shorts Player entry
       onOpen(originalItem, index);
     }
-  }, [items, onOpen]);
+  }, [onOpen]);
 
   // Handle author click
   const handleAuthorClick = useCallback((authorId: string) => {
@@ -106,19 +120,18 @@ export default function ShortsGrid({
     onLike?.(itemId);
   }, [onLike]);
 
-  // If there are cluster headers, we need custom rendering
+  // If there are cluster headers, we need custom rendering with sections
   if (clusterHeaders.length > 0) {
-    // Build sections: for each cluster header, show header then items until next header
     const sections: React.ReactNode[] = [];
     let lastIndex = 0;
     
     clusterHeaders.forEach((header, headerIdx) => {
-      // Items before this header (if any, and not first header)
+      // Items before this header (if any)
       if (header.index > lastIndex) {
         const beforeItems = unifiedItems.slice(lastIndex, header.index);
         if (beforeItems.length > 0) {
           sections.push(
-            <UnifiedMediaGrid
+            <UniversalMediaGrid
               key={`section-${lastIndex}`}
               items={beforeItems}
               config={WATCH_GRID_CONFIG}
@@ -144,7 +157,7 @@ export default function ShortsGrid({
       
       if (sectionItems.length > 0) {
         sections.push(
-          <UnifiedMediaGrid
+          <UniversalMediaGrid
             key={`section-${header.index}`}
             items={sectionItems}
             config={WATCH_GRID_CONFIG}
@@ -165,7 +178,7 @@ export default function ShortsGrid({
     // Any remaining items after the last header
     if (lastIndex < unifiedItems.length) {
       sections.push(
-        <UnifiedMediaGrid
+        <UniversalMediaGrid
           key={`section-final`}
           items={unifiedItems.slice(lastIndex)}
           config={WATCH_GRID_CONFIG}
@@ -183,10 +196,10 @@ export default function ShortsGrid({
     return <>{sections}</>;
   }
 
-  // No clustering - render normally
+  // No clustering - render single grid
   return (
     <>
-      <UnifiedMediaGrid
+      <UniversalMediaGrid
         items={unifiedItems}
         config={WATCH_GRID_CONFIG}
         isLoading={isLoading}

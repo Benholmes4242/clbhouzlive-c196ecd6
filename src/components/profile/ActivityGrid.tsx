@@ -1,8 +1,10 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import HighQualityImage from '@/components/ui/high-quality-image';
-import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
+import { 
+  UniversalMediaGrid, 
+  UniversalGridConfig, 
+  UniversalMediaItem 
+} from '@/components/grid';
 
 export type LayoutHint = 'square' | 'tall' | 'wide';
 
@@ -23,48 +25,58 @@ interface ActivityGridProps {
   className?: string;
 }
 
+// Grid config for Profile Activity grid
+const ACTIVITY_GRID_CONFIG: UniversalGridConfig = {
+  layout: 'portrait-grid',
+  columns: 3,
+  autoplayPattern: 'every-nth',
+  autoplayNth: 3,
+  maxConcurrent: 2,
+  surface: 'profile',
+  lazyLoad: true,
+  preloadViewports: 2,
+  initialVisible: 9, // 3 rows of 3
+  showCreator: false,
+  showLikes: false,
+  showDuration: true,
+  infiniteScroll: false,
+};
+
 /**
- * ActivityGrid - Premium 3-column grid with 2px gaps and rounded squares
- * Supports masonry-style layout hints for varied content
+ * Convert ActivityGridItem to UniversalMediaItem
+ */
+function activityItemToUniversal(
+  item: ActivityGridItem & { _stackCount?: number; _stackName?: string }, 
+  index: number
+): UniversalMediaItem {
+  return {
+    id: item.id,
+    postId: item.roundId || item.id,
+    type: item.type,
+    url: item.thumbnailUrl,
+    thumbnailUrl: item.thumbnailUrl,
+    playbackUrl: item.previewUrl,
+    sortIndex: index,
+    orientation: item.layoutHint === 'wide' ? 'landscape' : item.layoutHint === 'tall' ? 'portrait' : 'square',
+    tileVariant: 'portrait',
+    additionalMediaCount: item._stackCount ? item._stackCount - 1 : undefined,
+    courseName: item._stackName || item.courseName,
+  };
+}
+
+/**
+ * ActivityGrid - Premium 3-column grid with 2px gaps
+ * Uses UniversalMediaGrid under the hood
  */
 const ActivityGrid: React.FC<ActivityGridProps> = ({
   items,
   onItemClick,
   className
 }) => {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  // Keep reference to original items for lookup
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
   
-  // Check if device supports hover (not touch)
-  const [supportsHover, setSupportsHover] = useState(false);
-  
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    setSupportsHover(window.matchMedia('(pointer:fine)').matches);
-  }, []);
-
-  // Cleanup video refs on unmount
-  useEffect(() => {
-    return () => {
-      videoRefs.current.clear();
-    };
-  }, []);
-
-  // Handle hover preview for videos on desktop
-  // NOTE: For grid hover previews, we use simple video element with autoplay
-  // attribute rather than calling .play() directly. The browser handles it.
-  const handleMouseEnter = useCallback((item: ActivityGridItem) => {
-    if (!supportsHover || item.type !== 'video') return;
-    setHoveredId(item.id);
-    // Video will autoplay via the autoPlay attribute when src is set
-  }, [supportsHover]);
-
-  const handleMouseLeave = useCallback((item: ActivityGridItem) => {
-    if (!supportsHover) return;
-    setHoveredId(null);
-    // Video will stop when src is cleared (see render logic)
-  }, [supportsHover]);
-
   // Group posts by round for stacking
   const groupedItems = useMemo(() => {
     const byRound = new Map<string, ActivityGridItem[]>();
@@ -88,22 +100,30 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
     });
   }, [items]);
 
-  // Flatten for grid display (for now, simple implementation)
+  // Flatten for grid display with stack metadata
   const displayItems = useMemo(() => {
     return groupedItems.flatMap(group => {
       if (group.kind === 'single') return [group.item];
-      // For rounds, show first item with stack indicator
-      return [{ ...group.items[0], _stackCount: group.items.length, _stackName: group.courseName }];
+      return [{ 
+        ...group.items[0], 
+        _stackCount: group.items.length, 
+        _stackName: group.courseName 
+      }];
     });
   }, [groupedItems]);
-
-  // Lazy loading: only mount grid items in/near viewport
-  const { visibleIndices, registerTile } = useLazyTiles({
-    totalItems: displayItems.length,
-    initialVisible: 9, // First 3 rows (9 items for 3-column grid)
-    preloadViewports: 2,
-    estimatedRowHeight: 120,
-  });
+  
+  // Convert to UniversalMediaItem format
+  const unifiedItems = useMemo(() => {
+    return displayItems.map((item, index) => activityItemToUniversal(item as any, index));
+  }, [displayItems]);
+  
+  // Handle item click - find original item
+  const handleItemClick = useCallback((unifiedItem: UniversalMediaItem, index: number) => {
+    const originalItem = itemsRef.current.find(item => item.id === unifiedItem.id);
+    if (originalItem) {
+      onItemClick(originalItem, index);
+    }
+  }, [onItemClick]);
 
   if (items.length === 0) {
     return (
@@ -118,95 +138,12 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
   }
 
   return (
-    <div 
-      className={cn(
-        "grid grid-cols-3 gap-[2px] pb-24",
-        className
-      )}
-    >
-      {displayItems.map((item, index) => {
-        const isVisible = visibleIndices.has(index);
-        
-        // Render placeholder for tiles not yet visible
-        if (!isVisible) {
-          return (
-            <div
-              key={`placeholder-${item.id}`}
-              ref={(el) => el && registerTile(index, el)}
-              data-lazy-index={index}
-              className="relative aspect-square bg-muted/20"
-            />
-          );
-        }
-        
-        const isVideo = item.type === 'video';
-        const isHovered = hoveredId === item.id;
-        const stackCount = (item as any)._stackCount;
-        const stackName = (item as any)._stackName;
-        
-        return (
-          <div
-            key={item.id}
-            className={cn(
-              "relative overflow-hidden aspect-square",
-              "bg-muted/30 cursor-pointer",
-              "transition-transform duration-200",
-              "active:scale-[0.98]"
-            )}
-            onClick={() => onItemClick(item, index)}
-            onMouseEnter={() => handleMouseEnter(item)}
-            onMouseLeave={() => handleMouseLeave(item)}
-          >
-            {/* Image/Video content */}
-            {isVideo && supportsHover ? (
-              <video
-                ref={el => {
-                  if (el) videoRefs.current.set(item.id, el);
-                }}
-                src={isHovered ? item.previewUrl : undefined}
-                poster={item.thumbnailUrl}
-                className="w-full h-full object-cover"
-                playsInline
-                muted
-                loop
-                preload="metadata"
-                autoPlay={isHovered}
-              />
-            ) : (
-              <HighQualityImage
-                src={item.thumbnailUrl}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            )}
-            
-            {/* Video indicator */}
-            {isVideo && !isHovered && (
-              <div className="absolute right-1.5 bottom-1.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5">
-                <Play className="w-3 h-3 fill-white text-white" />
-              </div>
-            )}
-            
-            {/* Stack indicator for grouped rounds */}
-            {stackCount && stackCount > 1 && (
-              <>
-                {/* Stacked frame effect */}
-                <div className="absolute inset-0 border border-white/25 pointer-events-none" />
-                <div className="absolute inset-1 border border-white/15 pointer-events-none" />
-                
-                {/* Stack label */}
-                <div className="absolute left-1.5 bottom-1.5 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white flex items-center gap-1">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="4" y="4" width="16" height="16" rx="2" />
-                    <rect x="8" y="8" width="16" height="16" rx="2" />
-                  </svg>
-                  {stackName} · {stackCount}
-                </div>
-              </>
-            )}
-          </div>
-        );
-      })}
+    <div className={cn("pb-24", className)}>
+      <UniversalMediaGrid
+        items={unifiedItems}
+        config={ACTIVITY_GRID_CONFIG}
+        onItemClick={handleItemClick}
+      />
     </div>
   );
 };

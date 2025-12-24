@@ -50,3 +50,13 @@ export {
   useGridMediaRuntime,
   useVerticalFeedRuntime,
 } from './hooks';
+
+// Adapters
+export {
+  exploreItemToUniversal,
+  exploreItemsToUniversal,
+  activityItemToUniversal,
+  activityItemsToUniversal,
+  activityPostToUniversal,
+  activityPostsToUniversal,
+} from './adapters';
