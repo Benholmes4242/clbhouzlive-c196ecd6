@@ -28,6 +28,11 @@ interface GolferVerificationCardProps {
   request: GolferVerificationRequest;
   myReview?: string;
   onClick: () => void;
+  // Bulk selection props
+  selectMode?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+  selectable?: boolean;
 }
 
 const getStatusVariant = (status: string): StatusVariant => {
@@ -71,6 +76,10 @@ export function GolferVerificationCard({
   request,
   myReview,
   onClick,
+  selectMode = false,
+  selected = false,
+  onSelect,
+  selectable = true,
 }: GolferVerificationCardProps) {
   const profile = request.user_profile;
   const approvalCount = request.approval_count ?? 0;
@@ -108,6 +117,10 @@ export function GolferVerificationCard({
         variant: getStatusVariant(request.status),
       }}
       onClick={onClick}
+      selectMode={selectMode}
+      selected={selected}
+      onSelect={onSelect}
+      selectable={selectable}
     />
   );
 }

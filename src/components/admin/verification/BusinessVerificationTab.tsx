@@ -39,6 +39,10 @@ import { ENABLE_VERIFICATION_BYPASS } from '@/lib/featureFlags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BusinessVerificationCard, BusinessVerificationBottomSheet } from './mobile';
 import { AdminListSkeleton, AdminEmptyState } from '@/components/admin/mobile';
+import { useBulkSelect } from '@/hooks/useBulkSelect';
+import { BulkActionBar, SelectModeHeader } from '@/components/admin/BulkActionBar';
+import { SelectModeButton } from '@/components/admin/SelectModeButton';
+import { verifyBulk } from '@/lib/adminBulkApi';
 
 interface VerificationRequest {
   id: string;
@@ -191,6 +195,53 @@ const BusinessVerificationTab = () => {
   const approvedRequests = requests?.filter(r => r.status === 'approved') ?? [];
   const rejectedRequests = requests?.filter(r => r.status === 'rejected') ?? [];
   const revokedRequests = requests?.filter(r => r.status === 'revoked') ?? [];
+
+  // Bulk selection for pending requests only
+  const bulkSelect = useBulkSelect(
+    pendingRequests,
+    (r) => r.status === 'pending' // Only pending are selectable
+  );
+
+  // Bulk action handlers
+  const handleBulkApprove = async () => {
+    try {
+      const result = await bulkSelect.executeBulk(async (ids) => {
+        return await verifyBulk('approve', 'business', ids);
+      });
+      toast.success(`Approved ${result.success.length} verifications`, {
+        description: result.failed.length > 0 ? `${result.failed.length} failed` : undefined,
+        action: {
+          label: 'View Audit Log',
+          onClick: () => window.location.href = '/admin/audit',
+        },
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      bulkSelect.exitSelectMode();
+    } catch (error: any) {
+      toast.error('Bulk approval failed', { description: error.message });
+    }
+  };
+
+  const handleBulkReject = async () => {
+    try {
+      const result = await bulkSelect.executeBulk(async (ids) => {
+        return await verifyBulk('reject', 'business', ids);
+      });
+      toast.success(`Rejected ${result.success.length} verifications`, {
+        description: result.failed.length > 0 ? `${result.failed.length} failed` : undefined,
+        action: {
+          label: 'View Audit Log',
+          onClick: () => window.location.href = '/admin/audit',
+        },
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      bulkSelect.exitSelectMode();
+    } catch (error: any) {
+      toast.error('Bulk rejection failed', { description: error.message });
+    }
+  };
 
   const submitReviewMutation = useMutation({
     mutationFn: async ({ requestId, decision, note, bypassCooldown = false }: { requestId: string; decision: string; note?: string; bypassCooldown?: boolean }) => {
@@ -737,31 +788,70 @@ const BusinessVerificationTab = () => {
 
   return (
     <div className="space-y-4">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      {/* Bulk action bar (mobile: sticky bottom, desktop: inline) */}
+      {bulkSelect.selectMode && activeTab === 'pending' && (
+        <BulkActionBar
+          selectedCount={bulkSelect.selectedCount}
+          onCancel={bulkSelect.exitSelectMode}
+          processing={!!bulkSelect.progress && bulkSelect.progress.processed < bulkSelect.progress.total}
+          progress={bulkSelect.progress}
+          actions={[
+            {
+              label: 'Approve',
+              onClick: handleBulkApprove,
+              icon: <CheckCircle className="h-4 w-4" />,
+            },
+            {
+              label: 'Reject',
+              onClick: handleBulkReject,
+              variant: 'destructive',
+              icon: <XCircle className="h-4 w-4" />,
+            },
+          ]}
+        />
+      )}
+
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); bulkSelect.exitSelectMode(); }}>
         {/* Status tabs - single row with horizontal scroll */}
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-          <TabsList className="inline-flex w-full md:w-auto h-9 md:h-10 gap-1">
-            <TabsTrigger value="pending" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Pending
-              {pendingRequests.length > 0 && <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
-            </TabsTrigger>
-            <TabsTrigger value="approved" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Approved
-              <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="rejected" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Rejected
-              <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="revoked" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Revoked
-              <span className="text-[10px] md:text-xs opacity-60">({revokedRequests.length})</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex items-center justify-between gap-2">
+          <div className="overflow-x-auto flex-1 -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList className="inline-flex w-full md:w-auto h-9 md:h-10 gap-1">
+              <TabsTrigger value="pending" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
+                Pending
+                {pendingRequests.length > 0 && <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
+              </TabsTrigger>
+              <TabsTrigger value="approved" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
+                Approved
+                <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="rejected" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
+                Rejected
+                <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="revoked" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
+                Revoked
+                <span className="text-[10px] md:text-xs opacity-60">({revokedRequests.length})</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          {/* Select button - only show on pending tab when there are items */}
+          {activeTab === 'pending' && pendingRequests.length > 0 && !bulkSelect.selectMode && (
+            <SelectModeButton onClick={bulkSelect.enterSelectMode} />
+          )}
         </div>
 
         <TabsContent value="pending" className="mt-4 space-y-3">
-          {!isMobile && <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>}
+          {/* Select mode header */}
+          {bulkSelect.selectMode && (
+            <SelectModeHeader
+              selectedCount={bulkSelect.selectedCount}
+              totalCount={bulkSelect.selectableCount}
+              allSelected={bulkSelect.allSelected}
+              onToggleAll={bulkSelect.toggleSelectAll}
+              onCancel={bulkSelect.exitSelectMode}
+            />
+          )}
+          {!isMobile && !bulkSelect.selectMode && <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>}
           {pendingRequests.length === 0 ? (
             <AdminEmptyState icon={Building2} title="No pending requests" description="All caught up!" />
           ) : isMobile ? (
@@ -770,7 +860,11 @@ const BusinessVerificationTab = () => {
                 key={request.id}
                 request={request}
                 myReview={myReviewsByRequest.get(request.id)}
-                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+                onClick={() => { if (!bulkSelect.selectMode) { setSelectedRequest(request); setMobileSheetOpen(true); } }}
+                selectMode={bulkSelect.selectMode}
+                selected={bulkSelect.isSelected(request.id)}
+                onSelect={() => bulkSelect.toggleSelect(request.id)}
+                selectable={true}
               />
             ))
           ) : pendingRequests.map(request => renderRequestCard(request, true))}
