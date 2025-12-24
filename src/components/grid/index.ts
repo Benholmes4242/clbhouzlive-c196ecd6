@@ -7,7 +7,6 @@
 
 // Main component
 export { UniversalMediaGrid, default } from './UniversalMediaGrid';
-export { default as ClubhouseVerticalGrid } from './ClubhouseVerticalGrid';
 
 // Types
 export type {
@@ -50,7 +49,6 @@ export {
   useViewportTracking,
   useGridMediaRuntime,
   useVerticalFeedRuntime,
-  useVerticalFeedLogic,
 } from './hooks';
 
 // Adapters

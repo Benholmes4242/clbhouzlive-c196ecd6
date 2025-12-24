@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
 interface PasswordSheetContentProps {
@@ -23,7 +23,6 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
   onForgotPassword,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
   
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);
@@ -38,33 +37,24 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
     }
   };
 
-  const getInputBackground = () => {
-    if (isFocused) return 'rgba(255, 255, 255, 0.08)';
-    return 'rgba(255, 255, 255, 0.05)';
-  };
-
   return (
-    <div className="space-y-5">
-      {/* Back button and email display - breadcrumb style */}
-      <div 
-        className="flex items-center gap-2.5 py-2 px-3 rounded-xl -mx-1"
-        style={{ background: 'rgba(255, 255, 255, 0.03)' }}
-      >
+    <div className="space-y-4">
+      {/* Back button and email display */}
+      <div className="flex items-center gap-3 mb-2">
         <button
           onClick={onBack}
           disabled={submitting}
-          className="w-7 h-7 flex items-center justify-center rounded-full transition-all active:scale-95"
+          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
           style={{ background: 'rgba(255, 255, 255, 0.08)' }}
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-white/60" />
+          <ArrowLeft className="w-4 h-4 text-white/70" />
         </button>
-        <span 
-          className="text-[13px] text-white/50 truncate"
-          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
-        >
-          {email}
-        </span>
+        <span className="text-white/60 text-[14px] truncate">{email}</span>
       </div>
+      
+      <p className="text-white/60 text-[14px]">
+        Enter your password to sign in.
+      </p>
       
       <div>
         <input
@@ -73,47 +63,25 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           placeholder="Password"
           disabled={submitting}
-          className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
           style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
-            background: getInputBackground(),
-            border: passwordError 
-              ? '1px solid #E03131' 
-              : '1px solid rgba(255, 255, 255, 0.07)',
-            boxShadow: isFocused 
-              ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
-              : 'none',
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: passwordError ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
           }}
           autoComplete="current-password"
         />
-        <style>{`
-          input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 14px;
-          }
-        `}</style>
         {passwordError && (
           <p className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
         )}
       </div>
       
-      {/* Submit button - premium white */}
+      {/* Submit button - white, black text */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
-        style={{
-          fontFamily: 'SF Pro Text, system-ui, sans-serif',
-          fontWeight: 500,
-          background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
-          color: '#0D0F11',
-          cursor: isDisabled ? 'not-allowed' : 'pointer',
-          opacity: isDisabled ? 0.6 : 1,
-        }}
+        className="w-full h-[52px] flex items-center justify-center rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? (
           <Loader2 className="w-5 h-5 animate-spin" />
@@ -122,19 +90,12 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         )}
       </button>
       
-      {/* Forgot password - subtle, reassuring */}
       <button
         onClick={onForgotPassword}
         disabled={submitting}
-        className="w-full text-center text-[13px] transition-colors pt-2 group"
-        style={{ 
-          fontFamily: 'SF Pro Text, system-ui, sans-serif',
-          color: 'rgba(255, 255, 255, 0.4)',
-        }}
+        className="w-full text-center text-[14px] text-white/50 hover:text-white/70 transition-colors pt-1"
       >
-        <span className="group-hover:underline group-hover:text-white/55 transition-colors">
-          Forgot your password?
-        </span>
+        Forgot your password?
       </button>
     </div>
   );
