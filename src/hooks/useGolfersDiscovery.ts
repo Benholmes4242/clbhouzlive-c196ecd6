@@ -77,6 +77,7 @@ export function useGolfersDiscovery() {
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
         .neq('id', user!.id)
+        .is('deleted_at', null)
         .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`)
         .limit(50);
 
@@ -106,7 +107,8 @@ export function useGolfersDiscovery() {
       let query = supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index', { count: 'exact' })
-        .neq('id', user!.id);
+        .neq('id', user!.id)
+        .is('deleted_at', null);
 
       // Apply filter
       switch (activeFilter) {
