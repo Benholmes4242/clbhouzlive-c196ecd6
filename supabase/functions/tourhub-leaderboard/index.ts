@@ -90,8 +90,27 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const tour = (url.searchParams.get("tour") || "pga").trim();
-    const eventId = (url.searchParams.get("event") || "").trim();
+    
+    // Support both GET query params and POST body
+    let tour = url.searchParams.get("tour") || "";
+    let eventId = url.searchParams.get("event") || "";
+    
+    // If params not in URL, try POST body
+    if ((!tour || !eventId) && req.method === "POST") {
+      try {
+        const body = await req.json();
+        if (!tour && body.tour) tour = String(body.tour);
+        if (!eventId && body.event) eventId = String(body.event);
+      } catch {
+        // Ignore JSON parse errors
+      }
+    }
+    
+    // Normalize
+    tour = (tour || "pga").trim();
+    eventId = eventId.trim();
+
+    console.log(`[tourhub-leaderboard] Request: tour=${tour}, eventId=${eventId}, method=${req.method}`);
 
     if (!ALLOWED_TOURS.has(tour)) {
       return jsonResponse({ error: "Invalid tour", tour }, 400, 5);
