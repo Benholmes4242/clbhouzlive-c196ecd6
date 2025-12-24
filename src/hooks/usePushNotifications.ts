@@ -52,15 +52,22 @@ export function usePushNotifications(): UsePushNotificationsResult {
   }, []);
 
   // Get OneSignal subscription info
-  const getOneSignalInfo = useCallback((): Promise<{ id: string | null; subscribed: boolean }> => {
+  const getOneSignalInfo = useCallback((): Promise<{ id: string | null; subscribed: boolean; permissionDenied: boolean }> => {
     return new Promise((resolve) => {
       // Try Median's onesignal bridge first
       if (window.median?.onesignal) {
-        window.median.onesignal.onesignalInfo((info: { oneSignalUserId?: string; oneSignalSubscribed?: boolean }) => {
+        window.median.onesignal.onesignalInfo((info: { 
+          oneSignalUserId?: string; 
+          oneSignalSubscribed?: boolean;
+          oneSignalRequiresUserPrivacyConsent?: boolean;
+          oneSignalPushPermissionStatus?: string; // 'authorized' | 'denied' | 'not_determined' etc.
+        }) => {
           console.log('[usePushNotifications] Median onesignal info:', info);
+          const permissionDenied = info.oneSignalPushPermissionStatus === 'denied';
           resolve({
             id: info.oneSignalUserId || null,
             subscribed: info.oneSignalSubscribed || false,
+            permissionDenied,
           });
         });
         return;
@@ -73,16 +80,43 @@ export function usePushNotifications(): UsePushNotificationsResult {
           oneSignal.getUserId((userId) => {
             oneSignal.isPushNotificationsEnabled((enabled) => {
               console.log('[usePushNotifications] OneSignal info:', { userId, enabled });
-              resolve({ id: userId, subscribed: enabled });
+              // Standard SDK doesn't easily expose permission denied status
+              resolve({ id: userId, subscribed: enabled, permissionDenied: false });
             });
           });
         });
         return;
       }
 
-      resolve({ id: null, subscribed: false });
+      resolve({ id: null, subscribed: false, permissionDenied: false });
     });
   }, []);
+
+  // Poll for OneSignal subscription with timeout
+  const pollForSubscription = useCallback(async (maxWaitMs: number = 25000, intervalMs: number = 1000): Promise<{ id: string | null; subscribed: boolean; permissionDenied: boolean }> => {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < maxWaitMs) {
+      const info = await getOneSignalInfo();
+      console.log('[usePushNotifications] Polling:', info);
+      
+      // Exit early if we got a subscription ID and it's subscribed
+      if (info.id && info.subscribed) {
+        return info;
+      }
+      
+      // Exit early if permission was explicitly denied
+      if (info.permissionDenied) {
+        return info;
+      }
+      
+      // Wait before next poll
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+    
+    // Final check after timeout
+    return await getOneSignalInfo();
+  }, [getOneSignalInfo]);
 
   // Register the device with our backend
   const registerDevice = useCallback(async (providerId: string, enabled: boolean): Promise<boolean> => {
@@ -128,11 +162,13 @@ export function usePushNotifications(): UsePushNotificationsResult {
     }
 
     try {
-      const { id, subscribed } = await getOneSignalInfo();
-      console.log('[usePushNotifications] Current state:', { id, subscribed });
+      const { id, subscribed, permissionDenied } = await getOneSignalInfo();
+      console.log('[usePushNotifications] Current state:', { id, subscribed, permissionDenied });
 
-      if (!id) {
-        setState('prompt');
+      if (permissionDenied) {
+        setState('denied');
+      } else if (!id) {
+        setState('prompt'); // Not yet prompted or unknown
       } else if (subscribed) {
         setState('enabled');
       } else {
@@ -170,16 +206,20 @@ export function usePushNotifications(): UsePushNotificationsResult {
         }
       }
 
-      // Wait a bit for the prompt to be handled
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Poll for subscription (up to 25 seconds for user to respond to prompt)
+      const { id, subscribed, permissionDenied } = await pollForSubscription(25000, 1000);
+      console.log('[usePushNotifications] After polling:', { id, subscribed, permissionDenied });
 
-      // Get the result
-      const { id, subscribed } = await getOneSignalInfo();
-      console.log('[usePushNotifications] After registration:', { id, subscribed });
+      if (permissionDenied) {
+        console.log('[usePushNotifications] Permission explicitly denied by user');
+        setState('denied');
+        return false;
+      }
 
       if (!id) {
-        console.log('[usePushNotifications] No subscription ID after prompt - user likely denied');
-        setState('denied');
+        // No ID after 25s - permission still unknown/pending, keep as prompt
+        console.log('[usePushNotifications] No subscription ID after polling - staying in prompt state');
+        setState('prompt');
         return false;
       }
 
@@ -204,7 +244,7 @@ export function usePushNotifications(): UsePushNotificationsResult {
     } finally {
       setIsRegistering(false);
     }
-  }, [isOneSignalAvailable, getOneSignalInfo, registerDevice, user]);
+  }, [isOneSignalAvailable, pollForSubscription, registerDevice, user]);
 
   // Disable push notifications
   const disable = useCallback(async (): Promise<boolean> => {
@@ -215,19 +255,34 @@ export function usePushNotifications(): UsePushNotificationsResult {
     setIsRegistering(true);
 
     try {
-      // Opt out in OneSignal if method exists
-      const oneSignal = getOneSignal();
-      if (oneSignal) {
-        oneSignal.push(() => {
-          oneSignal.setSubscription(false);
-        });
+      // Try Median's opt-out method first
+      let optedOutViaMedian = false;
+      if (window.median?.onesignal?.setSubscription) {
+        console.log('[usePushNotifications] Using Median bridge to disable subscription');
+        window.median.onesignal.setSubscription(false);
+        optedOutViaMedian = true;
+      } else {
+        // Fallback to standard OneSignal SDK
+        const oneSignal = getOneSignal();
+        if (oneSignal) {
+          console.log('[usePushNotifications] Using OneSignal SDK to disable subscription');
+          oneSignal.push(() => {
+            oneSignal.setSubscription(false);
+          });
+        } else {
+          // No client-side opt-out available - just update DB
+          console.log('[usePushNotifications] No opt-out method available - only updating DB');
+        }
       }
 
       // Get current subscription ID to update backend
       const { id } = await getOneSignalInfo();
       
       if (id && user) {
-        await registerDevice(id, false);
+        const registered = await registerDevice(id, false);
+        if (!registered) {
+          console.warn('[usePushNotifications] Failed to update DB - but local state changed');
+        }
       }
 
       setState('disabled');
