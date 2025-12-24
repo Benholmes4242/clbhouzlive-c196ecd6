@@ -295,8 +295,19 @@ export function usePushNotifications(): UsePushNotificationsResult {
     }
   }, [isOneSignalAvailable, getOneSignalInfo, registerDevice, user]);
 
-  // Initial check
+  // Initial check + one-time diagnostic log
   useEffect(() => {
+    // Diagnostic: log what Median exposes for OneSignal
+    console.log('[Median OneSignal] window.median?.onesignal exists?', !!window.median?.onesignal);
+    console.log('[Median OneSignal] setSubscription method exists?', typeof window.median?.onesignal?.setSubscription);
+    
+    if (window.median?.onesignal?.onesignalInfo) {
+      window.median.onesignal.onesignalInfo((info: Record<string, unknown>) => {
+        console.log('[Median OneSignal] onesignalInfo full payload:', info);
+        console.log('[Median OneSignal] Available keys:', Object.keys(info));
+      });
+    }
+    
     refresh();
   }, [refresh]);
 
