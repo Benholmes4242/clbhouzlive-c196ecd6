@@ -4,9 +4,13 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import { useHideBottomNav } from "@/hooks/useBottomNavVisibility";
 
 export default function AdminLayout() {
   const [open, setOpen] = useState(false);
+  
+  // Hide bottom nav on all admin routes
+  useHideBottomNav();
 
   return (
     <div className="flex h-screen w-full max-w-full overflow-x-hidden bg-background">
