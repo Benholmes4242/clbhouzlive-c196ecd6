@@ -76,7 +76,7 @@ async function callFn(path: string, query: Record<string, string>) {
 async function getEventFromDB(tour: string, espnEventId: string) {
   const { data, error } = await sb
     .from("tourhub_events")
-    .select("id,tour,espn_event_id,name,short_name,status,start_date,end_date")
+    .select("id,tour,espn_event_id,name,status,start_date,end_date")
     .eq("tour", tour)
     .eq("espn_event_id", espnEventId)
     .maybeSingle();
@@ -167,7 +167,7 @@ serve(async (req) => {
         tour,
         espnEventId: eventId,
         year: ev.start_date ? new Date(ev.start_date).getUTCFullYear() : null,
-        name: safeStr(cached.name) || safeStr(ev.name) || safeStr(ev.short_name) || null,
+        name: safeStr(cached.name) || safeStr(ev.name) || null,
         status,
         generatedAt: new Date().toISOString(),
         leaders: normalizeLeaders(cached.leaders as unknown[]),
@@ -188,7 +188,7 @@ serve(async (req) => {
           tour,
           espnEventId: eventId,
           year: ev.start_date ? new Date(ev.start_date).getUTCFullYear() : null,
-          name: safeStr(espn.data?.name) || safeStr(ev.name) || safeStr(ev.short_name) || null,
+          name: safeStr(espn.data?.name) || safeStr(ev.name) || null,
           status: espn.data?.status || status,
           generatedAt: new Date().toISOString(),
           leaders: normalizeLeaders(espn.data.leaders),
@@ -222,7 +222,7 @@ serve(async (req) => {
             tour,
             espnEventId: eventId,
             year,
-            name: safeStr(ev.name) || safeStr(ev.short_name) || null,
+            name: safeStr(ev.name) || null,
             status,
             generatedAt: new Date().toISOString(),
             leaders: normalizeLeaders(leaders),
@@ -239,7 +239,7 @@ serve(async (req) => {
           tour,
           espnEventId: eventId,
           year,
-          name: safeStr(ev.name) || safeStr(ev.short_name) || null,
+          name: safeStr(ev.name) || null,
           status,
           generatedAt: new Date().toISOString(),
           leaders: [],
@@ -279,7 +279,7 @@ serve(async (req) => {
               tour,
               espnEventId: eventId,
               year,
-              name: safeStr(ev.name) || safeStr(ev.short_name) || null,
+              name: safeStr(ev.name) || null,
               status,
               generatedAt: new Date().toISOString(),
               leaders: normalizeLeaders(leaders),
@@ -300,7 +300,7 @@ serve(async (req) => {
             tour,
             espnEventId: eventId,
             year,
-            name: safeStr(espn.data?.name) || safeStr(ev.name) || safeStr(ev.short_name) || null,
+            name: safeStr(espn.data?.name) || safeStr(ev.name) || null,
             status: espn.data?.status || status,
             generatedAt: new Date().toISOString(),
             leaders: normalizeLeaders(espn.data.leaders),
@@ -317,7 +317,7 @@ serve(async (req) => {
           tour,
           espnEventId: eventId,
           year,
-          name: safeStr(ev.name) || safeStr(ev.short_name) || null,
+          name: safeStr(ev.name) || null,
           status,
           generatedAt: new Date().toISOString(),
           leaders: [],
@@ -336,7 +336,7 @@ serve(async (req) => {
         tour,
         espnEventId: eventId,
         year: ev.start_date ? new Date(ev.start_date).getUTCFullYear() : null,
-        name: safeStr(ev.name) || safeStr(ev.short_name) || null,
+        name: safeStr(ev.name) || null,
         status,
         generatedAt: new Date().toISOString(),
         leaders: [],
