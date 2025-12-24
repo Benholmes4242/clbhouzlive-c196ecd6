@@ -509,30 +509,35 @@ export function SettingsPageV2() {
   );
 }
 
-// ========== SETTINGS HEADER (Light frosted glass) ==========
+// ========== SETTINGS HEADER (Matches Top100Hub pattern) ==========
 
 function SettingsHeader({ onBack }: { onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
+      className="sticky top-0 z-50 bg-[#F8FAFC]"
       style={{
-        background: 'rgba(248,250,252,0.85)',
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
-        borderBottom: '1px solid rgba(31,36,40,0.06)',
-        boxShadow: '0 6px 18px rgba(31,36,40,0.06)',
-        paddingTop: 'max(env(safe-area-inset-top), 12px)',
+        paddingTop: 'max(env(safe-area-inset-top), 0px)',
       }}
     >
-      <button
-        onClick={onBack}
-        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
-      </button>
-      <div>
-        <h1 className="text-lg font-semibold text-[#1F2428]">Settings</h1>
-        <p className="text-[13px] text-[#5E666D]">Manage your account, creator identity and preferences.</p>
+      {/* Back button - top left */}
+      <div className="pt-4 pb-4 px-4">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center text-sm font-medium text-[#5E666D] hover:text-[#1F2428] transition"
+        >
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back
+        </button>
+      </div>
+      
+      {/* Title centered below */}
+      <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-4">
+        <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight text-[#1F2428]">
+          Settings
+        </h1>
+        <p className="text-center text-sm text-[#5E666D]/70">
+          Manage your account, creator identity and preferences.
+        </p>
       </div>
     </header>
   );
