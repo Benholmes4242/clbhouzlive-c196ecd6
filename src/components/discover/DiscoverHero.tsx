@@ -15,6 +15,15 @@ import {
   logHeroError,
   logHeroLoadedData,
 } from '@/utils/gridAuditTimeline';
+import {
+  logHeroComponentMount,
+  logHeroMediaRuntimeRegister,
+  logHeroPosterHidden,
+  logHeroPreloadManifest,
+  logHeroLoadedData as logHeroLoadedDataTiming,
+  logHeroPlaying as logHeroPlayingTiming,
+  logHeroCanPlay as logHeroCanPlayTiming,
+} from '@/utils/discoverTimeline';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_HERO = true;
@@ -98,6 +107,9 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
           observeTarget: containerRef.current,
         });
         
+        // Discover timing instrumentation
+        logHeroMediaRuntimeRegister(item.id, 0);
+        
         if (DEBUG_HERO) {
           logHero('REGISTERED_WITH_MEDIARUNTIME', { id: item.id.slice(0, 8) });
         }
@@ -129,6 +141,7 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
     if (uid) {
       const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
       logHero('LAYOUT_EFFECT_PRELOAD', { id: item.id.slice(0, 8) });
+      logHeroPreloadManifest(item.id);
       preloadHlsManifest(hlsUrl);
     }
   }, [item]);
@@ -137,6 +150,10 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   useEffect(() => {
     if (item) {
       logHeroMount(item.id, item.mediaType);
+      // Discover timing instrumentation
+      if (item.mediaType === 'video') {
+        logHeroComponentMount(item.id, autoplay);
+      }
     }
     logHero('MOUNT', { 
       itemId: item?.id,
@@ -167,6 +184,8 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   const handleLoadedData = useCallback(() => {
     if (item) {
       logHeroLoadedData(item.id, playerRef.current?.getCurrentTime?.() || 0);
+      // Discover timing instrumentation
+      logHeroLoadedDataTiming(item.id, playerRef.current?.getCurrentTime?.() || 0);
     }
     logHero('HANDLE_LOADED_DATA_CALLED', { itemId: item?.id, hasDuration: !!item?.durationSeconds });
     if (playerRef.current && !item?.durationSeconds) {

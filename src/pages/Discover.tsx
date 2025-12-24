@@ -1,8 +1,9 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import CompactHeader from '@/components/header/CompactHeader';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { logDiscoverPageMount, logDiscoverPageUnmount, logWatchTabActive } from '@/utils/discoverTimeline';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -43,6 +44,12 @@ type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 const Discover = () => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Timing instrumentation - log page mount/unmount
+  useEffect(() => {
+    logDiscoverPageMount();
+    return () => logDiscoverPageUnmount();
+  }, []);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -122,6 +129,13 @@ const Discover = () => {
   // Reset tags when switching main pill
   React.useEffect(() => {
     setSelectedTags([]);
+  }, [main]);
+
+  // Log when Watch tab becomes active
+  useEffect(() => {
+    if (main === 'shorts' || main === 'videos') {
+      logWatchTabActive(main);
+    }
   }, [main]);
   
   // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
