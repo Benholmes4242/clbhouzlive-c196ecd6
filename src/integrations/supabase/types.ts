@@ -5118,6 +5118,51 @@ export type Database = {
         }
         Relationships: []
       }
+      tourhub_event_mappings: {
+        Row: {
+          confidence: number
+          created_at: string
+          espn_event_id: string
+          id: string
+          last_verified_at: string | null
+          livegolf_event_id: string | null
+          match_method: string
+          notes: string | null
+          slashgolf_tourn_id: string | null
+          tour: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          espn_event_id: string
+          id?: string
+          last_verified_at?: string | null
+          livegolf_event_id?: string | null
+          match_method?: string
+          notes?: string | null
+          slashgolf_tourn_id?: string | null
+          tour: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          espn_event_id?: string
+          id?: string
+          last_verified_at?: string | null
+          livegolf_event_id?: string | null
+          match_method?: string
+          notes?: string | null
+          slashgolf_tourn_id?: string | null
+          tour?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       tourhub_events: {
         Row: {
           course_name: string | null
