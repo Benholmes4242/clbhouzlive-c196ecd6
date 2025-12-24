@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatHcp } from '@/lib/formatHcp';
 import { TapButton } from '@/components/ui/TapButton';
 import { Squircle } from '@/components/ui/squircle';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface HostGameViewProps {
   game: GameBeacon;
@@ -66,7 +67,7 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
                 {participants.map((p) => (
                   <button
                     key={p.user_id}
-                    onClick={() => navigate(`/profile/${p.username || p.user_id}`)}
+                    onClick={() => navigate(getProfilePathById(p.user_id, (p as any).creator_only, p.username))}
                     className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
                   >
                     <Squircle width={20} height={20}>

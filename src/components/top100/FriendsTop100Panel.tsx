@@ -6,6 +6,7 @@ import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface FriendsTop100PanelProps {
   listId: string;
@@ -58,7 +59,10 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
           {topThree.map((friend) => (
             <div
               key={friend.user_id}
-              onClick={() => navigate(`/profile/${friend.profile.username}`)}
+              onClick={() => {
+                const path = getProfilePathById(friend.user_id, (friend as any).creator_only, friend.profile.username);
+                navigate(path);
+              }}
               className="flex-shrink-0 bg-background/50 rounded-xl p-4 cursor-pointer hover:bg-background/70 transition-colors min-w-[160px]"
             >
               <div className="flex flex-col items-center gap-2">
@@ -93,7 +97,8 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
               <div
                 key={friend.user_id}
                 onClick={() => {
-                  navigate(`/profile/${friend.profile.username}`);
+                  const path = getProfilePathById(friend.user_id, (friend as any).creator_only, friend.profile.username);
+                  navigate(path);
                   setIsModalOpen(false);
                 }}
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors"

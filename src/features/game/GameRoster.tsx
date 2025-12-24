@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GameParticipant } from '@/features/nearby/types';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import HcpBadge from '@/components/HcpBadge';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface GameRosterProps {
   participants: GameParticipant[];
@@ -19,13 +20,9 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
     return new Date(a.joined_at || a.created_at).getTime() - new Date(b.joined_at || b.created_at).getTime();
   });
 
-  const handleAvatarClick = (username?: string, userId?: string) => {
-    if (username) {
-      navigate(`/profile/${username}`);
-    } else if (userId) {
-      // Fallback: navigate with user ID if no username
-      navigate(`/profile/${userId}`);
-    }
+  const handleAvatarClick = (userId: string, username?: string, creatorOnly?: boolean) => {
+    const path = getProfilePathById(userId, creatorOnly, username);
+    navigate(path);
   };
 
   return (
@@ -38,7 +35,7 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
           return (
             <button
               key={participant.id}
-              onClick={() => handleAvatarClick(profile?.username, participant.user_id)}
+              onClick={() => handleAvatarClick(participant.user_id, profile?.username, (profile as any)?.creator_only)}
               className="relative group"
               style={{ zIndex: sortedParticipants.length - index }}
             >

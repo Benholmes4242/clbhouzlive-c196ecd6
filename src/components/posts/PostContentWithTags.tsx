@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface TaggableEntity {
   id: string;
@@ -7,6 +8,7 @@ interface TaggableEntity {
   entity_id: string;
   name: string;
   username: string | null;
+  creator_only?: boolean | null;
 }
 
 interface PostTag {
@@ -35,11 +37,8 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
 
   const handleTagClick = (entity: TaggableEntity) => {
     if (entity.entity_type === 'user') {
-      if (entity.username) {
-        navigate(`/profile/${entity.username}`);
-      } else {
-        navigate(`/profile/${entity.entity_id}`);
-      }
+      const path = getProfilePathById(entity.entity_id, entity.creator_only, entity.username);
+      navigate(path);
     } else if (entity.entity_type === 'business') {
       navigate(`/business/${entity.entity_id}`);
     }

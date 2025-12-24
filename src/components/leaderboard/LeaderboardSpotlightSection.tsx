@@ -5,6 +5,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLeaderboardSpotlight, SpotlightType } from '@/hooks/useLeaderboardSpotlight';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 const SPOTLIGHT_CONFIG: Record<SpotlightType, { label: string; icon: typeof Trophy; formatValue: (v: number) => string }> = {
   most_played: {
@@ -28,8 +29,9 @@ export function LeaderboardSpotlightSection() {
   const navigate = useNavigate();
   const { data: spotlights, isLoading } = useLeaderboardSpotlight();
 
-  const handlePlayerClick = (userId: string) => {
-    navigate(`/profile/${userId}`);
+  const handlePlayerClick = (userId: string, creatorOnly?: boolean) => {
+    const path = getProfilePathById(userId, creatorOnly);
+    navigate(path);
   };
 
   if (isLoading) {

@@ -11,6 +11,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { GameParticipant as Participant } from '@/features/game/hooks/useGameParticipants';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 type UiParticipant = {
   user_id: string | null;
@@ -133,8 +134,9 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
       <button
         key={keyOf(p)}
         onClick={() => {
-          if (p.username || p.user_id) {
-            navigate(`/profile/${p.username || p.user_id}`);
+          if (p.user_id) {
+            const path = getProfilePathById(p.user_id, undefined, p.username);
+            navigate(path);
           }
         }}
         className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"

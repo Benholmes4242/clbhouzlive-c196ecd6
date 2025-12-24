@@ -15,6 +15,7 @@ import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+import { getProfilePathById } from '@/lib/profileRoutes';
 import {
   WeeklyHighlightsCarousel,
   StreakBadge,
@@ -260,7 +261,10 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
           </div>
           <button
             type="button"
-            onClick={() => navigate(`/profile/${spotlight.user_id}?tab=top100`)}
+            onClick={() => {
+              const path = getProfilePathById(spotlight.user_id, (spotlight as any).creator_only);
+              navigate(`${path}?tab=top100`);
+            }}
             className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-amber-600 text-white shadow-sm hover:bg-amber-700 transition-colors"
           >
             View profile
@@ -424,7 +428,10 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
               key={entry.user_id}
               data-user-id={entry.user_id}
               type="button"
-              onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
+              onClick={() => {
+                const path = getProfilePathById(entry.user_id, (entry as any).creator_only);
+                navigate(`${path}?tab=top100`);
+              }}
               className="w-full border-b border-border/40 bg-card/95 px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 transition-colors first:border-t"
             >
               {/* Left: avatar + text */}

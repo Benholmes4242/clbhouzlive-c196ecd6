@@ -8,6 +8,7 @@ import { useFriendActions } from '@/hooks/useFriendActions';
 import { SocialUser } from '@/hooks/useFollowersList';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import { UserCheck, UserPlus } from 'lucide-react';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface SocialUserRowProps {
   user: SocialUser;
@@ -32,7 +33,8 @@ export const SocialUserRow: React.FC<SocialUserRowProps> = ({ user, currentUserI
   });
 
   const handleRowClick = () => {
-    navigate(`/profile/${user.username}`);
+    const path = getProfilePathById(user.id, (user as any).creatorOnly, user.username);
+    navigate(path);
   };
 
   const handleFollowClick = (e: React.MouseEvent) => {

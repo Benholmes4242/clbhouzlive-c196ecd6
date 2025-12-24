@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { ChevronUp, ChevronDown, MapPin, User, Flag } from 'lucide-react';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface CreatorCapsuleProps {
   user: {
@@ -71,7 +72,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     if (onViewProfile) {
       onViewProfile();
     } else {
-      navigate(`/profile/${user.id}`);
+      const path = getProfilePathById(user.id);
+      navigate(path);
     }
   }, [navigate, onViewProfile, user.id]);
 

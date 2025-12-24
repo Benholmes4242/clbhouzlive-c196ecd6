@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import StoryItem from './StoryBar/StoryItem';
 import { useStoryData } from './StoryBar/useStoryData';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 const StoryBar = () => {
   const navigate = useNavigate();
@@ -47,9 +48,10 @@ const StoryBar = () => {
     }
   };
 
-  // Function to handle other users' profile navigation
-  const handleOtherProfile = (username: string) => {
-    navigate(`/profile/${username}`);
+  // Function to handle other users' profile navigation - respects creator_only
+  const handleOtherProfile = async (username: string, userId?: string, creatorOnly?: boolean) => {
+    const path = getProfilePathById(userId || username, creatorOnly, username);
+    navigate(path);
   };
 
   if (loading) {

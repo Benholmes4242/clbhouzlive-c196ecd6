@@ -9,6 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface UserProfile {
   id: string;
@@ -25,6 +26,8 @@ interface UserProfile {
   businessCategory?: string;
   businessLocation?: string;
   isVerifiedBusiness?: boolean;
+  // Creator-only mode
+  creatorOnly?: boolean;
 }
 
 interface MiniProfileSheetProps {
@@ -201,7 +204,8 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       handleClose();
       // Small delay to ensure modal closes before navigation
       setTimeout(() => {
-        navigate(`/profile/${user.id}`);
+        const path = getProfilePathById(user.id, user.creatorOnly, user.username);
+        navigate(path);
       }, 100);
     }
   };
@@ -211,7 +215,8 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       handleClose();
       // Small delay to ensure modal closes before navigation
       setTimeout(() => {
-        navigate(`/profile/${user.id}`);
+        const path = getProfilePathById(user.id, user.creatorOnly, user.username);
+        navigate(path);
       }, 100);
     }
   };
