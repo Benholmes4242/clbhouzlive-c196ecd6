@@ -191,6 +191,42 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          audience: string
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          metadata: Json | null
+          read_by: string[] | null
+          title: string
+          type: string
+        }
+        Insert: {
+          audience?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          message: string
+          metadata?: Json | null
+          read_by?: string[] | null
+          title: string
+          type: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          metadata?: Json | null
+          read_by?: string[] | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       admin_profiles: {
         Row: {
           created_at: string
@@ -6455,6 +6491,22 @@ export type Database = {
       }
     }
     Views: {
+      admin_audit_feed: {
+        Row: {
+          action: string | null
+          actor_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string | null
+          ip_address: string | null
+          source: string | null
+          status: string | null
+          target_email: string | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Relationships: []
+      }
       business_profile_daily_insights: {
         Row: {
           business_profile_id: string | null
@@ -7135,6 +7187,7 @@ export type Database = {
           newly_awarded_badges: Json
         }[]
       }
+      check_expiring_admin_access: { Args: never; Returns: undefined }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
