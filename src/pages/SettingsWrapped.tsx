@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
-import Settings from './Settings';
+import { SettingsPageV2 } from '@/components/settings/SettingsPageV2';
 
 const SettingsWrapped = () => {
-  const { setVariant } = useHeader();
+  const { hideHeader, showHeader } = useHeader();
 
   useEffect(() => {
-    // Settings page has white background, use solid-light
-    setVariant('solid-light');
-  }, [setVariant]);
+    // SettingsPageV2 has its own header, hide the global one
+    hideHeader();
+    return () => showHeader();
+  }, [hideHeader, showHeader]);
 
-  return <Settings />;
+  return <SettingsPageV2 />;
 };
 
 export default SettingsWrapped;

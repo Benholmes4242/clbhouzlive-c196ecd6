@@ -95,7 +95,7 @@ const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
 const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
-const Settings = lazy(() => import("./pages/Settings"));
+// Old Settings page removed - now using SettingsPageV2 via SettingsWrapped
 const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
