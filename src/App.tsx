@@ -172,6 +172,14 @@ const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEcho
 // Public Echo Share Page
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
 
+// Tour Hub pages
+const TourHubHomePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubHomePage })));
+const TourHubLivePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubLivePage })));
+const TourHubTourPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubTourPage })));
+const TourHubEventPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubEventPage })));
+const TourHubPlayerPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubPlayerPage })));
+const TourHubRankingsPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubRankingsPage })));
+
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 // Creator Page (Phase 3)
@@ -393,6 +401,14 @@ function AppRoutes() {
 
         <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
         <Route path="/game/:id" element={<Suspense fallback={<GenericPageSkeleton />}><GameDetailView /></Suspense>} />
+        
+        {/* Tour Hub routes */}
+        <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubHomePage /></Suspense>} />
+        <Route path="/tourhub/live" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubLivePage /></Suspense>} />
+        <Route path="/tourhub/tour/:tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubTourPage /></Suspense>} />
+        <Route path="/tourhub/event/:tour/:eventId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubEventPage /></Suspense>} />
+        <Route path="/tourhub/player/:athleteId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubPlayerPage /></Suspense>} />
+        <Route path="/tourhub/rankings" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubRankingsPage /></Suspense>} />
         
         {/* Hub routes - only when NOT using background location */}
         {!showHubOverlay && FEATURE_FLAGS.HUB && (

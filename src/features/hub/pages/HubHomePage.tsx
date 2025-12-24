@@ -13,6 +13,7 @@ import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
+import { TourHubTile } from '../home/tiles/TourHubTile';
 import '../home/hubThemeLight.css';
 
 // Animation constants - matches expanded map sheet
@@ -231,7 +232,7 @@ export function HubHomePage() {
           <YourGamesTile />
         </div>
 
-        {/* Echo & Quick Actions 2×2 grid - Square tiles */}
+        {/* Echo, Tour Hub, Quick Actions - 2×2 grid with Tour Hub taking one slot */}
         <div
           className="grid mt-3.5"
           style={{ 
@@ -243,8 +244,13 @@ export function HubHomePage() {
             <EchoTile />
           </div>
           <div style={{ aspectRatio: '1', width: '100%' }}>
-            <QuickActionsTile />
+            <TourHubTile />
           </div>
+        </div>
+        
+        {/* Quick Actions - Full width below */}
+        <div className="mt-3.5 pb-6" style={{ height: '120px' }}>
+          <QuickActionsTile />
         </div>
         </div>
       </main>
