@@ -67,13 +67,16 @@ export function SettingsRow({
         disabled && 'opacity-50 cursor-not-allowed',
       )}
     >
-      {/* Left content - min-width:0 prevents text from pushing layout wider */}
-      <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
-        {icon && (
-          <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
-            {icon}
-          </div>
-        )}
+      {/* Left content - consistent icon rail: 32px fixed width */}
+      <div className="flex items-center flex-1 min-w-0 overflow-hidden">
+        {/* Icon rail - fixed 32px width for perfect alignment */}
+        <div className="flex-shrink-0 w-[32px] h-[18px] flex items-center justify-center">
+          {icon && (
+            <div className="w-[18px] h-[18px] text-[#5E666D] flex items-center justify-center">
+              {icon}
+            </div>
+          )}
+        </div>
         <div className="flex-1 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 overflow-hidden">
             <span className="text-[15px] font-semibold text-[#1F2428] truncate overflow-hidden text-ellipsis">

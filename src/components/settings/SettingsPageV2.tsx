@@ -262,30 +262,38 @@ export function SettingsPageV2() {
               onCheckedChange={handleCreatorToggle}
               disabled={isUpdatingCreator}
               isFirst
-              isLast={!isCreator}
             />
             
-            {isCreator && (
-              <>
-                <SettingsToggleRow
-                  icon={<EyeOff className="w-[16px] h-[16px]" />}
-                  title="Use creator page only"
-                  subtitle="Hides your personal profile. People will only see your creator page."
-                  checked={creatorOnly}
-                  onCheckedChange={handleCreatorOnlyToggle}
-                  disabled={isUpdatingCreator}
-                  isIndented
-                  helperNote="Your personal profile is hidden."
-                />
-                <SettingsChevronRow
-                  icon={<ExternalLink className="w-[18px] h-[18px]" />}
-                  title="View creator page"
-                  subtitle="Preview how others see you."
-                  onClick={() => navigate(`/creator/${user.id}`)}
-                  isLast
-                />
-              </>
-            )}
+            {/* Always show these rows - disabled/gated when Creator Mode is off */}
+            <SettingsToggleRow
+              icon={<EyeOff className="w-[18px] h-[18px]" />}
+              title="Use creator page only"
+              subtitle="Hides your personal profile. People will only see your creator page."
+              checked={creatorOnly}
+              onCheckedChange={(checked) => {
+                if (!isCreator) {
+                  toast('Turn on Creator Mode to unlock this.', { duration: 2000 });
+                  return;
+                }
+                handleCreatorOnlyToggle(checked);
+              }}
+              disabled={!isCreator || isUpdatingCreator}
+              helperNote={isCreator && creatorOnly ? "Your personal profile is hidden." : undefined}
+            />
+            <SettingsChevronRow
+              icon={<ExternalLink className="w-[18px] h-[18px]" />}
+              title="View creator page"
+              subtitle="Preview how others see you."
+              onClick={() => {
+                if (!isCreator) {
+                  toast('Turn on Creator Mode to unlock this.', { duration: 2000 });
+                  return;
+                }
+                navigate(`/creator/${user.id}`);
+              }}
+              disabled={!isCreator}
+              isLast
+            />
           </SettingsSection>
         )}
 
