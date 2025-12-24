@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.tourhub-sync-enrich]
 verify_jwt = false
+
+[functions.tourhub-map-slashgolf]
+verify_jwt = false

@@ -5153,12 +5153,15 @@ export type Database = {
           confidence: number
           created_at: string
           espn_event_id: string
+          espn_name: string | null
           id: string
           last_verified_at: string | null
           livegolf_event_id: string | null
           match_method: string
+          matched_at: string | null
           matched_by: string | null
           notes: string | null
+          slashgolf_name: string | null
           slashgolf_tourn_id: string | null
           tour: string
           updated_at: string
@@ -5168,12 +5171,15 @@ export type Database = {
           confidence?: number
           created_at?: string
           espn_event_id: string
+          espn_name?: string | null
           id?: string
           last_verified_at?: string | null
           livegolf_event_id?: string | null
           match_method?: string
+          matched_at?: string | null
           matched_by?: string | null
           notes?: string | null
+          slashgolf_name?: string | null
           slashgolf_tourn_id?: string | null
           tour: string
           updated_at?: string
@@ -5183,12 +5189,15 @@ export type Database = {
           confidence?: number
           created_at?: string
           espn_event_id?: string
+          espn_name?: string | null
           id?: string
           last_verified_at?: string | null
           livegolf_event_id?: string | null
           match_method?: string
+          matched_at?: string | null
           matched_by?: string | null
           notes?: string | null
+          slashgolf_name?: string | null
           slashgolf_tourn_id?: string | null
           tour?: string
           updated_at?: string
