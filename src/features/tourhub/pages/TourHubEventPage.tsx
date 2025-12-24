@@ -29,7 +29,13 @@ export function TourHubEventPage() {
   const [showFullLeaderboard, setShowFullLeaderboard] = useState(false);
   
   const { data: events } = useTourEvents((tour || 'pga') as any);
-  const { data: leaderboard, isLoading, error, refetch } = useLeaderboard(tour || 'pga', eventId || '');
+  
+  // Only call leaderboard hook when we have valid params
+  const hasValidParams = Boolean(tour) && Boolean(eventId) && eventId.length > 0;
+  const { data: leaderboard, isLoading, error: leaderboardError, refetch } = useLeaderboard(
+    hasValidParams ? tour : undefined,
+    hasValidParams ? eventId : undefined
+  );
   
   const event = useMemo(() => {
     return events?.find(e => e.espn_event_id === eventId);
@@ -42,11 +48,15 @@ export function TourHubEventPage() {
     return showFullLeaderboard ? leaderboard.leaders : leaderboard.leaders.slice(0, 10);
   }, [leaderboard, showFullLeaderboard]);
   
-  if (error) {
+  // Handle missing eventId - show empty state instead of crashing
+  if (!eventId) {
     return (
       <TourHubShell>
         <div className="pt-6">
-          <ErrorState onRetry={() => refetch()} />
+          <PremiumEmptyState
+            title="Event not found"
+            description="This event could not be loaded. Please go back and try again."
+          />
         </div>
       </TourHubShell>
     );
@@ -106,7 +116,14 @@ export function TourHubEventPage() {
       {/* Tab Content */}
       {activeTab === 'leaderboard' && (
         <div>
-          {isLoading ? (
+          {/* Inline error state - non-fatal, keeps page visible */}
+          {leaderboardError ? (
+            <div className="bg-surface-card border border-border-subtle rounded-sq-lg p-6">
+              <ErrorState 
+                onRetry={() => refetch()} 
+              />
+            </div>
+          ) : isLoading ? (
             <LeaderboardSkeleton rows={10} />
           ) : leaderboard?.leaders && leaderboard.leaders.length > 0 ? (
             <>
