@@ -1,5 +1,10 @@
 // Immediately log that this module is being parsed
-console.log('[DiscoverTiming] Module parsing started');
+console.log('%c[DiscoverTiming] Module parsing started', 'background: #ff0000; color: #fff; font-size: 16px; padding: 4px;');
+// Also attach to window immediately
+if (typeof window !== 'undefined') {
+  (window as any).__discoverTimingLoaded = true;
+  console.log('%c[DiscoverTiming] Attached __discoverTimingLoaded = true', 'background: #00ff00; color: #000; font-size: 14px;');
+}
 
 /**
  * Discover Page Video Startup Timeline
