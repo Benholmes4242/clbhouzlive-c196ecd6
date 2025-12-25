@@ -34,10 +34,8 @@ export const FadeInContent: React.FC<FadeInContentProps> = ({
   return (
     <div
       className={cn(
-        'transition-all duration-motion-fast ease-out',
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-[2px]',
+        'transition-opacity duration-motion-fast ease-out',
+        isVisible ? 'opacity-100' : 'opacity-0',
         className
       )}
     >
