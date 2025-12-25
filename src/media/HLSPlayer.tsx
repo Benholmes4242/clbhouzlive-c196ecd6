@@ -305,26 +305,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             reason: 'autoplay',
           });
         } else {
-          // Node not yet registered - retry after a short delay
-          // This handles the race condition on initial page load
-          const retryTimeout = setTimeout(() => {
-            const stillRegistered = MediaRuntime.getNode(mediaId) !== undefined;
-            if (stillRegistered && video.paused && autoplayRef.current) {
-              MediaRuntime.requestPlay({
-                id: mediaId,
-                surface: 'clubhouse',
-                reason: 'autoplay',
-              });
-            } else if (video.paused && autoplayRef.current) {
-              // Fallback: if still not registered after delay, play directly
-              // This ensures the first video always starts
-              safePlay(video).catch(err => {
-                console.warn('[HLSPlayer] Fallback autoplay failed:', err);
-              });
-            }
-          }, 100);
-          
-          return () => clearTimeout(retryTimeout);
+          // Node not yet registered - play directly without delay
+          // This ensures the first video always starts immediately
+          // MediaRuntime will take over control once registered
+          safePlay(video).catch(err => {
+            console.warn('[HLSPlayer] Direct autoplay failed:', err);
+          });
         }
       } else if (!autoplay && !video.paused) {
         video.pause();
@@ -546,16 +532,18 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         }
         
         const hls = new Hls({
-          // Performance: Start with lowest quality for fast first frame
-          startLevel: 0, // Force lowest quality initially (then adapt up)
+          // Performance: Auto-select quality based on bandwidth for crisp initial quality
+          startLevel: -1, // Auto-select (not forced lowest)
           
           // Buffer settings for fast startup
           maxBufferLength: 10, // Buffer 10 seconds ahead
           maxMaxBufferLength: 20,
           backBufferLength: 4,
           
-          // Fast quality switching - start with low estimate
-          abrEwmaDefaultEstimate: 500000, // Start with 500kbps estimate
+          // Better initial bandwidth estimate for HD quality
+          abrEwmaDefaultEstimate: 2000000, // Start with 2Mbps estimate for decent quality
+          abrBandWidthFactor: 0.95, // More responsive quality switching
+          abrBandWidthUpFactor: 0.7, // Faster ramp-up to HD
           
           // Faster error recovery
           fragLoadingTimeOut: 10000,
