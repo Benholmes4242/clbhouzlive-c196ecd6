@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
 // ============================================
 // ACCOUNT HUB SHEET
@@ -57,6 +58,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   useLightTheme = false,
 }) => {
   const navigate = useNavigate();
+  const { hasUnread } = useUnreadNotifications();
   const sheetRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [snap, setSnap] = useState<SnapState>('peek');
@@ -447,6 +449,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 label="Notifications"
                 onClick={() => handleNavigate('/notificationmessages')}
                 useLightTheme={useLightTheme}
+                showBadge={hasUnread}
               />
               <QuickActionButton
                 icon={<Upload className="w-[18px] h-[18px]" />}
@@ -540,13 +543,15 @@ interface QuickActionButtonProps {
   label: string;
   onClick: () => void;
   useLightTheme: boolean;
+  showBadge?: boolean;
 }
 
 const QuickActionButton: React.FC<QuickActionButtonProps> = ({ 
   icon, 
   label, 
   onClick, 
-  useLightTheme 
+  useLightTheme,
+  showBadge = false,
 }) => (
   <button
     onClick={onClick}
@@ -556,7 +561,15 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       color: useLightTheme ? '#1a1a1a' : '#ffffff',
     }}
   >
-    <span style={{ opacity: 0.7 }}>{icon}</span>
+    <span className="relative" style={{ opacity: 0.7 }}>
+      {icon}
+      {showBadge && (
+        <span 
+          className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-orange-500"
+          aria-label="Unread notifications"
+        />
+      )}
+    </span>
     <span className="text-[12px] font-medium">{label}</span>
   </button>
 );
