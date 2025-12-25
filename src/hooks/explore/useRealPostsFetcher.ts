@@ -619,37 +619,55 @@ export const useRealPostsFetcher = () => {
     }
   };
 
-  // Helper: Check if a post passes vertical-only criteria
-  const passesVerticalFilter = (post: any): { passes: boolean; reason?: string } => {
-    const firstMedia = post.post_media?.[0];
+  // Helper: Find the primary video media from a post (uses display_order, then created_at)
+  const getPrimaryVideoMedia = (post: any): any | null => {
+    const mediaArray = post.post_media;
+    if (!Array.isArray(mediaArray) || mediaArray.length === 0) return null;
     
-    if (!firstMedia) {
+    // Sort by display_order (nulls last), then created_at ascending
+    const sorted = [...mediaArray].sort((a, b) => {
+      const orderA = a.display_order ?? 999;
+      const orderB = b.display_order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
+    
+    // Return first video found
+    return sorted.find(m => m.media_type === 'video') || null;
+  };
+
+  // Helper: Check if a post passes vertical-only criteria
+  // Returns meta_pending for posts with valid duration but missing AR (allowed through)
+  const passesVerticalFilter = (post: any): { passes: boolean; reason?: string } => {
+    const primaryMedia = getPrimaryVideoMedia(post);
+    
+    if (!primaryMedia) {
       return { passes: false, reason: 'no_media' };
     }
-    if (firstMedia.media_type !== 'video') {
+    if (primaryMedia.media_type !== 'video') {
       return { passes: false, reason: 'not_video' };
     }
     
     // Duration check: must have duration and be under 120s
-    if (typeof firstMedia.duration_seconds !== 'number') {
+    if (typeof primaryMedia.duration_seconds !== 'number') {
       return { passes: false, reason: 'duration_missing' };
     }
-    if (firstMedia.duration_seconds >= 120) {
+    if (primaryMedia.duration_seconds >= 120) {
       return { passes: false, reason: 'duration_ge_120' };
     }
     
     // Vertical-only check (when enabled)
     if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
-      let { width, height, aspect_ratio } = firstMedia;
+      let { width, height, aspect_ratio } = primaryMedia;
       
       // Compute AR from width/height if aspect_ratio is null
       if (aspect_ratio == null && width != null && height != null && height > 0) {
         aspect_ratio = width / height;
       }
       
-      // If still no AR available, reject
+      // If AR still missing, allow through as "meta_pending" - playback still works
       if (aspect_ratio == null) {
-        return { passes: false, reason: 'missing_meta' };
+        return { passes: true, reason: 'meta_pending' };
       }
       
       // Must be within vertical band
@@ -685,6 +703,7 @@ export const useRealPostsFetcher = () => {
         duration_ge_120: 0,
         missing_meta: 0,
         ar_outside_band: 0,
+        meta_pending: 0,
         passed: 0
       };
       
@@ -711,7 +730,8 @@ export const useRealPostsFetcher = () => {
               width,
               height,
               poster_url,
-              created_at
+              created_at,
+              display_order
             ),
             post_tags (
               id,
@@ -724,9 +744,10 @@ export const useRealPostsFetcher = () => {
               )
             )
           `)
+          // Order post_media by display_order, then created_at for deterministic [0] selection
+          .order('display_order', { ascending: true, foreignTable: 'post_media', nullsFirst: false })
           .order('created_at', { ascending: true, foreignTable: 'post_media' })
           .order('created_at', { ascending: false })
-          .limit(1, { foreignTable: 'post_media' })
           .eq('post_media.media_type', 'video');
 
         // Cursor-based pagination

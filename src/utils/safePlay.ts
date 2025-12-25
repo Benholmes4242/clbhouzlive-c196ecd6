@@ -29,6 +29,9 @@ interface SafePlayOptions {
   maxWaitTime?: number;
 }
 
+// Track elements currently attempting play to prevent duplicate calls
+const playingAttempts = new WeakSet<HTMLVideoElement>();
+
 export async function safePlay(
   video: HTMLVideoElement, 
   options: SafePlayOptions = {}
@@ -40,8 +43,14 @@ export async function safePlay(
     return legacySafePlay(video);
   }
 
-  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 200 } = options;
+  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 500 } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
+  
+  // Gate #0: Prevent duplicate play attempts on same element
+  if (playingAttempts.has(video)) {
+    devLog(`[safePlay] 🔒 Play already in flight for video ${videoId}, skipping`);
+    return false;
+  }
   
   logVideoTelemetry('video_autoplay_attempted', { videoId });
   
@@ -71,99 +80,121 @@ export async function safePlay(
     return false;
   }
   
+  // Gate #3: If blob URL failed previously, don't retry - caller must re-init source
+  const currentSrc = video.currentSrc || video.src || '';
+  if (currentSrc.startsWith('blob:') && video.getAttribute('data-format-error') === '1') {
+    devWarn(`[safePlay] 🚫 Blob URL already failed for video ${videoId}, caller must re-init`);
+    return false;
+  }
+  
   // Ensure proper preconditions for autoplay
   video.muted = true;
   video.playsInline = true;
   video.setAttribute('webkit-playsinline', 'true');
   
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      // If document is hidden, wait for visibility
-      if (document.hidden) {
-        devLog(`[safePlay] Document hidden, waiting for visibility for video ${videoId}`);
-        await waitForVisibility();
-      }
-      
-      // Don't wait for readyState >= 2, try playing immediately
-      // Modern browsers buffer while playing, no need to preload
-      if (video.readyState < 1) { // Only wait if HAVE_NOTHING
-        // Kick off loading explicitly (helps some WebViews / iOS cases)
-        try {
-          video.load();
-        } catch {
-          // ignore
+  // Lock this element
+  playingAttempts.add(video);
+  
+  try {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // If document is hidden, wait for visibility
+        if (document.hidden) {
+          devLog(`[safePlay] Document hidden, waiting for visibility for video ${videoId}`);
+          await waitForVisibility();
         }
         
-        // Give it just 100ms to start loading
-        await delay(100);
-        
-        devLog(`[safePlay] Quick load kick for ${videoId}, readyState: ${video.readyState}`);
-      }
-      
-      // iOS black-frame nudge - only if at beginning
-      if (video.currentTime === 0) {
-        try { 
-          video.currentTime = 0.001; 
-          devLog(`[safePlay] Applied iOS nudge for video ${videoId}`);
-        } catch {
-          // Ignore errors setting currentTime
+        // Wait for loadedmetadata if readyState is HAVE_NOTHING
+        if (video.readyState === 0) {
+          // Kick off loading explicitly
+          try {
+            video.load();
+          } catch {
+            // ignore
+          }
+          
+          // Wait for loadedmetadata with timeout
+          const gotMetadata = await waitForReadyStateWithTimeout(video, 1, maxWaitTime);
+          devLog(`[safePlay] Waited for metadata for ${videoId}, got: ${gotMetadata}, readyState: ${video.readyState}`);
+          
+          // If still HAVE_NOTHING after timeout, try play anyway (might work on some browsers)
         }
-      }
-      
-      devLog(`[${performance.now().toFixed(2)}ms] [safePlay] CALLING_PLAY`, {
-        videoId,
-        readyState: video.readyState,
-        attempt
-      });
-      await video.play();
-      const endTime = performance.now();
-      devLog(`[${endTime.toFixed(2)}ms] [safePlay] ✅ SUCCESS`, {
-        videoId,
-        totalTime: (endTime - startTime).toFixed(2) + 'ms',
-        attempt
-      });
-      logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
-      return true;
-      
-    } catch (err: any) {
-      devWarn(`[${performance.now().toFixed(2)}ms] [safePlay] Attempt ${attempt}/${maxRetries} FAILED for video ${videoId}:`, err?.name || err);
-      
-      // Handle NotAllowedError (autoplay blocked)
-      if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
-        devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
-        video.setAttribute('data-autoplay-blocked', '1');
-        logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
-        return false;
-      }
-      
-      // Handle NotSupportedError / MediaError - these are fatal format errors
-      // Don't retry, just fail immediately and let caller handle MP4 fallback
-      if (err?.name === 'NotSupportedError' || err?.name === 'MediaError') {
-        devWarn(`[safePlay] 🚫 Format error for video ${videoId}:`, err?.name);
-        video.setAttribute('data-format-error', '1');
-        logVideoTelemetry('video_format_error', { videoId, error: err?.name, src: video.currentSrc?.slice(-50) });
-        return false;
-      }
-      
-      // Handle AbortError - usually means source changed or element detached mid-play
-      if (err?.name === 'AbortError') {
-        devWarn(`[safePlay] ⚠️ AbortError for video ${videoId} - source likely changed`);
-        // Don't retry, the element state is likely invalid
-        return false;
-      }
-      
-      // Wait before retrying (exponential backoff)
-      if (attempt < maxRetries) {
-        await delay(baseDelay * attempt);
+        
+        // iOS black-frame nudge - only if at beginning
+        if (video.currentTime === 0) {
+          try { 
+            video.currentTime = 0.001; 
+            devLog(`[safePlay] Applied iOS nudge for video ${videoId}`);
+          } catch {
+            // Ignore errors setting currentTime
+          }
+        }
+        
+        devLog(`[${performance.now().toFixed(2)}ms] [safePlay] CALLING_PLAY`, {
+          videoId,
+          readyState: video.readyState,
+          attempt
+        });
+        await video.play();
+        const endTime = performance.now();
+        devLog(`[${endTime.toFixed(2)}ms] [safePlay] ✅ SUCCESS`, {
+          videoId,
+          totalTime: (endTime - startTime).toFixed(2) + 'ms',
+          attempt
+        });
+        logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
+        return true;
+        
+      } catch (err: any) {
+        devWarn(`[${performance.now().toFixed(2)}ms] [safePlay] Attempt ${attempt}/${maxRetries} FAILED for video ${videoId}:`, err?.name || err);
+        
+        // Handle NotAllowedError (autoplay blocked)
+        if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
+          devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
+          video.setAttribute('data-autoplay-blocked', '1');
+          logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
+          return false;
+        }
+        
+        // Handle NotSupportedError / MediaError - these are fatal format errors
+        // Don't retry, just fail immediately and let caller handle MP4 fallback
+        if (err?.name === 'NotSupportedError' || err?.name === 'MediaError') {
+          devWarn(`[safePlay] 🚫 Format error for video ${videoId}:`, err?.name);
+          video.setAttribute('data-format-error', '1');
+          logVideoTelemetry('video_format_error', { videoId, error: err?.name, src: currentSrc.slice(-50) });
+          return false;
+        }
+        
+        // Handle AbortError - usually means source changed or element detached mid-play
+        if (err?.name === 'AbortError') {
+          devWarn(`[safePlay] ⚠️ AbortError for video ${videoId} - source likely changed`);
+          // Don't retry, the element state is likely invalid
+          return false;
+        }
+        
+        // Blob URL failure - don't retry, caller must re-init source
+        if (currentSrc.startsWith('blob:')) {
+          devWarn(`[safePlay] 🚫 Blob URL failed for video ${videoId}, not retrying`);
+          video.setAttribute('data-format-error', '1');
+          return false;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        if (attempt < maxRetries) {
+          await delay(baseDelay * attempt);
+        }
       }
     }
+    
+    // Keep error logs in production for monitoring
+    console.error(`[safePlay] ❌ All ${maxRetries} attempts failed for video ${videoId}`);
+    video.setAttribute('data-autoplay-blocked', '1');
+    logVideoTelemetry('video_autoplay_blocked', { videoId, reason: 'max_retries_exceeded' });
+    return false;
+  } finally {
+    // Always release the lock
+    playingAttempts.delete(video);
   }
-  
-  // Keep error logs in production for monitoring
-  console.error(`[safePlay] ❌ All ${maxRetries} attempts failed for video ${videoId}`);
-  video.setAttribute('data-autoplay-blocked', '1');
-  logVideoTelemetry('video_autoplay_blocked', { videoId, reason: 'max_retries_exceeded' });
-  return false;
 }
 
 /**
@@ -221,22 +252,50 @@ function waitForVisibility(): Promise<void> {
 }
 
 /**
- * Wait for video readyState to reach target level
+ * Wait for video readyState to reach target level with timeout
  */
-function waitForReadyState(video: HTMLVideoElement, targetState: number): Promise<boolean> {
+function waitForReadyStateWithTimeout(video: HTMLVideoElement, targetState: number, timeoutMs: number): Promise<boolean> {
   if (video.readyState >= targetState) return Promise.resolve(true);
   
   return new Promise<boolean>(resolve => {
+    let resolved = false;
+    
+    const cleanup = () => {
+      video.removeEventListener('loadedmetadata', checkReadyState);
+      video.removeEventListener('loadeddata', checkReadyState);
+      video.removeEventListener('canplay', checkReadyState);
+      video.removeEventListener('error', handleError);
+    };
+    
     const checkReadyState = () => {
-      if (video.readyState >= targetState) {
-        video.removeEventListener('loadeddata', checkReadyState);
-        video.removeEventListener('canplay', checkReadyState);
+      if (!resolved && video.readyState >= targetState) {
+        resolved = true;
+        cleanup();
         resolve(true);
       }
     };
     
+    const handleError = () => {
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        resolve(false);
+      }
+    };
+    
+    video.addEventListener('loadedmetadata', checkReadyState);
     video.addEventListener('loadeddata', checkReadyState);
     video.addEventListener('canplay', checkReadyState);
+    video.addEventListener('error', handleError);
+    
+    // Timeout fallback
+    setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        resolve(false);
+      }
+    }, timeoutMs);
   });
 }
 
