@@ -62,9 +62,20 @@ export function useVerticalFeedLogic({
   const hasPreloadedFirst = useRef(false);
   const firstFrameReadyFiredRef = useRef(false);
   
-  // Force-first autoplay bootstrap: the very first card should autoplay on initial landing,
-  // regardless of transient/incorrect IntersectionObserver ratios during initial layout.
-  // We drop this bootstrap as soon as the user scrolls (or after a short safety timeout).
+  // ==================================================================================
+  // CRITICAL: First-video autoplay bootstrap for initial page landing
+  // ==================================================================================
+  // Problem: On initial Clubhouse page load, IntersectionObserver can fire with
+  // intersectionRatio=0 before the first card is fully laid out, setting autoplayMap
+  // to false and preventing autoplay until the user scrolls away and back.
+  //
+  // Solution: Force autoplayMap[firstPostId]=true on initial landing and protect it
+
+  // from being set to false until the user actually scrolls. This ensures the first
+  // video ALWAYS autoplays immediately when users land on the Clubhouse page.
+  //
+  // DO NOT REMOVE OR MODIFY without thorough testing on initial page load!
+  // ==================================================================================
   const bootstrapFirstAutoplayRef = useRef(true);
   const bootstrapFirstAutoplayTimeoutRef = useRef<number | null>(null);
 
