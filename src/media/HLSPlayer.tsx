@@ -380,11 +380,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           pendingAutoplayRetryRef.current = false;
         };
       }
-    } else if (!video.paused && !managedByMediaRuntime) {
-      // Only pause for standalone mode (not MediaRuntime-managed).
-      // When managedByMediaRuntime is true, MediaRuntime is the single authority
-      // for play/pause - the autoplay prop is only used for initial autoplay intent,
-      // not to override user-initiated play via MediaRuntime.requestPlay().
+    } else if (!video.paused) {
       video.pause();
     }
 
