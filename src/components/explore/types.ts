@@ -1,4 +1,16 @@
 
+// Polymorphic creator - works for both personal and business actors
+export interface CreatorInfo {
+  type: 'personal' | 'business';
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  username?: string;
+  verified?: boolean;
+  subtitle?: string; // homeClub for personal, location/category for business
+  handicap?: number | string; // Only for personal
+}
+
 export interface ExploreContentItem {
   id: string;
   type: 'video' | 'image' | 'cta';
@@ -11,6 +23,15 @@ export interface ExploreContentItem {
   durationSeconds?: number; // Numeric duration for filtering (temporary until DB field added)
   thumbnailSrc?: string;
   createdAt?: string | Date; // Date the content was posted
+  
+  // Actor/author info (polymorphic)
+  actorType?: 'personal' | 'business' | null;
+  actorId?: string | null;
+  
+  // Polymorphic creator (replaces user for unified rendering)
+  creator?: CreatorInfo;
+  
+  // Legacy user field for backward compatibility
   user?: {
     id: string;
     name: string;
@@ -20,6 +41,17 @@ export interface ExploreContentItem {
     homeClub?: string;
     handicap?: number | string;
   };
+  
+  // Business info when actor is business
+  business?: {
+    id: string;
+    name: string;
+    logoUrl?: string;
+    isVerified?: boolean;
+    category?: string;
+    location?: string;
+  };
+  
   label?: string;
   isFollowing?: boolean;
   ctaTitle?: string;
