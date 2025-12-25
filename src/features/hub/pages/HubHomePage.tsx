@@ -215,7 +215,7 @@ export function HubHomePage() {
         <div className="hub-grabber" />
 
       {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-screen pt-[env(safe-area-inset-top,0px)] px-3.5">
+      <main className="w-full overflow-y-auto h-screen pt-[max(env(safe-area-inset-top,0px),24px)] px-3.5">
         <div>
         {/* Nearby Golfers - Full width */}
         <div style={{ height: 'var(--hub-tile-fixed-h)' }}>
