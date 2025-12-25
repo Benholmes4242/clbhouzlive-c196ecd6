@@ -244,7 +244,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
       <div 
         className="flex-1 overflow-y-auto overscroll-contain"
         style={{ 
-          paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom) + 84px)' : '12px'
+          paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom) + 16px)' : '12px'
         }}
       >
         {/* Switch profile section */}
@@ -476,9 +476,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   }
 
   // ===========================================
-  // MOBILE: Bottom Sheet (rendered via portal)
+  // MOBILE: Full-height panel overlay (starts under header, covers bottom nav)
   // ===========================================
   if (isMobile) {
+    // Header height: 56px + safe-area-inset-top
+    const headerHeight = 'calc(56px + env(safe-area-inset-top))';
+    
     return (
       <>
         <UploadCenterPanel 
@@ -487,11 +490,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         />
         {createPortal(
           <>
-            {/* Backdrop */}
+            {/* Backdrop - starts under header */}
             <div
-              className="fixed inset-0 z-[9998] animate-in fade-in duration-200"
+              className="fixed left-0 right-0 bottom-0 z-[9998] animate-in fade-in duration-200"
               style={{
-                background: useLightTheme ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.6)',
+                top: headerHeight,
+                background: useLightTheme ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.5)',
                 backdropFilter: 'blur(4px)',
                 WebkitBackdropFilter: 'blur(4px)',
                 touchAction: 'none',
@@ -500,23 +504,21 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
               aria-label="Close menu"
             />
             
-            {/* Bottom Sheet */}
+            {/* Full-height Panel - covers bottom nav */}
             <div
               ref={menuRef}
-              className="fixed z-[9999] flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-200"
+              className="fixed left-0 right-0 bottom-0 z-[9999] flex flex-col animate-in slide-in-from-bottom-3 fade-in duration-200"
               style={{
-                left: '12px',
-                right: '12px',
-                bottom: 'calc(12px + env(safe-area-inset-bottom))',
-                maxHeight: 'calc(100vh - 24px - env(safe-area-inset-bottom))',
-                borderRadius: '20px',
+                top: headerHeight,
+                borderTopLeftRadius: '18px',
+                borderTopRightRadius: '18px',
                 overflow: 'hidden',
-                background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.96)',
+                background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.98)',
                 backdropFilter: 'blur(40px) saturate(150%)',
                 WebkitBackdropFilter: 'blur(40px) saturate(150%)',
                 boxShadow: useLightTheme 
-                  ? '0 24px 60px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
-                  : '0 24px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+                  ? '0 -8px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(0, 0, 0, 0.06)'
+                  : '0 -8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
               }}
             >
               {menuContent}
