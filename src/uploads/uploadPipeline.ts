@@ -1,10 +1,12 @@
 // Upload pipeline - processes jobs asynchronously
 // Includes stream asset tracking for orphan cleanup
+// Includes video metadata polling for dimension/duration population
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { createPost } from '@/services/posts/createPost';
 import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
+import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import type { UploadJobInput } from './types';
 
 // Import upload utilities dynamically to avoid circular deps
@@ -51,6 +53,31 @@ async function cleanupStreamAssets(streamUids: string[]): Promise<void> {
     } catch (err) {
       console.warn(`[uploadPipeline] Error cleaning up stream asset ${uid}:`, err);
     }
+  }
+}
+
+/**
+ * Poll for video metadata and update post_media record (background task)
+ */
+async function pollAndUpdateVideoMetadata(streamId: string, postMediaId: string): Promise<void> {
+  try {
+    console.log(`[uploadPipeline] Starting metadata poll for streamId: ${streamId}, postMediaId: ${postMediaId}`);
+    
+    const metadata = await pollStreamMetadata(streamId, {
+      maxAttempts: 30, // 60 seconds max (2s intervals)
+      intervalMs: 2000,
+    });
+
+    if (metadata) {
+      const success = await updatePostMediaMetadata(postMediaId, metadata);
+      if (success) {
+        console.log(`[uploadPipeline] Video metadata populated: ${postMediaId}`, metadata);
+      }
+    } else {
+      console.warn(`[uploadPipeline] Failed to get metadata for ${streamId} - video may need backfill`);
+    }
+  } catch (err) {
+    console.error(`[uploadPipeline] Metadata poll error for ${streamId}:`, err);
   }
 }
 
@@ -182,7 +209,7 @@ async function processJob(jobId: string): Promise<void> {
         const filterId = edits?.filter ?? null;
 
         // Create media record with stream_id and poster_url for videos
-        const { error: mediaError } = await supabase
+        const { data: mediaRecord, error: mediaError } = await supabase
           .from('post_media')
           .insert({
             post_id: postId,
@@ -193,11 +220,19 @@ async function processJob(jobId: string): Promise<void> {
             filter_id: filterId,
             stream_id: streamId,
             poster_url: posterUrl,
-          });
+          })
+          .select('id')
+          .single();
 
         if (mediaError) {
           console.error(`[uploadPipeline] Media record error:`, mediaError);
           throw mediaError;
+        }
+
+        // For videos, poll for metadata and update the record
+        // This runs in background - don't block on it
+        if (mediaType === 'video' && streamId && mediaRecord?.id) {
+          pollAndUpdateVideoMetadata(streamId, mediaRecord.id);
         }
 
         // Update progress
