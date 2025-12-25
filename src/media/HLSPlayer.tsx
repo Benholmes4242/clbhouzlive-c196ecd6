@@ -346,7 +346,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ HLS Setup ============
   
   // Ref to hold setupSource function for attach() to call
-  const setupSourceRef = useRef<(() => void) | null>(null);
+  const setupSourceRef = useRef<(() => Promise<void>) | null>(null);
+  
+  // Setup generation token to prevent stale async work from attaching
+  const setupGenRef = useRef(0);
+  
+  // Stable telemetry videoId (never undefined)
+  const telemetryVideoId = mediaId ?? src?.split('/').pop()?.split('.')[0] ?? 'unknown';
   
   // Helper to cleanup timeupdate listener
   const cleanupTimeUpdateListener = useCallback(() => {
@@ -374,12 +380,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setIsPosterVisible(true);
     
     const setupSource = async () => {
-      const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
-      logDebug('HLS_LOAD_START', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
+      // Increment generation token - any stale async work will bail
+      const myGen = ++setupGenRef.current;
       
-      // Cleanup previous
+      const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
+      logDebug('HLS_LOAD_START', { src: shortSrc, mediaId: mediaId?.slice(0, 8), generation: myGen });
+      
+      // Cleanup previous HLS instance
       if (hlsRef.current) {
         try {
+          // Clear listeners first to prevent late events firing into stale closures
+          hlsRef.current.removeAllListeners?.();
           hlsRef.current.stopLoad();
           hlsRef.current.detachMedia();
           hlsRef.current.destroy();
@@ -387,11 +398,32 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hlsRef.current = null;
       }
       
-      // Reset video
+      // Hard reset video element for stubborn pipelines (Safari/iOS + HLS fatal recovery)
+      try {
+        video.pause();
+        video.currentTime = 0;
+      } catch {}
+      
+      // Clear any <source> children
+      try {
+        while (video.firstChild) video.removeChild(video.firstChild);
+      } catch {}
+      
+      // Clear format markers so next setup isn't "born failed"
+      video.removeAttribute('data-format-error');
+      video.removeAttribute('data-autoplay-blocked');
+      
+      // Reset video src
       video.removeAttribute('src');
       try {
         video.load();
       } catch {}
+      
+      // Bail if stale after cleanup
+      if (myGen !== setupGenRef.current) {
+        logDebug('SETUP_STALE_AFTER_CLEANUP', { myGen, currentGen: setupGenRef.current });
+        return;
+      }
       
       // Check if native HLS supported (iOS/Safari)
       // Can be overridden with FORCE_HLS_JS for debugging
@@ -429,6 +461,68 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           });
         };
         video.addEventListener('loadeddata', onLoadedData, { once: true });
+        
+        // Native HLS error handler for consistent retry/overlay behavior
+        const onNativeError = () => {
+          // Skip if stale setup
+          if (myGen !== setupGenRef.current) return;
+          
+          console.error('[HLSPlayer] NATIVE_ERROR', {
+            mediaId: mediaId?.slice(0, 8),
+            error: video.error?.code,
+            message: video.error?.message,
+          });
+          
+          logVideoTelemetry('hls_fatal_error', {
+            videoId: telemetryVideoId,
+            hlsType: 'native',
+            hlsDetails: video.error?.message ?? 'native_playback_error',
+            fatal: true
+          });
+          
+          // Attempt MP4 fallback if available
+          if (mp4FallbackUrl && !triedMp4Fallback) {
+            console.warn('[HLSPlayer] 🔁 Native failed, attempting MP4 fallback');
+            logVideoTelemetry('mp4_fallback_attempted', {
+              videoId: telemetryVideoId,
+              mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
+            });
+            
+            setTriedMp4Fallback(true);
+            video.src = mp4FallbackUrl;
+            video.load();
+            
+            safePlay(video).then(played => {
+              if (played) {
+                setHasError(false);
+                setShowUnavailable(false);
+                setLastError(null);
+                logVideoTelemetry('mp4_fallback_succeeded', { videoId: telemetryVideoId });
+              } else {
+                setHasError(true);
+                setShowUnavailable(true);
+                setLastError('MP4 fallback failed');
+                logVideoTelemetry('mp4_fallback_failed', { videoId: telemetryVideoId, reason: 'safePlay_failed' });
+                logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+                onFatalError?.(new Error('MP4 fallback failed'), true);
+              }
+            }).catch(() => {
+              setHasError(true);
+              setShowUnavailable(true);
+              setLastError('MP4 fallback exception');
+              logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+              onFatalError?.(new Error('MP4 fallback exception'), true);
+            });
+            return;
+          }
+          
+          setHasError(true);
+          setShowUnavailable(true);
+          setLastError(video.error?.message ?? 'native_error');
+          logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
+          onFatalError?.(new Error(video.error?.message ?? 'Native playback error'), triedMp4Fallback);
+        };
+        video.addEventListener('error', onNativeError, { once: true });
         
         // Apply start time
         if (startTime && startTime > 0) {
@@ -476,9 +570,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           // Fatal error path
           const videoEl = videoRef.current;
 
-          // Log telemetry for fatal HLS error
+          // Log telemetry for fatal HLS error (use stable videoId)
           logVideoTelemetry('hls_fatal_error', {
-            videoId: mediaId,
+            videoId: telemetryVideoId,
             hlsType: data.type,
             hlsDetails: data.details,
             fatal: true
@@ -495,17 +589,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             console.warn('[HLSPlayer] 🔁 Attempting MP4 fallback');
             
             logVideoTelemetry('mp4_fallback_attempted', {
-              videoId: mediaId,
+              videoId: telemetryVideoId,
               mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
             });
 
             setTriedMp4Fallback(true);
 
             try {
-              // Destroy HLS instance cleanly
+              // Destroy HLS instance cleanly and null the ref
               try {
+                hls.removeAllListeners?.();
                 hls.destroy();
               } catch {}
+              hlsRef.current = null;
 
               // Reset element state
               videoEl.pause();
@@ -521,34 +617,38 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
 
               if (played) {
                 console.info('[HLSPlayer] ✅ MP4 fallback playback started');
-                logVideoTelemetry('mp4_fallback_succeeded', { videoId: mediaId });
+                // Clear overlay/error state in case they were set
+                setHasError(false);
+                setShowUnavailable(false);
+                setLastError(null);
+                logVideoTelemetry('mp4_fallback_succeeded', { videoId: telemetryVideoId });
                 return;
               }
 
               // MP4 failed → propagate fatal
               console.error('[HLSPlayer] ❌ MP4 fallback failed');
               logVideoTelemetry('mp4_fallback_failed', {
-                videoId: mediaId,
+                videoId: telemetryVideoId,
                 reason: 'safePlay_returned_false'
               });
               onFatalError?.(new Error('MP4 fallback failed'), true);
               setHasError(true);
               setShowUnavailable(true);
               setLastError('MP4 fallback failed');
-              logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
+              logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
               return;
 
             } catch (err) {
               console.error('[HLSPlayer] ❌ MP4 fallback exception', err);
               logVideoTelemetry('mp4_fallback_failed', {
-                videoId: mediaId,
+                videoId: telemetryVideoId,
                 reason: err instanceof Error ? err.message : 'unknown_exception'
               });
               onFatalError?.(err instanceof Error ? err : new Error('MP4 fallback error'), true);
               setHasError(true);
               setShowUnavailable(true);
               setLastError(err instanceof Error ? err.message : 'MP4 fallback error');
-              logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
+              logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
               return;
             }
           }
@@ -557,7 +657,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           setHasError(true);
           setShowUnavailable(true);
           setLastError(data.details ?? 'unknown_error');
-          logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
+          logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
           onFatalError?.(new Error(data.details), triedMp4Fallback);
         });
         
@@ -664,9 +764,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           });
         });
         
+        // Bail if stale after async HLS.js load
+        if (myGen !== setupGenRef.current) {
+          logDebug('SETUP_STALE_AFTER_HLS_LOAD', { myGen, currentGen: setupGenRef.current });
+          try { hls.destroy(); } catch {}
+          return;
+        }
+        
+        // Set ref BEFORE attach/load so cleanup kills the right instance
+        hlsRef.current = hls;
         hls.attachMedia(video);
         hls.loadSource(src);
-        hlsRef.current = hls;
       }
     };
     
@@ -680,6 +788,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       setupSourceRef.current = null;
       if (hlsRef.current) {
         try {
+          // Clear listeners first to prevent late events
+          hlsRef.current.removeAllListeners?.();
           hlsRef.current.stopLoad();
           hlsRef.current.detachMedia();
           hlsRef.current.destroy();
@@ -1101,7 +1211,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const videoEl = videoRef.current;
     if (!videoEl) return;
     
-    logVideoTelemetry('video_retry_clicked', { videoId: mediaId });
+    logVideoTelemetry('video_retry_clicked', { videoId: telemetryVideoId });
     
     // Reset all error states
     setShowUnavailable(false);
@@ -1113,20 +1223,29 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     videoEl.removeAttribute('data-format-error');
     videoEl.removeAttribute('data-autoplay-blocked');
     
-    // Full reset
+    // Hard reset video element
     try {
       videoEl.pause();
+      videoEl.currentTime = 0;
+    } catch {}
+    
+    // Clear any <source> children
+    try {
+      while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
+    } catch {}
+    
+    try {
       videoEl.removeAttribute('src');
       videoEl.load();
     } catch {}
     
-    // Re-run the normal setup path
+    // Re-run the normal setup path (await it since setupSource is async)
     try {
-      setupSourceRef.current?.();
+      await setupSourceRef.current?.();
     } catch (err) {
       setShowUnavailable(true);
       setLastError('retry_setup_failed');
-      logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
+      logVideoTelemetry('video_unavailable_shown', { videoId: telemetryVideoId });
       return;
     }
     
@@ -1136,7 +1255,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         await safePlay(videoEl);
       } catch {}
     }
-  }, [src, autoplay, managedByMediaRuntime, mediaId]);
+  }, [src, autoplay, managedByMediaRuntime, telemetryVideoId]);
   
   // ============ Mute Toggle ============
   
