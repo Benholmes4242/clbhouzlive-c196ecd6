@@ -172,18 +172,19 @@ export function useVerticalFeedLogic({
   const handleScroll = useCallback(() => {
     if (!scrollViewRef.current) return;
 
-    // Any user scroll means we should stop forcing first-card autoplay
-    if (bootstrapFirstAutoplayRef.current) {
+    const scrollTop = scrollViewRef.current.scrollTop;
+    const itemHeight = window.innerHeight;
+    const newIndex = Math.round(scrollTop / itemHeight);
+
+    // Any *meaningful* user scroll means we should stop forcing first-card autoplay.
+    // (Some browsers fire an initial scroll event at scrollTop=0 on mount.)
+    if (bootstrapFirstAutoplayRef.current && (newIndex !== 0 || scrollTop > 20)) {
       bootstrapFirstAutoplayRef.current = false;
       if (bootstrapFirstAutoplayTimeoutRef.current) {
         window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
         bootstrapFirstAutoplayTimeoutRef.current = null;
       }
     }
-
-    const scrollTop = scrollViewRef.current.scrollTop;
-    const itemHeight = window.innerHeight;
-    const newIndex = Math.round(scrollTop / itemHeight);
 
     // Notify scroll state
     if (!isScrollingRef.current) {
@@ -322,6 +323,10 @@ export function useVerticalFeedLogic({
       }
       if (scrollSettleTimeoutRef.current) {
         clearTimeout(scrollSettleTimeoutRef.current);
+      }
+      if (bootstrapFirstAutoplayTimeoutRef.current) {
+        window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
+        bootstrapFirstAutoplayTimeoutRef.current = null;
       }
     };
   }, []);

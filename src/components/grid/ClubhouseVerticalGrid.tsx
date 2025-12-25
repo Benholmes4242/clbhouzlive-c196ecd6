@@ -615,8 +615,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       muted={isGloballyMuted}
                       className="w-full h-full"
                       isMobile={isMobile}
-                      shouldAttach={!!shouldAttachMap[item.id]}
-                      autoplay={!!autoplayMap[item.id]}
+                      // Enforce immediate autoplay for the very first card on initial landing
+                      eagerMount={index === 0 && currentIndex === 0}
+                      shouldAttach={index === 0 && currentIndex === 0 ? true : !!shouldAttachMap[item.id]}
+                      autoplay={index === 0 && currentIndex === 0 ? true : !!autoplayMap[item.id]}
                       isNearby={isNearbyItem}
                       isActive={index === currentIndex}
                       postId={item.id}

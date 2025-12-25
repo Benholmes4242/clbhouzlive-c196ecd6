@@ -141,6 +141,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // TTFF timing ref
   const ttffStartRef = useRef<number>(0);
   const ttffFiredRef = useRef(false);
+
+  // Autoplay retry: handle initial-mount races where autoplay fires before src is attached
+  const pendingAutoplayRetryRef = useRef(false);
   
   // RUM: Rebuffer tracking ref
   const rebufferStartRef = useRef<number>(0);
@@ -297,7 +300,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
-    
+
     logDebug('AUTOPLAY_EFFECT_TRIGGERED', {
       autoplay,
       managedByMediaRuntime,
@@ -307,46 +310,73 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       isPosterVisible,
       mediaId: mediaId?.slice(0, 8)
     });
-    
+
     // Update muted state
     video.muted = muted;
-    
-    if (managedByMediaRuntime) {
-      // MediaRuntime-managed: Route playback through MediaRuntime
-      if (autoplay && video.paused && mediaId) {
-        // Check if node is registered with MediaRuntime
+
+    const attemptPlay = () => {
+      if (!video.isConnected) return;
+      if (!autoplayRef.current) return;
+      if (!video.paused) return;
+
+      if (managedByMediaRuntime) {
+        if (!mediaId) return;
+
         const isRegistered = MediaRuntime.getNode(mediaId) !== undefined;
-        
+
         if (isRegistered) {
-          // Node is registered - use MediaRuntime
           MediaRuntime.requestPlay({
             id: mediaId,
             surface: 'clubhouse',
             reason: 'autoplay',
           });
         } else {
-          // Node not yet registered - play directly without delay
-          // This ensures the first video always starts immediately
-          // MediaRuntime will take over control once registered
-          safePlay(video).catch(err => {
+          // Node not yet registered (common on first mount). Play directly;
+          // MediaRuntime can take over once registration completes.
+          safePlay(video).catch((err) => {
             console.warn('[HLSPlayer] Direct autoplay failed:', err);
           });
         }
-      } else if (!autoplay && !video.paused) {
-        video.pause();
-      }
-    } else {
-      // Standalone mode: Handle autoplay directly (hero videos, modals, etc.)
-      if (autoplay && video.paused) {
-        // This is a standalone video not managed by MediaRuntime
-        // Safe to call play() directly
-        safePlay(video).catch(err => {
+      } else {
+        // Standalone mode: Handle autoplay directly (hero videos, modals, etc.)
+        safePlay(video).catch((err) => {
           console.warn('[HLSPlayer] Standalone autoplay failed:', err);
         });
-      } else if (!autoplay && !video.paused) {
-        video.pause();
       }
+    };
+
+    // Cleanup for any one-shot retry listeners we add
+    let cleanupRetry: (() => void) | undefined;
+
+    if (autoplay) {
+      attemptPlay();
+
+      // If we're still paused, schedule a one-shot retry once the element becomes ready.
+      // This fixes the initial landing case where autoplay runs before src/HLS is fully attached.
+      if (video.paused && !pendingAutoplayRetryRef.current) {
+        pendingAutoplayRetryRef.current = true;
+
+        const onReady = () => {
+          pendingAutoplayRetryRef.current = false;
+          attemptPlay();
+        };
+
+        video.addEventListener('loadedmetadata', onReady, { once: true });
+        video.addEventListener('canplay', onReady, { once: true });
+
+        cleanupRetry = () => {
+          video.removeEventListener('loadedmetadata', onReady);
+          video.removeEventListener('canplay', onReady);
+          pendingAutoplayRetryRef.current = false;
+        };
+      }
+    } else if (!video.paused) {
+      video.pause();
     }
+
+    return () => {
+      cleanupRetry?.();
+    };
   }, [autoplay, muted, managedByMediaRuntime, mediaId]);
   
   // ============ HLS Setup ============
