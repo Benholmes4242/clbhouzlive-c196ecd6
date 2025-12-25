@@ -292,6 +292,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               'flex flex-col',
               isDark ? 'bg-black' : isGrey ? 'bg-muted' : 'bg-[#f8fafc]'
             )}
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
             <div className={cn(
