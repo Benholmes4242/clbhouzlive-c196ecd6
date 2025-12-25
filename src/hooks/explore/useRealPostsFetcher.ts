@@ -619,83 +619,65 @@ export const useRealPostsFetcher = () => {
     }
   };
 
+  // Helper: Check if a post passes vertical-only criteria
+  const passesVerticalFilter = (post: any): { passes: boolean; reason?: string } => {
+    const firstMedia = post.post_media?.[0];
+    
+    if (!firstMedia) {
+      return { passes: false, reason: 'no_media' };
+    }
+    if (firstMedia.media_type !== 'video') {
+      return { passes: false, reason: 'not_video' };
+    }
+    
+    // Duration check: must have duration and be under 120s
+    if (typeof firstMedia.duration_seconds !== 'number') {
+      return { passes: false, reason: 'duration_missing' };
+    }
+    if (firstMedia.duration_seconds >= 120) {
+      return { passes: false, reason: 'duration_ge_120' };
+    }
+    
+    // Vertical-only check (when enabled)
+    if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
+      let { width, height, aspect_ratio } = firstMedia;
+      
+      // Compute AR from width/height if aspect_ratio is null
+      if (aspect_ratio == null && width != null && height != null && height > 0) {
+        aspect_ratio = width / height;
+      }
+      
+      // If still no AR available, reject
+      if (aspect_ratio == null) {
+        return { passes: false, reason: 'missing_meta' };
+      }
+      
+      // Must be within vertical band
+      if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
+        return { passes: false, reason: 'ar_outside_band' };
+      }
+    }
+    
+    return { passes: true };
+  };
+
   // NEW: Clubhouse explore feed — short videos only (<120s, first media gating)
+  // Uses "fetch-until-enough-valid" pattern to prevent empty feeds
   const fetchClubhouseExploreShorts = async (
     limit: number = 30,
     cursor: string | null = null
   ): Promise<ExploreContentItem[]> => {
     try {
-      let query = supabase
-        .from('posts')
-        .select(`
-          id,
-          content,
-          created_at,
-          user_id,
-          actor_type,
-          actor_id,
-          post_media!inner (
-            id,
-            media_type,
-            media_url,
-            duration_seconds,
-            aspect_ratio,
-            orientation,
-            width,
-            height,
-            poster_url,
-            created_at
-          ),
-          post_tags (
-            id,
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name
-            )
-          )
-        `)
-        .order('created_at', { ascending: true, foreignTable: 'post_media' })
-        .order('created_at', { ascending: false })
-        .limit(1, { foreignTable: 'post_media' });
-
-      // Filter: video only
-      // PHASE A HOTFIX: Removed strict duration_seconds filter from DB query
-      // Now allowing null duration_seconds (for business posts missing metadata)
-      query = query.eq('post_media.media_type', 'video');
-
-      // Apply vertical-only aspect ratio band when flag is enabled (TikTok-style)
-      // HOTFIX: Removed from DB query to allow business posts with NULL metadata
-      // For personal posts with metadata: enforce vertical band
-      // For business posts: allow through (until metadata pipeline + backfill complete)
-      // if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
-      //   query = query... (moved to JS filter below)
-      // }
-
-      // Cursor-based pagination
-      if (cursor) {
-        query = query.lt('created_at', cursor);
-      }
-
-      query = query.limit(limit);
-
-      const { data: postsData, error } = await query;
-
-      if (error) {
-        console.error('[ClubhouseAudit] Query error:', error);
-        return [];
-      }
-
-      console.log('[ClubhouseAudit] Raw postsData count:', postsData?.length ?? 0);
-
-      if (!postsData || postsData.length === 0) {
-        console.log('[ClubhouseAudit] No posts returned from Supabase');
-        return [];
-      }
-
-      // Debug counters for rejection reasons
+      const TARGET_COUNT = limit;
+      const MAX_FETCHES = 5; // Prevent infinite loops
+      const PAGE_SIZE = Math.max(limit, 30); // Fetch at least 30 per page
+      
+      let validPosts: any[] = [];
+      let currentCursor = cursor;
+      let fetchCount = 0;
+      let totalRawFetched = 0;
+      
+      // Rejection counters for debugging
       const rejectionReasons = {
         no_media: 0,
         not_video: 0,
@@ -705,53 +687,89 @@ export const useRealPostsFetcher = () => {
         ar_outside_band: 0,
         passed: 0
       };
+      
+      // Keep fetching until we have enough valid posts or exhaust data
+      while (validPosts.length < TARGET_COUNT && fetchCount < MAX_FETCHES) {
+        fetchCount++;
+        
+        let query = supabase
+          .from('posts')
+          .select(`
+            id,
+            content,
+            created_at,
+            user_id,
+            actor_type,
+            actor_id,
+            post_media!inner (
+              id,
+              media_type,
+              media_url,
+              duration_seconds,
+              aspect_ratio,
+              orientation,
+              width,
+              height,
+              poster_url,
+              created_at
+            ),
+            post_tags (
+              id,
+              tagged_entity_id,
+              taggable_entities (
+                id,
+                entity_type,
+                entity_id,
+                name
+              )
+            )
+          `)
+          .order('created_at', { ascending: true, foreignTable: 'post_media' })
+          .order('created_at', { ascending: false })
+          .limit(1, { foreignTable: 'post_media' })
+          .eq('post_media.media_type', 'video');
 
-      // Defensive filter: ensure first media is video with valid metadata
-      const validPosts = postsData.filter(post => {
-        const firstMedia = post.post_media?.[0];
-        
-        if (!firstMedia) {
-          rejectionReasons.no_media++;
-          return false;
+        // Cursor-based pagination
+        if (currentCursor) {
+          query = query.lt('created_at', currentCursor);
         }
-        if (firstMedia.media_type !== 'video') {
-          rejectionReasons.not_video++;
-          return false;
+
+        query = query.limit(PAGE_SIZE);
+
+        const { data: postsData, error } = await query;
+
+        if (error) {
+          console.error('[ClubhouseAudit] Query error:', error);
+          break;
         }
-        
-        // Duration check: must have duration and be under limit
-        if (typeof firstMedia.duration_seconds !== 'number') {
-          rejectionReasons.duration_missing++;
-          return false;
-        }
-        if (firstMedia.duration_seconds >= 120) {
-          rejectionReasons.duration_ge_120++;
-          return false;
+
+        if (!postsData || postsData.length === 0) {
+          console.log('[ClubhouseAudit] No more posts from Supabase');
+          break;
         }
         
-        // Vertical-only check: applies uniformly to all posts (business + personal)
-        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
-          const { width, height, aspect_ratio } = firstMedia;
+        totalRawFetched += postsData.length;
+        
+        // Update cursor for next fetch
+        currentCursor = postsData[postsData.length - 1].created_at;
+
+        // Filter posts
+        for (const post of postsData) {
+          if (validPosts.length >= TARGET_COUNT) break;
           
-          // All posts must have metadata to pass
-          if (width == null || height == null || aspect_ratio == null) {
-            rejectionReasons.missing_meta++;
-            return false;
-          }
-          
-          // All posts must be within vertical band
-          if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
-            rejectionReasons.ar_outside_band++;
-            return false;
+          const result = passesVerticalFilter(post);
+          if (result.passes) {
+            validPosts.push(post);
+            rejectionReasons.passed++;
+          } else if (result.reason) {
+            rejectionReasons[result.reason as keyof typeof rejectionReasons]++;
           }
         }
-        
-        rejectionReasons.passed++;
-        return true;
-      });
+      }
 
       console.log('[ClubhouseAudit] Filter results:', {
-        raw: postsData.length,
+        totalRawFetched,
+        fetchCount,
         valid: validPosts.length,
         rejectionReasons,
         verticalBand: { min: VERTICAL_MIN_AR, max: VERTICAL_MAX_AR },

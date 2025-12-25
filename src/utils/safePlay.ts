@@ -53,8 +53,23 @@ export async function safePlay(
     readyStateName: readyStateNames[video.readyState],
     currentTime: video.currentTime,
     paused: video.paused,
-    networkState: video.networkState
+    networkState: video.networkState,
+    isConnected: video.isConnected
   });
+  
+  // Gate #1: Element must be connected to DOM
+  if (!video.isConnected) {
+    devWarn(`[safePlay] 🚫 Video element not connected to DOM for video ${videoId}`);
+    logVideoTelemetry('video_autoplay_blocked', { videoId, reason: 'not_connected' });
+    return false;
+  }
+  
+  // Gate #2: Must have a valid source
+  if (!video.src && !video.currentSrc) {
+    devWarn(`[safePlay] 🚫 No valid src for video ${videoId}`);
+    logVideoTelemetry('video_autoplay_blocked', { videoId, reason: 'no_src' });
+    return false;
+  }
   
   // Ensure proper preconditions for autoplay
   video.muted = true;
@@ -113,10 +128,27 @@ export async function safePlay(
     } catch (err: any) {
       devWarn(`[${performance.now().toFixed(2)}ms] [safePlay] Attempt ${attempt}/${maxRetries} FAILED for video ${videoId}:`, err?.name || err);
       
+      // Handle NotAllowedError (autoplay blocked)
       if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
         devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
         video.setAttribute('data-autoplay-blocked', '1');
         logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
+        return false;
+      }
+      
+      // Handle NotSupportedError / MediaError - these are fatal format errors
+      // Don't retry, just fail immediately and let caller handle MP4 fallback
+      if (err?.name === 'NotSupportedError' || err?.name === 'MediaError') {
+        devWarn(`[safePlay] 🚫 Format error for video ${videoId}:`, err?.name);
+        video.setAttribute('data-format-error', '1');
+        logVideoTelemetry('video_format_error', { videoId, error: err?.name, src: video.currentSrc?.slice(-50) });
+        return false;
+      }
+      
+      // Handle AbortError - usually means source changed or element detached mid-play
+      if (err?.name === 'AbortError') {
+        devWarn(`[safePlay] ⚠️ AbortError for video ${videoId} - source likely changed`);
+        // Don't retry, the element state is likely invalid
         return false;
       }
       
