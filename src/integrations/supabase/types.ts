@@ -1643,6 +1643,42 @@ export type Database = {
           },
         ]
       }
+      comment_notifications: {
+        Row: {
+          actor_user_id: string
+          comment_id: string
+          created_at: string
+          id: string
+          parent_comment_id: string | null
+          post_id: string
+          read_at: string | null
+          recipient_user_id: string
+          type: string
+        }
+        Insert: {
+          actor_user_id: string
+          comment_id: string
+          created_at?: string
+          id?: string
+          parent_comment_id?: string | null
+          post_id: string
+          read_at?: string | null
+          recipient_user_id: string
+          type: string
+        }
+        Update: {
+          actor_user_id?: string
+          comment_id?: string
+          created_at?: string
+          id?: string
+          parent_comment_id?: string | null
+          post_id?: string
+          read_at?: string | null
+          recipient_user_id?: string
+          type?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           conversation_type: string
@@ -3265,6 +3301,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hidden_comments: {
+        Row: {
+          comment_id: string
+          created_at: string
+          details: string | null
+          id: string
+          post_id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          post_id: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          post_id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       invite_requests: {
         Row: {

@@ -13,9 +13,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Smile, ChevronLeft, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2 } from 'lucide-react';
+import { Send, Smile, ChevronLeft, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
+import { useHiddenComments } from '@/hooks/useHiddenComments';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import data from '@emoji-mart/data';
@@ -55,6 +56,8 @@ interface CommentItemProps {
   onLongPress?: (comment: CommentWithReplies | CommentReply) => void;
   isAuthor?: boolean; // True if comment author is the post creator
   isHighlighted?: boolean; // True if comment should show glow effect
+  isHidden?: boolean; // True if user reported this comment (soft-hide)
+  onReveal?: () => void; // Callback to reveal a hidden comment
 }
 
 // Haptic feedback utility
@@ -82,10 +85,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onLongPress,
   isAuthor = false,
   isHighlighted = false,
+  isHidden = false,
+  onReveal,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const [isPressing, setIsPressing] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   const handleLike = () => {
     if (!comment.has_liked) {
@@ -112,6 +118,55 @@ const CommentItem: React.FC<CommentItemProps> = ({
       longPressTimer.current = null;
     }
   };
+
+  // If comment is hidden and not revealed, show soft-hide UI
+  if (isHidden && !isRevealed) {
+    return (
+      <>
+        {showDivider && (
+          <div 
+            className={cn(
+              "h-px ml-[58px] mr-[56px]",
+              isDark ? "bg-white/10" : "bg-border/25"
+            )}
+          />
+        )}
+        <div 
+          className={cn(
+            "flex items-center gap-3 py-3",
+            isReply && "pl-[26px]"
+          )}
+        >
+          <div className={cn(
+            "w-8 h-8 rounded-full flex items-center justify-center",
+            isDark ? "bg-white/10" : "bg-muted"
+          )}>
+            <Flag className={cn("w-4 h-4", isDark ? "text-white/40" : "text-muted-foreground")} />
+          </div>
+          <div className="flex-1">
+            <span className={cn(
+              "text-[13px]",
+              isDark ? "text-white/50" : "text-muted-foreground"
+            )}>
+              You reported this comment.
+            </span>
+          </div>
+          <button
+            onClick={() => setIsRevealed(true)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors",
+              isDark 
+                ? "bg-white/10 text-white/70 hover:bg-white/15" 
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Tap to view
+          </button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -667,6 +722,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     isTogglingLike,
   } = useCommentsWithReplies(postId);
 
+  // Hidden comments management (soft-hide for reporter)
+  const { hiddenCommentIds, hideComment } = useHiddenComments(postId);
+
   const isDark = theme === 'dark';
   const isGrey = theme === 'grey';
 
@@ -812,9 +870,13 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, [selectedComment]);
 
   const handleReport = useCallback((reason: string, details?: string) => {
-    // TODO: Implement actual report submission
-    console.log('Report submitted:', { commentId: selectedComment?.id, reason, details });
-  }, [selectedComment]);
+    if (!selectedComment?.id) return;
+    
+    // Soft-hide the comment for this user
+    hideComment(selectedComment.id, reason, details);
+    
+    console.log('Report submitted:', { commentId: selectedComment.id, reason, details });
+  }, [selectedComment, hideComment]);
 
   const handleBlock = useCallback(() => {
     // TODO: Implement actual block functionality
@@ -1071,6 +1133,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           onLongPress={handleLongPress}
                           isAuthor={creatorUserId === comment.user_id}
                           isHighlighted={highlightedCommentId === comment.id}
+                          isHidden={hiddenCommentIds.has(comment.id)}
                         />
                         
                         {/* Replies - indented from comment text start with subtle dividers */}
@@ -1090,6 +1153,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 onLongPress={handleLongPress}
                                 isAuthor={creatorUserId === reply.user_id}
                                 isHighlighted={highlightedCommentId === reply.id}
+                                isHidden={hiddenCommentIds.has(reply.id)}
                               />
                             ))}
                             
