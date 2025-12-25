@@ -1,31 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef, useId } from 'react';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
-import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
-import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { Button } from '@/components/ui/button';
-import CourseRankBadges from '../CourseRankBadges';
-import MedalIcon from '@/components/ui/medal-icon';
-import Top100AchievementsList from '@/components/badges/Top100AchievementsList';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserAchievements } from '@/hooks/useUserAchievements';
-import { MediaRuntime } from '@/media/runtime/MediaRuntime';
-import Hls from 'hls.js';
-// Links legend trophy now uses uploaded UK flag trophy
-// Continental swinger trophy now uses uploaded EU flag trophy
-// Stars & Stripes trophy now uses uploaded US flag trophy
-
-// Session-based mute preference management
-const MUTE_PREFERENCE_KEY = 'videoMutePreference';
-
-const getSessionMutePreference = (): boolean => {
-  const stored = sessionStorage.getItem(MUTE_PREFERENCE_KEY);
-  return stored ? JSON.parse(stored) : true; // Default to muted
-};
-
-const setSessionMutePreference = (isMuted: boolean): void => {
-  sessionStorage.setItem(MUTE_PREFERENCE_KEY, JSON.stringify(isMuted));
-};
+import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface HighlightVideo {
   id: string;
@@ -43,12 +21,10 @@ interface HighlightVideo {
   averageRating?: number | null;
 }
 
-// Remove LiquidGlassCard - achievements are now in dedicated section below
-
 interface DepthStackCarouselProps {
   highlights: HighlightVideo[];
   onVideoPlay?: (videoId: string) => void;
-  userId?: string; // Add userId prop to support other user profiles
+  userId?: string;
   userFirstName?: string;
   isOwnProfile?: boolean;
 }
@@ -59,155 +35,91 @@ const VideoCard: React.FC<{
   onVideoPlay?: (videoId: string) => void;
   isMobile: boolean;
   isHovered?: boolean;
-  isFirstCard?: boolean;
-  shouldAutoPlay?: boolean;
   userFirstName?: string;
   isOwnProfile?: boolean;
-}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, isFirstCard = false, shouldAutoPlay = false, userFirstName = 'User', isOwnProfile = false }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Always muted since no audio controls
+}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, userFirstName = 'User', isOwnProfile = false }) => {
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [shouldAttach, setShouldAttach] = useState(false);
+  const [autoplay, setAutoplay] = useState(false);
   const mediaId = useId();
-  const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(
-    video.videoUrl || '', 
-    video.id, 
-    video.thumbnail
-  );
 
-  const {
-    ref: autoplayRef,
-    shouldAutoplay,
-    isInView,
-    handleMouseEnter,
-    handleMouseLeave
-  } = useVideoAutoplay({
-    enabled: true,
-    threshold: isMobile ? 0.8 : 0.6 // Higher threshold for mobile (more of card must be visible)
-  });
+  // Get HLS URL and poster from video URL
+  const uid = video.videoUrl ? uidFromNode({ src: video.videoUrl }) : null;
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
+  const poster = uid 
+    ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` 
+    : video.thumbnail;
 
-  // Initialize HLS for .m3u8 streams
+  // Intersection observer for attach/autoplay
   useEffect(() => {
-    if (!video.videoUrl || !videoRef.current) return;
+    const card = cardRef.current;
+    if (!card) return;
 
-    if (video.videoUrl.includes('.m3u8')) {
-      if (Hls.isSupported()) {
-        hlsRef.current = new Hls();
-        hlsRef.current.loadSource(video.videoUrl);
-        hlsRef.current.attachMedia(videoRef.current);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        const ratio = entry.intersectionRatio;
+        
+        // Attach when nearby (any visibility)
+        setShouldAttach(entry.isIntersecting);
+        
+        // Autoplay when 60% visible (higher threshold for carousel)
+        const threshold = isMobile ? 0.8 : 0.6;
+        setAutoplay(ratio >= threshold);
+      },
+      { 
+        root: null, 
+        rootMargin: '100px 0px',
+        threshold: [0, 0.3, 0.5, 0.6, 0.8, 1.0] 
       }
-    }
+    );
 
-    return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-    };
-  }, [video.videoUrl]);
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, [isMobile]);
 
-  // Initialize video loading and ensure first frame is visible
+  // Handle attach/detach based on visibility
   useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement || !video.videoUrl) return;
-
-    // Ensure video loads metadata and first frame
-    videoElement.load();
-    
-    // Set to first frame when loaded
-    const handleLoadedData = () => {
-      if (videoElement.paused) {
-        videoElement.currentTime = 0;
-      }
-    };
-
-    videoElement.addEventListener('loadeddata', handleLoadedData);
-    return () => videoElement.removeEventListener('loadeddata', handleLoadedData);
-  }, [video.videoUrl]);
-
-  // Handle autoplay logic via MediaRuntime
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) return;
-
-    videoElement.muted = true; // Always muted
-    
-    // Route playback through MediaRuntime
-    if (isInView) {
-      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'autoplay' });
-      setIsPlaying(true);
+    if (shouldAttach) {
+      playerRef.current?.attach();
     } else {
-      // CLEANUP_PAUSE: Stop playback when out of view
-      MediaRuntime.requestPause({ id: mediaId, reason: 'visibility' });
-      if (videoElement) {
-        videoElement.currentTime = 0; // Reset to first frame
-      }
-      setIsPlaying(false);
+      playerRef.current?.detach();
     }
-  }, [isInView, mediaId]);
-
-  // Update video mute state - always muted
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (videoElement) {
-      videoElement.muted = true;
-    }
-  }, []);
+  }, [shouldAttach]);
 
   const handleVideoClick = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
-        setIsPlaying(false);
-      } else {
-        MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
-        setIsPlaying(true);
-      }
-    }
     onVideoPlay?.(video.id);
-  };
-
-  const toggleMute = (e: React.MouseEvent) => {
-    // Audio controls removed - no mute toggle functionality
   };
 
   return (
     <div 
-      ref={autoplayRef}
+      ref={cardRef}
       className="relative aspect-video h-[266px] rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
-      {video.videoUrl ? (
-        <video
-          ref={videoRef}
+      {hlsUrl ? (
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
+          poster={poster}
+          muted={true}
+          autoplay={autoplay}
+          loop={true}
+          managedByMediaRuntime={true}
+          mediaId={mediaId}
           className="w-full h-full object-cover"
-          muted
-          loop
-          playsInline
-          controls={false}
-          preload="metadata" // Ensure first frame loads
-          poster={thumbnailReady ? thumbnailSrc : video.thumbnail}
-          onLoadedData={() => {
-            console.log('Video loaded:', video.id);
-            // Ensure paused videos show first frame
-            if (videoRef.current && videoRef.current.paused) {
-              videoRef.current.currentTime = 0;
-            }
-          }}
-          onError={(e) => console.error('Video error:', e)}
         />
       ) : (
         <img 
-          src={thumbnailReady ? thumbnailSrc : video.thumbnail}
+          src={poster}
           alt={video.courseName}
           className="w-full h-full object-cover"
         />
       )}
       
       {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30 pointer-events-none" />
       
       {/* My Highlights Badge - Top Left */}
       <div className="absolute top-3 left-3 z-10">
@@ -219,17 +131,9 @@ const VideoCard: React.FC<{
           </div>
         </div>
       </div>
-      
-      {/* Mute button removed - no audio controls */}
-
-      {/* Course rankings - removed for highlights section */}
-
-      {/* Course info overlay - removed course name and location */}
     </div>
   );
 };
-
-// LiquidGlassCard component removed - achievements are now in dedicated section below
 
 const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   highlights,
@@ -241,7 +145,6 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   
-  // Use all highlight videos for infinite carousel
   const carouselItems = highlights;
 
   const {
@@ -252,20 +155,18 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     isMobile
   } = useCarouselNavigation(carouselItems.length);
 
-  // Responsive card visibility based on screen size
   const getVisibleCards = () => {
-    if (typeof window === 'undefined') return 3; // SSR fallback
+    if (typeof window === 'undefined') return 3;
     
     const width = window.innerWidth;
-    if (width <= 430) return 1.15; // Mobile: 1 full + peek
-    if (width <= 768) return 1.7; // Small tablet: ~1.6-1.8
-    if (width <= 1024) return 2.2; // Large tablet: ~2.2
-    return 3; // Desktop: 3
+    if (width <= 430) return 1.15;
+    if (width <= 768) return 1.7;
+    if (width <= 1024) return 2.2;
+    return 3;
   };
 
   const [visibleCards, setVisibleCards] = useState(getVisibleCards);
 
-  // Update visible cards on resize
   useEffect(() => {
     const handleResize = () => {
       setVisibleCards(getVisibleCards());
@@ -275,10 +176,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Create a local ref to access the container element
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Handle scroll to detect which card should be active
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -294,13 +193,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         const card = cards[i] as HTMLElement;
         const cardRect = card.getBoundingClientRect();
         
-        // Calculate how much of the card is visible
         const left = Math.max(cardRect.left, containerRect.left);
         const right = Math.min(cardRect.right, containerRect.right);
         const visibleWidth = Math.max(0, right - left);
         const visibility = visibleWidth / cardRect.width;
         
-        // For mobile, require higher visibility threshold
         const threshold = isMobile ? 0.8 : 0.6;
         
         if (visibility > threshold && visibility > maxVisibility) {
@@ -315,7 +212,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     };
 
     container.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     
     return () => container.removeEventListener('scroll', handleScroll);
   }, [activeVideoIndex, isMobile]);
@@ -361,7 +258,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         </>
       )}
 
-      {/* Carousel container with peek effect */}
+      {/* Carousel container */}
       <div
         ref={(node) => {
           carouselRef(node);
@@ -377,17 +274,16 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         }}
       >
         {carouselItems
-          .filter(item => item.videoUrl) // Hide cards without videos
+          .filter(item => item.videoUrl)
           .map((item, index) => {
-            // Use fixed widths for scrollable carousel - much smaller to prevent overlap
             const getCardWidth = () => {
-              if (typeof window === 'undefined') return 'w-72'; // SSR fallback
+              if (typeof window === 'undefined') return 'w-72';
               
               const width = window.innerWidth;
-              if (width <= 430) return 'w-[85vw]'; // Mobile: single card
-              if (width <= 768) return 'w-64'; // Small tablet: 256px
-              if (width <= 1024) return 'w-72'; // Large tablet: 288px
-              return 'w-80'; // Desktop: 320px - much smaller than before
+              if (width <= 430) return 'w-[85vw]';
+              if (width <= 768) return 'w-64';
+              if (width <= 1024) return 'w-72';
+              return 'w-80';
             };
 
             return (
@@ -404,8 +300,6 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   onVideoPlay={onVideoPlay}
                   isMobile={isMobile}
                   isHovered={hoveredCardIndex === index}
-                  isFirstCard={index === 0}
-                  shouldAutoPlay={hoveredCardIndex === null || hoveredCardIndex === 0}
                   userFirstName={userFirstName}
                   isOwnProfile={isOwnProfile}
                 />
@@ -423,8 +317,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => {
                 const container = containerRef.current;
                 if (container) {
-                  const cardWidth = isMobile ? container.offsetWidth * 0.85 : 320; // Match fixed 320px (w-80)
-                  const gap = 12; // gap-3 = 12px
+                  const cardWidth = isMobile ? container.offsetWidth * 0.85 : 320;
+                  const gap = 12;
                   const scrollPosition = index * (cardWidth + gap);
                   container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                 }

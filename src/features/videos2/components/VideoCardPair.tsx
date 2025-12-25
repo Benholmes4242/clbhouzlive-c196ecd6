@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HLSVideo } from './HLSVideo';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { EchoButton } from './EchoButton';
 import { CourseTag } from './CourseTag';
 import { VideoItem } from '../types';
@@ -8,7 +8,6 @@ import { Check } from 'lucide-react';
 
 type VideoCardPairProps = {
   video: VideoItem;
-  autoRegister?: (video: HTMLVideoElement | null) => void;
   onVideoClick: (id: string) => void;
   onEchoToggle: (id: string) => void;
 };
@@ -21,10 +20,15 @@ const tagIcons: Record<string, string> = {
   Gear: '⚙️',
 };
 
-export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle }: VideoCardPairProps) {
+export function VideoCardPair({ video, onVideoClick, onEchoToggle }: VideoCardPairProps) {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [echoActive, setEchoActive] = useState(false);
   const [echoCount, setEchoCount] = useState(video.echoes);
+  const [shouldAttach, setShouldAttach] = useState(false);
+  const [autoplay, setAutoplay] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const mediaId = useId();
 
   const formatDuration = (sec: number): string => {
     const min = Math.floor(sec / 60);
@@ -44,8 +48,40 @@ export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle 
     onEchoToggle(video.id);
   };
 
+  // Intersection observer for attach/autoplay
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setShouldAttach(entry.isIntersecting);
+        setAutoplay(entry.intersectionRatio >= 0.5);
+      },
+      { 
+        root: null, 
+        rootMargin: '100px 0px',
+        threshold: [0, 0.5, 1.0] 
+      }
+    );
+
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, []);
+
+  // Handle attach/detach
+  useEffect(() => {
+    if (shouldAttach) {
+      playerRef.current?.attach();
+    } else {
+      playerRef.current?.detach();
+    }
+  }, [shouldAttach]);
+
   return (
     <motion.div
+      ref={cardRef}
       className="group cursor-pointer"
       onClick={() => onVideoClick(video.id)}
       whileHover={{ y: -2 }}
@@ -57,16 +93,21 @@ export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle 
         onMouseEnter={() => setIsPreviewing(true)}
         onMouseLeave={() => setIsPreviewing(false)}
       >
-        <HLSVideo
-          hlsUrl={video.hlsUrl}
-          src={video.src}
+        <HLSPlayer
+          ref={playerRef}
+          src={video.hlsUrl || ''}
+          mp4FallbackUrl={video.src}
           poster={video.poster}
+          muted={true}
+          autoplay={autoplay}
+          loop={true}
+          managedByMediaRuntime={true}
+          mediaId={mediaId}
           className="w-full h-full object-cover"
-          autoRegister={autoRegister}
         />
 
         {/* Duration pill */}
-        <div className="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm px-1.5 py-0.5 rounded text-white text-xs font-medium">
+        <div className="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm px-1.5 py-0.5 rounded text-white text-xs font-medium z-10">
           {formatDuration(video.durationSec)}
         </div>
 
@@ -77,7 +118,7 @@ export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm px-2 py-0.5 rounded text-white text-xs font-medium"
+              className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm px-2 py-0.5 rounded text-white text-xs font-medium z-10"
             >
               {tagIcons[video.tag]} {video.tag}
             </motion.div>
@@ -86,7 +127,7 @@ export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle 
 
         {/* Accent edge on hover */}
         {isPreviewing && (
-          <div className="absolute inset-y-0 left-0 w-0.5 bg-[#6e9277]" />
+          <div className="absolute inset-y-0 left-0 w-0.5 bg-[#6e9277] z-10" />
         )}
       </div>
 
