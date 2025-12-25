@@ -684,22 +684,50 @@ export const useRealPostsFetcher = () => {
       const { data: postsData, error } = await query;
 
       if (error) {
-        console.error('[DataFetch] Error:', error);
+        console.error('[ClubhouseAudit] Query error:', error);
         return [];
       }
 
+      console.log('[ClubhouseAudit] Raw postsData count:', postsData?.length ?? 0);
+
       if (!postsData || postsData.length === 0) {
+        console.log('[ClubhouseAudit] No posts returned from Supabase');
         return [];
       }
+
+      // Debug counters for rejection reasons
+      const rejectionReasons = {
+        no_media: 0,
+        not_video: 0,
+        duration_missing: 0,
+        duration_ge_120: 0,
+        missing_meta: 0,
+        ar_outside_band: 0,
+        passed: 0
+      };
 
       // Defensive filter: ensure first media is video with valid metadata
       const validPosts = postsData.filter(post => {
         const firstMedia = post.post_media?.[0];
-        if (!firstMedia || firstMedia.media_type !== 'video') return false;
+        
+        if (!firstMedia) {
+          rejectionReasons.no_media++;
+          return false;
+        }
+        if (firstMedia.media_type !== 'video') {
+          rejectionReasons.not_video++;
+          return false;
+        }
         
         // Duration check: must have duration and be under limit
-        if (typeof firstMedia.duration_seconds !== 'number') return false;
-        if (firstMedia.duration_seconds >= 120) return false;
+        if (typeof firstMedia.duration_seconds !== 'number') {
+          rejectionReasons.duration_missing++;
+          return false;
+        }
+        if (firstMedia.duration_seconds >= 120) {
+          rejectionReasons.duration_ge_120++;
+          return false;
+        }
         
         // Vertical-only check: applies uniformly to all posts (business + personal)
         if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
@@ -707,16 +735,27 @@ export const useRealPostsFetcher = () => {
           
           // All posts must have metadata to pass
           if (width == null || height == null || aspect_ratio == null) {
+            rejectionReasons.missing_meta++;
             return false;
           }
           
           // All posts must be within vertical band
           if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
+            rejectionReasons.ar_outside_band++;
             return false;
           }
         }
         
+        rejectionReasons.passed++;
         return true;
+      });
+
+      console.log('[ClubhouseAudit] Filter results:', {
+        raw: postsData.length,
+        valid: validPosts.length,
+        rejectionReasons,
+        verticalBand: { min: VERTICAL_MIN_AR, max: VERTICAL_MAX_AR },
+        clubhouseVerticalOnly: FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY
       });
 
       // Split posts by actor_type for polymorphic hydration
