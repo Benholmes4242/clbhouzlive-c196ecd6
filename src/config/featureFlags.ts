@@ -37,6 +37,7 @@ export const FEATURE_FLAGS = {
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;
 
-// Vertical aspect ratio band (9:16 ± 7%) - width/height
-export const VERTICAL_MIN_AR = 0.56;  // ~9:16 lower bound
-export const VERTICAL_MAX_AR = 0.60;  // ~9:16 upper bound
+// Vertical aspect ratio band - expanded to catch encoder drift
+// 9:16 = 0.5625, but real-world videos vary. Range: 0.52-0.70
+export const VERTICAL_MIN_AR = 0.52;  // Generous lower bound for vertical
+export const VERTICAL_MAX_AR = 0.70;  // Generous upper bound (still excludes square/landscape)
