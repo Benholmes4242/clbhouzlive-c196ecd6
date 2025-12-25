@@ -130,21 +130,24 @@ export function useCommentsWithReplies(postId: string | null) {
     },
   });
 
-  // Add comment mutation
+  // Add comment mutation - returns the new comment ID
   const addCommentMutation = useMutation({
-    mutationFn: async ({ content, parentId }: { content: string; parentId?: string }) => {
+    mutationFn: async ({ content, parentId }: { content: string; parentId?: string }): Promise<string> => {
       if (!postId || !user?.id) throw new Error('Missing postId or user');
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('post_comments')
         .insert({
           post_id: postId,
           user_id: user.id,
           content,
           parent_id: parentId || null,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+      return data.id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
@@ -190,8 +193,8 @@ export function useCommentsWithReplies(postId: string | null) {
   return {
     comments,
     commentsLoading,
-    addComment: (content: string, parentId?: string) => 
-      addCommentMutation.mutate({ content, parentId }),
+    addComment: (content: string, parentId?: string): Promise<string> => 
+      addCommentMutation.mutateAsync({ content, parentId }),
     isAddingComment: addCommentMutation.isPending,
     toggleCommentLike: (commentId: string) => toggleLikeMutation.mutate(commentId),
     isTogglingLike: toggleLikeMutation.isPending,
