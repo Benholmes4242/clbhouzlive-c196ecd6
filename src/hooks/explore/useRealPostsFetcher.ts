@@ -698,9 +698,8 @@ export const useRealPostsFetcher = () => {
         if (!firstMedia || firstMedia.media_type !== 'video') return false;
         
         // Duration check: must have duration and be under limit
-        if (typeof firstMedia.duration_seconds === 'number') {
-          if (firstMedia.duration_seconds >= 120) return false;
-        }
+        if (typeof firstMedia.duration_seconds !== 'number') return false;
+        if (firstMedia.duration_seconds >= 120) return false;
         
         // Vertical-only check: applies uniformly to all posts (business + personal)
         if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
