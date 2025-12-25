@@ -259,9 +259,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
         </div>
       </div>
 
-      {/* Results area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto px-3 py-4">
+      {/* Results area - iOS scroll fix: min-h-0 + momentum */}
+      <div 
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        <div className="max-w-2xl mx-auto px-3 py-4 pb-safe">
           
           {/* Loading state */}
           {isLoading && query.trim() && (
