@@ -257,10 +257,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const playedSet = useMemo(() => new Set(playedTop100CourseIds), [playedTop100CourseIds]);
   const currentCourseId = currentPost?.golfCourse?.id;
 
-  // Notify parent of comments state
+  // Notify parent of comments state + pause/resume video
   useEffect(() => {
     onCommentsOpenChange?.(commentsModalOpen);
-  }, [commentsModalOpen, onCommentsOpenChange]);
+    
+    // Pause video when comments open, resume when closed
+    const activePostId = currentPost?.id;
+    if (activePostId) {
+      if (commentsModalOpen) {
+        runtimeBridge.requestPause(activePostId, 'user');
+      } else {
+        runtimeBridge.requestPlay(activePostId, 'user');
+      }
+    }
+  }, [commentsModalOpen, onCommentsOpenChange, currentPost?.id, runtimeBridge]);
 
   // Follow status query
   const { data: isFollowing } = useQuery({
