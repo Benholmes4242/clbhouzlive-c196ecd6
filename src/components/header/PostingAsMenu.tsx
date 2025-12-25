@@ -15,7 +15,6 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
-import { AccountHubSheet } from './AccountHubSheet';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
@@ -37,21 +36,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const isMobile = useIsMobile();
   const menuRef = useRef<HTMLDivElement>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
-  const [headerHeight, setHeaderHeight] = useState(56);
-
-  // Measure header height on mount and resize
-  useEffect(() => {
-    const measureHeader = () => {
-      const header = document.querySelector('[data-chrome="header"]') as HTMLElement;
-      if (header) {
-        setHeaderHeight(header.getBoundingClientRect().height);
-      }
-    };
-    
-    measureHeader();
-    window.addEventListener('resize', measureHeader);
-    return () => window.removeEventListener('resize', measureHeader);
-  }, []);
 
   // Check admin status
   const { data: adminStatus } = useQuery({
@@ -69,6 +53,39 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   });
 
   const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
+
+  // Lock/unlock body scroll when menu opens/closes (mobile only)
+  useEffect(() => {
+    if (!isOpen || !isMobile) return;
+    
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen, isMobile]);
+
+  // Handle escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   // Calculate popover position for desktop
   useLayoutEffect(() => {
@@ -136,20 +153,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     };
   }, [isOpen, isMobile, onClose, anchorRef]);
 
-  // Handle escape key (desktop)
-  useEffect(() => {
-    if (!isOpen || isMobile) return;
-    
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-    
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose, isMobile]);
-
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -176,75 +179,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
-  // Build profiles array for AccountHubSheet
-  const profiles = availableActors.map(actor => ({
-    id: actor.id,
-    type: actor.type as 'personal' | 'business',
-    name: actor.name,
-    avatarUrl: actor.avatarUrl,
-    subtitle: actor.type === 'personal' ? email : 'Business',
-  }));
-
-  // Current actor for AccountHubSheet
-  const currentActorData = {
-    type: (activeActor?.type || 'personal') as 'personal' | 'business',
-    id: activeActor?.id || user?.id || '',
-    name: activeActor?.name || displayName,
-    avatarUrl: activeActor?.avatarUrl,
-    subtitle: email,
-  };
-
-  // Handle profile switch in AccountHubSheet
-  const handleSwitchProfile = async (profileId: string) => {
-    const actor = availableActors.find(a => a.id === profileId);
-    if (actor && (activeActor?.id !== actor.id)) {
-      setActiveActor(actor);
-    }
-  };
-
-  // Handle navigation from AccountHubSheet
-  const handleAccountHubNavigate = (route: string) => {
-    if (route === '/upload') {
-      setUploadCenterOpen(true);
-    } else if (route === '/logout') {
-      handleLogout();
-    } else if (route === '/settings/business') {
-      navigate('/businesses/manage');
-    } else if (route === '/settings/profile') {
-      navigate('/edit-profile');
-    } else if (route === `/profile/${currentActorData.id}`) {
-      handleNavigate('/profile');
-    } else {
-      navigate(route);
-    }
-  };
-
-  // ===========================================
-  // MOBILE: AccountHubSheet with two snap states
-  // ===========================================
-  if (isMobile) {
-    return (
-      <>
-        <UploadCenterPanel 
-          isOpen={uploadCenterOpen} 
-          onClose={() => setUploadCenterOpen(false)} 
-        />
-        <AccountHubSheet
-          open={isOpen}
-          onClose={onClose}
-          currentActor={currentActorData}
-          profiles={profiles}
-          onSwitchProfile={handleSwitchProfile}
-          onNavigate={handleAccountHubNavigate}
-          isAdmin={hasAdminAccess || false}
-          headerHeight={headerHeight}
-          useLightTheme={useLightTheme}
-        />
-      </>
-    );
-  }
-
-  // Desktop menu content
+  // Shared menu content
   const menuContent = (
     <>
       {/* Identity summary card */}
@@ -289,13 +224,28 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
               </span>
             </span>
           </div>
+          {/* Close button - mobile only */}
+          {isMobile && (
+            <button
+              onClick={onClose}
+              className={cn(
+                "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
+                useLightTheme ? "hover:bg-slate-100" : "hover:bg-white/10"
+              )}
+              aria-label="Close menu"
+            >
+              <X className={cn("h-4 w-4", useLightTheme ? "text-slate-500" : "text-white/60")} />
+            </button>
+          )}
         </div>
       </div>
       
       {/* Scrollable content area */}
       <div 
         className="flex-1 overflow-y-auto overscroll-contain"
-        style={{ paddingBottom: '12px' }}
+        style={{ 
+          paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom) + 16px)' : '12px'
+        }}
       >
         {/* Switch profile section */}
         <div className="px-3 py-2">
@@ -522,6 +472,61 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         isOpen={uploadCenterOpen} 
         onClose={() => setUploadCenterOpen(false)} 
       />
+    );
+  }
+
+  // ===========================================
+  // MOBILE: Full-height panel overlay (starts under header, covers bottom nav)
+  // ===========================================
+  if (isMobile) {
+    // Header height: 56px + safe-area-inset-top
+    const headerHeight = 'calc(56px + env(safe-area-inset-top))';
+    
+    return (
+      <>
+        <UploadCenterPanel 
+          isOpen={uploadCenterOpen} 
+          onClose={() => setUploadCenterOpen(false)} 
+        />
+        {createPortal(
+          <>
+            {/* Backdrop - starts under header */}
+            <div
+              className="fixed left-0 right-0 bottom-0 z-[9998] animate-in fade-in duration-200"
+              style={{
+                top: headerHeight,
+                background: useLightTheme ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                touchAction: 'none',
+              }}
+              onClick={onClose}
+              aria-label="Close menu"
+            />
+            
+            {/* Full-height Panel - covers bottom nav */}
+            <div
+              ref={menuRef}
+              className="fixed left-0 right-0 bottom-0 z-[9999] flex flex-col animate-in slide-in-from-bottom-3 fade-in duration-200"
+              style={{
+                top: headerHeight,
+                borderTopLeftRadius: '18px',
+                borderTopRightRadius: '18px',
+                overflow: 'hidden',
+                background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.98)',
+                backdropFilter: 'blur(40px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+                boxShadow: useLightTheme 
+                  ? '0 -8px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(0, 0, 0, 0.06)'
+                  : '0 -8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+              }}
+            >
+              {menuContent}
+            </div>
+          </>,
+          document.body
+        )}
+      </>
     );
   }
 
