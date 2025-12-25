@@ -445,7 +445,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               <QuickActionButton
                 icon={<Bell className="w-[18px] h-[18px]" />}
                 label="Notifications"
-                onClick={() => handleNavigate('/notifications')}
+                onClick={() => handleNavigate('/notificationmessages')}
                 useLightTheme={useLightTheme}
               />
               <QuickActionButton
