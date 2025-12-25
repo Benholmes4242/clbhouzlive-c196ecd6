@@ -159,12 +159,9 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ 
-        opacity: isVisible ? 1 : 0, 
-        x: isVisible ? 0 : 20 
-      }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      initial={{ opacity: 1, x: 0 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0 }}
       className={cn(
         'fixed right-4 z-40',
         'flex flex-col items-center',
