@@ -138,9 +138,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           layout
           className={cn(
             'rounded-sq-lg overflow-hidden',
-            'bg-black/50 backdrop-blur-2xl',
-            'border border-white/10',
-            'shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
+            'bg-black/50 backdrop-blur-xl',
+            'border border-white/[0.08]',
+            'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]'
           )}
         >
           {/* Collapsed State - Always visible */}
