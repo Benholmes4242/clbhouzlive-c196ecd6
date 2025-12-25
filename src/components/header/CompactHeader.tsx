@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const { hasUnread } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pillRef = useRef<HTMLButtonElement>(null);
   
   // Cinema Dim context
   const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
@@ -218,6 +219,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {user && (
               <div className="sm:hidden">
                 <PostingAsPill 
+                  ref={pillRef}
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
@@ -240,6 +242,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
           useLightTheme={useLightTheme}
+          anchorRef={pillRef}
         />
       )}
 
