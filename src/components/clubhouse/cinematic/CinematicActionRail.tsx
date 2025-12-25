@@ -152,6 +152,11 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   const slotCount = onSave ? 5 : 4;
   const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
+  // Position rail so bottom aligns with bottom of glass SocialDock
+  // SocialDock: safe-area-bottom + 16px padding + content (~120px total height)
+  // Align bottom of rail (paper airplane icon) with bottom of dock
+  const DOCK_BOTTOM_OFFSET = 'calc(env(safe-area-inset-bottom, 0px) + 130px)';
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -166,8 +171,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         'pointer-events-auto'
       )}
       style={{
-        top: '50%',
-        transform: 'translateY(-50%)',
+        bottom: DOCK_BOTTOM_OFFSET,
         gap: GAP,
         height: totalHeight,
       }}

@@ -198,11 +198,11 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             <MediaAreaSkeleton isStatic={isStatic} />
             
             {/* Right-side action rail - positioned exactly like CinematicActionRail */}
+            {/* Bottom aligns with bottom of glass SocialDock */}
             <div 
               className="absolute right-4 flex flex-col items-center"
               style={{ 
-                top: '50%', 
-                transform: 'translateY(-50%)',
+                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 130px)',
               }}
             >
               <ActionRailSkeleton isStatic={isStatic} />
