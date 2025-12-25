@@ -17,8 +17,6 @@ export interface ExploreContentItem {
     username?: string;
     avatar: string;
     verified?: boolean;
-    homeClub?: string;
-    handicap?: number;
   };
   label?: string;
   isFollowing?: boolean;

@@ -89,7 +89,7 @@ export const useRealPostsFetcher = () => {
       // Get user profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
 
       if (profilesError) {
@@ -214,9 +214,7 @@ export const useRealPostsFetcher = () => {
             name: userProfile?.display_name || userProfile?.username || 'User',
             username: userProfile?.username,
             avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: Math.random() > 0.7, // Random verification for demo
-            homeClub: userProfile?.home_club || undefined,
-            handicap: userProfile?.eg_handicap_index ?? undefined
+            verified: Math.random() > 0.7 // Random verification for demo
           },
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
@@ -330,7 +328,7 @@ export const useRealPostsFetcher = () => {
       // Get user profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
 
       if (profilesError) {
@@ -464,9 +462,7 @@ export const useRealPostsFetcher = () => {
             name: userProfile?.display_name || userProfile?.username || 'User',
             username: userProfile?.username,
             avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: Math.random() > 0.7, // Random verification for demo
-            homeClub: userProfile?.home_club || undefined,
-            handicap: userProfile?.eg_handicap_index ?? undefined
+            verified: Math.random() > 0.7 // Random verification for demo
           },
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
