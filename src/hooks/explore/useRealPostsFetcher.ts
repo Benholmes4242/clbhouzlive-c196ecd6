@@ -142,11 +142,20 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
-      // Format posts for explore grid
+      // Format posts for explore grid with polymorphic creator hydration
       const formattedPosts = postsData.map(post => {
-        const userProfile = profiles?.find(profile => profile.id === post.user_id);
+        const isBusinessPost = post.actor_type === 'business';
+        
+        const userProfile = !isBusinessPost 
+          ? profiles?.find(profile => profile.id === post.user_id) 
+          : null;
+          
+        const businessAccount = isBusinessPost && post.actor_id
+          ? businessAccounts?.find(b => b.id === post.actor_id)
+          : null;
+          
         const allMedia = (post.post_media || []);
-        const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0]; // Prefer video as primary
+        const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0];
         
         const isValid =
           (primaryMedia.media_type === 'image' && isValidImageUrl(primaryMedia.media_url)) ||
