@@ -295,7 +295,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
           >
             {/* Header */}
             <div className={cn(
-              "flex-shrink-0 border-b",
+              "flex-shrink-0 border-b pt-[max(env(safe-area-inset-top,0px),12px)]",
               isDark ? "border-white/10" : "border-border/50"
             )}>
               {/* Back button row */}
