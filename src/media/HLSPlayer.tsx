@@ -25,6 +25,7 @@ import {
   logFirstVideoLoadedData,
   logFirstMediaPosterLoaded 
 } from '@/utils/bootTimeline';
+import { logVideoTelemetry } from '@/utils/videoTelemetry';
 
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
@@ -163,6 +164,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [isReady, setIsReady] = useState(false);
   const [hasFirstFrame, setHasFirstFrame] = useState(false); // Track first frame readiness
   const [triedMp4Fallback, setTriedMp4Fallback] = useState(false); // Track if MP4 fallback was attempted
+  const [showUnavailable, setShowUnavailable] = useState(false); // Show "Video unavailable" overlay
+  const [lastError, setLastError] = useState<string | null>(null); // Last error message for debug
   
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);
@@ -473,6 +476,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           // Fatal error path
           const videoEl = videoRef.current;
 
+          // Log telemetry for fatal HLS error
+          logVideoTelemetry('hls_fatal_error', {
+            videoId: mediaId,
+            hlsType: data.type,
+            hlsDetails: data.details,
+            fatal: true
+          });
+
           // Safety guard
           if (!videoEl) {
             onError?.(new Error(data.details));
@@ -482,6 +493,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           // Attempt MP4 fallback if available and not already tried
           if (mp4FallbackUrl && !triedMp4Fallback) {
             console.warn('[HLSPlayer] 🔁 Attempting MP4 fallback');
+            
+            logVideoTelemetry('mp4_fallback_attempted', {
+              videoId: mediaId,
+              mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
+            });
 
             setTriedMp4Fallback(true);
 
@@ -505,25 +521,43 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
 
               if (played) {
                 console.info('[HLSPlayer] ✅ MP4 fallback playback started');
+                logVideoTelemetry('mp4_fallback_succeeded', { videoId: mediaId });
                 return;
               }
 
               // MP4 failed → propagate fatal
               console.error('[HLSPlayer] ❌ MP4 fallback failed');
+              logVideoTelemetry('mp4_fallback_failed', {
+                videoId: mediaId,
+                reason: 'safePlay_returned_false'
+              });
               onFatalError?.(new Error('MP4 fallback failed'), true);
               setHasError(true);
+              setShowUnavailable(true);
+              setLastError('MP4 fallback failed');
+              logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
               return;
 
             } catch (err) {
               console.error('[HLSPlayer] ❌ MP4 fallback exception', err);
+              logVideoTelemetry('mp4_fallback_failed', {
+                videoId: mediaId,
+                reason: err instanceof Error ? err.message : 'unknown_exception'
+              });
               onFatalError?.(err instanceof Error ? err : new Error('MP4 fallback error'), true);
               setHasError(true);
+              setShowUnavailable(true);
+              setLastError(err instanceof Error ? err.message : 'MP4 fallback error');
+              logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
               return;
             }
           }
 
           // No fallback possible or already tried
           setHasError(true);
+          setShowUnavailable(true);
+          setLastError(data.details ?? 'unknown_error');
+          logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
           onFatalError?.(new Error(data.details), triedMp4Fallback);
         });
         
@@ -1061,22 +1095,48 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   // ============ Retry Handler ============
   
-  const handleRetry = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRetry = useCallback(async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     
-    const video = videoRef.current;
-    if (!video) return;
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
     
+    logVideoTelemetry('video_retry_clicked', { videoId: mediaId });
+    
+    // Reset all error states
+    setShowUnavailable(false);
     setHasError(false);
+    setLastError(null);
+    setTriedMp4Fallback(false);
     
-    // Re-trigger source setup by toggling src
-    const currentSrc = src;
-    video.src = '';
-    setTimeout(() => {
-      video.src = currentSrc;
-      safePlay(video);
-    }, 100);
-  }, [src]);
+    // Clear format markers
+    videoEl.removeAttribute('data-format-error');
+    videoEl.removeAttribute('data-autoplay-blocked');
+    
+    // Full reset
+    try {
+      videoEl.pause();
+      videoEl.removeAttribute('src');
+      videoEl.load();
+    } catch {}
+    
+    // Re-run the normal setup path
+    try {
+      setupSourceRef.current?.();
+    } catch (err) {
+      setShowUnavailable(true);
+      setLastError('retry_setup_failed');
+      logVideoTelemetry('video_unavailable_shown', { videoId: mediaId });
+      return;
+    }
+    
+    // If autoplay should happen, try
+    if (autoplay && !managedByMediaRuntime) {
+      try {
+        await safePlay(videoEl);
+      } catch {}
+    }
+  }, [src, autoplay, managedByMediaRuntime, mediaId]);
   
   // ============ Mute Toggle ============
   
@@ -1191,17 +1251,25 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         </button>
       )}
       
-      {/* Error State with Retry */}
-      {hasError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 bg-black/60">
+      {/* Error State / Video Unavailable Overlay */}
+      {(hasError || showUnavailable) && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm px-4 text-center">
+          <div className="text-white text-sm font-semibold">Video unavailable</div>
+          <div className="text-white/70 text-xs mt-1">Tap retry or swipe to skip</div>
+          
           <button
-            className="flex flex-col items-center gap-2 text-white"
+            className="mt-3 rounded-full bg-white/15 px-4 py-2 text-white text-xs font-medium hover:bg-white/20 active:bg-white/25"
             onClick={handleRetry}
             aria-label="Retry playback"
           >
-            <RefreshCw className="w-8 h-8" />
-            <span className="text-sm">Tap to retry</span>
+            Retry
           </button>
+          
+          {process.env.NODE_ENV !== 'production' && lastError && (
+            <div className="mt-3 text-white/50 text-[10px] break-words max-w-[260px]">
+              {lastError}
+            </div>
+          )}
         </div>
       )}
       
