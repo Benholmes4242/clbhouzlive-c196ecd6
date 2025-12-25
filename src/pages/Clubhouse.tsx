@@ -123,8 +123,7 @@ const Clubhouse = () => {
     }
   }, [seasonRecap]);
   
-  // Track overlay states
-  const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
+  // Comments now use CommentsPage (slide-in from right) - no drawer state needed
   
   // ⚠️ HEADER/FOOTER AUTO-HIDE DISABLED
   // Chrome is always visible on Clubhouse - no hide logic, no timers, no animations
@@ -275,7 +274,7 @@ const Clubhouse = () => {
             onActiveVideoRefChange={(ref) => {
               activeVideoRef.current = ref;
             }}
-            onCommentsOpenChange={setIsCommentsDrawerOpen}
+            onCommentsOpenChange={() => {}}
             onPostDetailsOpen={() => console.log('Post details opened')}
             onFirstFrameReady={handleFirstFrameReady}
           />
