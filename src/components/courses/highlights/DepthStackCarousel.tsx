@@ -71,7 +71,7 @@ const VideoCard: React.FC<{
       },
       { 
         root: null, 
-        rootMargin: '100px 0px',
+        rootMargin: '200px 0px',
         threshold: [0, 0.3, 0.5, 0.6, 0.8, 1.0] 
       }
     );

@@ -386,7 +386,7 @@ const syncPlayingFromRuntime = useCallback(() => {
       },
       {
         threshold: thresholds,
-        rootMargin: '100px 0px 100px 0px', // Start detecting 100px before entering viewport
+        rootMargin: '300px 0px 300px 0px', // Start detecting 300px before entering viewport for fast scroll
       }
     );
     
