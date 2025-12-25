@@ -62,28 +62,45 @@ export function useVerticalFeedLogic({
   const hasPreloadedFirst = useRef(false);
   const firstFrameReadyFiredRef = useRef(false);
   
-  // Protect first video autoplay from observer race condition
+  // Force-first autoplay bootstrap: the very first card should autoplay on initial landing,
+  // regardless of transient/incorrect IntersectionObserver ratios during initial layout.
+  // We drop this bootstrap as soon as the user scrolls (or after a short safety timeout).
+  const bootstrapFirstAutoplayRef = useRef(true);
+  const bootstrapFirstAutoplayTimeoutRef = useRef<number | null>(null);
+
+  // Protect first video autoplay from observer races
   const firstVideoProtectedUntilRef = useRef<number>(0);
   const firstPostIdRef = useRef<string | null>(null);
   
   // Preload first video immediately in layout phase
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current || !posts.length) return;
-    
+
     const firstPost = posts[0];
     if (!firstPost || firstPost.type !== 'video') return;
-    
+
     hasPreloadedFirst.current = true;
     firstPostIdRef.current = firstPost.id;
-    
-    // Protect first video autoplay from observer race for 500ms
-    firstVideoProtectedUntilRef.current = Date.now() + 500;
-    
+
+    // Bootstrap: keep first card autoplay true on initial landing.
+    // Drop this once the user scrolls (or after a long safety timeout).
+    bootstrapFirstAutoplayRef.current = true;
+    if (bootstrapFirstAutoplayTimeoutRef.current) {
+      window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
+    }
+    bootstrapFirstAutoplayTimeoutRef.current = window.setTimeout(() => {
+      bootstrapFirstAutoplayRef.current = false;
+      bootstrapFirstAutoplayTimeoutRef.current = null;
+    }, 15000);
+
+    // Also protect against early observer false negatives for a short window
+    firstVideoProtectedUntilRef.current = Date.now() + 2500;
+
     // Set both maps synchronously
     setShouldAttachMap({ [firstPost.id]: true });
     setAutoplayMap({ [firstPost.id]: true });
-    
-    // Preload HLS manifest
+
+    // Preload HLS manifest + first segments
     const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
@@ -112,20 +129,28 @@ export function useVerticalFeedLogic({
       },
       { root: null, rootMargin: '500px 0px 500px 0px', threshold: 0 }
     );
-    
+
     // Autoplay observer (center detection)
     const playObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
-          
-          // Protect first video from being set to false during initial mount race
+
           const isFirstVideo = id === firstPostIdRef.current;
+
+          // Hard bootstrap: on initial landing, force the first card to be autoplay=true
+          // regardless of transient IO ratios.
+          if (isFirstVideo && bootstrapFirstAutoplayRef.current) {
+            setAutoplayMap((m) => (m[id] ? m : { ...m, [id]: true }));
+            return;
+          }
+
+          // Protect first video from being set to false during early mount/layout.
           const isProtected = isFirstVideo && Date.now() < firstVideoProtectedUntilRef.current;
           const shouldAutoplay = e.intersectionRatio >= 0.5;
-          
-          // Only allow setting to false if not protected, or always allow setting to true
+
+          // Always allow true; only allow false when not protected.
           if (shouldAutoplay || !isProtected) {
             setAutoplayMap((m) => ({ ...m, [id]: shouldAutoplay }));
           }
@@ -133,31 +158,40 @@ export function useVerticalFeedLogic({
       },
       { root: null, threshold: [0.0, 0.5, 1.0] }
     );
-    
+
     nearRef.current = nearObserver;
     playRef.current = playObserver;
-    
+
     return () => {
       nearObserver.disconnect();
       playObserver.disconnect();
     };
   }, [posts]);
-  
+
   // Scroll handler
   const handleScroll = useCallback(() => {
     if (!scrollViewRef.current) return;
-    
+
+    // Any user scroll means we should stop forcing first-card autoplay
+    if (bootstrapFirstAutoplayRef.current) {
+      bootstrapFirstAutoplayRef.current = false;
+      if (bootstrapFirstAutoplayTimeoutRef.current) {
+        window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
+        bootstrapFirstAutoplayTimeoutRef.current = null;
+      }
+    }
+
     const scrollTop = scrollViewRef.current.scrollTop;
     const itemHeight = window.innerHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
-    
+
     // Notify scroll state
     if (!isScrollingRef.current) {
       isScrollingRef.current = true;
       onScrollStateChange?.(true);
       MediaRuntime.setUIState({ isScrolling: true });
     }
-    
+
     // Clear previous settle timeout
     if (scrollSettleTimeoutRef.current) {
       clearTimeout(scrollSettleTimeoutRef.current);
@@ -167,18 +201,18 @@ export function useVerticalFeedLogic({
       onScrollStateChange?.(false);
       MediaRuntime.setUIState({ isScrolling: false });
     }, 150);
-    
+
     // Index update with hysteresis
     const now = Date.now();
     const MIN_INDEX_CHANGE_INTERVAL = 80;
-    
+
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       if (now - lastIndexChangeTimeRef.current < MIN_INDEX_CHANGE_INTERVAL) return;
-      
+
       lastIndexChangeTimeRef.current = now;
       setCurrentIndex(newIndex);
       onCurrentIndexChange?.(newIndex);
-      
+
       // Visual index with slight delay for smooth HUD
       if (visualIndexTimeoutRef.current) {
         window.clearTimeout(visualIndexTimeoutRef.current);
@@ -187,7 +221,7 @@ export function useVerticalFeedLogic({
         setVisualIndex(newIndex);
       }, 40);
     }
-    
+
     // Load more check
     if (newIndex >= posts.length - 3 && hasMore && !isLoadingMore) {
       onLoadMore?.();
