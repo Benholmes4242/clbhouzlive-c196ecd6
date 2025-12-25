@@ -11,7 +11,7 @@ export const useRealPostsFetcher = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      // Get users that the current user follows
+      // Get users that the current user follows (personal follows)
       const { data: followedUsers, error: followError } = await supabase
         .from('user_follows')
         .select('following_id')
@@ -24,8 +24,29 @@ export const useRealPostsFetcher = () => {
 
       const followedUserIds = followedUsers?.map(f => f.following_id) || [];
       
-      if (followedUserIds.length === 0) {
-        return []; // No followed users, return empty
+      // Get businesses that the current user follows
+      const { data: followedBusinesses, error: businessFollowError } = await supabase
+        .from('business_follows')
+        .select('business_id')
+        .eq('follower_id', user.id);
+        
+      if (businessFollowError) {
+        console.error('Error fetching followed businesses:', businessFollowError);
+      }
+      
+      const followedBusinessIds = followedBusinesses?.map(f => f.business_id) || [];
+      
+      if (followedUserIds.length === 0 && followedBusinessIds.length === 0) {
+        return []; // No followed users/businesses, return empty
+      }
+
+      // Build query filters for polymorphic following
+      const orFilters: string[] = [];
+      if (followedUserIds.length > 0) {
+        orFilters.push(`and(or(actor_type.eq.personal,actor_type.is.null),user_id.in.(${followedUserIds.join(',')}))`);
+      }
+      if (followedBusinessIds.length > 0) {
+        orFilters.push(`and(actor_type.eq.business,actor_id.in.(${followedBusinessIds.join(',')}))`);
       }
 
       // Build the query for friends' posts (both videos and photos)
@@ -36,6 +57,8 @@ export const useRealPostsFetcher = () => {
           content,
           created_at,
           user_id,
+          actor_type,
+          actor_id,
           post_media!inner (
             id,
             media_type,
@@ -57,7 +80,7 @@ export const useRealPostsFetcher = () => {
             )
           )
         `)
-        .in('user_id', followedUserIds)
+        .or(orFilters.join(','))
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1)
         .limit(postsPerPage);
@@ -83,18 +106,40 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      // Get unique user IDs
-      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      // Split posts by actor type for polymorphic hydration
+      const personalPosts = postsData.filter(p => !p.actor_type || p.actor_type === 'personal');
+      const businessPosts = postsData.filter(p => p.actor_type === 'business');
+
+      // Get unique user IDs (for personal posts)
+      const userIds = [...new Set(personalPosts.map(post => post.user_id))];
+      
+      // Get unique business IDs (for business posts)
+      const businessIds = [...new Set(businessPosts.map(post => post.actor_id).filter(Boolean))] as string[];
       
       // Get user profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', userIds);
+      const { data: profiles, error: profilesError } = userIds.length > 0
+        ? await supabase
+            .from('user_profiles')
+            .select('id, display_name, username, profile_photo_url')
+            .in('id', userIds)
+        : { data: [], error: null };
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
         return [];
+      }
+      
+      // Get business accounts
+      const { data: businessAccounts, error: businessError } = businessIds.length > 0
+        ? await supabase
+            .from('business_accounts')
+            .select('id, name, logo_url, is_verified, category, location')
+            .in('id', businessIds)
+        : { data: [], error: null };
+        
+      if (businessError) {
+        console.error('Error fetching business accounts:', businessError);
+        // Don't fail - just continue without business data
       }
 
       // Format posts for explore grid
@@ -192,6 +237,40 @@ export const useRealPostsFetcher = () => {
           aspectRatio = width / height;
         }
 
+        // Build polymorphic creator
+        const creator = isBusinessPost && businessAccount
+          ? {
+              type: 'business' as const,
+              id: businessAccount.id,
+              name: businessAccount.name || 'Business',
+              avatarUrl: businessAccount.logo_url || undefined,
+              verified: businessAccount.is_verified || false,
+              subtitle: businessAccount.location || businessAccount.category || undefined,
+            }
+          : {
+              type: 'personal' as const,
+              id: post.user_id,
+              name: userProfile?.display_name || userProfile?.username || 'User',
+              username: userProfile?.username || undefined,
+              avatarUrl: userProfile?.profile_photo_url || undefined,
+            };
+
+        // Legacy user object
+        const user = isBusinessPost && businessAccount
+          ? {
+              id: businessAccount.id,
+              name: businessAccount.name || 'Business',
+              avatar: businessAccount.logo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              verified: businessAccount.is_verified || false,
+            }
+          : {
+              id: post.user_id,
+              name: userProfile?.display_name || userProfile?.username || 'User',
+              username: userProfile?.username,
+              avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              verified: Math.random() > 0.7,
+            };
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -204,21 +283,26 @@ export const useRealPostsFetcher = () => {
           comments: Math.floor(Math.random() * 100) + 5,
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
-          durationSeconds, // Store numeric value for filtering
+          durationSeconds,
           aspectRatio,
           width,
           height,
-          createdAt: post.created_at, // Map created_at to createdAt
-          user: {
-            id: post.user_id,
-            name: userProfile?.display_name || userProfile?.username || 'User',
-            username: userProfile?.username,
-            avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: Math.random() > 0.7 // Random verification for demo
-          },
+          createdAt: post.created_at,
+          actorType: (post.actor_type || 'personal') as 'personal' | 'business',
+          actorId: post.actor_id || post.user_id,
+          creator,
+          user,
+          business: isBusinessPost && businessAccount ? {
+            id: businessAccount.id,
+            name: businessAccount.name,
+            logoUrl: businessAccount.logo_url,
+            isVerified: businessAccount.is_verified,
+            category: businessAccount.category,
+            location: businessAccount.location,
+          } : undefined,
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: true, // All posts in friends feed should be from followed users
+          isFollowing: true,
           media: allMedia.filter(m => isValidImageUrl(m.media_url)),
           audioTrack: generateAudioTrack()
         };
@@ -532,6 +616,8 @@ export const useRealPostsFetcher = () => {
           content,
           created_at,
           user_id,
+          actor_type,
+          actor_id,
           post_media!inner (
             id,
             media_type,
@@ -559,10 +645,10 @@ export const useRealPostsFetcher = () => {
         .order('created_at', { ascending: false })
         .limit(1, { foreignTable: 'post_media' });
 
-      // Filter: video only + duration < 120s
-      query = query
-        .eq('post_media.media_type', 'video')
-        .lte('post_media.duration_seconds', 119); // < 120
+      // Filter: video only
+      // PHASE A HOTFIX: Removed strict duration_seconds filter from DB query
+      // Now allowing null duration_seconds (for business posts missing metadata)
+      query = query.eq('post_media.media_type', 'video');
 
       // Apply vertical-only aspect ratio band when flag is enabled (TikTok-style)
       // Guards: require complete metadata (no NULLs) + width/height band 0.56-0.60
@@ -593,35 +679,76 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      // Defensive filter: ensure first media is video <120s
+      // Defensive filter: ensure first media is video
+      // PHASE A HOTFIX: Allow videos with null duration_seconds (business posts)
+      // If duration is known, enforce < 120s; if unknown, allow through
       const validPosts = postsData.filter(post => {
         const firstMedia = post.post_media?.[0];
-        return (
-          firstMedia &&
-          firstMedia.media_type === 'video' &&
-          typeof firstMedia.duration_seconds === 'number' &&
-          firstMedia.duration_seconds < 120
-        );
+        if (!firstMedia || firstMedia.media_type !== 'video') return false;
+        
+        // If duration is known, enforce limit; if null/undefined, allow (temp hotfix)
+        if (typeof firstMedia.duration_seconds === 'number') {
+          return firstMedia.duration_seconds < 120;
+        }
+        
+        // Log missing metadata for monitoring (sample 10% to reduce noise)
+        if (Math.random() < 0.1) {
+          console.warn('[DataFetch] Post missing duration_seconds:', post.id);
+        }
+        
+        return true; // TEMP: Allow unknown duration until pipeline fix
       });
 
-      // Get unique user IDs
-      const userIds = [...new Set(validPosts.map(post => post.user_id))] as string[];
+      // Split posts by actor_type for polymorphic hydration
+      const personalPosts = validPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
+      const businessPosts = validPosts.filter(p => p.actor_type === 'business');
       
-      // Get user profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index, show_handicap')
-        .in('id', userIds);
+      // Get unique user IDs (for personal posts)
+      const userIds = [...new Set(personalPosts.map(post => post.user_id))] as string[];
+      
+      // Get unique business IDs (for business posts)
+      const businessIds = [...new Set(businessPosts.map(post => post.actor_id).filter(Boolean))] as string[];
+      
+      // Fetch user profiles
+      const { data: profiles, error: profilesError } = userIds.length > 0 
+        ? await supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index, show_handicap')
+          .in('id', userIds)
+        : { data: [], error: null };
 
       if (profilesError) {
         console.error('[DataFetch] Profiles error:', profilesError);
         return [];
       }
+      
+      // Fetch business accounts
+      const { data: businessAccounts, error: businessError } = businessIds.length > 0
+        ? await supabase
+          .from('business_accounts')
+          .select('id, name, logo_url, is_verified, category, location')
+          .in('id', businessIds)
+        : { data: [], error: null };
+        
+      if (businessError) {
+        console.error('[DataFetch] Business accounts error:', businessError);
+        // Don't fail - just continue without business data
+      }
 
-      // Format posts
+      // Format posts with polymorphic creator hydration
       const formattedPosts = validPosts.map(post => {
-        const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const firstMedia = post.post_media[0];
+        const isBusinessPost = post.actor_type === 'business';
+        
+        // Get creator info based on actor type
+        let userProfile: any = null;
+        let businessAccount: any = null;
+        
+        if (isBusinessPost && post.actor_id) {
+          businessAccount = businessAccounts?.find(b => b.id === post.actor_id);
+        } else {
+          userProfile = profiles?.find(profile => profile.id === post.user_id);
+        }
 
         // Find golf course from tags
         const golfCourseTag = (post.post_tags || []).find(
@@ -639,6 +766,64 @@ export const useRealPostsFetcher = () => {
 
         const durationSeconds = firstMedia.duration_seconds;
 
+        // Build polymorphic creator object
+        const creator = isBusinessPost && businessAccount
+          ? {
+              type: 'business' as const,
+              id: businessAccount.id,
+              name: businessAccount.name || 'Business',
+              avatarUrl: businessAccount.logo_url || undefined,
+              verified: businessAccount.is_verified || false,
+              subtitle: businessAccount.location || businessAccount.category || undefined,
+            }
+          : {
+              type: 'personal' as const,
+              id: post.user_id,
+              name: userProfile?.display_name || userProfile?.username || 'User',
+              username: userProfile?.username || undefined,
+              avatarUrl: userProfile?.profile_photo_url || undefined,
+              verified: Math.random() > 0.7, // TODO: use real verified status
+              subtitle: userProfile?.home_club || undefined,
+              handicap: userProfile?.show_handicap !== false && userProfile?.eg_handicap_index != null 
+                ? userProfile.eg_handicap_index 
+                : undefined,
+            };
+
+        // Also build legacy user object for backward compatibility
+        const user = isBusinessPost && businessAccount
+          ? {
+              id: businessAccount.id,
+              name: businessAccount.name || 'Business',
+              username: undefined,
+              avatar: businessAccount.logo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              verified: businessAccount.is_verified || false,
+              homeClub: undefined,
+              handicap: undefined,
+            }
+          : {
+              id: post.user_id,
+              name: userProfile?.display_name || userProfile?.username || 'User',
+              username: userProfile?.username,
+              avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              verified: Math.random() > 0.7,
+              homeClub: userProfile?.home_club || undefined,
+              handicap: userProfile?.show_handicap !== false && userProfile?.eg_handicap_index != null 
+                ? userProfile.eg_handicap_index 
+                : undefined,
+            };
+
+        // Build business object for business posts
+        const business = isBusinessPost && businessAccount
+          ? {
+              id: businessAccount.id,
+              name: businessAccount.name,
+              logoUrl: businessAccount.logo_url,
+              isVerified: businessAccount.is_verified,
+              category: businessAccount.category,
+              location: businessAccount.location,
+            }
+          : undefined;
+
         return {
           id: post.id,
           type: 'video' as const,
@@ -648,20 +833,14 @@ export const useRealPostsFetcher = () => {
           likes: Math.floor(Math.random() * 500) + 50,
           comments: Math.floor(Math.random() * 100) + 5,
           shares: Math.floor(Math.random() * 50) + 1,
-          duration: `${durationSeconds}s`,
-          durationSeconds,
+          duration: durationSeconds ? `${durationSeconds}s` : undefined,
+          durationSeconds: durationSeconds ?? undefined,
           createdAt: post.created_at,
-          user: {
-            id: post.user_id,
-            name: userProfile?.display_name || userProfile?.username || 'User',
-            username: userProfile?.username,
-            avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: Math.random() > 0.7,
-            homeClub: userProfile?.home_club || undefined,
-            handicap: userProfile?.show_handicap !== false && userProfile?.eg_handicap_index != null 
-              ? userProfile.eg_handicap_index 
-              : undefined
-          },
+          actorType: (post.actor_type || 'personal') as 'personal' | 'business',
+          actorId: post.actor_id || post.user_id,
+          creator,
+          user,
+          business,
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
