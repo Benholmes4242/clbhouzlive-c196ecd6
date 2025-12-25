@@ -63,9 +63,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
   };
 
   return (
-    <div className={cn("flex gap-3", isReply && "ml-10 mt-3")}>
+    <div className={cn(
+      "flex py-3",
+      isReply ? "ml-[26px] gap-2.5" : "gap-2.5"
+    )}>
       <SquircleAvatar
-        size={isReply ? 28 : 36}
+        size={isReply ? 26 : 32}
         src={comment.avatar_url}
         alt={comment.user_name}
         fallback={comment.user_name?.charAt(0) || '?'}
@@ -74,48 +77,48 @@ const CommentItem: React.FC<CommentItemProps> = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
           <span className={cn(
-            "text-[13px] font-semibold",
+            "text-[15px] font-semibold truncate max-w-[140px]",
             isDark ? "text-white" : "text-foreground"
           )}>
             {comment.user_name}
           </span>
           <span className={cn(
-            "text-[11px]",
-            isDark ? "text-white/40" : "text-muted-foreground"
+            "text-[12px] flex-shrink-0",
+            isDark ? "text-white/50" : "text-muted-foreground/70"
           )}>
             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
           </span>
         </div>
         <p className={cn(
-          "mt-0.5 text-[13px] leading-snug",
+          "mt-[3px] text-[14px] leading-[18px]",
           isDark ? "text-white/85" : "text-foreground/85"
         )}>
           {comment.content}
         </p>
         
         {/* Actions row */}
-        <div className="flex items-center gap-4 mt-1.5">
-          {!isReply && onReply && (
+        {!isReply && onReply && (
+          <div className="mt-1.5">
             <button
               onClick={() => onReply(comment.id, comment.user_name)}
               className={cn(
                 "text-[11px] font-medium transition-colors",
-                isDark ? "text-white/40 hover:text-white/60" : "text-muted-foreground hover:text-foreground"
+                isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
               )}
             >
               Reply
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Like button */}
-      <div className="flex flex-col items-center gap-0.5 ml-2">
+      {/* Like button - fixed width for alignment */}
+      <div className="flex flex-col items-center w-[44px] flex-shrink-0">
         <motion.button
           whileTap={{ scale: 0.85 }}
           onClick={handleLike}
           disabled={isLiking}
-          className="relative p-1"
+          className="relative p-2.5 -m-1"
         >
           <AnimatePresence>
             {showLikeAnim && (
@@ -131,17 +134,17 @@ const CommentItem: React.FC<CommentItemProps> = ({
           </AnimatePresence>
           <Heart
             className={cn(
-              "w-4 h-4 transition-colors",
+              "w-[18px] h-[18px] transition-colors",
               comment.has_liked
                 ? "fill-red-500 text-red-500"
-                : isDark ? "text-white/40 hover:text-white/60" : "text-muted-foreground hover:text-foreground"
+                : isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
             )}
           />
         </motion.button>
         {comment.likes_count > 0 && (
           <span className={cn(
-            "text-[10px]",
-            isDark ? "text-white/40" : "text-muted-foreground"
+            "text-[11px] -mt-1",
+            isDark ? "text-white/50" : "text-muted-foreground"
           )}>
             {comment.likes_count}
           </span>
@@ -199,7 +202,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   const handleReply = useCallback((commentId: string, userName: string) => {
     setReplyingTo({ id: commentId, name: userName });
-    inputRef.current?.focus();
+    // Use setTimeout to ensure the input is ready before focusing
+    setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 100);
   }, []);
 
   const handleEmojiSelect = useCallback((emoji: any) => {
@@ -321,25 +328,28 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 </span>
               </div>
 
-              {/* Post preview card */}
+              {/* Post preview card - two column grid */}
               <div className="px-4 pb-3">
                 <div className={cn(
-                  "p-3 rounded-sq-md",
+                  "p-[14px] rounded-[18px]",
                   isDark ? "bg-white/5" : isGrey ? "bg-background/50" : "bg-muted/50"
                 )}>
-                  {/* Row 1: Creator strip */}
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex gap-3">
+                    {/* Left column: Portrait rectangle */}
                     {videoThumbnail && (
                       <img
                         src={videoThumbnail}
                         alt="Video thumbnail"
-                        className="w-12 h-16 object-cover rounded-sq-sm flex-shrink-0"
+                        className="w-[96px] h-[96px] object-cover rounded-[14px] flex-shrink-0"
                       />
                     )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                    
+                    {/* Right column: Creator stack + caption */}
+                    <div className="flex-1 min-w-0 flex flex-col">
+                      {/* Row 1: Avatar + Name */}
+                      <div className="flex items-center gap-2.5">
                         <SquircleAvatar
-                          size={32}
+                          size={34}
                           src={creatorAvatar}
                           alt={creatorName}
                           fallback={creatorName?.charAt(0) || '?'}
@@ -347,7 +357,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         />
                         <div className="flex-1 min-w-0">
                           <span className={cn(
-                            "text-[14px] font-semibold block truncate",
+                            "text-[16px] font-semibold block truncate",
                             isDark ? "text-white" : "text-foreground"
                           )}>
                             {creatorName || 'Unknown'}
@@ -356,45 +366,45 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           {/* Row 2: Metadata - Home Club + Handicap */}
                           {(creatorHomeClub || creatorHandicap) && (
                             <span className={cn(
-                              "text-[12px] block truncate",
-                              isDark ? "text-white/50" : "text-muted-foreground"
+                              "text-[13px] block truncate mt-[1px]",
+                              isDark ? "text-white/60" : "text-muted-foreground"
                             )}>
                               {[creatorHomeClub, creatorHandicap && `${creatorHandicap}`].filter(Boolean).join(' • ')}
                             </span>
                           )}
                         </div>
                       </div>
+
+                      {/* Row 3: Caption - starts under avatar, right of portrait */}
+                      {caption && (
+                        <motion.div 
+                          className="mt-2.5"
+                          animate={{ height: 'auto' }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <p className={cn(
+                            "text-[14px] leading-[18px]",
+                            isDark ? "text-white/70" : "text-foreground/70",
+                            !expandedCaption && "line-clamp-3"
+                          )}>
+                            {displayCaption}
+                            {captionNeedsTruncation && !expandedCaption && '...'}
+                          </p>
+                          {captionNeedsTruncation && (
+                            <button
+                              onClick={() => setExpandedCaption(!expandedCaption)}
+                              className={cn(
+                                "text-[12px] font-medium mt-1",
+                                isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
+                              )}
+                            >
+                              {expandedCaption ? 'Less' : 'More'}
+                            </button>
+                          )}
+                        </motion.div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Row 3: Caption preview */}
-                  {caption && (
-                    <motion.div 
-                      className="mt-2.5"
-                      animate={{ height: 'auto' }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <p className={cn(
-                        "text-[13px] leading-snug",
-                        isDark ? "text-white/70" : "text-foreground/70",
-                        !expandedCaption && "line-clamp-3"
-                      )}>
-                        {displayCaption}
-                        {captionNeedsTruncation && !expandedCaption && '...'}
-                      </p>
-                      {captionNeedsTruncation && (
-                        <button
-                          onClick={() => setExpandedCaption(!expandedCaption)}
-                          className={cn(
-                            "text-[12px] font-medium mt-0.5",
-                            isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          {expandedCaption ? 'Less' : 'More'}
-                        </button>
-                      )}
-                    </motion.div>
-                  )}
                 </div>
               </div>
             </div>
@@ -408,7 +418,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             {/* Comments List - Scrollable */}
             <div 
               ref={commentsListRef}
-              className="flex-1 overflow-y-auto px-4 py-4"
+              className="flex-1 overflow-y-auto px-4"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               {commentsLoading ? (
@@ -428,7 +438,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="divide-y divide-border/10">
                   {comments.map((comment) => {
                     const repliesExpanded = expandedReplies.has(comment.id);
                     const visibleReplies = repliesExpanded 
@@ -447,12 +457,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           isLiking={isTogglingLike}
                         />
                         
-                        {/* Replies */}
+                        {/* Replies - with reduced indent */}
                         {comment.replies.length > 0 && (
-                          <div className={cn(
-                            "ml-10 mt-2 pl-3 border-l-2",
-                            isDark ? "border-white/10" : "border-border/30"
-                          )}>
+                          <div className="mt-1">
                             {visibleReplies.map((reply) => (
                               <CommentItem
                                 key={reply.id}
@@ -470,7 +477,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               <button
                                 onClick={() => toggleRepliesExpanded(comment.id)}
                                 className={cn(
-                                  "text-[12px] font-medium mt-2 ml-10",
+                                  "text-[12px] font-medium py-2 ml-[52px]",
                                   isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
                                 )}
                               >
@@ -481,7 +488,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               <button
                                 onClick={() => toggleRepliesExpanded(comment.id)}
                                 className={cn(
-                                  "text-[12px] font-medium mt-2 ml-10",
+                                  "text-[12px] font-medium py-2 ml-[52px]",
                                   isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
                                 )}
                               >
@@ -497,28 +504,39 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               )}
             </div>
 
-            {/* Emoji Picker */}
+            {/* Emoji Picker with tap-outside overlay */}
             <AnimatePresence>
               {showEmojiPicker && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className={cn(
-                    "absolute bottom-24 left-4 right-4 z-10 emoji-picker-container",
-                    "rounded-lg overflow-hidden shadow-xl"
-                  )}
-                >
-                  <Picker
-                    data={data}
-                    onEmojiSelect={handleEmojiSelect}
-                    theme={isDark ? 'dark' : 'light'}
-                    previewPosition="none"
-                    skinTonePosition="none"
-                    maxFrequentRows={2}
-                    perLine={8}
+                <>
+                  {/* Transparent overlay to capture outside taps */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-[9]"
+                    onClick={() => setShowEmojiPicker(false)}
                   />
-                </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className={cn(
+                      "absolute bottom-24 left-4 right-4 z-10 emoji-picker-container",
+                      "rounded-[16px] overflow-hidden shadow-xl"
+                    )}
+                  >
+                    <Picker
+                      data={data}
+                      onEmojiSelect={handleEmojiSelect}
+                      theme={isDark ? 'dark' : 'light'}
+                      previewPosition="none"
+                      skinTonePosition="none"
+                      maxFrequentRows={2}
+                      perLine={8}
+                    />
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
 
@@ -534,20 +552,21 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               )}
               style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
             >
-              {/* Reply indicator */}
+              {/* Reply indicator bar */}
               <AnimatePresence>
                 {replyingTo && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.15 }}
                     className={cn(
-                      "flex items-center justify-between mb-2 pb-2 border-b",
+                      "flex items-center justify-between mb-2 h-[28px]",
                       isDark ? "border-white/10" : "border-border/30"
                     )}
                   >
                     <span className={cn(
-                      "text-[12px]",
+                      "text-[13px]",
                       isDark ? "text-white/60" : "text-muted-foreground"
                     )}>
                       Replying to <span className="font-medium">{replyingTo.name}</span>
@@ -555,7 +574,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     <button
                       onClick={() => setReplyingTo(null)}
                       className={cn(
-                        "p-1 rounded-full transition-colors",
+                        "w-9 h-9 flex items-center justify-center rounded-full transition-colors -mr-1.5",
                         isDark ? "hover:bg-white/10" : "hover:bg-muted"
                       )}
                     >
@@ -571,7 +590,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <div className={cn(
-                    "flex items-center gap-2 rounded-full px-4 py-2.5",
+                    "flex items-center gap-2 rounded-[22px] h-[44px] px-4",
                     isDark 
                       ? "bg-white/10 border border-white/15" 
                       : "bg-background border border-border/50"
@@ -583,6 +602,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       onKeyDown={handleKeyPress}
+                      onFocus={() => setShowEmojiPicker(false)}
                       className={cn(
                         'flex-1 bg-transparent',
                         'text-[14px]',
@@ -595,7 +615,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     <button 
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                       className={cn(
-                        "transition-colors emoji-button",
+                        "transition-colors emoji-button p-1.5 -mr-1",
                         isDark 
                           ? "text-white/40 hover:text-white/60" 
                           : "text-muted-foreground hover:text-foreground",
