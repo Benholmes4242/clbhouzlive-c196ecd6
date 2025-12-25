@@ -465,12 +465,66 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           manifestLoadingTimeOut: 10000,
         });
         
-        hls.on(Hls.Events.ERROR, (_, data) => {
+        hls.on(Hls.Events.ERROR, async (_, data) => {
           console.error('[HLSPlayer] HLS error:', data.type, data.details);
-          if (data.fatal) {
-            setHasError(true);
+
+          if (!data.fatal) return;
+
+          // Fatal error path
+          const videoEl = videoRef.current;
+
+          // Safety guard
+          if (!videoEl) {
             onError?.(new Error(data.details));
+            return;
           }
+
+          // Attempt MP4 fallback if available and not already tried
+          if (mp4FallbackUrl && !triedMp4Fallback) {
+            console.warn('[HLSPlayer] 🔁 Attempting MP4 fallback');
+
+            setTriedMp4Fallback(true);
+
+            try {
+              // Destroy HLS instance cleanly
+              try {
+                hls.destroy();
+              } catch {}
+
+              // Reset element state
+              videoEl.pause();
+              videoEl.removeAttribute('src');
+              videoEl.load();
+
+              // Assign MP4 source
+              videoEl.src = mp4FallbackUrl;
+              videoEl.load();
+
+              // Attempt playback using hardened logic
+              const played = await safePlay(videoEl);
+
+              if (played) {
+                console.info('[HLSPlayer] ✅ MP4 fallback playback started');
+                return;
+              }
+
+              // MP4 failed → propagate fatal
+              console.error('[HLSPlayer] ❌ MP4 fallback failed');
+              onFatalError?.(new Error('MP4 fallback failed'), true);
+              setHasError(true);
+              return;
+
+            } catch (err) {
+              console.error('[HLSPlayer] ❌ MP4 fallback exception', err);
+              onFatalError?.(err instanceof Error ? err : new Error('MP4 fallback error'), true);
+              setHasError(true);
+              return;
+            }
+          }
+
+          // No fallback possible or already tried
+          setHasError(true);
+          onFatalError?.(new Error(data.details), triedMp4Fallback);
         });
         
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
