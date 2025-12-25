@@ -101,3 +101,9 @@ verify_jwt = false
 
 [functions.tourhub-map-slashgolf]
 verify_jwt = false
+
+[functions.fix-stream-account-ids]
+verify_jwt = false
+
+[functions.backfill-video-metadata]
+verify_jwt = false
