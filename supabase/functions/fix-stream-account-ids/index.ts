@@ -17,163 +17,131 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!;
     const cloudflareStreamToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN')!;
-    const correctAccountId = '4ah4gni80ytefpck';
+    const correctSubdomain = 'customer-4ah4gni80ytefpck';
+    const wrongSubdomain = 'customer-9p8qw7hk8dxqwnx6';
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log('🔧 Fixing Stream URLs to use correct manifests...');
-    console.log(`✅ Correct account ID: ${correctAccountId}`);
+    console.log('🔧 Fixing Stream URLs to use correct customer subdomain...');
+    console.log(`✅ Correct subdomain: ${correctSubdomain}`);
+    console.log(`❌ Wrong subdomain to fix: ${wrongSubdomain}`);
 
     let updateCount = 0;
     const errors: string[] = [];
 
-    // Get all videos from Cloudflare Stream
-    console.log('📹 Fetching videos from Cloudflare Stream...');
-    const streamResponse = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/stream`, {
-      headers: {
-        'Authorization': `Bearer ${cloudflareStreamToken}`,
-      },
-    });
-
-    if (!streamResponse.ok) {
-      throw new Error(`Failed to fetch Stream videos: ${streamResponse.statusText}`);
-    }
-
-    const streamData = await streamResponse.json();
-    const streamVideos = streamData.result || [];
-    console.log(`Found ${streamVideos.length} videos in Stream`);
-
-    // Create mapping from old URLs to correct Stream URLs
-    const urlMappings = new Map<string, string>();
+    // STEP 1: Fix wrong customer subdomain in all tables
+    console.log('📹 Step 1: Fixing wrong customer subdomain in URLs...');
     
-    // Wrong account IDs found in the database
-    const wrongAccountIds = [
-      'a1b264d44ddbe2b5127bb6ff5c274108'
-    ];
-
-    // Get all Stream URLs from all media tables
-    console.log('🔄 Finding all Stream URLs in database...');
-    const allStreamUrls: {table: string, id: string, url: string}[] = [];
-    
-    // Get from post_media (both Stream and R2 URLs)
-    const { data: postMedia, error: postError } = await supabase
+    // Fix post_media
+    const { data: postMediaToFix, error: postFetchError } = await supabase
       .from('post_media')
-      .select('id, media_url')
-      .or('media_url.like.%cloudflarestream.com%,media_url.like.%media.clbhouz.co.uk%');
+      .select('id, media_url, poster_url')
+      .like('media_url', `%${wrongSubdomain}%`);
     
-    if (postError) {
-      errors.push(`Error fetching post_media: ${postError.message}`);
-    } else {
-      postMedia.forEach(item => {
-        allStreamUrls.push({table: 'post_media', id: item.id, url: item.media_url});
-      });
-    }
-
-    // Get from profile_media (both Stream and R2 URLs)
-    const { data: profileMedia, error: profileError } = await supabase
-      .from('profile_media')
-      .select('id, media_url')
-      .or('media_url.like.%cloudflarestream.com%,media_url.like.%media.clbhouz.co.uk%');
-    
-    if (profileError) {
-      errors.push(`Error fetching profile_media: ${profileError.message}`);
-    } else {
-      profileMedia.forEach(item => {
-        allStreamUrls.push({table: 'profile_media', id: item.id, url: item.media_url});
-      });
-    }
-
-    // Get from course_review_media (both Stream and R2 URLs)
-    const { data: courseMedia, error: courseError } = await supabase
-      .from('course_review_media')
-      .select('id, media_url')
-      .or('media_url.like.%cloudflarestream.com%,media_url.like.%media.clbhouz.co.uk%');
-    
-    if (courseError) {
-      errors.push(`Error fetching course_review_media: ${courseError.message}`);
-    } else {
-      courseMedia.forEach(item => {
-        allStreamUrls.push({table: 'course_review_media', id: item.id, url: item.media_url});
-      });
-    }
-
-    console.log(`📊 Found ${allStreamUrls.length} Stream URLs in database`);
-
-    // Try to map database URLs to correct Stream URLs
-    for (const dbItem of allStreamUrls) {
-      let correctStreamUrl = null;
-      
-      if (dbItem.url.includes('cloudflarestream.com')) {
-        // Handle existing Stream URLs - extract video ID
-        const videoIdMatch = dbItem.url.match(/\/([a-f0-9]{32})\//);
-        if (!videoIdMatch) continue;
-        
-        const currentVideoId = videoIdMatch[1];
-        
-        // Find matching video in Stream
-        const streamVideo = streamVideos.find((video: any) => video.uid === currentVideoId);
-        
-        if (streamVideo) {
-          // Use the correct manifest URL
-          correctStreamUrl = `https://customer-${correctAccountId}.cloudflarestream.com/${streamVideo.uid}/manifest/video.m3u8`;
-        }
-      } else if (dbItem.url.includes('media.clbhouz.co.uk')) {
-        // Handle R2 URLs - extract filename and map to Stream video
-        const filename = dbItem.url.split('/').pop();
-        if (!filename) continue;
-        
-        // Find Stream video by filename in metadata
-        const streamVideo = streamVideos.find((video: any) => {
-          // Check if filename matches the original filename stored in meta
-          if (video.meta?.name === filename) return true;
-          
-          // Also check for partial matches (some files might have been renamed)
-          const baseFilename = filename.replace(/\.[^/.]+$/, ""); // Remove extension
-          if (video.meta?.name && video.meta.name.includes(baseFilename)) return true;
-          
-          return false;
-        });
-        
-        if (streamVideo) {
-          correctStreamUrl = `https://customer-${correctAccountId}.cloudflarestream.com/${streamVideo.uid}/manifest/video.m3u8`;
-          console.log(`🔄 Mapping R2 file ${filename} to Stream video ${streamVideo.uid}`);
-        } else {
-          console.log(`⚠️ No Stream video found for R2 file: ${filename}`);
-          continue;
-        }
-      }
-      
-      if (correctStreamUrl && dbItem.url !== correctStreamUrl) {
-        console.log(`🔄 Updating ${dbItem.table}:${dbItem.id} -> ${correctStreamUrl}`);
+    if (postFetchError) {
+      errors.push(`Error fetching post_media: ${postFetchError.message}`);
+    } else if (postMediaToFix && postMediaToFix.length > 0) {
+      console.log(`Found ${postMediaToFix.length} post_media rows with wrong subdomain`);
+      for (const item of postMediaToFix) {
+        const newMediaUrl = item.media_url.replace(wrongSubdomain, correctSubdomain);
+        const newPosterUrl = item.poster_url ? item.poster_url.replace(wrongSubdomain, correctSubdomain) : null;
         
         const { error: updateError } = await supabase
-          .from(dbItem.table)
-          .update({ media_url: correctStreamUrl })
-          .eq('id', dbItem.id);
+          .from('post_media')
+          .update({ 
+            media_url: newMediaUrl,
+            poster_url: newPosterUrl 
+          })
+          .eq('id', item.id);
         
         if (updateError) {
-          errors.push(`Failed to update ${dbItem.table} ${dbItem.id}: ${updateError.message}`);
+          errors.push(`Failed to update post_media ${item.id}: ${updateError.message}`);
         } else {
           updateCount++;
+          console.log(`✅ Updated post_media ${item.id}`);
         }
       }
     }
 
-    console.log(`🎉 Stream URL fix complete: ${updateCount} URLs updated`);
+    // Fix profile_media
+    const { data: profileMediaToFix, error: profileFetchError } = await supabase
+      .from('profile_media')
+      .select('id, media_url, poster_url')
+      .like('media_url', `%${wrongSubdomain}%`);
+    
+    if (profileFetchError) {
+      errors.push(`Error fetching profile_media: ${profileFetchError.message}`);
+    } else if (profileMediaToFix && profileMediaToFix.length > 0) {
+      console.log(`Found ${profileMediaToFix.length} profile_media rows with wrong subdomain`);
+      for (const item of profileMediaToFix) {
+        const newMediaUrl = item.media_url.replace(wrongSubdomain, correctSubdomain);
+        const newPosterUrl = item.poster_url ? item.poster_url.replace(wrongSubdomain, correctSubdomain) : null;
+        
+        const { error: updateError } = await supabase
+          .from('profile_media')
+          .update({ 
+            media_url: newMediaUrl,
+            poster_url: newPosterUrl 
+          })
+          .eq('id', item.id);
+        
+        if (updateError) {
+          errors.push(`Failed to update profile_media ${item.id}: ${updateError.message}`);
+        } else {
+          updateCount++;
+          console.log(`✅ Updated profile_media ${item.id}`);
+        }
+      }
+    }
+
+    // Fix course_review_media
+    const { data: courseMediaToFix, error: courseFetchError } = await supabase
+      .from('course_review_media')
+      .select('id, media_url, poster_url')
+      .like('media_url', `%${wrongSubdomain}%`);
+    
+    if (courseFetchError) {
+      errors.push(`Error fetching course_review_media: ${courseFetchError.message}`);
+    } else if (courseMediaToFix && courseMediaToFix.length > 0) {
+      console.log(`Found ${courseMediaToFix.length} course_review_media rows with wrong subdomain`);
+      for (const item of courseMediaToFix) {
+        const newMediaUrl = item.media_url.replace(wrongSubdomain, correctSubdomain);
+        const newPosterUrl = item.poster_url ? item.poster_url.replace(wrongSubdomain, correctSubdomain) : null;
+        
+        const { error: updateError } = await supabase
+          .from('course_review_media')
+          .update({ 
+            media_url: newMediaUrl,
+            poster_url: newPosterUrl 
+          })
+          .eq('id', item.id);
+        
+        if (updateError) {
+          errors.push(`Failed to update course_review_media ${item.id}: ${updateError.message}`);
+        } else {
+          updateCount++;
+          console.log(`✅ Updated course_review_media ${item.id}`);
+        }
+      }
+    }
+
+    console.log(`📊 Step 1 complete: Fixed ${updateCount} URLs with wrong subdomain`);
+
+    console.log(`🎉 Stream subdomain fix complete: ${updateCount} URLs updated`);
 
     return new Response(JSON.stringify({
       success: true,
       updatedUrls: updateCount,
-      correctAccountId: correctAccountId,
-      wrongAccountIds: wrongAccountIds,
-      errors: errors
+      correctSubdomain,
+      wrongSubdomain,
+      errors
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
     const err = normalizeError(error);
-    console.error('❌ Account ID fix error:', err.name, err.message, err.stack);
+    console.error('❌ Subdomain fix error:', err.name, err.message, err.stack);
     return new Response(JSON.stringify({ 
       error: err.message,
       success: false
