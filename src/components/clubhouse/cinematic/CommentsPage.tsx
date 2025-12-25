@@ -19,6 +19,7 @@ import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hook
 import { useHiddenComments } from '@/hooks/useHiddenComments';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MOTION_MED, EASE_OUT, SPRING_SNAPPY } from '@/lib/motionTokens';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 
@@ -989,15 +990,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
           {/* Comments Panel */}
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ 
-              type: 'spring', 
-              damping: 28, 
-              stiffness: 300,
-              mass: 0.8
-            }}
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={SPRING_SNAPPY}
             className={cn(
               'fixed inset-y-0 right-0 z-[101]',
               'w-full sm:w-[420px] max-w-full',
@@ -1200,9 +1196,22 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           commentRef={registerCommentRef(comment.id)}
                         />
                         
-                        {/* Replies - indented from comment text start with subtle dividers */}
+                        {/* Replies - indented with thread connector line */}
                         {comment.replies.length > 0 && (
-                          <div>
+                          <div className="relative">
+                            {/* Thread connector line */}
+                            <div 
+                              className={cn(
+                                "absolute left-[42px] top-0 bottom-0 w-[2px]",
+                                isDark ? "bg-white/10" : "bg-border/25"
+                              )}
+                              style={{ 
+                                // Only show connector alongside replies
+                                height: 'calc(100% - 8px)',
+                                marginTop: '4px'
+                              }}
+                            />
+                            
                             {visibleReplies.map((reply, replyIndex) => (
                               <CommentItem
                                 key={reply.id}
@@ -1229,7 +1238,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               <button
                                 onClick={() => toggleRepliesExpanded(comment.id)}
                                 className={cn(
-                                  "text-[12px] font-medium py-2 pl-[58px]",
+                                  "relative z-10 text-[12px] font-medium py-2 pl-[58px]",
                                   isDark ? "text-white/55 hover:text-white/75" : "text-muted-foreground hover:text-foreground"
                                 )}
                               >
@@ -1240,7 +1249,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               <button
                                 onClick={() => toggleRepliesExpanded(comment.id)}
                                 className={cn(
-                                  "text-[12px] font-medium py-2 pl-[58px]",
+                                  "relative z-10 text-[12px] font-medium py-2 pl-[58px]",
                                   isDark ? "text-white/55 hover:text-white/75" : "text-muted-foreground hover:text-foreground"
                                 )}
                               >

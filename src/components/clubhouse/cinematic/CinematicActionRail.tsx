@@ -8,6 +8,7 @@ import React, { useState, useCallback } from 'react';
 import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
 
 interface CinematicActionRailProps {
   postId: string;
@@ -42,6 +43,7 @@ interface ActionSlotProps {
   ariaLabel: string;
   activeColor?: string;
   showCount?: boolean;
+  isLikeButton?: boolean;
 }
 
 /**
@@ -56,8 +58,20 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
   ariaLabel,
   activeColor = 'text-red-500',
   showCount = true,
+  isLikeButton = false,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
+  const [showLikePop, setShowLikePop] = useState(false);
+  const wasActive = React.useRef(isActive);
+
+  // Track when becoming active (for like pop)
+  React.useEffect(() => {
+    if (isLikeButton && isActive && !wasActive.current) {
+      setShowLikePop(true);
+      setTimeout(() => setShowLikePop(false), MOTION_FAST);
+    }
+    wasActive.current = isActive;
+  }, [isActive, isLikeButton]);
 
   const handlePress = useCallback(() => {
     setIsPressed(true);
@@ -65,7 +79,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }
-    setTimeout(() => setIsPressed(false), 150);
+    setTimeout(() => setIsPressed(false), MOTION_FAST);
     onClick();
   }, [onClick]);
 
@@ -78,7 +92,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
     >
       {/* Icon button - fixed size */}
       <motion.button
-        whileTap={{ scale: 0.92 }}
+        whileTap={pressFeedback}
         onClick={handlePress}
         aria-label={ariaLabel}
         className={cn(
@@ -87,9 +101,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
           'border border-white/10',
           'flex items-center justify-center',
           'shadow-[0_4px_12px_rgba(0,0,0,0.25)]',
-          'transition-all duration-150',
-          'hover:bg-black/35',
-          'active:scale-95'
+          'hover:bg-black/35'
         )}
         style={{ width: ICON_SIZE, height: ICON_SIZE }}
       >
@@ -100,19 +112,25 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
               initial={{ scale: 0.5, opacity: 0.6 }}
               animate={{ scale: 1.5, opacity: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: MOTION_FAST / 1000, ease: EASE_OUT }}
               className="absolute inset-0 rounded-full bg-white/20"
             />
           )}
         </AnimatePresence>
 
-        <Icon
-          className={cn(
-            'w-5 h-5 transition-colors duration-150 relative z-10',
-            isActive ? cn(activeColor, 'fill-current') : 'text-white'
-          )}
-          strokeWidth={isActive ? 0 : 2}
-        />
+        {/* Icon with like pop animation */}
+        <motion.div
+          animate={showLikePop ? likePop : {}}
+          className="relative z-10"
+        >
+          <Icon
+            className={cn(
+              'w-5 h-5',
+              isActive ? cn(activeColor, 'fill-current') : 'text-white'
+            )}
+            strokeWidth={isActive ? 0 : 2}
+          />
+        </motion.div>
       </motion.button>
 
       {/* Count container - ALWAYS in layout, opacity controls visibility */}
@@ -192,6 +210,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         onClick={onLike}
         ariaLabel={hasLiked ? 'Unlike' : 'Like'}
         activeColor="text-red-500"
+        isLikeButton
       />
 
       {/* Slot 3: Comment */}
