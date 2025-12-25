@@ -35,6 +35,9 @@ interface CommentsPageProps {
   theme?: 'dark' | 'light' | 'grey';
   currentUserId?: string;
   creatorUserId?: string; // Post owner's user ID for Author badge
+  // Notification deep linking - when provided, will expand + scroll + highlight on mount
+  initialCommentId?: string; // The comment to highlight
+  initialParentCommentId?: string; // The parent comment to expand (for replies)
 }
 
 // ReplyingTo state always stores the top-level comment ID for one-level threading
@@ -57,7 +60,9 @@ interface CommentItemProps {
   isAuthor?: boolean; // True if comment author is the post creator
   isHighlighted?: boolean; // True if comment should show glow effect
   isHidden?: boolean; // True if user reported this comment (soft-hide)
+  isRevealed?: boolean; // True if user tapped "view" on a hidden comment (session state)
   onReveal?: () => void; // Callback to reveal a hidden comment
+  commentRef?: (el: HTMLDivElement | null) => void; // Ref callback for scroll/highlight
 }
 
 // Haptic feedback utility
@@ -86,12 +91,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
   isAuthor = false,
   isHighlighted = false,
   isHidden = false,
+  isRevealed = false,
   onReveal,
+  commentRef,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const [isPressing, setIsPressing] = useState(false);
-  const [isRevealed, setIsRevealed] = useState(false);
 
   const handleLike = () => {
     if (!comment.has_liked) {
@@ -132,6 +138,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
           />
         )}
         <div 
+          ref={commentRef}
           className={cn(
             "flex items-center gap-3 py-3",
             isReply && "pl-[26px]"
@@ -152,7 +159,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             </span>
           </div>
           <button
-            onClick={() => setIsRevealed(true)}
+            onClick={onReveal}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors",
               isDark 
@@ -180,6 +187,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         />
       )}
       <motion.div 
+        ref={commentRef}
         className={cn(
           "flex items-start select-none relative rounded-xl transition-all duration-150",
           isReply ? "pl-[26px] py-2.5 gap-2.5" : "py-3 gap-2.5",
@@ -696,6 +704,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   theme = 'dark',
   currentUserId,
   creatorUserId,
+  initialCommentId,
+  initialParentCommentId,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -709,6 +719,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [listVisible, setListVisible] = useState(false);
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [revealedCommentIds, setRevealedCommentIds] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -728,15 +739,30 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const isDark = theme === 'dark';
   const isGrey = theme === 'grey';
 
+  // Reveal a hidden comment (session-only, persists while on this screen)
+  const revealComment = useCallback((commentId: string) => {
+    setRevealedCommentIds(prev => new Set(prev).add(commentId));
+  }, []);
+  
+  // Register a ref for a comment (works for both parent and reply)
+  const registerCommentRef = useCallback((commentId: string) => (el: HTMLDivElement | null) => {
+    if (el) {
+      commentRefs.current.set(commentId, el);
+    } else {
+      commentRefs.current.delete(commentId);
+    }
+  }, []);
+
   // Highlight a comment with glow effect and auto-clear
   const highlightComment = useCallback((commentId: string, scrollToIt = true) => {
     setHighlightedCommentId(commentId);
     
     if (scrollToIt) {
-      requestAnimationFrame(() => {
+      // Use a small delay to ensure refs are registered after render
+      setTimeout(() => {
         const el = commentRefs.current.get(commentId);
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
+      }, 50);
     }
     
     // Clear highlight after 1200ms (120ms fade in + 800ms hold + 300ms fade out)
@@ -777,12 +803,29 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
   }, [isOpen]);
 
+  // Notification deep linking - expand parent, scroll to comment, highlight it
+  useEffect(() => {
+    if (!isOpen || !initialCommentId || commentsLoading) return;
+    
+    // If this is a reply, expand the parent thread first
+    if (initialParentCommentId) {
+      setExpandedReplies(prev => new Set(prev).add(initialParentCommentId));
+    }
+    
+    // Wait for render to complete, then highlight and scroll
+    const timer = setTimeout(() => {
+      highlightComment(initialCommentId, true);
+    }, 200);
+    
+    return () => clearTimeout(timer);
+  }, [isOpen, initialCommentId, initialParentCommentId, commentsLoading, highlightComment]);
+
   const handleSubmitComment = useCallback(async () => {
     if (!newComment.trim() || isAddingComment) return;
     
     // For replies, always attach to top-level parent (one-level threading)
     // topLevelId is guaranteed to be a parent comment ID, never a reply ID
-    const parentId = replyingTo?.topLevelId ?? null;
+    const parentId = replyingTo?.topLevelId ?? undefined;
     
     // Store current content before clearing
     const content = newComment;
@@ -791,19 +834,23 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     setShowEmojiPicker(false);
     triggerHaptic('success');
     
-    // Add comment and highlight it once added
-    addComment(content, parentId);
-    
-    // Since addComment is optimistic, we'll highlight after a brief delay
-    // In a real implementation, addComment would return the new comment ID
-    setTimeout(() => {
-      // Find the newest comment (last one added)
-      const latestComment = comments[comments.length - 1];
-      if (latestComment) {
-        highlightComment(latestComment.id, true);
+    try {
+      // Add comment and get the exact new comment ID
+      const newCommentId = await addComment(content, parentId);
+      
+      // If this is a reply, expand the parent thread first
+      if (parentId) {
+        setExpandedReplies(prev => new Set(prev).add(parentId));
       }
-    }, 300);
-  }, [newComment, isAddingComment, addComment, replyingTo, comments, highlightComment]);
+      
+      // Wait for query invalidation to complete, then highlight
+      setTimeout(() => {
+        highlightComment(newCommentId, true);
+      }, 150);
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  }, [newComment, isAddingComment, addComment, replyingTo, highlightComment]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -1083,7 +1130,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               animate={{ opacity: listVisible ? 1 : 0 }}
               transition={{ duration: 0.15 }}
               className="flex-1 overflow-y-auto px-4"
-              style={{ WebkitOverflowScrolling: 'touch' }}
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: Math.max(16, keyboardOffset + 72), // 72px = composer height approx
+              }}
             >
               {commentsLoading ? (
                 <div className="flex items-center justify-center py-12">
@@ -1114,9 +1164,6 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     return (
                       <div 
                         key={comment.id}
-                        ref={(el) => {
-                          if (el) commentRefs.current.set(comment.id, el);
-                        }}
                         className={cn(
                           index > 0 && "border-t",
                           isDark ? "border-white/8" : "border-border/30"
@@ -1134,6 +1181,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           isAuthor={creatorUserId === comment.user_id}
                           isHighlighted={highlightedCommentId === comment.id}
                           isHidden={hiddenCommentIds.has(comment.id)}
+                          isRevealed={revealedCommentIds.has(comment.id)}
+                          onReveal={() => revealComment(comment.id)}
+                          commentRef={registerCommentRef(comment.id)}
                         />
                         
                         {/* Replies - indented from comment text start with subtle dividers */}
@@ -1154,6 +1204,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 isAuthor={creatorUserId === reply.user_id}
                                 isHighlighted={highlightedCommentId === reply.id}
                                 isHidden={hiddenCommentIds.has(reply.id)}
+                                isRevealed={revealedCommentIds.has(reply.id)}
+                                onReveal={() => revealComment(reply.id)}
+                                commentRef={registerCommentRef(reply.id)}
                               />
                             ))}
                             
