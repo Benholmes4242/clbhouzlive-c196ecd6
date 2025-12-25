@@ -41,6 +41,7 @@ export interface HLSPlayerProps {
   // Source
   src: string;
   poster?: string;
+  mp4FallbackUrl?: string; // Optional MP4 fallback URL to try when HLS fails
   
   // Playback
   autoplay?: boolean;
@@ -64,6 +65,7 @@ export interface HLSPlayerProps {
   onError?: (error: Error) => void;
   onLoadedData?: () => void;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
+  onFatalError?: (error: Error, triedMp4: boolean) => void; // Called when all fallbacks exhausted
   
   // Advanced
   externallyManaged?: boolean; // Disable internal play/pause on click
@@ -93,6 +95,7 @@ export interface HLSPlayerRef {
 const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   src,
   poster,
+  mp4FallbackUrl,
   autoplay = false,
   muted = true,
   loop = false,
@@ -108,6 +111,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   onError,
   onLoadedData,
   onTimeUpdate,
+  onFatalError,
   externallyManaged = false,
   startTime,
   preload = 'metadata',
@@ -158,6 +162,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [hasError, setHasError] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [hasFirstFrame, setHasFirstFrame] = useState(false); // Track first frame readiness
+  const [triedMp4Fallback, setTriedMp4Fallback] = useState(false); // Track if MP4 fallback was attempted
   
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);

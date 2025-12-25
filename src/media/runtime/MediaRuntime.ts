@@ -33,6 +33,9 @@ export interface MediaNode {
   errorState: ErrorType | null;
   retryCount: number;
   lastError?: Error;
+  
+  // Generation token: incremented each time play is attempted, prevents stale callbacks
+  playGeneration: number;
 }
 
 export interface UIState {
@@ -154,6 +157,7 @@ class MediaRuntimeCore {
       isVisible: false,
       errorState: null,
       retryCount: 0,
+      playGeneration: 0,
     });
     
     // Tag element for callbacks
@@ -316,14 +320,39 @@ class MediaRuntimeCore {
     // listener checks activeMediaIds - it needs to be set before video.play() fires
     this.state.activeMediaIds.add(id);
     
+    // Increment generation token for this play attempt
+    // This allows us to detect if the candidate changed during async safePlay
+    node.playGeneration++;
+    const thisGeneration = node.playGeneration;
+    
     // Attempt play
     if (DEBUG_MEDIA_RUNTIME) {
       console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] CALLING_SAFEPLAY`, { 
         id: id.slice(0, 8),
-        readyState: node.videoElement.readyState 
+        readyState: node.videoElement.readyState,
+        generation: thisGeneration
       });
     }
     const success = await safePlay(node.videoElement);
+    
+    // Check if generation changed during async play (stale candidate)
+    const nodeAfter = this.registry.get(id);
+    if (!nodeAfter || nodeAfter.playGeneration !== thisGeneration) {
+      if (DEBUG_MEDIA_RUNTIME) {
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] STALE_PLAY_IGNORED`, { 
+          id: id.slice(0, 8),
+          expectedGen: thisGeneration,
+          currentGen: nodeAfter?.playGeneration 
+        });
+      }
+      // Stale: candidate changed during play - don't update state
+      // But pause this video since it's no longer the winner
+      if (success) {
+        node.videoElement.pause();
+      }
+      this.state.activeMediaIds.delete(id);
+      return false;
+    }
     
     if (success) {
       const endTime = performance.now();
@@ -351,7 +380,8 @@ class MediaRuntimeCore {
           surface,
           reason,
           timeTaken: (endTime - startTime).toFixed(2) + 'ms',
-          totalActive: this.state.activeMediaIds.size
+          totalActive: this.state.activeMediaIds.size,
+          generation: thisGeneration
         });
       }
     } else {
