@@ -30,10 +30,10 @@ export default function SlidingPanels<T extends Key = string>({
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={String(activeKey)}
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -24 }}
-            transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
             style={{ position: 'relative' }}
             onAnimationStart={handleAnimationStart}
             onAnimationComplete={handleAnimationComplete}
