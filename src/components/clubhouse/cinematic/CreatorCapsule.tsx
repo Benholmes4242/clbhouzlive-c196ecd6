@@ -162,20 +162,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               hideRing
             />
 
-            {/* Name + Course */}
+            {/* Name */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-[13px] font-semibold text-white truncate">
                   @{user?.username || user?.name?.toLowerCase().replace(/\s/g, '') || 'golfer'}
                 </span>
-                {courseName && (
-                  <>
-                    <span className="text-white/50">·</span>
-                    <span className="text-[12px] text-white/70 truncate">
-                      {courseName}
-                    </span>
-                  </>
-                )}
               </div>
               
               {/* Caption preview (collapsed) */}
