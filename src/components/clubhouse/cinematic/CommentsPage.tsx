@@ -35,6 +35,12 @@ interface CommentsPageProps {
   currentUserId?: string;
 }
 
+// ReplyingTo state always stores the top-level comment ID for one-level threading
+interface ReplyingToState {
+  topLevelId: string; // Always the parent comment ID, never a reply ID
+  displayName: string; // Name to show in "Replying to X"
+}
+
 interface CommentItemProps {
   comment: CommentWithReplies | CommentReply;
   isDark: boolean;
@@ -104,12 +110,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   return (
     <>
-      {/* Subtle divider between replies only */}
+      {/* Subtle divider between replies only - inset to reply text start, avoiding heart column */}
       {showDivider && (
         <div 
           className={cn(
-            "h-px ml-[62px] mr-4",
-            isDark ? "bg-white/8" : "bg-border/20"
+            "h-px ml-[58px] mr-[56px]",
+            isDark ? "bg-white/10" : "bg-border/25"
           )}
         />
       )}
@@ -614,7 +620,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
+  const [replyingTo, setReplyingTo] = useState<ReplyingToState | null>(null);
   const [expandedCaption, setExpandedCaption] = useState(false);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
   const [selectedComment, setSelectedComment] = useState<CommentWithReplies | CommentReply | null>(null);
@@ -651,7 +657,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     if (!newComment.trim() || isAddingComment) return;
     
     // For replies, always attach to top-level parent (one-level threading)
-    const parentId = replyingTo?.id;
+    // topLevelId is guaranteed to be a parent comment ID, never a reply ID
+    const parentId = replyingTo?.topLevelId ?? null;
     
     addComment(newComment, parentId);
     setNewComment('');
@@ -668,7 +675,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   }, [handleSubmitComment]);
 
   const handleReply = useCallback((commentId: string, userName: string) => {
-    setReplyingTo({ id: commentId, name: userName });
+    // commentId is always a top-level comment ID (Reply button only appears on parent comments)
+    // This ensures one-level threading - replies always attach to the parent comment
+    setReplyingTo({ topLevelId: commentId, displayName: userName });
     triggerHaptic('light');
     // Ensure cursor appears inside input field
     requestAnimationFrame(() => {
@@ -1024,45 +1033,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               )}
             </motion.div>
 
-            {/* Full-screen emoji overlay - covers entire viewport */}
-            <AnimatePresence>
-              {showEmojiPicker && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="fixed inset-0 z-[105]"
-                  onClick={() => setShowEmojiPicker(false)}
-                />
-              )}
-            </AnimatePresence>
-
-            {/* Emoji Picker - positioned above input */}
-            <AnimatePresence>
-              {showEmojiPicker && (
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 12 }}
-                  transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
-                  className={cn(
-                    "absolute bottom-24 left-4 right-4 z-[110] emoji-picker-container",
-                    "rounded-[16px] overflow-hidden shadow-xl"
-                  )}
-                >
-                  <Picker
-                    data={data}
-                    onEmojiSelect={handleEmojiSelect}
-                    theme={isDark ? 'dark' : 'light'}
-                    previewPosition="none"
-                    skinTonePosition="none"
-                    maxFrequentRows={2}
-                    perLine={8}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Comment Input - Fixed Bottom */}
 
             {/* Comment Input - Fixed Bottom */}
             <div 
@@ -1092,7 +1063,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       "text-[13px]",
                       isDark ? "text-white/60" : "text-muted-foreground"
                     )}>
-                      Replying to <span className="font-medium">{replyingTo.name}</span>
+                      Replying to <span className="font-medium">{replyingTo.displayName}</span>
                     </span>
                     <button
                       onClick={() => setReplyingTo(null)}
@@ -1123,7 +1094,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     <input
                       ref={inputRef}
                       type="text"
-                      placeholder={replyingTo ? `Reply to ${replyingTo.name}...` : "Add a comment..."}
+                      placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : "Add a comment..."}
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       onKeyDown={handleKeyPress}
@@ -1173,6 +1144,55 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               </div>
             </div>
           </motion.div>
+
+          {/* Full-screen emoji overlay - MUST be outside panel, covers entire viewport including sides */}
+          <AnimatePresence>
+            {showEmojiPicker && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="fixed inset-0 z-[105]"
+                style={{ pointerEvents: 'auto' }}
+                onClick={() => setShowEmojiPicker(false)}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Emoji Picker - positioned above input, same width as input */}
+          <AnimatePresence>
+            {showEmojiPicker && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+                className={cn(
+                  "fixed right-4 z-[110] emoji-picker-container",
+                  "rounded-[16px] overflow-hidden shadow-xl",
+                  "sm:right-auto sm:left-[calc(100%-420px+16px)] sm:w-[calc(420px-32px)]"
+                )}
+                style={{ 
+                  bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+                  left: '16px',
+                  right: '16px',
+                  maxWidth: 'calc(100% - 32px)',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Picker
+                  data={data}
+                  onEmojiSelect={handleEmojiSelect}
+                  theme={isDark ? 'dark' : 'light'}
+                  previewPosition="none"
+                  skinTonePosition="none"
+                  maxFrequentRows={2}
+                  perLine={8}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Action Sheet */}
           <AnimatePresence>
