@@ -117,9 +117,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       {/* Capsule Container */}
       <motion.div
         ref={capsuleRef}
-        initial={{ opacity: 1, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ 
+          opacity: isVisible ? 1 : 0, 
+          y: isVisible ? 0 : 20 
+        }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={cn(
