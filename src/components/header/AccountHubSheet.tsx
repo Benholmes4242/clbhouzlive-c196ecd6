@@ -6,10 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
 // ============================================
-// ACCOUNT HUB SHEET
-// A world-class bottom sheet with two snap states (Peek/Full)
+// ACCOUNT HUB SHEET - FINAL POLISH PASS
+// World-class bottom sheet with premium glass styling
 // Features: profile carousel, quick actions, grouped menu
-// Starts below header, covers bottom nav
+// Starts below header, covers bottom nav, desktop responsive
 // ============================================
 
 type SnapState = 'peek' | 'full';
@@ -43,7 +43,7 @@ interface AccountHubSheetProps {
 }
 
 // Snap point percentages (of available height below header)
-const SNAP_PEEK = 0.48; // 48% for peek
+const SNAP_PEEK = 0.52; // 52% for peek
 const SNAP_FULL = 0.94; // 94% for full
 
 export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
@@ -65,12 +65,21 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   const [switchingProfileId, setSwitchingProfileId] = useState<string | null>(null);
   const [isClosing, setIsClosing] = useState(false);
   const [showToast, setShowToast] = useState<string | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   
   // Touch/drag state
   const dragStartY = useRef<number>(0);
   const dragCurrentY = useRef<number>(0);
   const isDragging = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
+
+  // Check for desktop viewport
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 900);
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   // Calculate available height (viewport - header)
   const availableHeight = typeof window !== 'undefined' 
@@ -112,7 +121,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
       onClose();
       setIsClosing(false);
       setSnap('peek');
-    }, 200);
+    }, 220);
   }, [onClose]);
 
   // Handle profile switch
@@ -144,6 +153,10 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
 
   // Touch handlers for swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Only start drag on header area or when content is scrolled to top
+    const content = contentRef.current;
+    if (content && content.scrollTop > 0) return;
+    
     dragStartY.current = e.touches[0].clientY;
     isDragging.current = true;
   };
@@ -169,13 +182,14 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
     isDragging.current = false;
     
     const delta = dragCurrentY.current - dragStartY.current;
+    const velocity = Math.abs(delta) > 80; // High velocity threshold
     const threshold = 50;
     
     if (snap === 'peek') {
       if (delta < -threshold) {
         // Swipe up -> expand to full
         setSnap('full');
-      } else if (delta > threshold) {
+      } else if (delta > threshold || (velocity && delta > 25)) {
         // Swipe down from peek -> close
         handleClose();
       }
@@ -193,84 +207,106 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
 
   if (!open) return null;
 
-  const backdropClasses = cn(
-    'fixed inset-0 z-[9998] transition-opacity duration-200',
-    isClosing ? 'opacity-0' : 'opacity-100'
-  );
+  // Calculate sheet position
+  const sheetTop = isDesktop 
+    ? headerHeight + 12 
+    : headerHeight + (availableHeight - currentHeight) + dragOffset;
 
-  const sheetClasses = cn(
-    'fixed left-0 right-0 bottom-0 z-[9999] flex flex-col transition-all duration-200 ease-out',
-    isClosing && 'translate-y-full opacity-0'
-  );
-
-  // Calculate sheet top position and transform
-  const sheetTop = headerHeight + (availableHeight - currentHeight) + dragOffset;
+  // Theme colors
+  const colors = {
+    bg: useLightTheme 
+      ? 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)'
+      : 'linear-gradient(180deg, rgba(28,28,30,0.96) 0%, rgba(18,18,20,0.98) 100%)',
+    shadow: useLightTheme
+      ? '0 -8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)'
+      : '0 -8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
+    border: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+    text: useLightTheme ? '#1a1a1a' : '#ffffff',
+    textMuted: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
+    sectionLabel: useLightTheme ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)',
+    cardBg: useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+    cardBorder: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+    grabHandle: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.25)',
+    closeBg: useLightTheme ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)',
+    closeHover: useLightTheme ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)',
+    closeIcon: useLightTheme ? '#666' : '#999',
+  };
 
   return createPortal(
     <>
-      {/* Backdrop */}
+      {/* Backdrop - tap to dismiss */}
       <div
-        className={backdropClasses}
+        className={cn(
+          'fixed inset-0 z-[9998] transition-all',
+          isClosing ? 'opacity-0' : 'opacity-100'
+        )}
         style={{
-          background: 'rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          background: 'rgba(0, 0, 0, 0.38)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          transitionDuration: '220ms',
         }}
         onClick={handleClose}
         aria-label="Close menu"
       />
 
-      {/* Sheet */}
+      {/* Sheet Container */}
       <div
         ref={sheetRef}
-        className={sheetClasses}
+        className={cn(
+          'fixed z-[9999] flex flex-col transition-all',
+          isClosing && 'opacity-0'
+        )}
         style={{
+          // Mobile: full-width bottom sheet
+          // Desktop: anchored popover
           top: sheetTop,
-          borderTopLeftRadius: '24px',
-          borderTopRightRadius: '24px',
-          background: useLightTheme 
-            ? 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)'
-            : 'linear-gradient(180deg, rgba(28,28,30,0.98) 0%, rgba(18,18,20,0.98) 100%)',
+          left: isDesktop ? 'auto' : 0,
+          right: isDesktop ? 16 : 0,
+          bottom: isDesktop ? 'auto' : 0,
+          width: isDesktop ? 420 : 'auto',
+          height: isDesktop ? 'min(640px, calc(100vh - 100px))' : `calc(100vh - ${sheetTop}px)`,
+          borderTopLeftRadius: isDesktop ? 22 : 24,
+          borderTopRightRadius: isDesktop ? 22 : 24,
+          borderBottomLeftRadius: isDesktop ? 22 : 0,
+          borderBottomRightRadius: isDesktop ? 22 : 0,
+          background: colors.bg,
           backdropFilter: 'blur(40px) saturate(150%)',
           WebkitBackdropFilter: 'blur(40px) saturate(150%)',
-          boxShadow: useLightTheme
-            ? '0 -8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8)'
-            : '0 -8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
-          height: `calc(100vh - ${sheetTop}px)`,
-          paddingBottom: 'env(safe-area-inset-bottom)',
+          boxShadow: colors.shadow,
+          paddingBottom: isDesktop ? 0 : 'env(safe-area-inset-bottom)',
+          transform: isClosing ? 'translateY(24px)' : 'translateY(0)',
+          transitionDuration: isClosing ? '180ms' : '220ms',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          overflow: 'hidden',
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Drag Handle */}
-        <div className="flex justify-center pt-3 pb-1">
+        {/* Grab Handle */}
+        <div className="flex justify-center pt-2.5 pb-1.5">
           <div 
-            className="w-10 h-1 rounded-full"
-            style={{
-              background: useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)'
-            }}
+            className="w-9 h-1 rounded-full"
+            style={{ background: colors.grabHandle }}
           />
         </div>
 
-        {/* Top Bar - Sticky */}
+        {/* Header Row - Sticky */}
         <div 
-          className="flex items-center justify-between px-5 py-3 border-b"
+          className="flex items-center justify-between px-4 py-2.5"
           style={{
-            borderColor: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+            borderBottom: `1px solid ${colors.border}`,
             position: 'sticky',
             top: 0,
             zIndex: 2,
-            background: 'inherit',
           }}
         >
           <div className="flex items-center gap-3">
             {/* Avatar */}
             <div 
-              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center"
-              style={{
-                background: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)'
-              }}
+              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
+              style={{ background: colors.cardBg }}
             >
               {currentActor.avatarUrl ? (
                 <img 
@@ -279,34 +315,35 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <User className="w-5 h-5 opacity-60" />
+                <User className="w-5 h-5" style={{ opacity: 0.6, color: colors.text }} />
               )}
             </div>
             <div>
               <div 
-                className="font-semibold text-[15px]"
-                style={{ color: useLightTheme ? '#1a1a1a' : '#ffffff' }}
+                className="font-semibold text-[16px] leading-tight"
+                style={{ color: colors.text }}
               >
                 {currentActor.name}
               </div>
               <div 
-                className="text-[13px]"
-                style={{ color: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }}
+                className="text-[13px] leading-tight mt-0.5"
+                style={{ color: colors.textMuted }}
               >
                 Posting as {currentActor.name}
               </div>
             </div>
           </div>
           
-          {/* Close button */}
+          {/* Close button - glass circle */}
           <button
             onClick={handleClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
             style={{
-              background: useLightTheme ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)'
+              background: colors.closeBg,
+              border: `1px solid ${colors.cardBorder}`,
             }}
           >
-            <X className="w-5 h-5" style={{ color: useLightTheme ? '#666' : '#999' }} />
+            <X className="w-[18px] h-[18px]" style={{ color: colors.closeIcon }} />
           </button>
         </div>
 
@@ -315,113 +352,63 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           ref={contentRef}
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
-            paddingBottom: 'calc(16px + env(safe-area-inset-bottom))'
+            WebkitOverflowScrolling: 'touch',
+            paddingBottom: isDesktop ? 16 : 'calc(24px + env(safe-area-inset-bottom))',
           }}
         >
           {/* Profile Switcher Section */}
-          <div className="px-5 pt-4 pb-3">
+          <div className="px-4 pt-3 pb-2">
             <div 
-              className="text-xs font-medium uppercase tracking-wider mb-3"
-              style={{ color: useLightTheme ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)' }}
+              className="text-[12px] font-medium uppercase tracking-[0.06em] mb-2.5"
+              style={{ color: colors.sectionLabel }}
             >
               Switch profile
             </div>
             
-            {/* Horizontal Carousel */}
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+            {/* Horizontal Carousel with snap */}
+            <div 
+              className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
+              style={{ 
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
               {profiles.map((profile) => {
                 const isSelected = profile.id === currentActor.id;
                 const isSwitching = switchingProfileId === profile.id;
                 
                 return (
-                  <button
+                  <ProfileCard
                     key={profile.id}
+                    profile={profile}
+                    isSelected={isSelected}
+                    isSwitching={isSwitching}
                     onClick={() => handleSwitchProfile(profile.id)}
-                    disabled={isSwitching}
-                    className="flex-shrink-0 flex items-center gap-3 p-3 rounded-2xl transition-all duration-150"
-                    style={{
-                      width: '170px',
-                      background: isSelected 
-                        ? (useLightTheme ? 'rgba(59,130,246,0.1)' : 'rgba(59,130,246,0.15)')
-                        : (useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)'),
-                      border: isSelected 
-                        ? '1.5px solid rgba(59,130,246,0.4)'
-                        : '1.5px solid transparent',
-                    }}
-                  >
-                    {/* Avatar */}
-                    <div 
-                      className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
-                      style={{
-                        background: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)'
-                      }}
-                    >
-                      {profile.avatarUrl ? (
-                        <img 
-                          src={profile.avatarUrl} 
-                          alt={profile.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : profile.type === 'business' ? (
-                        <Building2 className="w-5 h-5 opacity-60" />
-                      ) : (
-                        <User className="w-5 h-5 opacity-60" />
-                      )}
-                      
-                      {/* Selected check */}
-                      {isSelected && !isSwitching && (
-                        <div 
-                          className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center"
-                          style={{ background: '#3b82f6' }}
-                        >
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                      
-                      {/* Loading spinner */}
-                      {isSwitching && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Info */}
-                    <div className="flex-1 min-w-0 text-left">
-                      <div 
-                        className="font-medium text-[14px] truncate"
-                        style={{ color: useLightTheme ? '#1a1a1a' : '#ffffff' }}
-                      >
-                        {profile.name}
-                      </div>
-                      <div 
-                        className="text-[12px]"
-                        style={{ color: useLightTheme ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)' }}
-                      >
-                        {profile.type === 'personal' ? 'Personal' : 'Business'}
-                      </div>
-                    </div>
-                  </button>
+                    useLightTheme={useLightTheme}
+                  />
                 );
               })}
               
               {/* Add Business Card */}
               <button
                 onClick={() => handleNavigate('/settings/business')}
-                className="flex-shrink-0 flex items-center justify-center gap-2 p-3 rounded-2xl transition-colors"
+                className="flex-shrink-0 flex items-center justify-center gap-2 p-3 rounded-[14px] transition-all active:scale-[0.98]"
                 style={{
-                  width: '140px',
-                  background: useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
-                  border: `1.5px dashed ${useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)'}`,
+                  scrollSnapAlign: 'start',
+                  width: 140,
+                  height: 74,
+                  background: colors.cardBg,
+                  border: `1.5px dashed ${useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.18)'}`,
+                  opacity: 0.85,
                 }}
               >
                 <Plus 
                   className="w-5 h-5" 
-                  style={{ color: useLightTheme ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)' }}
+                  style={{ color: colors.textMuted }}
                 />
                 <span 
                   className="text-[13px] font-medium"
-                  style={{ color: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }}
+                  style={{ color: colors.textMuted }}
                 >
                   Add business
                 </span>
@@ -430,14 +417,11 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           </div>
 
           {/* Divider */}
-          <div 
-            className="mx-5 h-px"
-            style={{ background: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' }}
-          />
+          <Divider useLightTheme={useLightTheme} />
 
           {/* Quick Actions Row */}
-          <div className="px-5 py-4">
-            <div className="flex gap-3">
+          <div className="px-4 py-3">
+            <div className="grid grid-cols-3 gap-3">
               <QuickActionButton
                 icon={<User className="w-[18px] h-[18px]" />}
                 label="View profile"
@@ -461,10 +445,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           </div>
 
           {/* Divider */}
-          <div 
-            className="mx-5 h-px"
-            style={{ background: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' }}
-          />
+          <Divider useLightTheme={useLightTheme} />
 
           {/* Menu Sections */}
           <div className="py-2">
@@ -490,10 +471,10 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               />
             </MenuSection>
 
-            {/* Admin Section */}
+            {/* Admin Section - Premium privileged highlight */}
             {isAdmin && (
               <MenuSection title="Admin" useLightTheme={useLightTheme}>
-                <MenuItem
+                <AdminMenuItem
                   icon={<Shield className="w-5 h-5" />}
                   label="Admin Dashboard"
                   onClick={() => handleNavigate('/admin')}
@@ -502,16 +483,21 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               </MenuSection>
             )}
 
-            {/* Danger Section */}
-            <MenuSection title="" useLightTheme={useLightTheme}>
-              <MenuItem
-                icon={<LogOut className="w-5 h-5" />}
-                label="Log out"
+            {/* Danger Zone - Logout */}
+            <div className="px-4 pt-4">
+              <button
                 onClick={() => handleNavigate('/logout')}
-                useLightTheme={useLightTheme}
-                danger
-              />
-            </MenuSection>
+                className="w-full flex items-center gap-4 px-4 py-4 rounded-[14px] transition-all active:scale-[0.98]"
+                style={{
+                  background: 'rgba(255, 91, 91, 0.06)',
+                  border: '1px solid rgba(255, 91, 91, 0.14)',
+                  color: '#ef4444',
+                }}
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="text-[15px] font-medium">Log out</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -537,7 +523,112 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   );
 };
 
-// Quick Action Button Component
+// ============================================
+// PROFILE CARD COMPONENT
+// Horizontal carousel card with selected glow
+// ============================================
+
+interface ProfileCardProps {
+  profile: Profile;
+  isSelected: boolean;
+  isSwitching: boolean;
+  onClick: () => void;
+  useLightTheme: boolean;
+}
+
+const ProfileCard: React.FC<ProfileCardProps> = ({
+  profile,
+  isSelected,
+  isSwitching,
+  onClick,
+  useLightTheme,
+}) => {
+  const colors = {
+    text: useLightTheme ? '#1a1a1a' : '#ffffff',
+    textMuted: useLightTheme ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)',
+    cardBg: useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+    avatarBg: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={isSwitching}
+      className="relative flex-shrink-0 flex items-center gap-2.5 p-2.5 rounded-[14px] transition-all active:scale-[0.98]"
+      style={{
+        scrollSnapAlign: 'start',
+        width: 150,
+        height: 74,
+        background: isSelected 
+          ? (useLightTheme ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.12)')
+          : colors.cardBg,
+        border: isSelected 
+          ? '2px solid rgba(59,130,246,0.5)'
+          : `1.5px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
+        boxShadow: isSelected 
+          ? '0 0 0 4px rgba(59,130,246,0.12)'
+          : 'none',
+      }}
+    >
+      {/* Avatar */}
+      <div 
+        className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+        style={{ background: colors.avatarBg }}
+      >
+        {profile.avatarUrl ? (
+          <img 
+            src={profile.avatarUrl} 
+            alt={profile.name}
+            className="w-full h-full object-cover"
+          />
+        ) : profile.type === 'business' ? (
+          <Building2 className="w-5 h-5" style={{ opacity: 0.6, color: colors.text }} />
+        ) : (
+          <User className="w-5 h-5" style={{ opacity: 0.6, color: colors.text }} />
+        )}
+        
+        {/* Loading spinner */}
+        {isSwitching && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          </div>
+        )}
+      </div>
+      
+      {/* Info */}
+      <div className="flex-1 min-w-0 text-left">
+        <div 
+          className="font-medium text-[14px] truncate leading-tight"
+          style={{ color: colors.text }}
+        >
+          {profile.name}
+        </div>
+        <div 
+          className="text-[12px] leading-tight mt-0.5"
+          style={{ color: colors.textMuted }}
+        >
+          {profile.type === 'personal' ? 'Personal' : 'Business'}
+        </div>
+      </div>
+
+      {/* Selected checkmark - top right badge */}
+      {isSelected && !isSwitching && (
+        <div 
+          className="absolute top-2 right-2 w-[18px] h-[18px] rounded-full flex items-center justify-center"
+          style={{ background: '#3b82f6' }}
+        >
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      )}
+    </button>
+  );
+};
+
+// ============================================
+// QUICK ACTION BUTTON COMPONENT
+// Equal-width grid button with gradient
+// ============================================
+
 interface QuickActionButtonProps {
   icon: React.ReactNode;
   label: string;
@@ -555,10 +646,14 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className="flex-1 flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-colors"
+    className="flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-[14px] transition-all active:scale-[0.98]"
     style={{
-      background: useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+      background: useLightTheme 
+        ? 'linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.02) 100%)'
+        : 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+      border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
       color: useLightTheme ? '#1a1a1a' : '#ffffff',
+      height: 56,
     }}
   >
     <span className="relative" style={{ opacity: 0.7 }}>
@@ -567,7 +662,7 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
         <span 
           className={cn(
             "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500",
-            useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
+            useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(28,28,30)]"
           )}
           aria-label="Unread notifications"
         />
@@ -577,7 +672,26 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   </button>
 );
 
-// Menu Section Component
+// ============================================
+// DIVIDER COMPONENT
+// Very subtle horizontal line
+// ============================================
+
+interface DividerProps {
+  useLightTheme: boolean;
+}
+
+const Divider: React.FC<DividerProps> = ({ useLightTheme }) => (
+  <div 
+    className="mx-4 h-px"
+    style={{ background: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)' }}
+  />
+);
+
+// ============================================
+// MENU SECTION COMPONENT
+// ============================================
+
 interface MenuSectionProps {
   title: string;
   children: React.ReactNode;
@@ -585,10 +699,10 @@ interface MenuSectionProps {
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({ title, children, useLightTheme }) => (
-  <div className="px-5 py-1">
+  <div className="px-4 py-1">
     {title && (
       <div 
-        className="text-xs font-medium uppercase tracking-wider mb-1 px-4"
+        className="text-[12px] font-medium uppercase tracking-[0.06em] mb-1 px-3"
         style={{ color: useLightTheme ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)' }}
       >
         {title}
@@ -598,7 +712,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, children, useLightThem
   </div>
 );
 
-// Menu Item Component
+// ============================================
+// MENU ITEM COMPONENT
+// Clean row with 52px height
+// ============================================
+
 interface MenuItemProps {
   icon: React.ReactNode;
   label: string;
@@ -616,8 +734,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-colors"
+    className="w-full flex items-center gap-4 px-3 py-3 rounded-[12px] transition-colors active:bg-black/5 dark:active:bg-white/5"
     style={{
+      height: 52,
       color: danger 
         ? '#ef4444' 
         : (useLightTheme ? '#1a1a1a' : '#ffffff'),
@@ -631,6 +750,48 @@ const MenuItem: React.FC<MenuItemProps> = ({
         style={{ opacity: 0.3 }} 
       />
     )}
+  </button>
+);
+
+// ============================================
+// ADMIN MENU ITEM COMPONENT
+// Premium gold accent highlight
+// ============================================
+
+interface AdminMenuItemProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  useLightTheme: boolean;
+}
+
+const AdminMenuItem: React.FC<AdminMenuItemProps> = ({ 
+  icon, 
+  label, 
+  onClick, 
+  useLightTheme,
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-4 px-3 py-3 rounded-[12px] transition-colors"
+    style={{
+      height: 52,
+      background: 'rgba(245, 185, 66, 0.06)',
+      borderLeft: '2px solid rgba(245, 185, 66, 0.55)',
+      color: useLightTheme ? '#1a1a1a' : '#ffffff',
+    }}
+  >
+    <span style={{ opacity: 0.8, color: 'rgba(245, 185, 66, 0.9)' }}>{icon}</span>
+    <span className="flex-1 text-left text-[15px] font-medium">{label}</span>
+    <span 
+      className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+      style={{
+        background: 'rgba(245, 185, 66, 0.15)',
+        color: 'rgba(245, 185, 66, 0.9)',
+      }}
+    >
+      Admin
+    </span>
   </button>
 );
 
