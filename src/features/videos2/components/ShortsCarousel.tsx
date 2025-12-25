@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect, useId } from 'react';
 import { motion } from 'framer-motion';
-import { HLSVideo } from './HLSVideo';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { VideoItem } from '../types';
 
 type ShortsCarouselProps = {
@@ -11,9 +11,7 @@ type ShortsCarouselProps = {
 /**
  * ShortsCarousel - Horizontal scrolling shorts carousel
  * 
- * REFACTORED: Removed useAutoplayInRail hook dependency.
- * Autoplay is now controlled exclusively by MediaRuntime.
- * HLSVideo components should register with MediaRuntime for autoplay.
+ * Uses unified HLSPlayer with MediaRuntime for autoplay control.
  */
 export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -36,36 +34,99 @@ export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
         className="flex gap-3 overflow-x-auto pb-2 no-scrollbar"
       >
         {videos.map((video) => (
-          <motion.div
-            key={video.id}
-            className="flex-shrink-0 w-40 cursor-pointer group"
-            onClick={() => onVideoClick(video.id)}
-            whileHover={{ y: -2 }}
-          >
-            {/* Thumbnail/Video */}
-            <div className="relative aspect-[2/3] rounded-sq-md overflow-hidden bg-gray-900 shadow-lg">
-              <HLSVideo
-                hlsUrl={video.hlsUrl}
-                src={video.src}
-                poster={video.poster}
-                className="w-full h-full object-cover"
-              />
-
-              {/* Views */}
-              <div className="absolute bottom-2 left-2 right-2">
-                <div className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-white text-xs">
-                  👁️ {formatViews(video.views)}
-                </div>
-              </div>
-            </div>
-
-            {/* Title */}
-            <p className="text-white text-sm font-medium mt-2 line-clamp-2">
-              {video.title}
-            </p>
-          </motion.div>
+          <ShortCard 
+            key={video.id} 
+            video={video} 
+            onVideoClick={onVideoClick}
+            formatViews={formatViews}
+          />
         ))}
       </div>
     </div>
+  );
+}
+
+// Separate card component for intersection observer per card
+function ShortCard({ 
+  video, 
+  onVideoClick,
+  formatViews
+}: { 
+  video: VideoItem; 
+  onVideoClick: (id: string) => void;
+  formatViews: (n: number) => string;
+}) {
+  const [shouldAttach, setShouldAttach] = useState(false);
+  const [autoplay, setAutoplay] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const mediaId = useId();
+
+  // Intersection observer for attach/autoplay
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setShouldAttach(entry.isIntersecting);
+        setAutoplay(entry.intersectionRatio >= 0.5);
+      },
+      { 
+        root: null, 
+        rootMargin: '100px 0px',
+        threshold: [0, 0.5, 1.0] 
+      }
+    );
+
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, []);
+
+  // Handle attach/detach
+  useEffect(() => {
+    if (shouldAttach) {
+      playerRef.current?.attach();
+    } else {
+      playerRef.current?.detach();
+    }
+  }, [shouldAttach]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className="flex-shrink-0 w-40 cursor-pointer group"
+      onClick={() => onVideoClick(video.id)}
+      whileHover={{ y: -2 }}
+    >
+      {/* Thumbnail/Video */}
+      <div className="relative aspect-[2/3] rounded-sq-md overflow-hidden bg-gray-900 shadow-lg">
+        <HLSPlayer
+          ref={playerRef}
+          src={video.hlsUrl || ''}
+          mp4FallbackUrl={video.src}
+          poster={video.poster}
+          muted={true}
+          autoplay={autoplay}
+          loop={true}
+          managedByMediaRuntime={true}
+          mediaId={mediaId}
+          className="w-full h-full object-cover"
+        />
+
+        {/* Views */}
+        <div className="absolute bottom-2 left-2 right-2 z-10">
+          <div className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-white text-xs">
+            👁️ {formatViews(video.views)}
+          </div>
+        </div>
+      </div>
+
+      {/* Title */}
+      <p className="text-white text-sm font-medium mt-2 line-clamp-2">
+        {video.title}
+      </p>
+    </motion.div>
   );
 }
