@@ -142,7 +142,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const ttffStartRef = useRef<number>(0);
   const ttffFiredRef = useRef(false);
 
-  // Autoplay retry: handle initial-mount races where autoplay fires before src is attached
+  // ==================================================================================
+  // CRITICAL: Autoplay retry for initial-mount race condition
+  // ==================================================================================
+  // Problem: On Clubhouse initial landing, the autoplay effect can fire before HLS.js
+  // has attached/loaded the source, causing safePlay() to fail silently.
+  //
+  // Solution: If autoplay=true but video is still paused after attemptPlay(), we
+  // schedule a one-shot retry on loadedmetadata/canplay events.
+  //
+  // DO NOT REMOVE without testing first-video autoplay on fresh Clubhouse page load!
+  // ==================================================================================
   const pendingAutoplayRetryRef = useRef(false);
   
   // RUM: Rebuffer tracking ref
