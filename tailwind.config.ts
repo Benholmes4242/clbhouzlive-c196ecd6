@@ -212,7 +212,10 @@ export default {
 			boxShadow: {
 				'hud': 'var(--hud-shadow)'
 			},
-			keyframes: {
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
 				'accordion-down': {
 					from: {
 						height: '0'
