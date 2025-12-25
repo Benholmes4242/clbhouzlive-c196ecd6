@@ -565,7 +565,10 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       {icon}
       {showBadge && (
         <span 
-          className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-orange-500"
+          className={cn(
+            "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500",
+            useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
+          )}
           aria-label="Unread notifications"
         />
       )}
