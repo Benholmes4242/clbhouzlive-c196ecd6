@@ -44,8 +44,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   
-  // Determine dim state
-  const isDimmed = isClubhousePage && cinemaDim;
+  // ⛔ BOTTOM NAV NEVER DIMS ON CLUBHOUSE
+  // Cinema dim is ONLY for the header - bottom nav stays fully visible at all times
+  const isDimmed = false;
   
   // Check if drawer is active (for clubhouse mini profile or comments)
   const [isDrawerActive, setIsDrawerActive] = useState(false);
