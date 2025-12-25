@@ -1002,8 +1002,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               'fixed inset-y-0 right-0 z-[101]',
               'w-full sm:w-[420px] max-w-full',
               'flex flex-col',
-              isDark ? 'bg-black' : isGrey ? 'bg-muted' : 'bg-[#f8fafc]'
+              !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
+            style={isDark ? {
+              background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
+            } : undefined}
           >
             {/* Header */}
             <motion.div 
