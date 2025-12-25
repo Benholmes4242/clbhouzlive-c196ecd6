@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef, useId } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useId, useLayoutEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { Button } from '@/components/ui/button';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 interface HighlightVideo {
   id: string;
@@ -144,8 +145,23 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 }) => {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
+  const hasPreloadedFirst = useRef(false);
   
   const carouselItems = highlights;
+
+  // Preload first video manifest for fast startup
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current || !carouselItems.length) return;
+    
+    const firstWithVideo = carouselItems.find(item => item.videoUrl);
+    if (!firstWithVideo?.videoUrl) return;
+    
+    hasPreloadedFirst.current = true;
+    const uid = uidFromNode({ src: firstWithVideo.videoUrl });
+    if (uid) {
+      preloadHlsManifest(`https://videodelivery.net/${uid}/manifest/video.m3u8`);
+    }
+  }, [carouselItems]);
 
   const {
     carouselRef,

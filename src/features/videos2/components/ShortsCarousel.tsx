@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect, useId } from 'react';
+import React, { useRef, useState, useEffect, useId, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { VideoItem } from '../types';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 type ShortsCarouselProps = {
   videos: VideoItem[];
@@ -15,6 +16,18 @@ type ShortsCarouselProps = {
  */
 export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
   const railRef = useRef<HTMLDivElement>(null);
+  const hasPreloadedFirst = useRef(false);
+
+  // Preload first video manifest
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current || !videos.length) return;
+    
+    const firstVideo = videos[0];
+    if (firstVideo?.hlsUrl) {
+      hasPreloadedFirst.current = true;
+      preloadHlsManifest(firstVideo.hlsUrl);
+    }
+  }, [videos]);
 
   const formatViews = (n: number): string => {
     if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
