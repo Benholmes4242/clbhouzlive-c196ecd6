@@ -102,7 +102,7 @@ export function useVerticalFeedLogic({
           setShouldAttachMap((m) => ({ ...m, [id]: e.isIntersecting || e.intersectionRatio > 0 }));
         });
       },
-      { root: null, rootMargin: '300px 0px 300px 0px', threshold: 0 }
+      { root: null, rootMargin: '500px 0px 500px 0px', threshold: 0 }
     );
     
     // Autoplay observer (center detection)
@@ -214,22 +214,26 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // Preload next video
+  // Preload next 3 videos for fast scrolling
   useEffect(() => {
     if (!posts.length) return;
     
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= posts.length) return;
+    const VIDEOS_TO_PRELOAD = 3;
     
-    const nextPost = posts[nextIndex];
-    if (!nextPost || nextPost.media?.[0]?.media_type !== 'video') return;
-    
-    const src = nextPost.media[0]?.media_url;
-    if (!src) return;
-    
-    const uid = uidFromNode({ src });
-    if (uid) {
-      preloadHlsManifest(`https://videodelivery.net/${uid}/manifest/video.m3u8`);
+    for (let i = 1; i <= VIDEOS_TO_PRELOAD; i++) {
+      const nextIndex = currentIndex + i;
+      if (nextIndex >= posts.length) break;
+      
+      const nextPost = posts[nextIndex];
+      if (!nextPost || nextPost.media?.[0]?.media_type !== 'video') continue;
+      
+      const src = nextPost.media[0]?.media_url;
+      if (!src) continue;
+      
+      const uid = uidFromNode({ src });
+      if (uid) {
+        preloadHlsManifest(`https://videodelivery.net/${uid}/manifest/video.m3u8`);
+      }
     }
   }, [currentIndex, posts]);
   

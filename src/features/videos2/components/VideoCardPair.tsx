@@ -62,7 +62,7 @@ export function VideoCardPair({ video, onVideoClick, onEchoToggle }: VideoCardPa
       },
       { 
         root: null, 
-        rootMargin: '100px 0px',
+        rootMargin: '300px 0px',
         threshold: [0, 0.5, 1.0] 
       }
     );

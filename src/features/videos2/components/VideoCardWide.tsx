@@ -62,7 +62,7 @@ export function VideoCardWide({ video, onVideoClick, onEchoToggle }: VideoCardWi
       },
       { 
         root: null, 
-        rootMargin: '100px 0px',
+        rootMargin: '300px 0px',
         threshold: [0, 0.5, 1.0] 
       }
     );
