@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload } from 'lucide-react';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload, X } from 'lucide-react';
 import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
 import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -10,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
@@ -18,9 +20,11 @@ interface PostingAsMenuProps {
   isOpen: boolean;
   onClose: () => void;
   useLightTheme?: boolean;
+  /** Ref to the pill element for desktop anchor positioning */
+  anchorRef?: React.RefObject<HTMLElement>;
 }
 
-export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: PostingAsMenuProps) {
+export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
@@ -29,6 +33,9 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
   const { hasPending, hasFailed } = useUploadJobs();
   const showUploadIndicator = hasPending || hasFailed;
+  const isMobile = useIsMobile();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
 
   // Check admin status
   const { data: adminStatus } = useQuery({
@@ -46,6 +53,105 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
   });
 
   const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
+
+  // Lock/unlock body scroll when menu opens/closes (mobile only)
+  useEffect(() => {
+    if (!isOpen || !isMobile) return;
+    
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen, isMobile]);
+
+  // Handle escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
+  // Calculate popover position for desktop
+  useLayoutEffect(() => {
+    if (!isOpen || isMobile || !anchorRef?.current || !menuRef.current) return;
+
+    const calculatePosition = () => {
+      const rect = anchorRef.current!.getBoundingClientRect();
+      const menuWidth = 360;
+      const menuHeight = menuRef.current!.offsetHeight || 500;
+      const padding = 12;
+      const gap = 10;
+
+      let top = rect.bottom + gap;
+      let left = rect.right - menuWidth;
+
+      // Clamp left edge
+      if (left < padding) {
+        left = padding;
+      }
+      // Clamp right edge
+      if (left + menuWidth > window.innerWidth - padding) {
+        left = window.innerWidth - padding - menuWidth;
+      }
+
+      // Flip upward if overflow at bottom
+      if (top + menuHeight > window.innerHeight - padding) {
+        top = rect.top - gap - menuHeight;
+        // If still overflows top, just clamp to top
+        if (top < padding) {
+          top = padding;
+        }
+      }
+
+      setPopoverPosition({ top, left });
+    };
+
+    calculatePosition();
+    // Recalculate on resize
+    window.addEventListener('resize', calculatePosition);
+    return () => window.removeEventListener('resize', calculatePosition);
+  }, [isOpen, isMobile, anchorRef]);
+
+  // Click outside to close (desktop only)
+  useEffect(() => {
+    if (!isOpen || isMobile) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        // Also check if click is on the anchor
+        if (anchorRef?.current && anchorRef.current.contains(e.target as Node)) {
+          return; // Let the pill handle its own toggle
+        }
+        onClose();
+      }
+    };
+
+    // Delay to avoid immediate close on open click
+    const timeout = setTimeout(() => {
+      window.addEventListener('click', handleClickOutside);
+    }, 10);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen, isMobile, onClose, anchorRef]);
 
   const handleLogout = async () => {
     try {
@@ -73,315 +179,387 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
-  return (
+  // Shared menu content
+  const menuContent = (
     <>
-      {/* Upload Center Panel - rendered outside menu so it persists when menu closes */}
+      {/* Identity summary card */}
+      <div 
+        className={cn(
+          "px-4 py-4 border-b flex-shrink-0",
+          useLightTheme ? "border-slate-200/80" : "border-white/8"
+        )}
+        style={{ background: useLightTheme ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.04)' }}
+      >
+        <div className="flex items-center gap-3">
+          <SquircleAvatar
+            size={44}
+            src={activeActor?.avatarUrl}
+            alt={displayName}
+            fallback={getInitials(displayName)}
+            hideRing
+          />
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={cn(
+              "text-sm font-semibold truncate",
+              useLightTheme ? "text-slate-800" : "text-white"
+            )}>
+              {displayName}
+            </span>
+            <span className={cn(
+              "text-xs truncate",
+              useLightTheme ? "text-slate-500" : "text-white/50"
+            )}>
+              {email}
+            </span>
+            <span className={cn(
+              "mt-0.5 text-[11px]",
+              useLightTheme ? "text-slate-400" : "text-white/40"
+            )}>
+              {postingAsCopy.headerPill.label}{' '}
+              <span className={cn(
+                "font-medium",
+                useLightTheme ? "text-slate-600" : "text-white/60"
+              )}>
+                {activeActor?.name}
+              </span>
+            </span>
+          </div>
+          {/* Close button - mobile only */}
+          {isMobile && (
+            <button
+              onClick={onClose}
+              className={cn(
+                "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
+                useLightTheme ? "hover:bg-slate-100" : "hover:bg-white/10"
+              )}
+              aria-label="Close menu"
+            >
+              <X className={cn("h-4 w-4", useLightTheme ? "text-slate-500" : "text-white/60")} />
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {/* Scrollable content area */}
+      <div 
+        className="flex-1 overflow-y-auto overscroll-contain"
+        style={{ 
+          paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom) + 84px)' : '12px'
+        }}
+      >
+        {/* Switch profile section */}
+        <div className="px-3 py-2">
+          <div className="px-2 mb-1">
+            <span className={cn(
+              "text-[11px] font-medium uppercase tracking-wider",
+              useLightTheme ? "text-slate-400" : "text-white/45"
+            )}>
+              {postingAsCopy.dropdown.sectionTitle}
+            </span>
+            <p className={cn(
+              "text-[10px] mt-0.5",
+              useLightTheme ? "text-slate-400" : "text-white/30"
+            )}>
+              {postingAsCopy.dropdown.helper}
+            </p>
+          </div>
+          <div className="mt-2 space-y-0.5">
+            {availableActors.map((actor) => {
+              const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
+              
+              return (
+                <button
+                  key={`${actor.type}-${actor.id}`}
+                  onClick={() => {
+                    if (!isActive) {
+                      setActiveActor(actor);
+                      toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
+                    }
+                    onClose();
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
+                    "transition-all duration-150 active:scale-[0.98]",
+                    useLightTheme 
+                      ? isActive 
+                        ? "bg-slate-100 border border-slate-200" 
+                        : "hover:bg-slate-50 border border-transparent"
+                      : isActive 
+                        ? "bg-white/10 border border-white/12" 
+                        : "hover:bg-white/5 border border-transparent"
+                  )}
+                >
+                  <SquircleAvatar
+                    size={28}
+                    src={actor.avatarUrl}
+                    alt={actor.name}
+                    fallback={getInitials(actor.name)}
+                    hideRing
+                  />
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn(
+                        "text-xs font-medium truncate",
+                        useLightTheme ? "text-slate-700" : "text-white"
+                      )}>
+                        {actor.name}
+                      </span>
+                      {actor.type === 'business' ? (
+                        <Building2 className={cn(
+                          "h-3 w-3 flex-shrink-0",
+                          useLightTheme ? "text-slate-400" : "text-white/40"
+                        )} />
+                      ) : (
+                        <User className={cn(
+                          "h-3 w-3 flex-shrink-0",
+                          useLightTheme ? "text-slate-400" : "text-white/40"
+                        )} />
+                      )}
+                    </div>
+                    <span className={cn(
+                      "text-[10px]",
+                      useLightTheme ? "text-slate-400" : "text-white/40"
+                    )}>
+                      {actor.type === 'personal' 
+                        ? postingAsCopy.actorLabels.personal 
+                        : postingAsCopy.actorLabels.business}
+                    </span>
+                  </div>
+                  {isActive && (
+                    <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+            
+            {/* Empty state when no businesses */}
+            {availableActors.filter(a => a.type === 'business').length === 0 && (
+              <div className={cn(
+                "px-3 py-3 rounded-sq-md border border-dashed mt-2",
+                useLightTheme ? "border-slate-200" : "border-white/10"
+              )}>
+                <p className={cn(
+                  "text-xs font-medium",
+                  useLightTheme ? "text-slate-600" : "text-white/60"
+                )}>
+                  {postingAsCopy.emptyState.title}
+                </p>
+                <p className={cn(
+                  "text-[10px] mt-0.5",
+                  useLightTheme ? "text-slate-400" : "text-white/40"
+                )}>
+                  {postingAsCopy.emptyState.body}
+                </p>
+                <button
+                  onClick={() => handleNavigate('/business/intro')}
+                  className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+                >
+                  <Plus className="h-3 w-3" />
+                  {postingAsCopy.emptyState.cta}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Divider */}
+        <div className={cn(
+          "border-t mx-3",
+          useLightTheme ? "border-slate-100" : "border-white/6"
+        )} />
+        
+        {/* Core action items */}
+        <nav className="px-3 py-1.5 space-y-0.5">
+          {/* Notifications */}
+          <MenuRow
+            icon={<Bell className="h-[18px] w-[18px]" />}
+            label="Notifications"
+            onClick={() => handleNavigate('/notificationmessages')}
+            useLightTheme={useLightTheme}
+            trailing={hasUnread && (
+              <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+            )}
+          />
+          
+          {/* Upload Center */}
+          <MenuRow
+            icon={<CloudUpload className="h-[18px] w-[18px]" />}
+            label="Upload Center"
+            onClick={() => {
+              setUploadCenterOpen(true);
+              onClose();
+            }}
+            useLightTheme={useLightTheme}
+            trailing={showUploadIndicator && (
+              <span className={cn(
+                "h-2.5 w-2.5 rounded-full",
+                hasFailed ? "bg-red-500" : "bg-primary"
+              )} />
+            )}
+          />
+          
+          {/* View profile */}
+          <MenuRow
+            icon={<User className="h-[18px] w-[18px]" />}
+            label="View profile"
+            onClick={() => handleNavigate('/profile')}
+            useLightTheme={useLightTheme}
+          />
+          
+          {/* Edit profile */}
+          <MenuRow
+            icon={<Pencil className="h-[18px] w-[18px]" />}
+            label="Edit profile"
+            onClick={() => handleNavigate('/edit-profile')}
+            useLightTheme={useLightTheme}
+          />
+          
+          {/* Business profiles */}
+          <MenuRow
+            icon={<Building2 className="h-[18px] w-[18px]" />}
+            label="Business profiles"
+            onClick={() => handleNavigate('/businesses/manage')}
+            useLightTheme={useLightTheme}
+          />
+          
+          {/* Settings */}
+          <MenuRow
+            icon={<Settings className="h-[18px] w-[18px]" />}
+            label="Settings"
+            onClick={() => handleNavigate('/settings')}
+            useLightTheme={useLightTheme}
+          />
+
+          {/* Admin Dashboard */}
+          {hasAdminAccess && (
+            <MenuRow
+              icon={<Shield className="h-[18px] w-[18px]" />}
+              label="Admin Dashboard"
+              onClick={() => handleNavigate('/admin')}
+              useLightTheme={useLightTheme}
+            />
+          )}
+        </nav>
+        
+        {/* Logout section */}
+        <div className="px-3 pt-1 pb-3">
+          <div className={cn(
+            "border-t pt-2",
+            useLightTheme ? "border-slate-100" : "border-white/6"
+          )}>
+            <button
+              onClick={() => {
+                handleLogout();
+                onClose();
+              }}
+              className={cn(
+                "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
+                "hover:bg-red-500/10 transition-colors active:scale-[0.98]"
+              )}
+            >
+              <LogOut className="h-[18px] w-[18px] text-red-500" />
+              <span className="text-sm text-red-500 font-medium">Log out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  if (!isOpen) {
+    return (
       <UploadCenterPanel 
         isOpen={uploadCenterOpen} 
         onClose={() => setUploadCenterOpen(false)} 
       />
+    );
+  }
 
-      {/* Menu content - only render when open */}
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <button
-            className={cn(
-              "fixed inset-0 z-[199]",
-              useLightTheme ? "bg-black/20 backdrop-blur-sm" : "bg-black/60 backdrop-blur-sm"
-            )}
-            onClick={onClose}
-            aria-label="Close profile menu"
-          />
-          
-          {/* Menu panel */}
-          <div 
-            className={cn(
-              "fixed inset-x-0 z-[200]",
-              "animate-in fade-in slide-in-from-top-2 duration-200"
-            )}
-            style={{ 
-              top: 'calc(56px + env(safe-area-inset-top) + 8px)',
-              transform: 'translateZ(0)',
-              WebkitTransform: 'translate3d(0, 0, 0)',
-              willChange: 'transform'
-            }}
-          >
-            <div 
-              className="mx-2 sm:mx-3 overflow-hidden"
+  // ===========================================
+  // MOBILE: Bottom Sheet (rendered via portal)
+  // ===========================================
+  if (isMobile) {
+    return (
+      <>
+        <UploadCenterPanel 
+          isOpen={uploadCenterOpen} 
+          onClose={() => setUploadCenterOpen(false)} 
+        />
+        {createPortal(
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-[9998] animate-in fade-in duration-200"
               style={{
-                borderRadius: '24px',
-                background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.92)',
+                background: useLightTheme ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                touchAction: 'none',
+              }}
+              onClick={onClose}
+              aria-label="Close menu"
+            />
+            
+            {/* Bottom Sheet */}
+            <div
+              ref={menuRef}
+              className="fixed z-[9999] flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-200"
+              style={{
+                left: '12px',
+                right: '12px',
+                bottom: 'calc(12px + env(safe-area-inset-bottom))',
+                maxHeight: 'calc(100vh - 24px - env(safe-area-inset-bottom))',
+                borderRadius: '20px',
+                overflow: 'hidden',
+                background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.96)',
                 backdropFilter: 'blur(40px) saturate(150%)',
                 WebkitBackdropFilter: 'blur(40px) saturate(150%)',
                 boxShadow: useLightTheme 
-                  ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
-                  : '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+                  ? '0 24px 60px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
+                  : '0 24px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
               }}
             >
-              {/* Identity summary card */}
-              <div 
-                className={cn(
-                  "px-4 py-4 border-b",
-                  useLightTheme ? "border-slate-200/80" : "border-white/8"
-                )}
-                style={{ background: useLightTheme ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.04)' }}
-              >
-                <div className="flex items-center gap-3">
-                  <SquircleAvatar
-                    size={44}
-                    src={activeActor?.avatarUrl}
-                    alt={displayName}
-                    fallback={getInitials(displayName)}
-                    hideRing
-                  />
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className={cn(
-                      "text-sm font-semibold truncate",
-                      useLightTheme ? "text-slate-800" : "text-white"
-                    )}>
-                      {displayName}
-                    </span>
-                    <span className={cn(
-                      "text-xs truncate",
-                      useLightTheme ? "text-slate-500" : "text-white/50"
-                    )}>
-                      {email}
-                    </span>
-                    <span className={cn(
-                      "mt-0.5 text-[11px]",
-                      useLightTheme ? "text-slate-400" : "text-white/40"
-                    )}>
-                      {postingAsCopy.headerPill.label}{' '}
-                      <span className={cn(
-                        "font-medium",
-                        useLightTheme ? "text-slate-600" : "text-white/60"
-                      )}>
-                        {activeActor?.name}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Switch profile section */}
-              <div className="px-3 py-2">
-                <div className="px-2 mb-1">
-                  <span className={cn(
-                    "text-[11px] font-medium uppercase tracking-wider",
-                    useLightTheme ? "text-slate-400" : "text-white/45"
-                  )}>
-                    {postingAsCopy.dropdown.sectionTitle}
-                  </span>
-                  <p className={cn(
-                    "text-[10px] mt-0.5",
-                    useLightTheme ? "text-slate-400" : "text-white/30"
-                  )}>
-                    {postingAsCopy.dropdown.helper}
-                  </p>
-                </div>
-                <div className="mt-2 space-y-0.5">
-                  {availableActors.map((actor) => {
-                    const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
-                    
-                    return (
-                      <button
-                        key={`${actor.type}-${actor.id}`}
-                        onClick={() => {
-                          if (!isActive) {
-                            setActiveActor(actor);
-                            toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
-                          }
-                          onClose();
-                        }}
-                        className={cn(
-                          "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
-                          "transition-all duration-150 active:scale-[0.98]",
-                          useLightTheme 
-                            ? isActive 
-                              ? "bg-slate-100 border border-slate-200" 
-                              : "hover:bg-slate-50 border border-transparent"
-                            : isActive 
-                              ? "bg-white/10 border border-white/12" 
-                              : "hover:bg-white/5 border border-transparent"
-                        )}
-                      >
-                        <SquircleAvatar
-                          size={28}
-                          src={actor.avatarUrl}
-                          alt={actor.name}
-                          fallback={getInitials(actor.name)}
-                          hideRing
-                        />
-                        <div className="flex-1 text-left min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className={cn(
-                              "text-xs font-medium truncate",
-                              useLightTheme ? "text-slate-700" : "text-white"
-                            )}>
-                              {actor.name}
-                            </span>
-                            {actor.type === 'business' ? (
-                              <Building2 className={cn(
-                                "h-3 w-3 flex-shrink-0",
-                                useLightTheme ? "text-slate-400" : "text-white/40"
-                              )} />
-                            ) : (
-                              <User className={cn(
-                                "h-3 w-3 flex-shrink-0",
-                                useLightTheme ? "text-slate-400" : "text-white/40"
-                              )} />
-                            )}
-                          </div>
-                          <span className={cn(
-                            "text-[10px]",
-                            useLightTheme ? "text-slate-400" : "text-white/40"
-                          )}>
-                            {actor.type === 'personal' 
-                              ? postingAsCopy.actorLabels.personal 
-                              : postingAsCopy.actorLabels.business}
-                          </span>
-                        </div>
-                        {isActive && (
-                          <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })}
-                  
-                  {/* Empty state when no businesses */}
-                  {availableActors.filter(a => a.type === 'business').length === 0 && (
-                    <div className={cn(
-                      "px-3 py-3 rounded-sq-md border border-dashed mt-2",
-                      useLightTheme ? "border-slate-200" : "border-white/10"
-                    )}>
-                      <p className={cn(
-                        "text-xs font-medium",
-                        useLightTheme ? "text-slate-600" : "text-white/60"
-                      )}>
-                        {postingAsCopy.emptyState.title}
-                      </p>
-                      <p className={cn(
-                        "text-[10px] mt-0.5",
-                        useLightTheme ? "text-slate-400" : "text-white/40"
-                      )}>
-                        {postingAsCopy.emptyState.body}
-                      </p>
-                      <button
-                        onClick={() => handleNavigate('/business/intro')}
-                        className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
-                      >
-                        <Plus className="h-3 w-3" />
-                        {postingAsCopy.emptyState.cta}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Divider */}
-              <div className={cn(
-                "border-t",
-                useLightTheme ? "border-slate-100" : "border-white/6"
-              )} />
-              
-              {/* Core action items */}
-              <nav className="px-3 py-1.5 space-y-0.5">
-                {/* Notifications */}
-                <MenuRow
-                  icon={<Bell className="h-[18px] w-[18px]" />}
-                  label="Notifications"
-                  onClick={() => handleNavigate('/notificationmessages')}
-                  useLightTheme={useLightTheme}
-                  trailing={hasUnread && (
-                    <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
-                  )}
-                />
-                
-                {/* Upload Center */}
-                <MenuRow
-                  icon={<CloudUpload className="h-[18px] w-[18px]" />}
-                  label="Upload Center"
-                  onClick={() => {
-                    setUploadCenterOpen(true);
-                    onClose();
-                  }}
-                  useLightTheme={useLightTheme}
-                  trailing={showUploadIndicator && (
-                    <span className={cn(
-                      "h-2.5 w-2.5 rounded-full",
-                      hasFailed ? "bg-red-500" : "bg-primary"
-                    )} />
-                  )}
-                />
-                
-                {/* View profile */}
-                <MenuRow
-                  icon={<User className="h-[18px] w-[18px]" />}
-                  label="View profile"
-                  onClick={() => handleNavigate('/profile')}
-                  useLightTheme={useLightTheme}
-                />
-                
-                {/* Edit profile */}
-                <MenuRow
-                  icon={<Pencil className="h-[18px] w-[18px]" />}
-                  label="Edit profile"
-                  onClick={() => handleNavigate('/edit-profile')}
-                  useLightTheme={useLightTheme}
-                />
-                
-                {/* Business profiles */}
-                <MenuRow
-                  icon={<Building2 className="h-[18px] w-[18px]" />}
-                  label="Business profiles"
-                  onClick={() => handleNavigate('/businesses/manage')}
-                  useLightTheme={useLightTheme}
-                />
-                
-                {/* Settings */}
-                <MenuRow
-                  icon={<Settings className="h-[18px] w-[18px]" />}
-                  label="Settings"
-                  onClick={() => handleNavigate('/settings')}
-                  useLightTheme={useLightTheme}
-                />
-
-                {/* Admin Dashboard */}
-                {hasAdminAccess && (
-                  <MenuRow
-                    icon={<Shield className="h-[18px] w-[18px]" />}
-                    label="Admin Dashboard"
-                    onClick={() => handleNavigate('/admin')}
-                    useLightTheme={useLightTheme}
-                  />
-                )}
-              </nav>
-              
-              {/* Logout section */}
-              <div className="px-3 pt-1 pb-3">
-                <div className={cn(
-                  "border-t pt-2",
-                  useLightTheme ? "border-slate-100" : "border-white/6"
-                )}>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      onClose();
-                    }}
-                    className={cn(
-                      "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
-                      "hover:bg-red-500/10 transition-colors active:scale-[0.98]"
-                    )}
-                  >
-                    <LogOut className="h-[18px] w-[18px] text-red-500" />
-                    <span className="text-sm text-red-500 font-medium">Log out</span>
-                  </button>
-                </div>
-              </div>
+              {menuContent}
             </div>
-          </div>
-        </>
+          </>,
+          document.body
+        )}
+      </>
+    );
+  }
+
+  // ===========================================
+  // DESKTOP: Anchored Popover (rendered via portal)
+  // ===========================================
+  return (
+    <>
+      <UploadCenterPanel 
+        isOpen={uploadCenterOpen} 
+        onClose={() => setUploadCenterOpen(false)} 
+      />
+      {createPortal(
+        <div
+          ref={menuRef}
+          className="fixed z-[9999] flex flex-col animate-in fade-in slide-in-from-top-2 duration-150"
+          style={{
+            top: `${popoverPosition.top}px`,
+            left: `${popoverPosition.left}px`,
+            width: '360px',
+            maxWidth: 'calc(100vw - 24px)',
+            maxHeight: 'calc(100vh - 24px)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.96)',
+            backdropFilter: 'blur(40px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+            boxShadow: useLightTheme 
+              ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
+              : '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          {menuContent}
+        </div>,
+        document.body
       )}
     </>
   );
