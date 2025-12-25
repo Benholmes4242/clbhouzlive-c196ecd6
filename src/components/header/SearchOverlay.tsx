@@ -199,7 +199,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
 
   return (
     <div 
-      className="fixed inset-0 z-[80] flex flex-col"
+      className="fixed inset-0 z-[80] flex flex-col min-h-0 h-full"
       style={{
         background: useLightTheme ? 'rgba(248, 250, 252, 0.98)' : 'rgba(10, 10, 10, 0.98)',
         backdropFilter: 'blur(24px)',

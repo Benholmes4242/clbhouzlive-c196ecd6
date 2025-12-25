@@ -257,16 +257,24 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const playedSet = useMemo(() => new Set(playedTop100CourseIds), [playedTop100CourseIds]);
   const currentCourseId = currentPost?.golfCourse?.id;
 
+  // Track if we paused video due to comments modal (don't resume if user paused manually)
+  const pausedByCommentsRef = useRef(false);
+
   // Notify parent of comments state + pause/resume video
   useEffect(() => {
     onCommentsOpenChange?.(commentsModalOpen);
     
-    // Pause video when comments open, resume when closed
     const activePostId = currentPost?.id;
-    if (activePostId) {
-      if (commentsModalOpen) {
-        runtimeBridge.requestPause(activePostId, 'user');
-      } else {
+    if (!activePostId) return;
+    
+    if (commentsModalOpen) {
+      // Mark that WE paused it, then pause
+      pausedByCommentsRef.current = true;
+      runtimeBridge.requestPause(activePostId, 'user');
+    } else {
+      // Only resume if we were the ones who paused it
+      if (pausedByCommentsRef.current) {
+        pausedByCommentsRef.current = false;
         runtimeBridge.requestPlay(activePostId, 'user');
       }
     }
