@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect, useId } from 'react';
+import React, { useState, useRef, useEffect, useId, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { EchoButton } from './EchoButton';
 import { CourseTag } from './CourseTag';
 import { VideoItem } from '../types';
 import { Check } from 'lucide-react';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 type VideoCardWideProps = {
   video: VideoItem;
