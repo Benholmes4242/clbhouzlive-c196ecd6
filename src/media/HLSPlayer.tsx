@@ -26,6 +26,14 @@ import {
   logFirstMediaPosterLoaded 
 } from '@/utils/bootTimeline';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
+import {
+  startVideoSession,
+  recordTTFF,
+  recordRebuffer,
+  recordQualityChange,
+  recordFailure,
+  endVideoSession,
+} from '@/lib/analytics/videoPerformance';
 
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
@@ -134,6 +142,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const ttffStartRef = useRef<number>(0);
   const ttffFiredRef = useRef(false);
   
+  // RUM: Rebuffer tracking ref
+  const rebufferStartRef = useRef<number>(0);
+  
   // ============ Debug: Log Component Mount ============
   useEffect(() => {
     const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
@@ -148,10 +159,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Boot timeline: log first video mount
     if (mediaId) {
       logFirstVideoMounted(mediaId, src);
+      
+      // RUM: Start video session tracking
+      const surface = managedByMediaRuntime ? 'feed' : 'standalone';
+      startVideoSession(mediaId, surface, src);
     }
     
     return () => {
       logDebug('UNMOUNT', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
+      
+      // RUM: End video session
+      if (mediaId) {
+        endVideoSession(mediaId);
+      }
     };
   }, []);
   
@@ -565,6 +585,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             hlsDetails: data.details,
             fatal: true
           });
+          
+          // RUM: Record HLS failure
+          if (mediaId) {
+            recordFailure(mediaId, `hls_${data.type}_${data.details}`, true);
+          }
 
           // Safety guard
           if (!videoEl) {
@@ -705,6 +730,15 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             bitrateKbps: level?.bitrate ? Math.round(level.bitrate / 1000) : 'N/A',
             timestamp: performance.now().toFixed(1),
           });
+          
+          // RUM: Record quality change
+          if (mediaId && level?.bitrate) {
+            recordQualityChange(
+              mediaId, 
+              level.bitrate,
+              level.width && level.height ? { width: level.width, height: level.height } : undefined
+            );
+          }
         });
         
         // Diagnostic: Track when fragments start loading with detailed info
@@ -906,6 +940,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         const ttffMs = performance.now() - ttffStartRef.current;
         logDebug('TTFF_RECORDED', { ttffMs: ttffMs.toFixed(2), mediaId: mediaId?.slice(0, 8) });
         MediaRuntime.recordTtff(mediaId, ttffMs);
+        
+        // RUM: Record TTFF for analytics
+        recordTTFF(mediaId);
       }
       
       // CRITICAL FIX: Hide poster and show video IMMEDIATELY via direct DOM manipulation
@@ -1071,14 +1108,39 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     setHasError(true);
     setIsPosterVisible(true);
+    
+    // RUM: Record failure
+    if (mediaId) {
+      recordFailure(mediaId, video.error?.message || 'video_element_error', true);
+    }
+    
     onError?.(new Error(video.error?.message || 'Video playback error'));
-  }, [onError]);
+  }, [onError, mediaId]);
   
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video || !onTimeUpdate) return;
     onTimeUpdate(video.currentTime, video.duration || 0);
   }, [onTimeUpdate]);
+  
+  // RUM: Handle waiting (rebuffer start)
+  const handleWaiting = useCallback(() => {
+    // Only track rebuffers after first frame (during playback)
+    if (mediaId && hasFirstFrame && isPlaying && rebufferStartRef.current === 0) {
+      rebufferStartRef.current = performance.now();
+      logDebug('REBUFFER_START', { mediaId: mediaId?.slice(0, 8) });
+    }
+  }, [mediaId, hasFirstFrame, isPlaying]);
+  
+  // RUM: Handle playing (rebuffer end)
+  const handlePlayingEvent = useCallback(() => {
+    if (mediaId && rebufferStartRef.current > 0) {
+      const duration = performance.now() - rebufferStartRef.current;
+      rebufferStartRef.current = 0;
+      logDebug('REBUFFER_END', { mediaId: mediaId?.slice(0, 8), duration: duration.toFixed(0) });
+      recordRebuffer(mediaId, duration);
+    }
+  }, [mediaId]);
   
   // ============ Buffering State Tracking ============
   
@@ -1342,6 +1404,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         onEnded={handleEnded}
         onError={handleError}
         onTimeUpdate={handleTimeUpdate}
+        onWaiting={handleWaiting}
+        onPlaying={handlePlayingEvent}
         onClick={handleClick}
       />
       
