@@ -24,6 +24,7 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserTop100CourseIds } from '@/hooks/useUserTop100CourseIds';
 import { useClubhouseRuntimeBridge } from '@/hooks/useClubhouseRuntimeBridge';
+import { useSoftResume } from '@/hooks/useSoftResume';
 
 import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/clubhouse/cinematic';
@@ -238,6 +239,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     itemRefs,
   });
 
+  // Soft resume hook for smooth audio ramp
+  const { softResume, cancelRamp } = useSoftResume();
+
   // State for modals and interactions
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -274,8 +278,18 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       pausedPostIdRef.current = activePostId;
       runtimeBridge.requestPause(activePostId, 'user');
     } else if (pausedByCommentsRef.current && pausedPostIdRef.current) {
-      // Only resume the specific post we paused
-      runtimeBridge.requestPlay(pausedPostIdRef.current, 'user');
+      // Only resume the specific post we paused with soft audio ramp
+      const pausedPostIndex = filteredPosts.findIndex(p => p.id === pausedPostIdRef.current);
+      const videoRef = videoRefs.current[pausedPostIndex];
+      
+      if (videoRef && !isGloballyMuted) {
+        // Use soft resume for smooth audio fade-in
+        softResume(videoRef, isGloballyMuted);
+      } else {
+        // Fallback to regular resume
+        runtimeBridge.requestPlay(pausedPostIdRef.current!, 'user');
+      }
+      
       pausedByCommentsRef.current = false;
       pausedPostIdRef.current = null;
     }

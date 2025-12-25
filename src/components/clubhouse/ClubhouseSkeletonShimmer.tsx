@@ -21,7 +21,7 @@ interface ClubhouseSkeletonShimmerProps {
 }
 
 /**
- * Skeleton block with shimmer animation
+ * Skeleton block with shimmer animation using standardized tailwind keyframe
  */
 const SkeletonBlock: React.FC<{
   className?: string;
@@ -37,12 +37,7 @@ const SkeletonBlock: React.FC<{
   >
     {!isStatic && (
       <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%)',
-          backgroundSize: '200% 100%',
-          animation: 'shimmer 1.4s ease-in-out infinite',
-        }}
+        className="absolute inset-0 animate-[shimmer_1.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent"
       />
     )}
   </div>
@@ -162,29 +157,13 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
   isStatic = false,
   className,
 }) => {
-  // Add keyframes to document if not already present
-  React.useEffect(() => {
-    const styleId = 'clubhouse-skeleton-shimmer-keyframes';
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.textContent = `
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  }, []);
-
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
           className={cn(
             "absolute inset-0 z-50 pointer-events-none",
-            "bg-[#0F0F0F]", // Same as Clubhouse background
+            "bg-[#0F0F0F]",
             className
           )}
           initial={{ opacity: 1 }}
@@ -198,7 +177,6 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             <MediaAreaSkeleton isStatic={isStatic} />
             
             {/* Right-side action rail - positioned exactly like CinematicActionRail */}
-            {/* Bottom aligns with bottom of CreatorCapsule at 80px offset */}
             <div 
               className="absolute right-4 flex flex-col items-center"
               style={{ 
@@ -218,7 +196,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <CreatorCapsuleSkeleton isStatic={isStatic} />
             </div>
             
-            {/* Optional: subtle gradient at bottom for depth */}
+            {/* Subtle gradient at bottom for depth */}
             <div 
               className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
               style={{

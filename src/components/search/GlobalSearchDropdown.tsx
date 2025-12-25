@@ -323,7 +323,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     </div>
   );
 
-  // Result section
+  // Result section with sticky header
   const ResultSection = ({ title, items, icon }: { title: string; items: SearchResult[]; icon: React.ReactNode }) => {
     if (items.length === 0) return null;
 
@@ -332,9 +332,12 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
         "border-t first:border-t-0",
         isClubhousePage ? "border-white/10" : "border-black/10"
       )}>
+        {/* Sticky section header */}
         <div className={cn(
-          "px-4 py-2",
-          isClubhousePage ? "bg-white/5" : "bg-black/5"
+          "px-4 py-2 sticky top-0 z-[2] backdrop-blur-md",
+          isClubhousePage 
+            ? "bg-[rgba(10,10,10,0.85)]" 
+            : "bg-[rgba(248,250,252,0.85)]"
         )}>
           <h3 className={cn(
             "text-xs font-medium flex items-center gap-2",
