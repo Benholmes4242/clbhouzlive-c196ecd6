@@ -33,6 +33,7 @@ interface CommentsPageProps {
   caption?: string;
   theme?: 'dark' | 'light' | 'grey';
   currentUserId?: string;
+  creatorUserId?: string; // Post owner's user ID for Author badge
 }
 
 // ReplyingTo state always stores the top-level comment ID for one-level threading
@@ -52,6 +53,8 @@ interface CommentItemProps {
   showDivider?: boolean;
   isOwnComment?: boolean;
   onLongPress?: (comment: CommentWithReplies | CommentReply) => void;
+  isAuthor?: boolean; // True if comment author is the post creator
+  isHighlighted?: boolean; // True if comment should show glow effect
 }
 
 // Haptic feedback utility
@@ -77,6 +80,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
   showDivider = false,
   isOwnComment = false,
   onLongPress,
+  isAuthor = false,
+  isHighlighted = false,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -121,10 +126,17 @@ const CommentItem: React.FC<CommentItemProps> = ({
       )}
       <motion.div 
         className={cn(
-          "flex items-start select-none",
+          "flex items-start select-none relative rounded-xl transition-all duration-150",
           isReply ? "pl-[26px] py-2.5 gap-2.5" : "py-3 gap-2.5",
-          isPressing && "opacity-75"
+          isPressing && "opacity-75",
+          // Highlight glow effect
+          isHighlighted && (isDark 
+            ? "bg-white/[0.06] ring-1 ring-white/15" 
+            : "bg-primary/[0.06] ring-1 ring-primary/20")
         )}
+        initial={isHighlighted ? { opacity: 0 } : false}
+        animate={isHighlighted ? { opacity: 1 } : {}}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchEnd}
@@ -141,15 +153,26 @@ const CommentItem: React.FC<CommentItemProps> = ({
           hideRing
         />
         <div className="flex-1 min-w-0">
-          {/* Name + Timestamp row - same baseline */}
-          <div className="flex items-baseline gap-2">
+          {/* Name + Author Badge + Timestamp row - same baseline */}
+          <div className="flex items-center gap-2">
             <span className={cn(
               "text-[15px] font-semibold truncate",
-              isReply ? "max-w-[120px]" : "max-w-[160px]",
+              isReply ? "max-w-[100px]" : "max-w-[140px]",
               isDark ? "text-white" : "text-foreground"
             )}>
               {comment.user_name}
             </span>
+            {/* Author badge pill */}
+            {isAuthor && (
+              <span className={cn(
+                "flex-shrink-0 px-2 py-0.5 rounded-full text-[11px] font-semibold",
+                isDark 
+                  ? "bg-white/15 text-white/90" 
+                  : "bg-primary/15 text-primary"
+              )}>
+                Author
+              </span>
+            )}
             <span className={cn(
               "text-[12px] flex-shrink-0",
               isDark ? "text-white/55" : "text-muted-foreground/75"
@@ -617,6 +640,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   caption,
   theme = 'dark',
   currentUserId,
+  creatorUserId,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -628,8 +652,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [showReportModal, setShowReportModal] = useState(false);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [listVisible, setListVisible] = useState(false);
+  const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
+  const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const {
     comments,
@@ -643,6 +670,45 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const isDark = theme === 'dark';
   const isGrey = theme === 'grey';
 
+  // Highlight a comment with glow effect and auto-clear
+  const highlightComment = useCallback((commentId: string, scrollToIt = true) => {
+    setHighlightedCommentId(commentId);
+    
+    if (scrollToIt) {
+      requestAnimationFrame(() => {
+        const el = commentRefs.current.get(commentId);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+    
+    // Clear highlight after 1200ms (120ms fade in + 800ms hold + 300ms fade out)
+    setTimeout(() => {
+      setHighlightedCommentId(null);
+    }, 1200);
+  }, []);
+
+  // iOS keyboard-aware animations using VisualViewport API
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return;
+    
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    
+    const handleResize = () => {
+      const offset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      setKeyboardOffset(offset);
+    };
+    
+    viewport.addEventListener('resize', handleResize);
+    viewport.addEventListener('scroll', handleResize);
+    
+    return () => {
+      viewport.removeEventListener('resize', handleResize);
+      viewport.removeEventListener('scroll', handleResize);
+      setKeyboardOffset(0);
+    };
+  }, [isOpen]);
+
   // Page entrance animation - fade in list after mount
   useEffect(() => {
     if (isOpen) {
@@ -653,19 +719,33 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
   }, [isOpen]);
 
-  const handleSubmitComment = useCallback(() => {
+  const handleSubmitComment = useCallback(async () => {
     if (!newComment.trim() || isAddingComment) return;
     
     // For replies, always attach to top-level parent (one-level threading)
     // topLevelId is guaranteed to be a parent comment ID, never a reply ID
     const parentId = replyingTo?.topLevelId ?? null;
     
-    addComment(newComment, parentId);
+    // Store current content before clearing
+    const content = newComment;
     setNewComment('');
     setReplyingTo(null);
     setShowEmojiPicker(false);
     triggerHaptic('success');
-  }, [newComment, isAddingComment, addComment, replyingTo]);
+    
+    // Add comment and highlight it once added
+    addComment(content, parentId);
+    
+    // Since addComment is optimistic, we'll highlight after a brief delay
+    // In a real implementation, addComment would return the new comment ID
+    setTimeout(() => {
+      // Find the newest comment (last one added)
+      const latestComment = comments[comments.length - 1];
+      if (latestComment) {
+        highlightComment(latestComment.id, true);
+      }
+    }, 300);
+  }, [newComment, isAddingComment, addComment, replyingTo, comments, highlightComment]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -679,12 +759,15 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     // This ensures one-level threading - replies always attach to the parent comment
     setReplyingTo({ topLevelId: commentId, displayName: userName });
     triggerHaptic('light');
+    
+    // Highlight the comment being replied to
+    highlightComment(commentId, true);
+    
     // Ensure cursor appears inside input field
     requestAnimationFrame(() => {
       inputRef.current?.focus();
-      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     });
-  }, []);
+  }, [highlightComment]);
 
   const handleEmojiSelect = useCallback((emoji: any) => {
     const input = inputRef.current;
@@ -709,10 +792,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
         next.delete(commentId);
       } else {
         next.add(commentId);
+        // Highlight parent comment when expanding replies
+        highlightComment(commentId, true);
       }
       return next;
     });
-  }, []);
+  }, [highlightComment]);
 
   const handleLongPress = useCallback((comment: CommentWithReplies | CommentReply) => {
     setSelectedComment(comment);
@@ -967,6 +1052,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     return (
                       <div 
                         key={comment.id}
+                        ref={(el) => {
+                          if (el) commentRefs.current.set(comment.id, el);
+                        }}
                         className={cn(
                           index > 0 && "border-t",
                           isDark ? "border-white/8" : "border-border/30"
@@ -981,6 +1069,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           isLiking={isTogglingLike}
                           isOwnComment={isOwnComment}
                           onLongPress={handleLongPress}
+                          isAuthor={creatorUserId === comment.user_id}
+                          isHighlighted={highlightedCommentId === comment.id}
                         />
                         
                         {/* Replies - indented from comment text start with subtle dividers */}
@@ -998,6 +1088,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 showDivider={replyIndex > 0}
                                 isOwnComment={currentUserId === reply.user_id}
                                 onLongPress={handleLongPress}
+                                isAuthor={creatorUserId === reply.user_id}
+                                isHighlighted={highlightedCommentId === reply.id}
                               />
                             ))}
                             
@@ -1033,10 +1125,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               )}
             </motion.div>
 
-            {/* Comment Input - Fixed Bottom */}
-
-            {/* Comment Input - Fixed Bottom */}
-            <div 
+            {/* Comment Input - Fixed Bottom with keyboard-aware transform */}
+            <motion.div 
               className={cn(
                 "flex-shrink-0 border-t backdrop-blur-xl px-4 py-3",
                 isDark 
@@ -1045,7 +1135,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     ? "border-border/50 bg-muted/80"
                     : "border-border/50 bg-white/80"
               )}
-              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+              style={{ 
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+              }}
+              animate={{ 
+                y: -keyboardOffset 
+              }}
+              transition={{ 
+                duration: 0.18, 
+                ease: [0.4, 0, 0.2, 1] 
+              }}
             >
               {/* Reply indicator bar - 28-32px height */}
               <AnimatePresence>
@@ -1142,7 +1241,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   <Send className="w-4 h-4" />
                 </motion.button>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Full-screen emoji overlay - MUST be outside panel, covers entire viewport including sides */}
