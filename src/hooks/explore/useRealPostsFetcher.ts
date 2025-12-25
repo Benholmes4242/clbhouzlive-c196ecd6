@@ -86,14 +86,11 @@ export const useRealPostsFetcher = () => {
         .limit(postsPerPage);
 
       // Apply vertical-only filtering when flag is enabled
-      if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
-        query = query
-          .not('post_media.width', 'is', null)
-          .not('post_media.height', 'is', null)
-          .not('post_media.aspect_ratio', 'is', null)
-          .gte('post_media.aspect_ratio', VERTICAL_MIN_AR)
-          .lte('post_media.aspect_ratio', VERTICAL_MAX_AR);
-      }
+      // HOTFIX: Removed from DB query to allow business posts with NULL metadata
+      // Now applied post-fetch with business post exemption
+      // if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
+      //   query = query... (moved to JS filter below)
+      // }
 
       const { data: postsData, error } = await query;
 
@@ -143,6 +140,7 @@ export const useRealPostsFetcher = () => {
       }
 
       // Format posts for explore grid with polymorphic creator hydration
+      // HOTFIX: Apply vertical-only filter in JS with business post exemption
       const formattedPosts = postsData.map(post => {
         const isBusinessPost = post.actor_type === 'business';
         
@@ -163,6 +161,21 @@ export const useRealPostsFetcher = () => {
         
         if (!primaryMedia || !isValid) {
           return null;
+        }
+        
+        // HOTFIX: Vertical-only check - enforce for personal posts, skip for business
+        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY && !isBusinessPost && primaryMedia.media_type === 'video') {
+          const { width, height, aspect_ratio } = primaryMedia;
+          
+          // Personal posts must have metadata to pass
+          if (width == null || height == null || aspect_ratio == null) {
+            return null;
+          }
+          
+          // Personal posts must be within vertical band
+          if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
+            return null;
+          }
         }
 
         // Find golf course from post tags
@@ -660,15 +673,12 @@ export const useRealPostsFetcher = () => {
       query = query.eq('post_media.media_type', 'video');
 
       // Apply vertical-only aspect ratio band when flag is enabled (TikTok-style)
-      // Guards: require complete metadata (no NULLs) + width/height band 0.56-0.60
-      if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
-        query = query
-          .not('post_media.width', 'is', null)
-          .not('post_media.height', 'is', null)
-          .not('post_media.aspect_ratio', 'is', null)
-          .gte('post_media.aspect_ratio', VERTICAL_MIN_AR)
-          .lte('post_media.aspect_ratio', VERTICAL_MAX_AR);
-      }
+      // HOTFIX: Removed from DB query to allow business posts with NULL metadata
+      // For personal posts with metadata: enforce vertical band
+      // For business posts: allow through (until metadata pipeline + backfill complete)
+      // if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
+      //   query = query... (moved to JS filter below)
+      // }
 
       // Cursor-based pagination
       if (cursor) {
@@ -690,22 +700,41 @@ export const useRealPostsFetcher = () => {
 
       // Defensive filter: ensure first media is video
       // PHASE A HOTFIX: Allow videos with null duration_seconds (business posts)
-      // If duration is known, enforce < 120s; if unknown, allow through
+      // HOTFIX: Apply vertical-only in JS with business post exemption
       const validPosts = postsData.filter(post => {
         const firstMedia = post.post_media?.[0];
         if (!firstMedia || firstMedia.media_type !== 'video') return false;
         
-        // If duration is known, enforce limit; if null/undefined, allow (temp hotfix)
+        const isBusinessPost = post.actor_type === 'business';
+        
+        // Duration check: if known, enforce limit; if null, allow (for business posts)
         if (typeof firstMedia.duration_seconds === 'number') {
-          return firstMedia.duration_seconds < 120;
+          if (firstMedia.duration_seconds >= 120) return false;
         }
         
-        // Log missing metadata for monitoring (sample 10% to reduce noise)
-        if (Math.random() < 0.1) {
-          console.warn('[DataFetch] Post missing duration_seconds:', post.id);
+        // Vertical-only check: enforce for personal posts with metadata, skip for business
+        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY && !isBusinessPost) {
+          const { width, height, aspect_ratio } = firstMedia;
+          
+          // Personal posts must have metadata to pass
+          if (width == null || height == null || aspect_ratio == null) {
+            return false;
+          }
+          
+          // Personal posts must be within vertical band
+          if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
+            return false;
+          }
         }
         
-        return true; // TEMP: Allow unknown duration until pipeline fix
+        // Business posts: allow through even with null metadata (TEMP until backfill)
+        if (isBusinessPost && firstMedia.width == null) {
+          if (Math.random() < 0.1) {
+            console.warn('[DataFetch] Business post missing metadata (allowed):', post.id);
+          }
+        }
+        
+        return true;
       });
 
       // Split posts by actor_type for polymorphic hydration
