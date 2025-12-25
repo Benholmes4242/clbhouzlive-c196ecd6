@@ -5,12 +5,15 @@
  * - Consistent 8/12/16 spacing rhythm
  * - 44px tap targets throughout
  * - Refined animations and transitions
+ * - Subtle haptics and micro-interactions
+ * - One-level reply threading with dividers
+ * - Moderation/reporting UX
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Smile, ChevronLeft, Heart, X, MessageCircle } from 'lucide-react';
+import { Send, Smile, ChevronLeft, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,6 +32,7 @@ interface CommentsPageProps {
   creatorHandicap?: number | string;
   caption?: string;
   theme?: 'dark' | 'light' | 'grey';
+  currentUserId?: string;
 }
 
 interface CommentItemProps {
@@ -39,7 +43,22 @@ interface CommentItemProps {
   onReply?: (commentId: string, userName: string) => void;
   isReply?: boolean;
   isLiking?: boolean;
+  showDivider?: boolean;
+  isOwnComment?: boolean;
+  onLongPress?: (comment: CommentWithReplies | CommentReply) => void;
 }
+
+// Haptic feedback utility
+const triggerHaptic = (type: 'light' | 'success' | 'warning' = 'light') => {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    const patterns = {
+      light: [10],
+      success: [10, 50, 10],
+      warning: [20, 30, 20],
+    };
+    navigator.vibrate(patterns[type]);
+  }
+};
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
@@ -49,109 +68,534 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onReply,
   isReply = false,
   isLiking,
+  showDivider = false,
+  isOwnComment = false,
+  onLongPress,
 }) => {
   const [showLikeAnim, setShowLikeAnim] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const [isPressing, setIsPressing] = useState(false);
 
   const handleLike = () => {
     if (!comment.has_liked) {
       setShowLikeAnim(true);
       setTimeout(() => setShowLikeAnim(false), 600);
     }
+    triggerHaptic('light');
     onLike(comment.id);
   };
 
+  const handleTouchStart = () => {
+    setIsPressing(true);
+    longPressTimer.current = setTimeout(() => {
+      triggerHaptic('light');
+      onLongPress?.(comment);
+      setIsPressing(false);
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    setIsPressing(false);
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
   return (
-    <div className={cn(
-      "flex items-start",
-      isReply ? "pl-[26px] py-2.5 gap-2.5" : "py-3 gap-2.5"
-    )}>
-      <SquircleAvatar
-        size={isReply ? 26 : 32}
-        src={comment.avatar_url}
-        alt={comment.user_name}
-        fallback={comment.user_name?.charAt(0) || '?'}
-        hideRing
-      />
-      <div className="flex-1 min-w-0">
-        {/* Name + Timestamp row - same baseline */}
-        <div className="flex items-baseline gap-2">
-          <span className={cn(
-            "text-[15px] font-semibold truncate",
-            isReply ? "max-w-[120px]" : "max-w-[160px]",
-            isDark ? "text-white" : "text-foreground"
+    <>
+      {/* Subtle divider between replies only */}
+      {showDivider && (
+        <div 
+          className={cn(
+            "h-px ml-[62px] mr-4",
+            isDark ? "bg-white/8" : "bg-border/20"
+          )}
+        />
+      )}
+      <motion.div 
+        className={cn(
+          "flex items-start select-none",
+          isReply ? "pl-[26px] py-2.5 gap-2.5" : "py-3 gap-2.5",
+          isPressing && "opacity-75"
+        )}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          onLongPress?.(comment);
+        }}
+      >
+        <SquircleAvatar
+          size={isReply ? 26 : 32}
+          src={comment.avatar_url}
+          alt={comment.user_name}
+          fallback={comment.user_name?.charAt(0) || '?'}
+          hideRing
+        />
+        <div className="flex-1 min-w-0">
+          {/* Name + Timestamp row - same baseline */}
+          <div className="flex items-baseline gap-2">
+            <span className={cn(
+              "text-[15px] font-semibold truncate",
+              isReply ? "max-w-[120px]" : "max-w-[160px]",
+              isDark ? "text-white" : "text-foreground"
+            )}>
+              {comment.user_name}
+            </span>
+            <span className={cn(
+              "text-[12px] flex-shrink-0",
+              isDark ? "text-white/55" : "text-muted-foreground/75"
+            )}>
+              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+            </span>
+          </div>
+          
+          {/* Comment body - 3px gap from name row */}
+          <p className={cn(
+            "mt-[3px] text-[14px] leading-[18px]",
+            isDark ? "text-white/85" : "text-foreground/85"
           )}>
-            {comment.user_name}
-          </span>
-          <span className={cn(
-            "text-[12px] flex-shrink-0",
-            isDark ? "text-white/55" : "text-muted-foreground/75"
-          )}>
-            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-          </span>
+            {comment.content}
+          </p>
+          
+          {/* Reply action - 6px gap, consistent alignment */}
+          {!isReply && onReply && (
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                onReply(comment.id, comment.user_name);
+              }}
+              className={cn(
+                "mt-1.5 text-[12px] font-medium transition-colors",
+                isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Reply
+            </button>
+          )}
         </div>
+
+        {/* Like button - fixed 44px width for consistent alignment */}
+        <div className="flex flex-col items-center w-11 flex-shrink-0">
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={handleLike}
+            disabled={isLiking}
+            className="relative w-11 h-11 flex items-center justify-center"
+          >
+            <AnimatePresence>
+              {showLikeAnim && (
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 1 }}
+                  animate={{ scale: 1.6, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <motion.div
+              animate={comment.has_liked ? { scale: [1, 1.08, 1] } : {}}
+              transition={{ duration: 0.15 }}
+            >
+              <Heart
+                className={cn(
+                  "w-[18px] h-[18px] transition-colors",
+                  comment.has_liked
+                    ? "fill-red-500 text-red-500"
+                    : isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
+                )}
+              />
+            </motion.div>
+          </motion.button>
+          {comment.likes_count > 0 && (
+            <span className={cn(
+              "text-[11px] -mt-2",
+              isDark ? "text-white/55" : "text-muted-foreground"
+            )}>
+              {comment.likes_count}
+            </span>
+          )}
+        </div>
+      </motion.div>
+    </>
+  );
+};
+
+// Report reasons
+const REPORT_REASONS = [
+  { id: 'spam', label: 'Spam' },
+  { id: 'harassment', label: 'Harassment' },
+  { id: 'hate', label: 'Hate speech' },
+  { id: 'nudity', label: 'Nudity' },
+  { id: 'violence', label: 'Violence' },
+  { id: 'misinformation', label: 'Misinformation' },
+  { id: 'other', label: 'Other' },
+];
+
+interface ActionSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  isDark: boolean;
+  isOwnComment: boolean;
+  onDelete?: () => void;
+  onCopy?: () => void;
+  onReport?: () => void;
+  onBlock?: () => void;
+}
+
+const ActionSheet: React.FC<ActionSheetProps> = ({
+  isOpen,
+  onClose,
+  isDark,
+  isOwnComment,
+  onDelete,
+  onCopy,
+  onReport,
+  onBlock,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-end justify-center"
+      onClick={onClose}
+    >
+      <div className={cn(
+        "absolute inset-0",
+        isDark ? "bg-black/60" : "bg-black/40"
+      )} />
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          "relative w-full max-w-md mx-4 mb-4 rounded-[20px] overflow-hidden",
+          isDark ? "bg-zinc-900" : "bg-white"
+        )}
+      >
+        {isOwnComment ? (
+          <>
+            <button
+              onClick={() => { onCopy?.(); onClose(); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+              )}
+            >
+              <Copy className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+              <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Copy text</span>
+            </button>
+            <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+            <button
+              onClick={() => { onDelete?.(); onClose(); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                "text-red-500 hover:bg-red-500/10"
+              )}
+            >
+              <Trash2 className="w-5 h-5" />
+              <span className="text-[15px]">Delete</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => { onCopy?.(); onClose(); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+              )}
+            >
+              <Copy className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+              <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Copy text</span>
+            </button>
+            <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+            <button
+              onClick={() => { onReport?.(); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-4 transition-colors",
+                isDark ? "hover:bg-white/5" : "hover:bg-muted/50"
+              )}
+            >
+              <Flag className={cn("w-5 h-5", isDark ? "text-white/70" : "text-muted-foreground")} />
+              <span className={cn("text-[15px]", isDark ? "text-white" : "text-foreground")}>Report</span>
+            </button>
+            <div className={cn("h-px mx-4", isDark ? "bg-white/10" : "bg-border/50")} />
+            <button
+              onClick={() => { onBlock?.(); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-4 transition-colors text-red-500 hover:bg-red-500/10"
+              )}
+            >
+              <Ban className="w-5 h-5" />
+              <span className="text-[15px]">Block user</span>
+            </button>
+          </>
+        )}
         
-        {/* Comment body - 3px gap from name row */}
-        <p className={cn(
-          "mt-[3px] text-[14px] leading-[18px]",
-          isDark ? "text-white/85" : "text-foreground/85"
-        )}>
-          {comment.content}
+        <div className={cn("h-2", isDark ? "bg-black/30" : "bg-muted/50")} />
+        
+        <button
+          onClick={onClose}
+          className={cn(
+            "w-full py-4 text-[16px] font-medium transition-colors",
+            isDark ? "text-white hover:bg-white/5" : "text-foreground hover:bg-muted/50"
+          )}
+        >
+          Cancel
+        </button>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+interface ReportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (reason: string, details?: string) => void;
+  isDark: boolean;
+}
+
+const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, onSubmit, isDark }) => {
+  const [selectedReason, setSelectedReason] = useState<string | null>(null);
+  const [details, setDetails] = useState('');
+  const [step, setStep] = useState<'reason' | 'details' | 'confirm'>('reason');
+
+  const handleSubmit = () => {
+    if (selectedReason) {
+      onSubmit(selectedReason, details);
+      triggerHaptic('success');
+      setStep('confirm');
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedReason(null);
+    setDetails('');
+    setStep('reason');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[210] flex items-center justify-center p-4"
+      onClick={handleClose}
+    >
+      <div className={cn(
+        "absolute inset-0",
+        isDark ? "bg-black/70" : "bg-black/50"
+      )} />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          "relative w-full max-w-sm rounded-[20px] overflow-hidden",
+          isDark ? "bg-zinc-900" : "bg-white"
+        )}
+      >
+        {step === 'confirm' ? (
+          <div className="p-6 text-center">
+            <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className={cn("text-[18px] font-semibold mb-2", isDark ? "text-white" : "text-foreground")}>
+              Thanks for letting us know
+            </h3>
+            <p className={cn("text-[14px] mb-6", isDark ? "text-white/60" : "text-muted-foreground")}>
+              We'll review this comment and take action if needed.
+            </p>
+            <button
+              onClick={handleClose}
+              className={cn(
+                "w-full py-3 rounded-[12px] text-[15px] font-medium transition-colors",
+                isDark ? "bg-white text-black" : "bg-foreground text-background"
+              )}
+            >
+              Done
+            </button>
+          </div>
+        ) : step === 'details' ? (
+          <div className="p-5">
+            <h3 className={cn("text-[18px] font-semibold mb-4", isDark ? "text-white" : "text-foreground")}>
+              Add details (optional)
+            </h3>
+            <textarea
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="Tell us more about this issue..."
+              className={cn(
+                "w-full h-24 px-4 py-3 rounded-[12px] text-[14px] resize-none outline-none",
+                isDark 
+                  ? "bg-white/10 text-white placeholder:text-white/40 border border-white/15"
+                  : "bg-muted text-foreground placeholder:text-muted-foreground border border-border"
+              )}
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setStep('reason')}
+                className={cn(
+                  "flex-1 py-3 rounded-[12px] text-[15px] font-medium transition-colors",
+                  isDark ? "bg-white/10 text-white" : "bg-muted text-foreground"
+                )}
+              >
+                Back
+              </button>
+              <button
+                onClick={handleSubmit}
+                className={cn(
+                  "flex-1 py-3 rounded-[12px] text-[15px] font-medium transition-colors",
+                  isDark ? "bg-white text-black" : "bg-foreground text-background"
+                )}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-5">
+            <h3 className={cn("text-[18px] font-semibold mb-4", isDark ? "text-white" : "text-foreground")}>
+              Why are you reporting this?
+            </h3>
+            <div className="space-y-2">
+              {REPORT_REASONS.map((reason) => (
+                <button
+                  key={reason.id}
+                  onClick={() => setSelectedReason(reason.id)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-3 rounded-[12px] transition-colors",
+                    selectedReason === reason.id
+                      ? isDark ? "bg-white/15" : "bg-primary/10"
+                      : isDark ? "bg-white/5 hover:bg-white/10" : "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  <span className={cn("text-[14px]", isDark ? "text-white" : "text-foreground")}>
+                    {reason.label}
+                  </span>
+                  {selectedReason === reason.id && (
+                    <div className={cn(
+                      "w-5 h-5 rounded-full flex items-center justify-center",
+                      isDark ? "bg-white" : "bg-primary"
+                    )}>
+                      <svg className={cn("w-3 h-3", isDark ? "text-black" : "text-white")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={handleClose}
+                className={cn(
+                  "flex-1 py-3 rounded-[12px] text-[15px] font-medium transition-colors",
+                  isDark ? "bg-white/10 text-white" : "bg-muted text-foreground"
+                )}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => selectedReason && setStep('details')}
+                disabled={!selectedReason}
+                className={cn(
+                  "flex-1 py-3 rounded-[12px] text-[15px] font-medium transition-colors",
+                  "disabled:opacity-40 disabled:cursor-not-allowed",
+                  isDark ? "bg-white text-black" : "bg-foreground text-background"
+                )}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+interface BlockConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  userName: string;
+  isDark: boolean;
+}
+
+const BlockConfirmModal: React.FC<BlockConfirmModalProps> = ({ isOpen, onClose, onConfirm, userName, isDark }) => {
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[210] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className={cn(
+        "absolute inset-0",
+        isDark ? "bg-black/70" : "bg-black/50"
+      )} />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          "relative w-full max-w-sm rounded-[20px] overflow-hidden p-6",
+          isDark ? "bg-zinc-900" : "bg-white"
+        )}
+      >
+        <h3 className={cn("text-[18px] font-semibold mb-2", isDark ? "text-white" : "text-foreground")}>
+          Block {userName}?
+        </h3>
+        <p className={cn("text-[14px] mb-6", isDark ? "text-white/60" : "text-muted-foreground")}>
+          They won't be able to see your posts or interact with you. You won't see their comments.
         </p>
-        
-        {/* Reply action - 6px gap, consistent alignment */}
-        {!isReply && onReply && (
+        <div className="flex gap-3">
           <button
-            onClick={() => onReply(comment.id, comment.user_name)}
+            onClick={onClose}
             className={cn(
-              "mt-1.5 text-[12px] font-medium transition-colors",
-              isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
+              "flex-1 py-3 rounded-[12px] text-[15px] font-medium transition-colors",
+              isDark ? "bg-white/10 text-white" : "bg-muted text-foreground"
             )}
           >
-            Reply
+            Cancel
           </button>
-        )}
-      </div>
-
-      {/* Like button - fixed 44px width for consistent alignment */}
-      <div className="flex flex-col items-center w-11 flex-shrink-0">
-        <motion.button
-          whileTap={{ scale: 0.85 }}
-          onClick={handleLike}
-          disabled={isLiking}
-          className="relative w-11 h-11 flex items-center justify-center"
-        >
-          <AnimatePresence>
-            {showLikeAnim && (
-              <motion.div
-                initial={{ scale: 0.5, opacity: 1 }}
-                animate={{ scale: 1.6, opacity: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <Heart className="w-5 h-5 fill-red-500 text-red-500" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <Heart
-            className={cn(
-              "w-[18px] h-[18px] transition-colors",
-              comment.has_liked
-                ? "fill-red-500 text-red-500"
-                : isDark ? "text-white/50 hover:text-white/70" : "text-muted-foreground hover:text-foreground"
-            )}
-          />
-        </motion.button>
-        {comment.likes_count > 0 && (
-          <span className={cn(
-            "text-[11px] -mt-2",
-            isDark ? "text-white/55" : "text-muted-foreground"
-          )}>
-            {comment.likes_count}
-          </span>
-        )}
-      </div>
-    </div>
+          <button
+            onClick={() => {
+              triggerHaptic('warning');
+              onConfirm();
+              onClose();
+            }}
+            className="flex-1 py-3 rounded-[12px] text-[15px] font-medium bg-red-500 text-white transition-colors hover:bg-red-600"
+          >
+            Block
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -166,12 +610,18 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   creatorHandicap,
   caption,
   theme = 'dark',
+  currentUserId,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
   const [expandedCaption, setExpandedCaption] = useState(false);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [selectedComment, setSelectedComment] = useState<CommentWithReplies | CommentReply | null>(null);
+  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [listVisible, setListVisible] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
 
@@ -187,12 +637,27 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const isDark = theme === 'dark';
   const isGrey = theme === 'grey';
 
+  // Page entrance animation - fade in list after mount
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => setListVisible(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setListVisible(false);
+    }
+  }, [isOpen]);
+
   const handleSubmitComment = useCallback(() => {
     if (!newComment.trim() || isAddingComment) return;
-    addComment(newComment, replyingTo?.id);
+    
+    // For replies, always attach to top-level parent (one-level threading)
+    const parentId = replyingTo?.id;
+    
+    addComment(newComment, parentId);
     setNewComment('');
     setReplyingTo(null);
     setShowEmojiPicker(false);
+    triggerHaptic('success');
   }, [newComment, isAddingComment, addComment, replyingTo]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
@@ -204,6 +669,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   const handleReply = useCallback((commentId: string, userName: string) => {
     setReplyingTo({ id: commentId, name: userName });
+    triggerHaptic('light');
     // Ensure cursor appears inside input field
     requestAnimationFrame(() => {
       inputRef.current?.focus();
@@ -238,6 +704,36 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
       return next;
     });
   }, []);
+
+  const handleLongPress = useCallback((comment: CommentWithReplies | CommentReply) => {
+    setSelectedComment(comment);
+    setShowActionSheet(true);
+  }, []);
+
+  const handleCopyText = useCallback(() => {
+    if (selectedComment?.content) {
+      navigator.clipboard.writeText(selectedComment.content);
+      triggerHaptic('light');
+    }
+  }, [selectedComment]);
+
+  const handleReport = useCallback((reason: string, details?: string) => {
+    // TODO: Implement actual report submission
+    console.log('Report submitted:', { commentId: selectedComment?.id, reason, details });
+  }, [selectedComment]);
+
+  const handleBlock = useCallback(() => {
+    // TODO: Implement actual block functionality
+    console.log('Block user:', selectedComment?.user_name);
+    setShowBlockModal(false);
+    setShowActionSheet(false);
+  }, [selectedComment]);
+
+  const handleDelete = useCallback(() => {
+    // TODO: Implement actual delete functionality
+    console.log('Delete comment:', selectedComment?.id);
+    setShowActionSheet(false);
+  }, [selectedComment]);
 
   // Prevent body scroll when open
   useEffect(() => {
@@ -296,13 +792,19 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             )}
           >
             {/* Header */}
-            <div className={cn(
-              "flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),12px)]",
-              isDark ? "border-white/10" : "border-border/50"
-            )}>
+            <motion.div 
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.2 }}
+              className={cn(
+                "flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),12px)]",
+                isDark ? "border-white/10" : "border-border/50"
+              )}
+            >
               {/* Back button row - 44px tap target */}
               <div className="flex items-center gap-3 px-4 py-3">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   onClick={onClose}
                   className={cn(
                     'w-11 h-11 rounded-full',
@@ -314,7 +816,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   )}
                 >
                   <ChevronLeft className={cn("w-5 h-5", isDark ? "text-white" : "text-foreground")} />
-                </button>
+                </motion.button>
                 <span className={cn(
                   "text-[16px] font-semibold",
                   isDark ? "text-white" : "text-foreground"
@@ -324,7 +826,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               </div>
 
               {/* Post preview card - two column layout */}
-              <div className="px-4 pb-3">
+              <motion.div 
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.2 }}
+                className="px-4 pb-3"
+              >
                 <div className={cn(
                   "p-[14px] rounded-[18px]",
                   isDark ? "bg-white/5" : isGrey ? "bg-background/50" : "bg-muted/50"
@@ -374,7 +881,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
                       {/* Row 3: Caption (10px gap from metadata) */}
                       {caption && (
-                        <div className="mt-2.5">
+                        <motion.div 
+                          className="mt-2.5"
+                          initial={false}
+                          animate={{ height: 'auto' }}
+                          transition={{ duration: 0.2 }}
+                        >
                           <p className={cn(
                             "text-[14px] leading-[20px]",
                             isDark ? "text-white/75" : "text-foreground/75",
@@ -394,13 +906,13 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               {expandedCaption ? 'Less' : 'More'}
                             </button>
                           )}
-                        </div>
+                        </motion.div>
                       )}
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Soft divider - 12px spacing below header */}
             <div className={cn(
@@ -408,9 +920,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               isDark ? "bg-white/8" : "bg-border/40"
             )} />
 
-            {/* Comments List - 16px horizontal padding */}
-            <div 
+            {/* Comments List - 16px horizontal padding with entrance animation */}
+            <motion.div 
               ref={commentsListRef}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: listVisible ? 1 : 0 }}
+              transition={{ duration: 0.15 }}
               className="flex-1 overflow-y-auto px-4"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
@@ -438,6 +953,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       ? comment.replies 
                       : comment.replies.slice(0, 2);
                     const hiddenRepliesCount = comment.replies.length - 2;
+                    const isOwnComment = currentUserId === comment.user_id;
 
                     return (
                       <div 
@@ -454,12 +970,14 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           onLike={toggleCommentLike}
                           onReply={handleReply}
                           isLiking={isTogglingLike}
+                          isOwnComment={isOwnComment}
+                          onLongPress={handleLongPress}
                         />
                         
-                        {/* Replies - indented from comment text start */}
+                        {/* Replies - indented from comment text start with subtle dividers */}
                         {comment.replies.length > 0 && (
                           <div>
-                            {visibleReplies.map((reply) => (
+                            {visibleReplies.map((reply, replyIndex) => (
                               <CommentItem
                                 key={reply.id}
                                 comment={reply}
@@ -468,6 +986,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                                 onLike={toggleCommentLike}
                                 isReply
                                 isLiking={isTogglingLike}
+                                showDivider={replyIndex > 0}
+                                isOwnComment={currentUserId === reply.user_id}
+                                onLongPress={handleLongPress}
                               />
                             ))}
                             
@@ -501,42 +1022,45 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   })}
                 </div>
               )}
-            </div>
+            </motion.div>
 
-            {/* Emoji Picker with tap-outside overlay */}
+            {/* Full-screen emoji overlay - covers entire viewport */}
             <AnimatePresence>
               {showEmojiPicker && (
-                <>
-                  {/* Transparent overlay */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute inset-0 z-[9]"
-                    onClick={() => setShowEmojiPicker(false)}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="fixed inset-0 z-[105]"
+                  onClick={() => setShowEmojiPicker(false)}
+                />
+              )}
+            </AnimatePresence>
+
+            {/* Emoji Picker - positioned above input */}
+            <AnimatePresence>
+              {showEmojiPicker && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 12 }}
+                  transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+                  className={cn(
+                    "absolute bottom-24 left-4 right-4 z-[110] emoji-picker-container",
+                    "rounded-[16px] overflow-hidden shadow-xl"
+                  )}
+                >
+                  <Picker
+                    data={data}
+                    onEmojiSelect={handleEmojiSelect}
+                    theme={isDark ? 'dark' : 'light'}
+                    previewPosition="none"
+                    skinTonePosition="none"
+                    maxFrequentRows={2}
+                    perLine={8}
                   />
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 16 }}
-                    transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
-                    className={cn(
-                      "absolute bottom-24 left-4 right-4 z-10 emoji-picker-container",
-                      "rounded-[16px] overflow-hidden shadow-xl"
-                    )}
-                  >
-                    <Picker
-                      data={data}
-                      onEmojiSelect={handleEmojiSelect}
-                      theme={isDark ? 'dark' : 'light'}
-                      previewPosition="none"
-                      skinTonePosition="none"
-                      maxFrequentRows={2}
-                      perLine={8}
-                    />
-                  </motion.div>
-                </>
+                </motion.div>
               )}
             </AnimatePresence>
 
@@ -559,7 +1083,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 28 }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    transition={{ duration: 0.16, ease: 'easeOut' }}
                     className={cn(
                       "flex items-center justify-between mb-2 overflow-hidden"
                     )}
@@ -591,9 +1115,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   {/* Input pill - 44px height, 22px radius */}
                   <div className={cn(
                     "flex items-center gap-2 rounded-[22px] h-[44px] pl-4 pr-3",
-                    "transition-shadow",
+                    "transition-shadow duration-150",
                     isDark 
-                      ? "bg-white/10 border border-white/15 focus-within:border-white/25" 
+                      ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
                       : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
                   )}>
                     <input
@@ -613,7 +1137,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           : 'text-foreground placeholder:text-muted-foreground'
                       )}
                     />
-                    <button 
+                    <motion.button 
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                       className={cn(
                         "w-9 h-9 flex items-center justify-center rounded-full transition-colors emoji-button",
@@ -624,11 +1149,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       )}
                     >
                       <Smile className="w-5 h-5" />
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
                 
-                {/* Send button - consistent tap target */}
+                {/* Send button - consistent tap target with press animation */}
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={handleSubmitComment}
@@ -636,7 +1161,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   className={cn(
                     'w-11 h-11 rounded-full',
                     'flex items-center justify-center',
-                    'transition-all',
+                    'transition-all duration-150',
                     'disabled:opacity-40 disabled:cursor-not-allowed',
                     isDark 
                       ? 'bg-white text-black hover:bg-white/90' 
@@ -648,6 +1173,62 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               </div>
             </div>
           </motion.div>
+
+          {/* Action Sheet */}
+          <AnimatePresence>
+            {showActionSheet && (
+              <ActionSheet
+                isOpen={showActionSheet}
+                onClose={() => {
+                  setShowActionSheet(false);
+                  setSelectedComment(null);
+                }}
+                isDark={isDark}
+                isOwnComment={currentUserId === selectedComment?.user_id}
+                onDelete={handleDelete}
+                onCopy={handleCopyText}
+                onReport={() => {
+                  setShowActionSheet(false);
+                  setShowReportModal(true);
+                }}
+                onBlock={() => {
+                  setShowActionSheet(false);
+                  setShowBlockModal(true);
+                }}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Report Modal */}
+          <AnimatePresence>
+            {showReportModal && (
+              <ReportModal
+                isOpen={showReportModal}
+                onClose={() => {
+                  setShowReportModal(false);
+                  setSelectedComment(null);
+                }}
+                onSubmit={handleReport}
+                isDark={isDark}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Block Confirm Modal */}
+          <AnimatePresence>
+            {showBlockModal && selectedComment && (
+              <BlockConfirmModal
+                isOpen={showBlockModal}
+                onClose={() => {
+                  setShowBlockModal(false);
+                  setSelectedComment(null);
+                }}
+                onConfirm={handleBlock}
+                userName={selectedComment.user_name}
+                isDark={isDark}
+              />
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>
