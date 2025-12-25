@@ -723,6 +723,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const hasHandledInitialLinkRef = useRef(false);
 
   const {
     comments,
@@ -803,9 +804,19 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
   }, [isOpen]);
 
-  // Notification deep linking - expand parent, scroll to comment, highlight it
+  // Notification deep linking - expand parent, scroll to comment, highlight it (runs once per open)
   useEffect(() => {
-    if (!isOpen || !initialCommentId || commentsLoading) return;
+    // Reset guard when modal closes
+    if (!isOpen) {
+      hasHandledInitialLinkRef.current = false;
+      return;
+    }
+    
+    // Skip if no initial comment, still loading, or already handled
+    if (!initialCommentId || commentsLoading || hasHandledInitialLinkRef.current) return;
+    
+    // Mark as handled to prevent double-scroll/glow
+    hasHandledInitialLinkRef.current = true;
     
     // If this is a reply, expand the parent thread first
     if (initialParentCommentId) {
