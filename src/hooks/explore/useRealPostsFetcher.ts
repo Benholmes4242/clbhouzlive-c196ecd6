@@ -85,12 +85,7 @@ export const useRealPostsFetcher = () => {
         .range(currentOffset, currentOffset + postsPerPage - 1)
         .limit(postsPerPage);
 
-      // Apply vertical-only filtering when flag is enabled
-      // HOTFIX: Removed from DB query to allow business posts with NULL metadata
-      // Now applied post-fetch with business post exemption
-      // if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
-      //   query = query... (moved to JS filter below)
-      // }
+      // Vertical-only filtering is applied post-fetch for flexibility
 
       const { data: postsData, error } = await query;
 
@@ -140,7 +135,6 @@ export const useRealPostsFetcher = () => {
       }
 
       // Format posts for explore grid with polymorphic creator hydration
-      // HOTFIX: Apply vertical-only filter in JS with business post exemption
       const formattedPosts = postsData.map(post => {
         const isBusinessPost = post.actor_type === 'business';
         
@@ -163,16 +157,16 @@ export const useRealPostsFetcher = () => {
           return null;
         }
         
-        // HOTFIX: Vertical-only check - enforce for personal posts, skip for business
-        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY && !isBusinessPost && primaryMedia.media_type === 'video') {
+        // Vertical-only check - applies uniformly to all posts (business + personal)
+        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY && primaryMedia.media_type === 'video') {
           const { width, height, aspect_ratio } = primaryMedia;
           
-          // Personal posts must have metadata to pass
+          // All posts must have metadata to pass
           if (width == null || height == null || aspect_ratio == null) {
             return null;
           }
           
-          // Personal posts must be within vertical band
+          // All posts must be within vertical band
           if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
             return null;
           }
@@ -698,39 +692,28 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      // Defensive filter: ensure first media is video
-      // PHASE A HOTFIX: Allow videos with null duration_seconds (business posts)
-      // HOTFIX: Apply vertical-only in JS with business post exemption
+      // Defensive filter: ensure first media is video with valid metadata
       const validPosts = postsData.filter(post => {
         const firstMedia = post.post_media?.[0];
         if (!firstMedia || firstMedia.media_type !== 'video') return false;
         
-        const isBusinessPost = post.actor_type === 'business';
-        
-        // Duration check: if known, enforce limit; if null, allow (for business posts)
+        // Duration check: must have duration and be under limit
         if (typeof firstMedia.duration_seconds === 'number') {
           if (firstMedia.duration_seconds >= 120) return false;
         }
         
-        // Vertical-only check: enforce for personal posts with metadata, skip for business
-        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY && !isBusinessPost) {
+        // Vertical-only check: applies uniformly to all posts (business + personal)
+        if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
           const { width, height, aspect_ratio } = firstMedia;
           
-          // Personal posts must have metadata to pass
+          // All posts must have metadata to pass
           if (width == null || height == null || aspect_ratio == null) {
             return false;
           }
           
-          // Personal posts must be within vertical band
+          // All posts must be within vertical band
           if (aspect_ratio < VERTICAL_MIN_AR || aspect_ratio > VERTICAL_MAX_AR) {
             return false;
-          }
-        }
-        
-        // Business posts: allow through even with null metadata (TEMP until backfill)
-        if (isBusinessPost && firstMedia.width == null) {
-          if (Math.random() < 0.1) {
-            console.warn('[DataFetch] Business post missing metadata (allowed):', post.id);
           }
         }
         
