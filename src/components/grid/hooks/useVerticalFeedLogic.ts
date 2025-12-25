@@ -62,6 +62,10 @@ export function useVerticalFeedLogic({
   const hasPreloadedFirst = useRef(false);
   const firstFrameReadyFiredRef = useRef(false);
   
+  // Protect first video autoplay from observer race condition
+  const firstVideoProtectedUntilRef = useRef<number>(0);
+  const firstPostIdRef = useRef<string | null>(null);
+  
   // Preload first video immediately in layout phase
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current || !posts.length) return;
@@ -70,6 +74,10 @@ export function useVerticalFeedLogic({
     if (!firstPost || firstPost.type !== 'video') return;
     
     hasPreloadedFirst.current = true;
+    firstPostIdRef.current = firstPost.id;
+    
+    // Protect first video autoplay from observer race for 500ms
+    firstVideoProtectedUntilRef.current = Date.now() + 500;
     
     // Set both maps synchronously
     setShouldAttachMap({ [firstPost.id]: true });
@@ -111,7 +119,16 @@ export function useVerticalFeedLogic({
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
-          setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.5 }));
+          
+          // Protect first video from being set to false during initial mount race
+          const isFirstVideo = id === firstPostIdRef.current;
+          const isProtected = isFirstVideo && Date.now() < firstVideoProtectedUntilRef.current;
+          const shouldAutoplay = e.intersectionRatio >= 0.5;
+          
+          // Only allow setting to false if not protected, or always allow setting to true
+          if (shouldAutoplay || !isProtected) {
+            setAutoplayMap((m) => ({ ...m, [id]: shouldAutoplay }));
+          }
         });
       },
       { root: null, threshold: [0.0, 0.5, 1.0] }
