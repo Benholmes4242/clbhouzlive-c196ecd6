@@ -314,7 +314,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {/* People section */}
               {peopleResults.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 px-2 mb-2">
+                  <div className={cn(
+                    "flex items-center gap-2 px-2 py-2 mb-2 sticky top-0 z-[2] backdrop-blur-md rounded-sq-sm",
+                    useLightTheme 
+                      ? "bg-[rgba(248,250,252,0.9)]" 
+                      : "bg-[rgba(10,10,10,0.9)]"
+                  )}>
                     <User className={cn(
                       "h-3.5 w-3.5",
                       useLightTheme ? "text-slate-400" : "text-white/40"
@@ -343,7 +348,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {/* Courses section */}
               {courseResults.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 px-2 mb-2">
+                  <div className={cn(
+                    "flex items-center gap-2 px-2 py-2 mb-2 sticky top-0 z-[2] backdrop-blur-md rounded-sq-sm",
+                    useLightTheme 
+                      ? "bg-[rgba(248,250,252,0.9)]" 
+                      : "bg-[rgba(10,10,10,0.9)]"
+                  )}>
                     <MapPin className={cn(
                       "h-3.5 w-3.5",
                       useLightTheme ? "text-slate-400" : "text-white/40"
@@ -372,7 +382,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {/* Business Profiles section */}
               {businessResults.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 px-2 mb-2">
+                  <div className={cn(
+                    "flex items-center gap-2 px-2 py-2 mb-2 sticky top-0 z-[2] backdrop-blur-md rounded-sq-sm",
+                    useLightTheme 
+                      ? "bg-[rgba(248,250,252,0.9)]" 
+                      : "bg-[rgba(10,10,10,0.9)]"
+                  )}>
                     <Building className={cn(
                       "h-3.5 w-3.5",
                       useLightTheme ? "text-slate-400" : "text-white/40"
@@ -502,13 +517,21 @@ interface ResultRowProps {
 }
 
 const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, getInitials, useLightTheme = false }) => {
-  // Highlight matching text
+  // Highlight matching text with subtle background
   const highlightText = (text: string) => {
-    if (!query.trim()) return text;
+    if (!query.trim() || query.length < 2) return text;
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     const parts = text.split(regex);
     return parts.map((part, i) => 
-      regex.test(part) ? <mark key={i} className="bg-primary/20 text-primary">{part}</mark> : part
+      regex.test(part) ? (
+        <span 
+          key={i} 
+          className="bg-amber-500/[0.18] px-1 rounded-md"
+          style={{ borderRadius: '6px' }}
+        >
+          {part}
+        </span>
+      ) : part
     );
   };
 
