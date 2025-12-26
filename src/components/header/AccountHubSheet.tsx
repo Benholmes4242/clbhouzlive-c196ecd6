@@ -372,7 +372,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             WebkitOverflowScrolling: 'touch',
-            paddingBottom: isDesktop ? 16 : 'calc(24px + env(safe-area-inset-bottom))',
+            // 28px rule: bottom of Sign Out button must be 28px from bottom of page
+            paddingBottom: isDesktop ? 28 : 'calc(28px + env(safe-area-inset-bottom))',
           }}
         >
           {/* Profile Switcher Section */}
