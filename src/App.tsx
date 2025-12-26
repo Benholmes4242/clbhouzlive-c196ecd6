@@ -596,58 +596,58 @@ const AppInner: React.FC = () => {
   return (
     <TooltipProvider>
       <SecurityHeaders />
-      <AccessGate>
-        <HeaderProvider>
-          <ModalProvider>
-            <BottomNavigationProvider>
-              <CinemaDimProvider>
-                <UIProvider>
-                  <ToastHost>
-                  <BrowserRouter>
-                    <HubProvider>
-                      <ActiveActorProvider>
-                        <ScrollToTop />
-                        <ScrollRestoration />
-                        <MediaSystemProvider>
-                          <GlobalAudioProvider>
-                            {/* RETIRED: VideoManagerProvider + VideoPlaybackManagerProvider removed */}
-                            {/* All playback control is now centralized in MediaSystemProvider */}
-                            <TopTenProvider>
-                              <VideoPlaybackProvider>
-                                <ErrorBoundary>
-                                <AuthWrapper>
-                                  <SeasonWrapModal />
-                                  <AchievementToastWrapper />
-                                  <Suspense fallback={null}>
-                                    <div className="app-depth">
-                                      {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                      <AppRoutes />
-                                    </div>
-                                  </Suspense>
-                                  {/* Mini Player - persists across navigation */}
-                                  <Suspense fallback={null}>
-                                    <MiniPlayer />
-                                    <GlobalQueueDrawer />
-                                  </Suspense>
-                                </AuthWrapper>
-                                </ErrorBoundary>
-                              </VideoPlaybackProvider>
-                            </TopTenProvider>
-                          </GlobalAudioProvider>
-                        </MediaSystemProvider>
-                        <Toaster />
-                        <Sonner />
-                        <GlobalBottomNavigation />
-                      </ActiveActorProvider>
-                    </HubProvider>
-                  </BrowserRouter>
-                  </ToastHost>
-                </UIProvider>
-              </CinemaDimProvider>
-            </BottomNavigationProvider>
-          </ModalProvider>
-        </HeaderProvider>
-      </AccessGate>
+      <BrowserRouter>
+        <AccessGate>
+          <HeaderProvider>
+            <ModalProvider>
+              <BottomNavigationProvider>
+                <CinemaDimProvider>
+                  <UIProvider>
+                    <ToastHost>
+                      <HubProvider>
+                        <ActiveActorProvider>
+                          <ScrollToTop />
+                          <ScrollRestoration />
+                          <MediaSystemProvider>
+                            <GlobalAudioProvider>
+                              {/* RETIRED: VideoManagerProvider + VideoPlaybackManagerProvider removed */}
+                              {/* All playback control is now centralized in MediaSystemProvider */}
+                              <TopTenProvider>
+                                <VideoPlaybackProvider>
+                                  <ErrorBoundary>
+                                    <AuthWrapper>
+                                      <SeasonWrapModal />
+                                      <AchievementToastWrapper />
+                                      <Suspense fallback={null}>
+                                        <div className="app-depth">
+                                          {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                          <AppRoutes />
+                                        </div>
+                                      </Suspense>
+                                      {/* Mini Player - persists across navigation */}
+                                      <Suspense fallback={null}>
+                                        <MiniPlayer />
+                                        <GlobalQueueDrawer />
+                                      </Suspense>
+                                    </AuthWrapper>
+                                  </ErrorBoundary>
+                                </VideoPlaybackProvider>
+                              </TopTenProvider>
+                            </GlobalAudioProvider>
+                          </MediaSystemProvider>
+                          <Toaster />
+                          <Sonner />
+                          <GlobalBottomNavigation />
+                        </ActiveActorProvider>
+                      </HubProvider>
+                    </ToastHost>
+                  </UIProvider>
+                </CinemaDimProvider>
+              </BottomNavigationProvider>
+            </ModalProvider>
+          </HeaderProvider>
+        </AccessGate>
+      </BrowserRouter>
     </TooltipProvider>
   );
 };
