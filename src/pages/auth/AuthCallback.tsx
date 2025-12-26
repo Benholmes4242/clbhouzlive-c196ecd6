@@ -26,13 +26,13 @@ const AuthCallback: React.FC = () => {
           // Clear the stored email
           localStorage.removeItem('pending_signup_email');
           
-          setStatus("Email verified! Please sign in...");
+          setStatus("Email verified! Redirecting...");
           
           // Sign out the user so they have to enter their password
           await supabase.auth.signOut();
           
-          // Redirect to /auth with email prefilled
-          navigate(`/auth?email=${encodeURIComponent(pendingEmail)}&confirmed=1`, { replace: true });
+          // Redirect to dedicated verified page (not into the app)
+          navigate('/auth/verified', { replace: true });
           return;
         }
 
