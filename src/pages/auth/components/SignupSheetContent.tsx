@@ -16,6 +16,9 @@ interface SignupSheetContentProps {
   setUsernameAvailable: (available: boolean | null) => void;
 }
 
+// Password validation: minimum 8 characters
+const MIN_PASSWORD_LENGTH = 8;
+
 const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   email,
   password,
@@ -30,14 +33,28 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   setUsernameAvailable,
 }) => {
   const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [suggestedUsernames, setSuggestedUsernames] = useState<string[]>([]);
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const usernameCheckTimeout = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
     setTimeout(() => usernameRef.current?.focus(), 100);
   }, []);
+
+  // Username validation: 3+ characters and available
+  const isUsernameValid = username.length >= 3 && usernameAvailable === true;
+  
+  // Password validation: 8+ characters
+  const isPasswordValid = password.length >= MIN_PASSWORD_LENGTH;
+  
+  // Password field is disabled until username is valid
+  const isPasswordDisabled = !isUsernameValid || submitting;
+  
+  // Submit is disabled until both are valid
+  const isSubmitDisabled = submitting || !isPasswordValid || !isUsernameValid;
 
   const checkUsernameAvailability = async (usernameToCheck: string) => {
     if (!usernameToCheck.trim() || usernameToCheck.length < 3) {
@@ -98,30 +115,40 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
     const cleanValue = value.replace('@', '');
     setUsername(cleanValue);
     
-    const timeoutId = setTimeout(() => {
+    // Clear previous timeout
+    if (usernameCheckTimeout.current) {
+      clearTimeout(usernameCheckTimeout.current);
+    }
+    
+    // Debounce the check
+    usernameCheckTimeout.current = setTimeout(() => {
       checkUsernameAvailability(cleanValue);
     }, 500);
-
-    return () => clearTimeout(timeoutId);
   };
 
   const handleChipClick = (suggestion: string) => {
     setUsername(suggestion);
     setUsernameAvailable(true);
     setSuggestedUsernames([]);
+    // Focus password field when selecting a suggestion
+    setTimeout(() => passwordRef.current?.focus(), 100);
   };
 
-  const isPasswordValid = password.length >= 6;
-  const isUsernameValid = username.length >= 3 && usernameAvailable === true;
-  const isDisabled = submitting || !isPasswordValid || !isUsernameValid;
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isDisabled) {
+    if (e.key === 'Enter' && !isSubmitDisabled) {
       onSubmit();
     }
   };
 
-  const getInputBackground = (focused: boolean) => {
+  // When username becomes valid, focus password field
+  useEffect(() => {
+    if (isUsernameValid && !password) {
+      setTimeout(() => passwordRef.current?.focus(), 100);
+    }
+  }, [isUsernameValid]);
+
+  const getInputBackground = (focused: boolean, disabled: boolean = false) => {
+    if (disabled) return 'rgba(255, 255, 255, 0.02)';
     if (focused) return 'rgba(255, 255, 255, 0.08)';
     return 'rgba(255, 255, 255, 0.05)';
   };
@@ -228,9 +255,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
       </div>
       
-      {/* Password */}
+      {/* Password - disabled until username is valid */}
       <div>
         <input
+          ref={passwordRef}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -238,26 +266,36 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           onFocus={() => setPasswordFocused(true)}
           onBlur={() => setPasswordFocused(false)}
           placeholder="Create password"
-          disabled={submitting}
+          disabled={isPasswordDisabled}
           className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
           style={{
             fontFamily: 'SF Pro Text, system-ui, sans-serif',
-            background: getInputBackground(passwordFocused),
+            background: getInputBackground(passwordFocused, isPasswordDisabled),
             border: passwordError 
               ? '1px solid #E03131' 
               : '1px solid rgba(255, 255, 255, 0.07)',
             boxShadow: passwordFocused 
               ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
               : 'none',
+            opacity: isPasswordDisabled ? 0.5 : 1,
+            cursor: isPasswordDisabled ? 'not-allowed' : 'text',
           }}
           autoComplete="new-password"
         />
+        
+        {/* Password hint - show when password field is enabled but empty/short */}
+        {isUsernameValid && !passwordError && (
+          <p className="text-white/40 text-[12px] mt-2">
+            Minimum 8 characters
+          </p>
+        )}
+        
         {passwordError && (
           <p className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
         )}
-        {password.length > 0 && password.length < 6 && !passwordError && (
-          <p className="text-white/50 text-[13px] mt-2">
-            Password must be at least 6 characters
+        {password.length > 0 && password.length < MIN_PASSWORD_LENGTH && !passwordError && (
+          <p className="text-[#E03131] text-[13px] mt-2">
+            Password must be at least {MIN_PASSWORD_LENGTH} characters
           </p>
         )}
       </div>
@@ -265,15 +303,15 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
       {/* Submit button - premium white */}
       <button
         onClick={onSubmit}
-        disabled={isDisabled}
+        disabled={isSubmitDisabled}
         className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
           fontFamily: 'SF Pro Text, system-ui, sans-serif',
           fontWeight: 500,
-          background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
+          background: isSubmitDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
           color: '#0D0F11',
-          cursor: isDisabled ? 'not-allowed' : 'pointer',
-          opacity: isDisabled ? 0.6 : 1,
+          cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
+          opacity: isSubmitDisabled ? 0.6 : 1,
         }}
       >
         {submitting ? (
