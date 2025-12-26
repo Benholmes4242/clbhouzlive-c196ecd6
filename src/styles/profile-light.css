@@ -257,3 +257,13 @@
   background: transparent !important;
   backdrop-filter: none !important;
 }
+
+/* =========================
+   Achievement Card Overrides for Light Theme
+   Uses dark glass styling on light backgrounds
+   ========================= */
+.profile-theme-light {
+  --achievement-card-bg: rgba(31, 36, 40, 0.04);
+  --achievement-card-border: rgba(31, 36, 40, 0.12);
+  --achievement-ghost-overlay: rgba(31, 36, 40, 0.05);
+}
