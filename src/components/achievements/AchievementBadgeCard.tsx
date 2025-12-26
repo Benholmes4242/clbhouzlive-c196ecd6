@@ -189,20 +189,18 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'active:scale-[0.98]',
         unlocked && !isGhost && 'hover:shadow-lg',
         // Ghost styling
-        isGhost && 'border border-dashed',
-        // Theme-adaptive background
-        'bg-white/5 dark:bg-white/5'
+        isGhost && 'border border-dashed'
       )}
       style={{
-        // Glass base - adapts to light/dark themes
-        background: 'var(--achievement-card-bg, rgba(255, 255, 255, 0.05))',
-        border: `1px solid ${unlocked && !isGhost ? `${accentColor}25` : 'var(--achievement-card-border, rgba(255, 255, 255, 0.10))'}`,
+        // Glass base - adapts to light/dark themes via CSS variables
+        background: 'var(--achievement-card-bg, rgba(31, 36, 40, 0.04))',
+        border: `1px solid ${unlocked && !isGhost ? `${accentColor}25` : 'var(--achievement-card-border, rgba(31, 36, 40, 0.12))'}`,
         backdropFilter: 'blur(12px)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
         boxShadow: unlocked && !isGhost 
           ? `0 4px 20px ${accentColor}15`
-          : '0 2px 8px rgba(0, 0, 0, 0.08)',
+          : '0 2px 8px rgba(0, 0, 0, 0.06)',
       }}
     >
       {/* Left vertical accent strip */}
