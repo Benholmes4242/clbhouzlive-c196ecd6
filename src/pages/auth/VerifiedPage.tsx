@@ -41,7 +41,7 @@ const VerifiedPage: React.FC = () => {
       <div 
         className="absolute inset-0"
         style={{
-          background: '#1f2122',
+          background: '#160e0c',
         }}
       />
       
@@ -66,7 +66,7 @@ const VerifiedPage: React.FC = () => {
         <div 
           className="w-full max-w-[420px]"
           style={{
-            background: 'rgba(31, 33, 34, 0.95)',
+            background: 'rgba(22, 14, 12, 0.95)',
             backdropFilter: 'blur(22px)',
             border: '1px solid rgba(255, 255, 255, 0.05)',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.55)',
