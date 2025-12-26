@@ -46,6 +46,11 @@
   --quest-accent-green: #6e9277;
   --quest-accent-gold: #D2B461;
 
+  /* Achievement card overrides for light theme */
+  --achievement-card-bg: rgba(31, 36, 40, 0.04);
+  --achievement-card-border: rgba(31, 36, 40, 0.10);
+  --achievement-ghost-overlay: rgba(31, 36, 40, 0.05);
+
   /* Apply to page */
   background: var(--quest-page);
   color: var(--quest-text-primary);

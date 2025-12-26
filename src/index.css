@@ -181,6 +181,13 @@ html.lightbox-open {
   /* Progress bar styling */
   --top100-progress-height: 6px;
   --top100-progress-radius: 999px;
+
+  /* ========================================
+     ACHIEVEMENT CARD DESIGN TOKENS (Dark mode default)
+     ======================================== */
+  --achievement-card-bg: rgba(255, 255, 255, 0.05);
+  --achievement-card-border: rgba(255, 255, 255, 0.10);
+  --achievement-ghost-overlay: rgba(255, 255, 255, 0.15);
 }
 
 /* ========================================
