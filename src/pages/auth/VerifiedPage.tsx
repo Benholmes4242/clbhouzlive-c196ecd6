@@ -1,90 +1,134 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { CheckCircle2, ExternalLink, ArrowRight } from "lucide-react";
 
-/**
- * VerifiedPage - Shown after email verification completes
- * 
- * This is a standalone page that works in a mobile browser.
- * After verifying their email, users land here and must manually sign in.
- */
+const APP_DEEP_LINK = "clbhouz://auth/signin?verified=1";
+const WEB_FALLBACK = "/auth?confirmed=1";
+
+function useQuery() {
+  const { search } = useLocation();
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 const VerifiedPage: React.FC = () => {
+  const query = useQuery();
+  const [attemptedOpen, setAttemptedOpen] = useState(false);
+
+  // Optional: pass through email if you want to prefill on web sign-in
+  const email = (query.get("email") || "").trim();
+  const webSigninHref = email
+    ? `${WEB_FALLBACK}&email=${encodeURIComponent(email)}`
+    : WEB_FALLBACK;
+
+  useEffect(() => {
+    // Gentle auto-attempt to open the app (non-blocking)
+    // If it succeeds, the OS switches to the app.
+    // If it fails, user stays here with clear CTAs.
+    const t = window.setTimeout(() => {
+      try {
+        window.location.href = APP_DEEP_LINK;
+      } finally {
+        setAttemptedOpen(true);
+      }
+    }, 700);
+
+    return () => window.clearTimeout(t);
+  }, []);
+
   return (
-    <div 
-      className="fixed inset-0 flex flex-col items-center justify-center px-6"
-      style={{
-        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
-      }}
-    >
-      {/* Glass container */}
-      <div 
-        className="flex flex-col items-center gap-6 p-8 rounded-3xl w-full max-w-sm"
-        style={{
-          background: 'rgba(10, 10, 10, 0.78)',
-          backdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.55)',
-        }}
-      >
-        {/* Logo */}
-        <img
-          src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-          alt="clbhouz"
-          className="h-10 w-auto opacity-80"
-        />
-        
-        {/* Success icon */}
-        <div 
-          className="w-16 h-16 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(47, 158, 68, 0.15)' }}
-        >
-          <CheckCircle2 className="w-8 h-8 text-[#2F9E44]" />
+    <div className="min-h-screen w-full bg-[#070707] relative overflow-hidden">
+      {/* Ambient background */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-[520px] w-[520px] rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 h-[520px] w-[520px] rounded-full bg-orange-400/10 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-4 py-10">
+        {/* Card */}
+        <div className="w-full rounded-3xl border border-white/10 bg-white/[0.04] shadow-[0_30px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl">
+          {/* Top strip */}
+          <div className="flex items-center justify-between px-6 pt-6">
+            <div className="flex items-center gap-3">
+              {/* Replace with your real logo image if you have one */}
+              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/5 ring-1 ring-white/10">
+                <span className="text-base font-semibold text-white/90">c</span>
+              </div>
+              <div className="leading-tight">
+                <div className="text-sm font-medium text-white/90">Clbhouz</div>
+                <div className="text-xs text-white/50">Email confirmation</div>
+              </div>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+              Secure
+              <span className="h-1 w-1 rounded-full bg-emerald-400/80" />
+              Verified
+            </div>
+          </div>
+
+          <div className="px-6 pb-7 pt-5 sm:px-10 sm:pb-10 sm:pt-7">
+            {/* Icon */}
+            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
+              <CheckCircle2 className="h-8 w-8 text-emerald-300" />
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              You're verified
+            </h1>
+
+            {/* Body */}
+            <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-6 text-white/70 sm:text-base">
+              Welcome to Clbhouz — your email address has been confirmed.
+              <br className="hidden sm:block" />
+              Now sign in to continue and finish setting up your profile.
+            </p>
+
+            {/* Auto-attempt note */}
+            <div className="mx-auto mt-5 max-w-xl text-center text-xs text-white/45">
+              {attemptedOpen ? (
+                <>
+                  If the app didn't open automatically, use the button below.
+                </>
+              ) : (
+                <>Opening the Clbhouz app…</>
+              )}
+            </div>
+
+            {/* Primary actions */}
+            <div className="mt-7 grid gap-3 sm:mt-8 sm:grid-cols-2">
+              {/* Open App */}
+              <a
+                href={APP_DEEP_LINK}
+                className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition active:scale-[0.99]"
+              >
+                Open Clbhouz App
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </a>
+
+              {/* Sign in on web */}
+              <Link
+                to={webSigninHref}
+                className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 backdrop-blur-xl transition hover:bg-white/8 active:scale-[0.99]"
+              >
+                Sign in on the web
+                <ExternalLink className="h-4 w-4 opacity-80" />
+              </Link>
+            </div>
+
+            {/* Footer microcopy */}
+            <div className="mt-6 text-center text-xs text-white/45">
+              You can close this tab once you've signed in.
+            </div>
+          </div>
         </div>
-        
-        {/* Headline */}
-        <h1 
-          className="text-white text-xl font-semibold text-center"
-          style={{ fontFamily: 'SF Pro Display, system-ui, sans-serif' }}
-        >
-          You're verified ✅
-        </h1>
-        
-        {/* Body text */}
-        <p 
-          className="text-white/60 text-[15px] text-center leading-relaxed"
-          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
-        >
-          Welcome to Clbhouz. Your email address has been confirmed.
-        </p>
-        
-        <p 
-          className="text-white/40 text-[13px] text-center"
-          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
-        >
-          Please sign in using your login details in the Clbhouz app (or on the web).
-        </p>
-        
-        {/* Sign in button */}
-        <Link
-          to="/auth"
-          className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98] mt-2"
-          style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
-            fontWeight: 500,
-            background: 'white',
-            color: '#0D0F11',
-          }}
-        >
-          Go to sign in
-        </Link>
-        
-        {/* Secondary text */}
-        <p 
-          className="text-white/30 text-[12px] text-center"
-          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
-        >
-          You can now close this tab.
-        </p>
+
+        {/* Bottom hint */}
+        <div className="mt-6 text-center text-[11px] text-white/35">
+          Tip: If you're on mobile and the app doesn't open, make sure Clbhouz is installed (and try tapping{" "}
+          <span className="text-white/55">Open Clbhouz App</span> again).
+        </div>
       </div>
     </div>
   );
