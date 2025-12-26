@@ -63,12 +63,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="Logo Mark"
-            className="w-auto h-12 object-contain"
+            className="w-auto h-14 object-contain"
           />
           <img
             src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
             alt="clbhouz Logo"
-            className="w-auto max-h-14 object-contain"
+            className="w-auto max-h-[68px] object-contain"
           />
         </div>
 
