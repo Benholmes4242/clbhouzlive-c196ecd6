@@ -70,7 +70,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-[53px] w-auto relative z-10"
+            className="h-[58px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
             <span 
