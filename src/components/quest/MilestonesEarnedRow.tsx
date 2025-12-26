@@ -1,11 +1,11 @@
 /**
- * MilestonesEarnedRow - Horizontal pill row showing unlocked milestone clubs
- * Light theme version
+ * MilestonesEarnedRow - Horizontal row showing unlocked milestone clubs
+ * Light theme version - now uses AchievementBadgeCard for consistent design
  */
 
 import React from 'react';
-import { Check } from 'lucide-react';
 import { CLUB_STEPS } from '@/lib/top100Club';
+import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 interface MilestonesEarnedRowProps {
   totalPlayed: number;
@@ -16,6 +16,7 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
   const milestones = CLUB_STEPS.map(step => ({
     threshold: step.threshold,
     name: `${step.threshold} Club`,
+    tierName: step.tierName,
     isUnlocked: totalPlayed >= step.threshold,
   }));
 
@@ -27,34 +28,30 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
 
   return (
     <section className="overflow-x-auto -mx-4 px-4">
-      <div className="flex items-center gap-2 pb-2">
+      <div className="flex items-center gap-3 pb-2">
         {unlockedMilestones.map(m => (
-          <div
+          <AchievementBadgeCard
             key={m.threshold}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
-            style={{
-              background: 'rgba(210, 180, 97, 0.14)',
-              color: '#8A7A42',
-              border: '1px solid rgba(210, 180, 97, 0.30)',
-            }}
-          >
-            <Check className="w-3 h-3" />
-            {m.name}
-          </div>
+            tier={String(m.threshold) as AchievementTier}
+            title={m.name}
+            subtitle={m.tierName}
+            unlocked={true}
+            status="UNLOCKED"
+            totalTop100Played={totalPlayed}
+          />
         ))}
         
-        {/* Show next locked milestone as muted */}
+        {/* Show next locked milestone as ghost */}
         {nextMilestone && (
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
-            style={{
-              background: 'var(--quest-pill-inactive)',
-              color: 'var(--quest-text-tertiary)',
-              border: '1px solid var(--quest-stroke)',
-            }}
-          >
-            {nextMilestone.name}
-          </div>
+          <AchievementBadgeCard
+            tier={String(nextMilestone.threshold) as AchievementTier}
+            title={nextMilestone.name}
+            subtitle={nextMilestone.tierName}
+            unlocked={false}
+            isGhost={true}
+            remaining={nextMilestone.threshold - totalPlayed}
+            totalTop100Played={totalPlayed}
+          />
         )}
       </div>
     </section>

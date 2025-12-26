@@ -1,7 +1,7 @@
 /**
  * MilestoneLadder - Vertical timeline showing milestone progression (5→400 Club)
  * This is the "Journey Map" showing ONLY milestones, not regional lists
- * Light theme version
+ * Light theme version - now uses AchievementBadgeCard for consistent design
  */
 
 import React from 'react';
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Check, Lock, Trophy } from 'lucide-react';
 import { CLUB_STEPS } from '@/lib/top100Club';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
+import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 interface MilestoneLadderProps {
   totalPlayed: number;
@@ -36,11 +37,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   totalPlayed,
   onClick,
 }) => {
-  const progressPercent = isCurrent 
-    ? Math.min((totalPlayed / threshold) * 100, 100) 
-    : isUnlocked ? 100 : 0;
-  const remaining = threshold - totalPlayed;
   const ringColor = getRingColorForThreshold(threshold);
+  const remaining = threshold - totalPlayed;
 
   return (
     <div className="relative flex items-start gap-4">
@@ -108,115 +106,19 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         )}
       </button>
 
-      {/* Milestone card */}
-      <button
-        onClick={onClick}
-        className={cn(
-          'flex-1 p-4 rounded-xl text-left transition-all duration-200 mb-4',
-          'hover:shadow-md active:scale-[0.98]',
-          !isUnlocked && !isCurrent && 'opacity-60',
-        )}
-        style={{
-          background: 'var(--quest-card)',
-          border: '1px solid var(--quest-stroke)',
-          boxShadow: isUnlocked
-            ? `0 0 12px ${ringColor}10`
-            : isCurrent
-            ? '0 0 10px rgba(110, 146, 119, 0.08)'
-            : 'var(--quest-shadow-sm)',
-        }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span
-            className="text-sm font-semibold"
-            style={{ color: 'var(--quest-text-primary)' }}
-          >
-            {name}
-          </span>
-          <span
-            className="text-xs px-2 py-0.5 rounded-full"
-            style={{
-              background: isUnlocked
-                ? `${ringColor}18`
-                : isCurrent
-                ? 'rgba(247, 147, 30, 0.16)'
-                : 'var(--quest-pill-inactive)',
-              border: isUnlocked
-                ? `1px solid ${ringColor}35`
-                : isCurrent
-                ? '1px solid rgba(247, 147, 30, 0.26)'
-                : '1px solid var(--quest-stroke)',
-              color: isUnlocked
-                ? ringColor
-                : isCurrent
-                ? 'var(--quest-text-primary)'
-                : 'var(--quest-text-tertiary)',
-            }}
-          >
-            {isUnlocked ? 'Unlocked' : isCurrent ? 'In Progress' : 'Locked'}
-          </span>
-        </div>
-
-        <p
-          className="text-xs mb-3"
-          style={{ color: 'var(--quest-text-tertiary)' }}
-        >
-          {tierName}
-        </p>
-
-        {/* Progress info */}
-        {isCurrent && !isUnlocked && (
-          <>
-            <div className="flex items-baseline justify-between mb-2">
-              <span
-                className="text-lg font-bold"
-                style={{ color: 'var(--quest-text-primary)' }}
-              >
-                {totalPlayed}
-                <span className="text-sm font-normal" style={{ color: 'var(--quest-text-tertiary)' }}>
-                  {' '}/ {threshold}
-                </span>
-              </span>
-              <span
-                className="text-xs"
-                style={{ color: 'var(--quest-accent-green)' }}
-              >
-                {remaining} to go
-              </span>
-            </div>
-
-            {/* Progress bar */}
-            <div
-              className="h-1.5 rounded-full overflow-hidden"
-              style={{ background: 'var(--quest-track)' }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${progressPercent}%`,
-                  background: 'linear-gradient(90deg, var(--quest-accent-green), var(--quest-accent-gold))',
-                }}
-              />
-            </div>
-          </>
-        )}
-
-        {/* Unlocked - show full bar */}
-        {isUnlocked && (
-          <div
-            className="h-1.5 rounded-full overflow-hidden"
-            style={{ background: 'var(--quest-track)' }}
-          >
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: '100%',
-                background: ringColor,
-              }}
-            />
-          </div>
-        )}
-      </button>
+      {/* Milestone card - now using AchievementBadgeCard */}
+      <div className="flex-1 mb-4" onClick={onClick}>
+        <AchievementBadgeCard
+          tier={String(threshold) as AchievementTier}
+          title={name}
+          subtitle={tierName}
+          unlocked={isUnlocked}
+          isGhost={!isUnlocked && !isCurrent}
+          status={isUnlocked ? 'UNLOCKED' : isCurrent ? undefined : 'LOCKED'}
+          remaining={!isUnlocked ? remaining : undefined}
+          totalTop100Played={totalPlayed}
+        />
+      </div>
     </div>
   );
 };

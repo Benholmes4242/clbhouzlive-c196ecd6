@@ -189,12 +189,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'active:scale-[0.98]',
         unlocked && !isGhost && 'hover:shadow-lg',
         // Ghost styling
-        isGhost && 'border border-dashed'
+        isGhost && 'border border-dashed',
+        // Theme-adaptive background
+        'bg-white/5 dark:bg-white/5'
       )}
       style={{
-        // Glass base - neutral dark background
-        background: 'rgba(255, 255, 255, 0.05)',
-        border: `1px solid ${unlocked && !isGhost ? `${accentColor}25` : 'rgba(255, 255, 255, 0.10)'}`,
+        // Glass base - adapts to light/dark themes
+        background: 'var(--achievement-card-bg, rgba(255, 255, 255, 0.05))',
+        border: `1px solid ${unlocked && !isGhost ? `${accentColor}25` : 'var(--achievement-card-border, rgba(255, 255, 255, 0.10))'}`,
         backdropFilter: 'blur(12px)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
@@ -232,7 +234,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       {isGhost && (
         <div 
           className="absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{ background: 'rgba(255, 255, 255, 0.15)' }}
+          style={{ background: 'var(--achievement-ghost-overlay, rgba(255, 255, 255, 0.15))' }}
         />
       )}
 
@@ -259,8 +261,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           >
             {tierLabel}
           </div>
-          {/* Subtitle in neutral */}
-          <div className="text-[11px] text-white/65 truncate">
+          {/* Subtitle - theme adaptive neutral */}
+          <div className="text-[11px] text-foreground/65 truncate">
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
