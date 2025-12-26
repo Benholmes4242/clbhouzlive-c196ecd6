@@ -581,10 +581,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         // No blue glow - clean frosted white
       }}
     >
-      {/* Selected checkmark - bottom-left of card, frosted white */}
+      {/* Selected checkmark - top-right of card, frosted white */}
       {isSelected && !isSwitching && (
         <div 
-          className="absolute -bottom-1 -left-1 w-[16px] h-[16px] rounded-full flex items-center justify-center"
+          className="absolute -top-1 -right-1 w-[16px] h-[16px] rounded-full flex items-center justify-center"
           style={{ 
             background: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.20)',
             border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.28)'}`,
