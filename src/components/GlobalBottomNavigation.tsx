@@ -18,7 +18,6 @@ import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
   '/auth',
-  '/create-profile',
   '/admin-setup',
   '/onboarding',
   // Add more full-screen routes as needed
