@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight } from 'lucide-react';
+import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -64,14 +64,20 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   const [snap, setSnap] = useState<SnapState>('peek');
   const [switchingProfileId, setSwitchingProfileId] = useState<string | null>(null);
   const [isClosing, setIsClosing] = useState(false);
-  const [showToast, setShowToast] = useState<string | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
+  // Track active actor locally for instant UI update
+  const [localActiveId, setLocalActiveId] = useState<string>(currentActor.id);
   
   // Touch/drag state
   const dragStartY = useRef<number>(0);
   const dragCurrentY = useRef<number>(0);
   const isDragging = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
+
+  // Sync localActiveId with currentActor when it changes externally
+  useEffect(() => {
+    setLocalActiveId(currentActor.id);
+  }, [currentActor.id]);
 
   // Check for desktop viewport
   useEffect(() => {
@@ -126,18 +132,18 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
 
   // Handle profile switch
   const handleSwitchProfile = async (profileId: string) => {
-    if (profileId === currentActor.id) return;
+    if (profileId === localActiveId) return;
     
+    // Optimistic UI update - instant
+    setLocalActiveId(profileId);
     setSwitchingProfileId(profileId);
+    
     try {
       await onSwitchProfile(profileId);
-      const profile = profiles.find(p => p.id === profileId);
-      if (profile) {
-        setShowToast(`Now posting as ${profile.name}`);
-        setTimeout(() => setShowToast(null), 2000);
-      }
-      // Auto-close after switch
-      setTimeout(() => handleClose(), 350);
+      // Sheet stays open, no toast
+    } catch {
+      // Revert on failure
+      setLocalActiveId(currentActor.id);
     } finally {
       setSwitchingProfileId(null);
     }
@@ -205,6 +211,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
     dragCurrentY.current = 0;
   };
 
+  // Get active profile for header display
+  const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
+
   if (!open) return null;
 
   // Calculate sheet position
@@ -231,6 +240,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
     closeHover: useLightTheme ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)',
     closeIcon: useLightTheme ? '#666' : '#999',
   };
+
+  // Sheet content padding constant for alignment
+  const SHEET_PADDING = 16;
 
   return createPortal(
     <>
@@ -265,7 +277,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           right: isDesktop ? 16 : 0,
           bottom: isDesktop ? 'auto' : 0,
           width: isDesktop ? 420 : 'auto',
-          height: isDesktop ? 'min(640px, calc(100vh - 100px))' : `calc(100vh - ${sheetTop}px)`,
+          // Content-driven height with max cap
+          height: isDesktop ? 'auto' : 'auto',
+          maxHeight: isDesktop ? 'min(640px, calc(100vh - 100px))' : `calc(100vh - ${sheetTop}px)`,
           borderTopLeftRadius: isDesktop ? 22 : 24,
           borderTopRightRadius: isDesktop ? 22 : 24,
           borderBottomLeftRadius: isDesktop ? 22 : 0,
@@ -284,18 +298,31 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Grab Handle */}
-        <div className="flex justify-center pt-2.5 pb-1.5">
+        {/* Grab Handle with Swipe-up Affordance */}
+        <div className="flex flex-col items-center pt-2.5 pb-1">
           <div 
             className="w-9 h-1 rounded-full"
             style={{ background: colors.grabHandle }}
           />
+          {/* Chevron bounce indicator for discoverability */}
+          {snap === 'peek' && (
+            <ChevronUp 
+              className="w-4 h-4 mt-1 animate-bounce"
+              style={{ 
+                color: colors.textMuted, 
+                opacity: 0.5,
+                animationDuration: '2s',
+              }}
+            />
+          )}
         </div>
 
         {/* Header Row - Sticky */}
         <div 
-          className="flex items-center justify-between px-4 py-2.5"
+          className="flex items-center justify-between py-2.5"
           style={{
+            paddingLeft: SHEET_PADDING,
+            paddingRight: SHEET_PADDING,
             borderBottom: `1px solid ${colors.border}`,
             position: 'sticky',
             top: 0,
@@ -303,15 +330,18 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           }}
         >
           <div className="flex items-center gap-3">
-            {/* Avatar */}
+            {/* Avatar - SQUIRCLE */}
             <div 
-              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
-              style={{ background: colors.cardBg }}
+              className="w-10 h-10 overflow-hidden flex items-center justify-center flex-shrink-0"
+              style={{ 
+                background: colors.cardBg,
+                borderRadius: 12, // SDS squircle
+              }}
             >
-              {currentActor.avatarUrl ? (
+              {activeProfile.avatarUrl ? (
                 <img 
-                  src={currentActor.avatarUrl} 
-                  alt={currentActor.name}
+                  src={activeProfile.avatarUrl} 
+                  alt={activeProfile.name}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -323,13 +353,13 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 className="font-semibold text-[16px] leading-tight"
                 style={{ color: colors.text }}
               >
-                {currentActor.name}
+                {activeProfile.name}
               </div>
               <div 
                 className="text-[13px] leading-tight mt-0.5"
                 style={{ color: colors.textMuted }}
               >
-                Posting as {currentActor.name}
+                Posting as {activeProfile.name}
               </div>
             </div>
           </div>
@@ -357,7 +387,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           }}
         >
           {/* Profile Switcher Section */}
-          <div className="px-4 pt-3 pb-2">
+          <div className="pt-3 pb-2" style={{ paddingLeft: SHEET_PADDING, paddingRight: SHEET_PADDING }}>
             <div 
               className="text-[12px] font-medium uppercase tracking-[0.06em] mb-2.5"
               style={{ color: colors.sectionLabel }}
@@ -365,16 +395,18 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               Switch profile
             </div>
             
-            {/* Horizontal Carousel with snap */}
+            {/* Horizontal Carousel with snap - aligned with quick actions */}
             <div 
-              className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
+              className="flex gap-3 overflow-x-auto pb-2"
               style={{ 
                 scrollSnapType: 'x mandatory',
                 WebkitOverflowScrolling: 'touch',
+                marginLeft: 0,
+                marginRight: 0,
               }}
             >
               {profiles.map((profile) => {
-                const isSelected = profile.id === currentActor.id;
+                const isSelected = profile.id === localActiveId;
                 const isSwitching = switchingProfileId === profile.id;
                 
                 return (
@@ -392,7 +424,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               {/* Add Business Card */}
               <button
                 onClick={() => handleNavigate('/settings/business')}
-                className="flex-shrink-0 flex items-center justify-center gap-2 p-3 rounded-[14px] transition-all active:scale-[0.98]"
+                className="flex-shrink-0 flex items-center justify-center gap-2 p-3 transition-all active:scale-[0.98]"
                 style={{
                   scrollSnapAlign: 'start',
                   width: 140,
@@ -400,6 +432,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                   background: colors.cardBg,
                   border: `1.5px dashed ${useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.18)'}`,
                   opacity: 0.85,
+                  borderRadius: 14,
                 }}
               >
                 <Plus 
@@ -420,12 +453,12 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           <Divider useLightTheme={useLightTheme} />
 
           {/* Quick Actions Row */}
-          <div className="px-4 py-3">
+          <div style={{ padding: `12px ${SHEET_PADDING}px` }}>
             <div className="grid grid-cols-3 gap-3">
               <QuickActionButton
                 icon={<User className="w-[18px] h-[18px]" />}
                 label="View profile"
-                onClick={() => handleNavigate(`/profile/${currentActor.id}`)}
+                onClick={() => handleNavigate(`/profile/${localActiveId}`)}
                 useLightTheme={useLightTheme}
               />
               <QuickActionButton
@@ -437,7 +470,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               />
               <QuickActionButton
                 icon={<Upload className="w-[18px] h-[18px]" />}
-                label="Upload"
+                label="Upload Center"
                 onClick={() => handleNavigate('/upload')}
                 useLightTheme={useLightTheme}
               />
@@ -471,7 +504,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
               />
             </MenuSection>
 
-            {/* Admin Section - Premium privileged highlight */}
+            {/* Admin Section - Premium privileged highlight with symmetric borders */}
             {isAdmin && (
               <MenuSection title="Admin" useLightTheme={useLightTheme}>
                 <AdminMenuItem
@@ -484,7 +517,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
             )}
 
             {/* Danger Zone - Logout */}
-            <div className="px-4 pt-4">
+            <div style={{ padding: `16px ${SHEET_PADDING}px 0` }}>
               <button
                 onClick={() => handleNavigate('/logout')}
                 className="w-full flex items-center gap-4 px-4 py-4 rounded-[14px] transition-all active:scale-[0.98]"
@@ -501,23 +534,6 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Toast */}
-      {showToast && (
-        <div
-          className="fixed left-1/2 -translate-x-1/2 z-[10000] px-4 py-2.5 rounded-full animate-in fade-in slide-in-from-bottom-4 duration-200"
-          style={{
-            bottom: 'calc(100px + env(safe-area-inset-bottom))',
-            background: useLightTheme ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.95)',
-            color: useLightTheme ? '#fff' : '#000',
-            fontSize: '14px',
-            fontWeight: 500,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-          }}
-        >
-          {showToast}
-        </div>
-      )}
     </>,
     document.body
   );
@@ -525,7 +541,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
 
 // ============================================
 // PROFILE CARD COMPONENT
-// Horizontal carousel card with selected glow
+// Squircle avatars, frosted white active state, tick on avatar bottom-right
+// 2-line name clamp for longer names
 // ============================================
 
 interface ProfileCardProps {
@@ -550,76 +567,95 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     avatarBg: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)',
   };
 
+  // Frosted white active state (no blue)
+  const activeCardBg = useLightTheme 
+    ? 'rgba(0,0,0,0.06)' 
+    : 'rgba(255,255,255,0.10)';
+  const activeCardBorder = useLightTheme 
+    ? 'rgba(0,0,0,0.12)' 
+    : 'rgba(255,255,255,0.22)';
+
   return (
     <button
       onClick={onClick}
       disabled={isSwitching}
-      className="relative flex-shrink-0 flex items-center gap-2.5 p-2.5 rounded-[14px] transition-all active:scale-[0.98]"
+      className="relative flex-shrink-0 flex items-center gap-2 p-2 transition-all active:scale-[0.98]"
       style={{
         scrollSnapAlign: 'start',
-        width: 150,
+        width: 160, // Wider for less truncation
         height: 74,
-        background: isSelected 
-          ? (useLightTheme ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.12)')
-          : colors.cardBg,
+        background: isSelected ? activeCardBg : colors.cardBg,
         border: isSelected 
-          ? '2px solid rgba(59,130,246,0.5)'
+          ? `1.5px solid ${activeCardBorder}`
           : `1.5px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
-        boxShadow: isSelected 
-          ? '0 0 0 4px rgba(59,130,246,0.12)'
-          : 'none',
+        borderRadius: 14,
+        // No blue glow - clean frosted white
       }}
     >
-      {/* Avatar */}
-      <div 
-        className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
-        style={{ background: colors.avatarBg }}
-      >
-        {profile.avatarUrl ? (
-          <img 
-            src={profile.avatarUrl} 
-            alt={profile.name}
-            className="w-full h-full object-cover"
-          />
-        ) : profile.type === 'business' ? (
-          <Building2 className="w-5 h-5" style={{ opacity: 0.6, color: colors.text }} />
-        ) : (
-          <User className="w-5 h-5" style={{ opacity: 0.6, color: colors.text }} />
-        )}
+      {/* Avatar with tick badge - SQUIRCLE */}
+      <div className="relative flex-shrink-0">
+        <div 
+          className="w-9 h-9 overflow-hidden flex items-center justify-center"
+          style={{ 
+            background: colors.avatarBg,
+            borderRadius: 10, // SDS squircle for smaller avatar
+          }}
+        >
+          {profile.avatarUrl ? (
+            <img 
+              src={profile.avatarUrl} 
+              alt={profile.name}
+              className="w-full h-full object-cover"
+            />
+          ) : profile.type === 'business' ? (
+            <Building2 className="w-4 h-4" style={{ opacity: 0.6, color: colors.text }} />
+          ) : (
+            <User className="w-4 h-4" style={{ opacity: 0.6, color: colors.text }} />
+          )}
+          
+          {/* Loading spinner */}
+          {isSwitching && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40" style={{ borderRadius: 10 }}>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            </div>
+          )}
+        </div>
         
-        {/* Loading spinner */}
-        {isSwitching && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        {/* Selected checkmark - bottom-right on avatar, frosted white */}
+        {isSelected && !isSwitching && (
+          <div 
+            className="absolute -bottom-0.5 -right-0.5 w-[16px] h-[16px] rounded-full flex items-center justify-center"
+            style={{ 
+              background: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.20)',
+              border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.28)'}`,
+            }}
+          >
+            <Check className="w-2.5 h-2.5" style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.9)' }} />
           </div>
         )}
       </div>
       
-      {/* Info */}
-      <div className="flex-1 min-w-0 text-left">
+      {/* Info - 2-line name clamp */}
+      <div className="flex-1 min-w-0 text-left pr-1">
         <div 
-          className="font-medium text-[14px] truncate leading-tight"
-          style={{ color: colors.text }}
+          className="font-medium text-[13px] leading-tight"
+          style={{ 
+            color: colors.text,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
         >
           {profile.name}
         </div>
         <div 
-          className="text-[12px] leading-tight mt-0.5"
+          className="text-[11px] leading-tight mt-0.5"
           style={{ color: colors.textMuted }}
         >
           {profile.type === 'personal' ? 'Personal' : 'Business'}
         </div>
       </div>
-
-      {/* Selected checkmark - top right badge */}
-      {isSelected && !isSwitching && (
-        <div 
-          className="absolute top-2 right-2 w-[18px] h-[18px] rounded-full flex items-center justify-center"
-          style={{ background: '#3b82f6' }}
-        >
-          <Check className="w-3 h-3 text-white" />
-        </div>
-      )}
     </button>
   );
 };
@@ -755,7 +791,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
 // ============================================
 // ADMIN MENU ITEM COMPONENT
-// Premium gold accent highlight
+// Premium gold accent highlight - SYMMETRIC BORDERS
 // ============================================
 
 interface AdminMenuItemProps {
@@ -777,7 +813,9 @@ const AdminMenuItem: React.FC<AdminMenuItemProps> = ({
     style={{
       height: 52,
       background: 'rgba(245, 185, 66, 0.06)',
+      // Symmetric left + right borders
       borderLeft: '2px solid rgba(245, 185, 66, 0.55)',
+      borderRight: '2px solid rgba(245, 185, 66, 0.55)',
       color: useLightTheme ? '#1a1a1a' : '#ffffff',
     }}
   >

@@ -52,7 +52,7 @@ export function UploadCenterPanel({ isOpen, onClose }: UploadCenterPanelProps) {
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Cloud className="w-4 h-4 text-slate-500" />
-                <span className="font-medium text-sm text-slate-900">Uploads</span>
+                <span className="font-medium text-sm text-slate-900">Upload Center</span>
               </div>
               <button
                 onClick={onClose}
@@ -66,7 +66,7 @@ export function UploadCenterPanel({ isOpen, onClose }: UploadCenterPanelProps) {
             <div className="overflow-y-auto max-h-[calc(70vh-56px)]">
               {visibleJobs.length === 0 ? (
                 <div className="px-4 py-8 text-center text-slate-500 text-sm">
-                  No uploads
+                  No uploads yet
                 </div>
               ) : (
                 <div className="divide-y divide-slate-200">
