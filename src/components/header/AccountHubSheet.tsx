@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, ChevronUp } from 'lucide-react';
+import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -298,23 +298,12 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Grab Handle with Swipe-up Affordance */}
+        {/* Grab Handle */}
         <div className="flex flex-col items-center pt-2.5 pb-1">
           <div 
             className="w-9 h-1 rounded-full"
             style={{ background: colors.grabHandle }}
           />
-          {/* Chevron bounce indicator for discoverability */}
-          {snap === 'peek' && (
-            <ChevronUp 
-              className="w-4 h-4 mt-1 animate-bounce"
-              style={{ 
-                color: colors.textMuted, 
-                opacity: 0.5,
-                animationDuration: '2s',
-              }}
-            />
-          )}
         </div>
 
         {/* Header Row - Sticky */}
@@ -592,7 +581,20 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         // No blue glow - clean frosted white
       }}
     >
-      {/* Avatar with tick badge - SQUIRCLE */}
+      {/* Selected checkmark - bottom-left of card, frosted white */}
+      {isSelected && !isSwitching && (
+        <div 
+          className="absolute -bottom-1 -left-1 w-[16px] h-[16px] rounded-full flex items-center justify-center"
+          style={{ 
+            background: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.20)',
+            border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.28)'}`,
+          }}
+        >
+          <Check className="w-2.5 h-2.5" style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.9)' }} />
+        </div>
+      )}
+
+      {/* Avatar - SQUIRCLE */}
       <div className="relative flex-shrink-0">
         <div 
           className="w-9 h-9 overflow-hidden flex items-center justify-center"
@@ -620,19 +622,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             </div>
           )}
         </div>
-        
-        {/* Selected checkmark - bottom-right on avatar, frosted white */}
-        {isSelected && !isSwitching && (
-          <div 
-            className="absolute -bottom-0.5 -right-0.5 w-[16px] h-[16px] rounded-full flex items-center justify-center"
-            style={{ 
-              background: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.20)',
-              border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.28)'}`,
-            }}
-          >
-            <Check className="w-2.5 h-2.5" style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.9)' }} />
-          </div>
-        )}
       </div>
       
       {/* Info - 2-line name clamp */}
