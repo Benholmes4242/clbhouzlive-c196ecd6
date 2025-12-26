@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, RefreshCw, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,14 +8,28 @@ interface EmailVerificationGateProps {
   email: string;
 }
 
+const RESEND_COOLDOWN_SECONDS = 45;
+
 /**
  * EmailVerificationGate - Blocks app access until email is verified
  * Shows a clean verification screen with options to resend email or sign out
  */
 export const EmailVerificationGate: React.FC<EmailVerificationGateProps> = ({ email }) => {
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  // Cooldown timer
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   const handleResendEmail = async () => {
+    if (cooldown > 0) return;
+    
     setResending(true);
     try {
       const { error } = await supabase.auth.resend({
@@ -31,6 +45,7 @@ export const EmailVerificationGate: React.FC<EmailVerificationGateProps> = ({ em
         console.error('Resend error:', error);
       } else {
         toast.success('Verification email sent!');
+        setCooldown(RESEND_COOLDOWN_SECONDS);
       }
     } catch (err) {
       toast.error('Something went wrong');
@@ -72,7 +87,7 @@ export const EmailVerificationGate: React.FC<EmailVerificationGateProps> = ({ em
         <div className="space-y-3 pt-4">
           <Button
             onClick={handleResendEmail}
-            disabled={resending}
+            disabled={resending || cooldown > 0}
             variant="outline"
             className="w-full"
           >
@@ -81,7 +96,10 @@ export const EmailVerificationGate: React.FC<EmailVerificationGateProps> = ({ em
             ) : (
               <RefreshCw className="w-4 h-4 mr-2" />
             )}
-            Resend verification email
+            {cooldown > 0 
+              ? `Resend in ${cooldown}s` 
+              : 'Resend verification email'
+            }
           </Button>
 
           <Button
