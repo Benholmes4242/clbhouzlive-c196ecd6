@@ -62,6 +62,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   // Form fields
   const [username, setUsername] = useState("");
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState("");
   
   // Field-level error states
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -193,6 +194,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
       return;
     }
 
+    // Validate confirm password matches
+    if (password !== confirmPassword) {
+      setErrorMsg("Passwords don't match");
+      return;
+    }
+
     setSubmitting(true);
 
     const { data, error } = await supabase.auth.signUp({
@@ -221,6 +228,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       // Switch back to sign-in and show success notice
       setIsSignUp(false);
       setPassword('');
+      setConfirmPassword('');
       setUsername('');
       setView('entry');
       setAuthNotice({
@@ -411,6 +419,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
             email={email}
             password={password}
             setPassword={setPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
             username={username}
             setUsername={setUsername}
             passwordError={passwordError}
