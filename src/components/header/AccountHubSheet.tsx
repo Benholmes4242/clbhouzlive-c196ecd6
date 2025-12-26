@@ -446,7 +446,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
 
           {/* Quick Actions Row */}
           <div style={{ padding: `12px ${SHEET_PADDING}px` }}>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <QuickActionButton
                 icon={<User className="w-[18px] h-[18px]" />}
                 label="View profile"
@@ -459,12 +459,6 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 onClick={() => handleNavigate('/notificationmessages')}
                 useLightTheme={useLightTheme}
                 showBadge={hasUnread}
-              />
-              <QuickActionButton
-                icon={<Upload className="w-[18px] h-[18px]" />}
-                label="Upload Center"
-                onClick={() => handleNavigate('/upload')}
-                useLightTheme={useLightTheme}
               />
             </div>
           </div>
