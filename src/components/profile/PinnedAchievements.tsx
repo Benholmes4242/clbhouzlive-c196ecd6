@@ -11,6 +11,7 @@ import { useUserAchievements } from '@/hooks/useUserAchievements';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { toast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 interface Achievement {
   id: string;
@@ -19,6 +20,8 @@ interface Achievement {
   unlocked: boolean;
   iconURL?: string;
   description?: string;
+  tier?: AchievementTier;
+  subtitle?: string;
 }
 
 interface PinnedAchievementsProps {
@@ -49,14 +52,14 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [showAchievementModal, setShowAchievementModal] = useState(false);
 
-  // Mock achievement data (replace with real data later)
+  // Achievement data with tier mapping
   const mockAchievements: Achievement[] = [
-    { id: '20-club', name: '20 Club', xp: 200, unlocked: true, description: 'Play 20 golf courses' },
-    { id: '50-club', name: '50 Club', xp: 300, unlocked: true, description: 'Play 50 golf courses' },
-    { id: '100-club', name: 'Century Club', xp: 500, unlocked: false, description: 'Play 100 golf courses' },
-    { id: 'eagle-collector', name: 'Eagle Collector', xp: 400, unlocked: true, description: 'Collect 5 eagles' },
-    { id: 'birdie-blitz', name: 'Birdie Blitz', xp: 300, unlocked: false, description: 'Get 3 birdies in one round' },
-    { id: 'hole-in-one', name: 'Hole-in-One', xp: 1000, unlocked: false, description: 'Score an ace!' },
+    { id: '20-club', name: '20 Club', xp: 200, unlocked: true, description: 'Play 20 golf courses', tier: '20', subtitle: 'Founders Club' },
+    { id: '50-club', name: '50 Club', xp: 300, unlocked: true, description: 'Play 50 golf courses', tier: '50', subtitle: 'Heritage Club' },
+    { id: '100-club', name: 'Century Club', xp: 500, unlocked: false, description: 'Play 100 golf courses', tier: '100', subtitle: 'Century Club' },
+    { id: '5-club', name: '5 Club', xp: 100, unlocked: true, description: 'Play 5 golf courses', tier: '5', subtitle: 'Rookie Club' },
+    { id: '10-club', name: '10 Club', xp: 150, unlocked: true, description: 'Play 10 golf courses', tier: '10', subtitle: 'Fairway Club' },
+    { id: '200-club', name: '200 Club', xp: 600, unlocked: false, description: 'Play 200 golf courses', tier: '200', subtitle: 'Elite Club' },
   ];
 
   // Load user settings on mount
@@ -189,133 +192,33 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     setIsManagePinsOpen(true);
   };
 
-  // Get real badge image based on achievement name (match ClbhouzAchievementsModal sizing)
-  const getAchievementBadge = (achievementName: string) => {
-    switch (achievementName) {
-      case '20 Club':
-        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className="w-40 h-40" />;
-      case '50 Club':
-        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className="w-40 h-40" />;
-      case 'Century Club':
-        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className="w-40 h-40" />;
-      case 'Eagle Collector':
-        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-40 h-40" />;
-      case 'Birdie Blitz':
-        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-40 h-40" />;
-      case 'Hole-in-One':
-        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-40 h-40" />;
-      default:
-        return <Trophy className="w-8 h-8 text-primary" />;
-    }
-  };
-
-  // Render achievement badge with proper tooltip system
-  const renderAchievementBadge = (achievement: Achievement, isPlaceholder = false) => {
-    const badgeContent = (
-      <div 
-        className={`
-          achv-badge-size relative flex flex-col items-center justify-center
-          rounded-lg transition-all duration-200 cursor-pointer
-          ${isPlaceholder 
-            ? 'opacity-60' 
-            : achievement.unlocked
-              ? 'hover:scale-105'
-              : 'opacity-60 grayscale'
-          }
-        `}
-        onClick={isMobile && !isPlaceholder ? () => {
-          setSelectedAchievement(achievement);
-          setShowAchievementModal(true);
-        } : () => !isPlaceholder && setIsAchievementsModalOpen(true)}
-      >
-        {/* Badge Image */}
-        <div className="flex-shrink-0">
-          {isPlaceholder ? (
-            <Lock className="w-40 h-40 text-muted-foreground" />
-          ) : (
-            <div className={`transition-all duration-200 ${achievement.unlocked ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
-              {getAchievementBadge(achievement.name)}
-            </div>
-          )}
-        </div>
-        
-        {/* Lock overlay for locked achievements */}
-        {!isPlaceholder && !achievement.unlocked && (
-          <div className="absolute top-2 right-2">
-            <Lock className="w-4 h-4 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-    );
-
-    // Achievement title under badge
-    const titleContent = !isPlaceholder && (
-      <div className="text-center mt-3">
-        <div className={`text-sm font-semibold mb-1 ${achievement.unlocked ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
-          {achievement.name.toUpperCase()}
-        </div>
-        <div className={`text-sm font-medium ${achievement.unlocked ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-          +{achievement.xp} XP
-        </div>
-      </div>
-    );
-
-    const fullContent = (
-      <div className="flex flex-col items-center">
-        {badgeContent}
-        {titleContent}
-      </div>
-    );
-
-    if (isPlaceholder) {
-      return fullContent;
+  // Render achievement using shared AchievementBadgeCard
+  const renderAchievementCard = (achievement: Achievement, isPlaceholder = false) => {
+    if (isPlaceholder || !achievement.tier) {
+      // Ghost/placeholder card
+      return (
+        <AchievementBadgeCard
+          tier="5"
+          title=""
+          subtitle=""
+          unlocked={false}
+          isGhost={true}
+        />
+      );
     }
 
-    // Mobile: Click opens detail modal
-    if (isMobile) {
-      return fullContent;
-    }
-
-    // Desktop: Hover shows rich tooltip
     return (
-      <TooltipProvider key={achievement.id}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {fullContent}
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
-            <div className="p-2">
-              {/* Status Badge */}
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-semibold text-sm">{achievement.name}</h4>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  achievement.unlocked 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                }`}>
-                  {achievement.unlocked ? 'Unlocked' : 'Locked'}
-                </span>
-              </div>
-              
-              {/* Description */}
-              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                {achievement.description}
-              </p>
-              
-              {/* XP Value */}
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                  <span className="text-amber-500">✨</span>
-                  +{achievement.xp} XP
-                </span>
-                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                  🏆 One-time
-                </span>
-              </div>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div 
+        className="cursor-pointer"
+        onClick={() => setIsAchievementsModalOpen(true)}
+      >
+        <AchievementBadgeCard
+          tier={achievement.tier}
+          title={achievement.name}
+          subtitle={achievement.subtitle || achievement.description || ''}
+          unlocked={achievement.unlocked}
+        />
+      </div>
     );
   };
 
@@ -362,8 +265,8 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           </div>
         )}
 
-        {/* Achievement badges grid */}
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-6 mb-6 justify-items-center">
+        {/* Achievement badges grid - using unified AchievementBadgeCard */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {Array.from({ length: 4 }, (_, index) => {
             const achievement = displayAchievements[index];
             
@@ -371,7 +274,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
               // Show placeholder for empty state
               return (
                 <div key={`placeholder-${index}`}>
-                  {renderAchievementBadge(
+                  {renderAchievementCard(
                     { id: `placeholder-${index}`, name: '', xp: 0, unlocked: false },
                     true
                   )}
@@ -382,7 +285,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
             if (achievement) {
               return (
                 <div key={achievement.id}>
-                  {renderAchievementBadge(achievement)}
+                  {renderAchievementCard(achievement)}
                 </div>
               );
             }
@@ -512,7 +415,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         isCurrentUser={isOwnProfile}
       />
 
-      {/* Achievement Detail Modal for Mobile */}
+      {/* Achievement Detail Modal for Mobile - using unified AchievementBadgeCard */}
       {selectedAchievement && (
         <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
           <DialogContent className="max-w-[90vw] max-h-[70vh] p-4">
@@ -521,20 +424,17 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
             </DialogHeader>
             <div className="space-y-4">
               <div className="flex justify-center">
-                {getAchievementBadge(selectedAchievement.name)}
+                {selectedAchievement.tier && (
+                  <AchievementBadgeCard
+                    tier={selectedAchievement.tier}
+                    title={selectedAchievement.name}
+                    subtitle={selectedAchievement.subtitle || selectedAchievement.description || ''}
+                    unlocked={selectedAchievement.unlocked}
+                  />
+                )}
               </div>
               
-              <div className="text-center">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  selectedAchievement.unlocked 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                }`}>
-                  {selectedAchievement.unlocked ? 'Unlocked' : 'Locked'}
-                </span>
-              </div>
-              
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed text-center">
                 {selectedAchievement.description}
               </p>
               
