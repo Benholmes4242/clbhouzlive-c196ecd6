@@ -64,7 +64,7 @@ const VerifiedPage: React.FC = () => {
 
             {/* Headline */}
             <h1 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              Welcome to clbhouz.
+              Welcome to clbhouz
             </h1>
 
             {/* Body */}
