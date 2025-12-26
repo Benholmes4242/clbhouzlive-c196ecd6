@@ -22,11 +22,11 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   return (
     <div className="fixed inset-0 flex flex-col">
-      {/* Background - subtle near-black gradient (static, no motion) */}
+      {/* Background - solid dark color */}
       <div 
         className="absolute inset-0"
         style={{
-          background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
+          background: '#1f2122',
         }}
       />
       
@@ -108,7 +108,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div 
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
-            background: 'rgba(10, 10, 10, 0.78)',
+            background: 'rgba(31, 33, 34, 0.95)',
             backdropFilter: 'blur(22px)',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
             boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.55)',
