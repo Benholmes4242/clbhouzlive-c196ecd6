@@ -47,39 +47,24 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    // Query auth.users for the email
+    // Query auth.users using listUsers with search
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({
       page: 1,
-      perPage: 1,
+      perPage: 50,
     });
 
     if (error) {
       console.error("[auth-email-exists] Error listing users:", error.message);
-      // Fall back to a direct query approach
-    }
-
-    // Use getUserByEmail which is more direct
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserByEmail(normalizedEmail);
-
-    if (userError) {
-      // User not found is expected when email doesn't exist
-      if (userError.message.includes("User not found") || userError.status === 404) {
-        console.log(`[auth-email-exists] Email not found: ${normalizedEmail.substring(0, 3)}***`);
-        const response: EmailExistsResponse = { exists: false };
-        return new Response(
-          JSON.stringify(response),
-          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
-      }
-      
-      console.error("[auth-email-exists] Error checking email:", userError.message);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    const exists = !!userData?.user;
+    // Check for exact email match (case-insensitive)
+    const exists = (data?.users ?? []).some(
+      (u) => (u.email ?? '').toLowerCase() === normalizedEmail
+    );
     console.log(`[auth-email-exists] Email exists: ${exists}`);
 
     const response: EmailExistsResponse = { exists };
