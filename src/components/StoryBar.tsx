@@ -43,7 +43,7 @@ const StoryBar = () => {
       if (data) {
         navigate('/profile');
       } else {
-        navigate('/create-profile');
+        navigate('/edit-profile');
       }
     }
   };

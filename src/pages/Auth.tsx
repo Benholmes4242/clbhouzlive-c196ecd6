@@ -59,8 +59,8 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         const redirectPath = searchParams.get('redirect');
         
         if (!hasProfile || !hasCompletedOnboarding) {
-          // Profile doesn't exist or onboarding not complete - redirect to create profile
-          navigate("/create-profile", { replace: true });
+          // Profile doesn't exist or onboarding not complete - redirect to edit profile
+          navigate("/edit-profile", { replace: true });
         } else {
           // Fully onboarded - go to requested page or home
           navigate(redirectPath || "/", { replace: true });

@@ -54,7 +54,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   setAuthNotice,
 }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   // UI-only view state
   const [view, setView] = useState<AuthView>('entry');
@@ -68,6 +68,30 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState<string | null>(null);
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+
+  // Handle email prefill from query params (after email verification)
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    const confirmedParam = searchParams.get('confirmed');
+    
+    if (emailParam) {
+      setEmail(emailParam);
+      
+      // Auto-open the password sheet since we have the email
+      setView('password');
+      
+      // Show success notice if just confirmed
+      if (confirmedParam === '1') {
+        setAuthNotice({
+          type: 'success',
+          message: 'Email verified! Enter your password to sign in.',
+        });
+      }
+      
+      // Clear the query params to keep URL clean
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setEmail, setAuthNotice, setSearchParams]);
 
   // Clear errors when email/password change
   useEffect(() => {
@@ -191,6 +215,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
       }
       setSubmitting(false);
     } else if (data?.user) {
+      // Store email for callback to use
+      localStorage.setItem('pending_signup_email', email);
+      
       // Switch back to sign-in and show success notice
       setIsSignUp(false);
       setPassword('');
