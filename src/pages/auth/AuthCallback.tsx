@@ -18,6 +18,24 @@ const AuthCallback: React.FC = () => {
           return;
         }
 
+        // Check if this is a newly confirmed email (from verification link)
+        // We detect this by checking for pending signup email in localStorage
+        const pendingEmail = localStorage.getItem('pending_signup_email');
+        
+        if (pendingEmail) {
+          // Clear the stored email
+          localStorage.removeItem('pending_signup_email');
+          
+          setStatus("Email verified! Please sign in...");
+          
+          // Sign out the user so they have to enter their password
+          await supabase.auth.signOut();
+          
+          // Redirect to /auth with email prefilled
+          navigate(`/auth?email=${encodeURIComponent(pendingEmail)}&confirmed=1`, { replace: true });
+          return;
+        }
+
         setStatus("Checking profile...");
 
         // Check if user has a profile
@@ -32,13 +50,13 @@ const AuthCallback: React.FC = () => {
         }
 
         if (!profile) {
-          // No profile exists - redirect to profile setup (always personal)
+          // No profile exists - redirect to profile setup
           setStatus("Setting up your profile...");
-          navigate('/create-profile', { replace: true });
+          navigate('/edit-profile', { replace: true });
         } else if (!profile.has_completed_onboarding) {
           // Profile exists but onboarding not complete
           setStatus("Completing onboarding...");
-          navigate('/create-profile', { replace: true });
+          navigate('/edit-profile', { replace: true });
         } else {
           // Fully onboarded - go to home
           setStatus("Welcome back!");
