@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -33,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Normalize email: lowercase and trim
     const normalizedEmail = email.toLowerCase().trim();
-    console.log(`[auth-email-exists] Checking email: ${normalizedEmail.substring(0, 3)}***`);
+    console.log("[auth-email-exists] Checking email...");
 
     // Create Supabase client with service role key to access auth.users
     const supabaseAdmin = createClient(
