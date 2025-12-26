@@ -273,6 +273,15 @@ const EditProfilePage: React.FC = () => {
   const handleSave = useCallback(async () => {
     if (!user?.id) return;
 
+    // Minimum requirements check: display_name is required to complete onboarding
+    const meetsMinimumRequirements = formData.displayName.trim().length > 0;
+
+    // If minimum requirements not met, show warning and don't proceed
+    if (!meetsMinimumRequirements) {
+      toast.error('Please add a display name to continue');
+      return;
+    }
+
     setSaving(true);
     setSaveSuccess(false);
 
@@ -288,6 +297,8 @@ const EditProfilePage: React.FC = () => {
         home_club_visibility: formData.homeClubVisibility,
         additional_clubs_visibility: formData.additionalClubsVisibility,
         updated_at: new Date().toISOString(),
+        // Mark onboarding as complete when minimum requirements are met
+        has_completed_onboarding: true,
       };
 
       // Only update username if not already set
