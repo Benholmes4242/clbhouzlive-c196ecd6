@@ -22,8 +22,6 @@ interface AppleHUDOverlayProps {
   };
   caption?: string;
   createdAt?: string;
-  courseName?: string;
-  courseRating?: number;
   tags?: string[];
   
   // Engagement stats
@@ -43,7 +41,6 @@ interface AppleHUDOverlayProps {
   
   // Handlers
   onProfileSheetOpen?: () => void;
-  onCourseClick?: () => void;
   onMoreClick?: () => void;
   onLike: () => void;
   onComment: () => void;
@@ -63,8 +60,6 @@ const AppleHUDOverlayBase = ({
   user,
   caption,
   createdAt,
-  courseName,
-  courseRating,
   tags,
   stats,
   isLiked = false,
@@ -74,7 +69,6 @@ const AppleHUDOverlayBase = ({
   videoProgress = 0,
   shouldAnimate = false,
   onProfileSheetOpen,
-  onCourseClick,
   onMoreClick,
   onLike,
   onComment,
@@ -108,10 +102,7 @@ const AppleHUDOverlayBase = ({
             user={user}
             caption={caption}
             createdAt={createdAt}
-            courseName={courseName}
-            courseRating={courseRating}
             onProfileSheetOpen={onProfileSheetOpen}
-            onCourseClick={onCourseClick}
             onMoreClick={onMoreClick}
           />
           <div className="px-4">
@@ -146,7 +137,6 @@ export const AppleHUDOverlay = React.memo(
       prev.isActive === next.isActive &&
       prev.shouldAnimate === next.shouldAnimate &&
       prev.caption === next.caption &&
-      prev.courseName === next.courseName &&
       prev.videoProgress === next.videoProgress &&
       prev.isMuted === next.isMuted &&
       prev.isLiked === next.isLiked &&

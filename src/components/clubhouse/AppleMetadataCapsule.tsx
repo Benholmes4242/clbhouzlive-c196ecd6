@@ -22,11 +22,8 @@ interface AppleMetadataCapsuleProps {
   };
   caption?: string;
   createdAt?: string;
-  courseName?: string;
-  courseRating?: number;
   onProfileSheetOpen?: () => void;
   onMoreClick?: () => void;
-  onCourseClick?: () => void;
   className?: string;
 }
 
@@ -34,11 +31,8 @@ const AppleMetadataCapsuleBase = ({
   user,
   caption,
   createdAt,
-  courseName,
-  courseRating,
   onProfileSheetOpen,
   onMoreClick,
-  onCourseClick,
   className
 }: AppleMetadataCapsuleProps) => {
   const timeLabel = createdAt ? relativeTime(createdAt) : null;
@@ -92,24 +86,6 @@ const AppleMetadataCapsuleBase = ({
           </p>
         )}
 
-        {/* Row 3: course pill (optional) */}
-        {courseName && (
-          <div className="mt-0.5 flex w-full justify-center">
-            <button
-              type="button"
-              onClick={onCourseClick}
-              className="course-pill inline-flex items-center justify-center rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
-            >
-              <span className="course-pill-label truncate">{courseName}</span>
-              {typeof courseRating === 'number' && (
-                <span className="flex items-center gap-0.5 flex-shrink-0 ml-1">
-                  <span>·</span>
-                  <span>★ {courseRating.toFixed(1)}</span>
-                </span>
-              )}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
