@@ -48,18 +48,7 @@ const VerifiedPage: React.FC = () => {
         {/* Card */}
         <div className="w-full rounded-3xl border border-white/10 bg-white/[0.04] shadow-[0_30px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl">
           {/* Top strip */}
-          <div className="flex items-center justify-between px-6 pt-6">
-            <div className="flex items-center gap-3">
-              {/* Replace with your real logo image if you have one */}
-              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                <span className="text-base font-semibold text-white/90">c</span>
-              </div>
-              <div className="leading-tight">
-                <div className="text-sm font-medium text-white/90">Clbhouz</div>
-                <div className="text-xs text-white/50">Email confirmation</div>
-              </div>
-            </div>
-
+          <div className="flex items-center justify-end px-6 pt-6">
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
               Secure
               <span className="h-1 w-1 rounded-full bg-emerald-400/80" />
@@ -75,14 +64,12 @@ const VerifiedPage: React.FC = () => {
 
             {/* Headline */}
             <h1 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              You're verified
+              Welcome to clbhouz.
             </h1>
 
             {/* Body */}
             <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-6 text-white/70 sm:text-base">
-              Welcome to Clbhouz — your email address has been confirmed.
-              <br className="hidden sm:block" />
-              Now sign in to continue and finish setting up your profile.
+              Your email address has been verified. You can now sign in to finish setting up your profile.
             </p>
 
             {/* Auto-attempt note */}
@@ -92,7 +79,7 @@ const VerifiedPage: React.FC = () => {
                   If the app didn't open automatically, use the button below.
                 </>
               ) : (
-                <>Opening the Clbhouz app…</>
+                <>Opening the clbhouz app…</>
               )}
             </div>
 
@@ -103,7 +90,7 @@ const VerifiedPage: React.FC = () => {
                 href={APP_DEEP_LINK}
                 className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition active:scale-[0.99]"
               >
-                Open Clbhouz App
+                Open clbhouz App
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </a>
 
@@ -116,18 +103,13 @@ const VerifiedPage: React.FC = () => {
                 <ExternalLink className="h-4 w-4 opacity-80" />
               </Link>
             </div>
-
-            {/* Footer microcopy */}
-            <div className="mt-6 text-center text-xs text-white/45">
-              You can close this tab once you've signed in.
-            </div>
           </div>
         </div>
 
         {/* Bottom hint */}
         <div className="mt-6 text-center text-[11px] text-white/35">
-          Tip: If you're on mobile and the app doesn't open, make sure Clbhouz is installed (and try tapping{" "}
-          <span className="text-white/55">Open Clbhouz App</span> again).
+          Tip: If you're on mobile and the app doesn't open, make sure clbhouz is installed (and try tapping{" "}
+          <span className="text-white/55">Open clbhouz App</span> again).
         </div>
       </div>
     </div>
