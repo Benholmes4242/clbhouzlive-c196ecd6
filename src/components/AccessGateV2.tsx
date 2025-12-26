@@ -183,18 +183,19 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
       location.pathname === prefix || location.pathname.startsWith(prefix + '/')
     );
   }, [location.pathname]);
-  
-  // Bypass gate for auth routes - render children immediately
-  if (shouldBypass) {
-    return <>{children}</>;
-  }
 
+  // Track gate view (only when not bypassing)
   useEffect(() => {
-    captureEvent('gate_view');
-  }, []);
+    if (!shouldBypass) {
+      captureEvent('gate_view');
+    }
+  }, [shouldBypass]);
 
   // ===== Boot Sequence =====
   useEffect(() => {
+    // Skip boot sequence for bypassed routes
+    if (shouldBypass) return;
+    
     cancelledRef.current = false;
 
     const boot = async () => {
@@ -271,7 +272,12 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
       clearTimeout(renewTimer);
       clearTimeout(visTimer);
     };
-  }, []);
+  }, [shouldBypass]);
+  
+  // Bypass gate for auth routes - render children immediately (AFTER all hooks)
+  if (shouldBypass) {
+    return <>{children}</>;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
