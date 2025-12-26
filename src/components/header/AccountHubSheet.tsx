@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Plus, User, Bell, Settings, Building2, Shield, LogOut, ChevronRight } from 'lucide-react';
+import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -459,6 +459,12 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 onClick={() => handleNavigate('/notificationmessages')}
                 useLightTheme={useLightTheme}
                 showBadge={hasUnread}
+              />
+              <QuickActionButton
+                icon={<Upload className="w-[18px] h-[18px]" />}
+                label="Upload Center"
+                onClick={() => handleNavigate('/upload')}
+                useLightTheme={useLightTheme}
               />
             </div>
           </div>

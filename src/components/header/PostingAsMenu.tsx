@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, X } from 'lucide-react';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload, X } from 'lucide-react';
+import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
+import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +31,9 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { user } = useSupabaseSession();
   const { data: userProfile } = useUserProfile(user?.id);
   const { hasUnread } = useUnreadNotifications();
+  const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
+  const { hasPending, hasFailed } = useUploadJobs();
+  const showUploadIndicator = hasPending || hasFailed;
   const isMobile = useIsMobile();
   const menuRef = useRef<HTMLDivElement>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
@@ -199,7 +204,9 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
 
   // Handle navigation from AccountHubSheet
   const handleAccountHubNavigate = (route: string) => {
-    if (route === '/logout') {
+    if (route === '/upload') {
+      setUploadCenterOpen(true);
+    } else if (route === '/logout') {
       handleLogout();
     } else if (route === '/settings/business') {
       navigate('/businesses/manage');
@@ -217,17 +224,23 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // ===========================================
   if (isMobile) {
     return (
-      <AccountHubSheet
-        open={isOpen}
-        onClose={onClose}
-        currentActor={currentActorData}
-        profiles={profiles}
-        onSwitchProfile={handleSwitchProfile}
-        onNavigate={handleAccountHubNavigate}
-        isAdmin={hasAdminAccess || false}
-        headerHeight={headerHeight}
-        useLightTheme={useLightTheme}
-      />
+      <>
+        <UploadCenterPanel 
+          isOpen={uploadCenterOpen} 
+          onClose={() => setUploadCenterOpen(false)} 
+        />
+        <AccountHubSheet
+          open={isOpen}
+          onClose={onClose}
+          currentActor={currentActorData}
+          profiles={profiles}
+          onSwitchProfile={handleSwitchProfile}
+          onNavigate={handleAccountHubNavigate}
+          isAdmin={hasAdminAccess || false}
+          headerHeight={headerHeight}
+          useLightTheme={useLightTheme}
+        />
+      </>
     );
   }
 
@@ -418,6 +431,23 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             )}
           />
           
+          {/* Upload Center */}
+          <MenuRow
+            icon={<CloudUpload className="h-[18px] w-[18px]" />}
+            label="Upload Center"
+            onClick={() => {
+              setUploadCenterOpen(true);
+              onClose();
+            }}
+            useLightTheme={useLightTheme}
+            trailing={showUploadIndicator && (
+              <span className={cn(
+                "h-2.5 w-2.5 rounded-full",
+                hasFailed ? "bg-red-500" : "bg-primary"
+              )} />
+            )}
+          />
+          
           {/* View profile */}
           <MenuRow
             icon={<User className="h-[18px] w-[18px]" />}
@@ -487,35 +517,48 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   );
 
   if (!isOpen) {
-    return null;
+    return (
+      <UploadCenterPanel 
+        isOpen={uploadCenterOpen} 
+        onClose={() => setUploadCenterOpen(false)} 
+      />
+    );
   }
 
   // ===========================================
   // DESKTOP: Anchored Popover (rendered via portal)
   // ===========================================
-  return createPortal(
-    <div
-      ref={menuRef}
-      className="fixed z-[9999] flex flex-col animate-in fade-in slide-in-from-top-2 duration-150"
-      style={{
-        top: `${popoverPosition.top}px`,
-        left: `${popoverPosition.left}px`,
-        width: '360px',
-        maxWidth: 'calc(100vw - 24px)',
-        maxHeight: 'calc(100vh - 24px)',
-        borderRadius: '20px',
-        overflow: 'hidden',
-        background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.96)',
-        backdropFilter: 'blur(40px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(150%)',
-        boxShadow: useLightTheme 
-          ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
-          : '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
-      }}
-    >
-      {menuContent}
-    </div>,
-    document.body
+  return (
+    <>
+      <UploadCenterPanel 
+        isOpen={uploadCenterOpen} 
+        onClose={() => setUploadCenterOpen(false)} 
+      />
+      {createPortal(
+        <div
+          ref={menuRef}
+          className="fixed z-[9999] flex flex-col animate-in fade-in slide-in-from-top-2 duration-150"
+          style={{
+            top: `${popoverPosition.top}px`,
+            left: `${popoverPosition.left}px`,
+            width: '360px',
+            maxWidth: 'calc(100vw - 24px)',
+            maxHeight: 'calc(100vh - 24px)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.96)',
+            backdropFilter: 'blur(40px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+            boxShadow: useLightTheme 
+              ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
+              : '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          {menuContent}
+        </div>,
+        document.body
+      )}
+    </>
   );
 }
 
