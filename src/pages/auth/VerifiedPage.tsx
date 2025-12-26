@@ -90,7 +90,7 @@ const VerifiedPage: React.FC = () => {
                 href={APP_DEEP_LINK}
                 className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition active:scale-[0.99]"
               >
-                Open clbhouz App
+                Open clbhouz app
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </a>
 
