@@ -8,8 +8,9 @@ interface AccessGateV2Props {
   children: React.ReactNode;
 }
 
-// Auth routes that should bypass the access gate
-const AUTH_BYPASS_ROUTES = ['/auth', '/auth/verified', '/auth/callback', '/onboarding'];
+// Auth route prefixes that should bypass the access gate
+// Using prefixes so any new /auth/* routes are automatically bypassed
+const AUTH_BYPASS_PREFIXES = ['/auth', '/onboarding'];
 
 // ===== Session Storage Utils =====
 const KEY = 'clubhouz_gate_session';
@@ -174,9 +175,9 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const cancelledRef = useRef(false);
   
-  // Check if current route should bypass the gate
-  const shouldBypass = AUTH_BYPASS_ROUTES.some(route => 
-    location.pathname === route || location.pathname.startsWith(route + '/')
+  // Check if current route should bypass the gate (prefix match)
+  const shouldBypass = AUTH_BYPASS_PREFIXES.some(prefix => 
+    location.pathname === prefix || location.pathname.startsWith(prefix + '/')
   );
   
   // Bypass gate for auth routes - render children immediately
