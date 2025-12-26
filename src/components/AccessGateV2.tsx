@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { captureEvent } from "@/lib/posthog";
 import { AppLog } from "@/lib/logger";
@@ -6,6 +7,9 @@ import { AppLog } from "@/lib/logger";
 interface AccessGateV2Props {
   children: React.ReactNode;
 }
+
+// Auth routes that should bypass the access gate
+const AUTH_BYPASS_ROUTES = ['/auth', '/auth/verified', '/auth/callback', '/onboarding'];
 
 // ===== Session Storage Utils =====
 const KEY = 'clubhouz_gate_session';
@@ -162,12 +166,23 @@ async function checkOrRefresh(skipCache = false): Promise<void> {
 }
 
 const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
+  const location = useLocation();
   const [accessCode, setAccessCode] = useState("");
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const cancelledRef = useRef(false);
+  
+  // Check if current route should bypass the gate
+  const shouldBypass = AUTH_BYPASS_ROUTES.some(route => 
+    location.pathname === route || location.pathname.startsWith(route + '/')
+  );
+  
+  // Bypass gate for auth routes - render children immediately
+  if (shouldBypass) {
+    return <>{children}</>;
+  }
 
   useEffect(() => {
     captureEvent('gate_view');
