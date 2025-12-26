@@ -15,12 +15,16 @@ const AuthCallback: React.FC = () => {
         const type = hashParams.get('type') || searchParams.get('type');
         const accessToken = hashParams.get('access_token');
         
-        // If this is an email confirmation/signup verification, go straight to verified page
-        if (type === 'signup' || type === 'email' || type === 'email_confirmation') {
+        // PRIORITY 1: Email verification flow - always route to verified page
+        // Supabase uses type=signup for email confirmation, type=magiclink for magic links
+        // type=recovery for password reset, type=invite for invites
+        const isEmailVerification = type === 'signup' || type === 'email' || type === 'email_confirmation';
+        
+        if (isEmailVerification) {
           // Clear any pending signup email
           localStorage.removeItem('pending_signup_email');
           
-          // Sign out any session so user must enter password
+          // Sign out any session so user must enter password on next login
           if (accessToken) {
             await supabase.auth.signOut();
           }
@@ -30,12 +34,21 @@ const AuthCallback: React.FC = () => {
           return;
         }
 
-        // Get current user for other auth flows (OAuth, magic link, etc.)
+        // PRIORITY 2: Check for pending signup email (same-browser verification)
+        const pendingEmail = localStorage.getItem('pending_signup_email');
+        if (pendingEmail && accessToken) {
+          // This is email verification in same browser - go to verified page
+          localStorage.removeItem('pending_signup_email');
+          await supabase.auth.signOut();
+          navigate('/auth/verified', { replace: true });
+          return;
+        }
+
+        // PRIORITY 3: OAuth and other auth flows - get the user
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError || !user) {
-          // Check if we have pending signup email (same-browser verification)
-          const pendingEmail = localStorage.getItem('pending_signup_email');
+          // No user found after callback - something went wrong or verification link
           if (pendingEmail) {
             localStorage.removeItem('pending_signup_email');
             navigate('/auth/verified', { replace: true });
@@ -47,16 +60,10 @@ const AuthCallback: React.FC = () => {
           return;
         }
 
-        // Check if this is a newly confirmed email (from verification link)
-        const pendingEmail = localStorage.getItem('pending_signup_email');
+        // PRIORITY 4: Check if OAuth user (Google/Apple) - these don't need verification page
+        // OAuth users have email_confirmed_at set immediately
+        const isOAuthUser = user.app_metadata?.provider && user.app_metadata.provider !== 'email';
         
-        if (pendingEmail) {
-          localStorage.removeItem('pending_signup_email');
-          await supabase.auth.signOut();
-          navigate('/auth/verified', { replace: true });
-          return;
-        }
-
         setStatus("Checking profile...");
 
         // Check if user has a profile
@@ -72,10 +79,10 @@ const AuthCallback: React.FC = () => {
 
         if (!profile) {
           setStatus("Setting up your profile...");
-          navigate('/edit-profile', { replace: true });
+          navigate('/onboarding', { replace: true });
         } else if (!profile.has_completed_onboarding) {
           setStatus("Completing onboarding...");
-          navigate('/edit-profile', { replace: true });
+          navigate('/onboarding', { replace: true });
         } else {
           setStatus("Welcome back!");
           navigate('/', { replace: true });
