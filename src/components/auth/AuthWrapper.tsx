@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocation, Navigate } from 'react-router-dom';
 import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
+import { EmailVerificationGate } from './EmailVerificationGate';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -14,6 +15,9 @@ interface AuthWrapperProps {
  * Session resolves in the background while the app renders immediately.
  * 
  * Protected routes should handle their own loading states if needed.
+ * 
+ * EMAIL VERIFICATION GATE:
+ * If user is authenticated but email_confirmed_at is null, show verification screen.
  */
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
@@ -43,6 +47,13 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     // If user is authenticated and on auth page, redirect to main site
     if (user && location.pathname === '/auth') {
       return <Navigate to="/" replace />;
+    }
+
+    // EMAIL VERIFICATION GATE
+    // If user is authenticated but email not confirmed, show verification screen
+    // Allow /auth/callback through so email verification links work
+    if (user && !user.email_confirmed_at && location.pathname !== '/auth/callback') {
+      return <EmailVerificationGate email={user.email || ''} />;
     }
   }
 
