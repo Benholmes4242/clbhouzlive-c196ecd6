@@ -4,13 +4,13 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
-import { MilestoneJourneyRail } from '@/components/courses/MilestoneJourneyRail';
+import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
 import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
 import { Top100CompletedListsRow } from '@/components/top100/Top100CompletedListsRow';
 import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
 import type { Top100ListId } from '@/config/top100ListMilestones';
-
+import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
@@ -19,6 +19,18 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 import { buildYearSummary } from '@/lib/top100ProgressSelectors';
 
+// Tier colors for next milestone chip - derived from global MILESTONE_THEMES
+const TIER_COLORS: Record<string, string> = {
+  none: '#94a3b8',
+  rookie: MILESTONE_THEMES[5].bgDark,
+  fairway: MILESTONE_THEMES[10].bgDark,
+  founders: MILESTONE_THEMES[20].bgDark,
+  heritage: MILESTONE_THEMES[50].bgDark,
+  century: MILESTONE_THEMES[100].bgDark,
+  elite: MILESTONE_THEMES[200].bgDark,
+  legendary: MILESTONE_THEMES[300].bgDark,
+  grandslam: MILESTONE_THEMES[400].bgDark,
+};
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
@@ -40,6 +52,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     prevTotalRef.current = data.totalTop100Played;
   }, [data?.totalTop100Played, isOwnProfile]);
 
+  // Calculate next milestone progress percentage
+  const nextMilestoneProgress = React.useMemo(() => {
+    if (!data?.next_milestone) return 0;
+    const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
+    const currentThreshold = thresholds.find(t => t > (data?.totalTop100Played ?? 0)) || 400;
+    const prevThreshold = thresholds[thresholds.indexOf(currentThreshold) - 1] || 0;
+    const range = currentThreshold - prevThreshold;
+    const progress = (data?.totalTop100Played ?? 0) - prevThreshold;
+    return Math.min(100, Math.round((progress / range) * 100));
+  }, [data?.next_milestone, data?.totalTop100Played]);
 
   if (!effectiveUserId) {
     return (
@@ -147,10 +169,42 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           "What you've achieved"
           ============================================ */}
       
-      {/* 2.1 Milestone Journey Rail - integrated progress track */}
-      <div className="mb-6">
-        <MilestoneJourneyRail totalPlayed={data.totalTop100Played} />
+      {/* 2.1 Unlocked Milestone Card */}
+      <div className="mb-4">
+        <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
       </div>
+
+      {/* ============================================
+          SECTION 3: NEXT ACHIEVEMENT PROGRESS
+          "What's next"
+          ============================================ */}
+      
+      {/* 3.1 Progress-to-next-achievement bar - reduced vertical padding, aligned with tiles */}
+      {data?.next_milestone && (() => {
+        const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
+        return (
+          <div className="flex justify-center mb-4 mt-2">
+            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5">
+              <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
+                Next achievement:{' '}
+                <span className="font-semibold">
+                  {data.next_milestone.remaining} more to{' '}
+                </span>
+                <span className="font-semibold" style={{ color: nextTierColor }}>
+                  {data.next_milestone.tierName}
+                </span>
+              </p>
+              {/* Micro progress bar */}
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ============================================
           SECTION 4: SOCIAL CONTEXT (SECONDARY)
