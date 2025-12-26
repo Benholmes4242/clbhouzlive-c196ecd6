@@ -376,22 +376,24 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           }}
         >
           {/* Profile Switcher Section */}
-          <div className="pt-3 pb-2" style={{ paddingLeft: SHEET_PADDING, paddingRight: SHEET_PADDING }}>
+          <div className="pt-3 pb-2" style={{ overflow: 'visible' }}>
             <div 
               className="text-[12px] font-medium uppercase tracking-[0.06em] mb-2.5"
-              style={{ color: colors.sectionLabel }}
+              style={{ color: colors.sectionLabel, paddingLeft: SHEET_PADDING, paddingRight: SHEET_PADDING }}
             >
               Switch profile
             </div>
             
-            {/* Horizontal Carousel with snap - aligned with quick actions */}
+            {/* Horizontal Carousel with snap - with internal padding to prevent clipping */}
             <div 
-              className="flex gap-3 overflow-x-auto pb-2"
+              className="flex gap-3 overflow-x-auto overflow-y-visible pb-2"
               style={{ 
                 scrollSnapType: 'x mandatory',
                 WebkitOverflowScrolling: 'touch',
-                marginLeft: 0,
-                marginRight: 0,
+                paddingLeft: SHEET_PADDING,
+                paddingRight: SHEET_PADDING,
+                scrollPaddingLeft: SHEET_PADDING,
+                scrollPaddingRight: SHEET_PADDING,
               }}
             >
               {profiles.map((profile) => {
@@ -410,14 +412,14 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 );
               })}
               
-              {/* Add Business Card */}
+              {/* Add Business Card - tighter to match */}
               <button
                 onClick={() => handleNavigate('/settings/business')}
-                className="flex-shrink-0 flex items-center justify-center gap-2 p-3 transition-all active:scale-[0.98]"
+                className="flex-shrink-0 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 style={{
                   scrollSnapAlign: 'start',
-                  width: 140,
-                  height: 74,
+                  padding: '10px 12px',
+                  minWidth: 130,
                   background: colors.cardBg,
                   border: `1.5px dashed ${useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.18)'}`,
                   opacity: 0.85,
@@ -425,11 +427,11 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 }}
               >
                 <Plus 
-                  className="w-5 h-5" 
+                  className="w-4 h-4" 
                   style={{ color: colors.textMuted }}
                 />
                 <span 
-                  className="text-[13px] font-medium"
+                  className="text-[12px] font-medium"
                   style={{ color: colors.textMuted }}
                 >
                   Add business
@@ -542,6 +544,9 @@ interface ProfileCardProps {
   useLightTheme: boolean;
 }
 
+// Helper: clamp string to 15 characters
+const clamp15 = (s: string) => (s.length > 15 ? s.slice(0, 15) + '…' : s);
+
 const ProfileCard: React.FC<ProfileCardProps> = ({
   profile,
   isSelected,
@@ -569,23 +574,24 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     <button
       onClick={onClick}
       disabled={isSwitching}
-      className="flex-shrink-0 flex items-center gap-3 transition-all active:scale-[0.98]"
+      className="flex-shrink-0 flex items-center transition-all active:scale-[0.98]"
       style={{
         scrollSnapAlign: 'start',
-        padding: '12px 14px',
+        padding: '10px 12px',
+        gap: 10,
+        maxWidth: 240,
         background: isSelected ? activeCardBg : colors.cardBg,
         border: isSelected 
           ? `1px solid ${activeCardBorder}`
           : `1px solid ${colors.cardBorder}`,
         borderRadius: 14,
         backdropFilter: isSelected ? 'blur(12px)' : undefined,
-        transform: isSelected ? 'scale(1.01)' : undefined,
       }}
     >
-      {/* Avatar - SQUIRCLE */}
+      {/* Avatar - SQUIRCLE (smaller) */}
       <div className="relative flex-shrink-0">
         <div 
-          className="w-10 h-10 overflow-hidden flex items-center justify-center"
+          className="w-[38px] h-[38px] overflow-hidden flex items-center justify-center"
           style={{ 
             background: colors.avatarBg,
             borderRadius: 10, // SDS squircle
@@ -612,38 +618,46 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         </div>
       </div>
       
-      {/* Text Column - single line truncation */}
+      {/* Text Column */}
       <div className="flex-1 min-w-0 text-left">
+        {/* Name - clamped to 15 chars */}
         <div 
-          className="font-semibold text-[14px] leading-[18px] whitespace-nowrap overflow-hidden text-ellipsis"
+          className="font-semibold text-[13.5px] leading-[18px] whitespace-nowrap"
           style={{ color: colors.text }}
         >
-          {profile.name}
+          {clamp15(profile.name)}
         </div>
+        
+        {/* Subtitle row with tick on right */}
         <div 
-          className="text-[12px] leading-[16px] mt-0.5"
-          style={{ color: colors.textMuted }}
+          className="flex items-center justify-between mt-0.5"
+          style={{ gap: 8, minWidth: 0 }}
         >
-          {profile.type === 'personal' ? 'Personal' : 'Business'}
+          <span 
+            className="text-[11.5px] leading-[14px]"
+            style={{ color: colors.textMuted, opacity: 0.7 }}
+          >
+            {profile.type === 'personal' ? 'Personal' : 'Business'}
+          </span>
+          
+          {/* Active tick - on subtitle line, right-aligned */}
+          {isSelected && !isSwitching && (
+            <div 
+              className="flex-shrink-0 w-[16px] h-[16px] rounded-full flex items-center justify-center"
+              style={{ 
+                background: useLightTheme ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.18)',
+                border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.28)'}`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <Check 
+                className="w-[10px] h-[10px]" 
+                style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.95)' }} 
+              />
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Active indicator badge - inline on right, not absolute */}
-      {isSelected && !isSwitching && (
-        <div 
-          className="flex-shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center"
-          style={{ 
-            background: useLightTheme ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.18)',
-            border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.30)'}`,
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          <Check 
-            className="w-[10px] h-[10px]" 
-            style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.95)' }} 
-          />
-        </div>
-      )}
     </button>
   );
 };
