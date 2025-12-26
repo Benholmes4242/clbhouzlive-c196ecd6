@@ -270,16 +270,16 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           isClosing && 'opacity-0'
         )}
         style={{
-          // Mobile: full-width bottom sheet
-          // Desktop: anchored popover
-          top: sheetTop,
+          // Mobile: content-fit bottom sheet anchored to bottom
+          // Desktop: anchored popover from top
+          top: isDesktop ? sheetTop : 'auto',
           left: isDesktop ? 'auto' : 0,
           right: isDesktop ? 16 : 0,
-          bottom: isDesktop ? 'auto' : 0,
+          bottom: 0,
           width: isDesktop ? 420 : 'auto',
           // Content-driven height with max cap
-          height: isDesktop ? 'auto' : 'auto',
-          maxHeight: isDesktop ? 'min(640px, calc(100vh - 100px))' : `calc(100vh - ${sheetTop}px)`,
+          height: 'auto',
+          maxHeight: isDesktop ? 'min(640px, calc(100vh - 100px))' : `calc(100vh - ${headerHeight}px - 12px)`,
           borderTopLeftRadius: isDesktop ? 22 : 24,
           borderTopRightRadius: isDesktop ? 22 : 24,
           borderBottomLeftRadius: isDesktop ? 22 : 0,
@@ -372,8 +372,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             WebkitOverflowScrolling: 'touch',
-            // 28px rule: bottom of Sign Out button must be 28px from bottom of page
-            paddingBottom: isDesktop ? 28 : 'calc(28px + env(safe-area-inset-bottom))',
+            // 28px rule: bottom of Sign Out button must be 28px from bottom of sheet
+            paddingBottom: 28,
           }}
         >
           {/* Profile Switcher Section */}
