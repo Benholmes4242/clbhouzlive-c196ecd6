@@ -26,7 +26,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       <div 
         className="absolute inset-0"
         style={{
-          background: '#160e0c',
+          background: '#0d0d0d',
         }}
       />
       
@@ -108,7 +108,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div 
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
-            background: 'rgba(22, 14, 12, 0.95)',
+            background: 'rgba(13, 13, 13, 0.95)',
             backdropFilter: 'blur(22px)',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
             boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.55)',
