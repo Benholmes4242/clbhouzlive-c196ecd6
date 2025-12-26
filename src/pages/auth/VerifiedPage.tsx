@@ -36,44 +36,62 @@ const VerifiedPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[#070707] relative overflow-hidden">
-      {/* Ambient background */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-[520px] w-[520px] rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 h-[520px] w-[520px] rounded-full bg-orange-400/10 blur-3xl" />
-      </div>
+    <div 
+      className="fixed inset-0 overflow-hidden"
+      style={{ 
+        backgroundColor: 'var(--bg-page)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '16px',
+      }}
+    >
+      {/* Subtle gradient glow behind card - matches /auth */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style={{
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
+        }}
+      />
 
-      <div className="relative mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-4 py-10">
+      <div className="relative z-10 w-full max-w-[420px] mx-auto flex flex-col items-center">
         {/* Card */}
-        <div className="w-full rounded-3xl border border-white/10 bg-white/[0.04] shadow-[0_30px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl">
+        <div 
+          className="w-full"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '24px',
+            border: '1px solid rgba(214, 217, 222, 0.5)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+          }}
+        >
           {/* Top strip */}
           <div className="flex items-center justify-end px-6 pt-6">
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+            <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-500">
               Secure
-              <span className="h-1 w-1 rounded-full bg-emerald-400/80" />
+              <span className="h-1 w-1 rounded-full bg-emerald-500" />
               Verified
             </div>
           </div>
 
-          <div className="px-6 pb-7 pt-5 sm:px-10 sm:pb-10 sm:pt-7">
+          <div className="px-6 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
             {/* Icon */}
-            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
-              <CheckCircle2 className="h-8 w-8 text-emerald-300" />
+            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-emerald-50 ring-1 ring-emerald-100">
+              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
             </div>
 
             {/* Headline */}
-            <h1 className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            <h1 className="text-center text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
               Welcome to clbhouz
             </h1>
 
             {/* Body */}
-            <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-6 text-white/70 sm:text-base">
+            <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-6 text-gray-600 sm:text-base">
               Your email address has been verified. You can now sign in to finish setting up your profile.
             </p>
 
             {/* Auto-attempt note */}
-            <div className="mx-auto mt-5 max-w-xl text-center text-xs text-white/45">
+            <div className="mx-auto mt-5 max-w-xl text-center text-xs text-gray-400">
               {attemptedOpen ? (
                 <>
                   If the app didn't open automatically, use the button below.
@@ -88,7 +106,7 @@ const VerifiedPage: React.FC = () => {
               {/* Open App */}
               <a
                 href={APP_DEEP_LINK}
-                className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition active:scale-[0.99]"
+                className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-[#0D0F11] px-5 py-3 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition hover:bg-[#1a1d21] active:scale-[0.99]"
               >
                 Open clbhouz app
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -97,19 +115,19 @@ const VerifiedPage: React.FC = () => {
               {/* Sign in on web */}
               <Link
                 to={webSigninHref}
-                className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 backdrop-blur-xl transition hover:bg-white/8 active:scale-[0.99]"
+                className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-[0.99]"
               >
                 Sign in on the web
-                <ExternalLink className="h-4 w-4 opacity-80" />
+                <ExternalLink className="h-4 w-4 opacity-70" />
               </Link>
             </div>
           </div>
         </div>
 
         {/* Bottom hint */}
-        <div className="mt-6 text-center text-[11px] text-white/35">
-          Tip: If you're on mobile and the app doesn't open, make sure clbhouz is installed (and try tapping{" "}
-          <span className="text-white/55">Open clbhouz app</span> again).
+        <div className="mt-6 text-center text-[11px] text-gray-400">
+          Tip: If you're on mobile and the app didn't open, make sure clbhouz is installed (and try tapping{" "}
+          <span className="text-gray-600 font-medium">Open clbhouz app</span> again).
         </div>
       </div>
     </div>
