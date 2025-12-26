@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Loader2, ArrowLeft, Check, X } from 'lucide-react';
+import { Loader2, ArrowLeft, Check, X, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SignupSheetContentProps {
   email: string;
   password: string;
   setPassword: (password: string) => void;
+  confirmPassword: string;
+  setConfirmPassword: (password: string) => void;
   username: string;
   setUsername: (username: string) => void;
   passwordError: string | null;
@@ -23,6 +25,8 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   email,
   password,
   setPassword,
+  confirmPassword,
+  setConfirmPassword,
   username,
   setUsername,
   passwordError,
@@ -34,10 +38,15 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
 }) => {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [suggestedUsernames, setSuggestedUsernames] = useState<string[]>([]);
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const usernameCheckTimeout = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
@@ -50,11 +59,21 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   // Password validation: 8+ characters
   const isPasswordValid = password.length >= MIN_PASSWORD_LENGTH;
   
+  // Confirm password validation
+  const passwordsMatch = password === confirmPassword;
+  const isConfirmPasswordValid = confirmPassword.length > 0 && passwordsMatch;
+  
+  // Show mismatch error only if user has typed in confirm field
+  const showMismatchError = confirmPasswordTouched && confirmPassword.length > 0 && !passwordsMatch;
+  
   // Password field is disabled until username is valid
   const isPasswordDisabled = !isUsernameValid || submitting;
   
-  // Submit is disabled until both are valid
-  const isSubmitDisabled = submitting || !isPasswordValid || !isUsernameValid;
+  // Confirm password disabled until password is valid
+  const isConfirmPasswordDisabled = !isPasswordValid || !isUsernameValid || submitting;
+  
+  // Submit is disabled until all fields are valid
+  const isSubmitDisabled = submitting || !isPasswordValid || !isUsernameValid || !isConfirmPasswordValid;
 
   const checkUsernameAvailability = async (usernameToCheck: string) => {
     if (!usernameToCheck.trim() || usernameToCheck.length < 3) {
@@ -146,6 +165,13 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
       setTimeout(() => passwordRef.current?.focus(), 100);
     }
   }, [isUsernameValid]);
+
+  // When password becomes valid and confirm is empty, focus confirm field
+  useEffect(() => {
+    if (isPasswordValid && !confirmPassword) {
+      setTimeout(() => confirmPasswordRef.current?.focus(), 100);
+    }
+  }, [isPasswordValid]);
 
   const getInputBackground = (focused: boolean, disabled: boolean = false) => {
     if (disabled) return 'rgba(255, 255, 255, 0.02)';
@@ -257,31 +283,48 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
       
       {/* Password - disabled until username is valid */}
       <div>
-        <input
-          ref={passwordRef}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setPasswordFocused(true)}
-          onBlur={() => setPasswordFocused(false)}
-          placeholder="Create password"
-          disabled={isPasswordDisabled}
-          className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
-          style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
-            background: getInputBackground(passwordFocused, isPasswordDisabled),
-            border: passwordError 
-              ? '1px solid #E03131' 
-              : '1px solid rgba(255, 255, 255, 0.07)',
-            boxShadow: passwordFocused 
-              ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
-              : 'none',
-            opacity: isPasswordDisabled ? 0.5 : 1,
-            cursor: isPasswordDisabled ? 'not-allowed' : 'text',
-          }}
-          autoComplete="new-password"
-        />
+        <div className="relative">
+          <input
+            ref={passwordRef}
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setPasswordFocused(true)}
+            onBlur={() => setPasswordFocused(false)}
+            placeholder="Create password"
+            disabled={isPasswordDisabled}
+            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+            style={{
+              fontFamily: 'SF Pro Text, system-ui, sans-serif',
+              background: getInputBackground(passwordFocused, isPasswordDisabled),
+              border: passwordError 
+                ? '1px solid #E03131' 
+                : '1px solid rgba(255, 255, 255, 0.07)',
+              boxShadow: passwordFocused 
+                ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
+                : 'none',
+              opacity: isPasswordDisabled ? 0.5 : 1,
+              cursor: isPasswordDisabled ? 'not-allowed' : 'text',
+            }}
+            autoComplete="new-password"
+          />
+          {!isPasswordDisabled && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-opacity"
+              style={{ opacity: password.length > 0 ? 1 : 0.5 }}
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="w-4 h-4 text-white/50" />
+              ) : (
+                <Eye className="w-4 h-4 text-white/50" />
+              )}
+            </button>
+          )}
+        </div>
         
         {/* Password hint - show when password field is enabled but empty/short */}
         {isUsernameValid && !passwordError && (
@@ -296,6 +339,67 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         {password.length > 0 && password.length < MIN_PASSWORD_LENGTH && !passwordError && (
           <p className="text-[#E03131] text-[13px] mt-2">
             Password must be at least {MIN_PASSWORD_LENGTH} characters
+          </p>
+        )}
+      </div>
+      
+      {/* Confirm Password - disabled until password is valid */}
+      <div>
+        <div className="relative">
+          <input
+            ref={confirmPasswordRef}
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (!confirmPasswordTouched) setConfirmPasswordTouched(true);
+            }}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setConfirmPasswordFocused(true)}
+            onBlur={() => setConfirmPasswordFocused(false)}
+            placeholder="Confirm password"
+            disabled={isConfirmPasswordDisabled}
+            className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+            style={{
+              fontFamily: 'SF Pro Text, system-ui, sans-serif',
+              background: getInputBackground(confirmPasswordFocused, isConfirmPasswordDisabled),
+              border: showMismatchError 
+                ? '1px solid #E03131' 
+                : isConfirmPasswordValid
+                  ? '1px solid #2F9E44'
+                  : '1px solid rgba(255, 255, 255, 0.07)',
+              boxShadow: confirmPasswordFocused 
+                ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
+                : 'none',
+              opacity: isConfirmPasswordDisabled ? 0.5 : 1,
+              cursor: isConfirmPasswordDisabled ? 'not-allowed' : 'text',
+            }}
+            autoComplete="new-password"
+          />
+          {!isConfirmPasswordDisabled && (
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-opacity"
+              style={{ opacity: confirmPassword.length > 0 ? 1 : 0.5 }}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="w-4 h-4 text-white/50" />
+              ) : (
+                <Eye className="w-4 h-4 text-white/50" />
+              )}
+            </button>
+          )}
+        </div>
+        
+        {showMismatchError && (
+          <p className="text-[#E03131] text-[13px] mt-2">Passwords don't match.</p>
+        )}
+        
+        {isConfirmPasswordValid && (
+          <p className="text-[#2F9E44] text-[12px] mt-2 flex items-center gap-1">
+            <Check className="w-3 h-3" /> Passwords match
           </p>
         )}
       </div>
