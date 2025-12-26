@@ -112,6 +112,9 @@ const AdminSetupPage = () => {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          emailRedirectTo: "https://clbhouz.co.uk/auth/callback",
+        },
       });
 
       if (authError) throw authError;
