@@ -109,7 +109,7 @@ const VerifiedPage: React.FC = () => {
         {/* Bottom hint */}
         <div className="mt-6 text-center text-[11px] text-white/35">
           Tip: If you're on mobile and the app doesn't open, make sure clbhouz is installed (and try tapping{" "}
-          <span className="text-white/55">Open clbhouz App</span> again).
+          <span className="text-white/55">Open clbhouz app</span> again).
         </div>
       </div>
     </div>
