@@ -155,6 +155,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
       return;
     }
 
+    // Validate password (minimum 8 characters)
+    if (password.length < 8) {
+      setErrorMsg("Password must be at least 8 characters");
+      return;
+    }
+
     setSubmitting(true);
 
     const { data, error } = await supabase.auth.signUp({
@@ -344,9 +350,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
             email={email}
             setEmail={setEmail}
             emailError={emailError}
+            setEmailError={setEmailError}
             submitting={submitting}
             onContinue={handleEmailContinue}
             isLoginIntent={!isSignUp}
+            onSwitchToLogin={handleLoginClick}
           />
         )}
         
