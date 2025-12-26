@@ -36,7 +36,7 @@ const ConfirmNotice: React.FC<ConfirmNoticeProps> = ({
         email: lastResendEmail.current,
         password: password || "tempor4ryDummy#123",
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: "https://clbhouz.co.uk/auth/callback",
         },
       });
       if (error && !error.message.includes("User already registered")) {

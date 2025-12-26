@@ -175,7 +175,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: "https://clbhouz.co.uk/auth/callback",
         data: {
           username: username.toLowerCase(),
         }
