@@ -1196,66 +1196,72 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           commentRef={registerCommentRef(comment.id)}
                         />
                         
-                        {/* Replies - indented with thread connector line */}
+                        {/* Replies - thread rail layout with vertical connector */}
                         {comment.replies.length > 0 && (
-                          <div className="relative">
-                            {/* Thread connector line */}
+                          <div className="relative flex gap-3">
+                            {/* Thread connector line - centered on avatar column (26px avatar, so center = 13px + 26px indent = 39px) */}
                             <div 
-                              className={cn(
-                                "absolute left-[42px] top-0 bottom-0 w-[2px]",
-                                isDark ? "bg-white/10" : "bg-border/25"
-                              )}
+                              className="absolute w-[2px] rounded-full"
                               style={{ 
-                                // Only show connector alongside replies
-                                height: 'calc(100% - 8px)',
-                                marginTop: '4px'
+                                // Center behind reply avatars: 26px padding-left + 13px (half of 26px avatar)
+                                left: 'calc(26px + 13px - 1px)',
+                                // Start at first avatar top, end at last avatar bottom (with padding buffer)
+                                top: '19px', // First reply avatar top (py-2.5 = 10px + ~9px to avatar top)
+                                bottom: '19px', // Last reply avatar bottom (symmetric)
+                                // Subtle gradient for premium feel - fades at ends
+                                background: isDark 
+                                  ? 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.18) 10%, rgba(255,255,255,0.18) 90%, transparent 100%)'
+                                  : 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.12) 10%, rgba(0,0,0,0.12) 90%, transparent 100%)',
                               }}
                             />
                             
-                            {visibleReplies.map((reply, replyIndex) => (
-                              <CommentItem
-                                key={reply.id}
-                                comment={reply}
-                                isDark={isDark}
-                                isGrey={isGrey}
-                                onLike={toggleCommentLike}
-                                isReply
-                                isLiking={isTogglingLike}
-                                showDivider={replyIndex > 0}
-                                isOwnComment={currentUserId === reply.user_id}
-                                onLongPress={handleLongPress}
-                                isAuthor={creatorUserId === reply.user_id}
-                                isHighlighted={highlightedCommentId === reply.id}
-                                isHidden={hiddenCommentIds.has(reply.id)}
-                                isRevealed={revealedCommentIds.has(reply.id)}
-                                onReveal={() => revealComment(reply.id)}
-                                commentRef={registerCommentRef(reply.id)}
-                              />
-                            ))}
-                            
-                            {/* Show more replies button */}
-                            {hiddenRepliesCount > 0 && !repliesExpanded && (
-                              <button
-                                onClick={() => toggleRepliesExpanded(comment.id)}
-                                className={cn(
-                                  "relative z-10 text-[12px] font-medium py-2 pl-[58px]",
-                                  isDark ? "text-white/55 hover:text-white/75" : "text-muted-foreground hover:text-foreground"
-                                )}
-                              >
-                                View {hiddenRepliesCount} more {hiddenRepliesCount === 1 ? 'reply' : 'replies'}
-                              </button>
-                            )}
-                            {repliesExpanded && comment.replies.length > 2 && (
-                              <button
-                                onClick={() => toggleRepliesExpanded(comment.id)}
-                                className={cn(
-                                  "relative z-10 text-[12px] font-medium py-2 pl-[58px]",
-                                  isDark ? "text-white/55 hover:text-white/75" : "text-muted-foreground hover:text-foreground"
-                                )}
-                              >
-                                Hide replies
-                              </button>
-                            )}
+                            {/* Thread content container */}
+                            <div className="flex-1 pt-1.5 pb-1.5">
+                              {visibleReplies.map((reply, replyIndex) => (
+                                <CommentItem
+                                  key={reply.id}
+                                  comment={reply}
+                                  isDark={isDark}
+                                  isGrey={isGrey}
+                                  onLike={toggleCommentLike}
+                                  isReply
+                                  isLiking={isTogglingLike}
+                                  showDivider={replyIndex > 0}
+                                  isOwnComment={currentUserId === reply.user_id}
+                                  onLongPress={handleLongPress}
+                                  isAuthor={creatorUserId === reply.user_id}
+                                  isHighlighted={highlightedCommentId === reply.id}
+                                  isHidden={hiddenCommentIds.has(reply.id)}
+                                  isRevealed={revealedCommentIds.has(reply.id)}
+                                  onReveal={() => revealComment(reply.id)}
+                                  commentRef={registerCommentRef(reply.id)}
+                                />
+                              ))}
+                              
+                              {/* Show more replies button */}
+                              {hiddenRepliesCount > 0 && !repliesExpanded && (
+                                <button
+                                  onClick={() => toggleRepliesExpanded(comment.id)}
+                                  className={cn(
+                                    "relative z-10 text-[12px] font-medium py-2 pl-[32px]",
+                                    isDark ? "text-white/55 hover:text-white/75" : "text-muted-foreground hover:text-foreground"
+                                  )}
+                                >
+                                  View {hiddenRepliesCount} more {hiddenRepliesCount === 1 ? 'reply' : 'replies'}
+                                </button>
+                              )}
+                              {repliesExpanded && comment.replies.length > 2 && (
+                                <button
+                                  onClick={() => toggleRepliesExpanded(comment.id)}
+                                  className={cn(
+                                    "relative z-10 text-[12px] font-medium py-2 pl-[32px]",
+                                    isDark ? "text-white/55 hover:text-white/75" : "text-muted-foreground hover:text-foreground"
+                                  )}
+                                >
+                                  Hide replies
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
