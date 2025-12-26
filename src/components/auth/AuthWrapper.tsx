@@ -39,8 +39,9 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // Only redirect after session is fully resolved
   if (!loading) {
-    // If user is not authenticated and not on auth page, redirect to auth
-    if (!user && location.pathname !== '/auth') {
+    // If user is not authenticated and not on an auth page, redirect to auth
+    const isAuthPage = location.pathname === '/auth' || location.pathname === '/auth/verified' || location.pathname === '/auth/callback';
+    if (!user && !isAuthPage) {
       return <Navigate to="/auth" replace />;
     }
 
