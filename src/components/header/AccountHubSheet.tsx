@@ -551,56 +551,44 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   const colors = {
     text: useLightTheme ? '#1a1a1a' : '#ffffff',
-    textMuted: useLightTheme ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)',
-    cardBg: useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+    textMuted: useLightTheme ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.70)',
+    cardBg: useLightTheme ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
+    cardBorder: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
     avatarBg: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)',
   };
 
-  // Frosted white active state (no blue)
+  // Frosted white active state (no blue glow)
   const activeCardBg = useLightTheme 
-    ? 'rgba(0,0,0,0.06)' 
+    ? 'rgba(0,0,0,0.08)' 
     : 'rgba(255,255,255,0.10)';
   const activeCardBorder = useLightTheme 
-    ? 'rgba(0,0,0,0.12)' 
-    : 'rgba(255,255,255,0.22)';
+    ? 'rgba(0,0,0,0.14)' 
+    : 'rgba(255,255,255,0.18)';
 
   return (
     <button
       onClick={onClick}
       disabled={isSwitching}
-      className="relative flex-shrink-0 flex items-center gap-2 p-2 transition-all active:scale-[0.98]"
+      className="flex-shrink-0 flex items-center gap-3 transition-all active:scale-[0.98]"
       style={{
         scrollSnapAlign: 'start',
-        width: 160, // Wider for less truncation
-        height: 74,
+        padding: '12px 14px',
         background: isSelected ? activeCardBg : colors.cardBg,
         border: isSelected 
-          ? `1.5px solid ${activeCardBorder}`
-          : `1.5px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
+          ? `1px solid ${activeCardBorder}`
+          : `1px solid ${colors.cardBorder}`,
         borderRadius: 14,
-        // No blue glow - clean frosted white
+        backdropFilter: isSelected ? 'blur(12px)' : undefined,
+        transform: isSelected ? 'scale(1.01)' : undefined,
       }}
     >
-      {/* Selected checkmark - top-right of card, frosted white */}
-      {isSelected && !isSwitching && (
-        <div 
-          className="absolute -top-1 -right-1 w-[16px] h-[16px] rounded-full flex items-center justify-center"
-          style={{ 
-            background: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.20)',
-            border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.28)'}`,
-          }}
-        >
-          <Check className="w-2.5 h-2.5" style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.9)' }} />
-        </div>
-      )}
-
       {/* Avatar - SQUIRCLE */}
       <div className="relative flex-shrink-0">
         <div 
-          className="w-9 h-9 overflow-hidden flex items-center justify-center"
+          className="w-10 h-10 overflow-hidden flex items-center justify-center"
           style={{ 
             background: colors.avatarBg,
-            borderRadius: 10, // SDS squircle for smaller avatar
+            borderRadius: 10, // SDS squircle
           }}
         >
           {profile.avatarUrl ? (
@@ -624,27 +612,38 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         </div>
       </div>
       
-      {/* Info - 2-line name clamp */}
-      <div className="flex-1 min-w-0 text-left pr-1">
+      {/* Text Column - single line truncation */}
+      <div className="flex-1 min-w-0 text-left">
         <div 
-          className="font-medium text-[13px] leading-tight"
-          style={{ 
-            color: colors.text,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
+          className="font-semibold text-[14px] leading-[18px] whitespace-nowrap overflow-hidden text-ellipsis"
+          style={{ color: colors.text }}
         >
           {profile.name}
         </div>
         <div 
-          className="text-[11px] leading-tight mt-0.5"
+          className="text-[12px] leading-[16px] mt-0.5"
           style={{ color: colors.textMuted }}
         >
           {profile.type === 'personal' ? 'Personal' : 'Business'}
         </div>
       </div>
+
+      {/* Active indicator badge - inline on right, not absolute */}
+      {isSelected && !isSwitching && (
+        <div 
+          className="flex-shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center"
+          style={{ 
+            background: useLightTheme ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.18)',
+            border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.30)'}`,
+            backdropFilter: 'blur(10px)',
+          }}
+        >
+          <Check 
+            className="w-[10px] h-[10px]" 
+            style={{ color: useLightTheme ? '#1a1a1a' : 'rgba(255,255,255,0.95)' }} 
+          />
+        </div>
+      )}
     </button>
   );
 };
