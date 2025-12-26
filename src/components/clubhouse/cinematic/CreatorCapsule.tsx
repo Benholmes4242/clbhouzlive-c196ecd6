@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { ChevronUp, ChevronDown, MapPin, User, Flag } from 'lucide-react';
+import { ChevronUp, User } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface CreatorCapsuleProps {
@@ -21,27 +21,21 @@ interface CreatorCapsuleProps {
     avatar?: string;
   };
   caption?: string;
-  courseName?: string;
-  courseId?: string;
   isFollowing?: boolean;
   isOwnPost?: boolean;
   isVisible: boolean;
   onFollow?: () => void;
   onViewProfile?: () => void;
-  onViewCourse?: () => void;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   user,
   caption,
-  courseName,
-  courseId,
   isFollowing = false,
   isOwnPost = false,
   isVisible,
   onFollow,
   onViewProfile,
-  onViewCourse,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
@@ -77,13 +71,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     }
   }, [navigate, onViewProfile, user.id]);
 
-  const handleViewCourse = useCallback(() => {
-    if (onViewCourse) {
-      onViewCourse();
-    } else if (courseId) {
-      navigate(`/courses/${courseId}`);
-    }
-  }, [navigate, onViewCourse, courseId]);
 
   // Get initials for avatar fallback
   const initials = user?.name
@@ -247,21 +234,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                       Profile
                     </Button>
 
-                    {/* View Course */}
-                    {courseId && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewCourse();
-                        }}
-                        className="h-8 px-3 text-[12px] font-medium rounded-sq-sm text-white/80 hover:text-white hover:bg-white/10"
-                      >
-                        <Flag className="w-3.5 h-3.5 mr-1.5" />
-                        Course
-                      </Button>
-                    )}
                   </div>
                 </div>
               </motion.div>

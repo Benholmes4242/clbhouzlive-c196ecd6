@@ -775,8 +775,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             (filteredPosts[currentIndex].title as string | null) ?? 
             (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
           )}
-          courseName={filteredPosts[currentIndex].golfCourse?.name}
-          courseId={currentCourseId}
           isFollowing={isFollowing === true}
           isOwnPost={filteredPosts[currentIndex].user?.id === user?.id}
           isVisible={true}
