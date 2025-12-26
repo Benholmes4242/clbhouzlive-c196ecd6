@@ -78,6 +78,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
     if (passwordError) setPasswordError(null);
   }, [password]);
 
+  // Auto-dismiss authNotice after 4 seconds
+  useEffect(() => {
+    if (!authNotice) return;
+    const timer = setTimeout(() => {
+      setAuthNotice(null);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [authNotice, setAuthNotice]);
   // ===================
   // EXISTING HANDLERS - UNCHANGED SUPABASE WIRING
   // ===================
