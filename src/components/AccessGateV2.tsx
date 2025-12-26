@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useInRouterContext, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { captureEvent } from "@/lib/posthog";
 import { AppLog } from "@/lib/logger";
@@ -166,12 +166,9 @@ async function checkOrRefresh(skipCache = false): Promise<void> {
   scheduleRenew(next.expiresAt, checkOrRefresh);
 }
 
-const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
-  // Defensive: only call useLocation if we're inside a Router context
-  // This prevents crashes when AccessGateV2 is rendered outside BrowserRouter
-  const inRouter = useInRouterContext();
-  const routerLocation = inRouter ? useLocation() : null;
-  const pathname = routerLocation?.pathname ?? window.location.pathname;
+// Inner component that safely uses useLocation (only rendered inside Router)
+const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
+  const location = useLocation();
   
   const [accessCode, setAccessCode] = useState("");
   const [hasAccess, setHasAccess] = useState(false);
@@ -183,9 +180,9 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   // Check if current route should bypass the gate (prefix match)
   const shouldBypass = useMemo(() => {
     return AUTH_BYPASS_PREFIXES.some(prefix => 
-      pathname === prefix || pathname.startsWith(prefix + '/')
+      location.pathname === prefix || location.pathname.startsWith(prefix + '/')
     );
-  }, [pathname]);
+  }, [location.pathname]);
   
   // Bypass gate for auth routes - render children immediately
   if (shouldBypass) {
@@ -408,6 +405,26 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       </p>
     </main>
   );
+};
+
+// Wrapper that handles being rendered outside Router context
+const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
+  // Check bypass using window.location first (works outside Router)
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  
+  const shouldBypassEarly = useMemo(() => {
+    return AUTH_BYPASS_PREFIXES.some(prefix => 
+      pathname === prefix || pathname.startsWith(prefix + '/')
+    );
+  }, [pathname]);
+  
+  // If we should bypass, skip the gate entirely (no Router needed)
+  if (shouldBypassEarly) {
+    return <>{children}</>;
+  }
+  
+  // Otherwise render the inner gate which uses useLocation
+  return <AccessGateInner>{children}</AccessGateInner>;
 };
 
 export default AccessGateV2;
