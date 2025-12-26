@@ -6,6 +6,7 @@ import {
   MILESTONE_THEMES,
   MilestoneTier,
 } from '@/lib/globalAchievementMilestoneSystem';
+import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 import { getEmblemPath } from '@/lib/achievementEmblems';
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED' | 'NEW';
@@ -60,6 +61,24 @@ const CLUB_NAMES: Record<string, string> = {
 // Milestone thresholds for next tier calculation
 const MILESTONE_THRESHOLDS: number[] = [5, 10, 20, 50, 100, 200, 300, 400];
 
+/**
+ * Get the tier accent color from CLBHOUZ_ACHIEVEMENT_PALETTE
+ */
+function getTierAccentColor(tier: string): string {
+  const threshold = parseInt(tier, 10);
+  if (!isNaN(threshold) && MILESTONE_PALETTE_MAP[threshold]) {
+    return CLBHOUZ_ACHIEVEMENT_PALETTE[MILESTONE_PALETTE_MAP[threshold]];
+  }
+  // Regional tiers - use specific colors
+  const regionalColors: Record<string, string> = {
+    'GBI': '#4A7C59',
+    'EU': '#5B7EC0',
+    'USA': '#C75B5B',
+    'WORLD': '#7A8FC0',
+  };
+  return regionalColors[tier] || '#94a3b8';
+}
+
 export interface AchievementBadgeCardProps {
   tier: AchievementTier;
   title: string;
@@ -82,13 +101,15 @@ export interface AchievementBadgeCardProps {
 /**
  * AchievementBadgeCard - Global Achievement & Milestone System
  * 
- * World-class premium badge card with:
- * - Top row: tier band + status chip
- * - Hero value block (threshold number)
- * - Label row: trophy + named club
- * - Bottom micro-progress to next tier
+ * Modern glass design with tier color accents:
+ * - Dark glass base (not tier-colour filled)
+ * - Left vertical accent strip (tier colour)
+ * - Trophy icon (tier colour)
+ * - Title text (tier colour)
+ * - Watermark line art (tier colour at ~6% opacity)
+ * - Status chip with tier colour tint
  * 
- * All colors sourced from globalAchievementMilestoneSystem.ts
+ * All colors sourced from globalAchievementMilestoneSystem.ts / clbhouzAchievementPalette.ts
  */
 export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   tier,
@@ -105,10 +126,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   totalOnList,
   regionGlyph,
 }) => {
-  const palette = getTierPalette(tier, unlocked && !isGhost);
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
   const emblemSrc = getEmblemPath(tier);
+  
+  // Get tier accent color
+  const tierAccentColor = getTierAccentColor(tier);
+  const lockedColor = '#94a3b8';
+  const accentColor = unlocked && !isGhost ? tierAccentColor : lockedColor;
   
   // Determine if this is a milestone (numeric) or regional card
   const threshold = parseInt(tier, 10);
@@ -130,8 +155,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   let nextTier: number | null = null;
   let progressToNext = 0;
   let remainingToNext = 0;
-  let nextPalette: typeof palette | null = null;
-  let nextTierLabel: string | null = null;
   
   if (isMilestone && unlocked && !isGhost && totalTop100Played !== undefined) {
     const currentIndex = MILESTONE_THRESHOLDS.indexOf(threshold);
@@ -143,8 +166,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         const gapSize = nextTier - threshold;
         const progressInGap = totalTop100Played - threshold;
         progressToNext = gapSize > 0 ? Math.min(100, (progressInGap / gapSize) * 100) : 0;
-        nextPalette = getTierPalette(nextTier.toString(), true);
-        nextTierLabel = TIER_LABELS[nextTier.toString()] || `${nextTier} Club`;
       } else {
         nextTier = null;
       }
@@ -160,77 +181,105 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <div
       className={cn(
-        // Horizontal rectangle with SDS rounded corners - GLOBAL SIZE for all badges
+        // Glass card container with SDS rounded corners
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
-        'min-w-[180px] h-[92px] px-3 py-2.5',
-        unlocked && !isGhost
-          ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
-          : 'shadow-sm',
+        'min-w-[180px] h-[92px] pl-0 pr-3 py-2.5',
         // Micro-interactions
         'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
+        unlocked && !isGhost && 'hover:shadow-lg',
         // Ghost styling
-        isGhost && 'border border-dashed border-white/60'
+        isGhost && 'border border-dashed'
       )}
       style={{
-        background: unlocked && !isGhost
-          ? `linear-gradient(135deg, ${palette.bgLight}, ${palette.bgDark})`
-          : palette.bgLocked,
+        // Glass base - neutral dark background
+        background: 'rgba(255, 255, 255, 0.05)',
+        border: `1px solid ${unlocked && !isGhost ? `${accentColor}25` : 'rgba(255, 255, 255, 0.10)'}`,
+        backdropFilter: 'blur(12px)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
-        opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
+        opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
+        boxShadow: unlocked && !isGhost 
+          ? `0 4px 20px ${accentColor}15`
+          : '0 2px 8px rgba(0, 0, 0, 0.08)',
       }}
     >
-      {/* Background emblem - engraved crest effect */}
+      {/* Left vertical accent strip */}
+      <div 
+        className="absolute left-0 top-3 bottom-3 w-[4px] rounded-r-full"
+        style={{ 
+          backgroundColor: accentColor,
+          opacity: unlocked && !isGhost ? 0.9 : 0.4,
+        }}
+      />
+
+      {/* Background emblem watermark - tier-colored at ~6% opacity */}
       {emblemSrc && (
         <img
           src={emblemSrc}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.08]"
+          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125"
           style={{ 
-            filter: 'brightness(0)',
+            opacity: 0.06,
+            filter: unlocked && !isGhost 
+              ? `brightness(0) saturate(100%)` 
+              : 'brightness(0)',
           }}
         />
       )}
 
       {/* Ghost overlay */}
       {isGhost && (
-        <div className="absolute inset-0 rounded-[inherit] bg-white/40 pointer-events-none" />
+        <div 
+          className="absolute inset-0 rounded-[inherit] pointer-events-none"
+          style={{ background: 'rgba(255, 255, 255, 0.15)' }}
+        />
       )}
 
-      {/* Top left: Trophy icon + Title/Subtitle */}
-      <div className="flex items-start gap-2">
+      {/* Top row: Trophy icon + Title/Subtitle */}
+      <div className="flex items-start gap-2 pl-4">
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked ? 'rgba(15,23,42,0.08)' : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked && !isGhost 
+              ? `${accentColor}18` 
+              : 'rgba(148, 163, 184, 0.12)'
           }}
         >
-          {/* Trophy always uses dark slate to match title text */}
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked ? '#0F172A' : '#94a3b8' }} 
+            style={{ color: accentColor }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
-            {isMilestone ? `${threshold} Club` : title}
+          {/* Title in tier color */}
+          <div 
+            className="font-semibold leading-tight truncate text-[13px]"
+            style={{ color: accentColor }}
+          >
+            {tierLabel}
           </div>
-          <div className="text-[11px] text-slate-800/70 truncate">
+          {/* Subtitle in neutral */}
+          <div className="text-[11px] text-white/65 truncate">
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
       </div>
 
-      {/* Bottom right: Status chip */}
-      <div className="flex justify-end">
-        <div className={cn(
-          "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
-          unlocked && !isGhost
-            ? "bg-white/75 text-slate-800"
-            : "bg-white/60 text-slate-500"
-        )}>
+      {/* Bottom row: Status chip */}
+      <div className="flex justify-end pl-4">
+        <div 
+          className="inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium"
+          style={{
+            backgroundColor: unlocked && !isGhost 
+              ? `${accentColor}20` 
+              : 'rgba(148, 163, 184, 0.15)',
+            border: `1px solid ${unlocked && !isGhost 
+              ? `${accentColor}40` 
+              : 'rgba(148, 163, 184, 0.25)'}`,
+            color: unlocked && !isGhost ? accentColor : '#94a3b8',
+          }}
+        >
           {statusLabel}
         </div>
       </div>
