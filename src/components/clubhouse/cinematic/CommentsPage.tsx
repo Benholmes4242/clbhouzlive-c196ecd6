@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smile, ChevronLeft, ChevronRight, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
 import { useHiddenComments } from '@/hooks/useHiddenComments';
 import { formatDistanceToNow } from 'date-fns';
@@ -986,9 +987,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     }
   }, [isOpen]);
 
-  // Caption truncation logic
-  const captionNeedsTruncation = caption && caption.length > 120;
-  const displayCaption = expandedCaption ? caption : caption?.slice(0, 120);
+  // Caption truncation logic - strip golf course tag from caption since we render it separately
+  const cleanCaption = removeGolfCourseFromContent(caption || '');
+  const captionNeedsTruncation = cleanCaption && cleanCaption.length > 120;
+  const displayCaption = expandedCaption ? cleanCaption : cleanCaption?.slice(0, 120);
 
   const content = (
     <AnimatePresence mode="wait">
@@ -1125,8 +1127,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       </div>
 
                       {/* Row 3: Caption (10px gap from metadata) */}
-                      {caption && (
-                        <motion.div 
+                      {cleanCaption && (
+                        <motion.div
                           className="mt-2.5"
                           initial={false}
                           animate={{ height: 'auto' }}
