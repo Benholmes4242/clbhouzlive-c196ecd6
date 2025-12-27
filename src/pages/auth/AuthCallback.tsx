@@ -79,10 +79,10 @@ const AuthCallback: React.FC = () => {
 
         if (!profile) {
           setStatus("Setting up your profile...");
-          navigate('/onboarding', { replace: true });
+          navigate('/edit-profile', { replace: true });
         } else if (!profile.has_completed_onboarding) {
           setStatus("Completing onboarding...");
-          navigate('/onboarding', { replace: true });
+          navigate('/edit-profile', { replace: true });
         } else {
           setStatus("Welcome back!");
           navigate('/', { replace: true });
