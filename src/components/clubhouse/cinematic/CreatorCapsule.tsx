@@ -97,6 +97,75 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     ? `${caption.slice(0, 80)}...` 
     : caption;
 
+  // When the golf club tag is present, avoid the two-stage collapse (height first, then width)
+  // by letting layout reflow immediately while the expanded panel animates out.
+  const popLayoutForGolfTag = !!golfCourse;
+
+  const expandedInner = (
+    <div className="px-3 pb-3 space-y-3">
+      {/* Caption (scrollable) */}
+      {caption && (
+        <div 
+          className="max-h-[100px] overflow-y-auto scrollbar-hide"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          <p className="text-[13px] leading-relaxed text-white/90">
+            {caption}
+          </p>
+        </div>
+      )}
+
+      {/* Golf Course CTA - one-line gap after caption */}
+      {golfCourse && (
+        <div className={cn(caption && "mt-2")}>
+          <CourseLocationRow
+            course={golfCourse}
+            showChevron
+            isDark
+          />
+        </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="flex items-center gap-2 pt-1 border-t border-white/10">
+        {/* Follow button (not for own posts) */}
+        {!isOwnPost && onFollow && (
+          <Button
+            size="sm"
+            variant={isFollowing ? 'secondary' : 'default'}
+            onClick={(e) => {
+              e.stopPropagation();
+              onFollow();
+            }}
+            className={cn(
+              'h-8 px-3 text-[12px] font-medium rounded-sq-sm',
+              isFollowing 
+                ? 'bg-white/10 text-white hover:bg-white/15' 
+                : 'bg-white text-black hover:bg-white/90'
+            )}
+          >
+            {isFollowing ? 'Following' : 'Follow'}
+          </Button>
+        )}
+
+        {/* View Profile */}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleViewProfile();
+          }}
+          className="h-8 px-3 text-[12px] font-medium rounded-sq-sm text-white/80 hover:text-white hover:bg-white/10"
+        >
+          <User className="w-3.5 h-3.5 mr-1.5" />
+          Profile
+        </Button>
+
+      </div>
+    </div>
+  );
+
   return (
     <>
       {/* Backdrop for tap-outside when expanded */}
@@ -135,6 +204,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       >
         <motion.div
           layout
+          transition={{ layout: { duration: 0.22, ease: [0.19, 1, 0.22, 1] } }}
           className={cn(
             'rounded-sq-lg overflow-hidden',
             'bg-black/50 backdrop-blur-xl',
@@ -188,77 +258,17 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           </button>
 
           {/* Expanded Content */}
-          <AnimatePresence>
+          <AnimatePresence mode={popLayoutForGolfTag ? 'popLayout' : 'sync'}>
             {isExpanded && (
               <motion.div
+                key="expanded"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                 className="overflow-hidden"
               >
-                <div className="px-3 pb-3 space-y-3">
-                  {/* Caption (scrollable) */}
-                  {caption && (
-                    <div 
-                      className="max-h-[100px] overflow-y-auto scrollbar-hide"
-                      style={{ WebkitOverflowScrolling: 'touch' }}
-                    >
-                      <p className="text-[13px] leading-relaxed text-white/90">
-                        {caption}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Golf Course CTA - one-line gap after caption */}
-                  {golfCourse && (
-                    <div className={cn(caption && "mt-2")}>
-                      <CourseLocationRow
-                        course={golfCourse}
-                        showChevron
-                        isDark
-                      />
-                    </div>
-                  )}
-
-                  {/* Action buttons */}
-                  <div className="flex items-center gap-2 pt-1 border-t border-white/10">
-                    {/* Follow button (not for own posts) */}
-                    {!isOwnPost && onFollow && (
-                      <Button
-                        size="sm"
-                        variant={isFollowing ? 'secondary' : 'default'}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onFollow();
-                        }}
-                        className={cn(
-                          'h-8 px-3 text-[12px] font-medium rounded-sq-sm',
-                          isFollowing 
-                            ? 'bg-white/10 text-white hover:bg-white/15' 
-                            : 'bg-white text-black hover:bg-white/90'
-                        )}
-                      >
-                        {isFollowing ? 'Following' : 'Follow'}
-                      </Button>
-                    )}
-
-                    {/* View Profile */}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewProfile();
-                      }}
-                      className="h-8 px-3 text-[12px] font-medium rounded-sq-sm text-white/80 hover:text-white hover:bg-white/10"
-                    >
-                      <User className="w-3.5 h-3.5 mr-1.5" />
-                      Profile
-                    </Button>
-
-                  </div>
-                </div>
+                {expandedInner}
               </motion.div>
             )}
           </AnimatePresence>
