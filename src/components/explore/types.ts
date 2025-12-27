@@ -61,6 +61,8 @@ export interface ExploreContentItem {
     id: string;
     name: string;
     country: string;
+    sub_country?: string | null;
+    region?: string | null;
   };
   media?: {
     id: string;
