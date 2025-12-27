@@ -12,6 +12,16 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { ChevronUp, User } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import CourseLocationRow from '@/components/posts/CourseLocationRow';
+
+interface GolfCourseInfo {
+  id?: string | null;
+  name?: string | null;
+  region?: string | null;
+  country?: string | null;
+  sub_country?: string | null;
+  slug?: string | null;
+}
 
 interface CreatorCapsuleProps {
   user: {
@@ -21,6 +31,7 @@ interface CreatorCapsuleProps {
     avatar?: string;
   };
   caption?: string;
+  golfCourse?: GolfCourseInfo | null;
   isFollowing?: boolean;
   isOwnPost?: boolean;
   isVisible: boolean;
@@ -31,6 +42,7 @@ interface CreatorCapsuleProps {
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   user,
   caption,
+  golfCourse,
   isFollowing = false,
   isOwnPost = false,
   isVisible,
@@ -195,6 +207,17 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                       <p className="text-[13px] leading-relaxed text-white/90">
                         {caption}
                       </p>
+                    </div>
+                  )}
+
+                  {/* Golf Course CTA - one-line gap after caption */}
+                  {golfCourse && (
+                    <div className={cn(caption && "mt-2")}>
+                      <CourseLocationRow
+                        course={golfCourse}
+                        showChevron
+                        isDark
+                      />
                     </div>
                   )}
 
