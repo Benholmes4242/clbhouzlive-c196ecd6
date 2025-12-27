@@ -813,7 +813,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           <VideoScrubber
             videoEl={activeVideoEl}
             mediaId={currentPost.id}
-            height={3}
+            height={1.5}
             className="pointer-events-auto"
           />
         </div>
