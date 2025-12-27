@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -58,6 +58,38 @@ const CLUB_NAMES: Record<string, string> = {
   'WORLD': 'World Complete',
 };
 
+// Collector micro-stamp labels
+const MICRO_STAMPS: Record<string, string> = {
+  '5': 'CLB · 5',
+  '10': 'CLB · 10',
+  '20': 'CLB · 20',
+  '50': 'CLB · 50',
+  '100': 'CLB · 100',
+  '200': 'CLB · ELITE',
+  '300': 'CLB · LEGEND',
+  '400': 'CLB · SLAM',
+  'GBI': 'CLB · GBI',
+  'EU': 'CLB · EU',
+  'USA': 'CLB · USA',
+  'WORLD': 'CLB · WORLD',
+};
+
+// Glow intensity by tier (higher tiers = stronger glow)
+const GLOW_INTENSITY: Record<string, { opacity: number; scale: number }> = {
+  '5': { opacity: 0.06, scale: 1.8 },
+  '10': { opacity: 0.07, scale: 1.9 },
+  '20': { opacity: 0.08, scale: 2.0 },
+  '50': { opacity: 0.09, scale: 2.1 },
+  '100': { opacity: 0.10, scale: 2.2 },
+  '200': { opacity: 0.12, scale: 2.4 },
+  '300': { opacity: 0.14, scale: 2.6 },
+  '400': { opacity: 0.16, scale: 2.8 },
+  'GBI': { opacity: 0.08, scale: 2.0 },
+  'EU': { opacity: 0.08, scale: 2.0 },
+  'USA': { opacity: 0.08, scale: 2.0 },
+  'WORLD': { opacity: 0.12, scale: 2.4 },
+};
+
 // Milestone thresholds for next tier calculation
 const MILESTONE_THRESHOLDS: number[] = [5, 10, 20, 50, 100, 200, 300, 400];
 
@@ -77,6 +109,14 @@ function getTierAccentColor(tier: string): string {
     'WORLD': '#7A8FC0',
   };
   return regionalColors[tier] || '#94a3b8';
+}
+
+/**
+ * Desaturate a hex color slightly for subtle glow
+ */
+function desaturateColor(hex: string, amount: number = 0.2): string {
+  // Simple desaturation by mixing with grey
+  return hex; // Keep original for now - the low opacity handles subtlety
 }
 
 export interface AchievementBadgeCardProps {
@@ -101,16 +141,12 @@ export interface AchievementBadgeCardProps {
 /**
  * AchievementBadgeCard - Global Achievement & Milestone System
  * 
- * Apple-level polish design with:
- * - Neutral glass base (not tier-colour filled)
- * - Corner accents (bottom-left + top-right) using tier colour
- * - Subtle inner highlight sheen at top edge
- * - Trophy icon in soft circular container with tier tint
- * - Title text (tier colour)
- * - Watermark line art (tier colour at ~6% opacity)
- * - Refined status chip with tier colour tint
- * 
- * All colors sourced from globalAchievementMilestoneSystem.ts / clbhouzAchievementPalette.ts
+ * Collector / Rarity polish with:
+ * - Trophy medallion with inner highlight/shadow (medal-like)
+ * - Subtle rarity glow behind trophy (tier-weighted)
+ * - Micro-stamp collector detail (bottom-right, engraved feel)
+ * - Neutral glass base with corner accents
+ * - Premium interaction polish (hover lift, glow tighten)
  */
 export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   tier,
@@ -127,9 +163,13 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   totalOnList,
   regionGlyph,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
+  const microStamp = MICRO_STAMPS[tier] || `CLB · ${tier}`;
   const emblemSrc = getEmblemPath(tier);
+  const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.08, scale: 2.0 };
   
   // Get tier accent color
   const tierAccentColor = getTierAccentColor(tier);
@@ -179,11 +219,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
   }
 
+  // Interaction states
+  const hoverLift = isHovered && unlocked && !isGhost ? 2 : 0;
+  const glowScale = isHovered && unlocked && !isGhost ? 0.9 : 1;
+
   return (
     <div
       className={cn(
         // Glass card container with SDS rounded corners
-        'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
+        'rounded-sq-md flex flex-col justify-between transition-all duration-200 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3.5 py-3',
         // Micro-interactions
@@ -197,12 +241,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         background: 'var(--achievement-card-bg, rgba(31, 36, 40, 0.04))',
         border: `1px solid var(--achievement-card-border, rgba(31, 36, 40, 0.08))`,
         backdropFilter: 'blur(12px)',
-        transform: isPrimary ? 'translateY(-2px)' : undefined,
+        transform: `translateY(-${hoverLift + (isPrimary ? 2 : 0)}px)`,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
         boxShadow: unlocked && !isGhost 
-          ? `0 2px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)`
+          ? `0 ${2 + hoverLift}px ${12 + hoverLift * 2}px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)`
           : '0 1px 4px rgba(0, 0, 0, 0.03)',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Top edge inner highlight sheen - Apple-style premium feel */}
       <div 
@@ -217,17 +263,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       <div 
         className="absolute bottom-0 left-0 w-16 h-16 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at bottom left, ${accentColor}${unlocked && !isGhost ? '25' : '12'} 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse at bottom left, ${accentColor}${unlocked && !isGhost ? '20' : '10'} 0%, transparent 70%)`,
           borderBottomLeftRadius: 'inherit',
-        }}
-      />
-
-      {/* Top-right corner accent - lighter echo */}
-      <div 
-        className="absolute top-0 right-0 w-12 h-12 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at top right, ${accentColor}${unlocked && !isGhost ? '15' : '08'} 0%, transparent 60%)`,
-          borderTopRightRadius: 'inherit',
         }}
       />
 
@@ -237,12 +274,13 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           src={emblemSrc}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125"
+          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 transition-transform duration-300"
           style={{ 
             opacity: 0.06,
             filter: unlocked && !isGhost 
               ? `brightness(0) saturate(100%)` 
               : 'brightness(0)',
+            transform: `translateX(${16 + (isHovered ? -2 : 0)}px) scale(1.25)`,
           }}
         />
       )}
@@ -255,23 +293,68 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         />
       )}
 
-      {/* Top row: Trophy icon + Title/Subtitle */}
-      <div className="flex items-start gap-2.5 relative z-10">
-        {/* Icon container - soft circular pill with tier tint */}
+      {/* Micro-stamp collector detail - bottom right, engraved feel */}
+      {unlocked && !isGhost && (
         <div 
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ 
-            backgroundColor: unlocked && !isGhost 
-              ? `${accentColor}12` 
-              : 'rgba(148, 163, 184, 0.08)',
-            border: `1px solid ${unlocked && !isGhost ? `${accentColor}20` : 'rgba(148, 163, 184, 0.12)'}`,
+          className="absolute bottom-2 right-2.5 pointer-events-none select-none"
+          style={{
+            fontSize: '7px',
+            fontWeight: 600,
+            letterSpacing: '0.5px',
+            color: accentColor,
+            opacity: 0.12,
+            fontFamily: 'ui-monospace, SFMono-Regular, monospace',
           }}
         >
-          <Trophy 
-            className="w-3.5 h-3.5"
-            style={{ color: accentColor }} 
-          />
+          {microStamp}
         </div>
+      )}
+
+      {/* Top row: Trophy icon + Title/Subtitle */}
+      <div className="flex items-start gap-2.5 relative z-10">
+        {/* Trophy medallion container with rarity glow */}
+        <div className="relative flex-shrink-0">
+          {/* Rarity glow - radial aura behind medallion */}
+          {unlocked && !isGhost && (
+            <div 
+              className="absolute inset-0 pointer-events-none transition-transform duration-200"
+              style={{
+                background: `radial-gradient(circle, ${accentColor} 0%, transparent 70%)`,
+                opacity: glowConfig.opacity * glowScale,
+                transform: `scale(${glowConfig.scale * glowScale})`,
+                filter: 'blur(4px)',
+              }}
+            />
+          )}
+          
+          {/* Medallion container - medal-like with inner highlight/shadow */}
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center relative overflow-hidden"
+            style={{ 
+              backgroundColor: unlocked && !isGhost 
+                ? `${accentColor}10` 
+                : 'rgba(148, 163, 184, 0.06)',
+              border: `1px solid ${unlocked && !isGhost ? `${accentColor}18` : 'rgba(148, 163, 184, 0.10)'}`,
+              boxShadow: unlocked && !isGhost
+                ? `inset 1px 1px 2px rgba(255,255,255,0.3), inset -1px -1px 2px ${accentColor}15`
+                : 'inset 0 1px 1px rgba(255,255,255,0.1)',
+            }}
+          >
+            {/* Inner top-left highlight */}
+            <div 
+              className="absolute top-0 left-0 w-3 h-3 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle at top left, rgba(255,255,255,0.4) 0%, transparent 70%)',
+              }}
+            />
+            
+            <Trophy 
+              className="w-3.5 h-3.5 relative z-10"
+              style={{ color: accentColor }} 
+            />
+          </div>
+        </div>
+        
         <div className="flex-1 min-w-0 overflow-hidden text-left">
           {/* Tier label - smaller, tighter tracking */}
           <div 
@@ -290,14 +373,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       {/* Bottom row: Status chip - refined size and alignment */}
       <div className="flex justify-end relative z-10">
         <div 
-          className="inline-flex items-center px-2 py-[3px] rounded-full text-[9px] font-medium tracking-wide"
+          className="inline-flex items-center px-2 py-[3px] rounded-full text-[9px] font-medium tracking-wide transition-all duration-200"
           style={{
             backgroundColor: unlocked && !isGhost 
-              ? `${accentColor}12` 
-              : 'rgba(148, 163, 184, 0.10)',
+              ? `${accentColor}10` 
+              : 'rgba(148, 163, 184, 0.08)',
             border: `1px solid ${unlocked && !isGhost 
-              ? `${accentColor}25` 
-              : 'rgba(148, 163, 184, 0.15)'}`,
+              ? `${accentColor}20` 
+              : 'rgba(148, 163, 184, 0.12)'}`,
             color: unlocked && !isGhost ? accentColor : '#94a3b8',
           }}
         >
