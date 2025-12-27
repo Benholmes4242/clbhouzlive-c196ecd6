@@ -27,8 +27,6 @@ export function useUserAchievements(userId?: string) {
 
       if (error) throw error;
 
-      // TESTING: Force all achievements to be unlocked for color testing
-      // TODO: Remove this override and restore: isUnlocked: !!row.is_unlocked
       return (data || []).map((row: any): UserAchievement => ({
         achievementId: row.achievement_id,
         code: row.code,
@@ -36,8 +34,8 @@ export function useUserAchievements(userId?: string) {
         description: row.description,
         category: row.category,
         points: row.points ?? 0,
-        isUnlocked: true, // TESTING OVERRIDE - was: !!row.is_unlocked
-        unlockedAt: row.unlocked_at ?? new Date().toISOString(),
+        isUnlocked: !!row.is_unlocked,
+        unlockedAt: row.unlocked_at,
       }));
     },
     staleTime: 60_000,
