@@ -101,13 +101,14 @@ export interface AchievementBadgeCardProps {
 /**
  * AchievementBadgeCard - Global Achievement & Milestone System
  * 
- * Modern glass design with tier color accents:
- * - Dark glass base (not tier-colour filled)
- * - Left vertical accent strip (tier colour)
- * - Trophy icon (tier colour)
+ * Apple-level polish design with:
+ * - Neutral glass base (not tier-colour filled)
+ * - Corner accents (bottom-left + top-right) using tier colour
+ * - Subtle inner highlight sheen at top edge
+ * - Trophy icon in soft circular container with tier tint
  * - Title text (tier colour)
  * - Watermark line art (tier colour at ~6% opacity)
- * - Status chip with tier colour tint
+ * - Refined status chip with tier colour tint
  * 
  * All colors sourced from globalAchievementMilestoneSystem.ts / clbhouzAchievementPalette.ts
  */
@@ -184,7 +185,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         // Glass card container with SDS rounded corners
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
-        'min-w-[180px] h-[92px] pl-0 pr-3 py-2.5',
+        'min-w-[180px] h-[92px] px-3.5 py-3',
         // Micro-interactions
         'active:scale-[0.98]',
         unlocked && !isGhost && 'hover:shadow-lg',
@@ -194,21 +195,39 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       style={{
         // Glass base - adapts to light/dark themes via CSS variables
         background: 'var(--achievement-card-bg, rgba(31, 36, 40, 0.04))',
-        border: `1px solid ${unlocked && !isGhost ? `${accentColor}25` : 'var(--achievement-card-border, rgba(31, 36, 40, 0.12))'}`,
+        border: `1px solid var(--achievement-card-border, rgba(31, 36, 40, 0.08))`,
         backdropFilter: 'blur(12px)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
         boxShadow: unlocked && !isGhost 
-          ? `0 4px 20px ${accentColor}15`
-          : '0 2px 8px rgba(0, 0, 0, 0.06)',
+          ? `0 2px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)`
+          : '0 1px 4px rgba(0, 0, 0, 0.03)',
       }}
     >
-      {/* Left vertical accent strip */}
+      {/* Top edge inner highlight sheen - Apple-style premium feel */}
       <div 
-        className="absolute left-0 top-3 bottom-3 w-[4px] rounded-r-full"
-        style={{ 
-          backgroundColor: accentColor,
-          opacity: unlocked && !isGhost ? 0.9 : 0.4,
+        className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 20%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.5) 80%, transparent 100%)',
+          opacity: 0.7,
+        }}
+      />
+
+      {/* Bottom-left corner accent - soft glassy blob */}
+      <div 
+        className="absolute bottom-0 left-0 w-16 h-16 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at bottom left, ${accentColor}${unlocked && !isGhost ? '25' : '12'} 0%, transparent 70%)`,
+          borderBottomLeftRadius: 'inherit',
+        }}
+      />
+
+      {/* Top-right corner accent - lighter echo */}
+      <div 
+        className="absolute top-0 right-0 w-12 h-12 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at top right, ${accentColor}${unlocked && !isGhost ? '15' : '08'} 0%, transparent 60%)`,
+          borderTopRightRadius: 'inherit',
         }}
       />
 
@@ -237,13 +256,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       )}
 
       {/* Top row: Trophy icon + Title/Subtitle */}
-      <div className="flex items-start gap-2 pl-4">
+      <div className="flex items-start gap-2.5 relative z-10">
+        {/* Icon container - soft circular pill with tier tint */}
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
             backgroundColor: unlocked && !isGhost 
-              ? `${accentColor}18` 
-              : 'rgba(148, 163, 184, 0.12)'
+              ? `${accentColor}12` 
+              : 'rgba(148, 163, 184, 0.08)',
+            border: `1px solid ${unlocked && !isGhost ? `${accentColor}20` : 'rgba(148, 163, 184, 0.12)'}`,
           }}
         >
           <Trophy 
@@ -252,31 +273,31 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* Title in tier color */}
+          {/* Tier label - smaller, tighter tracking */}
           <div 
-            className="font-semibold leading-tight truncate text-[13px]"
+            className="font-semibold leading-tight truncate text-[11px] tracking-tight uppercase"
             style={{ color: accentColor }}
           >
             {tierLabel}
           </div>
-          {/* Subtitle - theme adaptive neutral */}
-          <div className="text-[11px] text-foreground/65 truncate">
+          {/* Club name - primary label, clearer */}
+          <div className="text-[12px] font-medium text-foreground/80 truncate mt-0.5">
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
       </div>
 
-      {/* Bottom row: Status chip */}
-      <div className="flex justify-end pl-4">
+      {/* Bottom row: Status chip - refined size and alignment */}
+      <div className="flex justify-end relative z-10">
         <div 
-          className="inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium"
+          className="inline-flex items-center px-2 py-[3px] rounded-full text-[9px] font-medium tracking-wide"
           style={{
             backgroundColor: unlocked && !isGhost 
-              ? `${accentColor}20` 
-              : 'rgba(148, 163, 184, 0.15)',
+              ? `${accentColor}12` 
+              : 'rgba(148, 163, 184, 0.10)',
             border: `1px solid ${unlocked && !isGhost 
-              ? `${accentColor}40` 
-              : 'rgba(148, 163, 184, 0.25)'}`,
+              ? `${accentColor}25` 
+              : 'rgba(148, 163, 184, 0.15)'}`,
             color: unlocked && !isGhost ? accentColor : '#94a3b8',
           }}
         >
