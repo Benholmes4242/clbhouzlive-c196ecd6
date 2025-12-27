@@ -594,7 +594,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 scrollSnapStop: 'always'
               }}
             >
-              {/* Media Content */}
+              {/* Media Content - with padding for navbar + safe area */}
               <div 
                 onClick={(e) => {
                   if (currentMedia.media_type === 'video') {
@@ -604,6 +604,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 onTouchStart={(e) => handleMediaTouchStart(e, item.id, hasMultipleMedia)}
                 onTouchEnd={(e) => handleMediaTouchEnd(e, item.id, hasMultipleMedia, currentMediaIndex, mediaItems.length)}
                 className="relative w-full h-full z-10"
+                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))' }}
                 data-media-container
               >
                 {/* Double-tap heart burst */}
@@ -705,6 +706,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     </button>
                   </>
                 )}
+
+                {/* Video Progress Scrubber - anchored to bottom of video area */}
+                {currentMedia.media_type === 'video' && index === currentIndex && activeVideoEl && (
+                  <div 
+                    className="absolute left-0 right-0 bottom-0 z-[95] pointer-events-none"
+                  >
+                    <VideoScrubber
+                      videoEl={activeVideoEl}
+                      mediaId={item.id}
+                      height={2.5}
+                      className="pointer-events-auto"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Top 100 Pills */}
@@ -804,20 +819,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         />
       )}
 
-      {/* Video Progress Scrubber - positioned flush on top edge of bottom navbar */}
-      {activeVideoEl && currentPost && (
-        <div 
-          className="fixed left-0 right-0 z-[95] pointer-events-none"
-          style={{ bottom: 'var(--bottom-nav-height, 64px)' }}
-        >
-          <VideoScrubber
-            videoEl={activeVideoEl}
-            mediaId={currentPost.id}
-            height={2.5}
-            className="pointer-events-auto"
-          />
-        </div>
-      )}
     </div>
   );
 };
