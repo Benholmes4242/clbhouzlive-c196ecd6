@@ -45,11 +45,22 @@ export const VideoScrubber = memo(function VideoScrubber({
   const [isValidDuration, setIsValidDuration] = useState(false);
   const wasPausedRef = useRef(false);
   const rafRef = useRef<number>();
+  
+  // Internal state derivation (used when props not passed)
+  const [derivedBufferedPct, setDerivedBufferedPct] = useState(0);
+  const [derivedIsBuffering, setDerivedIsBuffering] = useState(false);
+  const [derivedHasFirstFrame, setDerivedHasFirstFrame] = useState(false);
+
+  // Use prop if explicitly passed (non-default), otherwise use derived
+  const effectiveBufferedPct = bufferedPct > 0 ? bufferedPct : derivedBufferedPct;
+  const effectiveIsBuffering = isBuffering || derivedIsBuffering;
+  const effectiveHasFirstFrame = hasFirstFrame && derivedHasFirstFrame; // Both must be true
 
   // Check if video has valid duration
   useEffect(() => {
     if (!videoEl) {
       setIsValidDuration(false);
+      setDerivedHasFirstFrame(false);
       return;
     }
 
@@ -69,6 +80,47 @@ export const VideoScrubber = memo(function VideoScrubber({
       videoEl.removeEventListener('durationchange', checkDuration);
     };
   }, [videoEl]);
+  
+  // Derive buffering state from video element
+  useEffect(() => {
+    if (!videoEl) return;
+    
+    const updateBuffered = () => {
+      if (!videoEl.duration || !Number.isFinite(videoEl.duration)) return;
+      const buffered = videoEl.buffered;
+      if (buffered.length > 0) {
+        const end = buffered.end(buffered.length - 1);
+        setDerivedBufferedPct(Math.min(1, end / videoEl.duration));
+      }
+    };
+    
+    const handleWaiting = () => setDerivedIsBuffering(true);
+    const handlePlaying = () => setDerivedIsBuffering(false);
+    const handleCanPlay = () => setDerivedIsBuffering(false);
+    const handleFirstFrame = () => setDerivedHasFirstFrame(true);
+    
+    // Check initial state
+    if (videoEl.readyState >= 2) {
+      setDerivedHasFirstFrame(true);
+    }
+    updateBuffered();
+    
+    videoEl.addEventListener('progress', updateBuffered);
+    videoEl.addEventListener('waiting', handleWaiting);
+    videoEl.addEventListener('playing', handlePlaying);
+    videoEl.addEventListener('canplay', handleCanPlay);
+    videoEl.addEventListener('loadeddata', handleFirstFrame);
+    videoEl.addEventListener('timeupdate', updateBuffered);
+    
+    return () => {
+      videoEl.removeEventListener('progress', updateBuffered);
+      videoEl.removeEventListener('waiting', handleWaiting);
+      videoEl.removeEventListener('playing', handlePlaying);
+      videoEl.removeEventListener('canplay', handleCanPlay);
+      videoEl.removeEventListener('loadeddata', handleFirstFrame);
+      videoEl.removeEventListener('timeupdate', updateBuffered);
+    };
+  }, [videoEl]);
 
   // Update progress bar (GPU-accelerated via scaleX)
   const updateProgress = useCallback(() => {
@@ -84,9 +136,9 @@ export const VideoScrubber = memo(function VideoScrubber({
   // Update buffered bar
   useEffect(() => {
     if (bufferedRef.current) {
-      bufferedRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, bufferedPct))})`;
+      bufferedRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, effectiveBufferedPct))})`;
     }
-  }, [bufferedPct]);
+  }, [effectiveBufferedPct]);
 
   // Sync loop for progress updates
   useEffect(() => {
@@ -195,9 +247,9 @@ export const VideoScrubber = memo(function VideoScrubber({
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   }, [isDragging]);
 
-  // Determine shimmer state
-  const showBufferingShimmer = hasFirstFrame && isBuffering;
-  const showGhostShimmer = isAttached && !hasFirstFrame;
+  // Determine shimmer state (using effective values that combine props + derived)
+  const showBufferingShimmer = effectiveHasFirstFrame && effectiveIsBuffering;
+  const showGhostShimmer = isAttached && !effectiveHasFirstFrame;
   const showAnyShimmer = showBufferingShimmer || showGhostShimmer;
 
   // Don't render if no valid video (but allow ghost shimmer before first frame)
@@ -241,7 +293,7 @@ export const VideoScrubber = memo(function VideoScrubber({
       <div
         ref={bufferedRef}
         className="absolute inset-0 origin-left will-change-transform bg-white/25 overflow-hidden rounded-full"
-        style={{ transform: `scaleX(${bufferedPct})` }}
+        style={{ transform: `scaleX(${effectiveBufferedPct})` }}
       >
         {/* Buffering shimmer (when stalled) */}
         {showBufferingShimmer && (
