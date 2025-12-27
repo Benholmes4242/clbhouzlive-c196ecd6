@@ -861,6 +861,42 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
+      // ===== Golf course hydration (CRITICAL for "Played at …" row) =====
+      const DEBUG_COURSE_LOCATION = import.meta.env.DEV;
+
+      const courseIds = validPosts
+        .flatMap((post: any) => (post.post_tags || [])
+          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
+          .map((tag: any) => tag.taggable_entities?.entity_id)
+        )
+        .filter(Boolean) as string[];
+
+      const uniqueCourseIds = [...new Set(courseIds)];
+
+      if (DEBUG_COURSE_LOCATION) {
+        console.log('[ClubhouseCourseHydration] uniqueCourseIds', uniqueCourseIds.length, uniqueCourseIds.slice(0, 20));
+      }
+
+      const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
+        ? await supabase
+          .from('golf_courses')
+          .select('id, name, country, sub_country, region')
+          .in('id', uniqueCourseIds)
+        : { data: [], error: null };
+
+      if (coursesError) {
+        console.error('[ClubhouseCourseHydration] golf_courses error:', coursesError);
+        // Don't fail - just continue without course data
+      }
+
+      const courseMap = new Map((golfCourses || []).map((c: any) => [c.id, c]));
+
+      if (DEBUG_COURSE_LOCATION) {
+        const fetched = (golfCourses || []).length;
+        const missing = Math.max(0, uniqueCourseIds.length - fetched);
+        console.log('[ClubhouseCourseHydration] fetched', fetched, 'missing', missing);
+      }
+
       // Format posts with polymorphic creator hydration
       const formattedPosts = validPosts.map(post => {
         const firstMedia = post.post_media[0];
@@ -876,20 +912,42 @@ export const useRealPostsFetcher = () => {
           userProfile = profiles?.find(profile => profile.id === post.user_id);
         }
 
-        // Find golf course from tags
+        // Find golf course from tags and hydrate from golf_courses
         const golfCourseTag = (post.post_tags || []).find(
-          tag => tag.taggable_entities?.entity_type === 'golf_club'
+          (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
 
         let golfCourse = null;
         if (golfCourseTag?.taggable_entities) {
-          golfCourse = {
-            id: golfCourseTag.taggable_entities.entity_id,
+          const courseId = golfCourseTag.taggable_entities.entity_id;
+          const fullCourse = courseMap.get(courseId);
+
+          if (DEBUG_COURSE_LOCATION && !fullCourse) {
+            console.warn('[ClubhouseCourseHydration] missing course row', {
+              courseId,
+              tagName: golfCourseTag.taggable_entities.name,
+            });
+          }
+
+          if (DEBUG_COURSE_LOCATION && fullCourse?.country?.toLowerCase?.() === 'unknown') {
+            console.warn('[ClubhouseCourseHydration] course has country=Unknown in DB', {
+              courseId,
+              name: fullCourse?.name,
+            });
+          }
+
+          golfCourse = fullCourse ? {
+            id: fullCourse.id,
+            name: fullCourse.name,
+            country: fullCourse.country || '',
+            sub_country: fullCourse.sub_country,
+            region: fullCourse.region,
+          } : {
+            id: courseId,
             name: golfCourseTag.taggable_entities.name,
-            country: 'Unknown'
+            country: '',
           };
         }
-
         const durationSeconds = firstMedia.duration_seconds;
 
         // Build polymorphic creator object

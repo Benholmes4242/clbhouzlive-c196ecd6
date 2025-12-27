@@ -24,52 +24,62 @@ interface CourseLocationRowProps {
 }
 
 /**
- * Formats location text matching Course Details page format:
- * {Course Name}, {Region/State}, {Country}
- * 
- * Rules:
- * - For GB&I and Continental Europe, use sub_country (e.g., "England", "Portugal")
- * - Never show "Britain & Ireland" or "Continental Europe" directly
- * - Never show "Unknown"
+ * Formats location text matching Course Details page intent:
+ * {Course Name}, {Region/State or Sub-country}, {Country}
+ *
+ * Hard rules:
+ * - NEVER render the literal string "Unknown" (case-insensitive)
+ * - If we don't have real location context, hide the entire row (no pin)
  */
+const isMeaningfulPart = (value?: string | null): value is string => {
+  const v = (value ?? '').trim();
+  if (!v) return false;
+  if (v.toLowerCase() === 'unknown') return false;
+  return true;
+};
+
 const formatLocationText = (course: CourseInfo): string => {
   const parts: string[] = [];
-  
-  // Add course name first
-  if (course.name) {
-    parts.push(course.name);
+
+  // Course name is required
+  if (isMeaningfulPart(course.name)) {
+    parts.push(course.name.trim());
   }
-  
-  // For GB&I and Continental Europe, prefer sub_country
+
+  // For GB&I and Continental Europe, prefer sub_country (e.g., "England", "Portugal")
   if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
-    if (course.sub_country) {
-      parts.push(course.sub_country);
-    } else if (course.region && course.region !== course.country) {
-      parts.push(course.region);
+    if (isMeaningfulPart(course.sub_country)) {
+      parts.push(course.sub_country.trim());
+    } else if (isMeaningfulPart(course.region) && course.region !== course.country) {
+      parts.push(course.region.trim());
     }
-    // Don't add "Britain & Ireland" or "Continental Europe" as country
+    // Intentionally do NOT add country label for these umbrella regions
   } else {
-    // For other countries (USA, etc.)
-    if (course.region && course.region !== course.country) {
-      parts.push(course.region);
+    if (isMeaningfulPart(course.region) && course.region !== course.country) {
+      parts.push(course.region.trim());
     }
-    if (course.country) {
-      parts.push(course.country);
+    if (isMeaningfulPart(course.country)) {
+      parts.push(course.country.trim());
     }
   }
-  
-  return parts.filter(Boolean).join(', ');
+
+  // Hide if we only have the name (no real location context)
+  if (parts.length < 2) return '';
+
+  // De-dupe adjacent duplicates
+  const deduped: string[] = [];
+  for (const p of parts) {
+    if (deduped[deduped.length - 1] !== p) deduped.push(p);
+  }
+
+  return deduped.join(', ');
 };
 
 /**
- * Renders the "📍 Played at [Course Name], [Region], [Country]" row
- * 
- * Features:
- * - Single horizontal row with map pin + text
- * - Never renders "Unknown" - hides entirely if no data
+ * Renders the "📍 Played at …" row.
+ *
+ * - Never renders "Unknown" (hides entirely)
  * - Entire row is clickable CTA navigating to course page
- * - Uses same formatter as Course Details page
- * - Subtle CTA styling with optional chevron
  */
 const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
   course,
@@ -79,16 +89,12 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
   onClick,
 }) => {
   const navigate = useNavigate();
-  
-  // Hide entirely if no course name
-  if (!course?.name) return null;
-  
+
+  // Hide entirely if missing data or only "Unknown" parts
+  if (!course || !isMeaningfulPart(course.name)) return null;
+
   const locationText = formatLocationText(course);
-  
-  // Don't render if we only have the course name (no location context)
-  // Actually, we should still render even with just the name
   if (!locationText) return null;
-  
   const courseIdentifier = course.slug || course.id;
   const isClickable = !!courseIdentifier;
   
