@@ -1,5 +1,87 @@
 /* Live Clubhouse Strip Styles - Suggested Golfers */
 
+/* ============================= */
+/* NEW: Suggested Golfers Carousel (Gamified) */
+/* ============================= */
+
+.suggested-golfers-row {
+  position: relative;
+  padding-bottom: 8px;
+  background: transparent;
+}
+
+/* Right edge scroll fade affordance */
+.suggested-golfers-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  background: linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Section header - flex row with title and "See all" */
+.suggested-golfers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 16px; /* Match content gutter */
+  padding-right: 16px;
+  margin-bottom: 12px;
+}
+
+/* Section title */
+.suggested-golfers-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+}
+
+/* See all button */
+.suggested-golfers-see-all {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.suggested-golfers-see-all:hover {
+  color: hsl(var(--foreground));
+}
+
+/* Horizontal scroll track - LEFT GUTTER MATCHES HEADER */
+.suggested-golfers-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 16px; /* CRITICAL: Match header padding */
+  padding-right: 16px;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+  align-items: flex-start;
+}
+
+.suggested-golfers-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================= */
+/* LEGACY: Old styles (kept for backwards compat) */
+/* ============================= */
+
 /* Row container - transparent background, no extra spacing (handled by parent) */
 .live-row {
   position: relative;
@@ -158,8 +240,6 @@
 .lc-nearby .lc-label {
   margin-top: 6px;
 }
-
-/* REMOVED: White text override - now using semantic tokens above */
 
 /* Nearby bubble styling */
 .lc-nearby {

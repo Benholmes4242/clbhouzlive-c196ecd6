@@ -1,32 +1,24 @@
-import React, { useEffect, useRef, useState, useId } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronRight } from 'lucide-react';
+import SuggestedGolferCard from '@/components/discover/SuggestedGolferCard';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
-
-function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
-  const a = w / 2, b = h / 2, m = 2 / n;
-  const pts: string[] = [];
-  for (let i = 0; i < steps; i++) {
-    const t = (i / steps) * Math.PI * 2;
-    const ct = Math.cos(t), st = Math.sin(t);
-    const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m) + a;
-    const y = Math.sign(st) * b * Math.pow(Math.abs(st), m) + b;
-    pts.push(`${x},${y}`);
-  }
-  return `M ${pts.join(" L ")} Z`;
-}
+const DISMISSED_KEY = 'dismissedSuggestedGolfers';
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
   const { golfers } = useActiveGolfers();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
+    const stored = localStorage.getItem(DISMISSED_KEY);
+    return new Set(stored ? JSON.parse(stored) : []);
+  });
   const navigate = useNavigate();
   
   const nearbyOnlineGolfers = golfers;
@@ -59,120 +51,90 @@ export function LiveClubhouseStrip() {
     }
   }, [isLoading, creators.length]);
 
-  // Show skeleton while loading instead of null
+  const handleDismiss = useCallback((id: string) => {
+    setDismissedIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem(DISMISSED_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  }, []);
+
+  const handleFollow = useCallback((id: string) => {
+    analyticsEvents.lcStrip.avatarClick(id, 0);
+  }, []);
+
+  // Combine and filter dismissed golfers
+  const allGolfers = [
+    ...nearbyOnlineGolfers.map(g => ({
+      id: g.id,
+      username: g.username || '',
+      display_name: g.display_name,
+      profile_photo_url: g.avatar_url || null,
+      home_club: g.home_club || null,
+      reason: 'plays_near' as const,
+    })),
+    ...creators.filter(c => !dismissedIds.has(c.id)).map(c => ({
+      id: c.id,
+      username: c.username || '',
+      display_name: c.display_name,
+      profile_photo_url: c.profile_photo_url || null,
+      home_club: c.home_club || null,
+      is_verified: false,
+      has_top100: false,
+      is_new: c.has_recent_post,
+      reason: 'suggested' as const,
+    })),
+  ].filter(g => !dismissedIds.has(g.id));
+
+  // Show skeleton while loading
   if (isLoading) {
     return (
-      <div className="live-row">
-        <div className="live-scroll" role="listbox" aria-label="Loading suggested creators">
-          {/* Skeleton tiles */}
-          {[...Array(6)].map((_, idx) => (
-            <div key={idx} className="lc-tile" role="option">
-              <div className="lc-avatar-btn">
-                <div className="w-[72px] h-[72px] rounded-[18px] bg-muted animate-pulse" />
-              </div>
-              <div className="lc-label">
-                <div className="h-4 w-20 bg-muted animate-pulse rounded mb-1" />
-                <div className="h-3 w-16 bg-muted animate-pulse rounded" />
-              </div>
-            </div>
+      <div className="suggested-golfers-row">
+        <div className="suggested-golfers-header">
+          <span className="suggested-golfers-title">Suggested golfers</span>
+        </div>
+        <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested creators">
+          {[...Array(4)].map((_, idx) => (
+            <div key={idx} className="w-[140px] h-[180px] rounded-2xl bg-muted animate-pulse flex-shrink-0" />
           ))}
         </div>
       </div>
     );
   }
 
-  if (!creators.length) return null;
+  if (allGolfers.length === 0) return null;
 
   return (
-    <div className="live-row">
-      {/* Section header with "See all" link */}
-      <div className="live-row-header">
-        <span className="live-row-title">Suggested golfers</span>
+    <div className="suggested-golfers-row">
+      {/* Section header with "See all" link - matching left gutter */}
+      <div className="suggested-golfers-header">
+        <span className="suggested-golfers-title">Suggested golfers</span>
         <button 
-          className="live-row-see-all"
+          className="suggested-golfers-see-all"
           onClick={() => navigate('/golferstofollow')}
         >
           See all
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
+      
+      {/* Carousel with proper left gutter matching title */}
       <div
-        className="live-scroll" 
+        className="suggested-golfers-scroll" 
         ref={rowRef} 
         role="listbox" 
         aria-label="Suggested golfers"
       >
-          {nearbyOnlineGolfers.map((golfer, idx) => (
-            <LiveTile 
-              key={golfer.id} 
-              creator={{
-                id: golfer.id,
-                username: golfer.username || '',
-                display_name: golfer.display_name,
-                profile_photo_url: golfer.avatar_url || null,
-                home_club: golfer.home_club || null,
-                is_online: false,
-                has_recent_post: false,
-                isMock: false,
-              }} 
-              index={idx + 1} 
-            />
-          ))}
-          {creators.map((c, idx) => (
-            <LiveTile 
-              key={c.id} 
-              creator={c} 
-              index={idx + nearbyOnlineGolfers.length + 1} 
-            />
+        {allGolfers.map((golfer) => (
+          <SuggestedGolferCard
+            key={golfer.id}
+            golfer={golfer}
+            onDismiss={handleDismiss}
+            onFollow={handleFollow}
+          />
         ))}
       </div>
-    </div>
-  );
-}
-
-function LiveTile({ creator, index }: { creator: any; index: number }) {
-  const navigate = useNavigate();
-
-  const seenIds = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]') as string[];
-  const hasSeen = seenIds.includes(creator.id);
-  const recentPulse = creator.has_recent_post && !hasSeen;
-
-  const onAvatarClick = () => {
-    // Mark as seen
-    const newSeen = [...new Set([...seenIds, creator.id])];
-    localStorage.setItem(SEEN_KEY, JSON.stringify(newSeen));
-    
-    analyticsEvents.lcStrip.avatarClick(creator.id, index);
-    
-    // Navigate to immersive profile
-    navigate(`/user/${creator.username}`);
-  };
-
-  return (
-    <div
-      className={`lc-tile ${recentPulse ? 'lc-recent' : ''}`}
-      role="option"
-    >
-      <button 
-        className="lc-avatar-btn" 
-        onClick={onAvatarClick} 
-        aria-label={creator.display_name}
-      >
-        <SquircleAvatar
-          size={72}
-          src={creator.profile_photo_url}
-          alt={creator.display_name}
-        />
-      </button>
-
-      <div className="lc-name" title={creator.display_name}>
-        {creator.display_name}
-      </div>
-      {creator.home_club && (
-        <div className="lc-sub" title={creator.home_club}>
-          {creator.home_club}
-        </div>
-      )}
     </div>
   );
 }
