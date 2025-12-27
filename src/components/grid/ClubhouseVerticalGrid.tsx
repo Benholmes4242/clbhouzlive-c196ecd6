@@ -730,6 +730,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           creatorHomeClub={filteredPosts[currentIndex].user?.homeClub}
           creatorHandicap={filteredPosts[currentIndex].user?.handicap}
           caption={filteredPosts[currentIndex].title || filteredPosts[currentIndex].ctaDescription}
+          courseId={filteredPosts[currentIndex].golfCourse?.id}
+          courseName={filteredPosts[currentIndex].golfCourse?.name}
+          courseCountry={filteredPosts[currentIndex].golfCourse?.country}
           onClose={() => {
             setCommentsModalOpen(false);
             setSelectedPostId('');
