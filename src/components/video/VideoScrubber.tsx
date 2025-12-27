@@ -319,7 +319,7 @@ export const VideoScrubber = memo(function VideoScrubber({
       
       {/* Larger touch target (invisible) */}
       <div 
-        className="absolute -top-4 -bottom-4 left-0 right-0" 
+        className="absolute -top-[25px] -bottom-[25px] left-0 right-0" 
         style={{ pointerEvents: 'inherit' }}
       />
     </div>
