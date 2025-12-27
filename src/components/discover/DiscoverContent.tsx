@@ -333,35 +333,70 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Create hero item from the first LANDSCAPE video content item
+  // Create hero item using ENGAGEMENT-BASED selection algorithm
+  // Scores videos by: likes, comments, views, recency
   // Hero must only select landscape videos (aspectRatio >= 1.25) to avoid cropping
   const heroItem = useMemo(() => {
     if (!currentContent || currentContent.length === 0) return null;
     
     const LANDSCAPE_THRESHOLD = 1.25;
-    
-    // Find the first landscape video item for the hero
-    const landscapeVideo = currentContent.find(item => {
-      if (item.type !== 'video') return false;
-      
-      // Check if we have explicit aspect ratio
-      if (item.aspectRatio && item.aspectRatio >= LANDSCAPE_THRESHOLD) {
+    const MIN_DURATION = 15; // seconds
+    const MAX_DURATION = 180; // seconds (3 minutes)
+    const now = Date.now();
+
+    // Score and rank videos
+    const scoredVideos = currentContent
+      .filter(item => {
+        if (item.type !== 'video') return false;
+
+        // Must be landscape
+        const aspectRatio = item.aspectRatio || 
+          (item.width && item.height && item.height > 0 ? item.width / item.height : 0);
+        if (aspectRatio < LANDSCAPE_THRESHOLD && !item.landscapeSuitable) return false;
+
+        // Duration filter (if duration is available)
+        const duration = item.durationSeconds || 0;
+        if (duration > 0 && (duration < MIN_DURATION || duration > MAX_DURATION)) return false;
+
         return true;
-      }
-      
-      // Fallback: compute from width/height if available
-      if (item.width && item.height && item.height > 0) {
-        const computedAspectRatio = item.width / item.height;
-        return computedAspectRatio >= LANDSCAPE_THRESHOLD;
-      }
-      
-      // Fallback: check landscapeSuitable flag
-      return item.landscapeSuitable === true;
-    });
-    
-    // If no landscape video found, return null (hero won't render)
-    // This prevents portrait videos from being cropped in the hero
-    return landscapeVideo ? createHeroItem(landscapeVideo) : null;
+      })
+      .map(item => {
+        // Calculate age in hours
+        const createdAt = item.createdAt;
+        const ageMs = createdAt 
+          ? now - new Date(createdAt).getTime()
+          : 24 * 60 * 60 * 1000; // Default to 24h if no date
+        const ageHours = ageMs / (1000 * 60 * 60);
+
+        // Recency boost
+        let recencyBoost = 1.0;
+        if (ageHours < 24) recencyBoost = 3.0;
+        else if (ageHours < 72) recencyBoost = 2.0;
+        else if (ageHours < 168) recencyBoost = 1.5;
+
+        // Engagement metrics (with safe defaults)
+        const likes = item.likes || 0;
+        const comments = item.comments || 0;
+        const views = Math.max(item.shares || 1, 1); // Use shares as proxy for views
+
+        // Weighted engagement score
+        const engagementRate = (likes + comments) / views;
+        const weightedEngagement = 
+          (1.0 * likes) + 
+          (3.0 * comments) + 
+          (0.1 * views) + 
+          (5.0 * engagementRate * 100);
+
+        const score = weightedEngagement * recencyBoost;
+
+        return { item, score, ageHours };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    if (scoredVideos.length === 0) return null;
+
+    const topVideo = scoredVideos[0];
+    return createHeroItem(topVideo.item, topVideo.score, topVideo.ageHours);
   }, [currentContent]);
 
   // Filter out the hero item from the grid

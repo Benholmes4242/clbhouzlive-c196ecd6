@@ -5,7 +5,8 @@ import {
   UniversalMediaGrid, 
   UniversalGridConfig, 
   UniversalMediaItem,
-  exploreItemsToUniversal 
+  exploreItemsToUniversal,
+  AR_LANDSCAPE_THRESHOLD,
 } from '@/components/grid';
 
 // Extended type to include clustering metadata
@@ -24,19 +25,21 @@ interface ShortsGridProps {
   currentUserId?: string;
 }
 
-// Grid config for Watch page using UniversalMediaGrid
+// Grid config for Watch page using mixed-grid layout
+// Every 5th tile is landscape, others are portrait
+// Only landscape tiles autoplay
 const WATCH_GRID_CONFIG: UniversalGridConfig = {
-  layout: 'portrait-grid',
+  layout: 'mixed-grid',
   columns: 2,
   autoplayPattern: 'every-nth',
-  autoplayNth: 3,
-  maxConcurrent: 2,
+  autoplayNth: 5, // Every 5th item (landscape tiles) can autoplay
+  maxConcurrent: 1, // Only 1 video at a time
   surface: 'shorts',
   lazyLoad: true,
   preloadViewports: 2,
   initialVisible: 6,
   showCreator: true,
-  showLikes: false,
+  showLikes: true, // Enable likes display
   showDuration: true,
   infiniteScroll: true,
   playThreshold: 0.4,
@@ -93,10 +96,83 @@ export default function ShortsGrid({
     return headers;
   }, [items]);
   
-  // Convert items to unified format (stripping the cluster metadata)
-  const unifiedItems = useMemo(() => {
-    return exploreItemsToUniversal(items);
+  // Separate videos by orientation for smart assignment
+  const { portraitVideos, landscapeVideos } = useMemo(() => {
+    const portrait: ClusteredExploreItem[] = [];
+    const landscape: ClusteredExploreItem[] = [];
+
+    items.forEach(item => {
+      const aspectRatio = item.aspectRatio || 
+        (item.width && item.height && item.height > 0 ? item.width / item.height : 1);
+      
+      if (aspectRatio >= AR_LANDSCAPE_THRESHOLD || item.landscapeSuitable) {
+        landscape.push(item);
+      } else {
+        portrait.push(item);
+      }
+    });
+
+    return { portraitVideos: portrait, landscapeVideos: landscape };
   }, [items]);
+
+  // Weave videos into mixed pattern (every 5th = landscape)
+  const mixedItems = useMemo(() => {
+    const result: ClusteredExploreItem[] = [];
+    let portraitIndex = 0;
+    let landscapeIndex = 0;
+    const totalSlots = Math.max(items.length, 20);
+
+    for (let i = 0; i < totalSlots; i++) {
+      const isLandscapeSlot = (i + 1) % 5 === 0;
+
+      if (isLandscapeSlot && landscapeIndex < landscapeVideos.length) {
+        result.push(landscapeVideos[landscapeIndex]);
+        landscapeIndex++;
+      } else if (!isLandscapeSlot && portraitIndex < portraitVideos.length) {
+        result.push(portraitVideos[portraitIndex]);
+        portraitIndex++;
+      } else {
+        // Fallback: use whatever is available
+        if (portraitIndex < portraitVideos.length) {
+          result.push(portraitVideos[portraitIndex]);
+          portraitIndex++;
+        } else if (landscapeIndex < landscapeVideos.length) {
+          result.push(landscapeVideos[landscapeIndex]);
+          landscapeIndex++;
+        }
+      }
+      
+      // Stop if we've used all items
+      if (portraitIndex >= portraitVideos.length && landscapeIndex >= landscapeVideos.length) {
+        break;
+      }
+    }
+
+    return result;
+  }, [portraitVideos, landscapeVideos, items.length]);
+  
+  // Convert mixed items to unified format with orientation metadata
+  const unifiedItems = useMemo(() => {
+    const unified = exploreItemsToUniversal(mixedItems);
+    
+    // Add orientation metadata for mixed-grid layout
+    return unified.map((item, index) => {
+      const isLandscapeSlot = (index + 1) % 5 === 0;
+      const aspectRatio = item.aspectRatio || 
+        (item.mediaWidth && item.mediaHeight && item.mediaHeight > 0 
+          ? item.mediaWidth / item.mediaHeight 
+          : 1);
+      const isActuallyLandscape = aspectRatio >= AR_LANDSCAPE_THRESHOLD;
+      
+      return {
+        ...item,
+        orientation: isActuallyLandscape ? 'landscape' as const : 'portrait' as const,
+        tileVariant: isLandscapeSlot && isActuallyLandscape ? 'landscape' as const : 'portrait' as const,
+        // Only landscape tiles can autoplay
+        isAutoplayCandidate: isLandscapeSlot && isActuallyLandscape,
+      };
+    });
+  }, [mixedItems]);
 
   // Handle item click - passes index for Shorts Player entry
   const handleItemClick = useCallback((unifiedItem: UniversalMediaItem, index: number) => {

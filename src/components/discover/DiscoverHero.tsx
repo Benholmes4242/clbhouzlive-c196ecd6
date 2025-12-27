@@ -338,7 +338,12 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
 }
 
 // Helper to create hero item from post data
-export function createHeroItem(post: any): HeroItem | null {
+// Now supports engagement scoring and dynamic context labels
+export function createHeroItem(
+  post: any,
+  engagementScore?: number,
+  ageHours?: number
+): HeroItem | null {
   if (!post) return null;
 
   const mediaUrl = post.media?.[0]?.media_url || post.src;
@@ -349,9 +354,32 @@ export function createHeroItem(post: any): HeroItem | null {
     posterUrl = getStreamPoster(mediaUrl, '1s') ?? undefined;
   }
 
+  // Determine context label based on engagement and age
+  let contextLabel = "RECOMMENDED FOR YOU";
+  
+  if (engagementScore !== undefined && ageHours !== undefined) {
+    const VIRAL_THRESHOLD = 500;
+    const HIGH_ENGAGEMENT_THRESHOLD = 200;
+    
+    if (ageHours < 6 && engagementScore > VIRAL_THRESHOLD) {
+      contextLabel = "GOING VIRAL";
+    } else if (ageHours < 24 && engagementScore > HIGH_ENGAGEMENT_THRESHOLD) {
+      contextLabel = "TRENDING NOW";
+    } else if (engagementScore > HIGH_ENGAGEMENT_THRESHOLD) {
+      contextLabel = "POPULAR THIS WEEK";
+    } else if (post.golfCourse?.id) {
+      contextLabel = "FEATURED COURSE";
+    } else if (post.user?.is_verified) {
+      contextLabel = "FROM TOP CREATOR";
+    }
+  } else {
+    // Fallback for older code paths without scoring
+    contextLabel = "TRENDING TODAY";
+  }
+
   return {
     id: post.id,
-    contextLabel: 'TRENDING TODAY',
+    contextLabel,
     title: post.title || post.caption || 'Featured moment',
     subContext: post.user?.name || post.course_name || '',
     mediaUrl,
