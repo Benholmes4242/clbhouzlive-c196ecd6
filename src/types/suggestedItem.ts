@@ -31,26 +31,44 @@ export type SuggestedBusiness = {
 export type SuggestedItem = SuggestedGolfer | SuggestedBusiness;
 
 /**
- * Check if a region string looks like a short code (e.g., ENG, SCT, WLS, NIR)
- * These are not suitable for display - we want full names like "England"
+ * UK region code mapping - Mapbox returns these short codes for UK regions
  */
-function isRegionCode(region: string): boolean {
+const UK_REGION_MAP: Record<string, string> = {
+  'ENG': 'England',
+  'SCO': 'Scotland',
+  'SCT': 'Scotland',
+  'WAL': 'Wales',
+  'WLS': 'Wales',
+  'NIR': 'Northern Ireland',
+};
+
+/**
+ * Normalize a region value for UK - maps codes like ENG to "England"
+ * For non-UK countries, returns the region as-is if it looks human-readable
+ */
+function normalizeRegion(region: string, country: string | null | undefined): string | null {
   const trimmed = region.trim();
-  // Match 2-3 uppercase letters (e.g., ENG, SCT, WLS, NIR)
-  if (/^[A-Z]{2,3}$/.test(trimmed)) {
-    return true;
+  
+  // For UK, use the region map
+  if (country === 'United Kingdom') {
+    const mapped = UK_REGION_MAP[trimmed.toUpperCase()];
+    if (mapped) return mapped;
   }
-  // Match ISO-style codes like GB-ENG
-  if (/^[A-Z]{2}-[A-Z]{2,3}$/.test(trimmed)) {
-    return true;
-  }
-  return false;
+  
+  // Check if it looks like a short code (2-3 uppercase letters or ISO-style like GB-ENG)
+  const isCode = /^[A-Z]{2,3}$/.test(trimmed) || /^[A-Z]{2}-[A-Z]{2,3}$/.test(trimmed);
+  
+  // If it's a code and not UK (already handled above), skip it
+  if (isCode) return null;
+  
+  // Otherwise it's human-readable, return as-is
+  return trimmed;
 }
 
 /**
  * Build a location label from business account fields
  * Format: "Country, Region" (preferred) or "Country, SubCountry" (fallback)
- * Region codes (ENG, SCT, etc.) are ignored - we only use human-readable names
+ * UK region codes (ENG, SCT, etc.) are mapped to full names
  */
 export function buildBusinessLocationLabel(business: {
   location?: string | null;
@@ -59,11 +77,14 @@ export function buildBusinessLocationLabel(business: {
   sub_country?: string | null;
   country?: string | null;
 }): string | null {
-  const hasValidRegion = business.region && !isRegionCode(business.region);
+  // Try to normalize the region (handles UK code mapping)
+  const normalizedRegion = business.region 
+    ? normalizeRegion(business.region, business.country) 
+    : null;
   
-  // Preferred: Country, Region (only if region is not a code)
-  if (business.country && hasValidRegion) {
-    return `${business.country}, ${business.region}`;
+  // Preferred: Country, Region (only if region is valid/normalized)
+  if (business.country && normalizedRegion) {
+    return `${business.country}, ${normalizedRegion}`;
   }
   // Fallback: Country, SubCountry
   if (business.country && business.sub_country) {

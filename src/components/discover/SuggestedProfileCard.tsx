@@ -149,10 +149,10 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
       {/* Card content - flex column */}
       <div className="flex flex-col h-full pt-3 pb-3 px-3">
-        {/* Avatar - large, centered */}
+        {/* Avatar - large, centered (~20% bigger: 56 → 68) */}
         <div className="relative flex justify-center mb-2">
           <SquircleAvatar
-            size={56}
+            size={68}
             src={avatarUrl}
             alt={displayName}
           />
@@ -160,15 +160,15 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
         {/* Text stack - tight gap, no reserved empty heights */}
         <div className="flex flex-col gap-0.5 items-center min-w-0">
-          {/* Name + Verified badge - 2 lines max */}
-          <div className="flex items-start gap-1 justify-center w-full">
-            <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug">
-              {displayName}
-            </p>
+          {/* Name + Verified badge inline - badge follows last character naturally */}
+          <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug w-full">
+            <span>{displayName}</span>
             {isVerified && (
-              <VerifiedBadge size="sm" className="flex-shrink-0 mt-0.5" />
+              <span className="inline-block align-middle ml-1">
+                <VerifiedBadge size="sm" />
+              </span>
             )}
-          </div>
+          </p>
 
           {/* Golfer: Home club (2 lines) OR Business: "Business Profile" */}
           {isGolfer && golferData?.home_club && (
