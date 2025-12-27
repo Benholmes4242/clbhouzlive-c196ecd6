@@ -172,7 +172,9 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
   
   const [accessCode, setAccessCode] = useState("");
   const [hasAccess, setHasAccess] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // Only enter "loading" when a session exists and needs validation.
+  // This prevents any flash of app content for first-time users with no session.
+  const [loading, setLoading] = useState(() => !!getSession());
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const cancelledRef = useRef(false);
@@ -334,19 +336,10 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
     }
   };
 
-  // If loading but session exists, optimistically render children
-  // The skeleton loader inside pages will show while validation completes
-  if (loading && getSession()) {
-    return <>{children}</>;
-  }
-
-  // Only show spinner if no session at all (true first-time access)
+  // Never block with a dedicated loading screen.
+  // Render children while we validate access in the background; page-level skeletons handle UX.
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <>{children}</>;
   }
 
   if (hasAccess) {
