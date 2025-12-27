@@ -46,10 +46,8 @@ export const VideoScrubber = memo(function VideoScrubber({
   const wasPausedRef = useRef(false);
   const rafRef = useRef<number>();
 
-  // Debug: move scrubber to the middle of the tile when ?scrubber=center
-  const debugCenter =
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('scrubber') === 'center';
+  // DEBUG: Force scrubber to center and make it very visible
+  const DEBUG_VISIBLE = true;
   
   // Internal state derivation (used when props not passed)
   const [derivedBufferedPct, setDerivedBufferedPct] = useState(0);
@@ -266,15 +264,16 @@ export const VideoScrubber = memo(function VideoScrubber({
     <div
       ref={trackRef}
       className={cn(
-        "absolute left-0 right-0 z-10 cursor-pointer touch-none",
+        "absolute left-0 right-0 z-50 cursor-pointer touch-none",
         "pointer-events-auto",
         className
       )}
       style={{
-        height: `${height}px`,
-        ...(debugCenter
-          ? { top: '50%', bottom: 'auto', transform: 'translateY(-50%)' }
-          : { bottom: 0 }),
+        height: DEBUG_VISIBLE ? '20px' : `${height}px`,
+        top: DEBUG_VISIBLE ? '50%' : 'auto',
+        bottom: DEBUG_VISIBLE ? 'auto' : 0,
+        transform: DEBUG_VISIBLE ? 'translateY(-50%)' : 'none',
+        backgroundColor: DEBUG_VISIBLE ? 'red' : 'transparent',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
