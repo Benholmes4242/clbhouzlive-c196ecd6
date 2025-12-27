@@ -74,20 +74,23 @@ const MICRO_STAMPS: Record<string, string> = {
   'WORLD': 'CLB · WORLD',
 };
 
-// Glow intensity by tier (higher tiers = stronger glow)
-const GLOW_INTENSITY: Record<string, { opacity: number; scale: number }> = {
-  '5': { opacity: 0.06, scale: 1.8 },
-  '10': { opacity: 0.07, scale: 1.9 },
-  '20': { opacity: 0.08, scale: 2.0 },
-  '50': { opacity: 0.09, scale: 2.1 },
-  '100': { opacity: 0.10, scale: 2.2 },
-  '200': { opacity: 0.12, scale: 2.4 },
-  '300': { opacity: 0.14, scale: 2.6 },
-  '400': { opacity: 0.16, scale: 2.8 },
-  'GBI': { opacity: 0.08, scale: 2.0 },
-  'EU': { opacity: 0.08, scale: 2.0 },
-  'USA': { opacity: 0.08, scale: 2.0 },
-  'WORLD': { opacity: 0.12, scale: 2.4 },
+// Glow intensity by tier - boosted so all tiers pop
+// Base tier (Rookie → Century): matches previous Legendary/Grand Slam
+// High tier (Elite → Legendary): +1 step stronger
+// Top tier (Grand Slam): strongest premium glow
+const GLOW_INTENSITY: Record<string, { opacity: number; scale: number; blur: number }> = {
+  '5': { opacity: 0.14, scale: 2.6, blur: 6 },
+  '10': { opacity: 0.14, scale: 2.6, blur: 6 },
+  '20': { opacity: 0.15, scale: 2.7, blur: 7 },
+  '50': { opacity: 0.15, scale: 2.7, blur: 7 },
+  '100': { opacity: 0.16, scale: 2.8, blur: 8 },
+  '200': { opacity: 0.18, scale: 3.0, blur: 9 },
+  '300': { opacity: 0.22, scale: 3.2, blur: 10 },
+  '400': { opacity: 0.26, scale: 3.5, blur: 12 },
+  'GBI': { opacity: 0.14, scale: 2.6, blur: 6 },
+  'EU': { opacity: 0.14, scale: 2.6, blur: 6 },
+  'USA': { opacity: 0.14, scale: 2.6, blur: 6 },
+  'WORLD': { opacity: 0.18, scale: 3.0, blur: 9 },
 };
 
 // Milestone thresholds for next tier calculation
@@ -169,7 +172,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   const clubName = CLUB_NAMES[tier] || title;
   const microStamp = MICRO_STAMPS[tier] || `CLB · ${tier}`;
   const emblemSrc = getEmblemPath(tier);
-  const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.08, scale: 2.0 };
+  const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.14, scale: 2.6, blur: 6 };
   
   // Get tier accent color
   const tierAccentColor = getTierAccentColor(tier);
@@ -314,15 +317,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       <div className="flex items-start gap-2.5 relative z-10">
         {/* Trophy medallion container with rarity glow */}
         <div className="relative flex-shrink-0">
-          {/* Rarity glow - radial aura behind medallion */}
+          {/* Rarity glow - radial aura behind medallion - boosted for collectible feel */}
           {unlocked && !isGhost && (
             <div 
               className="absolute inset-0 pointer-events-none transition-transform duration-200"
               style={{
-                background: `radial-gradient(circle, ${accentColor} 0%, transparent 70%)`,
+                background: `radial-gradient(circle, ${accentColor} 0%, ${accentColor}80 30%, transparent 70%)`,
                 opacity: glowConfig.opacity * glowScale,
                 transform: `scale(${glowConfig.scale * glowScale})`,
-                filter: 'blur(4px)',
+                filter: `blur(${glowConfig.blur}px)`,
               }}
             />
           )}
