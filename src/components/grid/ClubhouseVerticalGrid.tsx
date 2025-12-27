@@ -105,6 +105,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
             managedByMediaRuntime
+            externallyManaged={true}
             mediaId={postId}
             onLoadedData={onFirstFrameReady}
           />
