@@ -1,21 +1,9 @@
 import React from 'react';
 import { CLUB_STEPS, Top100ClubMeta } from '@/lib/top100Club';
-import { MILESTONE_THEMES, type MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
+import { AchievementBadgeSquircle, type SquircleTier } from '@/components/achievements/AchievementBadgeSquircle';
 
 // Show all tiers from 5 through 400 in order
 const MILESTONES: Top100ClubMeta[] = CLUB_STEPS;
-
-// Get ring color from global system (bgDark for softer pastel)
-function getTierRingColor(threshold: number): string {
-  const theme = MILESTONE_THEMES[threshold as MilestoneTier];
-  return theme?.bgDark ?? '#94a3b8';
-}
-
-// Get accent color from global system (for text/icons)
-function getTierAccentColor(threshold: number): string {
-  const theme = MILESTONE_THEMES[threshold as MilestoneTier];
-  return theme?.accent ?? '#94a3b8';
-}
 
 // Thresholds for each milestone
 const THRESHOLDS = [5, 10, 20, 50, 100, 200, 300, 400];
@@ -71,38 +59,23 @@ export function Top100MilestonesCarousel({
       <div className="overflow-x-auto pb-1 -mx-1 px-1">
         {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full">
-          {/* Row of circles */}
+          {/* Row of squircle badges */}
           <div className="flex gap-4">
             {MILESTONES.map((milestone) => {
               const isUnlocked = totalPlayed >= milestone.threshold;
               const remaining = Math.max(0, milestone.threshold - totalPlayed);
-              const ringColor = getTierRingColor(milestone.threshold);
-              const accentColor = getTierAccentColor(milestone.threshold);
 
               return (
-                <button
+                <div
                   key={milestone.tierId}
-                  type="button"
-                  onClick={() => onMilestoneClick?.(milestone)}
-                  className="flex flex-col items-center min-w-[72px] gap-1 focus:outline-none"
+                  className="flex flex-col items-center min-w-[72px] gap-1"
                 >
-                  {/* Squircle ring - uses bgDark for softer pastel matching cards */}
-                  <div className="relative">
-                    <div
-                      className="h-14 w-14 rounded-sq-md flex items-center justify-center bg-white"
-                      style={{
-                        boxShadow: isUnlocked
-                          ? `0 0 18px ${ringColor}22`
-                          : 'none',
-                        border: `2px solid ${isUnlocked ? ringColor : `${ringColor}66`}`,
-                        opacity: isUnlocked ? 1 : 0.65,
-                      }}
-                    >
-                      <span className="text-sm font-semibold" style={{ color: accentColor }}>
-                        {milestone.threshold}
-                      </span>
-                    </div>
-                  </div>
+                  {/* Unified AchievementBadgeSquircle */}
+                  <AchievementBadgeSquircle
+                    tier={String(milestone.threshold) as SquircleTier}
+                    unlocked={isUnlocked}
+                    onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
+                  />
 
                   {/* Labels - consistent two lines */}
                   <div className="mt-2 text-center">
@@ -113,7 +86,7 @@ export function Top100MilestonesCarousel({
                       {isUnlocked ? 'Unlocked' : `${remaining} away`}
                     </p>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
