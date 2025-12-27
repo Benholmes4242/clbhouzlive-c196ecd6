@@ -24,9 +24,6 @@ interface CourseLocationRowProps {
 }
 
 /**
- * Formats location text matching Course Details page intent:
- * {Course Name}, {Region/State or Sub-country}, {Country}
- *
  * Hard rules:
  * - NEVER render the literal string "Unknown" (case-insensitive)
  * - If we don't have real location context, hide the entire row (no pin)
@@ -40,39 +37,25 @@ const isMeaningfulPart = (value?: string | null): value is string => {
 
 /**
  * Location format (final spec):
- * - "CourseName, Country, Region" (preferred)
- * - If no region: "CourseName, Country, SubCountry"
+ * - "Country, Region" (preferred)
+ * - If no region: "Country, SubCountry"
  * - If neither region nor sub_country: hide row entirely
  */
-const formatLocationText = (course: CourseInfo): string => {
-  const courseName = isMeaningfulPart(course.name) ? course.name.trim() : null;
+const formatLocationText = (course: CourseInfo): string | null => {
   const country = isMeaningfulPart(course.country) ? course.country.trim() : null;
   const region = isMeaningfulPart(course.region) ? course.region.trim() : null;
   const subCountry = isMeaningfulPart(course.sub_country) ? course.sub_country.trim() : null;
 
-  // Must have course name
-  if (!courseName) return '';
+  if (!country) return null;
 
-  // Must have country + (region OR sub_country)
-  if (!country) return '';
-
-  let locationPart: string | null = null;
   if (region) {
-    locationPart = region;
-  } else if (subCountry) {
-    locationPart = subCountry;
+    return region !== country ? `${country}, ${region}` : country;
+  }
+  if (subCountry) {
+    return subCountry !== country ? `${country}, ${subCountry}` : country;
   }
 
-  if (!locationPart) return '';
-
-  // Build: "CourseName, Country, Region/SubCountry"
-  // De-dupe if country === region/subCountry
-  const parts = [courseName, country];
-  if (locationPart !== country) {
-    parts.push(locationPart);
-  }
-
-  return parts.join(', ');
+  return null;
 };
 
 /**
@@ -80,6 +63,7 @@ const formatLocationText = (course: CourseInfo): string => {
  *
  * - Never renders "Unknown" (hides entirely)
  * - Entire row is clickable CTA navigating to course page
+ * - Wraps up to 3 lines, truncates only after line 3
  */
 const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
   course,
@@ -95,6 +79,7 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
 
   const locationText = formatLocationText(course);
   if (!locationText) return null;
+
   const courseIdentifier = course.slug || course.id;
   const isClickable = !!courseIdentifier;
   
@@ -120,7 +105,7 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
       onClick={handleClick}
       disabled={!isClickable}
       className={cn(
-        "flex items-center gap-1.5 py-1 transition-all",
+        "flex items-start gap-1.5 py-1 transition-all text-left",
         isClickable && "cursor-pointer active:opacity-70 hover:opacity-80",
         !isClickable && "cursor-default",
         className
@@ -128,30 +113,35 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
     >
       <MapPin 
         className={cn(
-          "h-3.5 w-3.5 flex-shrink-0",
+          "h-3.5 w-3.5 flex-shrink-0 mt-[2px]",
           isDark ? "text-white/60" : "text-muted-foreground"
         )} 
       />
-      <span 
-        className={cn(
-          "text-[13px] font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0",
-          isDark ? "text-white/70" : "text-muted-foreground"
-        )}
-      >
-        Played at{' '}
+      <div className="min-w-0 flex-1">
         <span 
           className={cn(
-            "font-semibold",
-            isDark ? "text-white/90" : "text-foreground"
+            "text-[13px] font-medium",
+            "[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]",
+            "overflow-hidden break-words",
+            isDark ? "text-white/70" : "text-muted-foreground"
           )}
         >
-          {locationText}
+          <span className="opacity-80">Played at </span>
+          <span 
+            className={cn(
+              "font-semibold",
+              isDark ? "text-white/90" : "text-foreground"
+            )}
+          >
+            {course.name}
+          </span>
+          <span className="opacity-80">, {locationText}</span>
         </span>
-      </span>
+      </div>
       {showChevron && isClickable && (
         <ChevronRight 
           className={cn(
-            "h-3.5 w-3.5 flex-shrink-0 ml-auto",
+            "h-3.5 w-3.5 flex-shrink-0 mt-[2px]",
             isDark ? "text-white/40" : "text-muted-foreground/60"
           )} 
         />
