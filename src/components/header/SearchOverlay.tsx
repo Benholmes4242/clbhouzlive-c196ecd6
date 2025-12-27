@@ -526,8 +526,7 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
       regex.test(part) ? (
         <span 
           key={i} 
-          className="bg-amber-500/[0.18] px-1 rounded-md"
-          style={{ borderRadius: '6px' }}
+          className="bg-amber-500/[0.18] rounded-sm"
         >
           {part}
         </span>
