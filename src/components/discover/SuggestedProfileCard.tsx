@@ -151,21 +151,23 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
         {/* Text stack - tight gap, no reserved empty heights */}
         <div className="flex flex-col gap-0.5 items-center min-w-0">
           {/* Name + Verified badge inline - keep badge attached to last word for businesses */}
-          <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-tight w-full">
+          <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug w-full">
             {businessVerifiedNameParts ? (
               <>
                 {businessVerifiedNameParts.leading}
-                <span className="inline-flex items-center whitespace-nowrap gap-1">
-                  <span>{businessVerifiedNameParts.tail}</span>
-                  <VerifiedBadge size="sm" className="relative top-px" />
+                <span className="whitespace-nowrap">
+                  {businessVerifiedNameParts.tail}
+                  <span className="inline-block align-middle ml-1">
+                    <VerifiedBadge size="sm" />
+                  </span>
                 </span>
               </>
             ) : (
               <>
                 <span>{displayName}</span>
                 {isVerified && (
-                  <span className="inline-flex items-center gap-1 ml-1">
-                    <VerifiedBadge size="sm" className="relative top-px" />
+                  <span className="inline-block align-middle ml-1">
+                    <VerifiedBadge size="sm" />
                   </span>
                 )}
               </>
