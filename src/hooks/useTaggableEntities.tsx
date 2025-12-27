@@ -55,8 +55,8 @@ export const useTaggableEntities = () => {
         .from('golf_courses')
         .insert({
           name,
-          country: 'Unknown',
-          continent: 'North America'
+          country: null,
+          continent: null
         })
         .select()
         .single();

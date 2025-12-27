@@ -121,7 +121,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
             course={{
               id: golfClubTags[0].entity_id,
               name: golfClubTags[0].name,
-              country: 'Unknown',
+              country: null,
               region: undefined
             }}
             className="m-0"
@@ -179,7 +179,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                           course={{
                             id: golfClubTags[0].entity_id,
                             name: golfClubTags[0].name,
-                            country: 'Unknown',
+                            country: null,
                             region: undefined
                           }}
                           className="m-0"
