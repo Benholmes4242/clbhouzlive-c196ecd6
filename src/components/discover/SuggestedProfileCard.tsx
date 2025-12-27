@@ -147,7 +147,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
         <X className="w-3.5 h-3.5 text-muted-foreground" />
       </button>
 
-      {/* Card content - flex column with fixed height slots */}
+      {/* Card content - flex column */}
       <div className="flex flex-col h-full pt-3 pb-3 px-3">
         {/* Avatar - large, centered */}
         <div className="relative flex justify-center mb-2">
@@ -158,59 +158,52 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           />
         </div>
 
-        {/* Text content area - flex-1 to push button to bottom */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Slot 1: Name + Verified badge - 2 lines, min-h reserved */}
-          <div className="min-h-[36px] flex flex-col items-center justify-start">
-            <div className="flex items-start gap-1 justify-center w-full">
-              <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug">
-                {displayName}
-              </p>
-              {isVerified && (
-                <VerifiedBadge size="sm" className="flex-shrink-0 mt-0.5" />
-              )}
-            </div>
-          </div>
-
-          {/* Slot 2: Home club (golfers) or "Business profile" (businesses) - reserved height */}
-          <div className="min-h-[32px] flex items-start justify-center mt-0.5">
-            {isGolfer && golferData?.home_club ? (
-              <p className="text-[11px] text-muted-foreground text-center line-clamp-2 leading-snug w-full">
-                {golferData.home_club}
-              </p>
-            ) : isBusiness ? (
-              <p className="text-[11px] text-muted-foreground text-center line-clamp-1 w-full">
-                Business profile
-              </p>
-            ) : isGolfer ? (
-              // Empty placeholder for golfers without home club
-              <div className="w-full" />
-            ) : null}
-          </div>
-
-          {/* Slot 3: Handicap (golfers) or Location (businesses) - reserved height */}
-          <div className="min-h-[16px] flex items-start justify-center mt-0.5">
-            {isGolfer && showHandicap && formattedHandicap ? (
-              <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
-                {formattedHandicap}
-              </p>
-            ) : isBusiness && businessData?.location_label ? (
-              <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
-                {businessData.location_label}
-              </p>
-            ) : (
-              // Empty placeholder to reserve space
-              <div className="w-full" />
+        {/* Text stack - tight gap, no reserved empty heights */}
+        <div className="flex flex-col gap-0.5 items-center min-w-0">
+          {/* Name + Verified badge - 2 lines max */}
+          <div className="flex items-start gap-1 justify-center w-full">
+            <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug">
+              {displayName}
+            </p>
+            {isVerified && (
+              <VerifiedBadge size="sm" className="flex-shrink-0 mt-0.5" />
             )}
           </div>
+
+          {/* Golfer: Home club (2 lines) OR Business: "Business Profile" */}
+          {isGolfer && golferData?.home_club && (
+            <p className="text-[11px] text-muted-foreground text-center line-clamp-2 leading-snug w-full">
+              {golferData.home_club}
+            </p>
+          )}
+          {isBusiness && (
+            <p className="text-[11px] text-muted-foreground text-center line-clamp-1 w-full">
+              Business Profile
+            </p>
+          )}
+
+          {/* Golfer: Handicap (1 line) OR Business: Location (1 line) */}
+          {isGolfer && showHandicap && formattedHandicap && (
+            <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
+              {formattedHandicap}
+            </p>
+          )}
+          {isBusiness && businessData?.location_label && (
+            <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
+              {businessData.location_label}
+            </p>
+          )}
         </div>
 
-        {/* Follow CTA - pinned to bottom with mt-auto */}
+        {/* Spacer pushes button to bottom */}
+        <div className="flex-1" />
+
+        {/* Follow CTA - pinned to bottom */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full mt-auto h-8 text-xs font-medium rounded-lg",
+            "w-full h-8 text-xs font-medium rounded-lg",
             isFollowing && "bg-muted text-muted-foreground"
           )}
           onClick={handleFollow}
