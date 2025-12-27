@@ -46,6 +46,8 @@ interface CommentsPageProps {
   courseId?: string;
   courseName?: string;
   courseCountry?: string;
+  courseSubCountry?: string | null;
+  courseRegion?: string | null;
 }
 
 // ReplyingTo state always stores the top-level comment ID for one-level threading
@@ -717,6 +719,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   courseId,
   courseName,
   courseCountry,
+  courseSubCountry,
+  courseRegion,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -1156,6 +1160,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           id: courseId,
                           name: courseName,
                           country: courseCountry,
+                          sub_country: courseSubCountry,
+                          region: courseRegion,
                         }}
                         isDark={isDark}
                         showChevron={true}

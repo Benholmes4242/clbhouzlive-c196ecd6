@@ -134,6 +134,34 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
+      // Extract all golf course IDs from post tags for batch fetching
+      const courseIds = postsData
+        .flatMap(post => (post.post_tags || [])
+          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
+          .map((tag: any) => tag.taggable_entities?.entity_id)
+        )
+        .filter(Boolean) as string[];
+      
+      const uniqueCourseIds = [...new Set(courseIds)];
+      
+      // Batch fetch golf course details
+      const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
+        ? await supabase
+            .from('golf_courses')
+            .select('id, name, country, sub_country, region')
+            .in('id', uniqueCourseIds)
+        : { data: [], error: null };
+        
+      if (coursesError) {
+        console.error('Error fetching golf courses:', coursesError);
+        // Don't fail - just continue without course data
+      }
+      
+      // Create lookup map for courses
+      const courseMap = new Map(
+        (golfCourses || []).map(c => [c.id, c])
+      );
+
       // Format posts for explore grid with polymorphic creator hydration
       const formattedPosts = postsData.map(post => {
         const isBusinessPost = post.actor_type === 'business';
@@ -172,43 +200,29 @@ export const useRealPostsFetcher = () => {
           }
         }
 
-        // Find golf course from post tags
+        // Find golf course from post tags and hydrate with full details
         const golfCourseTag = (post.post_tags || []).find(
-          tag => tag.taggable_entities?.entity_type === 'golf_club'
+          (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
 
         let golfCourse = null;
         
         if (golfCourseTag?.taggable_entities) {
-          // Use golf course from tags if available
-          golfCourse = {
-            id: golfCourseTag.taggable_entities.entity_id,
+          const courseId = golfCourseTag.taggable_entities.entity_id;
+          const fullCourse = courseMap.get(courseId);
+          
+          // Use full course details if available
+          golfCourse = fullCourse ? {
+            id: fullCourse.id,
+            name: fullCourse.name,
+            country: fullCourse.country || '',
+            sub_country: fullCourse.sub_country,
+            region: fullCourse.region,
+          } : {
+            id: courseId,
             name: golfCourseTag.taggable_entities.name,
-            country: 'Unknown'
+            country: '',
           };
-        } else if (post.content) {
-          // Extract golf course from content text as fallback
-          const contentText = post.content;
-          
-          // Look for patterns like "📍 Played at [Course Name]" or "@[Course Name]"
-          // IMPORTANT: Stop capturing immediately after "Golf Club", "Golf Course", or "GC"
-          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i) ||
-                            contentText.match(/at\s+([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i);
-          
-          if (courseMatch) {
-            const courseName = courseMatch[1].trim()
-              .replace(/\([^)]*\)/g, '') // Remove any parentheses content
-              .replace(/\s+/g, ' ') // Normalize spaces
-              .trim();
-            
-            if (courseName.length > 3) { // Only if we have a reasonable course name
-              golfCourse = {
-                id: 'extracted-' + courseName.toLowerCase().replace(/\s+/g, '-'),
-                name: courseName,
-                country: 'Unknown'
-              };
-            }
-          }
         }
 
         // Generate random audio track for video posts (demo purposes)
@@ -436,6 +450,34 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
+      // Extract all golf course IDs from post tags for batch fetching
+      const courseIds = postsData
+        .flatMap(post => (post.post_tags || [])
+          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
+          .map((tag: any) => tag.taggable_entities?.entity_id)
+        )
+        .filter(Boolean) as string[];
+      
+      const uniqueCourseIds = [...new Set(courseIds)];
+      
+      // Batch fetch golf course details
+      const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
+        ? await supabase
+            .from('golf_courses')
+            .select('id, name, country, sub_country, region')
+            .in('id', uniqueCourseIds)
+        : { data: [], error: null };
+        
+      if (coursesError) {
+        console.error('Error fetching golf courses:', coursesError);
+        // Don't fail - just continue without course data
+      }
+      
+      // Create lookup map for courses
+      const courseMap = new Map(
+        (golfCourses || []).map(c => [c.id, c])
+      );
+
       // Format posts for explore grid
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
@@ -464,43 +506,29 @@ export const useRealPostsFetcher = () => {
           }
         }
 
-        // Find golf course from post tags
+        // Find golf course from post tags and hydrate with full details
         const golfCourseTag = (post.post_tags || []).find(
-          tag => tag.taggable_entities?.entity_type === 'golf_club'
+          (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
 
         let golfCourse = null;
         
         if (golfCourseTag?.taggable_entities) {
-          // Use golf course from tags if available
-          golfCourse = {
-            id: golfCourseTag.taggable_entities.entity_id,
+          const courseId = golfCourseTag.taggable_entities.entity_id;
+          const fullCourse = courseMap.get(courseId);
+          
+          // Use full course details if available
+          golfCourse = fullCourse ? {
+            id: fullCourse.id,
+            name: fullCourse.name,
+            country: fullCourse.country || '',
+            sub_country: fullCourse.sub_country,
+            region: fullCourse.region,
+          } : {
+            id: courseId,
             name: golfCourseTag.taggable_entities.name,
-            country: 'Unknown'
+            country: '',
           };
-        } else if (post.content) {
-          // Extract golf course from content text as fallback
-          const contentText = post.content;
-          
-          // Look for patterns like "📍 Played at [Course Name]" or "@[Course Name]"
-          // IMPORTANT: Stop capturing immediately after "Golf Club", "Golf Course", or "GC"
-          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i) ||
-                            contentText.match(/at\s+([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i);
-          
-          if (courseMatch) {
-            const courseName = courseMatch[1].trim()
-              .replace(/\([^)]*\)/g, '') // Remove any parentheses content
-              .replace(/\s+/g, ' ') // Normalize spaces
-              .trim();
-            
-            if (courseName.length > 3) { // Only if we have a reasonable course name
-              golfCourse = {
-                id: 'extracted-' + courseName.toLowerCase().replace(/\s+/g, '-'),
-                name: courseName,
-                country: 'Unknown'
-              };
-            }
-          }
         }
 
         // Generate random audio track for video posts (demo purposes)

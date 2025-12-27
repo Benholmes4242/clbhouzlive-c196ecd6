@@ -24,7 +24,7 @@ export interface PostMediaContext {
   items: MediaItem[];                 // atomic media items for thumbs/carousels
   mediaUrls: string[];                // convenience arrays for legacy code
   mediaTypes: MediaKind[];
-  golfCourse?: { id: string; name: string; country: string };
+  golfCourse?: { id: string; name: string; country: string; sub_country?: string | null; region?: string | null };
   user?: { id: string; displayName?: string; profile_photo_url?: string | null };
   displayName?: string;
   content?: string;
