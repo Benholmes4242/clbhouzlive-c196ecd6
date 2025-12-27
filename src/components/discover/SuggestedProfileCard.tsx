@@ -16,15 +16,15 @@ interface SuggestedProfileCardProps {
 }
 
 /**
- * Adds a non-breaking space between the last two words to prevent
- * the verified badge from wrapping alone onto a new line
+ * For verified BUSINESS names, split into "leading" text + final word "tail".
+ * We render the tail + badge inside a no-wrap span so the badge can never
+ * wrap onto its own line without any text.
  */
-function addNbspBetweenLastTwoWords(name: string): string {
-  const words = name.split(' ');
-  if (words.length < 2) return name;
-  const lastWord = words.pop()!;
-  const secondLastWord = words.pop()!;
-  return [...words, `${secondLastWord}\u00A0${lastWord}`].join(' ');
+function splitForVerifiedBadgePair(name: string): { leading: string; tail: string } {
+  const words = name.trim().split(/\s+/);
+  if (words.length <= 1) return { leading: name, tail: '' };
+  const tail = words.pop()!;
+  return { leading: `${words.join(' ')} `, tail };
 }
 
 const REASON_LABELS: Record<string, string> = {
@@ -105,9 +105,10 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
   const golferData = isGolfer ? item : null;
   const businessData = isBusiness ? item : null;
 
-  // Display name - for businesses, add nbsp between last two words so badge doesn't orphan
-  const rawName = isGolfer ? golferData!.display_name : businessData!.name;
-  const displayName = isBusiness ? addNbspBetweenLastTwoWords(rawName) : rawName;
+  // Display name
+  const displayName = isGolfer ? golferData!.display_name : businessData!.name;
+  const businessVerifiedNameParts =
+    isBusiness && isVerified ? splitForVerifiedBadgePair(displayName) : null;
 
   // Avatar URL
   const avatarUrl = isGolfer ? golferData!.profile_photo_url : businessData!.logo_url;
