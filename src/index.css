@@ -190,6 +190,11 @@ html.lightbox-open {
   --achievement-card-bg: rgba(31, 36, 40, 0.04);
   --achievement-card-border: rgba(31, 36, 40, 0.12);
   --achievement-ghost-overlay: rgba(31, 36, 40, 0.05);
+  
+  /* Squircle milestone tokens - OPAQUE backgrounds */
+  --squircle-unlocked-bg: rgba(252, 252, 254, 0.97);
+  --squircle-locked-bg: rgba(248, 248, 250, 0.95);
+  --journey-rail-base: rgba(31, 36, 40, 0.08);
 }
 
 /* Dark mode achievement card tokens */
@@ -197,6 +202,11 @@ html.lightbox-open {
   --achievement-card-bg: rgba(255, 255, 255, 0.05);
   --achievement-card-border: rgba(255, 255, 255, 0.10);
   --achievement-ghost-overlay: rgba(255, 255, 255, 0.15);
+  
+  /* Squircle milestone tokens - OPAQUE backgrounds for dark */
+  --squircle-unlocked-bg: rgba(35, 38, 45, 0.97);
+  --squircle-locked-bg: rgba(30, 33, 40, 0.95);
+  --journey-rail-base: rgba(255, 255, 255, 0.08);
 }
 
 /* ========================================

@@ -62,7 +62,7 @@ function getProgressPct(totalPlayed: number, thresholds: number[]): number {
  * Top100MilestoneTimeline - Part of Global Achievement & Milestone System
  * 
  * Uses unified AchievementBadgeSquircle for consistent styling site-wide
- * Progress rail runs BEHIND the milestone squircles
+ * Progress rail runs BEHIND the milestone squircles (contained within bounds)
  */
 export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTimelineProps) {
   const milestones = TOP100_MILESTONES;
@@ -71,6 +71,12 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
   const maxThreshold = milestones[milestones.length - 1]?.threshold || 400;
   const progressPct = getProgressPct(totalTop100Played, thresholds);
   const targetColor = getCurrentTargetColor(totalTop100Played);
+
+  // Calculate rail positioning - contained within first/last squircle centers
+  // Squircle width is 56px (h-14 w-14), container min-width is 80px
+  // So center of first = 40px, center of last = totalWidth - 40px
+  const squircleHalfWidth = 28; // half of 56px squircle
+  const containerHalfWidth = 40; // half of 80px container
 
   return (
     <section className="mt-4">
@@ -85,28 +91,31 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
       <div className="-mx-4 px-4 pb-2 scrollbar-hide overflow-x-auto">
         {/* Container for rail + squircles */}
         <div className="relative inline-flex">
-          {/* Progress rail - positioned behind squircles */}
+          {/* Progress rail - positioned behind squircles, contained within bounds */}
           {/* Start/end aligned to center of first/last squircle */}
           <div 
-            className="absolute top-[28px] h-[3px] rounded-full pointer-events-none"
+            className="absolute h-[3px] rounded-full pointer-events-none"
             style={{
-              // Position from center of first squircle to center of last
-              left: 'calc(40px)', // half of min-w-[80px]
-              right: 'calc(40px)',
-              background: 'var(--achievement-card-border, rgba(31, 36, 40, 0.10))',
+              // Vertically center: squircle is 56px, so center at 28px
+              top: '28px',
+              transform: 'translateY(-50%)',
+              // Horizontal containment: center of first to center of last
+              left: `${containerHalfWidth}px`,
+              right: `${containerHalfWidth}px`,
+              background: 'var(--journey-rail-base, rgba(31, 36, 40, 0.08))',
             }}
           >
-            {/* Fill portion */}
+            {/* Fill portion - soft gradient with tier color */}
             <div 
               className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
               style={{
                 width: `${progressPct}%`,
-                background: `linear-gradient(90deg, ${targetColor}50, ${targetColor}70)`,
+                background: `linear-gradient(90deg, ${targetColor}40, ${targetColor}60)`,
               }}
             />
           </div>
 
-          {/* Row of squircle badges - sits above rail */}
+          {/* Row of squircle badges - sits above rail (z-10) */}
           <div className="flex gap-3 relative z-10">
             {milestones.map((m, index) => {
               const unlocked = totalTop100Played >= m.threshold;
@@ -117,10 +126,11 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
                   key={m.id}
                   className="flex min-w-[80px] flex-col items-center gap-1"
                 >
-                  {/* Unified AchievementBadgeSquircle */}
+                  {/* Unified AchievementBadgeSquircle with current target state */}
                   <AchievementBadgeSquircle
                     tier={String(m.threshold) as SquircleTier}
                     unlocked={unlocked}
+                    isCurrentTarget={isNext}
                   />
 
                   {/* Label */}

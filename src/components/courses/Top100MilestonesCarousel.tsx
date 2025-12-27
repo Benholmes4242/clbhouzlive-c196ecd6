@@ -63,12 +63,27 @@ interface Top100MilestonesCarouselProps {
   onMilestoneClick?: (milestone: Top100ClubMeta) => void;
 }
 
+/**
+ * Top100MilestonesCarousel - Milestone Achievements (All Lists) section
+ * 
+ * Features:
+ * - Unified AchievementBadgeSquircle components (collector/rarity polish)
+ * - Journey rail runs BEHIND squircles, contained within bounds
+ * - Current target milestone emphasized with border + halo
+ */
 export function Top100MilestonesCarousel({
   totalPlayed,
   onMilestoneClick,
 }: Top100MilestonesCarouselProps) {
   const progressPct = getAchievementsProgressPct(totalPlayed);
   const targetColor = getCurrentTargetColor(totalPlayed);
+  
+  // Find next milestone index for current target state
+  const nextIndex = MILESTONES.findIndex(m => totalPlayed < m.threshold);
+
+  // Calculate rail positioning - contained within first/last squircle centers
+  // Squircle width is 56px (h-14 w-14), container min-width is 72px
+  const containerHalfWidth = 36; // half of 72px container
 
   return (
     <section className="space-y-2 mt-6">
@@ -85,31 +100,35 @@ export function Top100MilestonesCarousel({
         <div className="inline-flex flex-col min-w-full">
           {/* Container for rail + squircles - rail runs BEHIND */}
           <div className="relative">
-            {/* Progress rail - positioned behind squircles */}
+            {/* Progress rail - positioned behind squircles, contained within bounds */}
             {/* Start/end aligned to center of first/last squircle */}
             <div 
-              className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full pointer-events-none"
+              className="absolute h-[3px] rounded-full pointer-events-none"
               style={{
-                // Position from center of first squircle to center of last
-                left: 'calc(36px)', // half of min-w-[72px]
-                right: 'calc(36px)',
-                background: 'var(--achievement-card-border, rgba(31, 36, 40, 0.10))',
+                // Vertically center: squircle is 56px, so center at 28px
+                top: '50%',
+                transform: 'translateY(-50%)',
+                // Horizontal containment: center of first to center of last
+                left: `${containerHalfWidth}px`,
+                right: `${containerHalfWidth}px`,
+                background: 'var(--journey-rail-base, rgba(31, 36, 40, 0.08))',
               }}
             >
-              {/* Fill portion */}
+              {/* Fill portion - soft gradient with tier color */}
               <div 
                 className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
                 style={{
                   width: `${progressPct}%`,
-                  background: `linear-gradient(90deg, ${targetColor}50, ${targetColor}70)`,
+                  background: `linear-gradient(90deg, ${targetColor}40, ${targetColor}60)`,
                 }}
               />
             </div>
 
-            {/* Row of squircle badges - sits above rail */}
+            {/* Row of squircle badges - sits above rail (z-10) */}
             <div className="flex gap-4 relative z-10">
-              {MILESTONES.map((milestone) => {
+              {MILESTONES.map((milestone, index) => {
                 const isUnlocked = totalPlayed >= milestone.threshold;
+                const isNext = !isUnlocked && index === nextIndex;
                 const remaining = Math.max(0, milestone.threshold - totalPlayed);
 
                 return (
@@ -117,10 +136,11 @@ export function Top100MilestonesCarousel({
                     key={milestone.tierId}
                     className="flex flex-col items-center min-w-[72px] gap-1"
                   >
-                    {/* Unified AchievementBadgeSquircle */}
+                    {/* Unified AchievementBadgeSquircle with current target state */}
                     <AchievementBadgeSquircle
                       tier={String(milestone.threshold) as SquircleTier}
                       unlocked={isUnlocked}
+                      isCurrentTarget={isNext}
                       onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
                     />
 
