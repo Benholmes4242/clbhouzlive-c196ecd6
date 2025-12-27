@@ -17,6 +17,7 @@ import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { useClubhouseVideo } from '@/contexts/ClubhouseVideoContext';
 import { cn } from '@/lib/utils';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
@@ -84,7 +85,8 @@ const Clubhouse = () => {
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();
   
-  // Track active video for progress HUD
+  // Track active video for progress HUD - shared via context for bottom nav
+  const { setActiveVideo } = useClubhouseVideo();
   const activeVideoRef = useRef<HTMLVideoElement | null>(null);
   
   // Composer state management
@@ -273,6 +275,7 @@ const Clubhouse = () => {
             onCurrentPostChange={handleCurrentPostChange}
             onActiveVideoRefChange={(ref) => {
               activeVideoRef.current = ref;
+              setActiveVideo(ref);
             }}
             onCommentsOpenChange={() => {}}
             onPostDetailsOpen={() => console.log('Post details opened')}
