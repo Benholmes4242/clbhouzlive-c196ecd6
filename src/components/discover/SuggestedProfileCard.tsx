@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,19 @@ import { SuggestedItem } from '@/types/suggestedItem';
 
 interface SuggestedProfileCardProps {
   item: SuggestedItem;
-  onDismiss?: (id: string) => void;
   onFollow?: (id: string) => void;
+}
+
+/**
+ * Adds a non-breaking space between the last two words to prevent
+ * the verified badge from wrapping alone onto a new line
+ */
+function addNbspBetweenLastTwoWords(name: string): string {
+  const words = name.split(' ');
+  if (words.length < 2) return name;
+  const lastWord = words.pop()!;
+  const secondLastWord = words.pop()!;
+  return [...words, `${secondLastWord}\u00A0${lastWord}`].join(' ');
 }
 
 const REASON_LABELS: Record<string, string> = {
@@ -26,30 +37,15 @@ const REASON_LABELS: Record<string, string> = {
 
 export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
   item,
-  onDismiss,
   onFollow,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
 
   const isGolfer = item.type === 'golfer';
   const isBusiness = item.type === 'business';
-
-  const handleDismiss = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDismissed(true);
-    
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate([5]);
-    }
-    
-    setTimeout(() => {
-      onDismiss?.(item.id);
-    }, 200);
-  };
 
   const handleFollow = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -109,8 +105,9 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
   const golferData = isGolfer ? item : null;
   const businessData = isBusiness ? item : null;
 
-  // Display name
-  const displayName = isGolfer ? golferData!.display_name : businessData!.name;
+  // Display name - for businesses, add nbsp between last two words so badge doesn't orphan
+  const rawName = isGolfer ? golferData!.display_name : businessData!.name;
+  const displayName = isBusiness ? addNbspBetweenLastTwoWords(rawName) : rawName;
 
   // Avatar URL
   const avatarUrl = isGolfer ? golferData!.profile_photo_url : businessData!.logo_url;
@@ -130,23 +127,13 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
         "relative flex-shrink-0 w-[185px] h-[220px] rounded-2xl overflow-hidden cursor-pointer",
         "bg-card/80 backdrop-blur-sm border border-border/40",
         "shadow-sm hover:shadow-md transition-all duration-200",
-        "hover:scale-[1.02] active:scale-[0.98]",
-        isDismissed && "opacity-0 scale-90 pointer-events-none"
+        "hover:scale-[1.02] active:scale-[0.98]"
       )}
       onClick={handleCardClick}
       style={{
         transition: 'all 0.2s ease-out',
       }}
     >
-      {/* Dismiss X button - top right */}
-      <button
-        onClick={handleDismiss}
-        className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-muted/80 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors"
-        aria-label="Dismiss suggestion"
-      >
-        <X className="w-3.5 h-3.5 text-muted-foreground" />
-      </button>
-
       {/* Card content - flex column */}
       <div className="flex flex-col h-full pt-3 pb-3 px-3">
         {/* Avatar - large, centered (~20% bigger: 56 → 68) */}
@@ -154,7 +141,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           <SquircleAvatar
             size={68}
             src={avatarUrl}
-            alt={displayName}
+            alt={rawName}
           />
         </div>
 
