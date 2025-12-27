@@ -11,6 +11,7 @@ import {
   X,
   Play
 } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -151,18 +152,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     );
   };
 
-  // Get avatar/icon for result
+  // Get avatar/icon for result - returns icon only for non-image cases
   const getResultIcon = (result: any) => {
-    if (result.image) {
-      return (
-        <img 
-          src={result.image} 
-          alt="" 
-          className="w-full h-full rounded-full object-cover"
-        />
-      );
-    }
-
     const iconClass = isClubhousePage ? "h-5 w-5 text-white/70" : "h-5 w-5 text-black/70";
     switch (result.type) {
       case 'user':
@@ -372,25 +363,37 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                     : "hover:bg-black/5 focus:bg-black/10 focus:ring-2 focus:ring-[#F58220]/30 focus:outline-none"
                 )}
               >
-                {/* Avatar/Icon */}
-                <div className={cn(
-                  "w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 overflow-hidden",
-                  isClubhousePage ? "bg-white/10" : "bg-black/10"
-                )}>
-                  {item.image ? (
-                    <img 
-                      src={item.image} 
-                      alt="" 
-                      className="w-full h-full object-cover"
+                {/* Avatar/Icon - uses global SquircleAvatar for SDS consistency */}
+                <div className="flex-shrink-0">
+                  {item.type === 'user' ? (
+                    <SquircleAvatar
+                      src={item.image}
+                      alt={item.title}
+                      size={40}
+                      fallback={item.title ? getInitials(item.title) : '?'}
+                      hideRing
                     />
                   ) : (
                     <div className={cn(
-                      "w-full h-full bg-gradient-to-br flex items-center justify-center text-xs font-medium",
-                      isClubhousePage
-                        ? "from-primary/20 to-primary/10 text-white"
-                        : "from-[#F58220]/20 to-[#F58220]/10 text-black"
+                      "w-10 h-10 rounded-sq-md flex items-center justify-center overflow-hidden",
+                      isClubhousePage ? "bg-white/10" : "bg-black/10"
                     )}>
-                      {item.title ? getInitials(item.title) : getResultIcon(item)}
+                      {item.image ? (
+                        <img 
+                          src={item.image} 
+                          alt="" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className={cn(
+                          "w-full h-full bg-gradient-to-br flex items-center justify-center text-xs font-medium",
+                          isClubhousePage
+                            ? "from-primary/20 to-primary/10 text-white"
+                            : "from-[#F58220]/20 to-[#F58220]/10 text-black"
+                        )}>
+                          {item.title ? getInitials(item.title) : getResultIcon(item)}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
