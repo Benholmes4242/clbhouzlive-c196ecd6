@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Music } from 'lucide-react';
-import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { cn } from '@/lib/utils';
+import PostMeta from '@/components/posts/PostMeta';
 
 interface User {
   id: string;
@@ -17,28 +17,43 @@ interface AudioTrack {
   isOriginal?: boolean;
 }
 
+interface Tag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  start_index?: number;
+  end_index?: number;
+}
+
+interface GolfCourse {
+  id?: string | null;
+  name?: string | null;
+  region?: string | null;
+  country?: string | null;
+  sub_country?: string | null;
+  slug?: string | null;
+}
+
 interface FeedMetaProps {
   user?: User;
   caption?: string;
   audioTrack?: AudioTrack;
   className?: string;
+  /** Tags for @mentions */
+  tags?: Tag[];
+  /** Golf course for "Played at" row */
+  golfCourse?: GolfCourse | null;
 }
 
 const FeedMeta: React.FC<FeedMetaProps> = ({ 
   user, 
   caption, 
   audioTrack,
-  className 
+  className,
+  tags,
+  golfCourse
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const cleanCaption = caption ? removeGolfCourseFromContent(caption) : '';
-  const shouldShowMore = cleanCaption && cleanCaption.length > 100;
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
-
   return (
     <div 
       className={cn(
@@ -94,41 +109,17 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
         </div>
       )}
 
-      {/* Caption Text */}
-      {cleanCaption && (
-        <div className="mb-3">
-          <div 
-            className={cn(
-              "text-white text-base font-medium leading-relaxed",
-              !isExpanded && "line-clamp-2"
-            )}
-            style={{ 
-              textShadow: '0 1px 3px rgba(0,0,0,0.7)',
-              wordBreak: 'break-word'
-            }}
-          >
-            {cleanCaption}
-            {shouldShowMore && !isExpanded && (
-              <button
-                onClick={toggleExpanded}
-                className="ml-2 text-white/80 hover:text-white transition-colors"
-                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-              >
-                ...more
-              </button>
-            )}
-          </div>
-          {isExpanded && shouldShowMore && (
-            <button
-              onClick={toggleExpanded}
-              className="mt-1 text-white/80 hover:text-white transition-colors text-sm"
-              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-            >
-              Show less
-            </button>
-          )}
-        </div>
-      )}
+      {/* Caption + Course using PostMeta */}
+      <PostMeta
+        text={caption}
+        tags={tags}
+        golfCourse={golfCourse}
+        isDark={true}
+        textShadow={true}
+        maxLines={2}
+        showMore={true}
+        className="mb-3"
+      />
 
       {/* Music Pill */}
       {audioTrack && (
