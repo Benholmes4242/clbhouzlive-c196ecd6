@@ -24,7 +24,7 @@ export function useSuggestedBusinesses() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_accounts')
-        .select('id, name, logo_url, category, location, city, region, country')
+        .select('id, name, logo_url, category, location, city, region, country, is_verified')
         .eq('is_deleted', false)
         .order('is_verified', { ascending: false })
         .order('created_at', { ascending: false })
@@ -35,11 +35,10 @@ export function useSuggestedBusinesses() {
         return [];
       }
 
-      // Map to include sub_country as null (field doesn't exist in business_accounts)
       return (data || []).map(b => ({
         ...b,
         sub_country: null,
-        is_verified: (b as any).is_verified ?? false,
+        is_verified: b.is_verified ?? false,
       })) as SuggestedBusiness[];
     },
     staleTime: 60_000,
