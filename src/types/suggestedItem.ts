@@ -31,8 +31,26 @@ export type SuggestedBusiness = {
 export type SuggestedItem = SuggestedGolfer | SuggestedBusiness;
 
 /**
+ * Check if a region string looks like a short code (e.g., ENG, SCT, WLS, NIR)
+ * These are not suitable for display - we want full names like "England"
+ */
+function isRegionCode(region: string): boolean {
+  const trimmed = region.trim();
+  // Match 2-3 uppercase letters (e.g., ENG, SCT, WLS, NIR)
+  if (/^[A-Z]{2,3}$/.test(trimmed)) {
+    return true;
+  }
+  // Match ISO-style codes like GB-ENG
+  if (/^[A-Z]{2}-[A-Z]{2,3}$/.test(trimmed)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Build a location label from business account fields
  * Format: "Country, Region" (preferred) or "Country, SubCountry" (fallback)
+ * Region codes (ENG, SCT, etc.) are ignored - we only use human-readable names
  */
 export function buildBusinessLocationLabel(business: {
   location?: string | null;
@@ -41,8 +59,10 @@ export function buildBusinessLocationLabel(business: {
   sub_country?: string | null;
   country?: string | null;
 }): string | null {
-  // Preferred: Country, Region
-  if (business.country && business.region) {
+  const hasValidRegion = business.region && !isRegionCode(business.region);
+  
+  // Preferred: Country, Region (only if region is not a code)
+  if (business.country && hasValidRegion) {
     return `${business.country}, ${business.region}`;
   }
   // Fallback: Country, SubCountry
@@ -53,14 +73,6 @@ export function buildBusinessLocationLabel(business: {
   if (business.country) {
     return business.country;
   }
-  // Just region
-  if (business.region) {
-    return business.region;
-  }
-  // Just sub_country
-  if (business.sub_country) {
-    return business.sub_country;
-  }
-  // Nothing
+  // Nothing usable
   return null;
 }
