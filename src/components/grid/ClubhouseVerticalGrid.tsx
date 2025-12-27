@@ -27,6 +27,7 @@ import { useClubhouseRuntimeBridge } from '@/hooks/useClubhouseRuntimeBridge';
 import { useSoftResume } from '@/hooks/useSoftResume';
 
 import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
+import { Squircle } from '@/components/ui/squircle';
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/clubhouse/cinematic';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 
@@ -644,17 +645,22 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     
                     {videoControlsVisible[item.id] && (
                       <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-30">
-                        <div className="bg-black/60 rounded-full p-4 backdrop-blur-sm animate-fade-in">
-                          {videosPlaying[item.id] !== false ? (
-                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                            </svg>
-                          ) : (
-                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z"/>
-                            </svg>
-                          )}
-                        </div>
+                        <Squircle width={56} height={56}>
+                          <div 
+                            className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden animate-fade-in"
+                            style={{ borderRadius: '30%' }}
+                          >
+                            {videosPlaying[item.id] !== false ? (
+                              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                              </svg>
+                            ) : (
+                              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            )}
+                          </div>
+                        </Squircle>
                       </div>
                     )}
                   </>
