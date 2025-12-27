@@ -24,7 +24,10 @@ export function highlightMatch(text: string, query: string): React.ReactNode {
   return (
     <>
       {before}
-      <span className="bg-amber-500/[0.18] rounded-sm">
+      <span 
+        className="bg-amber-500/[0.18] px-1 rounded-md"
+        style={{ borderRadius: '6px' }}
+      >
         {match}
       </span>
       {after}
