@@ -28,6 +28,8 @@ import { useSoftResume } from '@/hooks/useSoftResume';
 
 import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/clubhouse/cinematic';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
@@ -243,6 +245,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   // Soft resume hook for smooth audio ramp
   const { softResume, cancelRamp } = useSoftResume();
 
+  // Bottom navigation height for scrubber positioning
+  const { height: bottomNavHeight } = useBottomNavigation();
+
   // State for modals and interactions
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -252,6 +257,18 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const [videosPlaying, setVideosPlaying] = useState<Record<string, boolean>>({});
   const lastTapRef = useRef<Record<string, number>>({});
   const controlsHideTimers = useRef<Record<string, number>>({});
+  
+  // Active video element for scrubber
+  const [activeVideoEl, setActiveVideoEl] = useState<HTMLVideoElement | null>(null);
+  
+  // Update active video element when current index changes
+  useEffect(() => {
+    const currentPostId = filteredPosts[currentIndex]?.id;
+    if (currentPostId) {
+      const videoEl = videoRefs.current[currentPostId];
+      setActiveVideoEl(videoEl || null);
+    }
+  }, [currentIndex, filteredPosts]);
 
   // Current post data
   const currentPost = filteredPosts[currentIndex];
@@ -608,8 +625,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     <VideoWithAutoplay
                       ref={(el) => {
                         registerVideoRef(item.id, el);
-                        if (index === currentIndex && el && onActiveVideoRefChange) {
-                          onActiveVideoRefChange(el);
+                        if (index === currentIndex && el) {
+                          setActiveVideoEl(el);
+                          onActiveVideoRefChange?.(el);
                         }
                       }}
                       src={currentMedia.media_url}
@@ -787,6 +805,23 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           isVisible={true}
           onFollow={handleFollowToggle}
         />
+      )}
+
+      {/* Video Progress Scrubber - positioned flush on top edge of bottom navbar */}
+      {activeVideoEl && currentPost && (
+        <div 
+          className="fixed left-0 right-0 z-[95] pointer-events-none"
+          style={{ bottom: bottomNavHeight }}
+        >
+          <VideoScrubber
+            videoEl={activeVideoEl}
+            mediaId={currentPost.id}
+            height={3}
+            className="pointer-events-auto"
+            hasFirstFrame={true}
+            isAttached={true}
+          />
+        </div>
       )}
     </div>
   );
