@@ -33,7 +33,6 @@ import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
-import { ClubhouseVideoProvider } from '@/contexts/ClubhouseVideoContext';
 import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
@@ -602,7 +601,6 @@ const AppInner: React.FC = () => {
           <HeaderProvider>
             <ModalProvider>
               <BottomNavigationProvider>
-                <ClubhouseVideoProvider>
                 <CinemaDimProvider>
                   <UIProvider>
                     <ToastHost>
@@ -645,7 +643,6 @@ const AppInner: React.FC = () => {
                     </ToastHost>
                   </UIProvider>
                 </CinemaDimProvider>
-                </ClubhouseVideoProvider>
               </BottomNavigationProvider>
             </ModalProvider>
           </HeaderProvider>

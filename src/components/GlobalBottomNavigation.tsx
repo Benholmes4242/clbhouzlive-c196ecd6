@@ -7,13 +7,11 @@ import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
-import { useClubhouseVideoSafe } from '@/contexts/ClubhouseVideoContext';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
-import ClubhouseVideoProgressBar from './bottom-navigation/ClubhouseVideoProgressBar';
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
 
@@ -205,12 +203,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               transform: 'none', // Prevent Framer Motion from adding transforms that might cause floating
             }}
           >
-            {/* Video Progress Bar - top edge of bottom nav, only on Clubhouse */}
-            {isClubhouseRoute && (
-              <ClubhouseVideoProgressBar 
-                className="absolute top-0 left-0 right-0 h-[2px] bg-hud-bg pointer-events-none z-10"
-              />
-            )}
             <div
               ref={(el) => {
                 navRef.current = el;
