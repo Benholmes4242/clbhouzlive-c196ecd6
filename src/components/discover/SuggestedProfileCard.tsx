@@ -155,9 +155,9 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
             {businessVerifiedNameParts ? (
               <>
                 {businessVerifiedNameParts.leading}
-                <span className="whitespace-nowrap">
+                <span className="whitespace-nowrap inline-flex items-center">
                   {businessVerifiedNameParts.tail}
-                  <span className="inline-block align-middle ml-1">
+                  <span className="ml-1">
                     <VerifiedBadge size="sm" />
                   </span>
                 </span>
@@ -166,7 +166,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
               <>
                 <span>{displayName}</span>
                 {isVerified && (
-                  <span className="inline-block align-middle ml-1">
+                  <span className="inline-flex items-center align-middle ml-1">
                     <VerifiedBadge size="sm" />
                   </span>
                 )}
