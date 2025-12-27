@@ -38,41 +38,41 @@ const isMeaningfulPart = (value?: string | null): value is string => {
   return true;
 };
 
+/**
+ * Location format (final spec):
+ * - "CourseName, Country, Region" (preferred)
+ * - If no region: "CourseName, Country, SubCountry"
+ * - If neither region nor sub_country: hide row entirely
+ */
 const formatLocationText = (course: CourseInfo): string => {
-  const parts: string[] = [];
+  const courseName = isMeaningfulPart(course.name) ? course.name.trim() : null;
+  const country = isMeaningfulPart(course.country) ? course.country.trim() : null;
+  const region = isMeaningfulPart(course.region) ? course.region.trim() : null;
+  const subCountry = isMeaningfulPart(course.sub_country) ? course.sub_country.trim() : null;
 
-  // Course name is required
-  if (isMeaningfulPart(course.name)) {
-    parts.push(course.name.trim());
+  // Must have course name
+  if (!courseName) return '';
+
+  // Must have country + (region OR sub_country)
+  if (!country) return '';
+
+  let locationPart: string | null = null;
+  if (region) {
+    locationPart = region;
+  } else if (subCountry) {
+    locationPart = subCountry;
   }
 
-  // For GB&I and Continental Europe, prefer sub_country (e.g., "England", "Portugal")
-  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
-    if (isMeaningfulPart(course.sub_country)) {
-      parts.push(course.sub_country.trim());
-    } else if (isMeaningfulPart(course.region) && course.region !== course.country) {
-      parts.push(course.region.trim());
-    }
-    // Intentionally do NOT add country label for these umbrella regions
-  } else {
-    if (isMeaningfulPart(course.region) && course.region !== course.country) {
-      parts.push(course.region.trim());
-    }
-    if (isMeaningfulPart(course.country)) {
-      parts.push(course.country.trim());
-    }
+  if (!locationPart) return '';
+
+  // Build: "CourseName, Country, Region/SubCountry"
+  // De-dupe if country === region/subCountry
+  const parts = [courseName, country];
+  if (locationPart !== country) {
+    parts.push(locationPart);
   }
 
-  // Hide if we only have the name (no real location context)
-  if (parts.length < 2) return '';
-
-  // De-dupe adjacent duplicates
-  const deduped: string[] = [];
-  for (const p of parts) {
-    if (deduped[deduped.length - 1] !== p) deduped.push(p);
-  }
-
-  return deduped.join(', ');
+  return parts.join(', ');
 };
 
 /**
@@ -134,7 +134,7 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
       />
       <span 
         className={cn(
-          "text-[13px] font-medium whitespace-nowrap",
+          "text-[13px] font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0",
           isDark ? "text-white/70" : "text-muted-foreground"
         )}
       >
