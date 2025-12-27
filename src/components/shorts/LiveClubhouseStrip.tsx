@@ -124,7 +124,7 @@ export function LiveClubhouseStrip() {
         </div>
         <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested profiles">
           {[...Array(4)].map((_, idx) => (
-            <div key={idx} className="w-[140px] h-[180px] rounded-2xl bg-muted animate-pulse flex-shrink-0" />
+            <div key={idx} className="w-[185px] h-[220px] rounded-2xl bg-muted animate-pulse flex-shrink-0" />
           ))}
         </div>
       </div>

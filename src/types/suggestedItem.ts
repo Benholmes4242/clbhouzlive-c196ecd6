@@ -32,15 +32,35 @@ export type SuggestedItem = SuggestedGolfer | SuggestedBusiness;
 
 /**
  * Build a location label from business account fields
+ * Format: "Country, Region" (preferred) or "Country, SubCountry" (fallback)
  */
 export function buildBusinessLocationLabel(business: {
   location?: string | null;
   city?: string | null;
   region?: string | null;
+  sub_country?: string | null;
   country?: string | null;
 }): string | null {
-  if (business.location) return business.location;
-  
-  const parts = [business.city, business.region, business.country].filter(Boolean);
-  return parts.length > 0 ? parts.join(', ') : null;
+  // Preferred: Country, Region
+  if (business.country && business.region) {
+    return `${business.country}, ${business.region}`;
+  }
+  // Fallback: Country, SubCountry
+  if (business.country && business.sub_country) {
+    return `${business.country}, ${business.sub_country}`;
+  }
+  // Just country
+  if (business.country) {
+    return business.country;
+  }
+  // Just region
+  if (business.region) {
+    return business.region;
+  }
+  // Just sub_country
+  if (business.sub_country) {
+    return business.sub_country;
+  }
+  // Nothing
+  return null;
 }

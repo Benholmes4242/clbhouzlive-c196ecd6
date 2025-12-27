@@ -9,6 +9,7 @@ export interface SuggestedBusiness {
   location: string | null;
   city: string | null;
   region: string | null;
+  sub_country: string | null;
   country: string | null;
   is_verified: boolean;
 }
@@ -23,7 +24,7 @@ export function useSuggestedBusinesses() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_accounts')
-        .select('id, name, logo_url, category, location, city, region, country, is_verified')
+        .select('id, name, logo_url, category, location, city, region, country')
         .eq('is_deleted', false)
         .order('is_verified', { ascending: false })
         .order('created_at', { ascending: false })
@@ -34,7 +35,12 @@ export function useSuggestedBusinesses() {
         return [];
       }
 
-      return (data || []) as SuggestedBusiness[];
+      // Map to include sub_country as null (field doesn't exist in business_accounts)
+      return (data || []).map(b => ({
+        ...b,
+        sub_country: null,
+        is_verified: (b as any).is_verified ?? false,
+      })) as SuggestedBusiness[];
     },
     staleTime: 60_000,
   });

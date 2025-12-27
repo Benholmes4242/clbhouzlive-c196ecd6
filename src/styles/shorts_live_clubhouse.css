@@ -62,16 +62,16 @@
 /* Horizontal scroll track - LEFT GUTTER MATCHES HEADER */
 .suggested-golfers-scroll {
   display: flex;
-  gap: 12px;
+  gap: 10px; /* Tighter gap for wider cards */
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding-left: 16px; /* CRITICAL: Match header padding */
-  padding-right: 16px;
+  padding-left: 12px; /* Slightly reduced padding */
+  padding-right: 12px;
   padding-bottom: 8px;
   scrollbar-width: none;
-  align-items: flex-start;
+  align-items: stretch; /* All cards same height */
 }
 
 .suggested-golfers-scroll::-webkit-scrollbar {
