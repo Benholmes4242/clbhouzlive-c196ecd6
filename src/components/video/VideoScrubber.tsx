@@ -45,6 +45,11 @@ export const VideoScrubber = memo(function VideoScrubber({
   const [isValidDuration, setIsValidDuration] = useState(false);
   const wasPausedRef = useRef(false);
   const rafRef = useRef<number>();
+
+  // Debug: move scrubber to the middle of the tile when ?scrubber=center
+  const debugCenter =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('scrubber') === 'center';
   
   // Internal state derivation (used when props not passed)
   const [derivedBufferedPct, setDerivedBufferedPct] = useState(0);
@@ -265,9 +270,11 @@ export const VideoScrubber = memo(function VideoScrubber({
         "pointer-events-auto",
         className
       )}
-      style={{ 
+      style={{
         height: `${height}px`,
-        bottom: 0,
+        ...(debugCenter
+          ? { top: '50%', bottom: 'auto', transform: 'translateY(-50%)' }
+          : { bottom: 0 }),
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
