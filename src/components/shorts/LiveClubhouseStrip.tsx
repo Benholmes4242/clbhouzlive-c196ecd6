@@ -158,7 +158,6 @@ export function LiveClubhouseStrip() {
           <SuggestedProfileCard
             key={item.id}
             item={item}
-            onDismiss={handleDismiss}
             onFollow={handleFollow}
           />
         ))}
