@@ -65,8 +65,10 @@ export function SettingsPageV2() {
   const [showCreatorOnlyConfirm, setShowCreatorOnlyConfirm] = React.useState(false);
   const [showDisableCreatorOnlyConfirm, setShowDisableCreatorOnlyConfirm] = React.useState(false);
 
-  // Handicap visibility state
+  // Privacy visibility states
+  const [isPublic, setIsPublic] = React.useState(true);
   const [showHandicap, setShowHandicap] = React.useState(true);
+  const [isUpdatingPrivacy, setIsUpdatingPrivacy] = React.useState(false);
   const [isUpdatingHandicap, setIsUpdatingHandicap] = React.useState(false);
 
   // Delete account state
@@ -84,11 +86,12 @@ export function SettingsPageV2() {
   const [showContactSheet, setShowContactSheet] = React.useState(false);
   const [showLegalSheet, setShowLegalSheet] = React.useState<'terms' | 'privacy' | 'guidelines' | null>(null);
 
-  // Sync creator state from profile
+  // Sync creator and privacy state from profile
   React.useEffect(() => {
     if (profile) {
       setIsCreator((profile as any)?.is_creator || false);
       setCreatorOnly((profile as any)?.creator_only || false);
+      setIsPublic((profile as any)?.is_public ?? true);
       setShowHandicap((profile as any)?.show_handicap ?? true);
     }
   }, [profile]);
@@ -174,6 +177,33 @@ export function SettingsPageV2() {
       setIsUpdatingCreator(false);
       setShowCreatorOnlyConfirm(false);
       setShowDisableCreatorOnlyConfirm(false);
+    }
+  };
+
+  // Public profile toggle
+  const handlePublicToggle = async (checked: boolean) => {
+    if (!user) return;
+    setIsUpdatingPrivacy(true);
+    setIsPublic(checked);
+
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ is_public: checked })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['liveClubhouseBase'] });
+      toast.success(checked ? 'Profile is now public' : 'Profile is now private');
+    } catch (err) {
+      console.error('[Settings] public toggle error:', err);
+      setIsPublic(!checked);
+      toast.error('Failed to update profile visibility');
+    } finally {
+      setIsUpdatingPrivacy(false);
     }
   };
 
@@ -355,12 +385,20 @@ export function SettingsPageV2() {
         <SettingsSection title="Privacy & Safety">
           <SettingsToggleRow
             icon={<Eye className="w-[18px] h-[18px]" />}
+            title="Public profile"
+            subtitle="When off, you won't appear in search or recommendations."
+            checked={isPublic}
+            onCheckedChange={handlePublicToggle}
+            disabled={isUpdatingPrivacy}
+            isFirst
+          />
+          <SettingsToggleRow
+            icon={<Eye className="w-[18px] h-[18px]" />}
             title="Show my handicap publicly"
             subtitle="Display handicap on your profile and in recommendations."
             checked={showHandicap}
             onCheckedChange={handleHandicapToggle}
             disabled={isUpdatingHandicap}
-            isFirst
           />
           <SettingsChevronRow
             icon={<ShieldBan className="w-[18px] h-[18px]" />}

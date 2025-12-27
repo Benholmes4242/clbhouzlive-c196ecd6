@@ -1,18 +1,21 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useSuggestedBusinesses } from '@/hooks/useSuggestedBusinesses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import SuggestedGolferCard from '@/components/discover/SuggestedGolferCard';
+import SuggestedProfileCard from '@/components/discover/SuggestedProfileCard';
+import { SuggestedItem, SuggestedGolfer, SuggestedBusiness, buildBusinessLocationLabel } from '@/types/suggestedItem';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
-const DISMISSED_KEY = 'dismissedSuggestedGolfers';
+const DISMISSED_KEY = 'dismissedSuggestedItems';
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
   const { golfers } = useActiveGolfers();
+  const { businesses, isLoading: isLoadingBusinesses } = useSuggestedBusinesses();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
@@ -64,40 +67,81 @@ export function LiveClubhouseStrip() {
     analyticsEvents.lcStrip.avatarClick(id, 0);
   }, []);
 
-  // Combine and filter dismissed golfers
-  const allGolfers = [
-    ...nearbyOnlineGolfers.map(g => ({
-      id: g.id,
-      username: g.username || '',
-      display_name: g.display_name,
-      profile_photo_url: g.avatar_url || null,
-      home_club: g.home_club || null,
-      is_verified: false, // TODO: add to nearby golfers query
-      eg_handicap_index: g.eg_handicap_index ?? null,
-      show_handicap: true, // nearby already respects visibility
-      reason: 'plays_near' as const,
-    })),
-    ...creators.filter(c => !dismissedIds.has(c.id)).map(c => ({
-      id: c.id,
-      username: c.username || '',
-      display_name: c.display_name,
-      profile_photo_url: c.profile_photo_url || null,
-      home_club: c.home_club || null,
-      is_verified: (c as any).is_verified ?? false,
-      eg_handicap_index: (c as any).eg_handicap_index ?? null,
-      show_handicap: (c as any).show_handicap ?? false,
-      reason: 'suggested' as const,
-    })),
-  ].filter(g => !dismissedIds.has(g.id));
+  // Build golfer items (filter by is_public)
+  const golferItems: SuggestedGolfer[] = [
+    ...nearbyOnlineGolfers
+      .filter(g => !dismissedIds.has(g.id))
+      .map(g => ({
+        type: 'golfer' as const,
+        id: g.id,
+        username: g.username || '',
+        display_name: g.display_name,
+        profile_photo_url: g.avatar_url || null,
+        home_club: g.home_club || null,
+        is_verified: false,
+        eg_handicap_index: g.eg_handicap_index ?? null,
+        show_handicap: true,
+        is_public: true,
+        reason: 'plays_near' as const,
+      })),
+    ...creators
+      .filter(c => !dismissedIds.has(c.id))
+      .map(c => ({
+        type: 'golfer' as const,
+        id: c.id,
+        username: c.username || '',
+        display_name: c.display_name,
+        profile_photo_url: c.profile_photo_url || null,
+        home_club: c.home_club || null,
+        is_verified: (c as any).is_verified ?? false,
+        eg_handicap_index: (c as any).eg_handicap_index ?? null,
+        show_handicap: (c as any).show_handicap ?? false,
+        is_public: true, // Already filtered by is_public in hook
+        reason: 'suggested' as const,
+      })),
+  ];
+
+  // Build business items (always eligible - no privacy filter)
+  const businessItems: SuggestedBusiness[] = businesses
+    .filter(b => !dismissedIds.has(b.id))
+    .map(b => ({
+      type: 'business' as const,
+      id: b.id,
+      name: b.name,
+      logo_url: b.logo_url,
+      category: b.category,
+      location_label: buildBusinessLocationLabel(b),
+      is_verified: b.is_verified,
+      reason: 'Suggested for you',
+    }));
+
+  // Interleave: 2 golfers → 1 business pattern
+  const mixedItems: SuggestedItem[] = [];
+  let gIdx = 0;
+  let bIdx = 0;
+  
+  while (gIdx < golferItems.length || bIdx < businessItems.length) {
+    // Add 2 golfers
+    if (gIdx < golferItems.length) {
+      mixedItems.push(golferItems[gIdx++]);
+    }
+    if (gIdx < golferItems.length) {
+      mixedItems.push(golferItems[gIdx++]);
+    }
+    // Add 1 business
+    if (bIdx < businessItems.length) {
+      mixedItems.push(businessItems[bIdx++]);
+    }
+  }
 
   // Show skeleton while loading
-  if (isLoading) {
+  if (isLoading || isLoadingBusinesses) {
     return (
       <div className="suggested-golfers-row">
         <div className="suggested-golfers-header">
-          <span className="suggested-golfers-title">Suggested golfers</span>
+          <span className="suggested-golfers-title">Suggested for you</span>
         </div>
-        <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested creators">
+        <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested profiles">
           {[...Array(4)].map((_, idx) => (
             <div key={idx} className="w-[140px] h-[180px] rounded-2xl bg-muted animate-pulse flex-shrink-0" />
           ))}
@@ -106,13 +150,13 @@ export function LiveClubhouseStrip() {
     );
   }
 
-  if (allGolfers.length === 0) return null;
+  if (mixedItems.length === 0) return null;
 
   return (
     <div className="suggested-golfers-row">
       {/* Section header with "See all" link - matching left gutter */}
       <div className="suggested-golfers-header">
-        <span className="suggested-golfers-title">Suggested golfers</span>
+        <span className="suggested-golfers-title">Suggested for you</span>
         <button 
           className="suggested-golfers-see-all"
           onClick={() => navigate('/golferstofollow')}
@@ -127,12 +171,12 @@ export function LiveClubhouseStrip() {
         className="suggested-golfers-scroll" 
         ref={rowRef} 
         role="listbox" 
-        aria-label="Suggested golfers"
+        aria-label="Suggested profiles"
       >
-        {allGolfers.map((golfer) => (
-          <SuggestedGolferCard
-            key={golfer.id}
-            golfer={golfer}
+        {mixedItems.map((item) => (
+          <SuggestedProfileCard
+            key={item.id}
+            item={item}
             onDismiss={handleDismiss}
             onFollow={handleFollow}
           />
