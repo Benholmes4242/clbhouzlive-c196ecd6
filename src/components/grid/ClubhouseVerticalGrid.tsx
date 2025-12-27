@@ -706,21 +706,27 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     </button>
                   </>
                 )}
+              </div>
 
-                {/* Video Progress Scrubber - anchored to bottom of video area */}
-                {currentMedia.media_type === 'video' && index === currentIndex && activeVideoEl && (
-                  <div 
-                    className="absolute left-0 right-0 bottom-0 z-[95] pointer-events-none"
+              {/* Overlay layer above video (not clipped) */}
+              {currentMedia.media_type === 'video' && index === currentIndex && (activeVideoEl || videoRefs.current[item.id]) && (
+                <div className="absolute inset-0 z-[95] pointer-events-none">
+                  <div
+                    className="absolute left-0 right-0 pointer-events-auto"
+                    style={{
+                      bottom:
+                        'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))',
+                    }}
                   >
                     <VideoScrubber
-                      videoEl={activeVideoEl}
+                      videoEl={(activeVideoEl || videoRefs.current[item.id]) as HTMLVideoElement}
                       mediaId={item.id}
                       height={2.5}
                       className="pointer-events-auto"
                     />
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Top 100 Pills */}
               {item.golfCourse?.id && (
