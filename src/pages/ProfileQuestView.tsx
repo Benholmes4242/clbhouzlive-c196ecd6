@@ -55,8 +55,9 @@ const ProfileQuestView: React.FC = () => {
   const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
   const isLoading = questLoading || progressLoading;
   
-  // Use totalTop100Played from the single source of truth
-  const totalPlayed = progressData?.totalTop100Played ?? 0;
+  // TESTING: Force high count to unlock all milestones for color testing
+  // TODO: Remove this override and restore: progressData?.totalTop100Played ?? 0
+  const totalPlayed = 400; // TESTING OVERRIDE - was: progressData?.totalTop100Played ?? 0
   
   // Map Top100ProgressForUser list data to RegionProgress format for Journey Summary
   const regionProgress: RegionProgress[] = useMemo(() => {
