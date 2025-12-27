@@ -14,7 +14,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Smile, ChevronLeft, ChevronRight, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye, MapPin } from 'lucide-react';
+import { Send, Smile, ChevronLeft, ChevronRight, Heart, X, MessageCircle, MoreHorizontal, Copy, Flag, Ban, Trash2, Eye } from 'lucide-react';
+import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import { cn } from '@/lib/utils';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useCommentsWithReplies, CommentWithReplies, CommentReply } from '@/hooks/useCommentsWithReplies';
@@ -749,13 +750,6 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
   const navigate = useNavigate();
 
-  // Navigate to course page
-  const handleCourseClick = useCallback(() => {
-    if (courseId) {
-      onClose();
-      navigate(`/courses/${courseId}`);
-    }
-  }, [courseId, navigate, onClose]);
 
 
   const isDark = theme === 'dark';
@@ -1157,39 +1151,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       )}
 
                       {/* Row 4: Golf Course Tag CTA (8px gap from caption) */}
-                      {courseName && (
-                        <button
-                          onClick={handleCourseClick}
-                          className={cn(
-                            "mt-2 flex items-center gap-1.5 py-1 transition-opacity active:opacity-70",
-                            courseId ? "cursor-pointer" : "cursor-default"
-                          )}
-                        >
-                          <MapPin className={cn(
-                            "h-3.5 w-3.5 flex-shrink-0",
-                            isDark ? "text-white/60" : "text-muted-foreground"
-                          )} />
-                          <span className={cn(
-                            "text-[13px]",
-                            isDark ? "text-white/60" : "text-muted-foreground"
-                          )}>
-                            Played at{' '}
-                            <span className={cn(
-                              "font-semibold",
-                              isDark ? "text-white/90" : "text-foreground"
-                            )}>
-                              {courseName}
-                            </span>
-                            {courseCountry && <>, {courseCountry}</>}
-                          </span>
-                          {courseId && (
-                            <ChevronRight className={cn(
-                              "h-3.5 w-3.5 flex-shrink-0",
-                              isDark ? "text-white/50" : "text-muted-foreground"
-                            )} />
-                          )}
-                        </button>
-                      )}
+                      <CourseLocationRow
+                        course={{
+                          id: courseId,
+                          name: courseName,
+                          country: courseCountry,
+                        }}
+                        isDark={isDark}
+                        showChevron={true}
+                        className="mt-2"
+                      />
                     </div>
                   </div>
                 </div>
