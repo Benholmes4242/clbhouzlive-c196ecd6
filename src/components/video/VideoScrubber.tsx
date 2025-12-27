@@ -275,8 +275,15 @@ export const VideoScrubber = memo(function VideoScrubber({
       onPointerCancel={handlePointerUp}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Track background */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm overflow-hidden rounded-full">
+      {/* Track background - using solid colors for better mobile rendering */}
+      <div 
+        className="absolute inset-0 overflow-hidden rounded-full"
+        style={{ 
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          // Force GPU layer without backdrop-blur which can cause mobile rendering issues
+          transform: 'translateZ(0)',
+        }}
+      >
         {/* Ghost shimmer (before first frame) */}
         {showGhostShimmer && (
           <div 
@@ -292,8 +299,13 @@ export const VideoScrubber = memo(function VideoScrubber({
       {/* Buffered layer (behind played) */}
       <div
         ref={bufferedRef}
-        className="absolute inset-0 origin-left will-change-transform bg-white/25 overflow-hidden rounded-full"
-        style={{ transform: `scaleX(${effectiveBufferedPct})` }}
+        className="absolute inset-0 origin-left overflow-hidden rounded-full"
+        style={{ 
+          transform: `scaleX(${effectiveBufferedPct})`,
+          backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          // Use translate3d to force GPU compositing on mobile
+          willChange: 'transform',
+        }}
       >
         {/* Buffering shimmer (when stalled) */}
         {showBufferingShimmer && (
@@ -307,14 +319,15 @@ export const VideoScrubber = memo(function VideoScrubber({
         )}
       </div>
       
-      {/* Progress fill (top layer) */}
+      {/* Progress fill (top layer) - using higher opacity for visibility */}
       <div
         ref={fillRef}
-        className={cn(
-          "absolute inset-0 origin-left will-change-transform rounded-full",
-          isDragging ? "bg-white/90" : "bg-white/60"
-        )}
-        style={{ transform: 'scaleX(0)' }}
+        className="absolute inset-0 origin-left rounded-full"
+        style={{ 
+          transform: 'scaleX(0)',
+          backgroundColor: isDragging ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)',
+          willChange: 'transform',
+        }}
       />
       
       {/* Larger touch target (invisible) */}
