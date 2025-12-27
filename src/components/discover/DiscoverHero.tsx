@@ -6,6 +6,7 @@ import { OverlayCorners } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef, useMediaAutoplay, MediaRuntime } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import PostMeta from '@/components/posts/PostMeta';
 import {
   logHeroMount,
   logHeroPosterLoad,
@@ -51,12 +52,24 @@ interface HeroItem {
     id: string;
     name: string;
     country: string;
+    region?: string;
+    sub_country?: string;
+    slug?: string;
   };
   creator?: {
     id: string;
     name: string;
     avatarUrl?: string;
   };
+  /** Tags for @mentions in caption */
+  tags?: Array<{
+    id: string;
+    entity_type: 'user' | 'golf_club' | 'business';
+    entity_id: string;
+    name: string;
+    start_index?: number;
+    end_index?: number;
+  }>;
 }
 
 interface DiscoverHeroProps {
@@ -286,10 +299,15 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
       <div className="px-4 py-3 flex items-end justify-between gap-3">
         {/* Text content - constrained to ~75% to leave room for avatar */}
         <div className="flex-1 min-w-0 max-w-[80%]">
-          {/* Caption - 2 lines max */}
-          <p className="text-sm text-foreground line-clamp-2 leading-snug">
-            {item.title}
-          </p>
+          {/* Caption + Course using PostMeta */}
+          <PostMeta
+            text={item.title}
+            tags={item.tags}
+            golfCourse={item.golfCourse}
+            isDark={false}
+            maxLines={2}
+            showMore={false}
+          />
           {/* Creator name */}
           <p className="text-xs text-muted-foreground mt-1 truncate">
             {creatorName}
@@ -345,6 +363,7 @@ export function createHeroItem(post: any): HeroItem | null {
     isTrending: post.isTrending,
     golfCourse: post.golfCourse,
     likes: post.likes,
+    tags: post.tags,
     creator: post.user ? {
       id: post.user.id,
       name: post.user.display_name || post.user.name || post.user.username,

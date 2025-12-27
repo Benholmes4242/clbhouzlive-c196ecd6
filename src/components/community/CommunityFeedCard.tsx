@@ -4,6 +4,7 @@ import { Heart, Play } from 'lucide-react';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
 import { formatDistanceToNow } from 'date-fns';
+import PostMeta from '@/components/posts/PostMeta';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 
@@ -164,15 +165,18 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
         )}
       </div>
 
-      {/* Meta Area - matches Videos tab layout */}
+      {/* Meta Area - matches Videos tab layout with PostMeta */}
       <div className="px-4 py-3 flex items-end justify-between gap-3">
         <div className="flex-1 min-w-0 max-w-[80%]">
-          {/* Title/Caption */}
-          {item.title && (
-            <p className="text-sm text-foreground line-clamp-2 leading-snug">
-              {item.title}
-            </p>
-          )}
+          {/* Caption + Course using PostMeta */}
+          <PostMeta
+            text={item.title}
+            tags={(item as any).tags}
+            golfCourse={(item as any).golfCourse}
+            isDark={false}
+            maxLines={2}
+            showMore={false}
+          />
           {/* Creator name · date · likes (smaller meta row) */}
           <div className="flex items-center gap-1 text-[11px] text-muted-foreground/80 mt-1.5">
             <button
