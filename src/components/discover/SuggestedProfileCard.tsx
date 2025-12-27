@@ -127,15 +127,14 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
   return (
     <div
       className={cn(
+        "suggested-profile-card",
         "relative flex-shrink-0 w-[185px] h-[220px] rounded-2xl overflow-hidden cursor-pointer",
         "bg-card/80 backdrop-blur-sm border border-border/40",
-        "shadow-sm hover:shadow-md transition-all duration-200",
-        "hover:scale-[1.02] active:scale-[0.98]"
+        "shadow-sm select-none touch-manipulation"
       )}
       onClick={handleCardClick}
-      style={{
-        transition: 'all 0.2s ease-out',
-      }}
+      role="button"
+      tabIndex={0}
     >
       {/* Card content - flex column */}
       <div className="flex flex-col h-full pt-3 pb-3 px-3">
