@@ -107,14 +107,16 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
   // Display name
   const displayName = isGolfer ? golferData!.display_name : businessData!.name;
-  const businessVerifiedNameParts =
-    isBusiness && isVerified ? splitForVerifiedBadgePair(displayName) : null;
 
   // Avatar URL
   const avatarUrl = isGolfer ? golferData!.profile_photo_url : businessData!.logo_url;
 
   // Verified status
   const isVerified = item.is_verified;
+
+  // For verified businesses, split name so last word + badge stay together
+  const businessVerifiedNameParts =
+    isBusiness && isVerified ? splitForVerifiedBadgePair(displayName) : null;
 
   // Handicap display (golfers only)
   const showHandicap = isGolfer && golferData?.eg_handicap_index != null && golferData.show_handicap === true;
@@ -142,19 +144,33 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           <SquircleAvatar
             size={68}
             src={avatarUrl}
-            alt={rawName}
+            alt={displayName}
           />
         </div>
 
         {/* Text stack - tight gap, no reserved empty heights */}
         <div className="flex flex-col gap-0.5 items-center min-w-0">
-          {/* Name + Verified badge inline - badge follows last character naturally */}
+          {/* Name + Verified badge inline - keep badge attached to last word for businesses */}
           <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug w-full">
-            <span>{displayName}</span>
-            {isVerified && (
-              <span className="inline-block align-middle ml-1">
-                <VerifiedBadge size="sm" />
-              </span>
+            {businessVerifiedNameParts ? (
+              <>
+                {businessVerifiedNameParts.leading}
+                <span className="whitespace-nowrap">
+                  {businessVerifiedNameParts.tail}
+                  <span className="inline-block align-middle ml-1">
+                    <VerifiedBadge size="sm" />
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <span>{displayName}</span>
+                {isVerified && (
+                  <span className="inline-block align-middle ml-1">
+                    <VerifiedBadge size="sm" />
+                  </span>
+                )}
+              </>
             )}
           </p>
 
