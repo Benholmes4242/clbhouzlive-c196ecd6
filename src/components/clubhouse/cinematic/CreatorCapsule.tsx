@@ -158,7 +158,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           }}
           className="h-8 px-3 text-[12px] font-medium rounded-sq-sm text-white/80 hover:text-white hover:bg-white/10"
         >
-          <User className="w-3.5 h-3.5 mr-1.5" />
+          <User className="w-3.5 h-3.5 mr-1" />
           Profile
         </Button>
 
@@ -218,8 +218,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             onClick={handleToggle}
             className={cn(
               'w-full flex items-center gap-3 px-3 py-2.5',
-              'text-left transition-colors',
-              'hover:bg-white/5'
+              'text-left',
+              // No hover/active/focus states - static identity element
+              'hover:bg-transparent active:bg-transparent focus:bg-transparent',
+              'active:opacity-100 focus-visible:outline-none'
             )}
           >
             {/* Avatar */}
