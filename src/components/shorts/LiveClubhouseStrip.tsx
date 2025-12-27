@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
-import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useSuggestedBusinesses } from '@/hooks/useSuggestedBusinesses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +13,6 @@ const DISMISSED_KEY = 'dismissedSuggestedItems';
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
-  const { golfers } = useActiveGolfers();
   const { businesses, isLoading: isLoadingBusinesses } = useSuggestedBusinesses();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
@@ -23,8 +21,6 @@ export function LiveClubhouseStrip() {
     return new Set(stored ? JSON.parse(stored) : []);
   });
   const navigate = useNavigate();
-  
-  const nearbyOnlineGolfers = golfers;
 
   useEffect(() => {
     const el = rowRef.current;
@@ -67,39 +63,24 @@ export function LiveClubhouseStrip() {
     analyticsEvents.lcStrip.avatarClick(id, 0);
   }, []);
 
-  // Build golfer items (filter by is_public)
-  const golferItems: SuggestedGolfer[] = [
-    ...nearbyOnlineGolfers
-      .filter(g => !dismissedIds.has(g.id))
-      .map(g => ({
-        type: 'golfer' as const,
-        id: g.id,
-        username: g.username || '',
-        display_name: g.display_name,
-        profile_photo_url: g.avatar_url || null,
-        home_club: g.home_club || null,
-        is_verified: false,
-        eg_handicap_index: g.eg_handicap_index ?? null,
-        show_handicap: true,
-        is_public: true,
-        reason: 'plays_near' as const,
-      })),
-    ...creators
-      .filter(c => !dismissedIds.has(c.id))
-      .map(c => ({
-        type: 'golfer' as const,
-        id: c.id,
-        username: c.username || '',
-        display_name: c.display_name,
-        profile_photo_url: c.profile_photo_url || null,
-        home_club: c.home_club || null,
-        is_verified: (c as any).is_verified ?? false,
-        eg_handicap_index: (c as any).eg_handicap_index ?? null,
-        show_handicap: (c as any).show_handicap ?? false,
-        is_public: true, // Already filtered by is_public in hook
-        reason: 'suggested' as const,
-      })),
-  ];
+  // Build golfer items from creators only (already filtered by is_public in hook)
+  // Note: nearbyOnlineGolfers uses mock data and doesn't have privacy fields, so we exclude them
+  // until useActiveGolfers is updated to respect privacy
+  const golferItems: SuggestedGolfer[] = creators
+    .filter(c => !dismissedIds.has(c.id))
+    .map(c => ({
+      type: 'golfer' as const,
+      id: c.id,
+      username: c.username || '',
+      display_name: c.display_name,
+      profile_photo_url: c.profile_photo_url || null,
+      home_club: c.home_club || null,
+      is_verified: (c as any).is_verified ?? false,
+      eg_handicap_index: (c as any).eg_handicap_index ?? null,
+      show_handicap: (c as any).show_handicap ?? false,
+      is_public: true, // Already filtered by is_public in hook
+      reason: 'suggested' as const,
+    }));
 
   // Build business items (always eligible - no privacy filter)
   const businessItems: SuggestedBusiness[] = businesses

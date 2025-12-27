@@ -99,7 +99,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
   const handleCardClick = () => {
     if (isGolfer) {
-      navigate(`/user/${item.username}`);
+      navigate(`/profile/${item.username}`);
     } else {
       navigate(`/business/${item.id}`);
     }
