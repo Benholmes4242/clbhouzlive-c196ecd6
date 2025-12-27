@@ -314,3 +314,22 @@
 @media (prefers-reduced-motion: reduce) {
   /* All animations removed - static design only */
 }
+
+/* ============================= */
+/* Suggested Profile Cards - No scale on touch */
+/* ============================= */
+
+.suggested-profile-card {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.suggested-profile-card,
+.suggested-profile-card:active,
+.suggested-profile-card:focus,
+.suggested-profile-card:focus-visible {
+  transform: none !important;
+}
