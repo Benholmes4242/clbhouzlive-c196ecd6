@@ -33,9 +33,9 @@ export const VideoScrubber = memo(function VideoScrubber({
   mediaId,
   height = 3,
   className,
-  bufferedPct = 0,
-  isBuffering = false,
-  hasFirstFrame = true,
+  bufferedPct,
+  isBuffering,
+  hasFirstFrame,
   isAttached = true,
 }: VideoScrubberProps) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -51,10 +51,10 @@ export const VideoScrubber = memo(function VideoScrubber({
   const [derivedIsBuffering, setDerivedIsBuffering] = useState(false);
   const [derivedHasFirstFrame, setDerivedHasFirstFrame] = useState(false);
 
-  // Use prop if explicitly passed (non-default), otherwise use derived
-  const effectiveBufferedPct = bufferedPct > 0 ? bufferedPct : derivedBufferedPct;
-  const effectiveIsBuffering = isBuffering || derivedIsBuffering;
-  const effectiveHasFirstFrame = hasFirstFrame && derivedHasFirstFrame; // Both must be true
+  // Use prop if explicitly passed, otherwise use derived (nullish coalescing)
+  const effectiveBufferedPct = bufferedPct ?? derivedBufferedPct;
+  const effectiveIsBuffering = isBuffering ?? derivedIsBuffering;
+  const effectiveHasFirstFrame = hasFirstFrame ?? derivedHasFirstFrame;
 
   // Check if video has valid duration
   useEffect(() => {
