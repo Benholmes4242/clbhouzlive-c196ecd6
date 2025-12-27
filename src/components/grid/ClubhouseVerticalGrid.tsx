@@ -804,11 +804,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         />
       )}
 
-      {/* Video Progress Scrubber - DEBUG: temporarily centered on screen */}
+      {/* Video Progress Scrubber - positioned flush on top edge of bottom navbar */}
       {activeVideoEl && currentPost && (
-        <div
+        <div 
           className="fixed left-0 right-0 z-[95] pointer-events-none"
-          style={{ top: '50%', bottom: 'auto', transform: 'translateY(-50%)' }}
+          style={{ bottom: 'var(--bottom-nav-height, 64px)' }}
         >
           <VideoScrubber
             videoEl={activeVideoEl}

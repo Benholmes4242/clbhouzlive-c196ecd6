@@ -45,9 +45,6 @@ export const VideoScrubber = memo(function VideoScrubber({
   const [isValidDuration, setIsValidDuration] = useState(false);
   const wasPausedRef = useRef(false);
   const rafRef = useRef<number>();
-
-  // DEBUG: Force scrubber to center and make it very visible
-  const DEBUG_VISIBLE = true;
   
   // Internal state derivation (used when props not passed)
   const [derivedBufferedPct, setDerivedBufferedPct] = useState(0);
@@ -264,16 +261,13 @@ export const VideoScrubber = memo(function VideoScrubber({
     <div
       ref={trackRef}
       className={cn(
-        "absolute left-0 right-0 z-50 cursor-pointer touch-none",
+        "absolute left-0 right-0 z-10 cursor-pointer touch-none",
         "pointer-events-auto",
         className
       )}
-      style={{
-        height: DEBUG_VISIBLE ? '20px' : `${height}px`,
-        top: DEBUG_VISIBLE ? '50%' : 'auto',
-        bottom: DEBUG_VISIBLE ? 'auto' : 0,
-        transform: DEBUG_VISIBLE ? 'translateY(-50%)' : 'none',
-        backgroundColor: DEBUG_VISIBLE ? 'red' : 'transparent',
+      style={{ 
+        height: `${height}px`,
+        bottom: 0,
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -281,15 +275,8 @@ export const VideoScrubber = memo(function VideoScrubber({
       onPointerCancel={handlePointerUp}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Track background - using solid colors for better mobile rendering */}
-      <div 
-        className="absolute inset-0 overflow-hidden rounded-full"
-        style={{ 
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          // Force GPU layer without backdrop-blur which can cause mobile rendering issues
-          transform: 'translateZ(0)',
-        }}
-      >
+      {/* Track background */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm overflow-hidden rounded-full">
         {/* Ghost shimmer (before first frame) */}
         {showGhostShimmer && (
           <div 
@@ -305,13 +292,8 @@ export const VideoScrubber = memo(function VideoScrubber({
       {/* Buffered layer (behind played) */}
       <div
         ref={bufferedRef}
-        className="absolute inset-0 origin-left overflow-hidden rounded-full"
-        style={{ 
-          transform: `scaleX(${effectiveBufferedPct})`,
-          backgroundColor: 'rgba(255, 255, 255, 0.3)',
-          // Use translate3d to force GPU compositing on mobile
-          willChange: 'transform',
-        }}
+        className="absolute inset-0 origin-left will-change-transform bg-white/25 overflow-hidden rounded-full"
+        style={{ transform: `scaleX(${effectiveBufferedPct})` }}
       >
         {/* Buffering shimmer (when stalled) */}
         {showBufferingShimmer && (
@@ -325,15 +307,14 @@ export const VideoScrubber = memo(function VideoScrubber({
         )}
       </div>
       
-      {/* Progress fill (top layer) - using higher opacity for visibility */}
+      {/* Progress fill (top layer) */}
       <div
         ref={fillRef}
-        className="absolute inset-0 origin-left rounded-full"
-        style={{ 
-          transform: 'scaleX(0)',
-          backgroundColor: isDragging ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)',
-          willChange: 'transform',
-        }}
+        className={cn(
+          "absolute inset-0 origin-left will-change-transform rounded-full",
+          isDragging ? "bg-white/90" : "bg-white/60"
+        )}
+        style={{ transform: 'scaleX(0)' }}
       />
       
       {/* Larger touch target (invisible) */}
