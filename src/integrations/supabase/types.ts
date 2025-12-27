@@ -6059,7 +6059,7 @@ export type Database = {
           recent_activity_badges: Json | null
           show_achievements_public: boolean | null
           show_additional_home_clubs: boolean
-          show_handicap: boolean | null
+          show_handicap: boolean
           social_links: Json | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
@@ -6153,7 +6153,7 @@ export type Database = {
           recent_activity_badges?: Json | null
           show_achievements_public?: boolean | null
           show_additional_home_clubs?: boolean
-          show_handicap?: boolean | null
+          show_handicap?: boolean
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
@@ -6247,7 +6247,7 @@ export type Database = {
           recent_activity_badges?: Json | null
           show_achievements_public?: boolean | null
           show_additional_home_clubs?: boolean
-          show_handicap?: boolean | null
+          show_handicap?: boolean
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
