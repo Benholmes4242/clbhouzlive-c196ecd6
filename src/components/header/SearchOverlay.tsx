@@ -522,16 +522,17 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
     if (!query.trim() || query.length < 2) return text;
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     const parts = text.split(regex);
-      return parts.map((part, i) => 
-        regex.test(part) ? (
-          <span 
-            key={i}
-            className="bg-amber-500/[0.18] p-0 m-0 inline rounded-[6px]"
-          >
-            {part}
-          </span>
-        ) : part
-      );
+    return parts.map((part, i) => 
+      regex.test(part) ? (
+        <span 
+          key={i} 
+          className="bg-amber-500/[0.18] px-1 rounded-md"
+          style={{ borderRadius: '6px' }}
+        >
+          {part}
+        </span>
+      ) : part
+    );
   };
 
   return (
