@@ -334,6 +334,13 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
     }
   };
 
+  // If loading but session exists, optimistically render children
+  // The skeleton loader inside pages will show while validation completes
+  if (loading && getSession()) {
+    return <>{children}</>;
+  }
+
+  // Only show spinner if no session at all (true first-time access)
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">

@@ -134,8 +134,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         }}
       >
         <motion.div
-          layout
-          transition={{ layout: { duration: 0.22, ease: [0.19, 1, 0.22, 1] } }}
+          animate={{ 
+            width: isExpanded ? 'auto' : 'fit-content'
+          }}
+          transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
           className={cn(
             'rounded-sq-lg overflow-hidden',
             'bg-black/50 backdrop-blur-xl',
