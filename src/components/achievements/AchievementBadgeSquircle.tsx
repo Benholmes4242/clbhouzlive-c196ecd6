@@ -20,16 +20,19 @@ function getTierAccentColor(tier: string): string {
   return '#94a3b8';
 }
 
-// Glow intensity by tier (higher tiers = stronger glow)
-const GLOW_INTENSITY: Record<string, { opacity: number; scale: number }> = {
-  '5': { opacity: 0.08, scale: 1.6 },
-  '10': { opacity: 0.09, scale: 1.7 },
-  '20': { opacity: 0.10, scale: 1.8 },
-  '50': { opacity: 0.11, scale: 1.9 },
-  '100': { opacity: 0.12, scale: 2.0 },
-  '200': { opacity: 0.14, scale: 2.1 },
-  '300': { opacity: 0.16, scale: 2.2 },
-  '400': { opacity: 0.18, scale: 2.3 },
+// Glow intensity by tier - boosted to match card collectible feel
+// Base tier (Rookie → Century): visible glow presence
+// High tier (Elite → Legendary): +1 step stronger
+// Top tier (Grand Slam): strongest premium glow
+const GLOW_INTENSITY: Record<string, { opacity: number; scale: number; blur: number }> = {
+  '5': { opacity: 0.18, scale: 1.4, blur: 8 },
+  '10': { opacity: 0.18, scale: 1.4, blur: 8 },
+  '20': { opacity: 0.20, scale: 1.5, blur: 9 },
+  '50': { opacity: 0.20, scale: 1.5, blur: 9 },
+  '100': { opacity: 0.22, scale: 1.6, blur: 10 },
+  '200': { opacity: 0.26, scale: 1.7, blur: 11 },
+  '300': { opacity: 0.30, scale: 1.8, blur: 12 },
+  '400': { opacity: 0.35, scale: 2.0, blur: 14 },
 };
 
 export interface AchievementBadgeSquircleProps {
@@ -77,7 +80,7 @@ export const AchievementBadgeSquircle: React.FC<AchievementBadgeSquircleProps> =
   const accentColor = getTierAccentColor(tier);
   const lockedColor = '#94a3b8';
   const displayColor = unlocked ? accentColor : lockedColor;
-  const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.10, scale: 1.8 };
+  const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.18, scale: 1.4, blur: 8 };
   
   const sizeClasses = size === 'compact' 
     ? 'h-12 w-12' 
@@ -157,7 +160,7 @@ export const AchievementBadgeSquircle: React.FC<AchievementBadgeSquircleProps> =
         />
       )}
 
-      {/* Rarity glow behind number - for unlocked milestones */}
+      {/* Rarity glow behind number - boosted for collectible token feel */}
       {unlocked && (
         <div 
           className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -166,10 +169,10 @@ export const AchievementBadgeSquircle: React.FC<AchievementBadgeSquircleProps> =
             style={{
               width: '100%',
               height: '100%',
-              background: `radial-gradient(circle, ${accentColor} 0%, transparent 65%)`,
+              background: `radial-gradient(circle, ${accentColor} 0%, ${accentColor}60 40%, transparent 70%)`,
               opacity: glowConfig.opacity,
-              transform: `scale(${glowConfig.scale * 0.7})`,
-              filter: 'blur(6px)',
+              transform: `scale(${glowConfig.scale})`,
+              filter: `blur(${glowConfig.blur}px)`,
             }}
           />
         </div>

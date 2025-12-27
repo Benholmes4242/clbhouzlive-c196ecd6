@@ -100,26 +100,27 @@ export function Top100MilestonesCarousel({
         <div className="inline-flex flex-col min-w-full">
           {/* Container for rail + squircles - rail runs BEHIND */}
           <div className="relative">
-            {/* Progress rail - positioned behind squircles, contained within bounds */}
-            {/* Start/end aligned to center of first/last squircle */}
+            {/* Progress rail - centered behind squircles, contained within bounds */}
+            {/* Rail sits at visual centerline of squircles (56px / 2 = 28px) */}
             <div 
-              className="absolute h-[3px] rounded-full pointer-events-none"
+              className="absolute h-[4px] rounded-full pointer-events-none"
               style={{
-                // Vertically center: squircle is 56px, so center at 28px
-                top: '50%',
+                // Vertically center at squircle midpoint
+                top: '28px',
                 transform: 'translateY(-50%)',
                 // Horizontal containment: center of first to center of last
                 left: `${containerHalfWidth}px`,
                 right: `${containerHalfWidth}px`,
-                background: 'var(--journey-rail-base, rgba(31, 36, 40, 0.08))',
+                background: 'var(--journey-rail-base, rgba(31, 36, 40, 0.06))',
               }}
             >
-              {/* Fill portion - soft gradient with tier color */}
+              {/* Fill portion - visible glow with tier color */}
               <div 
                 className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
                 style={{
                   width: `${progressPct}%`,
-                  background: `linear-gradient(90deg, ${targetColor}40, ${targetColor}60)`,
+                  background: `linear-gradient(90deg, ${targetColor}70, ${targetColor}90)`,
+                  boxShadow: `0 0 12px ${targetColor}50, 0 0 4px ${targetColor}40`,
                 }}
               />
             </div>
