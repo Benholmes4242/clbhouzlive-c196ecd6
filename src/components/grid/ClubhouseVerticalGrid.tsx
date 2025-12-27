@@ -29,7 +29,6 @@ import { useSoftResume } from '@/hooks/useSoftResume';
 import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from '@/components/clubhouse/cinematic';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
@@ -104,6 +103,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             autoplay={autoplay && isActive && (shouldAttach || eagerMount)}
             showMuteButton={false}
             showPlayButton={false}
+            showScrubber={false}
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
             managedByMediaRuntime
@@ -244,9 +244,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
   // Soft resume hook for smooth audio ramp
   const { softResume, cancelRamp } = useSoftResume();
-
-  // Bottom navigation height for scrubber positioning
-  const { height: bottomNavHeight } = useBottomNavigation();
 
   // State for modals and interactions
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
@@ -811,15 +808,13 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       {activeVideoEl && currentPost && (
         <div 
           className="fixed left-0 right-0 z-[95] pointer-events-none"
-          style={{ bottom: bottomNavHeight }}
+          style={{ bottom: 'var(--bottom-nav-height, 64px)' }}
         >
           <VideoScrubber
             videoEl={activeVideoEl}
             mediaId={currentPost.id}
             height={3}
             className="pointer-events-auto"
-            hasFirstFrame={true}
-            isAttached={true}
           />
         </div>
       )}
