@@ -72,6 +72,9 @@ export function LiveClubhouseStrip() {
       display_name: g.display_name,
       profile_photo_url: g.avatar_url || null,
       home_club: g.home_club || null,
+      is_verified: false, // TODO: add to nearby golfers query
+      eg_handicap_index: g.eg_handicap_index ?? null,
+      show_handicap: true, // nearby already respects visibility
       reason: 'plays_near' as const,
     })),
     ...creators.filter(c => !dismissedIds.has(c.id)).map(c => ({
@@ -80,9 +83,9 @@ export function LiveClubhouseStrip() {
       display_name: c.display_name,
       profile_photo_url: c.profile_photo_url || null,
       home_club: c.home_club || null,
-      is_verified: false,
-      has_top100: false,
-      is_new: c.has_recent_post,
+      is_verified: (c as any).is_verified ?? false,
+      eg_handicap_index: (c as any).eg_handicap_index ?? null,
+      show_handicap: (c as any).show_handicap ?? false,
       reason: 'suggested' as const,
     })),
   ].filter(g => !dismissedIds.has(g.id));

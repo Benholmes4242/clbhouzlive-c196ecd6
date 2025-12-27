@@ -4,7 +4,7 @@ import {
   User, Mail, AtSign, Sparkles, EyeOff, ExternalLink, 
   ShieldBan, Bell, Lock, HelpCircle, MessageSquare, 
   Headphones, FileText, Shield, ScrollText, Trash2, ArrowLeft,
-  Smartphone
+  Smartphone, Eye
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -65,6 +65,10 @@ export function SettingsPageV2() {
   const [showCreatorOnlyConfirm, setShowCreatorOnlyConfirm] = React.useState(false);
   const [showDisableCreatorOnlyConfirm, setShowDisableCreatorOnlyConfirm] = React.useState(false);
 
+  // Handicap visibility state
+  const [showHandicap, setShowHandicap] = React.useState(true);
+  const [isUpdatingHandicap, setIsUpdatingHandicap] = React.useState(false);
+
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
@@ -85,6 +89,7 @@ export function SettingsPageV2() {
     if (profile) {
       setIsCreator((profile as any)?.is_creator || false);
       setCreatorOnly((profile as any)?.creator_only || false);
+      setShowHandicap((profile as any)?.show_handicap ?? true);
     }
   }, [profile]);
 
@@ -169,6 +174,32 @@ export function SettingsPageV2() {
       setIsUpdatingCreator(false);
       setShowCreatorOnlyConfirm(false);
       setShowDisableCreatorOnlyConfirm(false);
+    }
+  };
+
+  // Handicap visibility toggle
+  const handleHandicapToggle = async (checked: boolean) => {
+    if (!user) return;
+    setIsUpdatingHandicap(true);
+    setShowHandicap(checked);
+
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ show_handicap: checked })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      toast.success(checked ? 'Handicap is now visible' : 'Handicap is now hidden');
+    } catch (err) {
+      console.error('[Settings] handicap toggle error:', err);
+      setShowHandicap(!checked);
+      toast.error('Failed to update handicap visibility');
+    } finally {
+      setIsUpdatingHandicap(false);
     }
   };
 
@@ -322,12 +353,20 @@ export function SettingsPageV2() {
 
         {/* ========== PRIVACY & SAFETY ========== */}
         <SettingsSection title="Privacy & Safety">
+          <SettingsToggleRow
+            icon={<Eye className="w-[18px] h-[18px]" />}
+            title="Show my handicap publicly"
+            subtitle="Display handicap on your profile and in recommendations."
+            checked={showHandicap}
+            onCheckedChange={handleHandicapToggle}
+            disabled={isUpdatingHandicap}
+            isFirst
+          />
           <SettingsChevronRow
             icon={<ShieldBan className="w-[18px] h-[18px]" />}
             title="Blocked users"
             subtitle="Manage people you've blocked."
             onClick={() => setShowBlockedSheet(true)}
-            isFirst
             isLast
           />
         </SettingsSection>

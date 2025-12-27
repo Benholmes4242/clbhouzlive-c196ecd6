@@ -97,7 +97,10 @@ export interface LiveCreator {
   latest_short_preview?: { posterUrl?: string; mp4Url?: string } | null;
   has_recent_post: boolean;
   is_online: boolean;
-  isMock: boolean; // Flag to indicate if this is mock data (for future tuning)
+  isMock: boolean;
+  is_verified?: boolean;
+  eg_handicap_index?: number | null;
+  show_handicap?: boolean;
 }
 
 /**
@@ -160,7 +163,7 @@ export function useLiveClubhouseProfiles() {
           
           const { data: profiles } = await supabase
             .from('user_profiles')
-            .select('id, username, display_name, profile_photo_url, home_club')
+            .select('id, username, display_name, profile_photo_url, home_club, is_verified_golfer, eg_handicap_index, show_handicap')
             .in('id', [...knownIds])
             .eq('is_public', true)
             .not('profile_photo_url', 'is', null)
@@ -176,7 +179,7 @@ export function useLiveClubhouseProfiles() {
           
           let suggestedQuery = supabase
             .from('user_profiles')
-            .select('id, username, display_name, profile_photo_url, home_club')
+            .select('id, username, display_name, profile_photo_url, home_club, is_verified_golfer, eg_handicap_index, show_handicap')
             .eq('is_public', true)
             .not('profile_photo_url', 'is', null)
             .not('display_name', 'is', null);
@@ -324,8 +327,11 @@ export function useLiveClubhouseProfiles() {
         latest_post_at: c.latest_post_at ?? null,
         latest_short_preview: previews[c.id] ?? null,
         has_recent_post: !!latest && (now - latest) < RECENT_MS,
-        is_online: !!onlineMap[c.id], // Green dot only if in presence channel
+        is_online: !!onlineMap[c.id],
         isMock: false,
+        is_verified: c.is_verified_golfer ?? false,
+        eg_handicap_index: c.eg_handicap_index ?? null,
+        show_handicap: c.show_handicap ?? false,
       };
     });
 
