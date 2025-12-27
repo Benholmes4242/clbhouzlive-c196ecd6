@@ -161,8 +161,13 @@ export function useVerticalFeedLogic({
           const isProtected = isFirstVideo && Date.now() < firstVideoProtectedUntilRef.current;
           const shouldAutoplay = e.intersectionRatio >= 0.5;
 
-          // Always allow true; only allow false when not protected.
-          if (shouldAutoplay || !isProtected) {
+          // Don't override user-initiated playback
+          const activeReason = MediaRuntime.getActiveReason();
+          const primaryActiveId = MediaRuntime.getPrimaryActiveId();
+          const isUserPlaying = activeReason === 'user' && primaryActiveId === id;
+
+          // Always allow true; only allow false when not protected AND not user-playing
+          if (!isUserPlaying && (shouldAutoplay || !isProtected)) {
             setAutoplayMap((m) => ({ ...m, [id]: shouldAutoplay }));
           }
         });

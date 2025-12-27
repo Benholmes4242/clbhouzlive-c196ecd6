@@ -883,6 +883,10 @@ class MediaRuntimeCore {
     return this.state.activeReason;
   }
   
+  getPrimaryActiveId(): string | null {
+    return this.state.primaryActiveId;
+  }
+  
   // ============ Telemetry Stats ============
   
   getTelemetryStats(): {

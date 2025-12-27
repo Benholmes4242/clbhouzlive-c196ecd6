@@ -381,7 +381,18 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         };
       }
     } else if (!video.paused) {
-      video.pause();
+      // Don't pause if this video is playing due to user action
+      if (managedByMediaRuntime && mediaId) {
+        const activeReason = MediaRuntime.getActiveReason();
+        const primaryActiveId = MediaRuntime.getPrimaryActiveId();
+        
+        // Only pause if NOT user-initiated OR this isn't the active video
+        if (activeReason !== 'user' || primaryActiveId !== mediaId) {
+          video.pause();
+        }
+      } else {
+        video.pause();
+      }
     }
 
     return () => {
