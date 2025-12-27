@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Check, BadgeCheck, Trophy, Sparkles } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface SuggestedGolferCardProps {
   golfer: {
@@ -16,8 +17,8 @@ interface SuggestedGolferCardProps {
     profile_photo_url: string | null;
     home_club?: string | null;
     is_verified?: boolean;
-    has_top100?: boolean;
-    is_new?: boolean;
+    eg_handicap_index?: number | null;
+    show_handicap?: boolean;
     mutual_count?: number;
     reason?: 'similar_handicap' | 'plays_near' | 'mutuals' | 'recently_active' | 'suggested';
   };
@@ -105,13 +106,10 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
       : REASON_LABELS[golfer.reason]
     : REASON_LABELS.suggested;
 
-  // Determine which badge to show (priority: verified > top100 > new)
-  const badge = golfer.is_verified 
-    ? { icon: BadgeCheck, label: 'Verified', color: 'text-blue-500' }
-    : golfer.has_top100
-    ? { icon: Trophy, label: 'Top 100', color: 'text-amber-500' }
-    : golfer.is_new
-    ? { icon: Sparkles, label: 'New', color: 'text-emerald-500' }
+  // Show handicap only if exists AND show_handicap is true
+  const showHandicap = golfer.eg_handicap_index != null && golfer.show_handicap === true;
+  const formattedHandicap = golfer.eg_handicap_index != null 
+    ? `HCP ${golfer.eg_handicap_index > 0 ? '+' : ''}${golfer.eg_handicap_index.toFixed(1)}`
     : null;
 
   return (
@@ -146,32 +144,38 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
             src={golfer.profile_photo_url}
             alt={golfer.display_name}
           />
-          
-          {/* Badge pill - attached to avatar */}
-          {badge && (
-            <div 
-              className={cn(
-                "absolute -bottom-1 left-1/2 -translate-x-1/2",
-                "flex items-center gap-0.5 px-1.5 py-0.5 rounded-full",
-                "bg-background border border-border/60 shadow-sm",
-                "text-[9px] font-medium whitespace-nowrap"
-              )}
-            >
-              <badge.icon className={cn("w-2.5 h-2.5", badge.color)} />
-              <span className="text-muted-foreground">{badge.label}</span>
-            </div>
+        </div>
+
+        {/* Name + Verified badge inline */}
+        <div className="flex items-center gap-1 justify-center w-full mt-1">
+          <p className="text-sm font-semibold text-foreground text-center truncate">
+            {golfer.display_name}
+          </p>
+          {golfer.is_verified && (
+            <VerifiedBadge size="sm" />
           )}
         </div>
 
-        {/* Name - centered */}
-        <p className="text-sm font-semibold text-foreground text-center truncate w-full mt-1">
-          {golfer.display_name}
-        </p>
+        {/* Home club - muted, single line, only if exists */}
+        {golfer.home_club && (
+          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
+            {golfer.home_club}
+          </p>
+        )}
 
-        {/* Reason pill - muted, one line */}
-        <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
-          {reasonLabel}
-        </p>
+        {/* Handicap - only if exists AND show_handicap is true */}
+        {showHandicap && formattedHandicap && (
+          <p className="text-[10px] text-muted-foreground/70 text-center truncate w-full mt-0.5">
+            {formattedHandicap}
+          </p>
+        )}
+
+        {/* Reason pill - muted, only show if no home_club to avoid crowding */}
+        {!golfer.home_club && (
+          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
+            {reasonLabel}
+          </p>
+        )}
 
         {/* Follow CTA - full width */}
         <Button
