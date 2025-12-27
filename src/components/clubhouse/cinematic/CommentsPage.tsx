@@ -1020,41 +1020,54 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               !isDark && (isGrey ? 'bg-muted' : 'bg-[#f8fafc]')
             )}
             style={isDark ? {
-              background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
+              background: '#0d0d0d',
             } : undefined}
           >
+            {/* Vignette overlay - darkens edges (matches /auth page) */}
+            {isDark && (
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.35) 100%)',
+                }}
+              />
+            )}
+            
+            {/* Ultra-fine grain texture overlay (matches /auth page) */}
+            {isDark && (
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-[0.025]"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                }}
+              />
+            )}
+            
             {/* Header */}
             <motion.div 
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.2 }}
               className={cn(
-                "flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),12px)]",
+                "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),12px)]",
                 isDark ? "border-white/10" : "border-border/50"
               )}
             >
-              {/* Back button row - 44px tap target */}
-              <div className="flex items-center gap-3 px-4 py-3">
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
+              {/* Back CTA - text style matching notifications page */}
+              <div className="px-4 py-3">
+                <button
+                  type="button"
                   onClick={onClose}
                   className={cn(
-                    'w-11 h-11 rounded-full',
-                    'flex items-center justify-center',
-                    'transition-colors',
+                    "flex items-center gap-0.5 transition-colors active:opacity-70",
                     isDark 
-                      ? 'bg-white/10 hover:bg-white/15' 
-                      : 'bg-muted hover:bg-muted/80'
+                      ? "text-white/80 hover:text-white" 
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <ChevronLeft className={cn("w-5 h-5", isDark ? "text-white" : "text-foreground")} />
-                </motion.button>
-                <span className={cn(
-                  "text-[16px] font-semibold",
-                  isDark ? "text-white" : "text-foreground"
-                )}>
-                  Comments
-                </span>
+                  <ChevronLeft className="h-5 w-5" />
+                  <span className="text-sm">Back</span>
+                </button>
               </div>
 
               {/* Post preview card - two column layout */}
