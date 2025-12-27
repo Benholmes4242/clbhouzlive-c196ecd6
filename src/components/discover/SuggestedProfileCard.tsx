@@ -118,13 +118,6 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
   // Verified status
   const isVerified = item.is_verified;
 
-  // Reason label for golfers
-  const reasonLabel = isGolfer && golferData?.reason 
-    ? golferData.reason === 'mutuals' && golferData.mutual_count
-      ? `${golferData.mutual_count} ${REASON_LABELS.mutuals}`
-      : REASON_LABELS[golferData.reason]
-    : REASON_LABELS.suggested;
-
   // Handicap display (golfers only)
   const showHandicap = isGolfer && golferData?.eg_handicap_index != null && golferData.show_handicap === true;
   const formattedHandicap = golferData?.eg_handicap_index != null 
@@ -134,7 +127,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
   return (
     <div
       className={cn(
-        "relative flex-shrink-0 w-[140px] rounded-2xl overflow-hidden cursor-pointer",
+        "relative flex-shrink-0 w-[185px] h-[220px] rounded-2xl overflow-hidden cursor-pointer",
         "bg-card/80 backdrop-blur-sm border border-border/40",
         "shadow-sm hover:shadow-md transition-all duration-200",
         "hover:scale-[1.02] active:scale-[0.98]",
@@ -154,68 +147,70 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
         <X className="w-3.5 h-3.5 text-muted-foreground" />
       </button>
 
-      {/* Card content */}
-      <div className="flex flex-col items-center pt-4 pb-3 px-3">
+      {/* Card content - flex column with fixed height slots */}
+      <div className="flex flex-col h-full pt-3 pb-3 px-3">
         {/* Avatar - large, centered */}
-        <div className="relative mb-2">
+        <div className="relative flex justify-center mb-2">
           <SquircleAvatar
-            size={64}
+            size={56}
             src={avatarUrl}
             alt={displayName}
           />
         </div>
 
-        {/* Name + Verified badge inline */}
-        <div className="flex items-center gap-1 justify-center w-full mt-1">
-          <p className="text-sm font-semibold text-foreground text-center truncate">
-            {displayName}
-          </p>
-          {isVerified && (
-            <VerifiedBadge size="sm" />
-          )}
+        {/* Text content area - flex-1 to push button to bottom */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Slot 1: Name + Verified badge - 2 lines, min-h reserved */}
+          <div className="min-h-[36px] flex flex-col items-center justify-start">
+            <div className="flex items-start gap-1 justify-center w-full">
+              <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug">
+                {displayName}
+              </p>
+              {isVerified && (
+                <VerifiedBadge size="sm" className="flex-shrink-0 mt-0.5" />
+              )}
+            </div>
+          </div>
+
+          {/* Slot 2: Home club (golfers) or "Business profile" (businesses) - reserved height */}
+          <div className="min-h-[32px] flex items-start justify-center mt-0.5">
+            {isGolfer && golferData?.home_club ? (
+              <p className="text-[11px] text-muted-foreground text-center line-clamp-2 leading-snug w-full">
+                {golferData.home_club}
+              </p>
+            ) : isBusiness ? (
+              <p className="text-[11px] text-muted-foreground text-center line-clamp-1 w-full">
+                Business profile
+              </p>
+            ) : isGolfer ? (
+              // Empty placeholder for golfers without home club
+              <div className="w-full" />
+            ) : null}
+          </div>
+
+          {/* Slot 3: Handicap (golfers) or Location (businesses) - reserved height */}
+          <div className="min-h-[16px] flex items-start justify-center mt-0.5">
+            {isGolfer && showHandicap && formattedHandicap ? (
+              <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
+                {formattedHandicap}
+              </p>
+            ) : isBusiness && businessData?.location_label ? (
+              <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
+                {businessData.location_label}
+              </p>
+            ) : (
+              // Empty placeholder to reserve space
+              <div className="w-full" />
+            )}
+          </div>
         </div>
 
-        {/* Golfer: Home club */}
-        {isGolfer && golferData?.home_club && (
-          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
-            {golferData.home_club}
-          </p>
-        )}
-
-        {/* Golfer: Handicap */}
-        {showHandicap && formattedHandicap && (
-          <p className="text-[10px] text-muted-foreground/70 text-center truncate w-full mt-0.5">
-            {formattedHandicap}
-          </p>
-        )}
-
-        {/* Golfer: Reason pill (only if no home club) */}
-        {isGolfer && !golferData?.home_club && (
-          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
-            {reasonLabel}
-          </p>
-        )}
-
-        {/* Business: Category */}
-        {isBusiness && businessData?.category && (
-          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
-            {businessData.category}
-          </p>
-        )}
-
-        {/* Business: Location */}
-        {isBusiness && businessData?.location_label && (
-          <p className="text-[10px] text-muted-foreground/70 text-center truncate w-full mt-0.5">
-            {businessData.location_label}
-          </p>
-        )}
-
-        {/* Follow CTA - full width */}
+        {/* Follow CTA - pinned to bottom with mt-auto */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full mt-3 h-8 text-xs font-medium rounded-lg",
+            "w-full mt-auto h-8 text-xs font-medium rounded-lg",
             isFollowing && "bg-muted text-muted-foreground"
           )}
           onClick={handleFollow}
