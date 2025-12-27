@@ -1,6 +1,6 @@
 import React from 'react';
 import { TOP100_MILESTONES } from '@/config/top100Milestones';
-import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
+import { AchievementBadgeSquircle, type SquircleTier } from '@/components/achievements/AchievementBadgeSquircle';
 
 interface Top100MilestoneTimelineProps {
   totalTop100Played: number;
@@ -9,7 +9,7 @@ interface Top100MilestoneTimelineProps {
 /**
  * Top100MilestoneTimeline - Part of Global Achievement & Milestone System
  * 
- * Uses SDS squircle shapes and colors from globalAchievementMilestoneSystem.ts
+ * Uses unified AchievementBadgeSquircle for consistent styling site-wide
  */
 export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTimelineProps) {
   const milestones = TOP100_MILESTONES;
@@ -30,41 +30,17 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
         {milestones.map((m, index) => {
           const unlocked = totalTop100Played >= m.threshold;
           const isNext = !unlocked && index === nextIndex;
-          
-          // Get color from Global Achievement & Milestone System
-          const themeColor = MILESTONE_THEMES[m.threshold]?.accent ?? '#94a3b8';
 
           return (
             <div
               key={m.id}
               className="flex min-w-[80px] flex-col items-center gap-1"
             >
-              {/* SDS Squircle badge - 34% border radius */}
-              <div
-                className={`
-                  flex items-center justify-center text-sm font-semibold
-                  transition-all duration-200 rounded-sq-md
-                  ${
-                    unlocked
-                      ? 'text-white'
-                      : isNext
-                      ? 'text-amber-600 bg-amber-50'
-                      : 'text-slate-400 bg-slate-50'
-                  }
-                `}
-                style={{
-                  width: '64px',
-                  height: '67px', // Maintain 1/1.05 aspect ratio
-                  border: unlocked 
-                    ? `2px solid ${themeColor}` 
-                    : isNext 
-                    ? '2px solid #FBBF24' 
-                    : '2px solid #D1D5DB',
-                  backgroundColor: unlocked ? themeColor : undefined,
-                }}
-              >
-                {m.threshold}
-              </div>
+              {/* Unified AchievementBadgeSquircle */}
+              <AchievementBadgeSquircle
+                tier={String(m.threshold) as SquircleTier}
+                unlocked={unlocked}
+              />
 
               {/* Label */}
               <span className="mt-1 text-[11px] font-medium text-foreground text-center">
