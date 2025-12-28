@@ -198,7 +198,7 @@ const MediaTile = memo<MediaTileProps>(({
         <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
           {/* Likes row - de-emphasised, tertiary style (above name) */}
           {config.showLikes && (item.likes || 0) > 0 && (
-            <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+            <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal">
               <Heart className="w-3 h-3" />
               <span>{item.likes || 0}</span>
             </div>
@@ -206,14 +206,11 @@ const MediaTile = memo<MediaTileProps>(({
 
           {/* User name */}
           {config.showCreator && item.creator?.name && (
-            <div 
-              className="text-white font-bold text-sm leading-tight cursor-pointer" 
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+            <div
+              className="text-white font-bold text-sm leading-tight cursor-pointer"
               onClick={handleAuthorClick}
             >
-              <span className="truncate block">
-                {item.creator.name}
-              </span>
+              <span className="truncate block">{item.creator.name}</span>
             </div>
           )}
         </div>
