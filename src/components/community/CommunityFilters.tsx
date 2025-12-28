@@ -1,14 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { ArrowUpDown, Check, Clock, Heart, MessageCircle, Users } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { ArrowUpDown, Clock, Heart, MessageCircle, Users } from 'lucide-react';
 import { StandardBottomSheet, SheetOptionRow } from '@/components/ui/standard-bottom-sheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export type CommunityMediaFilter = 'all' | 'shorts' | 'videos' | 'photos';
 export type CommunitySortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
@@ -40,7 +33,6 @@ export const CommunityFilters: React.FC<CommunityFiltersProps> = ({
   sortOption,
   onSortChange,
 }) => {
-  const isMobile = useIsMobile();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
@@ -79,72 +71,36 @@ export const CommunityFilters: React.FC<CommunityFiltersProps> = ({
             }}
           >
             {/* Sort Pill */}
-            {isMobile ? (
-              <>
-                <button
-                  onClick={() => setDrawerOpen(true)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap",
-                    "bg-muted/60 text-foreground border border-border/40",
-                    "hover:bg-muted transition-colors"
-                  )}
-                >
-                  <ArrowUpDown className="w-3.5 h-3.5" />
-                  <span>Sort</span>
-                </button>
-                <StandardBottomSheet
-                  isOpen={drawerOpen}
-                  onClose={() => setDrawerOpen(false)}
-                  title="Sort by"
-                  subtitle="Choose how results are ordered"
-                >
-                  <div className="space-y-2">
-                    {sortOptions.map((option) => (
-                      <SheetOptionRow
-                        key={option.id}
-                        label={option.label}
-                        description={option.description}
-                        selected={sortOption === option.id}
-                        onSelect={() => handleSortSelect(option.id)}
-                        icon={option.icon}
-                      />
-                    ))}
-                  </div>
-                </StandardBottomSheet>
-              </>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap",
-                      "bg-muted/60 text-foreground border border-border/40",
-                      "hover:bg-muted transition-colors"
-                    )}
-                  >
-                    <ArrowUpDown className="w-3.5 h-3.5" />
-                    <span>Sort</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48 bg-background border border-border z-50">
-                  {sortOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.id}
-                      onClick={() => handleSortSelect(option.id)}
-                      className={cn(
-                        "flex items-center justify-between cursor-pointer",
-                        sortOption === option.id && "text-primary font-medium"
-                      )}
-                    >
-                      <span>{option.label}</span>
-                      {sortOption === option.id && (
-                        <Check className="w-4 h-4 text-primary" />
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
+                "bg-muted/60 text-foreground border border-border/40",
+                "hover:bg-muted transition-colors active:scale-[0.98]"
+              )}
+            >
+              <ArrowUpDown className="w-3.5 h-3.5" />
+              <span>Sort</span>
+            </button>
+            <StandardBottomSheet
+              isOpen={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+              title="Sort by"
+              subtitle="Choose how results are ordered"
+            >
+              <div className="space-y-2">
+                {sortOptions.map((option) => (
+                  <SheetOptionRow
+                    key={option.id}
+                    label={option.label}
+                    description={option.description}
+                    selected={sortOption === option.id}
+                    onSelect={() => handleSortSelect(option.id)}
+                    icon={option.icon}
+                  />
+                ))}
+              </div>
+            </StandardBottomSheet>
 
             {/* Divider */}
             <div className="w-px h-5 bg-border/50 mx-1" />
