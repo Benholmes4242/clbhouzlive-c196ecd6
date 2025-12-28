@@ -115,40 +115,37 @@ export default function ShortsGrid({
     return { portraitVideos: portrait, landscapeVideos: landscape };
   }, [items]);
 
-  // STRICT PATTERN: 4 portraits + 1 landscape per cycle
-  // Only creates complete cycles - never mixes orientations
+  // Preferred pattern: 4 portraits + 1 landscape per cycle
+  // IMPORTANT: Never drop content just because we don't have enough landscapes.
+  // If landscapes are scarce, we keep appending portraits so the Watch page can
+  // still render a full initial batch (e.g. 20 items) and infinite scroll can continue.
   const mixedItems = useMemo(() => {
     const result: ClusteredExploreItem[] = [];
     let portraitIndex = 0;
     let landscapeIndex = 0;
 
     const PORTRAITS_PER_CYCLE = 4;
-    const LANDSCAPES_PER_CYCLE = 1;
 
-    // Calculate maximum complete cycles we can create
-    const maxCycles = Math.floor(Math.min(
-      portraitVideos.length / PORTRAITS_PER_CYCLE,
-      landscapeVideos.length / LANDSCAPES_PER_CYCLE
-    ));
-
-    // Build grid with complete cycles only
-    for (let cycle = 0; cycle < maxCycles; cycle++) {
-      // Add 4 portrait videos
-      for (let i = 0; i < PORTRAITS_PER_CYCLE; i++) {
-        if (portraitIndex < portraitVideos.length) {
-          result.push(portraitVideos[portraitIndex]);
-          portraitIndex++;
-        }
+    // Build cycles while we still have portraits (main feed content)
+    while (portraitIndex < portraitVideos.length) {
+      // Add up to 4 portrait videos
+      for (let i = 0; i < PORTRAITS_PER_CYCLE && portraitIndex < portraitVideos.length; i++) {
+        result.push(portraitVideos[portraitIndex]);
+        portraitIndex++;
       }
 
-      // Add 1 landscape video
+      // Add 1 landscape video if available
       if (landscapeIndex < landscapeVideos.length) {
         result.push(landscapeVideos[landscapeIndex]);
         landscapeIndex++;
       }
     }
 
-    // DO NOT add partial cycles - pattern must remain strict
+    // If we somehow have landscapes left (rare), append them at the end
+    while (landscapeIndex < landscapeVideos.length) {
+      result.push(landscapeVideos[landscapeIndex]);
+      landscapeIndex++;
+    }
 
     return result;
   }, [portraitVideos, landscapeVideos]);
@@ -168,8 +165,9 @@ export default function ShortsGrid({
           : 1);
       const isActuallyLandscape = aspectRatio >= AR_LANDSCAPE_THRESHOLD;
       
-      // Autoplay: 1st portrait (position 0) and landscape (position 4) of each cycle
-      const isAutoplayCandidate = positionInCycle === 0 || positionInCycle === 4;
+      // Autoplay: 1st portrait (position 0) + landscape (position 4) of each cycle
+      // If we don't have a real landscape at position 4, don't autoplay it.
+      const isAutoplayCandidate = positionInCycle === 0 || (positionInCycle === 4 && isActuallyLandscape);
       
       return {
         ...item,
