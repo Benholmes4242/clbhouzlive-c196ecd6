@@ -83,36 +83,20 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
 
-  // Apply client-side search filter (comprehensive - matches Watch page)
+  // Apply client-side search filter (matches Watch page implementation)
   const items = useMemo(() => {
     if (!searchQuery || !searchQuery.trim()) return rawItems;
     
     const query = searchQuery.toLowerCase();
     return rawItems.filter(item => {
-      // Post content fields
+      // Post content/title
       const titleMatch = (item.title || '').toLowerCase().includes(query);
-      const captionMatch = ((item as any).caption || '').toLowerCase().includes(query);
-      const descriptionMatch = ((item as any).description || '').toLowerCase().includes(query);
       
-      // User fields (legacy structure)
+      // User/creator fields
       const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
       const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
       
-      // Creator fields (polymorphic - new structure)
-      const creatorNameMatch = ((item as any).creator?.name || '').toLowerCase().includes(query);
-      const creatorUsernameMatch = ((item as any).creator?.username || '').toLowerCase().includes(query);
-      
-      // Business profile name
-      const businessMatch = ((item as any).business?.name || '').toLowerCase().includes(query);
-      
-      // Golf course name (both camelCase and snake_case)
-      const courseMatch = ((item as any).golfCourse?.name || '').toLowerCase().includes(query);
-      const golfCourseMatch = ((item as any).golf_course?.name || '').toLowerCase().includes(query);
-      
-      return titleMatch || captionMatch || descriptionMatch || 
-             userNameMatch || userUsernameMatch || 
-             creatorNameMatch || creatorUsernameMatch || 
-             businessMatch || courseMatch || golfCourseMatch;
+      return titleMatch || userNameMatch || userUsernameMatch;
     });
   }, [rawItems, searchQuery]);
 
