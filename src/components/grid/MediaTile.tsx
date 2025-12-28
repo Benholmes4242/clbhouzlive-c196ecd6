@@ -56,10 +56,6 @@ const MediaTile = memo<MediaTileProps>(({
   // Track current playback time for dynamic timer countdown
   const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
   
-  // Ref to track isPlaying for stable callback (avoids stale closure)
-  const isPlayingRef = useRef(isPlaying);
-  isPlayingRef.current = isPlaying;
-  
   const isVideo = item.type === 'video';
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
@@ -137,12 +133,11 @@ const MediaTile = memo<MediaTileProps>(({
   }, [item.durationSeconds]);
   
   // Handle time update for dynamic timer
-  // Use ref to avoid stale closure - callback doesn't need to change when isPlaying changes
   const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
-    if (isPlayingRef.current) {
+    if (isPlaying) {
       setCurrentPlaybackTime(currentTime);
     }
-  }, []);
+  }, [isPlaying]);
   
   // Top-left override content
   let topLeftOverride: React.ReactNode = null;
