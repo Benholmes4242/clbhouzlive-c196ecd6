@@ -390,7 +390,9 @@ export const useRealPostsFetcher = () => {
               entity_id,
               name
             )
-          )
+          ),
+          post_likes(count),
+          post_comments(count)
         `);
 
       // Filter out current user's PERSONAL posts (business posts are allowed)
@@ -618,8 +620,8 @@ export const useRealPostsFetcher = () => {
             ? getStreamPoster(primaryMedia.media_url, '1s') || undefined
             : undefined,
           title: post.content || 'Post',
-          likes: Math.floor(Math.random() * 500) + 50,
-          comments: Math.floor(Math.random() * 100) + 5,
+          likes: post.post_likes?.[0]?.count || 0,
+          comments: post.post_comments?.[0]?.count || 0,
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
@@ -835,7 +837,9 @@ export const useRealPostsFetcher = () => {
                 entity_id,
                 name
               )
-            )
+            ),
+            post_likes(count),
+            post_comments(count)
           `)
           // Order post_media by display_order, then created_at for deterministic [0] selection
           .order('display_order', { ascending: true, foreignTable: 'post_media', nullsFirst: false })
@@ -1085,8 +1089,8 @@ export const useRealPostsFetcher = () => {
           src: firstMedia.media_url,
           thumbnailSrc: firstMedia.poster_url || getStreamPoster(firstMedia.media_url, '1s') || undefined,
           title: post.content || 'Video',
-          likes: Math.floor(Math.random() * 500) + 50,
-          comments: Math.floor(Math.random() * 100) + 5,
+          likes: post.post_likes?.[0]?.count || 0,
+          comments: post.post_comments?.[0]?.count || 0,
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds: durationSeconds ?? undefined,
