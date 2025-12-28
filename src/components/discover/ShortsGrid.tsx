@@ -45,6 +45,14 @@ export default function ShortsGrid({
   const hasMoreRef = useRef(hasMore);
   const isLoadingRef = useRef(isLoading);
   
+  // Debug log
+  console.log('[ShortsGrid] Render:', { 
+    itemsCount: items?.length, 
+    isLoading, 
+    hasMore,
+    firstItem: items?.[0]?.id,
+  });
+  
   // Keep refs in sync
   useEffect(() => {
     hasMoreRef.current = hasMore;
