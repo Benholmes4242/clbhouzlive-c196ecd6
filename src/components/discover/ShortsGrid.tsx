@@ -116,7 +116,8 @@ export default function ShortsGrid({
   }, [items]);
 
   // STRICT PATTERN: 4 portraits + 1 landscape per cycle
-  // Only creates complete cycles - never mixes orientations
+  // Builds complete cycles when possible; falls back to showing items as-is
+  // so search results never render an empty grid just because there are no landscapes.
   const mixedItems = useMemo(() => {
     const result: ClusteredExploreItem[] = [];
     let portraitIndex = 0;
@@ -126,12 +127,20 @@ export default function ShortsGrid({
     const LANDSCAPES_PER_CYCLE = 1;
 
     // Calculate maximum complete cycles we can create
-    const maxCycles = Math.floor(Math.min(
-      portraitVideos.length / PORTRAITS_PER_CYCLE,
-      landscapeVideos.length / LANDSCAPES_PER_CYCLE
-    ));
+    const maxCycles = Math.floor(
+      Math.min(
+        portraitVideos.length / PORTRAITS_PER_CYCLE,
+        landscapeVideos.length / LANDSCAPES_PER_CYCLE
+      )
+    );
 
-    // Build grid with complete cycles only
+    // If we can't form even one complete cycle (common for filtered/search results),
+    // just render the items in their original order.
+    if (maxCycles === 0) {
+      return items;
+    }
+
+    // Build grid with complete cycles
     for (let cycle = 0; cycle < maxCycles; cycle++) {
       // Add 4 portrait videos
       for (let i = 0; i < PORTRAITS_PER_CYCLE; i++) {
@@ -148,10 +157,8 @@ export default function ShortsGrid({
       }
     }
 
-    // DO NOT add partial cycles - pattern must remain strict
-
     return result;
-  }, [portraitVideos, landscapeVideos]);
+  }, [portraitVideos, landscapeVideos, items]);
   
   // Convert mixed items to unified format with orientation metadata
   const unifiedItems = useMemo(() => {
