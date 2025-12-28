@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -8,7 +8,6 @@ import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 import ShortsInlineBlock from './ShortsInlineBlock';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
-import { useScrollNearBottom } from '@/hooks/useScrollNearBottom';
 
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -61,13 +60,46 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     estimatedRowHeight: 300,
   });
 
-  // Simple scroll-based infinite scroll - triggers when within 600px of bottom
-  useScrollNearBottom({
-    threshold: 600,
-    hasMore,
-    isLoading,
-    onLoadMore,
-  });
+  // Refs to avoid stale closure in IntersectionObserver callback
+  const hasMoreRef = useRef(hasMore);
+  const loadingRef = useRef(isLoading);
+  const onLoadMoreRef = useRef(onLoadMore);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Keep refs in sync with props - this avoids stale closures
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+    loadingRef.current = isLoading;
+    onLoadMoreRef.current = onLoadMore;
+  }, [hasMore, isLoading, onLoadMore]);
+
+  // Intersection observer for infinite scroll - stable observer, uses refs
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        
+        // Use refs to always get current values, not stale closure values
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
+          onLoadMoreRef.current();
+        }
+      },
+      { 
+        root: null,
+        rootMargin: '400px 0px', // Trigger 400px BEFORE reaching bottom
+        threshold: 0,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []); // Empty deps - observer created once, uses refs for current values
 
   if (itemsToRender.length === 0 && !isLoading) {
     return (
@@ -180,12 +212,17 @@ const VideosGrid: React.FC<VideosGridProps> = ({
         </div>
       )}
 
-      {/* Loading indicator for infinite scroll */}
-      {isLoading && hasMore && (
-        <div className="flex justify-center py-8">
-          <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-        </div>
-      )}
+      {/* Infinite scroll sentinel */}
+      <div 
+        ref={sentinelRef}
+        className="h-20 w-full mt-8"
+      >
+        {isLoading && hasMore && (
+          <div className="flex justify-center py-4">
+            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          </div>
+        )}
+      </div>
       
       {/* All caught up message */}
       {!hasMore && itemsToRender.length > 0 && !isLoading && (

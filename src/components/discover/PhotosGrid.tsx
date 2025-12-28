@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
-import { useScrollNearBottom } from '@/hooks/useScrollNearBottom';
 
 interface PhotosGridProps {
   items: ExploreContentItem[];
@@ -93,13 +92,28 @@ export default function PhotosGrid({
     return () => window.removeEventListener('resize', checkMobile);
   }, [checkMobile]);
 
-  // Simple scroll-based infinite scroll - triggers when within 600px of bottom
-  useScrollNearBottom({
-    threshold: 600,
-    hasMore,
-    isLoading,
-    onLoadMore,
-  });
+  // Intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    const sentinel = document.getElementById('photos-scroll-sentinel');
+    if (sentinel) {
+      observer.observe(sentinel);
+    }
+
+    return () => {
+      if (sentinel) {
+        observer.unobserve(sentinel);
+      }
+    };
+  }, [hasMore, isLoading, onLoadMore]);
 
   if (items.length === 0 && !isLoading) {
     return (
@@ -241,12 +255,14 @@ export default function PhotosGrid({
         })}
       </div>
 
-      {/* Loading indicator for infinite scroll */}
-      {isLoading && hasMore && (
-        <div className="flex justify-center py-8">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
+      {/* Infinite scroll sentinel */}
+      <div id="photos-scroll-sentinel" className="h-4 mt-4">
+        {isLoading && hasMore && (
+          <div className="flex justify-center py-4">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+      </div>
       
       {/* All caught up message */}
       {!hasMore && items.length > 0 && !isLoading && (
