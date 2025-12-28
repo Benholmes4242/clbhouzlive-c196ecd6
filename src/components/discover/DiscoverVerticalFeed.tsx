@@ -27,7 +27,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
-import { SHOW_META_TEST_POST, createMockClubhousePost } from '@/utils/mockMetaTestPost';
 
 // Video ref management - keep only current + neighbors to prevent memory leaks
 const MAX_VIDEO_REFS = 20;
@@ -195,7 +194,7 @@ const ImageWithPinchZoom: React.FC<{
 const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   isOpen,
   onClose,
-  posts: rawPosts,
+  posts,
   onLike,
   onLoadMore,
   hasMore,
@@ -204,11 +203,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   initialItem,
   initialMediaIndex = 0
 }) => {
-  // Inject mock test post if feature flag is enabled
-  const posts = useMemo(() => {
-    if (!SHOW_META_TEST_POST) return rawPosts;
-    return [createMockClubhousePost() as unknown as ExploreContentItem, ...rawPosts];
-  }, [rawPosts]);
 
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
