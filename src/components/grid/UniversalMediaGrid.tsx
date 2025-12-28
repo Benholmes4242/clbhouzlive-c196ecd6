@@ -129,38 +129,17 @@ export function UniversalMediaGrid({
         onLoadMore();
         window.setTimeout(() => {
           loadingRef.current = false;
-        }, 300); // Reduced from 500ms for faster response
+        }, 500);
       },
       {
         root: null,
-        rootMargin: '600px 0px', // Increased from 400px - trigger earlier for seamless loading
+        rootMargin: '400px 0px', // Trigger at ~70-80% scroll for seamless loading
         threshold: 0,
       }
     );
 
     observer.observe(sentinel);
-    
-    // Force check on mount - sentinel might already be visible
-    const checkInitial = () => {
-      const rect = sentinel.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      // If sentinel is within 600px of viewport bottom on mount, trigger load
-      if (rect.top < viewportHeight + 600 && hasMoreRef.current && !loadingRef.current && !isLoadingRef.current) {
-        loadingRef.current = true;
-        onLoadMore();
-        window.setTimeout(() => {
-          loadingRef.current = false;
-        }, 300);
-      }
-    };
-    
-    // Check after a brief delay to allow initial render
-    const timeoutId = window.setTimeout(checkInitial, 100);
-    
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(timeoutId);
-    };
+    return () => observer.disconnect();
   }, [mergedConfig.infiniteScroll, onLoadMore]);
   
   // Handle item click
