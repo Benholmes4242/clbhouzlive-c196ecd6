@@ -6,6 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,9 @@ const ProfilePage = () => {
   });
   const queryClient = useQueryClient();
   const hasCheckedEditParam = useRef(false);
+  
+  // Rehydration state - show skeleton when app is rehydrating after background
+  const { isRehydrating } = useRehydrationSafe();
   
   // Get current user
   const { user, loading: authLoading } = useSupabaseSession();
@@ -49,8 +53,9 @@ const ProfilePage = () => {
 
   // Loading state handled by route-level Suspense with ProfileSkeleton
   // Auth check still returns early - wait for both auth and profile to load
-  if (authLoading || profileLoading) {
-    return null;
+  // Also show skeleton during rehydration
+  if (authLoading || profileLoading || isRehydrating) {
+    return <ProfileSkeleton />;
   }
 
   // Show error if there's an issue

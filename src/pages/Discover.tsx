@@ -1,9 +1,11 @@
 import React, { useState, useMemo, lazy, Suspense, useEffect } from 'react';
 import CompactHeader from '@/components/header/CompactHeader';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { logDiscoverPageMount, logDiscoverPageUnmount, logWatchTabActive } from '@/utils/discoverTimeline';
+import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -44,12 +46,20 @@ type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 const Discover = () => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+  
+  // Rehydration state - show skeleton when app is rehydrating after background
+  const { isRehydrating } = useRehydrationSafe();
 
   // Timing instrumentation - log page mount/unmount
   useEffect(() => {
     logDiscoverPageMount();
     return () => logDiscoverPageUnmount();
   }, []);
+  
+  // Show skeleton during rehydration
+  if (isRehydrating) {
+    return <DiscoverSkeleton />;
+  }
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
