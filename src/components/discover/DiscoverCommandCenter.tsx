@@ -1,16 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Search, X, ArrowUpDown, Clock, Heart, MessageCircle, Users } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { StandardBottomSheet, SheetOptionRow } from '@/components/ui/standard-bottom-sheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Check } from 'lucide-react';
 
 export type SortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
 
@@ -64,7 +56,6 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   className,
 }) => {
   const isNonDefaultSort = sortValue !== defaultSortValue;
-  const isMobile = useIsMobile();
   const [isFocused, setIsFocused] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,72 +105,32 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
     );
     
-    if (isMobile) {
-      return (
-        <>
-          <button className={pillClasses} onClick={() => setDrawerOpen(true)}>
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>Sort</span>
-          </button>
-          <StandardBottomSheet
-            isOpen={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            title="Sort by"
-            subtitle="Choose how results are ordered"
-          >
-            <div className="space-y-2">
-              {SORT_OPTIONS.map((option) => (
-                <SheetOptionRow
-                  key={option.id}
-                  label={option.label}
-                  description={option.description}
-                  selected={sortValue === option.id}
-                  onSelect={() => handleSortSelect(option.id)}
-                  icon={option.icon}
-                />
-              ))}
-            </div>
-          </StandardBottomSheet>
-        </>
-      );
-    }
-
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className={pillClasses}>
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>Sort</span>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="start" 
-          className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
+      <>
+        <button className={pillClasses} onClick={() => setDrawerOpen(true)}>
+          <ArrowUpDown className="w-3.5 h-3.5" />
+          <span>Sort</span>
+        </button>
+        <StandardBottomSheet
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          title="Sort by"
+          subtitle="Choose how results are ordered"
         >
-          {SORT_OPTIONS.map((option) => {
-            const isActive = sortValue === option.id;
-            return (
-              <DropdownMenuItem
+          <div className="space-y-2">
+            {SORT_OPTIONS.map((option) => (
+              <SheetOptionRow
                 key={option.id}
-                onClick={() => handleSortSelect(option.id)}
-                className={cn(
-                  "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
-                  isActive 
-                    ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
-                    : "text-slate-700 dark:text-white/90"
-                )}
-              >
-                <span>{option.label}</span>
-                <div className="w-5 flex justify-end">
-                  {isActive && (
-                    <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
-                  )}
-                </div>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+                label={option.label}
+                description={option.description}
+                selected={sortValue === option.id}
+                onSelect={() => handleSortSelect(option.id)}
+                icon={option.icon}
+              />
+            ))}
+          </div>
+        </StandardBottomSheet>
+      </>
     );
   };
 
