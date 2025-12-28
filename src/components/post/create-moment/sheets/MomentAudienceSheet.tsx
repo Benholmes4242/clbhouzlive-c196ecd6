@@ -19,7 +19,7 @@ const AUDIENCE_OPTIONS: AudienceOption[] = [
     icon: <Globe className="w-5 h-5" />,
   },
   {
-    value: 'connections',
+    value: 'followers',
     label: 'Followers',
     description: 'Only your followers can see this',
     icon: <Users className="w-5 h-5" />,

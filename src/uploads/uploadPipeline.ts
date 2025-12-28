@@ -142,6 +142,8 @@ async function processJob(jobId: string): Promise<void> {
       actorType: job.actorType,
       actorId: job.actorId,
       courseId: job.courseInfo?.id || null,
+      categories: job.categories || [],
+      visibility: job.visibility || 'anyone',
     });
 
     const postId = postData.id;

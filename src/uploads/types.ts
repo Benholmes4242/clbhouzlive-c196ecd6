@@ -32,6 +32,10 @@ export interface UploadJob {
   selectedTags?: any[];
   mediaItems?: Array<{ id: string; file: File }>;
   studioEditsByMediaId?: Record<string, { filter?: string }>;
+  
+  // v2 fields
+  categories?: string[];
+  visibility?: 'anyone' | 'followers' | 'private';
 
   files: File[];
   createdAt: string;
@@ -59,7 +63,7 @@ export interface UploadJobInput {
   studioEditsByMediaId?: Record<string, { filter?: string }>;
   // New v2 fields
   categories?: string[];
-  visibility?: 'anyone' | 'connections' | 'private';
+  visibility?: 'anyone' | 'followers' | 'private';
 }
 
 // Serializable job for localStorage (no File objects)
