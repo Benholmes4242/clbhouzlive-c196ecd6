@@ -134,6 +134,8 @@ const MediaTile = memo<MediaTileProps>(({
   
   // Handle time update for dynamic timer
   const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
+    // DEBUG: Uncomment to verify timer events are firing
+    // console.log('[MediaTile] handleTimeUpdate', { id: item.postId, currentTime, duration, isPlaying });
     if (isPlaying) {
       setCurrentPlaybackTime(currentTime);
     }
