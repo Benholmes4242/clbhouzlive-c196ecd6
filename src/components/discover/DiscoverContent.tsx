@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { useHeroPreload } from '@/hooks/useHeroPreload';
-
+import { SHOW_META_TEST_POST, createMockHeroPost } from '@/utils/mockMetaTestPost';
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
   durationKey,
@@ -225,7 +225,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {
     if (content) {
-      let filtered = content;
+      // Inject mock test post if feature flag is enabled
+      let filtered: ExploreContentItem[] = SHOW_META_TEST_POST 
+        ? [createMockHeroPost() as unknown as ExploreContentItem, ...content]
+        : content;
       
       // Apply search filter if query exists
       if (searchQuery && searchQuery.trim()) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption } from '@/hooks/community/useCommunityFeed';
+import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption, CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import CommunityFeedCard from './CommunityFeedCard';
 import CommunityEmptyState from './CommunityEmptyState';
 import { DateSeparator } from './DateSeparator';
@@ -9,7 +9,7 @@ import { calculateDateSeparators } from '@/utils/dateSeparators';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-
+import { SHOW_META_TEST_POST, createMockCommunityPost } from '@/utils/mockMetaTestPost';
 interface CommunityFeedProps {
   onMediaClick: (item: any) => void;
 }
@@ -76,12 +76,18 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const commandCenterSort: SortOption = sortOption as SortOption;
 
   const {
-    items,
+    items: rawItems,
     loading,
     hasMore,
     communityCount,
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
+
+  // Inject mock test post if feature flag is enabled
+  const items = useMemo(() => {
+    if (!SHOW_META_TEST_POST) return rawItems;
+    return [createMockCommunityPost() as unknown as CommunityContentItem, ...rawItems];
+  }, [rawItems]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
