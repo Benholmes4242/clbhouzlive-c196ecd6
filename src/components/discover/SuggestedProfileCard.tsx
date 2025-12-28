@@ -157,8 +157,11 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
         {/* Text stack - tight gap, no reserved empty heights */}
         <div className="flex flex-col gap-0.5 items-center min-w-0">
-          {/* Name + Verified badge inline - keep badge attached to last word for businesses */}
-          <p className="text-sm font-semibold text-foreground text-center line-clamp-2 leading-snug w-full">
+          {/* Name + Verified badge inline - golfers: 1 line truncated, businesses: 2 lines */}
+          <p className={cn(
+            "text-sm font-semibold text-foreground text-center leading-snug w-full",
+            isGolfer ? "truncate" : "line-clamp-2"
+          )}>
             {businessVerifiedNameParts ? (
               <>
                 {businessVerifiedNameParts.leading}
