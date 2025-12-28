@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useSoundPreference } from './useSoundPreference';
 
 export interface ExclusiveVideoAudio {
   isMuted: boolean;
@@ -8,30 +7,39 @@ export interface ExclusiveVideoAudio {
   toggleMute: () => void;
 }
 
+/**
+ * Hook for exclusive video audio control.
+ * Uses ONLY GlobalAudioContext as single source of truth for mute state.
+ * Fixes the dual-state bug where useSoundPreference conflicted with GlobalAudioContext.
+ */
 export const useExclusiveVideoAudio = (videoId: string): ExclusiveVideoAudio => {
-  const { activeVideoId, setActiveVideo, isVideoActive } = useGlobalAudio();
-  const { isMuted: globalMuted, setMuted: setGlobalMuted } = useSoundPreference();
+  const { 
+    setActiveVideo, 
+    isVideoActive, 
+    isGloballyMuted, 
+    setGlobalMute 
+  } = useGlobalAudio();
   
   // This video is considered muted if either:
-  // 1. The global sound preference is muted, OR
+  // 1. The global audio is muted, OR
   // 2. This video is not the currently active video
-  const isMuted = globalMuted || !isVideoActive(videoId);
+  const isMuted = isGloballyMuted || !isVideoActive(videoId);
   const isActive = isVideoActive(videoId);
 
   const toggleMute = useCallback(() => {
-    if (globalMuted) {
+    if (isGloballyMuted) {
       // If globally muted, unmute and make this video active
-      setGlobalMuted(false);
+      setGlobalMute(false);
       setActiveVideo(videoId);
     } else if (isActive) {
       // If this video is active and not globally muted, mute globally
-      setGlobalMuted(true);
+      setGlobalMute(true);
       setActiveVideo(null);
     } else {
       // If another video is active, switch to this one
       setActiveVideo(videoId);
     }
-  }, [globalMuted, isActive, videoId, setGlobalMuted, setActiveVideo]);
+  }, [isGloballyMuted, isActive, videoId, setGlobalMute, setActiveVideo]);
 
   // Clean up when component unmounts
   useEffect(() => {

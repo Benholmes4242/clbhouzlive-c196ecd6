@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { MutualFriendsAvatars, MutualFriend } from './MutualFriendsAvatars';
 
 interface SuggestedGolferCardProps {
   golfer: {
@@ -20,6 +21,7 @@ interface SuggestedGolferCardProps {
     eg_handicap_index?: number | null;
     show_handicap?: boolean;
     mutual_count?: number;
+    mutual_friends?: MutualFriend[];
     reason?: 'similar_handicap' | 'plays_near' | 'mutuals' | 'recently_active' | 'suggested';
   };
   onDismiss?: (id: string) => void;
@@ -99,12 +101,33 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
     navigate(`/user/${golfer.username}`);
   };
 
-  // Get reason label
-  const reasonLabel = golfer.reason 
-    ? golfer.reason === 'mutuals' && golfer.mutual_count
-      ? `${golfer.mutual_count} ${REASON_LABELS.mutuals}`
-      : REASON_LABELS[golfer.reason]
-    : REASON_LABELS.suggested;
+  // Render reason with mutual friend avatars if available
+  const renderReasonLabel = () => {
+    // If mutuals reason and we have avatar data, show avatars + text
+    if (golfer.reason === 'mutuals' && golfer.mutual_friends && golfer.mutual_friends.length > 0) {
+      return (
+        <div className="flex items-center gap-1.5 justify-center">
+          <MutualFriendsAvatars friends={golfer.mutual_friends} maxDisplay={3} />
+          <span className="text-[11px] text-muted-foreground">
+            {golfer.mutual_count} {REASON_LABELS.mutuals}
+          </span>
+        </div>
+      );
+    }
+    
+    // Fallback to text-only
+    const reasonLabel = golfer.reason 
+      ? golfer.reason === 'mutuals' && golfer.mutual_count
+        ? `${golfer.mutual_count} ${REASON_LABELS.mutuals}`
+        : REASON_LABELS[golfer.reason]
+      : REASON_LABELS.suggested;
+    
+    return (
+      <span className="text-[11px] text-muted-foreground text-center truncate w-full">
+        {reasonLabel}
+      </span>
+    );
+  };
 
   // Show handicap only if exists AND show_handicap is true
   const showHandicap = golfer.eg_handicap_index != null && golfer.show_handicap === true;
@@ -172,9 +195,9 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
 
         {/* Reason pill - muted, only show if no home_club to avoid crowding */}
         {!golfer.home_club && (
-          <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
-            {reasonLabel}
-          </p>
+          <div className="mt-0.5">
+            {renderReasonLabel()}
+          </div>
         )}
 
         {/* Follow CTA - full width */}
