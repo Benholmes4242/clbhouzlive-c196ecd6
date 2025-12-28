@@ -1,20 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { ArrowUpDown, Check } from 'lucide-react';
+import { ArrowUpDown, Check, Clock, Heart, MessageCircle, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { StandardBottomSheet, SheetOptionRow } from '@/components/ui/standard-bottom-sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
 
 export type CommunityMediaFilter = 'all' | 'shorts' | 'videos' | 'photos';
 export type CommunitySortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
@@ -33,11 +27,11 @@ const mediaFilters: { id: CommunityMediaFilter; label: string }[] = [
   { id: 'photos', label: 'Photos' },
 ];
 
-const sortOptions: { id: CommunitySortOption; label: string }[] = [
-  { id: 'newest', label: 'Newest first' },
-  { id: 'most-liked', label: 'Most liked' },
-  { id: 'most-discussed', label: 'Most discussed' },
-  { id: 'friends-first', label: 'Friends first' },
+const sortOptions: { id: CommunitySortOption; label: string; description: string; icon: React.ReactNode }[] = [
+  { id: 'newest', label: 'Newest first', description: 'Most recent posts', icon: <Clock className="w-5 h-5" /> },
+  { id: 'most-liked', label: 'Most liked', description: 'Popular with the community', icon: <Heart className="w-5 h-5" /> },
+  { id: 'most-discussed', label: 'Most discussed', description: 'Lots of conversation', icon: <MessageCircle className="w-5 h-5" /> },
+  { id: 'friends-first', label: 'Friends first', description: 'People you know', icon: <Users className="w-5 h-5" /> },
 ];
 
 export const CommunityFilters: React.FC<CommunityFiltersProps> = ({
@@ -70,29 +64,6 @@ export const CommunityFilters: React.FC<CommunityFiltersProps> = ({
     setDrawerOpen(false);
   };
 
-  const SortContent = () => (
-    <div className="py-2">
-      {sortOptions.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => handleSortSelect(option.id)}
-          className={cn(
-            "w-full flex items-center justify-between px-4 py-3 text-sm transition-colors",
-            "hover:bg-muted/50",
-            sortOption === option.id
-              ? "text-primary font-medium"
-              : "text-foreground"
-          )}
-        >
-          <span>{option.label}</span>
-          {sortOption === option.id && (
-            <Check className="w-4 h-4 text-primary" />
-          )}
-        </button>
-      ))}
-    </div>
-  );
-
   return (
     <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm pb-2">
       <div className="px-3 md:container md:mx-auto md:px-0">
@@ -109,26 +80,38 @@ export const CommunityFilters: React.FC<CommunityFiltersProps> = ({
           >
             {/* Sort Pill */}
             {isMobile ? (
-              <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-                <DrawerTrigger asChild>
-                  <button
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap",
-                      "bg-muted/60 text-foreground border border-border/40",
-                      "hover:bg-muted transition-colors"
-                    )}
-                  >
-                    <ArrowUpDown className="w-3.5 h-3.5" />
-                    <span>Sort</span>
-                  </button>
-                </DrawerTrigger>
-                <DrawerContent className="bg-background">
-                  <DrawerHeader>
-                    <DrawerTitle>Sort by</DrawerTitle>
-                  </DrawerHeader>
-                  <SortContent />
-                </DrawerContent>
-              </Drawer>
+              <>
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap",
+                    "bg-muted/60 text-foreground border border-border/40",
+                    "hover:bg-muted transition-colors"
+                  )}
+                >
+                  <ArrowUpDown className="w-3.5 h-3.5" />
+                  <span>Sort</span>
+                </button>
+                <StandardBottomSheet
+                  isOpen={drawerOpen}
+                  onClose={() => setDrawerOpen(false)}
+                  title="Sort by"
+                  subtitle="Choose how results are ordered"
+                >
+                  <div className="space-y-2">
+                    {sortOptions.map((option) => (
+                      <SheetOptionRow
+                        key={option.id}
+                        label={option.label}
+                        description={option.description}
+                        selected={sortOption === option.id}
+                        onSelect={() => handleSortSelect(option.id)}
+                        icon={option.icon}
+                      />
+                    ))}
+                  </div>
+                </StandardBottomSheet>
+              </>
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

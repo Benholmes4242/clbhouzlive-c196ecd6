@@ -1,21 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Search, X, ArrowUpDown, Check } from 'lucide-react';
+import { Search, X, ArrowUpDown, Clock, Heart, MessageCircle, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
+import { motion } from 'framer-motion';
+import { StandardBottomSheet, SheetOptionRow } from '@/components/ui/standard-bottom-sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Check } from 'lucide-react';
 
 export type SortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
 
@@ -40,11 +35,11 @@ interface DiscoverCommandCenterProps {
   className?: string;
 }
 
-const SORT_OPTIONS: { id: SortOption; label: string }[] = [
-  { id: 'newest', label: 'Newest first' },
-  { id: 'most-liked', label: 'Most liked' },
-  { id: 'most-discussed', label: 'Most discussed' },
-  { id: 'friends-first', label: 'Friends first' },
+const SORT_OPTIONS: { id: SortOption; label: string; description: string; icon: React.ReactNode }[] = [
+  { id: 'newest', label: 'Newest first', description: 'Most recent posts', icon: <Clock className="w-5 h-5" /> },
+  { id: 'most-liked', label: 'Most liked', description: 'Popular with the community', icon: <Heart className="w-5 h-5" /> },
+  { id: 'most-discussed', label: 'Most discussed', description: 'Lots of conversation', icon: <MessageCircle className="w-5 h-5" /> },
+  { id: 'friends-first', label: 'Friends first', description: 'People you know', icon: <Users className="w-5 h-5" /> },
 ];
 
 /**
@@ -110,66 +105,42 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const SortContent = () => (
-    <div className="px-4 pb-2 space-y-1.5">
-      {SORT_OPTIONS.map((option) => {
-        const isActive = sortValue === option.id;
-        return (
-          <button
-            key={option.id}
-            onClick={() => handleSortSelect(option.id)}
-            className={cn(
-              "w-full flex items-center justify-between rounded-2xl px-4 py-3.5",
-              "text-[15px] transition-all duration-150",
-              "active:scale-[0.98]",
-              isActive
-                ? "bg-slate-100/80 dark:bg-white/10 border border-slate-300/50 dark:border-white/15 font-semibold text-slate-900 dark:text-white"
-                : "text-slate-800 dark:text-white/90 active:bg-slate-100/70 dark:active:bg-white/10"
-            )}
-          >
-            <span>{option.label}</span>
-            {/* Fixed width container to prevent layout shift */}
-            <div className="w-5 flex justify-end">
-              {isActive && (
-                <Check className="w-4.5 h-4.5 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
-              )}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-
   const SortPill = () => {
     const pillClasses = cn(
       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
       "transition-colors active:scale-[0.98]",
       isNonDefaultSort
-        ? "bg-foreground/15 text-foreground border border-foreground/30" // Non-default: stronger visual
-        : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted" // Default
+        ? "bg-foreground/15 text-foreground border border-foreground/30"
+        : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
     );
     
     if (isMobile) {
       return (
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
-            <button className={pillClasses}>
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <span>Sort</span>
-            </button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader className="pb-1">
-              <DrawerTitle className="text-center text-[17px] font-semibold text-slate-900 dark:text-white">
-                Sort by
-              </DrawerTitle>
-              <p className="text-center text-xs text-slate-500 dark:text-white/50 mt-0.5">
-                Choose how results are ordered
-              </p>
-            </DrawerHeader>
-            <SortContent />
-          </DrawerContent>
-        </Drawer>
+        <>
+          <button className={pillClasses} onClick={() => setDrawerOpen(true)}>
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            <span>Sort</span>
+          </button>
+          <StandardBottomSheet
+            isOpen={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            title="Sort by"
+            subtitle="Choose how results are ordered"
+          >
+            <div className="space-y-2">
+              {SORT_OPTIONS.map((option) => (
+                <SheetOptionRow
+                  key={option.id}
+                  label={option.label}
+                  description={option.description}
+                  selected={sortValue === option.id}
+                  onSelect={() => handleSortSelect(option.id)}
+                  icon={option.icon}
+                />
+              ))}
+            </div>
+          </StandardBottomSheet>
+        </>
       );
     }
 
