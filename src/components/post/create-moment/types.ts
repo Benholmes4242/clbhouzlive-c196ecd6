@@ -1,8 +1,18 @@
 // Types for Create Moment modal components
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 
-// Moment types for category tagging
+// Moment types for category tagging (legacy - kept for backwards compatibility)
 export type MomentType = 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
+
+// New category system - scalable with Discover filters
+export interface MomentCategory {
+  id: string;
+  label: string;
+  emoji: string;
+}
+
+// Visibility options for moments
+export type MomentVisibility = 'anyone' | 'connections' | 'private';
 
 // Taggable entity for @mentions (matches taggable_entities table)
 export interface TaggableEntity {
