@@ -103,10 +103,7 @@ async function preloadSegments(
       if (segmentResponse.ok) {
         // Actually read the body to ensure it's cached
         await segmentResponse.arrayBuffer();
-        
-        console.log(`[HLSPreload] Segment ${index + 1} loaded`, {
-          time: (performance.now() - startTime).toFixed(0) + 'ms',
-        });
+        // Segment loaded log removed for cleaner console
       }
     } catch {
       // Silently ignore individual segment failures
