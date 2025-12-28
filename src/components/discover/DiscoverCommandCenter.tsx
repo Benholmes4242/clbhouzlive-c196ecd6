@@ -267,70 +267,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const SortPill = () => {
-    const pillClasses = cn(
-      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-      "transition-colors active:scale-[0.98]",
-      isNonDefaultSort
-        ? "bg-foreground/15 text-foreground border border-foreground/30"
-        : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
-    );
-    
-    if (isMobile) {
-      return (
-        <>
-          <button className={pillClasses} onClick={() => setSheetOpen(true)}>
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>Sort</span>
-          </button>
-          <SortBottomSheet
-            isOpen={sheetOpen}
-            onClose={() => setSheetOpen(false)}
-            sortValue={sortValue}
-            onSortChange={handleSortSelect}
-          />
-        </>
-      );
-    }
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className={pillClasses}>
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>Sort</span>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="start" 
-          className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
-        >
-          {SORT_OPTIONS.map((option) => {
-            const isActive = sortValue === option.id;
-            return (
-              <DropdownMenuItem
-                key={option.id}
-                onClick={() => handleSortSelect(option.id)}
-                className={cn(
-                  "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
-                  isActive 
-                    ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
-                    : "text-slate-700 dark:text-white/90"
-                )}
-              >
-                <span>{option.label}</span>
-                <div className="w-5 flex justify-end">
-                  {isActive && (
-                    <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
-                  )}
-                </div>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
+  const sortPillClasses = cn(
+    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
+    "transition-colors active:scale-[0.98]",
+    isNonDefaultSort
+      ? "bg-foreground/15 text-foreground border border-foreground/30"
+      : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
+  );
 
   return (
     <div className={cn("bg-[var(--bg-page)]", className)}>
@@ -395,7 +338,48 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               }}
             >
               {/* Sort Pill */}
-              <SortPill />
+              {isMobile ? (
+                <button className={sortPillClasses} onClick={() => setSheetOpen(true)}>
+                  <ArrowUpDown className="w-3.5 h-3.5" />
+                  <span>Sort</span>
+                </button>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={sortPillClasses}>
+                      <ArrowUpDown className="w-3.5 h-3.5" />
+                      <span>Sort</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="start" 
+                    className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
+                  >
+                    {SORT_OPTIONS.map((option) => {
+                      const isActive = sortValue === option.id;
+                      return (
+                        <DropdownMenuItem
+                          key={option.id}
+                          onClick={() => handleSortSelect(option.id)}
+                          className={cn(
+                            "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
+                            isActive 
+                              ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
+                              : "text-slate-700 dark:text-white/90"
+                          )}
+                        >
+                          <span>{option.label}</span>
+                          <div className="w-5 flex justify-end">
+                            {isActive && (
+                              <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
+                            )}
+                          </div>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               {/* Divider */}
               <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />
@@ -434,6 +418,14 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
 
       {/* Bottom spacing gap */}
       <div className="h-4" />
+
+      {/* Sort Bottom Sheet (mobile only) */}
+      <SortBottomSheet
+        isOpen={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        sortValue={sortValue}
+        onSortChange={handleSortSelect}
+      />
     </div>
   );
 };
