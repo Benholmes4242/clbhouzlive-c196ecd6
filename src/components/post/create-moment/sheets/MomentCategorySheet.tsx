@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Tag, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,6 +34,13 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Haptic feedback helper
+  const triggerHaptic = useCallback(() => {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+  }, []);
+
   // Get suggested categories
   const suggestedCategoryIds = useMemo(() => {
     return suggestCategories({
@@ -57,8 +64,9 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
     );
   }, [searchQuery]);
 
-  // Toggle category selection
-  const toggleCategory = (categoryId: string) => {
+  // Toggle category selection with haptic
+  const toggleCategory = useCallback((categoryId: string) => {
+    triggerHaptic();
     if (selectedCategories.includes(categoryId)) {
       // Remove category
       onCategoriesChange(selectedCategories.filter(id => id !== categoryId));
@@ -66,7 +74,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
       // Add category
       onCategoriesChange([...selectedCategories, categoryId]);
     }
-  };
+  }, [selectedCategories, onCategoriesChange, triggerHaptic]);
 
   if (!isOpen) return null;
 
@@ -146,7 +154,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                       key={cat.id}
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 1.02 }}
                       onClick={() => !isDisabled && toggleCategory(cat.id)}
                       disabled={isDisabled}
                       className={cn(
@@ -169,23 +177,27 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             </div>
           )}
 
-          {/* Search input */}
+          {/* Search input - enhanced emphasis */}
           <div className="px-4 pb-3">
             <div 
               className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
               style={{
                 background: 'var(--cm-surface-input)',
-                border: '1px solid var(--cm-border-subtle)',
+                border: '1.5px solid var(--cm-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
               }}
             >
-              <Search className="w-4 h-4" style={{ color: 'var(--cm-icon-secondary)' }} />
+              <Search className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Start typing to tag this moment..."
                 className="flex-1 bg-transparent outline-none text-sm"
-                style={{ color: 'var(--cm-text-primary)' }}
+                style={{ 
+                  color: 'var(--cm-text-primary)',
+                  caretColor: 'var(--cm-accent)',
+                }}
                 autoFocus
               />
             </div>
@@ -204,6 +216,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.8, opacity: 0 }}
+                      whileTap={{ scale: 1.02 }}
                       onClick={() => toggleCategory(cat.id)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium"
                       style={{
@@ -240,7 +253,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 return (
                   <motion.button
                     key={cat.id}
-                    whileTap={{ scale: 0.95 }}
+                    whileTap={{ scale: 1.02 }}
                     onClick={() => toggleCategory(cat.id)}
                     disabled={isDisabled}
                     className={cn(
@@ -270,7 +283,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             )}
           </div>
 
-          {/* Done button */}
+          {/* Done button - updated CTA copy */}
           <div className="px-4 pt-2">
             <button
               onClick={onClose}
@@ -282,7 +295,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 border: selectedCategories.length > 0 ? 'none' : '1px solid var(--cm-border-subtle)',
               }}
             >
-              {selectedCategories.length === 0 ? 'Select at least 1 category' : 'Done'}
+              {selectedCategories.length === 0 ? 'Choose at least one tag to continue' : 'Done'}
             </button>
           </div>
         </motion.div>

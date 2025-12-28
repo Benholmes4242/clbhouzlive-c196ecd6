@@ -27,7 +27,7 @@ const AUDIENCE_OPTIONS: AudienceOption[] = [
   {
     value: 'private',
     label: 'Private',
-    description: 'Only you can see this moment',
+    description: 'Visible only to you',
     icon: <Lock className="w-5 h-5" />,
   },
 ];
@@ -39,9 +39,40 @@ interface MomentAudienceSheetProps {
   onVisibilityChange: (visibility: MomentVisibility) => void;
 }
 
+// Animated checkmark with draw-in effect
+const AnimatedCheck: React.FC = () => (
+  <motion.svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    initial="hidden"
+    animate="visible"
+  >
+    <motion.path
+      d="M4 10L8 14L16 6"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      variants={{
+        hidden: { pathLength: 0, opacity: 0 },
+        visible: { 
+          pathLength: 1, 
+          opacity: 1,
+          transition: { 
+            pathLength: { duration: 0.3, ease: "easeOut" },
+            opacity: { duration: 0.1 }
+          }
+        }
+      }}
+    />
+  </motion.svg>
+);
+
 /**
  * MomentAudienceSheet - Bottom sheet for selecting post visibility
- * Options: Anyone (default), Connections, Private
+ * Options: Anyone (default), Followers, Private
  */
 export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
   isOpen,
@@ -50,6 +81,10 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
   onVisibilityChange,
 }) => {
   const handleSelect = (value: MomentVisibility) => {
+    // Haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
     onVisibilityChange(value);
     onClose();
   };
@@ -116,10 +151,17 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                   key={option.value}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(option.value)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all"
                   style={{
-                    background: isSelected ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                    border: isSelected ? 'none' : '1px solid var(--cm-border-subtle)',
+                    background: isSelected 
+                      ? 'var(--cm-surface-slate)' 
+                      : 'var(--cm-surface-alt)',
+                    border: isSelected 
+                      ? 'none' 
+                      : '1px solid var(--cm-border-subtle)',
+                    boxShadow: isSelected 
+                      ? '0 2px 8px rgba(0, 0, 0, 0.12)' 
+                      : 'none',
                   }}
                 >
                   <div 
@@ -147,9 +189,7 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                     </p>
                   </div>
                   
-                  {isSelected && (
-                    <Check className="w-5 h-5 text-white" />
-                  )}
+                  {isSelected && <AnimatedCheck />}
                 </motion.button>
               );
             })}
