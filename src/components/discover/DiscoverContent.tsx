@@ -333,70 +333,93 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Create hero item using ENGAGEMENT-BASED selection algorithm
-  // Scores videos by: likes, comments, views, recency
-  // Hero must only select landscape videos (aspectRatio >= 1.25) to avoid cropping
+  // Create hero item using 3-TIER FALLBACK algorithm
+  // Priority 1: Most liked from last 24h
+  // Priority 2: Most liked from last 7 days
+  // Priority 3: Most recent landscape video
   const heroItem = useMemo(() => {
     if (!currentContent || currentContent.length === 0) return null;
     
     const LANDSCAPE_THRESHOLD = 1.25;
-    const MIN_DURATION = 15; // seconds
-    const MAX_DURATION = 180; // seconds (3 minutes)
-    const now = Date.now();
+    const MIN_DURATION = 15;
+    const MAX_DURATION = 180;
+    
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // Score and rank videos
-    const scoredVideos = currentContent
+    // Filter landscape videos with duration requirements
+    const landscapeVideos = currentContent.filter(item => {
+      if (item.type !== 'video') return false;
+      const aspectRatio = item.aspectRatio || 
+        (item.width && item.height && item.height > 0 ? item.width / item.height : 0);
+      if (aspectRatio < LANDSCAPE_THRESHOLD && !item.landscapeSuitable) return false;
+      const duration = item.durationSeconds || 0;
+      if (duration > 0 && (duration < MIN_DURATION || duration > MAX_DURATION)) return false;
+      return true;
+    });
+
+    if (landscapeVideos.length === 0) {
+      // No landscape videos at all - hero section will hide
+      return null;
+    }
+
+    // Helper to get age in hours
+    const getAgeHours = (item: ExploreContentItem) => {
+      const createdAt = item.createdAt || (item as any).created_at;
+      if (!createdAt) return 24 * 7; // Default to 1 week if no date
+      return (now.getTime() - new Date(createdAt).getTime()) / (1000 * 60 * 60);
+    };
+
+    // PRIORITY 1: Most liked video from last 24 hours
+    const todayVideos = landscapeVideos
       .filter(item => {
-        if (item.type !== 'video') return false;
-
-        // Must be landscape
-        const aspectRatio = item.aspectRatio || 
-          (item.width && item.height && item.height > 0 ? item.width / item.height : 0);
-        if (aspectRatio < LANDSCAPE_THRESHOLD && !item.landscapeSuitable) return false;
-
-        // Duration filter (if duration is available)
-        const duration = item.durationSeconds || 0;
-        if (duration > 0 && (duration < MIN_DURATION || duration > MAX_DURATION)) return false;
-
-        return true;
+        const createdAt = item.createdAt || (item as any).created_at;
+        if (!createdAt) return false;
+        return new Date(createdAt) >= oneDayAgo;
       })
-      .map(item => {
-        // Calculate age in hours
-        const createdAt = item.createdAt;
-        const ageMs = createdAt 
-          ? now - new Date(createdAt).getTime()
-          : 24 * 60 * 60 * 1000; // Default to 24h if no date
-        const ageHours = ageMs / (1000 * 60 * 60);
+      .filter(item => (item.likes || 0) > 0)
+      .sort((a, b) => (b.likes || 0) - (a.likes || 0));
 
-        // Recency boost
-        let recencyBoost = 1.0;
-        if (ageHours < 24) recencyBoost = 3.0;
-        else if (ageHours < 72) recencyBoost = 2.0;
-        else if (ageHours < 168) recencyBoost = 1.5;
+    if (todayVideos.length > 0) {
+      const heroVideo = todayVideos[0];
+      const ageHours = getAgeHours(heroVideo);
+      // Use high score to trigger "TRENDING NOW" label
+      return createHeroItem(heroVideo, 300, ageHours);
+    }
 
-        // Engagement metrics (with safe defaults)
-        const likes = item.likes || 0;
-        const comments = item.comments || 0;
-        const views = Math.max(item.shares || 1, 1); // Use shares as proxy for views
-
-        // Weighted engagement score
-        const engagementRate = (likes + comments) / views;
-        const weightedEngagement = 
-          (1.0 * likes) + 
-          (3.0 * comments) + 
-          (0.1 * views) + 
-          (5.0 * engagementRate * 100);
-
-        const score = weightedEngagement * recencyBoost;
-
-        return { item, score, ageHours };
+    // PRIORITY 2: Most liked video from last 7 days
+    const weekVideos = landscapeVideos
+      .filter(item => {
+        const createdAt = item.createdAt || (item as any).created_at;
+        if (!createdAt) return false;
+        return new Date(createdAt) >= oneWeekAgo;
       })
-      .sort((a, b) => b.score - a.score);
+      .filter(item => (item.likes || 0) > 0)
+      .sort((a, b) => (b.likes || 0) - (a.likes || 0));
 
-    if (scoredVideos.length === 0) return null;
+    if (weekVideos.length > 0) {
+      const heroVideo = weekVideos[0];
+      const ageHours = getAgeHours(heroVideo);
+      // Use medium score for "POPULAR THIS WEEK" label
+      return createHeroItem(heroVideo, 250, ageHours);
+    }
 
-    const topVideo = scoredVideos[0];
-    return createHeroItem(topVideo.item, topVideo.score, topVideo.ageHours);
+    // PRIORITY 3: Any landscape video (most recent)
+    const mostRecentLandscape = [...landscapeVideos]
+      .sort((a, b) => {
+        const aDate = new Date(a.createdAt || (a as any).created_at || 0).getTime();
+        const bDate = new Date(b.createdAt || (b as any).created_at || 0).getTime();
+        return bDate - aDate;
+      })[0];
+
+    if (mostRecentLandscape) {
+      const ageHours = getAgeHours(mostRecentLandscape);
+      // Use low score for "FEATURED" or generic label
+      return createHeroItem(mostRecentLandscape, 50, ageHours);
+    }
+
+    return null;
   }, [currentContent]);
 
   // Filter out the hero item from the grid
