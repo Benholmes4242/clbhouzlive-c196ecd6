@@ -4084,6 +4084,7 @@ export type Database = {
           achievement_id: string | null
           actor_id: string
           actor_type: string
+          badges: string[]
           categories: string[]
           content: string | null
           course_id: string | null
@@ -4101,6 +4102,7 @@ export type Database = {
           achievement_id?: string | null
           actor_id: string
           actor_type?: string
+          badges?: string[]
           categories?: string[]
           content?: string | null
           course_id?: string | null
@@ -4118,6 +4120,7 @@ export type Database = {
           achievement_id?: string | null
           actor_id?: string
           actor_type?: string
+          badges?: string[]
           categories?: string[]
           content?: string | null
           course_id?: string | null

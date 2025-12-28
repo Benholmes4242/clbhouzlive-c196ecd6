@@ -20,7 +20,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet } from "./sheets";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet } from "./sheets";
 import { useDraftPersistence } from "./useDraftPersistence";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 
@@ -65,14 +65,16 @@ export default function CreateMomentModal({
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   
-  // New v2 state - categories and visibility
+  // New v2 state - categories, badges, and visibility
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBadges, setSelectedBadges] = useState<string[]>([]);
   const [visibility, setVisibility] = useState<MomentVisibility>('anyone');
   
   // Sheet states
   const [showCategorySheet, setShowCategorySheet] = useState(false);
   const [showAudienceSheet, setShowAudienceSheet] = useState(false);
   const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
+  const [showBadgesSheet, setShowBadgesSheet] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -667,6 +669,17 @@ export default function CreateMomentModal({
           setShowEnhanceSheet(false);
           openStudio();
         }}
+        onOpenBadges={() => {
+          setShowEnhanceSheet(false);
+          setShowBadgesSheet(true);
+        }}
+      />
+
+      <MomentBadgesSheet
+        isOpen={showBadgesSheet}
+        onClose={() => setShowBadgesSheet(false)}
+        selectedBadges={selectedBadges}
+        onBadgesChange={setSelectedBadges}
       />
     </div>
   );
