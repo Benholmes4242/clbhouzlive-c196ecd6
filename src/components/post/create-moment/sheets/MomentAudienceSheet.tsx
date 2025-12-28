@@ -20,7 +20,7 @@ const AUDIENCE_OPTIONS: AudienceOption[] = [
   },
   {
     value: 'connections',
-    label: 'Connections',
+    label: 'Followers',
     description: 'Only your followers can see this',
     icon: <Users className="w-5 h-5" />,
   },

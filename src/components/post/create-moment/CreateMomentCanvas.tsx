@@ -139,9 +139,9 @@ export default function CreateMomentCanvas({
                     onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
                     style={{
-                      background: 'var(--cm-accent-subtle)',
-                      color: 'var(--cm-accent)',
-                      border: '1px solid rgba(247, 147, 30, 0.25)',
+                      background: 'var(--cm-surface-slate)',
+                      color: 'white',
+                      border: '1px solid var(--cm-border)',
                     }}
                   >
                     @{tag.username || tag.name}
