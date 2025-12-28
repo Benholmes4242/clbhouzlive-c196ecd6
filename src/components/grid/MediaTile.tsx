@@ -14,8 +14,7 @@ import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
-import { OverlayCorners } from '@/components/shared/overlay';
-import { Images, Trophy, Heart, MessageCircle } from 'lucide-react';
+import { Images, Trophy, Heart } from 'lucide-react';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
 
@@ -154,7 +153,7 @@ const MediaTile = memo<MediaTileProps>(({
       className={cn(
         aspectClass,
         'relative overflow-hidden bg-muted/30',
-        isLandscape && 'col-span-2 rounded-lg shadow-sm'
+        isLandscape && 'col-span-2'  // Full width, no rounded corners
       )}
       onClick={handleClick}
     >
@@ -190,93 +189,81 @@ const MediaTile = memo<MediaTileProps>(({
         <VideoScrubber videoEl={videoEl} height={3} />
       )}
       
-      {/* Enhanced landscape overlay with metadata */}
-      {isLandscape && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
-          <div className="flex items-center gap-3">
-            {/* Creator avatar */}
-            {config.showCreator && item.creator?.avatar && (
-              <div 
-                className="shrink-0 w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 cursor-pointer"
-                onClick={handleAuthorClick}
-              >
-                <img 
-                  src={item.creator.avatar} 
-                  alt={item.creator.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            
-            {/* Text content */}
-            <div className="flex-1 min-w-0">
-              {/* Course name or caption */}
-              {item.courseName && (
-                <p className="text-white font-semibold text-sm line-clamp-1 mb-0.5">
-                  {item.courseName}
-                </p>
-              )}
-              {/* Creator name */}
-              {config.showCreator && item.creator?.name && (
-                <p 
-                  className="text-white/80 text-xs truncate cursor-pointer hover:text-white"
-                  onClick={handleAuthorClick}
-                >
-                  {item.creator.name}
-                </p>
-              )}
+      {/* Bottom gradient for text legibility - portrait only */}
+      {!isLandscape && (
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+      )}
+      
+      {/* Unified meta layout - same for portrait and landscape */}
+      {/* Likes above, name below, avatar bottom right */}
+      <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
+        {/* Text content - bottom left */}
+        <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
+          {/* Likes row - de-emphasised, tertiary style (above name) */}
+          {config.showLikes && (item.likes || 0) > 0 && (
+            <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+              <Heart className="w-3 h-3" />
+              <span>{item.likes || 0}</span>
             </div>
-            
-            {/* Engagement stats */}
-            {config.showLikes && ((item.likes || 0) > 0 || (item.commentCount || 0) > 0) && (
-              <div className="text-white/90 flex items-center gap-3 text-sm">
-                {(item.likes || 0) > 0 && (
-                  <span className="flex items-center gap-1">
-                    <Heart className="w-4 h-4" fill="currentColor" />
-                    {formatCount(item.likes || 0)}
-                  </span>
-                )}
-                {(item.commentCount || 0) > 0 && (
-                  <span className="flex items-center gap-1">
-                    <MessageCircle className="w-4 h-4" />
-                    {formatCount(item.commentCount || 0)}
-                  </span>
-                )}
-              </div>
-            )}
+          )}
+
+          {/* User name */}
+          {config.showCreator && item.creator?.name && (
+            <div 
+              className="text-white font-bold text-sm leading-tight cursor-pointer" 
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+              onClick={handleAuthorClick}
+            >
+              <span className="truncate block">
+                {item.creator.name}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Avatar - bottom right, squircle */}
+        {config.showCreator && item.creator?.avatar && (
+          <div
+            className="absolute right-3 bottom-3 w-[40px] h-[40px] rounded-[10px] overflow-hidden bg-black/40 backdrop-blur-md pointer-events-auto cursor-pointer"
+            style={{
+              boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
+            }}
+            onClick={handleAuthorClick}
+          >
+            <img
+              src={item.creator.avatar}
+              alt={item.creator.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+      </div>
+      
+      {/* Duration badge - top left for videos (portrait only) */}
+      {!isLandscape && isVideo && config.showDuration && resolvedDuration && (
+        <div className="absolute top-2 left-2 z-10">
+          <div className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
+            {formatDuration(resolvedDuration)}
           </div>
         </div>
       )}
       
-      {/* Portrait tile overlay system (existing) */}
-      {!isLandscape && (
-        <>
-          {/* Bottom gradient for text legibility */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          
-          {/* Overlay system */}
-          <OverlayCorners
-            surface="tile"
-            variant={variant}
-            club={clubData}
-            durationSeconds={isVideo && config.showDuration ? resolvedDuration : undefined}
-            durationPlacement="top-left"
-            creatorName={config.showCreator ? item.creator?.name : undefined}
-            creatorAvatar={config.showCreator ? item.creator?.avatar : undefined}
-            likes={config.showLikes ? item.likes : undefined}
-            showCreator={config.showCreator}
-            showLikes={config.showLikes}
-            showAvatar={config.showCreator}
-            onCreatorClick={handleAuthorClick}
-            topLeftOverride={topLeftOverride}
-            hideRankingIfOverride={true}
-          />
-        </>
+      {/* Top-left override (milestone, multi-image count) - portrait only */}
+      {!isLandscape && topLeftOverride && (
+        <div className="absolute top-2 left-2 z-10">
+          {topLeftOverride}
+        </div>
       )}
     </motion.button>
   );
 });
 
 MediaTile.displayName = 'MediaTile';
+
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
 export default MediaTile;
