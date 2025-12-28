@@ -226,10 +226,9 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full h-7 text-xs font-medium",
+            "w-full h-7 text-xs font-medium rounded-sq-sm",
             isFollowing && "bg-muted text-muted-foreground"
           )}
-          style={{ borderRadius: '34%' }}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
         >
