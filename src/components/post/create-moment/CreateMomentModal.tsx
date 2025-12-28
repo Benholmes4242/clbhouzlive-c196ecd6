@@ -558,6 +558,8 @@ export default function CreateMomentModal({
           <CreateMomentControlBar
             hasMedia={hasMedia}
             hasCategories={hasCategories}
+            hasEnhanced={!!currentFilter && currentFilter !== 'normal'}
+            visibilityChanged={visibility !== 'anyone'}
             onMediaClick={handlePickFromLibrary}
             onEnhanceClick={() => setShowEnhanceSheet(true)}
             onCategoriesClick={() => setShowCategorySheet(true)}

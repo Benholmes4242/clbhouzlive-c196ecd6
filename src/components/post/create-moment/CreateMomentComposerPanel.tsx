@@ -153,18 +153,18 @@ export default function CreateMomentComposerPanel({
           
           <textarea
             ref={textareaRef}
-            className="w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none transition-colors"
+            className="w-full rounded-xl px-3 py-3 text-[14px] leading-relaxed resize-none transition-colors"
             style={{
               background: 'var(--cm-surface-input)',
               border: '1px solid var(--cm-border-subtle)',
               color: 'var(--cm-text-primary)',
-              minHeight: '48px',
-              maxHeight: '100px',
+              minHeight: '64px',
+              maxHeight: '120px',
               outline: 'none',
               WebkitTapHighlightColor: 'transparent',
               WebkitAppearance: 'none'
             }}
-            placeholder="Write a caption..."
+            placeholder="What happened here?"
             value={caption}
             onChange={handleCaptionInput}
             onFocus={handleFocus}

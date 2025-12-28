@@ -1,5 +1,6 @@
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Check, AlertCircle, RotateCcw } from "lucide-react";
+import { Loader2, Check, AlertCircle, RotateCcw, Image, Tag, Eye, MessageSquare } from "lucide-react";
 import { UploadProgressState } from "./types";
 
 interface CreateMomentShareBarProps {
@@ -7,6 +8,11 @@ interface CreateMomentShareBarProps {
   uploadProgress: UploadProgressState;
   onPost: () => void;
   onRetry?: () => void;
+  // Readiness indicators
+  hasMedia?: boolean;
+  hasCaption?: boolean;
+  hasCategory?: boolean;
+  hasVisibility?: boolean;
 }
 
 export default function CreateMomentShareBar({
@@ -14,15 +20,56 @@ export default function CreateMomentShareBar({
   uploadProgress,
   onPost,
   onRetry,
+  hasMedia = false,
+  hasCaption = false,
+  hasCategory = false,
+  hasVisibility = true,
 }: CreateMomentShareBarProps) {
   const { status, uploadedFiles, totalFiles, error } = uploadProgress;
   
   const isUploading = status === 'uploading';
   const isSuccess = status === 'success';
   const isFailed = status === 'failed';
+  const [hasShownPulse, setHasShownPulse] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [showPulse, setShowPulse] = useState(false);
 
   // Progress percentage
   const progressPercent = totalFiles > 0 ? Math.round((uploadedFiles / totalFiles) * 100) : 0;
+
+  // Trigger readiness pulse when all requirements are met for the first time
+  useEffect(() => {
+    const isReady = canPost && hasMedia && hasCategory;
+    if (isReady && !hasShownPulse && !isUploading) {
+      setShowPulse(true);
+      setHasShownPulse(true);
+      // Haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate([10, 50, 10]);
+      }
+      // Auto-dismiss pulse after animation
+      const timer = setTimeout(() => setShowPulse(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [canPost, hasMedia, hasCategory, hasShownPulse, isUploading]);
+
+  // Handle post with lock
+  const handlePost = useCallback(() => {
+    if (isLocked || !canPost || isUploading) return;
+    
+    // Lock button immediately
+    setIsLocked(true);
+    
+    // Haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(20);
+    }
+    
+    onPost();
+    
+    // Reset lock after a short delay (in case of error)
+    setTimeout(() => setIsLocked(false), 2000);
+  }, [isLocked, canPost, isUploading, onPost]);
 
   return (
     <div className="space-y-2">
@@ -88,28 +135,47 @@ export default function CreateMomentShareBar({
         )}
       </AnimatePresence>
 
-      {/* Share button - slate enabled, light disabled */}
-      <button
-        disabled={!canPost || isUploading}
-        onClick={onPost}
-        className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      {/* Optional: Readiness indicator */}
+      {hasMedia && (
+        <div className="flex items-center justify-center gap-3 py-1">
+          <ReadinessIcon active={hasMedia} icon={<Image className="w-3 h-3" />} />
+          <ReadinessIcon active={hasCaption} icon={<MessageSquare className="w-3 h-3" />} optional />
+          <ReadinessIcon active={hasCategory} icon={<Tag className="w-3 h-3" />} />
+          <ReadinessIcon active={hasVisibility} icon={<Eye className="w-3 h-3" />} />
+        </div>
+      )}
+
+      {/* Share button with readiness pulse */}
+      <motion.button
+        disabled={!canPost || isUploading || isLocked}
+        onClick={handlePost}
+        whileTap={{ scale: 0.97 }}
+        animate={{
+          boxShadow: showPulse 
+            ? ['0 0 0 0 rgba(100, 116, 139, 0)', '0 0 0 8px rgba(100, 116, 139, 0.3)', '0 0 0 0 rgba(100, 116, 139, 0)']
+            : 'none',
+        }}
+        transition={{ 
+          boxShadow: { duration: 0.8, ease: "easeOut" },
+        }}
+        className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         style={{
           background: isSuccess 
             ? 'rgba(34, 197, 94, 0.15)' 
-            : canPost && !isUploading
+            : canPost && !isUploading && !isLocked
               ? 'var(--cm-surface-slate)'
               : 'var(--cm-surface-alt)',
           border: isSuccess 
             ? '1px solid rgba(34, 197, 94, 0.3)' 
-            : canPost && !isUploading
+            : canPost && !isUploading && !isLocked
               ? 'none'
               : '1px solid var(--cm-border-subtle)',
           color: isSuccess 
             ? '#16A34A'
-            : canPost && !isUploading
+            : canPost && !isUploading && !isLocked
               ? 'white'
               : 'var(--cm-text-tertiary)',
-          boxShadow: canPost && !isUploading && !isSuccess ? 'var(--cm-shadow-button)' : 'none',
+          boxShadow: canPost && !isUploading && !isSuccess && !isLocked ? 'var(--cm-shadow-button)' : 'none',
         }}
         aria-label="Post your moment"
       >
@@ -131,7 +197,30 @@ export default function CreateMomentShareBar({
         ) : (
           <span>Share</span>
         )}
-      </button>
+      </motion.button>
     </div>
   );
 }
+
+// Small readiness icon component
+interface ReadinessIconProps {
+  active: boolean;
+  icon: React.ReactNode;
+  optional?: boolean;
+}
+
+const ReadinessIcon: React.FC<ReadinessIconProps> = ({ active, icon, optional = false }) => (
+  <div 
+    className="flex items-center justify-center"
+    style={{ 
+      color: active 
+        ? 'var(--cm-accent)' 
+        : optional 
+          ? 'var(--cm-border)' 
+          : 'var(--cm-text-tertiary)',
+      opacity: active ? 1 : optional ? 0.5 : 0.7,
+    }}
+  >
+    {icon}
+  </div>
+);
