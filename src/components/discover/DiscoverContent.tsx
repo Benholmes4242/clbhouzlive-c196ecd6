@@ -258,9 +258,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
 
   // Handle like toggle with optimistic updates
   const handleLikeToggle = useCallback((itemId: string) => {
-    if (!currentContent) return;
-
-    const item = currentContent.find(i => i.id === itemId);
+    // For shorts tab, check in content directly since we use gridContent now
+    const item = content?.find(i => i.id === itemId) || currentContent?.find(i => i.id === itemId);
     if (!item) return;
 
     const currentlyLiked = likedItems[itemId] ?? false;
@@ -268,6 +267,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
 
     // Optimistic update
     setLikedItems(prev => ({ ...prev, [itemId]: newLikedState }));
+    
+    // Also update currentContent for non-shorts tabs
     setCurrentContent(prev => 
       prev?.map(i =>
         i.id === itemId
@@ -310,7 +311,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         toast.error('Failed to update like. Please try again.');
       }
     }, 300);
-  }, [currentContent, likedItems, onLike]);
+  }, [content, currentContent, likedItems, onLike]);
 
   // Handle profile navigation
   const handleAuthorClick = useCallback((authorId: string) => {
@@ -332,12 +333,14 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Create hero item using 3-TIER FALLBACK algorithm
+  // Create hero item using 3-TIER FALLBACK algorithm from UNFILTERED content
   // Priority 1: Most liked from last 24h
   // Priority 2: Most liked from last 7 days
   // Priority 3: Most recent landscape video
+  // IMPORTANT: Hero is NEVER affected by search/tags - only grid is filtered
   const heroItem = useMemo(() => {
-    if (!currentContent || currentContent.length === 0) return null;
+    // Use UNFILTERED content for hero selection
+    if (!content || content.length === 0) return null;
     
     const LANDSCAPE_THRESHOLD = 1.25;
     const MIN_DURATION = 15;
@@ -348,7 +351,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     // Filter landscape videos with duration requirements
-    const landscapeVideos = currentContent.filter(item => {
+    const landscapeVideos = content.filter(item => {
       if (item.type !== 'video') return false;
       const aspectRatio = item.aspectRatio || 
         (item.width && item.height && item.height > 0 ? item.width / item.height : 0);
@@ -419,13 +422,48 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }
 
     return null;
-  }, [currentContent]);
+  }, [content]); // Uses UNFILTERED content - hero never changes with search/tags
 
-  // Filter out the hero item from the grid
+  // Grid content: Start with unfiltered content, remove hero, THEN apply search/tag filters
+  // This ensures hero stays constant while grid responds to filters
   const gridContent = useMemo(() => {
-    if (!currentContent || !heroItem) return currentContent;
-    return currentContent.filter(item => item.id !== heroItem.id);
-  }, [currentContent, heroItem]);
+    if (!content || content.length === 0) return [];
+
+    // STEP 1: Start with all content
+    let filtered = [...content];
+
+    // STEP 2: Remove hero item first (before filtering)
+    if (heroItem) {
+      filtered = filtered.filter(item => item.id !== heroItem.id);
+    }
+
+    // STEP 3: Apply search filter
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.title?.toLowerCase().includes(query) ||
+        item.ctaDescription?.toLowerCase().includes(query) ||
+        item.user?.name?.toLowerCase().includes(query) ||
+        item.user?.username?.toLowerCase().includes(query)
+      );
+    }
+
+    // STEP 4: Apply tag filter (watchActiveFilter for shorts tab)
+    const activeTags = watchActiveFilter !== 'all' ? [watchActiveFilter] : selectedTags;
+    if (activeTags.length > 0) {
+      filtered = applyTagFilter(filtered, activeTags);
+    }
+
+    // STEP 5: Remove duplicates and enrich with like state
+    const unique = filtered.filter((item, index, self) => 
+      index === self.findIndex(t => t.src === item.src)
+    ).map(item => ({
+      ...item,
+      isLiked: likedItems[item.id] ?? false
+    }));
+
+    return unique;
+  }, [content, heroItem, searchQuery, selectedTags, watchActiveFilter, likedItems]);
 
   // Apply course clustering when 3+ items from same course in top 15 (for Shorts tab)
   // MUST be called unconditionally to satisfy React hooks rules
@@ -491,12 +529,12 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         {/* Watch Section Gap Token: 16px between all major sections */}
         <div className="h-4" /> {/* 16px gap: CommandCenter → Hero */}
         
-        {/* Watch Hero - single featured item */}
+        {/* Watch Hero - single featured item (uses unfiltered content) */}
         <DiscoverHero 
           item={heroItem}
-          isLoading={loading && !currentContent}
+          isLoading={loading && !content}
           onWatch={(item) => {
-            const originalItem = currentContent?.find(c => c.id === item.id);
+            const originalItem = content?.find(c => c.id === item.id);
             if (originalItem) onMediaClick(originalItem);
           }}
         />
