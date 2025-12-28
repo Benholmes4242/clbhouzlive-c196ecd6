@@ -42,7 +42,7 @@ const logDebug = (event: string, data?: any) => {
 
 export function useLazyTiles({
   totalItems,
-  initialVisible = 6, // First 6 tiles (3 rows of 2)
+  initialVisible = 12, // First 12 tiles for better viewport fill
   preloadViewports = 2,
   estimatedRowHeight = 200,
 }: UseLazyTilesOptions): UseLazyTilesResult {
