@@ -76,12 +76,29 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const commandCenterSort: SortOption = sortOption as SortOption;
 
   const {
-    items,
+    items: rawItems,
     loading,
     hasMore,
     communityCount,
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
+
+  // Apply client-side search filter (matches Watch page implementation)
+  const items = useMemo(() => {
+    if (!searchQuery || !searchQuery.trim()) return rawItems;
+    
+    const query = searchQuery.toLowerCase();
+    return rawItems.filter(item => {
+      // Post content/title
+      const titleMatch = (item.title || '').toLowerCase().includes(query);
+      
+      // User/creator fields
+      const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
+      const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
+      
+      return titleMatch || userNameMatch || userUsernameMatch;
+    });
+  }, [rawItems, searchQuery]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
@@ -199,9 +216,10 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     );
   }
 
-  // Has community but no posts
+  // Has community but no posts (or search returned no results)
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
-    // Check if this is due to a filter
+    // Check if this is due to search or filter
+    const isSearchEmpty = searchQuery && searchQuery.trim().length > 0;
     const isFilteredEmpty = mediaFilter !== 'all';
     
     return (
@@ -218,7 +236,19 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             onPillSelect={handleFilterChange}
           />
         </div>
-        {isFilteredEmpty ? (
+        {isSearchEmpty ? (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <p className="text-muted-foreground text-center">
+              No posts found for "{searchQuery}"
+            </p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="mt-3 text-sm text-primary hover:underline"
+            >
+              Clear search
+            </button>
+          </div>
+        ) : isFilteredEmpty ? (
           <CommunityEmptyState variant="no-results" onClearFilter={handleClearFilter} />
         ) : (
           <CommunityEmptyState variant="quiet" />
