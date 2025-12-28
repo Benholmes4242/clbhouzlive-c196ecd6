@@ -1,5 +1,5 @@
 import React from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 export interface MutualFriend {
   id: string;
@@ -14,7 +14,7 @@ interface MutualFriendsAvatarsProps {
 
 /**
  * Displays overlapping mini-avatars for mutual friends.
- * Uses Squircle shape matching the SDS design system.
+ * Uses SquircleAvatar matching the SDS design system (1/1.05 aspect, 34% radius).
  */
 export const MutualFriendsAvatars: React.FC<MutualFriendsAvatarsProps> = ({ 
   friends, 
@@ -32,14 +32,13 @@ export const MutualFriendsAvatars: React.FC<MutualFriendsAvatarsProps> = ({
           className="relative"
           style={{ zIndex: maxDisplay - index }}
         >
-          <Squircle width={20} height={21} className="ring-1 ring-background">
-            <img
-              src={friend.avatar_url || '/placeholder.svg'}
-              alt={friend.display_name}
-              className="w-full h-full object-cover bg-muted"
-              loading="lazy"
-            />
-          </Squircle>
+          <SquircleAvatar
+            src={friend.avatar_url}
+            alt={friend.display_name}
+            size={20}
+            hideRing
+            className="ring-1 ring-background"
+          />
         </div>
       ))}
     </div>
