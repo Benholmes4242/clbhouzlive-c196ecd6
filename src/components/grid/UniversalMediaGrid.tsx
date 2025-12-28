@@ -103,7 +103,6 @@ export function UniversalMediaGrid({
   // Infinite scroll handler (IntersectionObserver sentinel; works with nested scroll containers)
   useEffect(() => {
     if (!mergedConfig.infiniteScroll || !onLoadMore) return;
-    if (!hasMore || isLoading) return;
 
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -118,12 +117,12 @@ export function UniversalMediaGrid({
         onLoadMore();
         window.setTimeout(() => {
           loadingRef.current = false;
-        }, 800);
+        }, 500);
       },
       {
         root: null,
-        rootMargin: '800px 0px',
-        threshold: 0.01,
+        rootMargin: '1200px 0px', // Trigger earlier for smoother loading
+        threshold: 0,
       }
     );
 
