@@ -355,7 +355,7 @@ export const useRealPostsFetcher = () => {
     durationFilter?: { from: number; to: number | null }
   ): Promise<ExploreContentItem[]> => {
     try {
-      // Build the base query with select
+      // Build the base query with select - includes actor_type/actor_id for business profiles
       let query = supabase
         .from('posts')
         .select(`
@@ -363,6 +363,8 @@ export const useRealPostsFetcher = () => {
           content,
           created_at,
           user_id,
+          actor_type,
+          actor_id,
           post_media!inner (
             id,
             media_type,
@@ -436,18 +438,40 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      // Get unique user IDs
-      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      // Split posts by actor type for polymorphic hydration
+      const personalPosts = postsData.filter((p: any) => !p.actor_type || p.actor_type === 'personal');
+      const businessPosts = postsData.filter((p: any) => p.actor_type === 'business');
+
+      // Get unique user IDs (for personal posts)
+      const userIds = [...new Set(personalPosts.map(post => post.user_id))];
+      
+      // Get unique business IDs (for business posts)
+      const businessIds = [...new Set(businessPosts.map((post: any) => post.actor_id).filter(Boolean))] as string[];
       
       // Get user profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', userIds);
+      const { data: profiles, error: profilesError } = userIds.length > 0
+        ? await supabase
+            .from('user_profiles')
+            .select('id, display_name, username, profile_photo_url')
+            .in('id', userIds)
+        : { data: [], error: null };
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
         return [];
+      }
+      
+      // Get business accounts
+      const { data: businessAccounts, error: businessError } = businessIds.length > 0
+        ? await supabase
+            .from('business_accounts')
+            .select('id, name, logo_url, is_verified, category, location')
+            .in('id', businessIds)
+        : { data: [], error: null };
+        
+      if (businessError) {
+        console.error('Error fetching business accounts:', businessError);
+        // Don't fail - just continue without business data
       }
 
       // Extract all golf course IDs from post tags for batch fetching
@@ -478,9 +502,17 @@ export const useRealPostsFetcher = () => {
         (golfCourses || []).map(c => [c.id, c])
       );
 
-      // Format posts for explore grid
-      const formattedPosts = postsData.map(post => {
-        const userProfile = profiles?.find(profile => profile.id === post.user_id);
+      // Format posts for explore grid with polymorphic creator hydration
+      const formattedPosts = postsData.map((post: any) => {
+        const isBusinessPost = post.actor_type === 'business';
+        
+        const userProfile = !isBusinessPost 
+          ? profiles?.find(profile => profile.id === post.user_id) 
+          : null;
+          
+        const businessAccount = isBusinessPost && post.actor_id
+          ? businessAccounts?.find(b => b.id === post.actor_id)
+          : null;
         const allMedia = (post.post_media || []);
         const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0]; // Prefer video as primary
         
@@ -584,14 +616,33 @@ export const useRealPostsFetcher = () => {
           aspectRatio,
           width,
           height,
-          createdAt: post.created_at, // Map created_at to createdAt
-          user: {
-            id: post.user_id,
-            name: userProfile?.display_name || userProfile?.username || 'User',
-            username: userProfile?.username,
-            avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: Math.random() > 0.7 // Random verification for demo
-          },
+          createdAt: post.created_at,
+          actorType: (post.actor_type || 'personal') as 'personal' | 'business',
+          actorId: post.actor_id || post.user_id,
+          // Polymorphic user object - use business profile if available
+          user: isBusinessPost && businessAccount
+            ? {
+                id: businessAccount.id,
+                name: businessAccount.name || 'Business',
+                avatar: businessAccount.logo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                verified: businessAccount.is_verified || false,
+              }
+            : {
+                id: post.user_id,
+                name: userProfile?.display_name || userProfile?.username || 'User',
+                username: userProfile?.username,
+                avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                verified: false,
+              },
+          // Also include business object for components that need it
+          business: isBusinessPost && businessAccount ? {
+            id: businessAccount.id,
+            name: businessAccount.name,
+            logoUrl: businessAccount.logo_url,
+            isVerified: businessAccount.is_verified,
+            category: businessAccount.category,
+            location: businessAccount.location,
+          } : undefined,
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
