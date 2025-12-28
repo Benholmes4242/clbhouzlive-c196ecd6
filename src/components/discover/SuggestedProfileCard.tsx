@@ -181,9 +181,9 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
             )}
           </p>
 
-          {/* Golfer: Home club (2 lines) OR Business: "Business Profile" */}
+          {/* Golfer: Home club (1 line, truncate) OR Business: "Business Profile" */}
           {isGolfer && golferData?.home_club && (
-            <p className="text-[11px] text-muted-foreground text-center line-clamp-2 leading-snug w-full">
+            <p className="text-[11px] text-muted-foreground text-center truncate w-full">
               {golferData.home_club}
             </p>
           )}

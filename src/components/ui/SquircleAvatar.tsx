@@ -45,6 +45,8 @@ export interface SquircleAvatarProps {
   top100Count?: number;
   /** Hide ring entirely (no grey or colored ring) */
   hideRing?: boolean;
+  /** Use a thin 0.5px ring instead of the standard 2.5px (for mini avatars) */
+  thinRing?: boolean;
   /** Fallback text (e.g., initials) */
   fallback?: string;
   /** Additional CSS classes */
@@ -80,6 +82,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   ringColor,
   top100Count,
   hideRing = false,
+  thinRing = false,
   fallback,
   className,
   onLoad,
@@ -236,7 +239,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: hideRing ? 'none' : '2.5px solid #D1D5DB',
+          border: hideRing ? 'none' : thinRing ? '0.5px solid #9CA3AF' : '2.5px solid #D1D5DB',
         }}
       >
         {avatarContent}
