@@ -7504,6 +7504,14 @@ export type Database = {
       base_club_name: { Args: { p_course_name: string }; Returns: string }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
+      can_view_followers_post: {
+        Args: {
+          p_actor_id: string
+          p_actor_type: string
+          p_post_user_id: string
+        }
+        Returns: boolean
+      }
       can_view_game_participant_profile: {
         Args: { _profile_user_id: string; _viewer_id: string }
         Returns: boolean
