@@ -55,7 +55,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   // Lazy loading - only mount items near viewport
   const { visibleIndices, registerTile } = useLazyTiles({
     totalItems: itemsToRender.length,
-    initialVisible: 4, // First 4 videos visible
+    initialVisible: 12, // First 12 videos visible for better initial viewport fill
     preloadViewports: 2,
     estimatedRowHeight: 300,
   });
