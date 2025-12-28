@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption } from '@/hooks/community/useCommunityFeed';
 import CommunityFeedCard from './CommunityFeedCard';
@@ -85,6 +85,16 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
+  
+  // Refs to avoid stale closure in IntersectionObserver callback
+  const hasMoreRef = useRef(hasMore);
+  const loadingRef = useRef(loading);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+    loadingRef.current = loading;
+  }, [hasMore, loading]);
 
   // CRITICAL: Preload first video immediately in layout phase (before paint)
   useLayoutEffect(() => {
@@ -122,21 +132,28 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return calculateDateSeparators(items);
   }, [items]);
 
-  // Infinite scroll observer
+  // Infinite scroll observer - uses refs to avoid stale closure
   useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
+        const entry = entries[0];
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
           loadMore();
         }
       },
-      { threshold: 0.3 }
+      { 
+        root: null,
+        rootMargin: '400px 0px', // Trigger 400px BEFORE reaching bottom
+        threshold: 0,
+      }
     );
 
-    const sentinel = sentinelRef.current;
-    if (sentinel) observer.observe(sentinel);
-    return () => { if (sentinel) observer.unobserve(sentinel); };
-  }, [hasMore, loading, loadMore]);
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   const handleVideoClick = useCallback((id: string) => {
     const item = items.find(i => i.id === id);
@@ -270,7 +287,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
       )}
 
       {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="h-4">
+      <div ref={sentinelRef} className="h-20 w-full">
         {loading && hasMore && items.length > 0 && (
           <div className="flex justify-center py-6">
             <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
