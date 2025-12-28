@@ -63,6 +63,7 @@ export function UniversalMediaGrid({
   chromeState,
 }: UniversalMediaGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   
   // Merge with default config for surface
@@ -99,27 +100,35 @@ export function UniversalMediaGrid({
     enabled: mergedConfig.autoplayPattern !== 'none',
   });
   
-  // Infinite scroll handler
+  // Infinite scroll handler (IntersectionObserver sentinel; works with nested scroll containers)
   useEffect(() => {
     if (!mergedConfig.infiniteScroll || !onLoadMore) return;
-    
-    const handleScroll = () => {
-      if (!gridRef.current || !hasMore || loadingRef.current || isLoading) return;
-      
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      const scrollThreshold = scrollHeight - clientHeight - 800;
-      
-      if (scrollTop > scrollThreshold) {
+    if (!hasMore || isLoading) return;
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (!first?.isIntersecting) return;
+        if (!hasMore || loadingRef.current || isLoading) return;
+
         loadingRef.current = true;
         onLoadMore();
-        setTimeout(() => {
+        window.setTimeout(() => {
           loadingRef.current = false;
-        }, 1000);
+        }, 800);
+      },
+      {
+        root: null,
+        rootMargin: '800px 0px',
+        threshold: 0.01,
       }
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, [mergedConfig.infiniteScroll, hasMore, isLoading, onLoadMore]);
   
   // Handle item click
@@ -305,6 +314,7 @@ export function UniversalMediaGrid({
     <>
       <div ref={gridRef} className="pb-4">
         {renderGrid()}
+        <div ref={sentinelRef} data-scroll-sentinel className="h-px w-full" />
       </div>
       
       {/* Loading indicator for infinite scroll */}
