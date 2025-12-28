@@ -440,12 +440,26 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // STEP 3: Apply search filter
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item => 
-        item.title?.toLowerCase().includes(query) ||
-        item.ctaDescription?.toLowerCase().includes(query) ||
-        item.user?.name?.toLowerCase().includes(query) ||
-        item.user?.username?.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter(item => {
+        // Video/post title and description fields
+        const titleMatch = (item.title || '').toLowerCase().includes(query);
+        const descMatch = (item.ctaDescription || '').toLowerCase().includes(query);
+        
+        // User/creator fields (polymorphic - check both legacy user and new creator)
+        const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
+        const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
+        const creatorNameMatch = (item.creator?.name || '').toLowerCase().includes(query);
+        const creatorUsernameMatch = (item.creator?.username || '').toLowerCase().includes(query);
+        
+        // Business profile name
+        const businessMatch = (item.business?.name || '').toLowerCase().includes(query);
+        
+        // Golf course name
+        const courseMatch = (item.golfCourse?.name || '').toLowerCase().includes(query);
+        
+        return titleMatch || descMatch || userNameMatch || userUsernameMatch || 
+               creatorNameMatch || creatorUsernameMatch || businessMatch || courseMatch;
+      });
     }
 
     // STEP 4: Apply tag filter (watchActiveFilter for shorts tab)
