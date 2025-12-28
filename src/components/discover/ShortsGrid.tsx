@@ -51,56 +51,27 @@ export default function ShortsGrid({
     isLoadingRef.current = isLoading;
   }, [hasMore, isLoading]);
   
-  // Separate videos by orientation
-  const { portraitVideos, landscapeVideos } = useMemo(() => {
-    const portrait: ExploreContentItem[] = [];
-    const landscape: ExploreContentItem[] = [];
-
-    items.forEach(item => {
+  // Build grid - all items shown as portrait (4P + 1L pattern is aspirational when we have landscape)
+  const gridItems = useMemo(() => {
+    const result: { item: ExploreContentItem; variant: 'portrait' | 'landscape' }[] = [];
+    
+    // Simply display all items - portrait cards, since shorts are typically vertical
+    items.forEach((item, index) => {
       const aspectRatio = item.aspectRatio || 
         (item.width && item.height && item.height > 0 ? item.width / item.height : 1);
       
-      if (aspectRatio >= AR_LANDSCAPE_THRESHOLD || item.landscapeSuitable) {
-        landscape.push(item);
-      } else {
-        portrait.push(item);
-      }
+      // Check if this is a landscape item AND it's in a "landscape slot" (every 5th)
+      const isLandscapeSlot = (index + 1) % CYCLE_SIZE === 0;
+      const isLandscapeContent = aspectRatio >= AR_LANDSCAPE_THRESHOLD || item.landscapeSuitable;
+      
+      // Only show as landscape if it's landscape content AND in a landscape slot
+      const variant = (isLandscapeSlot && isLandscapeContent) ? 'landscape' : 'portrait';
+      
+      result.push({ item, variant: variant as 'portrait' | 'landscape' });
     });
 
-    return { portraitVideos: portrait, landscapeVideos: landscape };
-  }, [items]);
-
-  // Build grid with strict 4P + 1L pattern
-  const gridItems = useMemo(() => {
-    const result: { item: ExploreContentItem; variant: 'portrait' | 'landscape' }[] = [];
-    let portraitIndex = 0;
-    let landscapeIndex = 0;
-
-    // Keep building cycles as long as we have content
-    while (true) {
-      // Check if we can complete another cycle
-      const remainingPortraits = portraitVideos.length - portraitIndex;
-      const remainingLandscapes = landscapeVideos.length - landscapeIndex;
-      
-      // Need 4 portraits and 1 landscape for a complete cycle
-      if (remainingPortraits >= PORTRAITS_PER_CYCLE && remainingLandscapes >= 1) {
-        // Add 4 portraits
-        for (let i = 0; i < PORTRAITS_PER_CYCLE; i++) {
-          result.push({ item: portraitVideos[portraitIndex++], variant: 'portrait' });
-        }
-        // Add 1 landscape
-        result.push({ item: landscapeVideos[landscapeIndex++], variant: 'landscape' });
-      } else {
-        // Can't complete a cycle - add remaining portraits as partial
-        while (portraitIndex < portraitVideos.length && result.length < items.length) {
-          result.push({ item: portraitVideos[portraitIndex++], variant: 'portrait' });
-        }
-        break;
-      }
-    }
-
     return result;
-  }, [portraitVideos, landscapeVideos, items.length]);
+  }, [items]);
 
   // Convert to unified format for MediaTile
   const unifiedItems = useMemo(() => {
