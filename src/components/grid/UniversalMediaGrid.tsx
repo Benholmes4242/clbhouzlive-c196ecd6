@@ -12,6 +12,7 @@
 
 import React, { useMemo, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { useScrollNearBottom } from '@/hooks/useScrollNearBottom';
 import {
   UniversalMediaGridProps,
   UniversalMediaItem,
@@ -63,10 +64,6 @@ export function UniversalMediaGrid({
   chromeState,
 }: UniversalMediaGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const loadingRef = useRef(false);
-  const hasMoreRef = useRef(hasMore);
-  const isLoadingRef = useRef(isLoading);
   
   // Merge with default config for surface
   const mergedConfig = useMemo(() => ({
@@ -102,45 +99,16 @@ export function UniversalMediaGrid({
     enabled: mergedConfig.autoplayPattern !== 'none',
   });
   
-  // Keep refs in sync with latest prop values
-  useEffect(() => {
-    hasMoreRef.current = hasMore;
-    isLoadingRef.current = isLoading;
-  }, [hasMore, isLoading]);
+  // Simple scroll-based infinite scroll - triggers when within 600px of bottom
 
-  // Infinite scroll handler (IntersectionObserver sentinel; works with nested scroll containers)
-  useEffect(() => {
-    if (!mergedConfig.infiniteScroll || !onLoadMore) return;
-
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (!first?.isIntersecting) return;
-        
-        // Use refs for latest values - avoids stale closure problem
-        if (!hasMoreRef.current || loadingRef.current || isLoadingRef.current) {
-          return;
-        }
-
-        loadingRef.current = true;
-        onLoadMore();
-        window.setTimeout(() => {
-          loadingRef.current = false;
-        }, 500);
-      },
-      {
-        root: null,
-        rootMargin: '400px 0px', // Trigger at ~70-80% scroll for seamless loading
-        threshold: 0,
-      }
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [mergedConfig.infiniteScroll, onLoadMore]);
+  // Simple scroll-based infinite scroll - triggers when within 600px of bottom
+  useScrollNearBottom({
+    threshold: 600,
+    enabled: mergedConfig.infiniteScroll && !!onLoadMore,
+    hasMore,
+    isLoading,
+    onLoadMore: onLoadMore ?? (() => {}),
+  });
   
   // Handle item click
   const handleItemClick = useCallback((item: UniversalMediaItem, index: number) => {
@@ -315,7 +283,7 @@ export function UniversalMediaGrid({
     <>
       <div ref={gridRef} className="pb-4">
         {renderGrid()}
-        <div ref={sentinelRef} data-scroll-sentinel className="h-px w-full" />
+        
       </div>
       
       {/* Loading indicator for infinite scroll */}
