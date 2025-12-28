@@ -36,7 +36,7 @@ export const MutualFriendsAvatars: React.FC<MutualFriendsAvatarsProps> = ({
             src={friend.avatar_url}
             alt={friend.display_name}
             size={20}
-            hideRing
+            thinRing
           />
         </div>
       ))}
