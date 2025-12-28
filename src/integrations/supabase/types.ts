@@ -4084,6 +4084,7 @@ export type Database = {
           achievement_id: string | null
           actor_id: string
           actor_type: string
+          categories: string[]
           content: string | null
           course_id: string | null
           created_at: string
@@ -4094,11 +4095,13 @@ export type Database = {
           pinned_until: string | null
           updated_at: string
           user_id: string
+          visibility: Database["public"]["Enums"]["post_visibility"]
         }
         Insert: {
           achievement_id?: string | null
           actor_id: string
           actor_type?: string
+          categories?: string[]
           content?: string | null
           course_id?: string | null
           created_at?: string
@@ -4109,11 +4112,13 @@ export type Database = {
           pinned_until?: string | null
           updated_at?: string
           user_id: string
+          visibility?: Database["public"]["Enums"]["post_visibility"]
         }
         Update: {
           achievement_id?: string | null
           actor_id?: string
           actor_type?: string
+          categories?: string[]
           content?: string | null
           course_id?: string | null
           created_at?: string
@@ -4124,6 +4129,7 @@ export type Database = {
           pinned_until?: string | null
           updated_at?: string
           user_id?: string
+          visibility?: Database["public"]["Enums"]["post_visibility"]
         }
         Relationships: [
           {
@@ -9269,6 +9275,7 @@ export type Database = {
       ping_response_state: "PENDING" | "ACCEPTED" | "DECLINED" | "EXPIRED"
       ping_status: "ACTIVE" | "MATCHING" | "CLOSED"
       ping_visibility: "FRIENDS" | "NEARBY" | "ALL"
+      post_visibility: "anyone" | "followers" | "private"
       user_type:
         | "individual"
         | "club"
@@ -9438,6 +9445,7 @@ export const Constants = {
       ping_response_state: ["PENDING", "ACCEPTED", "DECLINED", "EXPIRED"],
       ping_status: ["ACTIVE", "MATCHING", "CLOSED"],
       ping_visibility: ["FRIENDS", "NEARBY", "ALL"],
+      post_visibility: ["anyone", "followers", "private"],
       user_type: [
         "individual",
         "club",

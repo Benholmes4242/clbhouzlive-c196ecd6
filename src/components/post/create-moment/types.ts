@@ -11,8 +11,8 @@ export interface MomentCategory {
   emoji: string;
 }
 
-// Visibility options for moments
-export type MomentVisibility = 'anyone' | 'connections' | 'private';
+// Visibility options for moments (matches DB enum: post_visibility)
+export type MomentVisibility = 'anyone' | 'followers' | 'private';
 
 // Taggable entity for @mentions (matches taggable_entities table)
 export interface TaggableEntity {

@@ -12,6 +12,8 @@ export interface CreatePostInput {
   actorType: ActorType;
   actorId: string;
   courseId?: string | null;
+  categories?: string[];
+  visibility?: 'anyone' | 'followers' | 'private';
 }
 
 export interface CreatePostResult {
@@ -22,6 +24,8 @@ export interface CreatePostResult {
   actor_id: string;
   achievement_id: string | null;
   course_id: string | null;
+  categories: string[];
+  visibility: string;
   created_at: string;
   updated_at: string;
 }
@@ -40,8 +44,10 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
       actor_type: input.actorType,
       actor_id: input.actorId,
       course_id: input.courseId ?? null,
+      categories: input.categories ?? [],
+      visibility: input.visibility ?? 'anyone',
     })
-    .select('id, user_id, content, actor_type, actor_id, achievement_id, course_id, created_at, updated_at')
+    .select('id, user_id, content, actor_type, actor_id, achievement_id, course_id, categories, visibility, created_at, updated_at')
     .single();
 
   if (error) throw error;
