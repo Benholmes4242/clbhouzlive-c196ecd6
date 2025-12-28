@@ -63,15 +63,17 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   // Refs to avoid stale closure in IntersectionObserver callback
   const hasMoreRef = useRef(hasMore);
   const loadingRef = useRef(isLoading);
+  const onLoadMoreRef = useRef(onLoadMore);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Keep refs in sync with props
+  // Keep refs in sync with props - this avoids stale closures
   useEffect(() => {
     hasMoreRef.current = hasMore;
     loadingRef.current = isLoading;
-  }, [hasMore, isLoading]);
+    onLoadMoreRef.current = onLoadMore;
+  }, [hasMore, isLoading, onLoadMore]);
 
-  // Intersection observer for infinite scroll
+  // Intersection observer for infinite scroll - stable observer, uses refs
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -80,8 +82,9 @@ const VideosGrid: React.FC<VideosGridProps> = ({
       (entries) => {
         const entry = entries[0];
         
+        // Use refs to always get current values, not stale closure values
         if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
-          onLoadMore();
+          onLoadMoreRef.current();
         }
       },
       { 
@@ -96,7 +99,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     return () => {
       observer.disconnect();
     };
-  }, [onLoadMore]);
+  }, []); // Empty deps - observer created once, uses refs for current values
 
   if (itemsToRender.length === 0 && !isLoading) {
     return (
