@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 /**
  * useUnifiedFollowingFeed - Returns a single chronological feed
@@ -69,6 +70,9 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
         orFilters.push(`and(actor_type.eq.business,actor_id.in.(${followedBusinessIds.join(',')}))`);
       }
 
+      // Build visibility filter
+      const visibilityFilter = buildVisibilityFilter(user.id);
+      
       // Fetch ALL posts (videos + photos) in one query, ordered chronologically
       const { data: posts, error: pErr } = await supabase
         .from('posts')
@@ -77,6 +81,7 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
           post_media (id, media_type, media_url, duration_seconds, width, height)
         `)
         .or(orFilters.join(','))
+        .or(visibilityFilter)
         .order('created_at', { ascending: false })
         .range(nextOffset, nextOffset + pageSize - 1);
 

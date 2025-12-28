@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -47,6 +48,10 @@ export const useChannelsFeed = ({ subFilter = 'all' }: UseChannelsFeedProps = {}
   return useInfiniteQuery({
     queryKey: ['channels-feed', subFilter],
     queryFn: async ({ pageParam = 0 }) => {
+      // Get current user for visibility filtering
+      const { data: { user } } = await supabase.auth.getUser();
+      const visibilityFilter = buildVisibilityFilter(user?.id ?? null);
+      
       let query = supabase
         .from('posts')
         .select(`
@@ -81,7 +86,8 @@ export const useChannelsFeed = ({ subFilter = 'all' }: UseChannelsFeedProps = {}
           )
         `)
         .eq('post_media.media_type', 'video')
-        .gt('post_media.duration_seconds', 180);
+        .gt('post_media.duration_seconds', 180)
+        .or(visibilityFilter); // Apply visibility filter
 
       // Apply subfilter ordering and filtering
       if (subFilter === 'new') {

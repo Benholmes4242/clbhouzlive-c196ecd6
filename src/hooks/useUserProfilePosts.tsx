@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 type RawMedia = {
   id: string;
@@ -55,8 +56,16 @@ export const useUserProfilePosts = (userId: string | null) => {
         setError(null);
         setLoading(true);
 
+        // Get current user for visibility filtering
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        const visibilityFilter = buildVisibilityFilter(currentUser?.id ?? null);
+        
+        // For profile owner viewing their own profile, show all their posts
+        // For others, apply visibility filter
+        const isOwnProfile = currentUser?.id === userId;
+
         // Fetch personal posts for this profile (actor-scoped, not user_id)
-        const { data: postsData, error: postsError } = await supabase
+        let query = supabase
           .from('posts')
           .select(`
             id,
@@ -67,6 +76,13 @@ export const useUserProfilePosts = (userId: string | null) => {
           .eq('actor_id', userId)
           .order('created_at', { ascending: false })
           .limit(9); // Show latest 9 posts
+        
+        // Apply visibility filter only when viewing someone else's profile
+        if (!isOwnProfile) {
+          query = query.or(visibilityFilter);
+        }
+        
+        const { data: postsData, error: postsError } = await query;
 
         if (postsError) {
           console.error('Error fetching user posts:', postsError);

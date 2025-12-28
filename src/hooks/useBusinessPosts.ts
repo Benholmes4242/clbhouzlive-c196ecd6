@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { postKeys } from '@/queryKeys/posts';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 export interface PostTag {
   id: string;
@@ -47,6 +48,10 @@ export function useBusinessPosts(businessId?: string) {
     queryKey: postKeys.actorPosts('business', businessId ?? ''),
     enabled: !!businessId,
     queryFn: async () => {
+      // Get current user for visibility filtering
+      const { data: { user } } = await supabase.auth.getUser();
+      const visibilityFilter = buildVisibilityFilter(user?.id ?? null);
+      
       const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -84,6 +89,7 @@ export function useBusinessPosts(businessId?: string) {
         `)
         .eq('actor_type', 'business')
         .eq('actor_id', businessId!)
+        .or(visibilityFilter) // Apply visibility filter
         .order('created_at', { ascending: false });
 
       if (error) {
