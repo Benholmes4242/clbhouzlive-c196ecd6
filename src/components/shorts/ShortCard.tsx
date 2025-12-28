@@ -95,8 +95,7 @@ export default React.memo(function ShortCard({
           />
         )}
 
-        {/* Gradient overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        {/* No gradient overlay - clean look */}
 
         {/* Trending and Suggested badges removed for cleaner editorial look */}
 

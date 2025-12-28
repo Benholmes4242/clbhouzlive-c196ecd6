@@ -189,10 +189,7 @@ const MediaTile = memo<MediaTileProps>(({
         <VideoScrubber videoEl={videoEl} height={3} />
       )}
       
-      {/* Bottom gradient for text legibility - portrait only */}
-      {!isLandscape && (
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-      )}
+      {/* No gradient overlay - clean look */}
       
       {/* Unified meta layout - same for portrait and landscape */}
       {/* Likes above, name below, avatar bottom right */}
@@ -239,8 +236,8 @@ const MediaTile = memo<MediaTileProps>(({
         )}
       </div>
       
-      {/* Duration badge - top left for videos (portrait only) */}
-      {!isLandscape && isVideo && config.showDuration && resolvedDuration && (
+      {/* Duration badge - top left for videos (both portrait and landscape) */}
+      {isVideo && config.showDuration && resolvedDuration && (
         <div className="absolute top-2 left-2 z-10">
           <div className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
             {formatDuration(resolvedDuration)}
