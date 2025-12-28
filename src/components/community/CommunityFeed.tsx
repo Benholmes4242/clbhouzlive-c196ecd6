@@ -9,7 +9,7 @@ import { calculateDateSeparators } from '@/utils/dateSeparators';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { SHOW_META_TEST_POST, createMockCommunityPost } from '@/utils/mockMetaTestPost';
+
 interface CommunityFeedProps {
   onMediaClick: (item: any) => void;
 }
@@ -76,18 +76,12 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const commandCenterSort: SortOption = sortOption as SortOption;
 
   const {
-    items: rawItems,
+    items,
     loading,
     hasMore,
     communityCount,
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
-
-  // Inject mock test post if feature flag is enabled
-  const items = useMemo(() => {
-    if (!SHOW_META_TEST_POST) return rawItems;
-    return [createMockCommunityPost() as unknown as CommunityContentItem, ...rawItems];
-  }, [rawItems]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
