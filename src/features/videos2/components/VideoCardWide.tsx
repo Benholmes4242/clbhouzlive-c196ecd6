@@ -162,7 +162,12 @@ export function VideoCardWide({ video, onVideoClick, onEchoToggle }: VideoCardWi
 
           {/* Course + Echo */}
           <div className="flex items-center gap-3 mt-2">
-            {video.course && <CourseTag course={video.course} size="sm" />}
+            {video.course && (
+              <CourseTag 
+                course={video.course}
+                size="sm" 
+              />
+            )}
             <EchoButton
               count={echoCount}
               active={echoActive}

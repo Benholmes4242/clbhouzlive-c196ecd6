@@ -7,6 +7,17 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import TaggedText from '@/components/posts/TaggedText';
+import CourseLocationRow from '@/components/posts/CourseLocationRow';
+
+interface Tag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  start_index?: number;
+  end_index?: number;
+}
 
 interface PostContentProps {
   content: {
@@ -23,7 +34,10 @@ interface PostContentProps {
       name: string;
       country: string;
       region?: string;
+      slug?: string;
     };
+    /** Tags for @mentions */
+    tags?: Tag[];
   };
   onVideoClick?: () => void;
   golfClubTags?: {
@@ -133,7 +147,34 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
 
   return (
     <>
-      <p className="text-sm mb-3">{content.description}</p>
+      {/* Description with mention parsing */}
+      <div className="mb-3">
+        {content.tags && content.tags.length > 0 ? (
+          <TaggedText 
+            text={content.description} 
+            tags={content.tags}
+            className="text-sm"
+          />
+        ) : (
+          <p className="text-sm">{content.description}</p>
+        )}
+        
+        {/* Course CTA row */}
+        {content.golfCourse && (
+          <div className="mt-2">
+            <CourseLocationRow 
+              course={{
+                id: content.golfCourse.id,
+                name: content.golfCourse.name,
+                country: content.golfCourse.country,
+                region: content.golfCourse.region,
+                slug: content.golfCourse.slug,
+              }}
+              showChevron={true}
+            />
+          </div>
+        )}
+      </div>
       
       <div className="relative rounded-lg overflow-hidden mb-3">
         {content.type === 'video' ? (

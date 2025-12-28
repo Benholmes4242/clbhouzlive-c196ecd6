@@ -2,6 +2,26 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import TaggedText from '@/components/posts/TaggedText';
+import CourseLocationRow from '@/components/posts/CourseLocationRow';
+
+interface Tag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  start_index?: number;
+  end_index?: number;
+}
+
+interface GolfCourse {
+  id?: string | null;
+  name?: string | null;
+  region?: string | null;
+  country?: string | null;
+  sub_country?: string | null;
+  slug?: string | null;
+}
 
 interface PostMetadataProps {
   title?: string;
@@ -12,9 +32,13 @@ interface PostMetadataProps {
   };
   onUserClick?: () => void;
   className?: string;
+  /** Tags for @mentions */
+  tags?: Tag[];
+  /** Golf course for "Played at" CTA */
+  golfCourse?: GolfCourse | null;
 }
 
-const PostMetadata = ({ title, description, user, onUserClick, className }: PostMetadataProps) => {
+const PostMetadata = ({ title, description, user, onUserClick, className, tags, golfCourse }: PostMetadataProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const isMobile = useIsMobile();
   
@@ -73,18 +97,26 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
         </h3>
       )}
 
-      {/* Description */}
+      {/* Description with mention parsing */}
       {description && (
         <div className="text-white/85 pointer-events-auto">
-          <p
+          <div
             className={cn(
               "text-[14px] leading-snug",
               !showFullDescription && "line-clamp-2"
             )}
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
           >
-            {description}
-          </p>
+            {tags && tags.length > 0 ? (
+              <TaggedText 
+                text={description} 
+                tags={tags}
+                className="text-white/85"
+              />
+            ) : (
+              description
+            )}
+          </div>
           
           {description.length > 100 && (
             <button
@@ -101,6 +133,17 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
               {showFullDescription ? '... less' : '... more'}
             </button>
           )}
+        </div>
+      )}
+      
+      {/* Course CTA row */}
+      {golfCourse && (
+        <div className="mt-2 pointer-events-auto">
+          <CourseLocationRow 
+            course={golfCourse}
+            isDark={true}
+            showChevron={true}
+          />
         </div>
       )}
     </div>

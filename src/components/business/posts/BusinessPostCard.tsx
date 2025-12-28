@@ -18,7 +18,7 @@ import {
   BarChart2,
   Trash2,
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
@@ -107,19 +107,8 @@ export default function BusinessPostCard({
   // Engagement data for social proof line (like/comment actions handled by PostActionBar)
   const { likesCount, commentsCount } = usePostEngagement(post.id);
 
-  // Format timestamp like LinkedIn
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: false })
-    .replace('about ', '')
-    .replace(' days', 'd')
-    .replace(' day', 'd')
-    .replace(' hours', 'h')
-    .replace(' hour', 'h')
-    .replace(' minutes', 'm')
-    .replace(' minute', 'm')
-    .replace(' weeks', 'w')
-    .replace(' week', 'w')
-    .replace(' months', 'mo')
-    .replace(' month', 'mo');
+  // Format timestamp using unified utility
+  const timeAgo = formatTimeAgo(post.created_at, 'short');
 
   // Parse out the "Played at" line and get clean content
   const { cleanContent, courseName, regionText } = useMemo(
