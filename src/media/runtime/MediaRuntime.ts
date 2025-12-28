@@ -998,10 +998,7 @@ class MediaRuntimeCore {
   recordTtff(id: string, ms: number): void {
     this.telemetryStats.lastTtff = Math.round(ms);
     this.telemetry.timeToFirstFrame?.(id, ms);
-    
-    if (DEBUG_MEDIA_TELEMETRY) {
-      console.log(`[MediaTelemetry] ttff ${id.slice(0, 8)} ${Math.round(ms)}ms`);
-    }
+    // Removed verbose ttff log - slow TTFF warnings are in videoPerformance.ts
   }
   
   recordBufferingStart(id: string): void {

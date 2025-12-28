@@ -58,14 +58,12 @@ export function useHeroPreload(content: ExploreContentItem[] | null): void {
     
     // STRICT: Don't preload if already started for this ID
     if (preloadedIdRef.current === heroCandidate.id) {
-      console.log('[HeroPreload] Skipping duplicate preload', heroCandidate.id.slice(0, 8));
-      return;
+      return; // Skip duplicate log removed for cleaner console
     }
     
     // Double-check with started flag to prevent race conditions
     if (preloadStartedRef.current && preloadedIdRef.current) {
-      console.log('[HeroPreload] Already started, ignoring duplicate call');
-      return;
+      return; // Already started log removed for cleaner console
     }
     
     const mediaUrl = heroCandidate.media?.[0]?.media_url || heroCandidate.src;

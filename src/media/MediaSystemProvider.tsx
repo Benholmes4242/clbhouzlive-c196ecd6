@@ -157,8 +157,7 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
       isPlaying: !element.paused,
       lastPosition: positionsRef.current.get(id),
     });
-    
-    console.log('[MediaSystem] Registered:', id.slice(0, 8), kind);
+    // Registration log removed for cleaner console
   }, [isMuted]);
   
   const unregister = useCallback((id: string) => {
@@ -176,7 +175,7 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
     
     registry.current.delete(id);
-    console.log('[MediaSystem] Unregistered:', id.slice(0, 8));
+    // Unregistration log removed for cleaner console
   }, []);
   
   // ============ Playback Control ============

@@ -204,25 +204,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [isBuffering, setIsBuffering] = useState(false);
   const [bufferedPct, setBufferedPct] = useState(0);
   
-  // ============ Debug: Log State Changes ============
-  useEffect(() => {
-    logDebug('POSTER_VISIBILITY_CHANGE', { 
-      isPosterVisible,
-      hasFirstFrame,
-      videoReadyState: videoRef.current?.readyState,
-      mediaId: mediaId?.slice(0, 8)
-    });
-  }, [isPosterVisible]);
-  
-  useEffect(() => {
-    logDebug('FIRST_FRAME_CHANGE', { 
-      hasFirstFrame,
-      isPosterVisible,
-      videoTime: videoRef.current?.currentTime,
-      videoReadyState: videoRef.current?.readyState,
-      mediaId: mediaId?.slice(0, 8)
-    });
-  }, [hasFirstFrame]);
+  // ============ Debug: Log State Changes (removed verbose logs) ============
+  // POSTER_VISIBILITY_CHANGE and FIRST_FRAME_CHANGE logs removed for cleaner console
+  // The important events VIDEO_SHOWN_SYNC and POSTER_HIDDEN_SYNC are still logged
   
   // ============ Imperative Handle ============
   
@@ -311,15 +295,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
 
-    logDebug('AUTOPLAY_EFFECT_TRIGGERED', {
-      autoplay,
-      managedByMediaRuntime,
-      videoPaused: video.paused,
-      videoReadyState: video.readyState,
-      hasFirstFrame,
-      isPosterVisible,
-      mediaId: mediaId?.slice(0, 8)
-    });
+    // AUTOPLAY_EFFECT_TRIGGERED log removed for cleaner console
+    // The actual play attempts are logged by MediaRuntime
 
     // Update muted state
     video.muted = muted;
@@ -738,24 +715,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             bitrateKbps: Math.round((l.bitrate || 0) / 1000),
           }));
           
-          console.log('[HLSPlayer] MANIFEST_PARSED', {
-            mediaId: mediaId?.slice(0, 8),
-            levels,
-            currentLevel: hls.currentLevel,
-            startLevel: hls.startLevel,
-            readyState: video.readyState,
-            timestamp: parseTime.toFixed(1),
-          });
+          // MANIFEST_PARSED log removed for cleaner console
+          logDebug('MANIFEST_PARSED', { mediaId: mediaId?.slice(0, 8), levels });
           
           // CRITICAL: Immediately start loading video segments to reduce TTFF
           hls.startLoad(-1);
-          
-          console.log('[HLSPlayer] startLoad(-1) called', {
-            mediaId: mediaId?.slice(0, 8),
-            loadLevel: hls.loadLevel,
-            autoLevelEnabled: hls.autoLevelEnabled,
-            timestamp: performance.now().toFixed(1),
-          });
           
           // Apply start time after manifest loaded
           if (startTime && startTime > 0) {
@@ -792,50 +756,24 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           }
         });
         
-        // Diagnostic: Track when fragments start loading with detailed info
-        hls.on(Hls.Events.FRAG_LOADING, (_, data) => {
-          console.log('[HLSPlayer] FRAG_LOADING', {
-            mediaId: mediaId?.slice(0, 8),
-            segmentNumber: data.frag.sn,
-            duration: data.frag.duration?.toFixed(2) + 's',
-            level: data.frag.level,
-            type: data.frag.type,
-            url: data.frag.url?.slice(-50),
-            timestamp: performance.now().toFixed(1),
-          });
-        });
-        
-        // Diagnostic: Track when fragments complete loading with size/bitrate
+        // Fragment loading/loaded logs removed for cleaner console
+        // Only log slow segments (>1000ms load time)
         hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
           const stats = data.frag.stats;
-          const bytesLoaded = stats?.total || 0;
           const loadingStart = stats?.loading?.start || 0;
           const loadingEnd = stats?.loading?.end || 0;
           const timeToLoad = loadingEnd - loadingStart;
-          const bitrate = data.frag.duration > 0 
-            ? Math.round((bytesLoaded * 8) / (data.frag.duration * 1000)) 
-            : 0;
           
-          console.log('[HLSPlayer] FRAG_LOADED', {
-            mediaId: mediaId?.slice(0, 8),
-            segmentNumber: data.frag.sn,
-            duration: data.frag.duration?.toFixed(2) + 's',
-            sizeKB: (bytesLoaded / 1024).toFixed(1),
-            loadTimeMs: timeToLoad.toFixed(0),
-            bitrateKbps: bitrate,
-            level: data.frag.level,
-            timestamp: performance.now().toFixed(1),
-          });
+          if (timeToLoad > 1000) {
+            console.warn('[HLSPlayer] SLOW_FRAG_LOAD', {
+              mediaId: mediaId?.slice(0, 8),
+              segmentNumber: data.frag.sn,
+              loadTimeMs: timeToLoad.toFixed(0),
+            });
+          }
         });
         
-        // Diagnostic: Track buffer appending for discover hero
-        hls.on(Hls.Events.BUFFER_APPENDED, (_, data) => {
-          console.log('[HLSPlayer] BUFFER_APPENDED', {
-            mediaId: mediaId?.slice(0, 8),
-            type: data.type,
-            timestamp: performance.now().toFixed(1),
-          });
-        });
+        // BUFFER_APPENDED log removed - too verbose
         
         // Bail if stale after async HLS.js load
         if (myGen !== setupGenRef.current) {
@@ -989,7 +927,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
         const ttffMs = performance.now() - ttffStartRef.current;
-        logDebug('TTFF_RECORDED', { ttffMs: ttffMs.toFixed(2), mediaId: mediaId?.slice(0, 8) });
+        // TTFF_RECORDED detailed log removed - slow warnings are kept in recordTtff
         MediaRuntime.recordTtff(mediaId, ttffMs);
         
         // RUM: Record TTFF for analytics

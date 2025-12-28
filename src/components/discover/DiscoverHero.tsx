@@ -251,7 +251,7 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
         {/* Media - Image or Video */}
         {item.mediaType === 'video' && item.mediaUrl ? (
           <>
-            {logHero('RENDER_VIDEO', { autoplay, src: item.mediaUrl?.slice(0, 50) })}
+            {/* RENDER_VIDEO log removed - fires on every render */}
             <HLSPlayer
               ref={playerRef}
               src={item.mediaUrl}
