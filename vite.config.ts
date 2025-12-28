@@ -7,28 +7,49 @@ import { visualizer } from 'rollup-plugin-visualizer';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   base: '/',
-  publicPath: '/',
   server: {
     host: true,
     port: 8080,
   },
   build: {
-    sourcemap: true,
+    sourcemap: mode === 'development',
     target: 'esnext',
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         format: 'es',
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          supabase: ['@supabase/supabase-js'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-avatar', '@radix-ui/react-slot'],
+          // Core React - loaded first
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          // Supabase client
+          'supabase': ['@supabase/supabase-js'],
+          // HLS.js - lazy loaded when needed
+          'hls': ['hls.js'],
+          // UI components - radix primitives
+          'ui-core': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-tooltip',
+          ],
+          // Query/state management
+          'query': ['@tanstack/react-query'],
+          // Animation
+          'motion': ['framer-motion'],
         },
       },
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
+  },
+  esbuild: {
+    // Remove console.log in production (keep errors/warns)
+    drop: mode === 'production' ? ['debugger'] : [],
+    pure: mode === 'production' ? ['console.log', 'console.debug'] : [],
   },
   optimizeDeps: {
-    include: ['@supabase/supabase-js', '@tanstack/react-query'],
+    include: ['@supabase/supabase-js', '@tanstack/react-query', 'hls.js'],
   },
   worker: {
     format: 'es',
