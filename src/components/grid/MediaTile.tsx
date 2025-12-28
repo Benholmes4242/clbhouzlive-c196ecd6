@@ -53,6 +53,9 @@ const MediaTile = memo<MediaTileProps>(({
     item.durationSeconds
   );
   
+  // Track current playback time for dynamic timer countdown
+  const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
+  
   const isVideo = item.type === 'video';
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
@@ -108,6 +111,13 @@ const MediaTile = memo<MediaTileProps>(({
     };
   }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, index, registerMedia]);
   
+  // Reset current time when video stops playing
+  useEffect(() => {
+    if (!isPlaying) {
+      setCurrentPlaybackTime(0);
+    }
+  }, [isPlaying]);
+  
   // Handle video ready
   const handleCanPlay = useCallback(() => {
     const el = playerRef.current?.getElement();
@@ -121,6 +131,13 @@ const MediaTile = memo<MediaTileProps>(({
       }
     }
   }, [item.durationSeconds]);
+  
+  // Handle time update for dynamic timer
+  const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
+    if (isPlaying) {
+      setCurrentPlaybackTime(currentTime);
+    }
+  }, [isPlaying]);
   
   // Top-left override content
   let topLeftOverride: React.ReactNode = null;
@@ -180,6 +197,7 @@ const MediaTile = memo<MediaTileProps>(({
           managedByMediaRuntime={true}
           mediaId={item.postId}
           onLoadedData={handleCanPlay}
+          onTimeUpdate={handleTimeUpdate}
           className="absolute inset-0 h-full w-full"
         />
       )}
@@ -233,11 +251,14 @@ const MediaTile = memo<MediaTileProps>(({
         )}
       </div>
       
-      {/* Duration badge - top left for videos (both portrait and landscape) */}
+      {/* Duration badge - top left for videos (countdown when playing) */}
       {isVideo && config.showDuration && resolvedDuration && (
         <div className="absolute top-2 left-2 z-10">
           <div className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
-            {formatDuration(resolvedDuration)}
+            {isPlaying
+              ? formatDuration(Math.max(0, resolvedDuration - currentPlaybackTime))
+              : formatDuration(resolvedDuration)
+            }
           </div>
         </div>
       )}
