@@ -5,9 +5,6 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { getLatestShortPreviewForCreators } from '@/utils/shortsPreview';
 import { NotInterested } from '@/stores/notInterested';
 import { channelManager } from '@/utils/supabaseChannelManager';
-import { isMockLiveEnabled } from '@/mocks/mockSwitch';
-import { MOCK_CREATORS } from '@/mocks/live_clubhouse';
-import { startMockPresence } from '@/mocks/mockPresenceTicker';
 
 const RECENT_MS = 24 * 60 * 60 * 1000;
 const LIVE_STRIP_SESSION_KEY = 'liveStripSession';
@@ -97,22 +94,18 @@ export interface LiveCreator {
   latest_short_preview?: { posterUrl?: string; mp4Url?: string } | null;
   has_recent_post: boolean;
   is_online: boolean;
-  isMock: boolean;
   is_verified?: boolean;
   eg_handicap_index?: number | null;
   show_handicap?: boolean;
 }
 
 /**
- * Hook for fetching Live Clubhouse profiles with 50/50 mock + real blend
+ * Hook for fetching Live Clubhouse profiles - 100% real data
  * Real profiles: from user_profiles (following/followers + suggested, 60/40 mix)
- * Mock profiles: from MOCK_CREATORS array
- * Online status: driven by Supabase Realtime presence (real users only)
+ * Online status: driven by Supabase Realtime presence
  */
 export function useLiveClubhouseProfiles() {
-  const forceMock = isMockLiveEnabled(); // Dev override only
   const { user } = useSupabaseSession();
-  const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
   
   // Session tracking for freshness
   const sessionRef = useRef<{
@@ -126,9 +119,7 @@ export function useLiveClubhouseProfiles() {
     sessionRef.current = existing ?? startNewSession();
   }
 
-  // === REAL DATA PATH ===
-  
-  // Fetch base creator list with 60/40 mix (always runs unless forceMock override)
+  // Fetch base creator list with 60/40 mix
   const { data: baseCreators = [], isLoading } = useQuery({
     queryKey: ['liveClubhouseBase', user?.id],
     queryFn: async () => {
@@ -148,10 +139,10 @@ export function useLiveClubhouseProfiles() {
         (followers?.data ?? []).forEach(r => knownIds.add(r.follower_id));
       }
 
-      // Target 50% of final list = 12 real profiles (out of 24 total)
-      const targetRealProfiles = 12;
-      const targetKnown = Math.ceil(targetRealProfiles * 0.6); // ~7 known
-      const targetSuggested = Math.ceil(targetRealProfiles * 0.4); // ~5 suggested
+      // Target 24 real profiles
+      const targetRealProfiles = 24;
+      const targetKnown = Math.ceil(targetRealProfiles * 0.6); // ~14 known
+      const targetSuggested = Math.ceil(targetRealProfiles * 0.4); // ~10 suggested
       
       let knownProfiles: any[] = [];
       
@@ -241,29 +232,27 @@ export function useLiveClubhouseProfiles() {
       return interleaved.filter(profile => !NotInterested.isHidden(profile.id));
     },
     staleTime: 60_000,
-    enabled: !!user && !forceMock,
+    enabled: !!user,
   });
 
-  // Batch fetch previews and presence data in parallel to reduce re-renders
+  // Batch fetch previews and presence data
   const [enrichmentData, setEnrichmentData] = useState<{
     previews: Record<string, { posterUrl?: string; mp4Url?: string }>;
     onlineMap: Record<string, boolean>;
   }>({ previews: {}, onlineMap: {} });
   
   useEffect(() => {
-    if (!baseCreators.length || forceMock) return;
+    if (!baseCreators.length) return;
     
     // Fetch previews
     (async () => {
       const previewData = await getLatestShortPreviewForCreators(baseCreators.map(c => c.id));
       setEnrichmentData(prev => ({ ...prev, previews: previewData }));
     })();
-  }, [baseCreators, forceMock]);
+  }, [baseCreators]);
 
-  // Presence tracking (online status) - real users only
+  // Presence tracking (online status)
   useEffect(() => {
-    if (forceMock) return;
-    
     const channelName = 'presence:creators_online';
     const channel = channelManager.createChannel(channelName);
 
@@ -286,33 +275,11 @@ export function useLiveClubhouseProfiles() {
     return () => {
       channelManager.removeChannel(channelName);
     };
-  }, [user?.id, forceMock]);
+  }, [user?.id]);
 
-  // === BLEND LOGIC: 50% real + 50% mock ===
+  // Build final creators list - 100% real data
   const creators = useMemo(() => {
     const { previews, onlineMap } = enrichmentData;
-    
-    if (forceMock) {
-      // Dev override: 100% mock
-      const now = Date.now();
-      return MOCK_CREATORS.map(m => {
-        const msAgo = (m.minutesAgo ?? 999) * 60_000;
-        const latest = new Date(now - msAgo).toISOString();
-        return {
-          id: m.id,
-          username: m.username,
-          display_name: m.display_name,
-          profile_photo_url: m.profile_photo_url,
-          home_club: m.home_club ?? null,
-          latest_post_at: latest,
-          latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
-          has_recent_post: msAgo <= RECENT_MS,
-          is_online: false, // Never show green dot for mock
-          isMock: true,
-        };
-      });
-    }
-
     const now = Date.now();
     
     // Real profiles (from DB)
@@ -328,7 +295,6 @@ export function useLiveClubhouseProfiles() {
         latest_short_preview: previews[c.id] ?? null,
         has_recent_post: !!latest && (now - latest) < RECENT_MS,
         is_online: !!onlineMap[c.id],
-        isMock: false,
         is_verified: c.is_verified_golfer ?? false,
         eg_handicap_index: c.eg_handicap_index ?? null,
         show_handicap: c.show_handicap ?? false,
@@ -337,30 +303,17 @@ export function useLiveClubhouseProfiles() {
 
     // Session freshness: prefer creators not yet seen this session
     const seenSet = new Set(sessionRef.current?.seenCreatorIds || []);
-    const newReal = allRealProfiles.filter(p => !seenSet.has(p.id));
-    const seenReal = allRealProfiles.filter(p => seenSet.has(p.id));
+    const newProfiles = allRealProfiles.filter(p => !seenSet.has(p.id));
+    const seenProfiles = allRealProfiles.filter(p => seenSet.has(p.id));
 
-    // Pick our target set of real creators (12 max)
-    const TARGET_REAL = 12;
-    const pickedReal: LiveCreator[] = [];
-
-    // Fill first with new faces
-    for (const p of newReal) {
-      if (pickedReal.length >= TARGET_REAL) break;
-      pickedReal.push(p);
-    }
-
-    // Then top up with previously-seen faces
-    for (const p of seenReal) {
-      if (pickedReal.length >= TARGET_REAL) break;
-      pickedReal.push(p);
-    }
+    // Combine: new faces first, then previously-seen
+    const orderedProfiles = [...newProfiles, ...seenProfiles];
 
     // Update session with seen IDs
     const updatedSeen = Array.from(
       new Set([
         ...(sessionRef.current?.seenCreatorIds || []),
-        ...pickedReal.map(p => p.id),
+        ...orderedProfiles.map(p => p.id),
       ])
     );
 
@@ -371,39 +324,10 @@ export function useLiveClubhouseProfiles() {
 
     saveSession(sessionRef.current);
 
-    // Mock profiles (from static data)
-    const mockProfiles: LiveCreator[] = MOCK_CREATORS.slice(0, pickedReal.length).map(m => {
-      const msAgo = (m.minutesAgo ?? 999) * 60_000;
-      const latest = new Date(now - msAgo).toISOString();
-      return {
-        id: m.id,
-        username: m.username,
-        display_name: m.display_name,
-        profile_photo_url: m.profile_photo_url,
-        home_club: m.home_club ?? null,
-        latest_post_at: latest,
-        latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
-        has_recent_post: msAgo <= RECENT_MS,
-        is_online: false, // Never show green dot for mock profiles
-        isMock: true,
-      };
-    });
-
-    // Interleave: real, mock, real, mock, ...
-    const interleaved: LiveCreator[] = [];
-    const maxLength = Math.max(pickedReal.length, mockProfiles.length);
-    
-    for (let i = 0; i < maxLength; i++) {
-      if (i < pickedReal.length) interleaved.push(pickedReal[i]);
-      if (i < mockProfiles.length) interleaved.push(mockProfiles[i]);
-    }
-
     // Apply deterministic shuffle based on session ID
     const sessionId = sessionRef.current!.id;
-    const sessionOrdered = shuffleStableForSession(interleaved, sessionId);
+    return shuffleStableForSession(orderedProfiles, sessionId);
+  }, [baseCreators, enrichmentData]);
 
-    return sessionOrdered;
-  }, [baseCreators, enrichmentData, forceMock]);
-
-  return { creators, isLoading: forceMock ? false : isLoading };
+  return { creators, isLoading };
 }
