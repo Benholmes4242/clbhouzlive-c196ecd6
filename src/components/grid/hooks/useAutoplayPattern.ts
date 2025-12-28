@@ -42,6 +42,11 @@ export function useAutoplayPattern({
         // First item (0) and every nth after: 0, 3, 6, 9...
         return index % nth === 0;
         
+      case 'custom':
+        // Custom pattern - determined by item.isAutoplayCandidate at item level
+        // Return true here; actual candidacy is set per-item
+        return true;
+        
       case 'hero-only':
         return index === heroIndex;
         
@@ -123,6 +128,10 @@ export function markAutoplayCandidates<T extends { type: string }>(
           break;
         case 'every-nth':
           isCandidate = index % nth === 0;
+          break;
+        case 'custom':
+          // For custom pattern, preserve existing isAutoplayCandidate if set
+          isCandidate = (item as any).isAutoplayCandidate ?? false;
           break;
         case 'hero-only':
           isCandidate = index === heroIndex;

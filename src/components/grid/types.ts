@@ -17,6 +17,7 @@ export type GridLayout =
 export type AutoplayPattern = 
   | 'center-only'      // Only center/focused item autoplays (Clubhouse)
   | 'every-nth'        // Every Nth item autoplays (Watch grid)
+  | 'custom'           // Custom pattern (determined by item.isAutoplayCandidate)
   | 'hero-only'        // Only hero autoplays
   | 'viewport'         // All visible items autoplay (multi-video)
   | 'none';            // No autoplay

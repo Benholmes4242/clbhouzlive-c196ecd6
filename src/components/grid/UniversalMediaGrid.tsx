@@ -133,7 +133,7 @@ export function UniversalMediaGrid({
       },
       {
         root: null,
-        rootMargin: '1200px 0px', // Trigger earlier for smoother loading
+        rootMargin: '400px 0px', // Trigger at ~70-80% scroll for seamless loading
         threshold: 0,
       }
     );
