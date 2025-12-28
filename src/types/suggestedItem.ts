@@ -2,6 +2,12 @@
  * Unified type for suggested items in the carousel (golfers + businesses)
  */
 
+export interface MutualFriendPreview {
+  id: string;
+  avatar_url: string | null;
+  display_name: string;
+}
+
 export type SuggestedGolfer = {
   type: 'golfer';
   id: string;
@@ -15,6 +21,7 @@ export type SuggestedGolfer = {
   is_public?: boolean;
   reason?: 'similar_handicap' | 'plays_near' | 'mutuals' | 'recently_active' | 'suggested';
   mutual_count?: number;
+  mutual_friends?: MutualFriendPreview[];
 };
 
 export type SuggestedBusiness = {

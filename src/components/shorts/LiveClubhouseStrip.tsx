@@ -42,13 +42,13 @@ export function LiveClubhouseStrip() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch mutual counts for all creator IDs
+  // Fetch mutual counts AND mutual friend previews for all creator IDs
   const creatorIds = useMemo(() => creators.map(c => c.id), [creators]);
   
-  const { data: mutualCounts = {} } = useQuery({
-    queryKey: ['mutualCounts', user?.id, creatorIds],
+  const { data: mutualData = { counts: {}, friends: {} } } = useQuery({
+    queryKey: ['mutualCountsAndFriends', user?.id, creatorIds],
     queryFn: async () => {
-      if (!user?.id || creatorIds.length === 0) return {};
+      if (!user?.id || creatorIds.length === 0) return { counts: {}, friends: {} };
       
       // Get all users that the viewer follows
       const { data: viewerFollowing } = await supabase
@@ -56,7 +56,7 @@ export function LiveClubhouseStrip() {
         .select('following_id')
         .eq('follower_id', user.id);
       
-      if (!viewerFollowing?.length) return {};
+      if (!viewerFollowing?.length) return { counts: {}, friends: {} };
       
       const viewerFollowingIds = new Set(viewerFollowing.map(f => f.following_id));
       
@@ -66,23 +66,64 @@ export function LiveClubhouseStrip() {
         .select('follower_id, following_id')
         .in('follower_id', creatorIds);
       
-      if (!creatorsFollowing?.length) return {};
+      if (!creatorsFollowing?.length) return { counts: {}, friends: {} };
       
-      // Count mutuals: shared following (users both viewer and creator follow)
+      // Build mutual data: count and list of mutual friend IDs per creator
       const counts: Record<string, number> = {};
-      creatorIds.forEach(id => { counts[id] = 0; });
+      const mutualIdsByCreator: Record<string, string[]> = {};
+      creatorIds.forEach(id => { 
+        counts[id] = 0; 
+        mutualIdsByCreator[id] = [];
+      });
       
       creatorsFollowing.forEach(follow => {
         if (viewerFollowingIds.has(follow.following_id)) {
           counts[follow.follower_id] = (counts[follow.follower_id] || 0) + 1;
+          if (!mutualIdsByCreator[follow.follower_id]) {
+            mutualIdsByCreator[follow.follower_id] = [];
+          }
+          mutualIdsByCreator[follow.follower_id].push(follow.following_id);
         }
       });
       
-      return counts;
+      // Get profile data for mutual friends (up to 3 per creator)
+      const allMutualIds = new Set<string>();
+      Object.values(mutualIdsByCreator).forEach(ids => {
+        ids.slice(0, 3).forEach(id => allMutualIds.add(id));
+      });
+      
+      const friends: Record<string, Array<{ id: string; avatar_url: string | null; display_name: string }>> = {};
+      
+      if (allMutualIds.size > 0) {
+        const { data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, profile_photo_url, display_name, username')
+          .in('id', Array.from(allMutualIds));
+        
+        const profileMap = new Map(
+          (profiles || []).map(p => [p.id, { 
+            id: p.id, 
+            avatar_url: p.profile_photo_url, 
+            display_name: p.display_name || p.username || 'User' 
+          }])
+        );
+        
+        creatorIds.forEach(creatorId => {
+          friends[creatorId] = (mutualIdsByCreator[creatorId] || [])
+            .slice(0, 3)
+            .map(id => profileMap.get(id))
+            .filter(Boolean) as Array<{ id: string; avatar_url: string | null; display_name: string }>;
+        });
+      }
+      
+      return { counts, friends };
     },
     enabled: !!user?.id && creatorIds.length > 0,
     staleTime: 2 * 60 * 1000,
   });
+  
+  const mutualCounts = mutualData.counts;
+  const mutualFriends = mutualData.friends;
 
   useEffect(() => {
     const el = rowRef.current;
@@ -167,6 +208,7 @@ export function LiveClubhouseStrip() {
         is_public: true, // Already filtered by is_public in hook
         reason,
         mutual_count,
+        mutual_friends: mutualFriends[c.id] || [],
       };
     });
 
