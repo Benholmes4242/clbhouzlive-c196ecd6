@@ -18,9 +18,11 @@ import { OverlayPortalProvider } from "@/context/OverlayPortalContext";
 
 import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
-import CreateMomentComposerPanel from "./CreateMomentComposerPanel";
+import CreateMomentCanvas from "./CreateMomentCanvas";
+import CreateMomentControlBar from "./CreateMomentControlBar";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet } from "./sheets";
 import { useDraftPersistence } from "./useDraftPersistence";
-import { CreateMomentProps, GolfCourse, TaggableEntity, MomentType } from "./types";
+import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 
 // Animation constants
 const ECM_ENTRY_DURATION = 500;
@@ -62,7 +64,15 @@ export default function CreateMomentModal({
   const [isTyping, setIsTyping] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
-  const [momentType, setMomentType] = useState<MomentType | null>(null);
+  
+  // New v2 state - categories and visibility
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [visibility, setVisibility] = useState<MomentVisibility>('anyone');
+  
+  // Sheet states
+  const [showCategorySheet, setShowCategorySheet] = useState(false);
+  const [showAudienceSheet, setShowAudienceSheet] = useState(false);
+  const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -95,7 +105,9 @@ export default function CreateMomentModal({
   // Derived state
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
   const hasMedia = media.length > 0;
-  const canPost = hasMedia && !isSubmitting && !!user && !!momentType;
+  const hasCategories = selectedCategories.length > 0;
+  // Posting requires media + at least 1 category
+  const canPost = hasMedia && !isSubmitting && !!user && hasCategories;
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
@@ -192,7 +204,8 @@ export default function CreateMomentModal({
       onCourseSelect?.(null);
       setSnapVisibility('public');
       setSelectedTags([]);
-      setMomentType(null);
+      setSelectedCategories([]);
+      setVisibility('anyone');
       
       // Check for draft
       if (hasDraft) {
@@ -382,9 +395,15 @@ export default function CreateMomentModal({
     }
   };
 
-  // Post handler - enqueue and close immediately
+  // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = () => {
-    if (!canPost || !user) return;
+    if (!hasMedia || !user) return;
+    
+    // Soft-gated: if no categories, open category sheet instead of blocking
+    if (selectedCategories.length === 0) {
+      setShowCategorySheet(true);
+      return;
+    }
 
     const files = media.map(item => item.file);
     
@@ -407,6 +426,8 @@ export default function CreateMomentModal({
       files,
       mediaItems: media,
       studioEditsByMediaId,
+      categories: selectedCategories,
+      visibility,
     });
     
     clearDraft();
@@ -507,7 +528,7 @@ export default function CreateMomentModal({
           )}
         </section>
 
-        {/* Composer Panel - light slate surface */}
+        {/* Canvas - Caption + Course (simplified, canvas-first) */}
         <section
           className="composer relative z-[1003] flex flex-col"
           style={{
@@ -516,7 +537,7 @@ export default function CreateMomentModal({
           }}
         >
           <OverlayPortalProvider container={overlayRoot}>
-            <CreateMomentComposerPanel
+            <CreateMomentCanvas
               hasMedia={hasMedia}
               caption={caption}
               onCaptionChange={setCaption}
@@ -525,36 +546,39 @@ export default function CreateMomentModal({
                 setSelectedCourse(c);
                 onCourseSelect?.(c);
               }}
-              onOpenStudio={openStudio}
-              availableActorsCount={availableActors.length}
-              currentFilter={currentFilter}
               onTypingStateChange={setIsTyping}
               selectedTags={selectedTags}
               onTagsChange={setSelectedTags}
-              momentType={momentType}
-              onMomentTypeChange={setMomentType}
             />
           </OverlayPortalProvider>
 
-          {/* Share Bar - slate theme */}
+          {/* Control Bar - 4 icons */}
+          <CreateMomentControlBar
+            hasMedia={hasMedia}
+            hasCategories={hasCategories}
+            onMediaClick={handlePickFromLibrary}
+            onEnhanceClick={() => setShowEnhanceSheet(true)}
+            onCategoriesClick={() => setShowCategorySheet(true)}
+            onVisibilityClick={() => setShowAudienceSheet(true)}
+          />
+
+          {/* Share Button */}
           <div
             className="flex-shrink-0 px-4 pt-2"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
               background: 'var(--cm-surface-card)',
-              borderTop: '1px solid var(--cm-border-subtle)',
             }}
           >
             <button
-              disabled={!canPost}
+              disabled={!hasMedia}
               onClick={handlePost}
               className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
               style={{
-                background: canPost ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                border: canPost ? 'none' : '1px solid var(--cm-border-subtle)',
-                color: canPost ? 'white' : 'var(--cm-text-tertiary)',
-                boxShadow: canPost ? 'var(--cm-shadow-button)' : 'none',
-                opacity: canPost ? 1 : 1,
+                background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
+                color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
+                boxShadow: hasMedia ? 'var(--cm-shadow-button)' : 'none',
               }}
             >
               Share
@@ -616,6 +640,30 @@ export default function CreateMomentModal({
         edits={getEdits(media[activeIndex]?.id || '')}
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
+      />
+
+      {/* Bottom Sheets */}
+      <MomentCategorySheet
+        isOpen={showCategorySheet}
+        onClose={() => setShowCategorySheet(false)}
+        selectedCategories={selectedCategories}
+        onCategoriesChange={setSelectedCategories}
+      />
+
+      <MomentAudienceSheet
+        isOpen={showAudienceSheet}
+        onClose={() => setShowAudienceSheet(false)}
+        visibility={visibility}
+        onVisibilityChange={setVisibility}
+      />
+
+      <EnhanceMomentSheet
+        isOpen={showEnhanceSheet}
+        onClose={() => setShowEnhanceSheet(false)}
+        onOpenStudio={() => {
+          setShowEnhanceSheet(false);
+          openStudio();
+        }}
       />
     </div>
   );

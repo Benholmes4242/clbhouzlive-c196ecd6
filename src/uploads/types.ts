@@ -57,6 +57,9 @@ export interface UploadJobInput {
   files: File[];
   mediaItems?: Array<{ id: string; file: File }>;
   studioEditsByMediaId?: Record<string, { filter?: string }>;
+  // New v2 fields
+  categories?: string[];
+  visibility?: 'anyone' | 'connections' | 'private';
 }
 
 // Serializable job for localStorage (no File objects)
