@@ -115,24 +115,23 @@ export default function ShortsGrid({
     return { portraitVideos: portrait, landscapeVideos: landscape };
   }, [items]);
 
-  // STRICT PATTERN: 4 portraits + 1 landscape per cycle
-  // Only creates complete cycles - never mixes orientations
+  // PATTERN: 4 portraits + 1 landscape per cycle when possible
+  // Adds remaining portraits after complete cycles to avoid truncating content
   const mixedItems = useMemo(() => {
     const result: ClusteredExploreItem[] = [];
     let portraitIndex = 0;
     let landscapeIndex = 0;
 
     const PORTRAITS_PER_CYCLE = 4;
-    const LANDSCAPES_PER_CYCLE = 1;
 
-    // Calculate maximum complete cycles we can create
-    const maxCycles = Math.floor(Math.min(
-      portraitVideos.length / PORTRAITS_PER_CYCLE,
-      landscapeVideos.length / LANDSCAPES_PER_CYCLE
-    ));
+    // Calculate complete cycles we can create (limited by landscape availability)
+    const maxCompleteCycles = Math.min(
+      Math.floor(portraitVideos.length / PORTRAITS_PER_CYCLE),
+      landscapeVideos.length
+    );
 
-    // Build grid with complete cycles only
-    for (let cycle = 0; cycle < maxCycles; cycle++) {
+    // Build grid with complete cycles
+    for (let cycle = 0; cycle < maxCompleteCycles; cycle++) {
       // Add 4 portrait videos
       for (let i = 0; i < PORTRAITS_PER_CYCLE; i++) {
         if (portraitIndex < portraitVideos.length) {
@@ -148,7 +147,18 @@ export default function ShortsGrid({
       }
     }
 
-    // DO NOT add partial cycles - pattern must remain strict
+    // Add remaining portraits (partial cycle at the end)
+    // This ensures ALL content is displayed, not just complete cycles
+    while (portraitIndex < portraitVideos.length) {
+      result.push(portraitVideos[portraitIndex]);
+      portraitIndex++;
+    }
+
+    // Add any remaining landscapes at the end
+    while (landscapeIndex < landscapeVideos.length) {
+      result.push(landscapeVideos[landscapeIndex]);
+      landscapeIndex++;
+    }
 
     return result;
   }, [portraitVideos, landscapeVideos]);
