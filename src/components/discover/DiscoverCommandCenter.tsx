@@ -111,25 +111,32 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   }, []);
 
   const SortContent = () => (
-    <div className="py-2">
-      {SORT_OPTIONS.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => handleSortSelect(option.id)}
-          className={cn(
-            "w-full flex items-center justify-between px-4 py-3 text-sm transition-colors",
-            "hover:bg-muted/50",
-            sortValue === option.id
-              ? "text-primary font-medium"
-              : "text-foreground"
-          )}
-        >
-          <span>{option.label}</span>
-          {sortValue === option.id && (
-            <Check className="w-4 h-4 text-primary" />
-          )}
-        </button>
-      ))}
+    <div className="px-4 pb-2 space-y-1.5">
+      {SORT_OPTIONS.map((option) => {
+        const isActive = sortValue === option.id;
+        return (
+          <button
+            key={option.id}
+            onClick={() => handleSortSelect(option.id)}
+            className={cn(
+              "w-full flex items-center justify-between rounded-2xl px-4 py-3.5",
+              "text-[15px] transition-all duration-150",
+              "active:scale-[0.98]",
+              isActive
+                ? "bg-slate-100/80 dark:bg-white/10 border border-slate-300/50 dark:border-white/15 font-semibold text-slate-900 dark:text-white"
+                : "text-slate-800 dark:text-white/90 active:bg-slate-100/70 dark:active:bg-white/10"
+            )}
+          >
+            <span>{option.label}</span>
+            {/* Fixed width container to prevent layout shift */}
+            <div className="w-5 flex justify-end">
+              {isActive && (
+                <Check className="w-4.5 h-4.5 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
+              )}
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 
@@ -151,9 +158,14 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               <span>Sort</span>
             </button>
           </DrawerTrigger>
-          <DrawerContent className="bg-background">
-            <DrawerHeader>
-              <DrawerTitle>Sort by</DrawerTitle>
+          <DrawerContent>
+            <DrawerHeader className="pb-1">
+              <DrawerTitle className="text-center text-[17px] font-semibold text-slate-900 dark:text-white">
+                Sort by
+              </DrawerTitle>
+              <p className="text-center text-xs text-slate-500 dark:text-white/50 mt-0.5">
+                Choose how results are ordered
+              </p>
             </DrawerHeader>
             <SortContent />
           </DrawerContent>
@@ -169,22 +181,32 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
             <span>Sort</span>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48 bg-background border border-border z-50">
-          {SORT_OPTIONS.map((option) => (
-            <DropdownMenuItem
-              key={option.id}
-              onClick={() => handleSortSelect(option.id)}
-              className={cn(
-                "flex items-center justify-between cursor-pointer",
-                sortValue === option.id && "text-primary font-medium"
-              )}
-            >
-              <span>{option.label}</span>
-              {sortValue === option.id && (
-                <Check className="w-4 h-4 text-primary" />
-              )}
-            </DropdownMenuItem>
-          ))}
+        <DropdownMenuContent 
+          align="start" 
+          className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
+        >
+          {SORT_OPTIONS.map((option) => {
+            const isActive = sortValue === option.id;
+            return (
+              <DropdownMenuItem
+                key={option.id}
+                onClick={() => handleSortSelect(option.id)}
+                className={cn(
+                  "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
+                  isActive 
+                    ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
+                    : "text-slate-700 dark:text-white/90"
+                )}
+              >
+                <span>{option.label}</span>
+                <div className="w-5 flex justify-end">
+                  {isActive && (
+                    <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
+                  )}
+                </div>
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     );
