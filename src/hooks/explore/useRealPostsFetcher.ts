@@ -352,7 +352,8 @@ export const useRealPostsFetcher = () => {
     postsPerPage: number, 
     mediaFilter?: string, 
     subFilter?: string,
-    durationFilter?: { from: number; to: number | null }
+    durationFilter?: { from: number; to: number | null },
+    sortOption?: string
   ): Promise<ExploreContentItem[]> => {
     try {
       // Get current user to filter out their personal posts (business posts OK)
@@ -435,11 +436,52 @@ export const useRealPostsFetcher = () => {
       }
 
       // Apply ordering and pagination AFTER filters
+      // Always order by created_at in database - we'll re-sort in JS for other sort options
       query = query
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1);
 
       const { data: postsData, error } = await query;
+      
+      // Apply JavaScript sorting based on sortOption (aggregations can't be ordered in Supabase)
+      if (postsData && postsData.length > 0 && sortOption) {
+        if (sortOption === 'most-liked') {
+          postsData.sort((a: any, b: any) => {
+            const aLikes = a.post_likes?.[0]?.count || 0;
+            const bLikes = b.post_likes?.[0]?.count || 0;
+            return bLikes - aLikes; // Highest likes first
+          });
+        } else if (sortOption === 'most-discussed') {
+          postsData.sort((a: any, b: any) => {
+            const aComments = a.post_comments?.[0]?.count || 0;
+            const bComments = b.post_comments?.[0]?.count || 0;
+            return bComments - aComments; // Most comments first
+          });
+        } else if (sortOption === 'friends-first') {
+          // Get user's following list for friends-first sorting
+          if (currentUserId) {
+            const { data: following } = await supabase
+              .from('user_follows')
+              .select('following_id')
+              .eq('follower_id', currentUserId);
+            
+            const followingIds = new Set(following?.map(f => f.following_id) || []);
+            
+            postsData.sort((a: any, b: any) => {
+              const aIsFriend = followingIds.has(a.user_id);
+              const bIsFriend = followingIds.has(b.user_id);
+              
+              // Friends first
+              if (aIsFriend && !bIsFriend) return -1;
+              if (!aIsFriend && bIsFriend) return 1;
+              
+              // Then by date (newest first)
+              return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            });
+          }
+        }
+        // 'newest' or undefined - already sorted by created_at from database
+      }
 
       if (error) {
         console.error('Error fetching posts:', error);

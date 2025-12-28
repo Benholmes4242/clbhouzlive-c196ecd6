@@ -47,13 +47,15 @@ function pruneFilterMap<T>(
 export const useInfiniteExploreContent = (
   activeFilter?: string, 
   subFilter?: string,
-  durationFilter?: { from: number; to: number | null }
+  durationFilter?: { from: number; to: number | null },
+  sortOption?: string
 ) => {
   // Fast content caching by filter type (include all filter params in cache key)
   const filterKey = [
     activeFilter || 'Friends',
     subFilter,
-    durationFilter ? `${durationFilter.from}-${durationFilter.to}` : ''
+    durationFilter ? `${durationFilter.from}-${durationFilter.to}` : '',
+    sortOption || 'newest'
   ].filter(Boolean).join('-');
   const cacheKey = filterKey;
   
@@ -92,7 +94,7 @@ export const useInfiniteExploreContent = (
       if (activeFilter === 'Friends') {
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter, sortOption);
       }
       
       // Check if aborted before setting state
@@ -110,7 +112,7 @@ export const useInfiniteExploreContent = (
     } catch (error) {
       console.error('Error preloading content:', error);
     }
-  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, activeFilter, subFilter, durationFilter]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, activeFilter, subFilter, durationFilter, sortOption]);
 
   const loadMore = useCallback(async (abortSignal?: AbortSignal) => {
     if (loading || !hasMore) {
@@ -176,7 +178,7 @@ export const useInfiniteExploreContent = (
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
         // Try to fetch real posts with filter and subfilter
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter, sortOption);
       }
       
       // Check if aborted before setting state
@@ -236,7 +238,7 @@ export const useInfiniteExploreContent = (
         return pruneFilterMap(updated, currentFilter);
       });
     }
-  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore, activeFilter, subFilter, durationFilter]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore, activeFilter, subFilter, durationFilter, sortOption]);
 
   // Initialize states for new filters (but don't reset existing ones)
   useEffect(() => {

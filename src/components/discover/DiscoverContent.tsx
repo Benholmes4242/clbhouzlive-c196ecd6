@@ -210,13 +210,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     return getDurationFilter(duration);
   }, [main, duration]);
   
-  // Use existing hook to fetch content with filters
+  // Use existing hook to fetch content with filters and sort
   const { 
     content, 
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(filterType, sub, durationFilter);
+  } = useInfiniteExploreContent(filterType, sub, durationFilter, watchSortOption);
 
   // CRITICAL: Preload hero video manifest as soon as content arrives
   // This eliminates the 2.2s delay where preload only starts when Hero mounts
