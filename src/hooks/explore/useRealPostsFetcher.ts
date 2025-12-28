@@ -775,6 +775,10 @@ export const useRealPostsFetcher = () => {
     cursor: string | null = null
   ): Promise<ExploreContentItem[]> => {
     try {
+      // Get current user to filter out their personal posts (business posts OK)
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const currentUserId = currentUser?.id;
+
       const TARGET_COUNT = limit;
       const MAX_FETCHES = 5; // Prevent infinite loops
       const PAGE_SIZE = Math.max(limit, 30); // Fetch at least 30 per page
@@ -838,6 +842,12 @@ export const useRealPostsFetcher = () => {
           .order('created_at', { ascending: true, foreignTable: 'post_media' })
           .order('created_at', { ascending: false })
           .eq('post_media.media_type', 'video');
+
+        // Filter out current user's PERSONAL posts (business posts are allowed)
+        // Show posts where: user_id != currentUserId OR actor_type = 'business'
+        if (currentUserId) {
+          query = query.or(`user_id.neq.${currentUserId},actor_type.eq.business`);
+        }
 
         // Cursor-based pagination
         if (currentCursor) {
