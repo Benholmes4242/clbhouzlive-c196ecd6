@@ -106,8 +106,8 @@ export default function CreateMomentModal({
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
   const hasMedia = media.length > 0;
   const hasCategories = selectedCategories.length > 0;
-  // Posting requires media + at least 1 category
-  const canPost = hasMedia && !isSubmitting && !!user && hasCategories;
+  // Soft-gated: Share button enabled if media exists - category check happens on tap
+  const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
