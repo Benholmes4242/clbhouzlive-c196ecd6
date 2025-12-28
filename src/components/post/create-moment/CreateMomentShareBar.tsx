@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Check, AlertCircle, RotateCcw, Image, Tag, Eye, MessageSquare } from "lucide-react";
 import { UploadProgressState } from "./types";
+import { triggerHaptic } from "@/lib/ui/haptics";
 
 interface CreateMomentShareBarProps {
   canPost: boolean;
@@ -43,10 +44,7 @@ export default function CreateMomentShareBar({
     if (isReady && !hasShownPulse && !isUploading) {
       setShowPulse(true);
       setHasShownPulse(true);
-      // Haptic feedback
-      if ('vibrate' in navigator) {
-        navigator.vibrate([10, 50, 10]);
-      }
+      triggerHaptic('success');
       // Auto-dismiss pulse after animation
       const timer = setTimeout(() => setShowPulse(false), 1000);
       return () => clearTimeout(timer);
@@ -59,12 +57,7 @@ export default function CreateMomentShareBar({
     
     // Lock button immediately
     setIsLocked(true);
-    
-    // Haptic feedback
-    if ('vibrate' in navigator) {
-      navigator.vibrate(20);
-    }
-    
+    triggerHaptic('medium');
     onPost();
     
     // Reset lock after a short delay (in case of error)
@@ -135,15 +128,13 @@ export default function CreateMomentShareBar({
         )}
       </AnimatePresence>
 
-      {/* Optional: Readiness indicator */}
-      {hasMedia && (
-        <div className="flex items-center justify-center gap-3 py-1">
-          <ReadinessIcon active={hasMedia} icon={<Image className="w-3 h-3" />} />
-          <ReadinessIcon active={hasCaption} icon={<MessageSquare className="w-3 h-3" />} optional />
-          <ReadinessIcon active={hasCategory} icon={<Tag className="w-3 h-3" />} />
-          <ReadinessIcon active={hasVisibility} icon={<Eye className="w-3 h-3" />} />
-        </div>
-      )}
+      {/* Readiness indicator - ALWAYS shown, not gated by hasMedia */}
+      <div className="flex items-center justify-center gap-3 py-1">
+        <ReadinessIcon active={hasMedia} icon={<Image className="w-3 h-3" />} required />
+        <ReadinessIcon active={hasCaption} icon={<MessageSquare className="w-3 h-3" />} optional />
+        <ReadinessIcon active={hasCategory} icon={<Tag className="w-3 h-3" />} required />
+        <ReadinessIcon active={hasVisibility} icon={<Eye className="w-3 h-3" />} optional />
+      </div>
 
       {/* Share button with readiness pulse */}
       <motion.button
@@ -207,18 +198,19 @@ interface ReadinessIconProps {
   active: boolean;
   icon: React.ReactNode;
   optional?: boolean;
+  required?: boolean;
 }
 
 const ReadinessIcon: React.FC<ReadinessIconProps> = ({ active, icon, optional = false }) => (
   <div 
-    className="flex items-center justify-center"
+    className="flex items-center justify-center transition-colors"
     style={{ 
       color: active 
-        ? 'var(--cm-accent)' 
+        ? 'var(--cm-surface-slate)' 
         : optional 
           ? 'var(--cm-border)' 
           : 'var(--cm-text-tertiary)',
-      opacity: active ? 1 : optional ? 0.5 : 0.7,
+      opacity: active ? 1 : optional ? 0.4 : 0.6,
     }}
   >
     {icon}

@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Globe, Users, Lock, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { X, Globe, Users, Lock } from 'lucide-react';
 import { MomentVisibility } from '../types';
+import { triggerHaptic } from '@/lib/ui/haptics';
 
 interface AudienceOption {
   value: MomentVisibility;
@@ -81,10 +81,7 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
   onVisibilityChange,
 }) => {
   const handleSelect = (value: MomentVisibility) => {
-    // Haptic feedback
-    if ('vibrate' in navigator) {
-      navigator.vibrate(10);
-    }
+    triggerHaptic('selection');
     onVisibilityChange(value);
     onClose();
   };

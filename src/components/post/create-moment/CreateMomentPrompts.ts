@@ -51,36 +51,6 @@ export function getPromptsForContext(context: PromptContext): string[] {
   }
 }
 
-// Hook for rotating prompts
-import { useState, useEffect, useCallback } from 'react';
-
-export function useRotatingPrompt(
-  context: PromptContext,
-  intervalMs: number = 6000,
-  enabled: boolean = true
-) {
-  const [promptIndex, setPromptIndex] = useState(0);
-  const prompts = getPromptsForContext(context);
-
-  const rotate = useCallback(() => {
-    setPromptIndex(prev => (prev + 1) % prompts.length);
-  }, [prompts.length]);
-
-  useEffect(() => {
-    if (!enabled) return;
-    
-    const interval = setInterval(rotate, intervalMs);
-    return () => clearInterval(interval);
-  }, [enabled, intervalMs, rotate]);
-
-  // Reset index when context changes
-  useEffect(() => {
-    setPromptIndex(0);
-  }, [context]);
-
-  return {
-    prompt: prompts[promptIndex],
-    promptIndex,
-    rotate,
-  };
-}
+// NOTE: Rotating prompts hook removed - static copy is now used in Hero
+// The static copy ("Capture the moment" / "From the tee...") performs better
+// than rotating prompts for this use case.
