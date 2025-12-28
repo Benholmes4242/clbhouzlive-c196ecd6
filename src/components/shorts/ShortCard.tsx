@@ -103,92 +103,39 @@ export default React.memo(function ShortCard({
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
-        {/* Conditional Meta based on variant */}
-        {isLandscape && useGlassPanel ? (
-          /* Unified glass panel + avatar for landscape videos */
-          <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
-            {/* Glass panel - flush to right edge */}
-            <div
-              className="liquid-glass liquid-glass--elevated flex flex-col min-w-[180px] max-w-[240px] px-3 py-1 rounded-l-xl rounded-r-none transition-transform duration-200 group-hover:scale-[1.02] border-r-0"
-            >
-              {/* Creator name */}
-              <div className="text-white font-semibold text-body-md leading-tight flex items-center gap-2">
-                <span className="truncate">
-                  {item.user?.name || 'Unknown'}
-                </span>
-              </div>
-
-              {/* Divider line */}
-              <div className="mt-1 mb-1.5 h-px w-[calc(100%-4px)] bg-white/20" />
-
-              {/* Likes row - de-emphasised */}
-              <div className="flex items-center gap-1.5 text-white/50 text-[10px] font-normal leading-snug">
-                <Heart className="w-3 h-3" />
-                <span>{item.likes || 0}</span>
-              </div>
+        {/* Unified meta layout - same for portrait and landscape */}
+        {/* Text bottom left + avatar bottom right */}
+        <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
+          {/* Text content - bottom left */}
+          <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
+            {/* Likes row - de-emphasised, tertiary style (above name) */}
+            <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+              <Heart className="w-3 h-3" />
+              <span>{item.likes || 0}</span>
             </div>
 
-            {/* Avatar squircle - positioned 8px from right edge, 90% overlaps panel, 10% extends above */}
-            <div
-              className="absolute right-[8px] bottom-[10px] w-[48px] h-[48px] rounded-[12px] overflow-hidden bg-black/40 backdrop-blur-md"
-              style={{
-                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
-              }}
-            >
-              <img
-                src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                alt={item.user?.name || 'Unknown'}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Duration badge - attached to squircle */}
-            {item.duration && typeof item.duration === 'number' && (
-              <div 
-                className="absolute right-2 bottom-[-8px] text-body-sm font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.6)',
-                  backdropFilter: 'blur(8px)'
-                }}
-              >
-                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
-              </div>
-            )}
-          </div>
-        ) : (
-          /* Portrait meta - text bottom left + avatar bottom right */
-          <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
-            {/* Text content - bottom left */}
-            <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
-              {/* User name */}
-              <div className="text-white font-bold text-body-md leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                <span className="truncate block">
-                  {item.user?.name || 'Unknown'}
-                </span>
-              </div>
-
-              {/* Likes row - de-emphasised, tertiary style */}
-              <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-                <Heart className="w-3 h-3" />
-                <span>{item.likes || 0}</span>
-              </div>
-            </div>
-
-            {/* Avatar - bottom right, squircle (matching landscape style) */}
-            <div
-              className="absolute right-3 bottom-3 w-[40px] h-[40px] rounded-[10px] overflow-hidden bg-black/40 backdrop-blur-md"
-              style={{
-                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
-              }}
-            >
-              <img
-                src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                alt={item.user?.name || 'Unknown'}
-                className="w-full h-full object-cover"
-              />
+            {/* User name */}
+            <div className="text-white font-bold text-body-md leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+              <span className="truncate block">
+                {item.user?.name || 'Unknown'}
+              </span>
             </div>
           </div>
-        )}
+
+          {/* Avatar - bottom right, squircle */}
+          <div
+            className="absolute right-3 bottom-3 w-[40px] h-[40px] rounded-[10px] overflow-hidden bg-black/40 backdrop-blur-md"
+            style={{
+              boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
+            }}
+          >
+            <img
+              src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={item.user?.name || 'Unknown'}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
       </div>
     </button>
   );
