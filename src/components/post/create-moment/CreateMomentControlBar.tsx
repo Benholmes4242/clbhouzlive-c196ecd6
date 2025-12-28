@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Image, Sparkles, Tag, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { triggerHaptic } from '@/lib/ui/haptics';
 
 interface CreateMomentControlBarProps {
   hasMedia: boolean;
@@ -23,7 +24,6 @@ interface ControlBarButtonProps {
   onClick: () => void;
   'aria-label': string;
   shouldBounce?: boolean;
-  onBounceComplete?: () => void;
 }
 
 const ControlBarButton: React.FC<ControlBarButtonProps> = ({
@@ -33,27 +33,7 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
   onClick,
   'aria-label': ariaLabel,
   shouldBounce = false,
-  onBounceComplete,
 }) => {
-  const [isBouncing, setIsBouncing] = useState(false);
-
-  // Trigger bounce animation when shouldBounce changes to true
-  useEffect(() => {
-    if (shouldBounce && !isBouncing) {
-      setIsBouncing(true);
-      // Haptic feedback
-      if ('vibrate' in navigator) {
-        navigator.vibrate(10);
-      }
-      // Reset after animation
-      const timer = setTimeout(() => {
-        setIsBouncing(false);
-        onBounceComplete?.();
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldBounce, isBouncing, onBounceComplete]);
-
   return (
     <motion.button
       type="button"
@@ -61,9 +41,17 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
       disabled={disabled}
       whileTap={{ scale: 0.92 }}
       animate={{ 
-        scale: isBouncing ? [1, 1.08, 1] : 1,
+        scale: shouldBounce ? [1, 1.06, 1] : 1,
       }}
-      transition={{ duration: 0.2 }}
+      transition={{ 
+        duration: 0.2,
+        scale: { duration: 0.25 }
+      }}
+      onAnimationComplete={() => {
+        if (shouldBounce) {
+          triggerHaptic('selection');
+        }
+      }}
       className={cn(
         "relative w-11 h-11 rounded-xl flex items-center justify-center transition-colors",
         disabled && "opacity-40 cursor-not-allowed"
@@ -77,15 +65,15 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
       <span style={{ color: isActive ? 'white' : 'var(--cm-icon-primary)' }}>
         {icon}
       </span>
-      {/* Active indicator dot */}
+      {/* Active indicator dot - slate color, not orange */}
       {isActive && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
           style={{ 
-            background: 'var(--cm-accent)',
-            boxShadow: '0 0 4px rgba(247, 147, 30, 0.5)',
+            background: 'var(--cm-surface-slate)',
+            border: '2px solid var(--cm-surface-card)',
           }}
         />
       )}
@@ -119,6 +107,18 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
   const dismissHint = useCallback(() => {
     setShowHint(false);
   }, []);
+
+  // Track previous states to detect transitions
+  const shouldBounceMedia = hasMedia && !bouncedMedia;
+  const shouldBounceCategories = hasCategories && !bouncedCategories;
+
+  // Mark as bounced after first bounce
+  if (hasMedia && !bouncedMedia) {
+    setTimeout(() => setBouncedMedia(true), 300);
+  }
+  if (hasCategories && !bouncedCategories) {
+    setTimeout(() => setBouncedCategories(true), 300);
+  }
 
   return (
     <div
@@ -156,8 +156,7 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
             onMediaClick();
           }}
           aria-label="Add media"
-          shouldBounce={hasMedia && !bouncedMedia}
-          onBounceComplete={() => setBouncedMedia(true)}
+          shouldBounce={shouldBounceMedia}
         />
 
         {/* Enhance */}
@@ -181,8 +180,7 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
             onCategoriesClick();
           }}
           aria-label="Select categories"
-          shouldBounce={hasCategories && !bouncedCategories}
-          onBounceComplete={() => setBouncedCategories(true)}
+          shouldBounce={shouldBounceCategories}
         />
 
         {/* Visibility */}

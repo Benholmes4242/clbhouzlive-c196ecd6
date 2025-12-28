@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Camera, Images } from "lucide-react";
-import { useRotatingPrompt, PromptContext } from "./CreateMomentPrompts";
+import { triggerHaptic } from "@/lib/ui/haptics";
 
 interface CreateMomentHeroProps {
   hasMedia: boolean;
@@ -13,20 +13,20 @@ interface CreateMomentHeroProps {
 
 export default function CreateMomentHero({
   hasMedia,
-  isBusinessActor,
-  isTyping,
   onPickFromCamera,
   onPickFromLibrary,
 }: CreateMomentHeroProps) {
   const [isPressed, setIsPressed] = useState(false);
-  
-  const context: PromptContext = isBusinessActor ? 'business' : hasMedia ? 'hasMedia' : 'empty';
-  const { prompt } = useRotatingPrompt(context, 7000, !isTyping && !hasMedia);
 
   if (hasMedia) return null;
 
-  const triggerHaptic = useCallback(() => {
-    if ('vibrate' in navigator) navigator.vibrate(10);
+  const handlePressStart = useCallback(() => {
+    setIsPressed(true);
+    triggerHaptic('selection');
+  }, []);
+
+  const handlePressEnd = useCallback(() => {
+    setIsPressed(false);
   }, []);
 
   return (
@@ -40,6 +40,7 @@ export default function CreateMomentHero({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
       >
+        {/* Hero card with actual scale transform on press */}
         <motion.div 
           className="p-8 rounded-2xl flex flex-col items-center cursor-pointer"
           style={{
@@ -48,13 +49,19 @@ export default function CreateMomentHero({
             background: 'var(--cm-surface-card)',
             border: '1px dashed var(--cm-border)',
           }}
-          animate={{ scale: isPressed ? 0.98 : 1 }}
-          transition={{ duration: 0.1 }}
-          onTouchStart={() => { setIsPressed(true); triggerHaptic(); }}
-          onTouchEnd={() => setIsPressed(false)}
-          onMouseDown={() => { setIsPressed(true); triggerHaptic(); }}
-          onMouseUp={() => setIsPressed(false)}
-          onMouseLeave={() => setIsPressed(false)}
+          animate={{ 
+            scale: isPressed ? 0.98 : 1,
+          }}
+          transition={{ 
+            duration: 0.12, 
+            ease: "easeOut" 
+          }}
+          onTouchStart={handlePressStart}
+          onTouchEnd={handlePressEnd}
+          onTouchCancel={handlePressEnd}
+          onMouseDown={handlePressStart}
+          onMouseUp={handlePressEnd}
+          onMouseLeave={handlePressEnd}
         >
           <Camera className="w-12 h-12 mb-3" strokeWidth={1.5} style={{ color: 'var(--cm-icon-primary)' }} />
           
@@ -69,7 +76,11 @@ export default function CreateMomentHero({
           <div className="flex items-center justify-center gap-3 z-10">
             <motion.button
               type="button"
-              onClick={(e) => { e.stopPropagation(); triggerHaptic(); onPickFromCamera(); }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                triggerHaptic('selection'); 
+                onPickFromCamera(); 
+              }}
               whileTap={{ scale: 0.96 }}
               className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-sm"
               style={{
@@ -84,7 +95,11 @@ export default function CreateMomentHero({
             
             <motion.button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onPickFromLibrary(); }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                triggerHaptic('light');
+                onPickFromLibrary(); 
+              }}
               whileTap={{ scale: 0.96 }}
               className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 font-medium text-sm"
               style={{

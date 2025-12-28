@@ -4,6 +4,7 @@ import { X, Search, Tag, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MOMENT_CATEGORIES, getCategoryById } from '../categoryDefinitions';
 import { suggestCategories } from '@/utils/categorySuggestions';
+import { triggerHaptic } from '@/lib/ui/haptics';
 
 const MAX_CATEGORIES = 3;
 
@@ -34,13 +35,6 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Haptic feedback helper
-  const triggerHaptic = useCallback(() => {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(10);
-    }
-  }, []);
-
   // Get suggested categories
   const suggestedCategoryIds = useMemo(() => {
     return suggestCategories({
@@ -66,7 +60,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
 
   // Toggle category selection with haptic
   const toggleCategory = useCallback((categoryId: string) => {
-    triggerHaptic();
+    triggerHaptic('selection');
     if (selectedCategories.includes(categoryId)) {
       // Remove category
       onCategoriesChange(selectedCategories.filter(id => id !== categoryId));
@@ -74,7 +68,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
       // Add category
       onCategoriesChange([...selectedCategories, categoryId]);
     }
-  }, [selectedCategories, onCategoriesChange, triggerHaptic]);
+  }, [selectedCategories, onCategoriesChange]);
 
   if (!isOpen) return null;
 
@@ -131,11 +125,11 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             </button>
           </div>
 
-          {/* Suggested categories */}
+          {/* Suggested categories - SLATE styling, no gold */}
           {activeSuggestions.length > 0 && (
             <div className="px-4 pb-3">
               <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--cm-accent-gold)' }} />
+                <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--cm-text-secondary)' }} />
                 <span 
                   className="text-xs font-medium"
                   style={{ color: 'var(--cm-text-secondary)' }}
@@ -154,7 +148,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                       key={cat.id}
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      whileTap={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
                       onClick={() => !isDisabled && toggleCategory(cat.id)}
                       disabled={isDisabled}
                       className={cn(
@@ -162,12 +156,12 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                         isDisabled && "opacity-40 cursor-not-allowed"
                       )}
                       style={{
-                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.08))',
-                        border: '1px solid rgba(251, 191, 36, 0.3)',
+                        background: 'rgba(100, 116, 139, 0.12)',
+                        border: '1px solid rgba(100, 116, 139, 0.25)',
                         color: 'var(--cm-text-primary)',
                       }}
                     >
-                      <Sparkles className="w-3 h-3" style={{ color: 'var(--cm-accent-gold)' }} />
+                      <Sparkles className="w-3 h-3" style={{ color: 'var(--cm-text-secondary)' }} />
                       <span>{cat.emoji}</span>
                       <span>{cat.label}</span>
                     </motion.button>
@@ -196,7 +190,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 className="flex-1 bg-transparent outline-none text-sm"
                 style={{ 
                   color: 'var(--cm-text-primary)',
-                  caretColor: 'var(--cm-accent)',
+                  caretColor: 'var(--cm-surface-slate)',
                 }}
                 autoFocus
               />
@@ -216,7 +210,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.8, opacity: 0 }}
-                      whileTap={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
                       onClick={() => toggleCategory(cat.id)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium"
                       style={{
@@ -253,7 +247,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                 return (
                   <motion.button
                     key={cat.id}
-                    whileTap={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => toggleCategory(cat.id)}
                     disabled={isDisabled}
                     className={cn(
