@@ -221,14 +221,15 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
         {/* Spacer pushes button to bottom */}
         <div className="flex-1" />
 
-        {/* Follow CTA - pinned to bottom */}
+        {/* Follow CTA - pinned to bottom, SDS squircle style */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full h-7 text-xs font-medium rounded-lg",
+            "w-full h-7 text-xs font-medium",
             isFollowing && "bg-muted text-muted-foreground"
           )}
+          style={{ borderRadius: '34%' }}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
         >
