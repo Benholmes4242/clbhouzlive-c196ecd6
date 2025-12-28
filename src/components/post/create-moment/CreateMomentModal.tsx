@@ -648,6 +648,9 @@ export default function CreateMomentModal({
         onClose={() => setShowCategorySheet(false)}
         selectedCategories={selectedCategories}
         onCategoriesChange={setSelectedCategories}
+        caption={caption}
+        hasCourse={!!course}
+        mediaTypes={media.map(m => m.type === 'video' ? 'video' : 'photo')}
       />
 
       <MomentAudienceSheet
