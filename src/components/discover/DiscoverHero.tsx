@@ -278,11 +278,10 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
           />
         )}
 
-        {/* Unified overlay system */}
+        {/* Unified overlay system - no club tag on hero */}
         <OverlayCorners
           surface="hero"
-          club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
-          onClubClick={handleClubClick}
+          club={null}
           showDuration={false}
           trendingLabel="Trending Today"
           showCreator={false}
