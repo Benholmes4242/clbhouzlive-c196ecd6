@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Wand2, Type, Film, ChevronRight } from 'lucide-react';
+import { X, Sparkles, Wand2, Type, Film, ChevronRight, Award } from 'lucide-react';
 
 interface EnhanceOption {
   id: string;
@@ -17,6 +17,12 @@ const ENHANCE_OPTIONS: EnhanceOption[] = [
     label: 'Filters & Effects',
     description: 'Apply beautiful filters to your media',
     icon: <Sparkles className="w-5 h-5" />,
+  },
+  {
+    id: 'badges',
+    label: 'Add Achievement Badge',
+    description: 'Eagle, Birdie, Personal Best & more',
+    icon: <Award className="w-5 h-5" />,
   },
   {
     id: 'ai-caption',
@@ -46,6 +52,7 @@ interface EnhanceMomentSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenStudio: () => void;
+  onOpenBadges?: () => void;
 }
 
 /**
@@ -56,11 +63,15 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
   isOpen,
   onClose,
   onOpenStudio,
+  onOpenBadges,
 }) => {
   const handleOptionClick = (optionId: string) => {
     if (optionId === 'filters') {
       onClose();
       onOpenStudio();
+    } else if (optionId === 'badges' && onOpenBadges) {
+      onClose();
+      onOpenBadges();
     }
     // Other options are coming soon - no action
   };
