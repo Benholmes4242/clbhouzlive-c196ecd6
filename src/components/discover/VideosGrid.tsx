@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -60,28 +60,43 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     estimatedRowHeight: 300,
   });
 
+  // Refs to avoid stale closure in IntersectionObserver callback
+  const hasMoreRef = useRef(hasMore);
+  const loadingRef = useRef(isLoading);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+    loadingRef.current = isLoading;
+  }, [hasMore, isLoading]);
+
   // Intersection observer for infinite scroll
   useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
+        const entry = entries[0];
+        
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
           onLoadMore();
         }
       },
-      { threshold: 0.3 }
+      { 
+        root: null,
+        rootMargin: '400px 0px', // Trigger 400px BEFORE reaching bottom
+        threshold: 0,
+      }
     );
 
-    const sentinel = document.getElementById('videos-scroll-sentinel');
-    if (sentinel) {
-      observer.observe(sentinel);
-    }
+    observer.observe(sentinel);
 
     return () => {
-      if (sentinel) {
-        observer.unobserve(sentinel);
-      }
+      observer.disconnect();
     };
-  }, [hasMore, isLoading, onLoadMore]);
+  }, [onLoadMore]);
 
   if (itemsToRender.length === 0 && !isLoading) {
     return (
@@ -195,7 +210,10 @@ const VideosGrid: React.FC<VideosGridProps> = ({
       )}
 
       {/* Infinite scroll sentinel */}
-      <div id="videos-scroll-sentinel" className="h-4 mt-8">
+      <div 
+        ref={sentinelRef}
+        className="h-20 w-full mt-8"
+      >
         {isLoading && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
