@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { SuggestedItem } from '@/types/suggestedItem';
+import { MutualFriendsAvatars } from './MutualFriendsAvatars';
 
 interface SuggestedProfileCardProps {
   item: SuggestedItem;
@@ -204,11 +205,16 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
             </p>
           )}
 
-          {/* Golfer: Reason row (always reserve height for uniform cards) */}
+          {/* Golfer: Reason row with optional mutual friend avatars */}
           {isGolfer && (
-            <p className="text-[10px] text-muted-foreground/60 text-center line-clamp-1 w-full mt-0.5">
-              {reasonText || <span className="opacity-0">placeholder</span>}
-            </p>
+            <div className="flex items-center justify-center gap-1.5 mt-0.5 w-full">
+              {golferData?.mutual_friends && golferData.mutual_friends.length > 0 && (
+                <MutualFriendsAvatars friends={golferData.mutual_friends} maxDisplay={3} />
+              )}
+              <p className="text-[10px] text-muted-foreground/60 text-center line-clamp-1">
+                {reasonText || <span className="opacity-0">placeholder</span>}
+              </p>
+            </div>
           )}
         </div>
 

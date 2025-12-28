@@ -170,7 +170,8 @@ export async function safePlay(
   }
   
   // Ensure proper preconditions for autoplay
-  video.muted = true;
+  // NOTE: Do NOT force video.muted = true here - respect the muted state set by GlobalAudioContext
+  // The video element's muted state is already set by HLSPlayer based on isGloballyMuted
   video.playsInline = true;
   video.setAttribute('webkit-playsinline', 'true');
   
@@ -326,7 +327,7 @@ export async function safePlay(
  */
 function legacySafePlay(video: HTMLVideoElement): Promise<boolean> {
   return new Promise((resolve) => {
-    video.muted = true;
+    // NOTE: Do NOT force video.muted = true here - respect the muted state set by GlobalAudioContext
     video.playsInline = true;
     
     video.play()
