@@ -9,6 +9,7 @@ import React, { createContext, useContext, useRef, useCallback, useEffect, useSt
 import { safePlay } from '@/utils/safePlay';
 import { runtimeUserMute } from './runtime';
 import { MediaDevHud } from './runtime/MediaDevHud';
+import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 
 // ============ Types ============
 
@@ -61,6 +62,9 @@ const POSITION_SAVE_THROTTLE = 3000; // ms between saves
 // ============ Provider ============
 
 export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Rehydration integration - reset media on app resume
+  const { isRehydrating } = useRehydrationSafe();
+  
   // Deprecation warning - shown once
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -327,6 +331,21 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
       window.removeEventListener('focus', handleFocus);
     };
   }, [pauseAll]);
+  
+  // ============ Rehydration Handling ============
+  
+  useEffect(() => {
+    if (isRehydrating) {
+      console.log('[MediaSystem] App rehydrating - pausing all media for reconnection');
+      pauseAll();
+      
+      // Clear all registrations to force fresh reconnection
+      // Videos will re-register when their components remount with new reconnectionKey
+      registry.current.forEach((reg, id) => {
+        console.log(`[MediaSystem] Clearing registration for rehydration: ${id.slice(0, 8)}`);
+      });
+    }
+  }, [isRehydrating, pauseAll]);
   
   // ============ Context Value ============
   

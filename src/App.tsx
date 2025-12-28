@@ -15,6 +15,7 @@ import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
+import { RehydrationProvider } from './contexts/RehydrationContext';
 // RETIRED: VideoManagerProvider and VideoPlaybackManagerProvider
 // These competed with MediaRuntime for playback control.
 // All playback is now centralized in MediaSystemProvider.
@@ -660,10 +661,12 @@ const App: React.FC = () => {
       <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
         <Top100DebugProvider>
           <QueryClientProvider client={queryClient}>
-            <PostEventsBridge>
-              <UploadToastsBridge />
-              <AppInner />
-            </PostEventsBridge>
+            <RehydrationProvider>
+              <PostEventsBridge>
+                <UploadToastsBridge />
+                <AppInner />
+              </PostEventsBridge>
+            </RehydrationProvider>
           </QueryClientProvider>
         </Top100DebugProvider>
       </ThemeProvider>

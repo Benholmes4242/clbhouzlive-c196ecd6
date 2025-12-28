@@ -12,10 +12,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CompactHeader from '@/components/header/CompactHeader';
+import { useRehydrationSafe } from '@/contexts/RehydrationContext';
+import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
   const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
+  
+  // Rehydration state - show skeleton when app is rehydrating after background
+  const { isRehydrating } = useRehydrationSafe();
   
   // Bottom sheet state for notification actions
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
@@ -28,6 +33,11 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  
+  // Show skeleton during rehydration
+  if (isRehydrating) {
+    return <ActivityPageSkeleton />;
+  }
   
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);

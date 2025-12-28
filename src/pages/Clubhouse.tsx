@@ -22,8 +22,13 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
+import { useRehydrationSafe } from '@/contexts/RehydrationContext';
+import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 
 const Clubhouse = () => {
+  // Rehydration state - show skeleton when app is rehydrating after background
+  const { isRehydrating } = useRehydrationSafe();
+  
   // Log route entry for boot timeline
   useEffect(() => {
     logRouteClubhouse();
@@ -62,6 +67,11 @@ const Clubhouse = () => {
     skeletonMode, 
     signalFirstFrameReady 
   } = useClubhouseSkeletonTiming(posts.length > 0);
+  
+  // Show skeleton during rehydration
+  if (isRehydrating) {
+    return <ClubhouseSkeleton />;
+  }
 
   // Track loading posts state for boot timeline (audit only)
   const wasShowingLoadingRef = useRef(false);
