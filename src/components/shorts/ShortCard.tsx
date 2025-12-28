@@ -104,22 +104,20 @@ export default React.memo(function ShortCard({
 
         {/* Unified meta layout - same for portrait and landscape */}
         {/* Text bottom left + avatar bottom right */}
-        <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
-          {/* Text content - bottom left */}
-          <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
-            {/* Likes row - de-emphasised, tertiary style (above name) */}
-            <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-              <Heart className="w-3 h-3" />
-              <span>{item.likes || 0}</span>
-            </div>
+          <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
+            {/* Text content - bottom left */}
+            <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
+              {/* Likes row - de-emphasised, tertiary style (above name) */}
+              <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal">
+                <Heart className="w-3 h-3" />
+                <span>{item.likes || 0}</span>
+              </div>
 
-            {/* User name */}
-            <div className="text-white font-bold text-body-md leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-              <span className="truncate block">
-                {item.user?.name || 'Unknown'}
-              </span>
+              {/* User name */}
+              <div className="text-white font-bold text-body-md leading-tight">
+                <span className="truncate block">{item.user?.name || 'Unknown'}</span>
+              </div>
             </div>
-          </div>
 
           {/* Avatar - bottom right, squircle */}
           <div
