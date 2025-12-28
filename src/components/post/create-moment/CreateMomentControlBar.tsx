@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Image, Sparkles, Tag, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -108,17 +108,22 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
     setShowHint(false);
   }, []);
 
-  // Track previous states to detect transitions
+  // Compute bounce flags
   const shouldBounceMedia = hasMedia && !bouncedMedia;
   const shouldBounceCategories = hasCategories && !bouncedCategories;
 
-  // Mark as bounced after first bounce
-  if (hasMedia && !bouncedMedia) {
-    setTimeout(() => setBouncedMedia(true), 300);
-  }
-  if (hasCategories && !bouncedCategories) {
-    setTimeout(() => setBouncedCategories(true), 300);
-  }
+  // Mark as bounced after animation (moved to useEffect to avoid render-time setState)
+  useEffect(() => {
+    if (!hasMedia || bouncedMedia) return;
+    const t = setTimeout(() => setBouncedMedia(true), 300);
+    return () => clearTimeout(t);
+  }, [hasMedia, bouncedMedia]);
+
+  useEffect(() => {
+    if (!hasCategories || bouncedCategories) return;
+    const t = setTimeout(() => setBouncedCategories(true), 300);
+    return () => clearTimeout(t);
+  }, [hasCategories, bouncedCategories]);
 
   return (
     <div
