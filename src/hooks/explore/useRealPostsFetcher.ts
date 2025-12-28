@@ -355,6 +355,10 @@ export const useRealPostsFetcher = () => {
     durationFilter?: { from: number; to: number | null }
   ): Promise<ExploreContentItem[]> => {
     try {
+      // Get current user to filter out their personal posts (business posts OK)
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const currentUserId = currentUser?.id;
+
       // Build the base query with select - includes actor_type/actor_id for business profiles
       let query = supabase
         .from('posts')
@@ -388,6 +392,12 @@ export const useRealPostsFetcher = () => {
             )
           )
         `);
+
+      // Filter out current user's PERSONAL posts (business posts are allowed)
+      // Show posts where: user_id != currentUserId OR actor_type = 'business'
+      if (currentUserId) {
+        query = query.or(`user_id.neq.${currentUserId},actor_type.eq.business`);
+      }
 
       // IMPORTANT: Apply filters BEFORE range/limit for correct pagination
       // Add media type filter if specified
