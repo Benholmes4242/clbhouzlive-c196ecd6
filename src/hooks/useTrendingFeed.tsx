@@ -4,6 +4,7 @@ import { useUserPosts } from '@/hooks/useUserPosts';
 import { useOptimisticPosts } from '@/hooks/useOptimisticPosts';
 import { useExternalVideos } from '@/hooks/useExternalVideos';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 export const useTrendingFeed = () => {
   const { user } = useSupabaseSession();
@@ -42,6 +43,8 @@ export const useTrendingFeed = () => {
       if (allConnectedUserIds.length === 0) return [];
 
       // Single optimized query with all required data and filter for media posts only
+      const visibilityFilter = buildVisibilityFilter(user.id);
+      
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -54,6 +57,7 @@ export const useTrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
+        .or(visibilityFilter) // Apply visibility filter
         .order('created_at', { ascending: false })
         .limit(6); // Optimized limit for performance
 

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 interface PostMedia {
   id: string;
@@ -43,6 +44,9 @@ export const useUserPosts = () => {
     }
 
     try {
+      // Build visibility filter for privacy enforcement
+      const visibilityFilter = buildVisibilityFilter(user.id);
+      
       // Fetch only recent posts for faster loading
       const { data: postsData, error } = await supabase
         .from('posts')
@@ -54,6 +58,7 @@ export const useUserPosts = () => {
           actor_type
         `)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
+        .or(visibilityFilter) // Apply visibility filter
         .order('created_at', { ascending: false })
         .limit(10); // Limit initial load for performance
 

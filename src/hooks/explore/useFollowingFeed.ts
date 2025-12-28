@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 export function useFollowingFeed(pageSize = 12) {
   const [videos, setVideos] = useState<ExploreContentItem[]>([]);
@@ -40,6 +41,9 @@ export function useFollowingFeed(pageSize = 12) {
         return;
       }
 
+      // Build visibility filter
+      const visibilityFilter = buildVisibilityFilter(user.id);
+      
       // Fetch videos from followed users
       const { data: videoPosts, error: vErr } = await supabase
         .from('posts')
@@ -49,6 +53,7 @@ export function useFollowingFeed(pageSize = 12) {
         `)
         .in('user_id', followedIds)
         .eq('post_media.media_type', 'video')
+        .or(visibilityFilter)
         .order('created_at', { ascending: false })
         .range(nextOffset, nextOffset + pageSize - 1);
 
@@ -63,6 +68,7 @@ export function useFollowingFeed(pageSize = 12) {
         `)
         .in('user_id', followedIds)
         .eq('post_media.media_type', 'image')
+        .or(visibilityFilter)
         .order('created_at', { ascending: false })
         .range(nextOffset, nextOffset + pageSize - 1);
 

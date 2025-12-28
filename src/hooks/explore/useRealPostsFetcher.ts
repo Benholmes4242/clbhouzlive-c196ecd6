@@ -3,6 +3,7 @@ import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/expl
 import { isValidImageUrl } from './urlValidation';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { getStreamPoster } from '@/utils/stream';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 export const useRealPostsFetcher = () => {
   const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
@@ -79,8 +80,16 @@ export const useRealPostsFetcher = () => {
               name
             )
           )
-        `)
+        `);
+
+      // Add visibility filter - private posts only visible to owner
+      const visibilityFilter = buildVisibilityFilter(user.id);
+      
+      // Combine following filter with visibility filter
+      // Posts must match (following conditions) AND (visibility conditions)
+      query = query
         .or(orFilters.join(','))
+        .or(visibilityFilter)
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1)
         .limit(postsPerPage);
@@ -401,6 +410,10 @@ export const useRealPostsFetcher = () => {
       if (currentUserId) {
         query = query.or(`user_id.neq.${currentUserId},actor_type.eq.business`);
       }
+      
+      // Apply visibility filter - private posts only visible to owner
+      const visibilityFilter = buildVisibilityFilter(currentUserId);
+      query = query.or(visibilityFilter);
 
       // IMPORTANT: Apply filters BEFORE range/limit for correct pagination
       // Add media type filter if specified

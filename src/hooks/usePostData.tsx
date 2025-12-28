@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
 export const usePostData = () => {
   const [loading, setLoading] = useState(false);
@@ -7,6 +8,10 @@ export const usePostData = () => {
   const fetchPostWithDetails = useCallback(async (postId: string) => {
     setLoading(true);
     try {
+      // Get current user for visibility check
+      const { data: { user } } = await supabase.auth.getUser();
+      const visibilityFilter = buildVisibilityFilter(user?.id ?? null);
+      
       // Fetch post with all related data
       const { data: post, error: postError } = await supabase
         .from('posts')
@@ -41,6 +46,7 @@ export const usePostData = () => {
           )
         `)
         .eq('id', postId)
+        .or(visibilityFilter)
         .single();
 
       if (postError) {
@@ -61,7 +67,12 @@ export const usePostData = () => {
   const fetchUserPosts = useCallback(async (userId: string) => {
     setLoading(true);
     try {
-      const { data: posts, error: postsError } = await supabase
+      // Get current user for visibility check
+      const { data: { user } } = await supabase.auth.getUser();
+      const visibilityFilter = buildVisibilityFilter(user?.id ?? null);
+      const isOwnProfile = user?.id === userId;
+      
+      let query = supabase
         .from('posts')
         .select(`
           *,
@@ -95,7 +106,14 @@ export const usePostData = () => {
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-
+      
+      // Apply visibility filter only when viewing someone else's posts
+      if (!isOwnProfile) {
+        query = query.or(visibilityFilter);
+      }
+      
+      const { data: posts, error: postsError } = await query;
+      
       if (postsError) {
         console.error('Error fetching user posts:', postsError);
         throw postsError;
