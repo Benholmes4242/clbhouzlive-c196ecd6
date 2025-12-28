@@ -13,6 +13,7 @@
 
 import { safePlay } from '@/utils/safePlay';
 import { DEBUG_MEDIA_RUNTIME, DEBUG_MEDIA_TELEMETRY } from '@/media/debug';
+import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
 
 // ============ Types ============
 
@@ -78,7 +79,8 @@ const INTENT_SUPPRESS_DURATION = 2000; // 2s after user pause, suppress autoplay
 const SCRUB_SUPPRESS_DURATION = 600; // 600ms after scrub, suppress autoplay switching
 const BUFFERING_SUPPRESS_DURATION = 500; // 500ms grace for buffering videos
 const MAX_RETRIES = 1;
-
+const PLAY_RETRY_MAX = 3; // Max retries for requestPlay with backoff
+const PLAY_RETRY_BASE_DELAY = 100; // Base delay for exponential backoff
 // Concurrent video limits by surface
 const MAX_CONCURRENT_GRID_VIDEOS = 3; // Allow up to 3 grid videos simultaneously
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
@@ -325,7 +327,7 @@ class MediaRuntimeCore {
     node.playGeneration++;
     const thisGeneration = node.playGeneration;
     
-    // Attempt play
+    // Attempt play with retry logic
     if (DEBUG_MEDIA_RUNTIME) {
       console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] CALLING_SAFEPLAY`, { 
         id: id.slice(0, 8),
@@ -333,7 +335,93 @@ class MediaRuntimeCore {
         generation: thisGeneration
       });
     }
-    const success = await safePlay(node.videoElement);
+    
+    // Retry loop with exponential backoff
+    let success = false;
+    let lastError: Error | null = null;
+    
+    for (let attempt = 1; attempt <= PLAY_RETRY_MAX; attempt++) {
+      try {
+        if (DEBUG_MEDIA_RUNTIME && attempt > 1) {
+          console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] RETRY_ATTEMPT`, { 
+            id: id.slice(0, 8),
+            attempt,
+            maxRetries: PLAY_RETRY_MAX
+          });
+        }
+        
+        // Create regeneration handler for blob URL failures
+        const regenerateSource = async (mediaId: string) => {
+          if (mediaId !== id) return;
+          
+          const currentNode = this.registry.get(id);
+          if (!currentNode) return;
+          
+          const playerRef = (currentNode.videoElement as any).__hlsPlayerRef;
+          if (playerRef?.detach && playerRef?.attach) {
+            console.log(`[MediaRuntime] Regenerating HLS source for ${id.slice(0, 8)}`);
+            playerRef.detach();
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            playerRef.attach();
+          }
+        };
+        
+        success = await safePlay(node.videoElement, {
+          generation: thisGeneration,
+          onRegenerateSource: regenerateSource,
+        });
+        
+        if (success) {
+          if (DEBUG_MEDIA_RUNTIME) {
+            console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, {
+              id: id.slice(0, 8),
+              attempt,
+              generation: thisGeneration
+            });
+          }
+          break; // Success - exit retry loop
+        }
+        
+        // Play returned false but didn't throw - this is a soft failure
+        if (attempt < PLAY_RETRY_MAX) {
+          const delay = PLAY_RETRY_BASE_DELAY * Math.pow(2, attempt - 1);
+          if (DEBUG_MEDIA_RUNTIME) {
+            console.log(`[MediaRuntime] RETRY_SCHEDULED`, { 
+              id: id.slice(0, 8),
+              attempt,
+              delayMs: delay
+            });
+          }
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        
+      } catch (error: any) {
+        lastError = error;
+        
+        if (attempt === PLAY_RETRY_MAX) {
+          if (DEBUG_MEDIA_RUNTIME) {
+            console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED_FINAL`, { 
+              id: id.slice(0, 8),
+              attempt,
+              error: error?.message
+            });
+          }
+          break;
+        }
+        
+        // Calculate backoff delay: 100ms, 200ms, 400ms
+        const delay = PLAY_RETRY_BASE_DELAY * Math.pow(2, attempt - 1);
+        if (DEBUG_MEDIA_RUNTIME) {
+          console.log(`[MediaRuntime] RETRY_SCHEDULED_AFTER_ERROR`, { 
+            id: id.slice(0, 8),
+            attempt,
+            delayMs: delay,
+            error: error?.message
+          });
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
     
     // Check if generation changed during async play (stale candidate)
     const nodeAfter = this.registry.get(id);
@@ -372,6 +460,9 @@ class MediaRuntimeCore {
         this.telemetry.autoplayStart?.(id, surface);
       }
       
+      // Clear blob URL failures on success
+      BlobUrlManager.clearFailures(id);
+      
       this.notifyListeners();
       
       if (DEBUG_MEDIA_RUNTIME) {
@@ -389,7 +480,10 @@ class MediaRuntimeCore {
       this.state.activeMediaIds.delete(id);
       
       if (DEBUG_MEDIA_RUNTIME) {
-        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED`, { id: id.slice(0, 8) });
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED`, { 
+          id: id.slice(0, 8),
+          error: lastError?.message
+        });
       }
       this.telemetry.playFailure?.(id, 'blocked');
     }

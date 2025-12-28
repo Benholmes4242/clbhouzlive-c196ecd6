@@ -1,6 +1,7 @@
 /**
  * Safe video play utility with mobile-optimized autoplay handling
- * Handles readyState gating, iOS black frame fix, retry logic, and visibility handling
+ * Handles readyState gating, iOS black frame fix, retry logic, visibility handling,
+ * and blob URL regeneration for HLS.js failures.
  * 
  * PLAYBACK_AUTHORITY_ALLOWED: This is the core safe playback utility used by MediaRuntime.
  * All playback in the app should go through safePlay or MediaRuntime.requestPlay.
@@ -9,6 +10,7 @@
 import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
 import { logVideoTelemetry } from './videoTelemetry';
 import { DEBUG_SAFE_PLAY } from '@/media/debug';
+import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
 
 // Dev-only logging helper (controlled by DEBUG_SAFE_PLAY flag)
 const devLog = (message: string, ...args: any[]) => {
@@ -27,10 +29,24 @@ interface SafePlayOptions {
   maxRetries?: number;
   baseDelay?: number;
   maxWaitTime?: number;
+  generation?: number; // Play generation for blob URL tracking
+  onRegenerateSource?: (mediaId: string) => Promise<void>; // Callback to regenerate HLS source
 }
 
 // Track elements currently attempting play to prevent duplicate calls
 const playingAttempts = new WeakSet<HTMLVideoElement>();
+
+/**
+ * Validate that a blob URL is still accessible
+ */
+async function validateBlobUrl(blobUrl: string): Promise<boolean> {
+  try {
+    const response = await fetch(blobUrl, { method: 'HEAD' });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
 
 export async function safePlay(
   video: HTMLVideoElement, 
@@ -43,8 +59,9 @@ export async function safePlay(
     return legacySafePlay(video);
   }
 
-  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 500 } = options;
+  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 500, generation, onRegenerateSource } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
+  const mediaId = video.dataset.runtimeMediaId || videoId;
   
   // Gate #0: Prevent duplicate play attempts on same element
   if (playingAttempts.has(video)) {
@@ -63,7 +80,8 @@ export async function safePlay(
     currentTime: video.currentTime,
     paused: video.paused,
     networkState: video.networkState,
-    isConnected: video.isConnected
+    isConnected: video.isConnected,
+    generation
   });
   
   // Gate #1: Element must be connected to DOM
@@ -80,11 +98,75 @@ export async function safePlay(
     return false;
   }
   
-  // Gate #3: If blob URL failed previously, don't retry - caller must re-init source
+  // Gate #3: Check blob URL validity and generation failures
   const currentSrc = video.currentSrc || video.src || '';
-  if (currentSrc.startsWith('blob:') && video.getAttribute('data-format-error') === '1') {
-    devWarn(`[safePlay] 🚫 Blob URL already failed for video ${videoId}, caller must re-init`);
-    return false;
+  
+  // Check if this specific generation has failed before
+  if (generation !== undefined && BlobUrlManager.hasGenerationFailed(mediaId, generation)) {
+    devLog(`[safePlay] 🔄 Generation ${generation} previously failed for ${mediaId}, attempting regeneration...`);
+    
+    if (onRegenerateSource) {
+      try {
+        await onRegenerateSource(mediaId);
+        // Wait for new source to be set
+        await new Promise(resolve => requestAnimationFrame(resolve));
+      } catch (err) {
+        devWarn(`[safePlay] 🚫 Source regeneration failed for ${videoId}:`, err);
+        return false;
+      }
+    } else {
+      devWarn(`[safePlay] 🚫 Generation ${generation} failed and no regeneration handler available`);
+      return false;
+    }
+  }
+  
+  // Validate blob URL if present
+  if (currentSrc.startsWith('blob:')) {
+    // Check for previous format error marker
+    if (video.getAttribute('data-format-error') === '1') {
+      devWarn(`[safePlay] 🚫 Blob URL already failed for video ${videoId}, attempting regeneration...`);
+      
+      if (generation !== undefined) {
+        BlobUrlManager.markGenerationFailed(mediaId, generation);
+      }
+      
+      if (onRegenerateSource) {
+        try {
+          video.removeAttribute('data-format-error');
+          await onRegenerateSource(mediaId);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (err) {
+          devWarn(`[safePlay] 🚫 Source regeneration failed for ${videoId}:`, err);
+          video.setAttribute('data-format-error', '1');
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+    
+    // Validate blob URL is still accessible
+    const isValid = await validateBlobUrl(currentSrc);
+    if (!isValid) {
+      devLog(`[safePlay] 🚫 Blob URL invalid for ${mediaId}, attempting regeneration...`);
+      
+      if (generation !== undefined) {
+        BlobUrlManager.markGenerationFailed(mediaId, generation);
+      }
+      
+      if (onRegenerateSource) {
+        try {
+          await onRegenerateSource(mediaId);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (err) {
+          devWarn(`[safePlay] 🚫 Source regeneration failed for ${videoId}:`, err);
+          return false;
+        }
+      } else {
+        devWarn(`[safePlay] 🚫 Blob URL invalid and no regeneration handler available`);
+        return false;
+      }
+    }
   }
   
   // Ensure proper preconditions for autoplay
@@ -133,16 +215,24 @@ export async function safePlay(
         devLog(`[${performance.now().toFixed(2)}ms] [safePlay] CALLING_PLAY`, {
           videoId,
           readyState: video.readyState,
-          attempt
+          attempt,
+          generation
         });
         await video.play();
         const endTime = performance.now();
         devLog(`[${endTime.toFixed(2)}ms] [safePlay] ✅ SUCCESS`, {
           videoId,
           totalTime: (endTime - startTime).toFixed(2) + 'ms',
-          attempt
+          attempt,
+          generation
         });
         logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
+        
+        // Clear failures on success
+        if (generation !== undefined) {
+          BlobUrlManager.clearFailures(mediaId);
+        }
+        
         return true;
         
       } catch (err: any) {
@@ -157,10 +247,28 @@ export async function safePlay(
         }
         
         // Handle NotSupportedError / MediaError - these are fatal format errors
-        // Don't retry, just fail immediately and let caller handle MP4 fallback
         if (err?.name === 'NotSupportedError' || err?.name === 'MediaError') {
           devWarn(`[safePlay] 🚫 Format error for video ${videoId}:`, err?.name);
           video.setAttribute('data-format-error', '1');
+          
+          // Mark generation as failed for blob URL tracking
+          if (generation !== undefined) {
+            BlobUrlManager.markGenerationFailed(mediaId, generation);
+          }
+          
+          // Try regeneration if handler available
+          if (onRegenerateSource && attempt < maxRetries) {
+            devLog(`[safePlay] 🔄 Attempting source regeneration for ${videoId}...`);
+            try {
+              video.removeAttribute('data-format-error');
+              await onRegenerateSource(mediaId);
+              await new Promise(resolve => setTimeout(resolve, 100));
+              continue; // Retry with regenerated source
+            } catch (regenErr) {
+              devWarn(`[safePlay] 🚫 Source regeneration failed:`, regenErr);
+            }
+          }
+          
           logVideoTelemetry('video_format_error', { videoId, error: err?.name, src: currentSrc.slice(-50) });
           return false;
         }
@@ -168,13 +276,29 @@ export async function safePlay(
         // Handle AbortError - usually means source changed or element detached mid-play
         if (err?.name === 'AbortError') {
           devWarn(`[safePlay] ⚠️ AbortError for video ${videoId} - source likely changed`);
-          // Don't retry, the element state is likely invalid
+          // Don't mark as failed - this is expected when source changes
           return false;
         }
         
-        // Blob URL failure - don't retry, caller must re-init source
+        // Blob URL failure - try regeneration if available
         if (currentSrc.startsWith('blob:')) {
-          devWarn(`[safePlay] 🚫 Blob URL failed for video ${videoId}, not retrying`);
+          devWarn(`[safePlay] 🚫 Blob URL failed for video ${videoId}`);
+          
+          if (generation !== undefined) {
+            BlobUrlManager.markGenerationFailed(mediaId, generation);
+          }
+          
+          if (onRegenerateSource && attempt < maxRetries) {
+            devLog(`[safePlay] 🔄 Attempting source regeneration for blob URL failure...`);
+            try {
+              await onRegenerateSource(mediaId);
+              await new Promise(resolve => setTimeout(resolve, 100));
+              continue; // Retry with regenerated source
+            } catch (regenErr) {
+              devWarn(`[safePlay] 🚫 Source regeneration failed:`, regenErr);
+            }
+          }
+          
           video.setAttribute('data-format-error', '1');
           return false;
         }
