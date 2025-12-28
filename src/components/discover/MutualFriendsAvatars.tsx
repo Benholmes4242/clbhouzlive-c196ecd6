@@ -29,7 +29,7 @@ export const MutualFriendsAvatars: React.FC<MutualFriendsAvatarsProps> = ({
       {displayFriends.map((friend, index) => (
         <div
           key={friend.id}
-          className="relative"
+          className="relative rounded-[34%] bg-background p-[1.5px]"
           style={{ zIndex: maxDisplay - index }}
         >
           <SquircleAvatar
@@ -37,7 +37,6 @@ export const MutualFriendsAvatars: React.FC<MutualFriendsAvatarsProps> = ({
             alt={friend.display_name}
             size={20}
             hideRing
-            className="ring-1 ring-background"
           />
         </div>
       ))}
