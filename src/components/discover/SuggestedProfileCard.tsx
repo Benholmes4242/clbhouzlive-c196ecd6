@@ -124,6 +124,13 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     ? `HCP ${golferData.eg_handicap_index > 0 ? '+' : ''}${golferData.eg_handicap_index.toFixed(1)}`
     : null;
 
+  // Reason text for golfers
+  const reasonText = isGolfer
+    ? golferData?.reason === 'mutuals' && golferData?.mutual_count
+      ? `${golferData.mutual_count} mutual friend${golferData.mutual_count > 1 ? 's' : ''}`
+      : REASON_LABELS[golferData?.reason ?? 'suggested']
+    : null;
+
   return (
     <div
       className={cn(
@@ -194,6 +201,13 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           {isBusiness && businessData?.location_label && (
             <p className="text-[10px] text-muted-foreground/70 text-center line-clamp-1 w-full">
               {businessData.location_label}
+            </p>
+          )}
+
+          {/* Golfer: Reason row (always reserve height for uniform cards) */}
+          {isGolfer && (
+            <p className="text-[10px] text-muted-foreground/60 text-center line-clamp-1 w-full mt-0.5">
+              {reasonText || <span className="opacity-0">placeholder</span>}
             </p>
           )}
         </div>
