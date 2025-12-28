@@ -1,25 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, Tag } from 'lucide-react';
+import { X, Search, Tag, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MomentCategory } from '../types';
-
-// Available categories - matches Discover filters
-const MOMENT_CATEGORIES: MomentCategory[] = [
-  { id: 'funny', label: 'Funny', emoji: '😂' },
-  { id: 'challenge', label: 'Challenge', emoji: '🏆' },
-  { id: 'course-vlog', label: 'Course Vlog', emoji: '🎬' },
-  { id: 'tips-coaching', label: 'Tips & Coaching', emoji: '📚' },
-  { id: 'review', label: 'Review', emoji: '⭐' },
-  { id: 'swing', label: 'Swing', emoji: '🏌️' },
-  { id: 'hole-in-one', label: 'Hole in One', emoji: '🎯' },
-  { id: 'ace', label: 'Ace', emoji: '🦅' },
-  { id: 'gear', label: 'Gear', emoji: '⛳' },
-  { id: 'travel', label: 'Travel', emoji: '✈️' },
-  { id: 'tournament', label: 'Tournament', emoji: '🏅' },
-  { id: 'practice', label: 'Practice', emoji: '🎾' },
-  { id: 'other', label: 'Other', emoji: '📌' },
-];
+import { MOMENT_CATEGORIES, getCategoryById } from '../categoryDefinitions';
+import { suggestCategories } from '@/utils/categorySuggestions';
 
 const MAX_CATEGORIES = 3;
 
@@ -28,11 +12,15 @@ interface MomentCategorySheetProps {
   onClose: () => void;
   selectedCategories: string[];
   onCategoriesChange: (categories: string[]) => void;
+  // Context for suggestions
+  caption?: string;
+  hasCourse?: boolean;
+  mediaTypes?: ('video' | 'photo')[];
 }
 
 /**
  * MomentCategorySheet - Bottom sheet for selecting moment categories
- * Typeahead search with tokenized pills
+ * Includes AI-powered suggestions based on caption/context
  * At least 1 category required, max 3
  */
 export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
@@ -40,8 +28,25 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
   onClose,
   selectedCategories,
   onCategoriesChange,
+  caption = '',
+  hasCourse = false,
+  mediaTypes = [],
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Get suggested categories
+  const suggestedCategoryIds = useMemo(() => {
+    return suggestCategories({
+      caption,
+      hasCourse,
+      mediaTypes,
+    });
+  }, [caption, hasCourse, mediaTypes]);
+
+  // Filter out already-selected from suggestions
+  const activeSuggestions = useMemo(() => {
+    return suggestedCategoryIds.filter(id => !selectedCategories.includes(id));
+  }, [suggestedCategoryIds, selectedCategories]);
 
   // Filter categories based on search
   const filteredCategories = useMemo(() => {
@@ -62,9 +67,6 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
       onCategoriesChange([...selectedCategories, categoryId]);
     }
   };
-
-  // Get category by ID
-  const getCategoryById = (id: string) => MOMENT_CATEGORIES.find(c => c.id === id);
 
   if (!isOpen) return null;
 
@@ -120,6 +122,52 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
               <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
             </button>
           </div>
+
+          {/* Suggested categories */}
+          {activeSuggestions.length > 0 && (
+            <div className="px-4 pb-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--cm-accent-gold)' }} />
+                <span 
+                  className="text-xs font-medium"
+                  style={{ color: 'var(--cm-text-secondary)' }}
+                >
+                  Suggested for you
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {activeSuggestions.map(catId => {
+                  const cat = getCategoryById(catId);
+                  if (!cat) return null;
+                  const isDisabled = selectedCategories.length >= MAX_CATEGORIES;
+                  
+                  return (
+                    <motion.button
+                      key={cat.id}
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => !isDisabled && toggleCategory(cat.id)}
+                      disabled={isDisabled}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                        isDisabled && "opacity-40 cursor-not-allowed"
+                      )}
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.08))',
+                        border: '1px solid rgba(251, 191, 36, 0.3)',
+                        color: 'var(--cm-text-primary)',
+                      }}
+                    >
+                      <Sparkles className="w-3 h-3" style={{ color: 'var(--cm-accent-gold)' }} />
+                      <span>{cat.emoji}</span>
+                      <span>{cat.label}</span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Search input */}
           <div className="px-4 pb-3">
