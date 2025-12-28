@@ -65,6 +65,8 @@ export function UniversalMediaGrid({
   const gridRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
   
   // Merge with default config for surface
   const mergedConfig = useMemo(() => ({
@@ -100,6 +102,12 @@ export function UniversalMediaGrid({
     enabled: mergedConfig.autoplayPattern !== 'none',
   });
   
+  // Keep refs in sync with latest prop values
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+    isLoadingRef.current = isLoading;
+  }, [hasMore, isLoading]);
+
   // Infinite scroll handler (IntersectionObserver sentinel; works with nested scroll containers)
   useEffect(() => {
     if (!mergedConfig.infiniteScroll || !onLoadMore) return;
@@ -111,7 +119,11 @@ export function UniversalMediaGrid({
       (entries) => {
         const first = entries[0];
         if (!first?.isIntersecting) return;
-        if (!hasMore || loadingRef.current || isLoading) return;
+        
+        // Use refs for latest values - avoids stale closure problem
+        if (!hasMoreRef.current || loadingRef.current || isLoadingRef.current) {
+          return;
+        }
 
         loadingRef.current = true;
         onLoadMore();
@@ -128,7 +140,7 @@ export function UniversalMediaGrid({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [mergedConfig.infiniteScroll, hasMore, isLoading, onLoadMore]);
+  }, [mergedConfig.infiniteScroll, onLoadMore]);
   
   // Handle item click
   const handleItemClick = useCallback((item: UniversalMediaItem, index: number) => {
@@ -241,21 +253,11 @@ export function UniversalMediaGrid({
         );
         
       case 'mixed-grid':
+        // Skip virtual scrolling for mixed-grid to prevent blank tiles
         return (
           <MixedGridLayout columns={mergedConfig.columns ?? 2}>
             {processedItems.map((item, index) => {
               const variant = getTileVariant(item, index);
-              
-              if (!shouldRender(index)) {
-                return (
-                  <TilePlaceholder
-                    key={`placeholder-${item.id}`}
-                    index={index}
-                    variant={variant}
-                    registerTile={registerTile}
-                  />
-                );
-              }
               
               return (
                 <MediaTile

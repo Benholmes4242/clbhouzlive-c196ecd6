@@ -120,7 +120,11 @@ export default function ShortsGrid({
     const result: ClusteredExploreItem[] = [];
     let portraitIndex = 0;
     let landscapeIndex = 0;
-    const totalSlots = Math.max(items.length, 20);
+    // Never create more slots than available videos to prevent blank tiles
+    const totalSlots = Math.min(
+      items.length,
+      portraitVideos.length + landscapeVideos.length
+    );
 
     for (let i = 0; i < totalSlots; i++) {
       const isLandscapeSlot = (i + 1) % 5 === 0;
