@@ -36,16 +36,39 @@ interface SafePlayOptions {
 // Track elements currently attempting play to prevent duplicate calls
 const playingAttempts = new WeakSet<HTMLVideoElement>();
 
+// Maximum regeneration attempts to prevent infinite loops
+const MAX_REGENERATIONS = 3;
+
 /**
  * Validate that a blob URL is still accessible
+ * 
+ * IMPORTANT: Blob URLs CANNOT be validated via HTTP fetch/HEAD requests!
+ * They are in-memory object references, not network resources.
+ * 
+ * Instead, we check:
+ * 1. If registered in BlobUrlManager (proves it was created and not revoked)
+ * 2. For HLS.js blob URLs (MediaSource), trust them if video has metadata
+ * 
+ * HLS.js creates blob URLs for MediaSource internally, so we can't explicitly
+ * track them. We trust the blob URL is valid if:
+ * - It's registered in our manager, OR
+ * - The video element already has loaded data (readyState >= 1)
  */
-async function validateBlobUrl(blobUrl: string): Promise<boolean> {
-  try {
-    const response = await fetch(blobUrl, { method: 'HEAD' });
-    return response.ok;
-  } catch {
-    return false;
+function validateBlobUrl(blobUrl: string, mediaId: string, video?: HTMLVideoElement): boolean {
+  // Check if this blob URL is registered in our manager
+  const isRegistered = BlobUrlManager.hasBlobUrl(mediaId);
+  
+  // For HLS.js blob URLs, also trust if video has loaded metadata
+  // This handles the case where HLS.js created the blob internally
+  const hasVideoData = video && video.readyState >= 1;
+  
+  const isValid = isRegistered || hasVideoData;
+  
+  if (DEBUG_SAFE_PLAY) {
+    devLog(`[safePlay] Blob URL validation for ${mediaId.slice(0, 8)}: registered=${isRegistered}, hasVideoData=${hasVideoData}, valid=${isValid}`);
   }
+  
+  return isValid;
 }
 
 export async function safePlay(
@@ -122,6 +145,14 @@ export async function safePlay(
   
   // Validate blob URL if present
   if (currentSrc.startsWith('blob:')) {
+    // Check regeneration limit to prevent infinite loops
+    const regenCount = BlobUrlManager.getRegenerationCount(mediaId);
+    if (regenCount >= MAX_REGENERATIONS) {
+      devWarn(`[safePlay] 🚫 Max regenerations (${MAX_REGENERATIONS}) exceeded for ${mediaId}, giving up`);
+      video.setAttribute('data-format-error', '1');
+      return false;
+    }
+    
     // Check for previous format error marker
     if (video.getAttribute('data-format-error') === '1') {
       devWarn(`[safePlay] 🚫 Blob URL already failed for video ${videoId}, attempting regeneration...`);
@@ -132,6 +163,7 @@ export async function safePlay(
       
       if (onRegenerateSource) {
         try {
+          BlobUrlManager.incrementRegeneration(mediaId);
           video.removeAttribute('data-format-error');
           await onRegenerateSource(mediaId);
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -145,10 +177,10 @@ export async function safePlay(
       }
     }
     
-    // Validate blob URL is still accessible
-    const isValid = await validateBlobUrl(currentSrc);
+    // Validate blob URL using registry + video readyState (NOT HTTP fetch - blob URLs aren't network resources!)
+    const isValid = validateBlobUrl(currentSrc, mediaId, video);
     if (!isValid) {
-      devLog(`[safePlay] 🚫 Blob URL invalid for ${mediaId}, attempting regeneration...`);
+      devLog(`[safePlay] 🚫 Blob URL not valid for ${mediaId}, attempting regeneration...`);
       
       if (generation !== undefined) {
         BlobUrlManager.markGenerationFailed(mediaId, generation);
@@ -156,6 +188,7 @@ export async function safePlay(
       
       if (onRegenerateSource) {
         try {
+          BlobUrlManager.incrementRegeneration(mediaId);
           await onRegenerateSource(mediaId);
           await new Promise(resolve => setTimeout(resolve, 100));
         } catch (err) {
@@ -257,10 +290,19 @@ export async function safePlay(
             BlobUrlManager.markGenerationFailed(mediaId, generation);
           }
           
+          // Check regeneration limit before trying
+          const regenCount = BlobUrlManager.getRegenerationCount(mediaId);
+          if (regenCount >= MAX_REGENERATIONS) {
+            devWarn(`[safePlay] 🚫 Max regenerations (${MAX_REGENERATIONS}) exceeded for ${mediaId}`);
+            logVideoTelemetry('video_format_error', { videoId, error: err?.name, src: currentSrc.slice(-50), maxRegen: true });
+            return false;
+          }
+          
           // Try regeneration if handler available
           if (onRegenerateSource && attempt < maxRetries) {
             devLog(`[safePlay] 🔄 Attempting source regeneration for ${videoId}...`);
             try {
+              BlobUrlManager.incrementRegeneration(mediaId);
               video.removeAttribute('data-format-error');
               await onRegenerateSource(mediaId);
               await new Promise(resolve => setTimeout(resolve, 100));
@@ -289,9 +331,18 @@ export async function safePlay(
             BlobUrlManager.markGenerationFailed(mediaId, generation);
           }
           
+          // Check regeneration limit
+          const regenCount = BlobUrlManager.getRegenerationCount(mediaId);
+          if (regenCount >= MAX_REGENERATIONS) {
+            devWarn(`[safePlay] 🚫 Max regenerations (${MAX_REGENERATIONS}) exceeded for ${mediaId}`);
+            video.setAttribute('data-format-error', '1');
+            return false;
+          }
+          
           if (onRegenerateSource && attempt < maxRetries) {
             devLog(`[safePlay] 🔄 Attempting source regeneration for blob URL failure...`);
             try {
+              BlobUrlManager.incrementRegeneration(mediaId);
               await onRegenerateSource(mediaId);
               await new Promise(resolve => setTimeout(resolve, 100));
               continue; // Retry with regenerated source
