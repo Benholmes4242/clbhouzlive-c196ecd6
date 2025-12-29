@@ -37,7 +37,7 @@ import {
 
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
-import { FLAGS } from '@/config/flags';
+// FLAGS import removed - paused video mode is now permanent
 import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
 import { VideoErrorState } from '@/media/components/VideoErrorState';
 
@@ -94,11 +94,12 @@ export interface HLSPlayerProps {
   showScrubber?: boolean; // Show progress scrubber (default: true if MEDIA_SCRUBBER_V1)
   mediaId?: string; // Required for scrubber intent tracking
   
-  // Video System Refactor: Poster vs Paused Video Mode
+  // Video System: Paused Video Mode (default behavior)
   /**
-   * If true, video renders in paused state (first frame visible) instead of poster.
-   * If undefined, uses global FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER flag.
-   * @default undefined (controlled by feature flag)
+   * Controls video loading behavior.
+   * If false: Uses poster image mode (legacy behavior)
+   * If true or undefined: Uses paused video mode (default, shows first frame)
+   * @default undefined (paused video mode)
    */
   usePausedVideo?: boolean;
   
@@ -152,11 +153,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   usePausedVideo,
   customLoadingComponent,
 }, ref) => {
-  // ============ Feature Flag: Poster vs Paused Video Mode ============
-  // Component-level prop takes precedence, otherwise use global feature flag
-  const shouldUsePoster = usePausedVideo !== undefined 
-    ? !usePausedVideo 
-    : !FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER;
+  // ============ Paused Video Mode (Permanent) ============
+  // Paused video mode is now the default behavior
+  // usePausedVideo={false} can override to use poster mode if needed
+  const shouldUsePoster = usePausedVideo === false;
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const posterRef = useRef<HTMLDivElement>(null); // Ref for synchronous poster hiding
