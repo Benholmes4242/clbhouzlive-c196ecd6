@@ -59,13 +59,27 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+
   useEffect(() => {
     console.log('DiscoverCommandCenter drawerOpen', drawerOpen);
   }, [drawerOpen]);
 
+  useEffect(() => {
+    const onBlur = () => console.log('[DiscoverCommandCenter] window blur (drawerOpen:', drawerOpen, ')');
+    const onFocus = () => console.log('[DiscoverCommandCenter] window focus (drawerOpen:', drawerOpen, ')');
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [drawerOpen]);
+
+
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const sortTapStartRef = useRef<{ x: number; y: number } | null>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
 
@@ -113,7 +127,25 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return (
       <>
         <button
+          type="button"
           className={pillClasses}
+          onPointerDown={(e) => {
+            sortTapStartRef.current = { x: e.clientX, y: e.clientY };
+            console.log('Sort pill pointerdown', { pointerType: e.pointerType, x: e.clientX, y: e.clientY });
+          }}
+          onPointerUp={(e) => {
+            const start = sortTapStartRef.current;
+            sortTapStartRef.current = null;
+
+            const dx = start ? Math.abs(e.clientX - start.x) : null;
+            const dy = start ? Math.abs(e.clientY - start.y) : null;
+            console.log('Sort pill pointerup', { pointerType: e.pointerType, x: e.clientX, y: e.clientY, dx, dy });
+
+            // If onClick is getting swallowed (common in horizontal scrollers on iOS), open on a clean tap.
+            if (start && (dx ?? 999) < 10 && (dy ?? 999) < 10) {
+              setDrawerOpen(true);
+            }
+          }}
           onClick={() => {
             console.log('Sort pill clicked');
             setDrawerOpen(true);
