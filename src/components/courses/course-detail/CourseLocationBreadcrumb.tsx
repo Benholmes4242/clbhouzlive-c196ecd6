@@ -54,7 +54,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
-    <div className="px-4 pt-4 pb-0 bg-slate-100 space-y-6">
+    <div className="px-4 pt-4 pb-6 bg-slate-100 space-y-6">
       {/* Location breadcrumb */}
       {primaryRegionLabel && (
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -177,10 +177,10 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="w-full flex items-center justify-between px-0 pt-2 text-base group hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between px-0 pt-2 pb-2 text-base group hover:opacity-70 transition-opacity"
           >
             <span>
-              Explore <span className="font-semibold">{primaryListName} Top 100</span>
+              Explore <span className="font-semibold">{primaryListName.includes('Top 100') ? primaryListName : `${primaryListName} Top 100`}</span>
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
           </button>

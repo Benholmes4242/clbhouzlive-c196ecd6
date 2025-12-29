@@ -317,8 +317,8 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
 
       {/* Sort/Filter Bar - only show if media exists */}
       {hasAnyMedia && (
-        <div className="px-4 pt-6 pb-6 bg-muted/30">
-          <p className="mb-3 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
+        <div className="px-4 pt-8 pb-6 bg-muted/30">
+          <p className="mb-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
             Sort &amp; filter
           </p>
           <div className="flex items-center gap-2">

@@ -419,7 +419,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               className="mt-4 w-full h-11 rounded-sq-sm inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition hover:bg-slate-50 active:scale-[0.98]"
               onClick={handleRateClick}
             >
-              Rate this course
+              Write the first review
             </button>
           </div>
         </section>
@@ -451,7 +451,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 2 – Search bar (24px from summary) */}
-      <section className="px-4 pt-6 pb-4 bg-slate-100">
+      <section className="px-4 pt-6 pb-5 bg-slate-100">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
@@ -476,8 +476,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 3 – Sort & Filter controls (16px from search) */}
-      <div className="px-5 pt-4 pb-3 bg-slate-100">
-        <p className="mb-3 text-xs font-semibold tracking-[0.08em] text-slate-500">
+      <div className="px-5 pt-1 pb-4 bg-slate-100">
+        <p className="mb-4 text-xs font-semibold tracking-[0.08em] text-slate-500">
           Sort &amp; filter
         </p>
         {/* Sort pills */}
