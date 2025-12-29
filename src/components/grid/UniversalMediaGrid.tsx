@@ -321,21 +321,20 @@ export function UniversalMediaGrid({
         
       case 'portrait-grid':
       default:
+        // Sentinel position: after first 5 items for early infinite scroll trigger
+        const SENTINEL_AFTER_INDEX = 4; // 0-indexed, so after 5th item
+        
         return (
           <PortraitGridLayout columns={mergedConfig.columns ?? 2}>
             {processedItems.map((item, index) => {
-              if (!shouldRender(index)) {
-                return (
-                  <TilePlaceholder
-                    key={`placeholder-${item.id}`}
-                    index={index}
-                    variant="portrait"
-                    registerTile={registerTile}
-                  />
-                );
-              }
-              
-              return (
+              const tile = !shouldRender(index) ? (
+                <TilePlaceholder
+                  key={`placeholder-${item.id}`}
+                  index={index}
+                  variant="portrait"
+                  registerTile={registerTile}
+                />
+              ) : (
                 <MediaTile
                   key={`tile-${item.id}`}
                   item={item}
@@ -348,6 +347,23 @@ export function UniversalMediaGrid({
                   isPlaying={playingIds.has(item.postId)}
                 />
               );
+              
+              // Insert sentinel after the 5th item (index 4)
+              if (index === SENTINEL_AFTER_INDEX && mergedConfig.infiniteScroll) {
+                return (
+                  <React.Fragment key={`sentinel-group-${item.id}`}>
+                    {tile}
+                    <div 
+                      ref={sentinelRef} 
+                      data-scroll-sentinel 
+                      className="col-span-full h-px"
+                      aria-hidden="true"
+                    />
+                  </React.Fragment>
+                );
+              }
+              
+              return tile;
             })}
           </PortraitGridLayout>
         );
@@ -356,14 +372,7 @@ export function UniversalMediaGrid({
   
   return (
     <>
-      <div ref={gridRef} className="relative pb-4">
-        {/* Sentinel positioned at 800px to trigger infinite scroll early */}
-        <div 
-          ref={sentinelRef} 
-          data-scroll-sentinel 
-          className="absolute top-[800px] left-0 w-full h-px pointer-events-none"
-          aria-hidden="true"
-        />
+      <div ref={gridRef} className="pb-4">
         {renderGrid()}
       </div>
       
