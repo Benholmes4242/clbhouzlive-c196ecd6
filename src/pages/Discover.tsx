@@ -46,10 +46,7 @@ type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 const Discover = () => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalStartIndex, setModalStartIndex] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
+  
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
 
@@ -58,9 +55,15 @@ const Discover = () => {
     logDiscoverPageMount();
     return () => logDiscoverPageUnmount();
   }, []);
-
-  // NOTE: Don't early-return before hooks (causes "Rendered fewer hooks than expected")
-
+  
+  // Show skeleton during rehydration
+  if (isRehydrating) {
+    return <DiscoverSkeleton />;
+  }
+  const [modalStartIndex, setModalStartIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  
   const { main, sub } = useDiscoverQuery();
   const [durationFilter, setDurationFilter] = useVideoLengthFilter();
 
@@ -221,10 +224,6 @@ const Discover = () => {
     console.log('User followed:', userId);
     // In real app: API call to follow user
   };
-
-  if (isRehydrating) {
-    return <DiscoverSkeleton />;
-  }
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)]">

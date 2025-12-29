@@ -1,8 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Search, X, ArrowUpDown, Clock, Heart, MessageCircle, Users } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 import { StandardBottomSheet, SheetOptionRow } from '@/components/ui/standard-bottom-sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Check } from 'lucide-react';
 
 export type SortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
 
@@ -56,30 +64,12 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   className,
 }) => {
   const isNonDefaultSort = sortValue !== defaultSortValue;
+  const isMobile = useIsMobile();
   const [isFocused, setIsFocused] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-
-  useEffect(() => {
-    console.log('DiscoverCommandCenter drawerOpen', drawerOpen);
-  }, [drawerOpen]);
-
-  useEffect(() => {
-    const onBlur = () => console.log('[DiscoverCommandCenter] window blur (drawerOpen:', drawerOpen, ')');
-    const onFocus = () => console.log('[DiscoverCommandCenter] window focus (drawerOpen:', drawerOpen, ')');
-    window.addEventListener('blur', onBlur);
-    window.addEventListener('focus', onFocus);
-    return () => {
-      window.removeEventListener('blur', onBlur);
-      window.removeEventListener('focus', onFocus);
-    };
-  }, [drawerOpen]);
-
-
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const sortTapStartRef = useRef<{ x: number; y: number } | null>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
 
@@ -124,59 +114,72 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
     );
     
+    if (isMobile) {
+      return (
+        <>
+          <button className={pillClasses} onClick={() => setDrawerOpen(true)}>
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            <span>Sort</span>
+          </button>
+          <StandardBottomSheet
+            isOpen={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            title="Sort by"
+            subtitle="Choose how results are ordered"
+          >
+            <div className="space-y-2">
+              {SORT_OPTIONS.map((option) => (
+                <SheetOptionRow
+                  key={option.id}
+                  label={option.label}
+                  description={option.description}
+                  selected={sortValue === option.id}
+                  onSelect={() => handleSortSelect(option.id)}
+                  icon={option.icon}
+                />
+              ))}
+            </div>
+          </StandardBottomSheet>
+        </>
+      );
+    }
+
     return (
-      <>
-        <button
-          type="button"
-          className={pillClasses}
-          onPointerDown={(e) => {
-            sortTapStartRef.current = { x: e.clientX, y: e.clientY };
-            console.log('Sort pill pointerdown', { pointerType: e.pointerType, x: e.clientX, y: e.clientY });
-          }}
-          onPointerUp={(e) => {
-            const start = sortTapStartRef.current;
-            sortTapStartRef.current = null;
-
-            const dx = start ? Math.abs(e.clientX - start.x) : null;
-            const dy = start ? Math.abs(e.clientY - start.y) : null;
-            console.log('Sort pill pointerup', { pointerType: e.pointerType, x: e.clientX, y: e.clientY, dx, dy });
-
-            // If onClick is getting swallowed (common in horizontal scrollers on iOS), open on a clean tap.
-            if (start && (dx ?? 999) < 10 && (dy ?? 999) < 10) {
-              setDrawerOpen(true);
-            }
-          }}
-          onClick={() => {
-            console.log('Sort pill clicked');
-            setDrawerOpen(true);
-          }}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className={pillClasses}>
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            <span>Sort</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="start" 
+          className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
         >
-          <ArrowUpDown className="w-3.5 h-3.5" />
-          <span>Sort</span>
-        </button>
-        <div style={{ fontSize: 12, opacity: 0.7 }}>
-          sortOpen: {String(drawerOpen)}
-        </div>
-        <StandardBottomSheet
-          isOpen={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          title="Sort by"
-          subtitle="Choose how results are ordered"
-        >
-          <div className="space-y-2">
-            {SORT_OPTIONS.map((option) => (
-              <SheetOptionRow
+          {SORT_OPTIONS.map((option) => {
+            const isActive = sortValue === option.id;
+            return (
+              <DropdownMenuItem
                 key={option.id}
-                label={option.label}
-                description={option.description}
-                selected={sortValue === option.id}
-                onSelect={() => handleSortSelect(option.id)}
-                icon={option.icon}
-              />
-            ))}
-          </div>
-        </StandardBottomSheet>
-      </>
+                onClick={() => handleSortSelect(option.id)}
+                className={cn(
+                  "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
+                  isActive 
+                    ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
+                    : "text-slate-700 dark:text-white/90"
+                )}
+              >
+                <span>{option.label}</span>
+                <div className="w-5 flex justify-end">
+                  {isActive && (
+                    <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
+                  )}
+                </div>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   };
 
