@@ -73,46 +73,54 @@ export const CommunityFilters: React.FC<CommunityFiltersProps> = ({
   };
 
   const SortContent = () => (
-    <div className="px-4 pb-4 space-y-2">
-      {sortOptions.map((option) => {
-        const isActive = sortOption === option.id;
-        const Icon = option.icon;
-        return (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => handleSortSelect(option.id)}
-            className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
-            style={{
-              background: isActive ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-              border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
-              boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                style={{
-                  background: isActive ? 'rgba(255,255,255,0.15)' : 'var(--cm-surface-card)',
-                  border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
-                }}
-              >
-                <Icon
-                  className="w-5 h-5"
-                  style={{ color: isActive ? 'white' : 'var(--cm-icon-primary)' }}
-                />
+    <div 
+      className="px-4 overflow-y-auto"
+      style={{
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 84px)',
+        maxHeight: 'calc(75vh - 140px)',
+      }}
+    >
+      <div className="space-y-2">
+        {sortOptions.map((option) => {
+          const isActive = sortOption === option.id;
+          const Icon = option.icon;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => handleSortSelect(option.id)}
+              className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
+              style={{
+                background: isActive ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
+                boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    background: isActive ? 'rgba(255,255,255,0.15)' : 'var(--cm-surface-card)',
+                    border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
+                  }}
+                >
+                  <Icon
+                    className="w-5 h-5"
+                    style={{ color: isActive ? 'white' : 'var(--cm-icon-primary)' }}
+                  />
+                </div>
+                <span
+                  className="font-medium text-sm"
+                  style={{ color: isActive ? 'white' : 'var(--cm-text-primary)' }}
+                >
+                  {option.label}
+                </span>
               </div>
-              <span
-                className="font-medium text-sm"
-                style={{ color: isActive ? 'white' : 'var(--cm-text-primary)' }}
-              >
-                {option.label}
-              </span>
-            </div>
-            {isActive && <AnimatedCheck />}
-          </button>
-        );
-      })}
+              {isActive && <AnimatedCheck />}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 
