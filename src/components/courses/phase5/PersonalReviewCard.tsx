@@ -2,13 +2,38 @@
  * PersonalReviewCard - User's own review display (calm, reflective)
  * Phase 5: Memory-focused, not performative
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { Star, Edit3, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+
+// ReviewText component with line clamping and "Read more"
+const ReviewText: React.FC<{ text: string }> = ({ text }) => {
+  const [expanded, setExpanded] = useState(false);
+  const needsClamp = text.length > 180;
+  
+  return (
+    <div className="pt-3 border-t border-slate-100">
+      <p className={cn(
+        "text-sm text-slate-600 leading-relaxed italic",
+        !expanded && needsClamp && "line-clamp-3"
+      )}>
+        "{text}"
+      </p>
+      {needsClamp && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="mt-1 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+        >
+          {expanded ? 'Show less' : 'Read more'}
+        </button>
+      )}
+    </div>
+  );
+};
 
 interface PersonalReviewCardProps {
   courseId: string;
@@ -27,10 +52,9 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
     navigate(`/courses/${courseId}/rate`);
   };
 
-  // Format the date
-  const dateLabel = rating.updated_at
-    ? format(new Date(rating.updated_at), 'MMM d, yyyy')
-    : format(new Date(rating.created_at), 'MMM d, yyyy');
+  // Format the date with "Played on" prefix
+  const dateValue = rating.updated_at || rating.created_at;
+  const dateLabel = `Played on ${format(new Date(dateValue), 'MMM d, yyyy')}`;
 
   // Calculate average of sub-scores if available
   const subScores = [
@@ -113,13 +137,9 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         </div>
       )}
 
-      {/* Review text */}
+      {/* Review text with line clamping */}
       {rating.review && (
-        <div className="pt-3 border-t border-slate-100">
-          <p className="text-sm text-slate-600 leading-relaxed italic">
-            "{rating.review}"
-          </p>
-        </div>
+        <ReviewText text={rating.review} />
       )}
     </div>
   );

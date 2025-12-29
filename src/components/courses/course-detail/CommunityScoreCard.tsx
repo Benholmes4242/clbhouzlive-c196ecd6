@@ -39,16 +39,19 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           Community Score
         </h3>
         <p className="mt-1 text-base text-slate-500">
-          No ratings yet – be the first to rate this course!
+          No ratings yet
         </p>
 
         <Button
           onClick={onRateClick}
           className="mt-4 w-full"
-          variant="outline"
+          variant="default"
         >
-          Rate this course
+          Be the first to rate this course
         </Button>
+        <p className="mt-2 text-xs text-slate-400 text-center">
+          Your rating helps other golfers discover great courses.
+        </p>
       </div>
     );
   }

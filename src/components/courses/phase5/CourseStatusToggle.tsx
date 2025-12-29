@@ -1,6 +1,6 @@
 /**
  * CourseStatusToggle - Personal status toggle (Played / Want to Play)
- * Phase 5: Calm, private-first design
+ * Phase 5: Calm, private-first design with toast confirmations
  */
 import React from 'react';
 import { Check, Bookmark, MapPin, Loader2 } from 'lucide-react';
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus, CourseStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
 
 interface CourseStatusToggleProps {
   courseId: string;
@@ -23,6 +24,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { status, isLoading, setWantToPlay, setNextUp, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) {
@@ -61,20 +63,45 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     }
   };
 
-  const handleWantToPlayClick = () => {
+  const handleWantToPlayClick = async () => {
     if (status.status === 'want_to_play') {
-      setWantToPlay(false);
+      await setWantToPlay(false);
+      toast({
+        description: "Removed from your journey",
+        duration: 2000,
+      });
     } else if (status.status !== 'played') {
-      setWantToPlay(true);
+      await setWantToPlay(true);
+      toast({
+        description: "Added to your journey",
+        duration: 2000,
+      });
     }
+  };
+
+  const handleNextUpClick = async () => {
+    const wasNextUp = status.status === 'next_up';
+    await setNextUp(!wasNextUp);
+    toast({
+      description: wasNextUp ? "Removed from Next Up" : "Marked as Next Up",
+      duration: 2000,
+    });
   };
 
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
   const isNextUp = status.status === 'next_up';
+  const hasNoSelection = status.status === 'none';
 
   return (
     <div className={cn("space-y-3", className)}>
+      {/* Empty state nudge */}
+      {hasNoSelection && (
+        <p className="text-xs text-slate-400 mb-1">
+          Start tracking your journey
+        </p>
+      )}
+      
       {/* Status pills */}
       <div className="flex gap-2">
         {/* Played status */}
@@ -114,21 +141,23 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
         )}
       </div>
 
-      {/* Next Up option if Want to Play is selected */}
+      {/* Next Up option if Want to Play is selected - indented for hierarchy */}
       {(isWantToPlay || isNextUp) && (
-        <button
-          onClick={() => setNextUp(!isNextUp)}
-          disabled={isUpdating}
-          className={cn(
-            "flex items-center gap-2 text-sm transition-colors",
-            isNextUp
-              ? "text-amber-700 font-medium"
-              : "text-slate-500 hover:text-slate-700"
-          )}
-        >
-          <MapPin className={cn("h-3.5 w-3.5", isNextUp && "fill-amber-500")} />
-          {isNextUp ? "Marked as Next Up" : "Mark as Next Up"}
-        </button>
+        <div className="pl-2">
+          <button
+            onClick={handleNextUpClick}
+            disabled={isUpdating}
+            className={cn(
+              "flex items-center gap-2 text-sm transition-colors",
+              isNextUp
+                ? "text-amber-700 font-medium"
+                : "text-slate-500 hover:text-slate-700"
+            )}
+          >
+            <MapPin className={cn("h-3.5 w-3.5", isNextUp && "fill-amber-500")} />
+            {isNextUp ? "Marked as Next Up" : "Mark as Next Up"}
+          </button>
+        </div>
       )}
     </div>
   );
