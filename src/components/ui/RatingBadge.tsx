@@ -38,29 +38,28 @@ export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
         className
       )}
       style={{
-        // Glass base - matches achievement card styling
-        background: 'var(--achievement-card-bg, rgba(31, 36, 40, 0.04))',
-        border: `1px solid var(--achievement-card-border, rgba(31, 36, 40, 0.08))`,
+        // Glass base with tier-colored tint for more visible color
+        background: `linear-gradient(135deg, ${accentColor}18 0%, ${accentColor}08 100%)`,
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         color: 'var(--foreground)',
-        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+        boxShadow: `0 1px 6px ${accentColor}15, 0 1px 2px rgba(0, 0, 0, 0.04)`,
       }}
     >
-      {/* Top edge inner highlight sheen - Apple-style premium feel */}
+      {/* Top edge inner highlight sheen - tier colored for visibility */}
       <span 
         className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.4) 70%, transparent 100%)',
-          opacity: 0.6,
+          background: `linear-gradient(90deg, transparent 0%, ${accentColor}40 30%, ${accentColor}50 50%, ${accentColor}40 70%, transparent 100%)`,
+          opacity: 0.8,
         }}
       />
       
-      {/* Left accent glow - tier colored */}
+      {/* Left accent glow - stronger tier color */}
       <span 
-        className="absolute bottom-0 left-0 w-8 h-full pointer-events-none"
+        className="absolute bottom-0 left-0 w-10 h-full pointer-events-none"
         style={{
-          background: `linear-gradient(90deg, ${accentColor}25 0%, transparent 100%)`,
+          background: `linear-gradient(90deg, ${accentColor}35 0%, transparent 100%)`,
           borderRadius: 'inherit',
         }}
       />
