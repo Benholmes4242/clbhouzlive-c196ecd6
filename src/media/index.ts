@@ -42,3 +42,6 @@ export type { MediaTileProps } from './MediaTile';
 
 export { default as MediaFullscreenViewer } from './MediaFullscreenViewer';
 export type { MediaFullscreenViewerProps, MediaFullscreenItem } from './MediaFullscreenViewer';
+
+// Performance Audit (available in browser console as window.mediaAudit)
+import '@/utils/performanceAudit';
