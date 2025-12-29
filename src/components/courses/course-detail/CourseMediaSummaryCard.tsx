@@ -29,7 +29,7 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
           </p>
 
           {/* Counts - 8px below title */}
-          <p className="text-sm font-medium text-foreground tabular-nums">
+          <p className="text-sm font-semibold text-foreground tabular-nums">
             {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
             {' · '}
             {videoCount} {videoCount === 1 ? 'video' : 'videos'}

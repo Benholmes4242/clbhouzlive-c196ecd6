@@ -24,7 +24,7 @@ export function SegmentedTabs({ options, value, onChange, className = '' }: Segm
   return (
     <Tabs value={value} onValueChange={onChange}>
       <TabsList 
-        className={`grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-1.5 py-1 ${className}`}
+        className={`grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-1.5 py-1.5 ${className}`}
         style={{ 
           gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`
         }}
@@ -33,7 +33,7 @@ export function SegmentedTabs({ options, value, onChange, className = '' }: Segm
           <TabsTrigger 
             key={option.value}
             value={option.value}
-            className="rounded-sq-sm text-sm px-3 py-1.5 font-medium 
+            className="rounded-sq-sm text-sm px-3 py-1 font-medium 
               data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-foreground data-[state=active]:font-semibold
               data-[state=active]:border-b-2 data-[state=active]:border-primary/60
               text-muted-foreground hover:text-foreground 
