@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { triggerHaptic } from '@/lib/ui/haptics';
@@ -14,14 +15,10 @@ interface StandardBottomSheetProps {
 
 /**
  * StandardBottomSheet - Unified bottom sheet matching Visibility sheet design
- * 
- * Features:
- * - Backdrop: bg-black/40 (no blur)
- * - Sheet: rounded-t-2xl, var(--cm-surface-card)
- * - Handle: w-10 h-1 rounded-full
- * - Header: Left-aligned title + close X button
- * - Entry animation: spring (damping: 28, stiffness: 300)
- * - Safe area handling for iOS
+ *
+ * NOTE: This is rendered in a portal (document.body) with a very high z-index
+ * to ensure it always appears above sticky headers, bottom nav, and transformed
+ * containers (common stacking-context issues on mobile/Safari).
  */
 export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
   isOpen,
@@ -31,75 +28,61 @@ export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
   children,
   className,
 }) => {
-  useEffect(() => {
-    console.log('[StandardBottomSheet] isOpen changed:', isOpen);
-  }, [isOpen]);
+  if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
-  console.log('[StandardBottomSheet] render, isOpen:', isOpen);
-  return (
+  return createPortal(
     <AnimatePresence>
-      {isOpen && (
+      <motion.div
+        key="bottom-sheet-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        // Force top-most layering (beyond any app z-index conventions)
+        className="fixed inset-0 isolate z-[2147483647]"
+        onClick={onClose}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Sheet */}
         <motion.div
-          key="bottom-sheet-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[10000]"
-          onClick={onClose}
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          className={`absolute bottom-0 left-0 right-0 rounded-t-2xl bg-background ${className || ''}`}
+          style={{
+            paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+          }}
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* Backdrop - matches Visibility sheet: bg-black/40, no blur */}
-          <div className="absolute inset-0 bg-black/40" />
-          
-          {/* Sheet - using hardcoded white bg for debugging */}
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onAnimationStart={() => console.log('[StandardBottomSheet] animation START')}
-            onAnimationComplete={() => console.log('[StandardBottomSheet] animation COMPLETE')}
-            className={`absolute bottom-0 left-0 right-0 rounded-t-2xl ${className || ''}`}
-            style={{ 
-              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-              background: '#ffffff',
-              minHeight: '200px',
-              border: '3px solid red',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full" style={{ background: '#999' }} />
-            </div>
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
 
-            {/* Header - Left-aligned title + close X */}
-            <div className="flex items-center justify-between px-4 pb-3">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {title}
-                </h3>
-                {subtitle && (
-                  <p className="text-xs mt-0.5 text-muted-foreground">
-                    {subtitle}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-muted"
-              >
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pb-3">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+              {subtitle && <p className="text-xs mt-0.5 text-muted-foreground">{subtitle}</p>}
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-muted"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
 
-            {/* Content */}
-            <div className="px-4 pb-4">
-              {children}
-            </div>
-          </motion.div>
+          {/* Content */}
+          <div className="px-4 pb-4">{children}</div>
         </motion.div>
-      )}
-    </AnimatePresence>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
   );
 };
 
