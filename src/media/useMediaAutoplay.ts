@@ -64,8 +64,8 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   const {
     mode = 'grid',
     surface = 'grid',
-    startThreshold = 0.4,
-    stopThreshold = 0.25,
+    startThreshold = 0.01, // Immediate play on entering viewport
+    stopThreshold = 0.01,  // Immediate pause on exiting viewport
     preloadMargin = 300,
     scrollSettleDelay = 50, // Reduced from 200ms for instant response
   } = options;
@@ -386,7 +386,7 @@ const syncPlayingFromRuntime = useCallback(() => {
       },
       {
         threshold: thresholds,
-        rootMargin: '300px 0px 300px 0px', // Start detecting 300px before entering viewport for fast scroll
+        rootMargin: '0px 0px 0px 0px', // Play/pause exactly at viewport boundary
       }
     );
     
