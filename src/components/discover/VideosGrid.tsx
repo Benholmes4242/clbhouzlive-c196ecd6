@@ -8,7 +8,16 @@ import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 import ShortsInlineBlock from './ShortsInlineBlock';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
-
+import {
+  logGridMount,
+  logVideosArrayUpdate,
+  logLazyTilesState,
+  logRenderedCards,
+  logObserverSetup,
+  logObserverCallback,
+  logScrollPosition,
+  logObserverDisconnect,
+} from '@/utils/debugWatchPage';
 interface VideosGridProps {
   content: ExploreContentItem[];
   onMediaClick?: (item: ExploreContentItem) => void;
@@ -30,6 +39,11 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   activeTab = 'all',
   interleavedFeed = null
 }) => {
+  // Debug: Log component mount
+  useEffect(() => {
+    logGridMount();
+  }, []);
+
   // State for ShortsViewer
   const [shortsViewerOpen, setShortsViewerOpen] = useState(false);
   const [shortsViewerItems, setShortsViewerItems] = useState<ExploreContentItem[]>([]);
@@ -51,6 +65,12 @@ const VideosGrid: React.FC<VideosGridProps> = ({
           data: video
         }));
   }, [interleavedFeed, content]);
+
+  // Debug: Log videos array updates
+  useEffect(() => {
+    logVideosArrayUpdate(itemsToRender, 'VideosGrid.itemsToRender');
+    logRenderedCards();
+  }, [itemsToRender.length]);
   
   // Lazy loading - only mount items near viewport
   const { visibleIndices, registerTile } = useLazyTiles({
@@ -59,6 +79,16 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     preloadViewports: 2,
     estimatedRowHeight: 300,
   });
+
+  // Debug: Log lazy tiles state
+  useEffect(() => {
+    logLazyTilesState({
+      initialVisible: 12,
+      totalItems: itemsToRender.length,
+      visibleCount: visibleIndices.size,
+      visibleIndices: Array.from(visibleIndices),
+    });
+  }, [visibleIndices, itemsToRender.length]);
 
   // Refs to avoid stale closure in IntersectionObserver callback
   const hasMoreRef = useRef(hasMore);
@@ -76,14 +106,34 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   // Intersection observer for infinite scroll - stable observer, uses refs
   useEffect(() => {
     const sentinel = sentinelRef.current;
+    
+    // Debug: Log observer setup
+    logObserverSetup({
+      rootMargin: '400px 0px',
+      threshold: 0,
+      hasSentinel: !!sentinel,
+      sentinelRect: sentinel?.getBoundingClientRect(),
+    });
+    
     if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
+        const willTrigger = entry.isIntersecting && hasMoreRef.current && !loadingRef.current;
+        
+        // Debug: Log observer callback
+        logObserverCallback({
+          isIntersecting: entry.isIntersecting,
+          intersectionRatio: entry.intersectionRatio,
+          boundingClientRect: entry.boundingClientRect,
+          hasMore: hasMoreRef.current,
+          isLoading: loadingRef.current,
+          willTrigger,
+        });
         
         // Use refs to always get current values, not stale closure values
-        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
+        if (willTrigger) {
           onLoadMoreRef.current();
         }
       },
@@ -97,9 +147,42 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     observer.observe(sentinel);
 
     return () => {
+      logObserverDisconnect();
       observer.disconnect();
     };
   }, []); // Empty deps - observer created once, uses refs for current values
+
+  // Debug: Scroll position tracking for infinite scroll debugging
+  useEffect(() => {
+    const handleScroll = () => {
+      const sentinel = sentinelRef.current;
+      if (!sentinel) return;
+
+      const sentinelRect = sentinel.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const distanceFromBottom = sentinelRect.top - viewportHeight;
+
+      logScrollPosition({
+        sentinelTop: sentinelRect.top,
+        viewportHeight,
+        distanceFromBottom,
+        scrollY: window.scrollY,
+      });
+    };
+
+    // Throttle scroll events
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const throttledScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 200);
+    };
+
+    window.addEventListener('scroll', throttledScroll);
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   if (itemsToRender.length === 0 && !isLoading) {
     return (
