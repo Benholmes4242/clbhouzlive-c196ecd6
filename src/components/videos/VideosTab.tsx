@@ -209,11 +209,25 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     const dedupe = <T extends { id: string }>(videos: T[]): T[] => 
       videos.filter(v => v?.id && !seen.has(v.id) && (seen.add(v.id), true));
     
+    // Client-side search filter (matches Watch page implementation)
+    const searchFilter = <T extends { title?: string; caption?: string; creatorName?: string; creatorUsername?: string }>(videos: T[]): T[] => {
+      if (!searchQuery || !searchQuery.trim()) return videos;
+      
+      const query = searchQuery.toLowerCase();
+      return videos.filter(v => {
+        const titleMatch = (v.title || '').toLowerCase().includes(query);
+        const captionMatch = (v.caption || '').toLowerCase().includes(query);
+        const nameMatch = (v.creatorName || '').toLowerCase().includes(query);
+        const usernameMatch = (v.creatorUsername || '').toLowerCase().includes(query);
+        return titleMatch || captionMatch || nameMatch || usernameMatch;
+      });
+    };
+    
     // Process in priority order (after Continue Watching)
-    const followed = dedupe(followedVideosRaw);
-    const recommended = dedupe(recommendedVideosRaw);
-    const trending = dedupe(trendingVideosRaw);
-    const courses = dedupe(coursesVideosRaw);
+    const followed = searchFilter(dedupe(followedVideosRaw));
+    const recommended = searchFilter(dedupe(recommendedVideosRaw));
+    const trending = searchFilter(dedupe(trendingVideosRaw));
+    const courses = searchFilter(dedupe(coursesVideosRaw));
     
     return {
       followedVideos: followed,
@@ -221,7 +235,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       trendingVideos: trending,
       coursesVideos: courses,
     };
-  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw]);
+  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw, searchQuery]);
 
   // CRITICAL: Preload first video immediately in layout phase (before paint)
   useLayoutEffect(() => {
