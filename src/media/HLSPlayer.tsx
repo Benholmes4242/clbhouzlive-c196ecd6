@@ -37,6 +37,8 @@ import {
 
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
+import { FLAGS } from '@/config/flags';
+
 const getTimestamp = () => performance.now().toFixed(2);
 const logDebug = (event: string, data?: any) => {
   if (DEBUG_HLS_PLAYER) {
@@ -85,6 +87,12 @@ export interface HLSPlayerProps {
   // Scrubber
   showScrubber?: boolean; // Show progress scrubber (default: true if MEDIA_SCRUBBER_V1)
   mediaId?: string; // Required for scrubber intent tracking
+  
+  // Video System Refactor: Poster vs Paused Video Mode
+  // When true: Skip poster, render paused video showing first frame (new architecture)
+  // When false/undefined: Use feature flag FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER
+  // This prop allows per-component override for gradual rollout
+  usePausedVideo?: boolean;
 }
 
 export interface HLSPlayerRef {
@@ -127,7 +135,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   managedByMediaRuntime = false,
   showScrubber,
   mediaId,
+  usePausedVideo,
 }, ref) => {
+  // ============ Feature Flag: Poster vs Paused Video Mode ============
+  // Component-level prop takes precedence, otherwise use global feature flag
+  const shouldUsePoster = usePausedVideo !== undefined 
+    ? !usePausedVideo 
+    : !FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER;
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const posterRef = useRef<HTMLDivElement>(null); // Ref for synchronous poster hiding
@@ -930,8 +944,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         // TTFF_RECORDED detailed log removed - slow warnings are kept in recordTtff
         MediaRuntime.recordTtff(mediaId, ttffMs);
         
-        // RUM: Record TTFF for analytics
-        recordTTFF(mediaId);
+        // RUM: Record TTFF for analytics with poster mode tracking
+        recordTTFF(mediaId, shouldUsePoster);
       }
       
       // CRITICAL FIX: Hide poster and show video IMMEDIATELY via direct DOM manipulation
@@ -1323,41 +1337,44 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   return (
     <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
-      {/* Poster Layer - ALWAYS mounted, uses ref for synchronous opacity control */}
+      {/* Poster Layer - Only render if shouldUsePoster is true */}
+      {/* When usePausedVideo is enabled, this entire layer is skipped */}
       {/* Direct DOM manipulation via posterRef prevents black flash */}
-      <div
-        ref={posterRef}
-        className={cn(
-          'absolute inset-0 w-full h-full transition-opacity duration-100 ease-linear',
-          // GPU compositing hints for WebView
-          'will-change-opacity backface-hidden transform-gpu',
-          // Initial z-index positioning
-          'z-10'
-        )}
-        style={{ 
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          // Initial opacity controlled by state, then overridden by direct DOM for sync
-          opacity: isPosterVisible ? 1 : 0,
-          pointerEvents: isPosterVisible ? 'auto' : 'none'
-        }}
-      >
-        {poster ? (
-          <img
-            src={poster}
-            alt=""
-            draggable={false}
-            className={cn(
-              'w-full h-full',
-              objectFitClass
-            )}
-            onLoad={() => setIsPosterLoaded(true)}
-            onError={() => setIsPosterLoaded(false)}
-          />
-        ) : (
-          <div className="w-full h-full bg-black" />
-        )}
-      </div>
+      {shouldUsePoster && (
+        <div
+          ref={posterRef}
+          className={cn(
+            'absolute inset-0 w-full h-full transition-opacity duration-100 ease-linear',
+            // GPU compositing hints for WebView
+            'will-change-opacity backface-hidden transform-gpu',
+            // Initial z-index positioning
+            'z-10'
+          )}
+          style={{ 
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+            // Initial opacity controlled by state, then overridden by direct DOM for sync
+            opacity: isPosterVisible ? 1 : 0,
+            pointerEvents: isPosterVisible ? 'auto' : 'none'
+          }}
+        >
+          {poster ? (
+            <img
+              src={poster}
+              alt=""
+              draggable={false}
+              className={cn(
+                'w-full h-full',
+                objectFitClass
+              )}
+              onLoad={() => setIsPosterLoaded(true)}
+              onError={() => setIsPosterLoaded(false)}
+            />
+          ) : (
+            <div className="w-full h-full bg-black" />
+          )}
+        </div>
+      )}
       
       {/* Video Element - ALWAYS mounted, only opacity transitions */}
       <video
@@ -1367,8 +1384,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           objectFitClass,
           // GPU compositing hints for WebView - prevents flicker
           'will-change-opacity backface-hidden transform-gpu',
-          // Show when first painted frame is ready - poster fades out on top
-          hasFirstFrame ? 'opacity-100' : 'opacity-0'
+          // Poster mode: Show when first painted frame is ready (poster fades out on top)
+          // Paused-video mode: Always visible (video shows black until first frame, no poster layer)
+          shouldUsePoster 
+            ? (hasFirstFrame ? 'opacity-100' : 'opacity-0')
+            : 'opacity-100' // In paused-video mode, video is always visible
         )}
         style={{ 
           backfaceVisibility: 'hidden',
