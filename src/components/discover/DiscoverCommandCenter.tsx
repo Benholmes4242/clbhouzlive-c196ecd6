@@ -58,6 +58,11 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   const isNonDefaultSort = sortValue !== defaultSortValue;
   const [isFocused, setIsFocused] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    console.log('DiscoverCommandCenter drawerOpen', drawerOpen);
+  }, [drawerOpen]);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -107,7 +112,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     
     return (
       <>
-        <button className={pillClasses} onClick={() => setDrawerOpen(true)}>
+        <button
+          className={pillClasses}
+          onClick={() => {
+            console.log('Sort pill clicked');
+            setDrawerOpen(true);
+          }}
+        >
           <ArrowUpDown className="w-3.5 h-3.5" />
           <span>Sort</span>
         </button>
