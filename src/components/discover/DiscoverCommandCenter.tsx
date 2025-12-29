@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Search, X, ArrowUpDown, Check } from 'lucide-react';
+import { Search, X, ArrowUpDown, TrendingUp, ThumbsUp, MessageSquare, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
@@ -16,6 +17,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
+import { triggerHaptic } from '@/lib/ui/haptics';
 
 export type SortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
 
@@ -40,11 +43,11 @@ interface DiscoverCommandCenterProps {
   className?: string;
 }
 
-const SORT_OPTIONS: { id: SortOption; label: string }[] = [
-  { id: 'newest', label: 'Newest first' },
-  { id: 'most-liked', label: 'Most liked' },
-  { id: 'most-discussed', label: 'Most discussed' },
-  { id: 'friends-first', label: 'Friends first' },
+const SORT_OPTIONS: { id: SortOption; label: string; icon: React.ElementType }[] = [
+  { id: 'newest', label: 'Newest first', icon: TrendingUp },
+  { id: 'most-liked', label: 'Most liked', icon: ThumbsUp },
+  { id: 'most-discussed', label: 'Most discussed', icon: MessageSquare },
+  { id: 'friends-first', label: 'Friends first', icon: Users },
 ];
 
 /**
@@ -95,6 +98,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   };
 
   const handleSortSelect = (sort: SortOption) => {
+    triggerHaptic('selection');
     onSortChange(sort);
     setDrawerOpen(false);
   };
@@ -111,29 +115,43 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   }, []);
 
   const SortContent = () => (
-    <div className="px-4 pb-2 space-y-1.5">
+    <div className="px-4 pb-4 space-y-2">
       {SORT_OPTIONS.map((option) => {
         const isActive = sortValue === option.id;
+        const Icon = option.icon;
         return (
           <button
             key={option.id}
+            type="button"
             onClick={() => handleSortSelect(option.id)}
-            className={cn(
-              "w-full flex items-center justify-between rounded-2xl px-4 py-3.5",
-              "text-[15px] transition-all duration-150",
-              "active:scale-[0.98]",
-              isActive
-                ? "bg-slate-100/80 dark:bg-white/10 border border-slate-300/50 dark:border-white/15 font-semibold text-slate-900 dark:text-white"
-                : "text-slate-800 dark:text-white/90 active:bg-slate-100/70 dark:active:bg-white/10"
-            )}
+            className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
+            style={{
+              background: isActive ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+              border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
+              boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+            }}
           >
-            <span>{option.label}</span>
-            {/* Fixed width container to prevent layout shift */}
-            <div className="w-5 flex justify-end">
-              {isActive && (
-                <Check className="w-4.5 h-4.5 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
-              )}
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                style={{
+                  background: isActive ? 'rgba(255,255,255,0.15)' : 'var(--cm-surface-card)',
+                  border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
+                }}
+              >
+                <Icon
+                  className="w-5 h-5"
+                  style={{ color: isActive ? 'white' : 'var(--cm-icon-primary)' }}
+                />
+              </div>
+              <span
+                className="font-medium text-sm"
+                style={{ color: isActive ? 'white' : 'var(--cm-text-primary)' }}
+              >
+                {option.label}
+              </span>
             </div>
+            {isActive && <AnimatedCheck />}
           </button>
         );
       })}
@@ -153,19 +171,43 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
       return (
         <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
           <DrawerTrigger asChild>
-            <button className={pillClasses}>
+            <button 
+              type="button" 
+              className={pillClasses}
+              onClick={(e) => e.stopPropagation()}
+            >
               <ArrowUpDown className="w-3.5 h-3.5" />
               <span>Sort</span>
             </button>
           </DrawerTrigger>
           <DrawerContent>
-            <DrawerHeader className="pb-1">
-              <DrawerTitle className="text-center text-[17px] font-semibold text-slate-900 dark:text-white">
-                Sort by
-              </DrawerTitle>
-              <p className="text-center text-xs text-slate-500 dark:text-white/50 mt-0.5">
-                Choose how results are ordered
-              </p>
+            <DrawerHeader className="px-4 pb-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <DrawerTitle
+                    className="text-lg font-semibold text-left"
+                    style={{ color: 'var(--cm-text-primary)' }}
+                  >
+                    Sort by
+                  </DrawerTitle>
+                  <p 
+                    className="text-sm mt-1 text-left"
+                    style={{ color: 'var(--cm-text-secondary)' }}
+                  >
+                    Choose how results are ordered
+                  </p>
+                </div>
+                <DrawerClose asChild>
+                  <button
+                    type="button"
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: 'var(--cm-surface-alt)' }}
+                    aria-label="Close"
+                  >
+                    <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                  </button>
+                </DrawerClose>
+              </div>
             </DrawerHeader>
             <SortContent />
           </DrawerContent>
@@ -176,7 +218,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className={pillClasses}>
+          <button type="button" className={pillClasses}>
             <ArrowUpDown className="w-3.5 h-3.5" />
             <span>Sort</span>
           </button>
@@ -187,6 +229,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         >
           {SORT_OPTIONS.map((option) => {
             const isActive = sortValue === option.id;
+            const Icon = option.icon;
             return (
               <DropdownMenuItem
                 key={option.id}
@@ -198,10 +241,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                     : "text-slate-700 dark:text-white/90"
                 )}
               >
-                <span>{option.label}</span>
+                <div className="flex items-center gap-2">
+                  <Icon className="w-4 h-4" />
+                  <span>{option.label}</span>
+                </div>
                 <div className="w-5 flex justify-end">
                   {isActive && (
-                    <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
+                    <AnimatedCheck />
                   )}
                 </div>
               </DropdownMenuItem>

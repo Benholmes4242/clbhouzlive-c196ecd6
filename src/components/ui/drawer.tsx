@@ -27,7 +27,7 @@ const DrawerOverlay = React.forwardRef<
   <DrawerPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm",
+      "fixed inset-0 z-50 bg-black/40",
       className
     )}
     {...props}
@@ -44,23 +44,21 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col",
-        // Apple-level styling: rounded corners, blur, shadow
-        "rounded-t-3xl",
-        "border border-slate-200/40 dark:border-white/10",
-        "bg-white/95 dark:bg-black/80",
-        "backdrop-blur-xl",
-        "shadow-[0_-12px_40px_rgba(0,0,0,0.12)]",
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-2xl",
         className
       )}
       style={{
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)',
+        background: 'var(--cm-surface-card)',
+        paddingBottom: 'env(safe-area-inset-bottom, 16px)',
       }}
       {...props}
     >
-      {/* Drag handle - Apple style */}
-      <div className="flex justify-center pt-3 pb-1">
-        <div className="h-1 w-10 rounded-full bg-slate-300/70 dark:bg-white/20" />
+      {/* Handle - matches Visibility sheet */}
+      <div className="pt-3 pb-2 flex justify-center">
+        <div 
+          className="w-10 h-1 rounded-full"
+          style={{ background: 'var(--cm-border)' }}
+        />
       </div>
       {children}
     </DrawerPrimitive.Content>

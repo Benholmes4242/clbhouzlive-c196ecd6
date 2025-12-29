@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Globe, Users, Lock } from 'lucide-react';
 import { MomentVisibility } from '../types';
 import { triggerHaptic } from '@/lib/ui/haptics';
+import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
 
 interface AudienceOption {
   value: MomentVisibility;
@@ -38,37 +39,6 @@ interface MomentAudienceSheetProps {
   visibility: MomentVisibility;
   onVisibilityChange: (visibility: MomentVisibility) => void;
 }
-
-// Animated checkmark with draw-in effect
-const AnimatedCheck: React.FC = () => (
-  <motion.svg
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    fill="none"
-    initial="hidden"
-    animate="visible"
-  >
-    <motion.path
-      d="M4 10L8 14L16 6"
-      stroke="white"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      variants={{
-        hidden: { pathLength: 0, opacity: 0 },
-        visible: { 
-          pathLength: 1, 
-          opacity: 1,
-          transition: { 
-            pathLength: { duration: 0.3, ease: "easeOut" },
-            opacity: { duration: 0.1 }
-          }
-        }
-      }}
-    />
-  </motion.svg>
-);
 
 /**
  * MomentAudienceSheet - Bottom sheet for selecting post visibility
