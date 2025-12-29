@@ -60,15 +60,28 @@ export type RegisterMediaFn = (args: {
 
 // ============ Hook ============
 
+/**
+ * Hook for managing video autoplay with intersection observers
+ * 
+ * @param options Configuration options
+ * @param options.startThreshold Visibility ratio (0.0-1.0) at which video starts playing. Default: 0.4 (40%)
+ * @param options.stopThreshold Visibility ratio (0.0-1.0) at which video pauses. Default: 0.25 (25%)
+ * @param options.preloadMargin Distance in pixels before viewport to start preloading. Default: 300px
+ * @param options.scrollSettleDelay Milliseconds to wait after scroll stops. Default: 50ms
+ */
 export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   const {
     mode = 'grid',
     surface = 'grid',
-    startThreshold = 0.01, // Immediate play on entering viewport
-    stopThreshold = 0.01,  // Immediate pause on exiting viewport
+    startThreshold,      // No default - use effectiveStartThreshold below
+    stopThreshold,       // No default - use effectiveStopThreshold below
     preloadMargin = 300,
-    scrollSettleDelay = 50, // Reduced from 200ms for instant response
+    scrollSettleDelay = 50,
   } = options;
+  
+  // Apply proper defaults AFTER destructuring so passed values take precedence
+  const effectiveStartThreshold = startThreshold ?? 0.4;  // Default 40% visible to play
+  const effectiveStopThreshold = stopThreshold ?? 0.25;   // Default 25% visible to pause
   
   // Use safe version - MediaSystemProvider may not exist in all contexts
   const mediaSystem = useMediaSystemSafe();
@@ -346,7 +359,8 @@ const syncPlayingFromRuntime = useCallback(() => {
   syncPlayingRef.current = syncPlayingFromRuntime;
   
   useEffect(() => {
-    const thresholds = [stopThreshold, startThreshold];
+    // Use effective thresholds for hysteresis (40% play, 25% pause by default)
+    const thresholds = [effectiveStopThreshold, effectiveStartThreshold];
     
     playObserver.current = new IntersectionObserver(
       (entries) => {
@@ -360,13 +374,13 @@ const syncPlayingFromRuntime = useCallback(() => {
           const ratio = entry.intersectionRatio;
           const wasVisible = visibleIds.current.has(id);
           
-          // Hysteresis: start at startThreshold, stop at stopThreshold
+          // Hysteresis: start at effectiveStartThreshold, stop at effectiveStopThreshold
           let nextVisible = wasVisible;
           
-          if (ratio >= startThreshold) {
+          if (ratio >= effectiveStartThreshold) {
             visibleIds.current.add(id);
             nextVisible = true;
-          } else if (ratio <= stopThreshold) {
+          } else if (ratio <= effectiveStopThreshold) {
             visibleIds.current.delete(id);
             nextVisible = false;
           }
@@ -403,7 +417,7 @@ const syncPlayingFromRuntime = useCallback(() => {
       playObserver.current = null;
       visibleIds.current.clear();
     };
-  }, [startThreshold, stopThreshold]);
+  }, [effectiveStartThreshold, effectiveStopThreshold]);
   
   return {
     registerMedia,
