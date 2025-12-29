@@ -449,23 +449,32 @@ export const useRealPostsFetcher = () => {
       }
 
       // Apply ordering and pagination AFTER filters
-      // Always order by created_at in database - we'll re-sort in JS for other sort options
+      // For "newest" - order by created_at in database (most efficient)
+      // For sort options that need aggregates (likes/comments), fetch larger batch and sort in JS
+      // This is a workaround since Supabase JS client can't ORDER BY aggregates
+      
+      const needsAggregateSorting = sortOption === 'most-liked' || sortOption === 'most-discussed';
+      const fetchMultiplier = needsAggregateSorting ? 5 : 1; // Fetch 5x more for aggregate sorts
+      const fetchCount = postsPerPage * fetchMultiplier;
+      
       query = query
         .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + postsPerPage - 1);
+        .range(0, fetchCount - 1); // For aggregate sorts, always start from 0 to get best candidates
 
-      const { data: postsData, error } = await query;
+      const { data: rawPostsData, error } = await query;
       
-      // Apply JavaScript sorting based on sortOption (aggregations can't be ordered in Supabase)
-      if (postsData && postsData.length > 0 && sortOption) {
+      // Sort the full fetched batch by the chosen criteria
+      let sortedData = rawPostsData || [];
+      
+      if (sortedData.length > 0 && sortOption) {
         if (sortOption === 'most-liked') {
-          postsData.sort((a: any, b: any) => {
+          sortedData = [...sortedData].sort((a: any, b: any) => {
             const aLikes = a.post_likes?.[0]?.count || 0;
             const bLikes = b.post_likes?.[0]?.count || 0;
             return bLikes - aLikes; // Highest likes first
           });
         } else if (sortOption === 'most-discussed') {
-          postsData.sort((a: any, b: any) => {
+          sortedData = [...sortedData].sort((a: any, b: any) => {
             const aComments = a.post_comments?.[0]?.count || 0;
             const bComments = b.post_comments?.[0]?.count || 0;
             return bComments - aComments; // Most comments first
@@ -480,7 +489,7 @@ export const useRealPostsFetcher = () => {
             
             const followingIds = new Set(following?.map(f => f.following_id) || []);
             
-            postsData.sort((a: any, b: any) => {
+            sortedData = [...sortedData].sort((a: any, b: any) => {
               const aIsFriend = followingIds.has(a.user_id);
               const bIsFriend = followingIds.has(b.user_id);
               
@@ -495,6 +504,12 @@ export const useRealPostsFetcher = () => {
         }
         // 'newest' or undefined - already sorted by created_at from database
       }
+      
+      // Apply pagination AFTER sorting for aggregate sorts
+      // For normal sorts, this just slices the already-correct results
+      const postsData = needsAggregateSorting
+        ? sortedData.slice(currentOffset, currentOffset + postsPerPage)
+        : sortedData.slice(0, postsPerPage);
 
       if (error) {
         console.error('Error fetching posts:', error);
