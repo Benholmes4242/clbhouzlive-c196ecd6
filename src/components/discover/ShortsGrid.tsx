@@ -157,6 +157,18 @@ export default function ShortsGrid({
       }
     }
 
+    // Add any remaining portrait videos that didn't fit into complete cycles
+    while (portraitIndex < portraitVideos.length) {
+      result.push(portraitVideos[portraitIndex]);
+      portraitIndex++;
+    }
+
+    // Add any remaining landscape videos that didn't fit into complete cycles
+    while (landscapeIndex < landscapeVideos.length) {
+      result.push(landscapeVideos[landscapeIndex]);
+      landscapeIndex++;
+    }
+
     return result;
   }, [portraitVideos, landscapeVideos, items]);
   
