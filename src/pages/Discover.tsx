@@ -46,26 +46,21 @@ type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 const Discover = () => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalStartIndex, setModalStartIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
+  
+  const { main, sub } = useDiscoverQuery();
+  const [durationFilter, setDurationFilter] = useVideoLengthFilter();
 
   // Timing instrumentation - log page mount/unmount
   useEffect(() => {
     logDiscoverPageMount();
     return () => logDiscoverPageUnmount();
   }, []);
-  
-  // Show skeleton during rehydration
-  if (isRehydrating) {
-    return <DiscoverSkeleton />;
-  }
-  const [modalStartIndex, setModalStartIndex] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  
-  const { main, sub } = useDiscoverQuery();
-  const [durationFilter, setDurationFilter] = useVideoLengthFilter();
 
   // Top 100 integration hooks
   const {
@@ -195,6 +190,11 @@ const Discover = () => {
       });
     });
   }, [allContent]);
+
+  // Show skeleton during rehydration (MUST be after all hooks)
+  if (isRehydrating) {
+    return <DiscoverSkeleton />;
+  }
 
   // No loading state needed - Suspense at route level handles it with GenericPageSkeleton
   // if (loading && allContent.length === 0) return null;
