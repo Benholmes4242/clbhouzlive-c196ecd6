@@ -114,7 +114,8 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const SortContent = () => (
+  // Sort options content (inline to avoid hook issues with inner components)
+  const sortOptionsContent = (
     <div 
       className="px-4 overflow-y-auto"
       style={{
@@ -166,105 +167,98 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     </div>
   );
 
-  const SortPill = () => {
-    const pillClasses = cn(
-      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-      "transition-colors active:scale-[0.98]",
-      isNonDefaultSort
-        ? "bg-foreground/15 text-foreground border border-foreground/30" // Non-default: stronger visual
-        : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted" // Default
-    );
-    
-    if (isMobile) {
-      return (
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
-            <button 
-              type="button" 
-              className={pillClasses}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <span>Sort</span>
-            </button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader className="px-4 pb-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <DrawerTitle
-                    className="text-lg font-semibold text-left"
-                    style={{ color: 'var(--cm-text-primary)' }}
-                  >
-                    Sort by
-                  </DrawerTitle>
-                  <p 
-                    className="text-sm mt-1 text-left"
-                    style={{ color: 'var(--cm-text-secondary)' }}
-                  >
-                    Choose how results are ordered
-                  </p>
-                </div>
-                <DrawerClose asChild>
-                  <button
-                    type="button"
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: 'var(--cm-surface-alt)' }}
-                    aria-label="Close"
-                  >
-                    <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
-                  </button>
-                </DrawerClose>
-              </div>
-            </DrawerHeader>
-            <SortContent />
-          </DrawerContent>
-        </Drawer>
-      );
-    }
+  const pillClasses = cn(
+    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
+    "transition-colors active:scale-[0.98]",
+    isNonDefaultSort
+      ? "bg-foreground/15 text-foreground border border-foreground/30"
+      : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
+  );
 
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button type="button" className={pillClasses}>
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>Sort</span>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="start" 
-          className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
+  // Sort pill - renders as Drawer on mobile, DropdownMenu on desktop
+  const sortPillElement = isMobile ? (
+    <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+      <DrawerTrigger asChild>
+        <button 
+          type="button" 
+          className={pillClasses}
+          onClick={(e) => e.stopPropagation()}
         >
-          {SORT_OPTIONS.map((option) => {
-            const isActive = sortValue === option.id;
-            const Icon = option.icon;
-            return (
-              <DropdownMenuItem
-                key={option.id}
-                onClick={() => handleSortSelect(option.id)}
-                className={cn(
-                  "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
-                  isActive 
-                    ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
-                    : "text-slate-700 dark:text-white/90"
-                )}
+          <ArrowUpDown className="w-3.5 h-3.5" />
+          <span>Sort</span>
+        </button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="px-4 pb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <DrawerTitle
+                className="text-lg font-semibold text-left"
+                style={{ color: 'var(--cm-text-primary)' }}
               >
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4" />
-                  <span>{option.label}</span>
-                </div>
-                <div className="w-5 flex justify-end">
-                  {isActive && (
-                    <AnimatedCheck />
-                  )}
-                </div>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
+                Sort by
+              </DrawerTitle>
+              <p 
+                className="text-sm mt-1 text-left"
+                style={{ color: 'var(--cm-text-secondary)' }}
+              >
+                Choose how results are ordered
+              </p>
+            </div>
+            <DrawerClose asChild>
+              <button
+                type="button"
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--cm-surface-alt)' }}
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+              </button>
+            </DrawerClose>
+          </div>
+        </DrawerHeader>
+        {sortOptionsContent}
+      </DrawerContent>
+    </Drawer>
+  ) : (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" className={pillClasses}>
+          <ArrowUpDown className="w-3.5 h-3.5" />
+          <span>Sort</span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="start" 
+        className="w-52 p-1.5 bg-white/95 dark:bg-black/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-xl shadow-lg z-50"
+      >
+        {SORT_OPTIONS.map((option) => {
+          const isActive = sortValue === option.id;
+          const Icon = option.icon;
+          return (
+            <DropdownMenuItem
+              key={option.id}
+              onClick={() => handleSortSelect(option.id)}
+              className={cn(
+                "flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5",
+                isActive 
+                  ? "bg-slate-100/80 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
+                  : "text-slate-700 dark:text-white/90"
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <Icon className="w-4 h-4" />
+                <span>{option.label}</span>
+              </div>
+              <div className="w-5 flex justify-end">
+                {isActive && <AnimatedCheck />}
+              </div>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div className={cn("bg-[var(--bg-page)]", className)}>
@@ -329,7 +323,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               }}
             >
               {/* Sort Pill */}
-              <SortPill />
+              {sortPillElement}
 
               {/* Divider */}
               <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />
