@@ -31,74 +31,75 @@ export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
   children,
   className,
 }) => {
-  if (!isOpen) return null;
-
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
-        onClick={onClose}
-      >
-        {/* Backdrop - matches Visibility sheet: bg-black/40, no blur */}
-        <div className="absolute inset-0 bg-black/40" />
-        
-        {/* Sheet */}
+      {isOpen && (
         <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className={`absolute bottom-0 left-0 right-0 rounded-t-2xl ${className || ''}`}
-          style={{ 
-            background: 'var(--cm-surface-card)',
-            paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-          }}
-          onClick={(e) => e.stopPropagation()}
+          key="bottom-sheet-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[10000]"
+          onClick={onClose}
         >
-          {/* Handle - matches Visibility sheet */}
-          <div className="flex justify-center pt-3 pb-2">
-            <div 
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'var(--cm-border)' }}
-            />
-          </div>
-
-          {/* Header - Left-aligned title + close X (matches Visibility sheet) */}
-          <div className="flex items-center justify-between px-4 pb-3">
-            <div>
-              <h3 
-                className="text-lg font-semibold"
-                style={{ color: 'var(--cm-text-primary)' }}
-              >
-                {title}
-              </h3>
-              {subtitle && (
-                <p 
-                  className="text-xs mt-0.5"
-                  style={{ color: 'var(--cm-text-tertiary)' }}
-                >
-                  {subtitle}
-                </p>
-              )}
+          {/* Backdrop - matches Visibility sheet: bg-black/40, no blur */}
+          <div className="absolute inset-0 bg-black/40" />
+          
+          {/* Sheet */}
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className={`absolute bottom-0 left-0 right-0 rounded-t-2xl ${className || ''}`}
+            style={{ 
+              background: 'var(--cm-surface-card)',
+              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle - matches Visibility sheet */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div 
+                className="w-10 h-1 rounded-full"
+                style={{ background: 'var(--cm-border)' }}
+              />
             </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--cm-surface-alt)' }}
-            >
-              <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
-            </button>
-          </div>
 
-          {/* Content */}
-          <div className="px-4 pb-4">
-            {children}
-          </div>
+            {/* Header - Left-aligned title + close X (matches Visibility sheet) */}
+            <div className="flex items-center justify-between px-4 pb-3">
+              <div>
+                <h3 
+                  className="text-lg font-semibold"
+                  style={{ color: 'var(--cm-text-primary)' }}
+                >
+                  {title}
+                </h3>
+                {subtitle && (
+                  <p 
+                    className="text-xs mt-0.5"
+                    style={{ color: 'var(--cm-text-tertiary)' }}
+                  >
+                    {subtitle}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--cm-surface-alt)' }}
+              >
+                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="px-4 pb-4">
+              {children}
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      )}
     </AnimatePresence>
   );
 };
