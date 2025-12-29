@@ -103,7 +103,6 @@ const VideoCard: React.FC<{
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={poster}
           muted={true}
           autoplay={autoplay}
           loop={true}

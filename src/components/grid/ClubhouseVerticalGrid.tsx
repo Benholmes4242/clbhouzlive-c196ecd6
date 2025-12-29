@@ -98,7 +98,6 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
-            poster={poster}
             muted={muted}
             loop
             autoplay={autoplay && isActive && (shouldAttach || eagerMount)}

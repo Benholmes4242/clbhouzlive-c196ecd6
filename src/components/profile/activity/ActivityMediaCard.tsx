@@ -104,7 +104,6 @@ const ActivityMediaCard: React.FC<ActivityMediaCardProps> = ({
             <video
               ref={videoRef}
               src={isHovered ? src : undefined}
-              poster={item.thumbnailUrl || src}
               className={cn(
                 "w-full h-full object-cover",
                 status === 'loading' && "opacity-0"

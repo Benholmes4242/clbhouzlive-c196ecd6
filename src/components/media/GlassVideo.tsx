@@ -32,7 +32,6 @@ export function GlassVideo({ src, poster, ratio = 16/9, onPlayTap }: Props) {
           ref={videoRef}
           className="video-el"
           src={src}
-          poster={poster}
           controls
           playsInline               // iOS Safari inline rendering
           webkit-playsinline="true"

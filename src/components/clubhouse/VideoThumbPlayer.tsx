@@ -14,7 +14,7 @@ declare global {
 
 interface VideoThumbPlayerProps {
   url: string;
-  poster: string;
+  poster?: string; // Now optional - paused video mode doesn't need poster
   ioRoot?: Element | null;
   className?: string;
 }
@@ -299,7 +299,6 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     >
       <video
         ref={videoRef}
-        poster={poster}
         muted={muted}
         playsInline
         preload="metadata"

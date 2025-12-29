@@ -85,7 +85,6 @@ export const MediaRenderer = forwardRef<HTMLVideoElement | HTMLImageElement, Med
           <EnhancedVideoPlayer
             ref={ref as React.Ref<HTMLVideoElement>}
             src={src}
-            poster={derivedPoster}
             autoplay={autoPlay}
             muted={autoPlay}
             loop={loop}

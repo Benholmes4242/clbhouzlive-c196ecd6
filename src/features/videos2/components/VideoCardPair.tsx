@@ -98,7 +98,6 @@ export function VideoCardPair({ video, onVideoClick, onEchoToggle }: VideoCardPa
           ref={playerRef}
           src={video.hlsUrl || ''}
           mp4FallbackUrl={video.src}
-          poster={video.poster}
           muted={true}
           autoplay={autoplay}
           loop={true}

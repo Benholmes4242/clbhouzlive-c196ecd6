@@ -57,7 +57,6 @@ export default function ShortsVideoTile({
       <HLSPlayer
         ref={playerRef}
         src={hlsUrl}
-        poster={posterUrl}
         autoplay={isPlaying}
         muted
         loop

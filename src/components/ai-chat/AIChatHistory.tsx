@@ -84,7 +84,6 @@ export const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?
   return (
     <video
       ref={videoRef}
-      poster={poster}
       className={className}
       controls
       muted

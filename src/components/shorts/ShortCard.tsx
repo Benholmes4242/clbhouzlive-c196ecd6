@@ -74,7 +74,6 @@ export default React.memo(function ShortCard({
         {isVideo && hlsUrl ? (
           <HLSPlayer
             src={hlsUrl}
-            poster={posterUrl}
             autoplay={false}
             muted
             loop

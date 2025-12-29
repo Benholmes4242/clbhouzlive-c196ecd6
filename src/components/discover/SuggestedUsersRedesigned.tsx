@@ -380,7 +380,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <EnhancedVideoPlayer
             ref={videoRef}
             src={mediaUrl}
-            poster={user.latestVideo?.poster}
             autoplay={isVisible}
             playsInline={true}
             muted={true}

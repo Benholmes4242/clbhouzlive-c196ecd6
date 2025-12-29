@@ -352,7 +352,6 @@ export const MiniPlayer: React.FC = () => {
                   key={activeVideoId} // 6B-4: Key by activeVideoId to prevent stale audio
                   ref={videoElRef}
                   src={videoData.hlsUrl}
-                  poster={videoData.posterUrl}
                   autoplay
                   muted={true}  // Muted in mini to avoid audio issues / iOS restrictions
                   loop={false}

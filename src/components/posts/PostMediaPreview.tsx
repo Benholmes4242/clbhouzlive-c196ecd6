@@ -41,7 +41,6 @@ const PostMediaPreview = ({ file, previewUrl }: PostMediaPreviewProps) => {
               onPlay={handleVideoPlay}
               onPause={handleVideoPause}
               onEnded={handleVideoPause}
-              poster={previewUrl}
               preload="metadata"
             />
             {!isPlaying && (

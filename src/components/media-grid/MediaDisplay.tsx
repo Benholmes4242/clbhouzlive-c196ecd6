@@ -147,7 +147,6 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           <div className="relative w-full h-full">
             <EnhancedVideoPlayer
               src={media.media_url}
-              poster={thumbnailUrl || undefined}
               autoplay={shouldAutoplay}
               muted={videoIsMuted} // Use exclusive video audio state
               loop={loop}

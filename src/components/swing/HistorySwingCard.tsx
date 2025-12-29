@@ -144,7 +144,6 @@ export const HistorySwingCard: React.FC<HistorySwingCardProps> = ({
                   <div className="overflow-hidden rounded-xl ring-1 ring-black/10 bg-black/5">
                     <HLSVideoPlayer
                       src={analysis.videoUrl!}
-                      poster={getThumbnailUrl() || undefined}
                       className="w-full h-auto"
                     />
                   </div>

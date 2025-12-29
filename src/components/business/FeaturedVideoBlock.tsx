@@ -104,7 +104,6 @@ export function FeaturedVideoBlock({
         <video
           ref={videoRef}
           src={videoUrl || undefined}
-          poster={posterUrl || undefined}
           muted={isMuted}
           loop
           playsInline

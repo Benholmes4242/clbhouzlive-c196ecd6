@@ -125,7 +125,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             <HLSPlayer
               ref={playerRef}
               src={hlsUrl || ''}
-              poster={posterUrl || undefined}
               autoplay={isVisible}
               muted={isMuted}
               loop
