@@ -209,47 +209,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     const dedupe = <T extends { id: string }>(videos: T[]): T[] => 
       videos.filter(v => v?.id && !seen.has(v.id) && (seen.add(v.id), true));
     
-    // Client-side search filter (comprehensive - matches Watch page)
-    const searchFilter = <T extends Record<string, any>>(videos: T[]): T[] => {
-      if (!searchQuery || !searchQuery.trim()) return videos;
-      
-      const query = searchQuery.toLowerCase();
-      return videos.filter(v => {
-        // Video content fields
-        const titleMatch = (v.title || '').toLowerCase().includes(query);
-        const captionMatch = (v.caption || '').toLowerCase().includes(query);
-        const descriptionMatch = (v.description || '').toLowerCase().includes(query);
-        
-        // Creator fields (flat structure - videos tab specific)
-        const creatorNameMatch = (v.creatorName || '').toLowerCase().includes(query);
-        const creatorUsernameMatch = (v.creatorUsername || '').toLowerCase().includes(query);
-        
-        // User/creator fields (nested structure - polymorphic support)
-        const userNameMatch = (v.user?.name || '').toLowerCase().includes(query);
-        const userUsernameMatch = (v.user?.username || '').toLowerCase().includes(query);
-        const nestedCreatorNameMatch = (v.creator?.name || '').toLowerCase().includes(query);
-        const nestedCreatorUsernameMatch = (v.creator?.username || '').toLowerCase().includes(query);
-        
-        // Business profile name
-        const businessMatch = (v.business?.name || '').toLowerCase().includes(query);
-        
-        // Golf course name (both camelCase and snake_case)
-        const courseMatch = (v.golfCourse?.name || '').toLowerCase().includes(query);
-        const golfCourseMatch = (v.golf_course?.name || '').toLowerCase().includes(query);
-        
-        return titleMatch || captionMatch || descriptionMatch ||
-               creatorNameMatch || creatorUsernameMatch ||
-               userNameMatch || userUsernameMatch ||
-               nestedCreatorNameMatch || nestedCreatorUsernameMatch ||
-               businessMatch || courseMatch || golfCourseMatch;
-      });
-    };
-    
     // Process in priority order (after Continue Watching)
-    const followed = searchFilter(dedupe(followedVideosRaw));
-    const recommended = searchFilter(dedupe(recommendedVideosRaw));
-    const trending = searchFilter(dedupe(trendingVideosRaw));
-    const courses = searchFilter(dedupe(coursesVideosRaw));
+    const followed = dedupe(followedVideosRaw);
+    const recommended = dedupe(recommendedVideosRaw);
+    const trending = dedupe(trendingVideosRaw);
+    const courses = dedupe(coursesVideosRaw);
     
     return {
       followedVideos: followed,
@@ -257,7 +221,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       trendingVideos: trending,
       coursesVideos: courses,
     };
-  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw, searchQuery]);
+  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw]);
 
   // CRITICAL: Preload first video immediately in layout phase (before paint)
   useLayoutEffect(() => {

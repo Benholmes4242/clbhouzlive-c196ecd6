@@ -76,45 +76,12 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const commandCenterSort: SortOption = sortOption as SortOption;
 
   const {
-    items: rawItems,
+    items,
     loading,
     hasMore,
     communityCount,
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
-
-  // Apply client-side search filter (comprehensive - matches Watch page)
-  const items = useMemo(() => {
-    if (!searchQuery || !searchQuery.trim()) return rawItems;
-    
-    const query = searchQuery.toLowerCase();
-    return rawItems.filter(item => {
-      // Post content fields
-      const titleMatch = (item.title || '').toLowerCase().includes(query);
-      const captionMatch = ((item as any).caption || '').toLowerCase().includes(query);
-      const descriptionMatch = ((item as any).description || '').toLowerCase().includes(query);
-      
-      // User fields (legacy structure)
-      const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
-      const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
-      
-      // Creator fields (polymorphic - new structure)
-      const creatorNameMatch = ((item as any).creator?.name || '').toLowerCase().includes(query);
-      const creatorUsernameMatch = ((item as any).creator?.username || '').toLowerCase().includes(query);
-      
-      // Business profile name
-      const businessMatch = ((item as any).business?.name || '').toLowerCase().includes(query);
-      
-      // Golf course name (both camelCase and snake_case)
-      const courseMatch = ((item as any).golfCourse?.name || '').toLowerCase().includes(query);
-      const golfCourseMatch = ((item as any).golf_course?.name || '').toLowerCase().includes(query);
-      
-      return titleMatch || captionMatch || descriptionMatch || 
-             userNameMatch || userUsernameMatch || 
-             creatorNameMatch || creatorUsernameMatch || 
-             businessMatch || courseMatch || golfCourseMatch;
-    });
-  }, [rawItems, searchQuery]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
@@ -232,10 +199,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     );
   }
 
-  // Has community but no posts (or search returned no results)
+  // Has community but no posts
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
-    // Check if this is due to search or filter
-    const isSearchEmpty = searchQuery && searchQuery.trim().length > 0;
+    // Check if this is due to a filter
     const isFilteredEmpty = mediaFilter !== 'all';
     
     return (
@@ -252,19 +218,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             onPillSelect={handleFilterChange}
           />
         </div>
-        {isSearchEmpty ? (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <p className="text-muted-foreground text-center">
-              No posts found for "{searchQuery}"
-            </p>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="mt-3 text-sm text-primary hover:underline"
-            >
-              Clear search
-            </button>
-          </div>
-        ) : isFilteredEmpty ? (
+        {isFilteredEmpty ? (
           <CommunityEmptyState variant="no-results" onClearFilter={handleClearFilter} />
         ) : (
           <CommunityEmptyState variant="quiet" />
