@@ -8090,6 +8090,20 @@ export type Database = {
         Returns: Json
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_friends_first_post_ids: {
+        Args: {
+          p_current_user_id: string
+          p_limit: number
+          p_max_duration?: number
+          p_media_type?: string
+          p_min_duration?: number
+          p_offset: number
+        }
+        Returns: {
+          is_friend: boolean
+          post_id: string
+        }[]
+      }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }

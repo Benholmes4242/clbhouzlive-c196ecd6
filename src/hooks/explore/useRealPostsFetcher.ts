@@ -356,6 +356,221 @@ export const useRealPostsFetcher = () => {
     }
   };
 
+  /**
+   * Fetch posts with Friends First global ordering using RPC.
+   * Friends' posts appear before non-friends' posts globally, with correct pagination.
+   */
+  const fetchFriendsFirstPosts = async (
+    currentOffset: number,
+    postsPerPage: number,
+    mediaFilter?: string,
+    durationFilter?: { from: number; to: number | null }
+  ): Promise<ExploreContentItem[]> => {
+    try {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser?.id) return [];
+
+      // Determine media type for RPC
+      let mediaType: string | null = null;
+      if (mediaFilter === FILTER_TYPES.VIDEOS || mediaFilter === FILTER_TYPES.SHORTS) {
+        mediaType = 'video';
+      } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
+        mediaType = 'image';
+      }
+
+      // Determine duration filters
+      let maxDuration: number | null = null;
+      let minDuration: number | null = null;
+      
+      if (mediaFilter === FILTER_TYPES.SHORTS) {
+        maxDuration = 180;
+      } else if (durationFilter) {
+        if (durationFilter.from > 0) minDuration = durationFilter.from;
+        if (durationFilter.to !== null) maxDuration = durationFilter.to;
+      }
+
+      // Call RPC to get ordered post IDs
+      const { data: orderedIds, error: rpcError } = await supabase.rpc('get_friends_first_post_ids', {
+        p_current_user_id: currentUser.id,
+        p_limit: postsPerPage,
+        p_offset: currentOffset,
+        p_media_type: mediaType,
+        p_max_duration: maxDuration,
+        p_min_duration: minDuration,
+      });
+
+      if (rpcError) {
+        console.error('Error calling friends-first RPC:', rpcError);
+        return [];
+      }
+
+      if (!orderedIds || orderedIds.length === 0) {
+        return [];
+      }
+
+      const postIds = orderedIds.map((row: { post_id: string }) => row.post_id);
+
+      // Fetch full post data for these IDs
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          actor_type,
+          actor_id,
+          like_count,
+          comment_count,
+          post_media!inner (
+            id,
+            media_type,
+            media_url,
+            duration_seconds,
+            width,
+            height,
+            aspect_ratio,
+            media_width,
+            media_height,
+            image_orientation
+          ),
+          post_tags (
+            id,
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name
+            )
+          ),
+          post_likes(count),
+          post_comments(count)
+        `)
+        .in('id', postIds);
+
+      if (postsError) {
+        console.error('Error fetching posts by IDs:', postsError);
+        return [];
+      }
+
+      if (!postsData || postsData.length === 0) {
+        return [];
+      }
+
+      // Re-sort posts to match RPC order (Supabase .in() doesn't preserve order)
+      const postMap = new Map(postsData.map(p => [p.id, p]));
+      const sortedPosts = postIds.map((id: string) => postMap.get(id)).filter(Boolean) as any[];
+
+      // Hydrate posts with user/business profiles and golf course data
+      const personalPosts = sortedPosts.filter(p => !p.actor_type || p.actor_type === 'personal');
+      const businessPosts = sortedPosts.filter(p => p.actor_type === 'business');
+
+      const userIds = [...new Set(personalPosts.map(post => post.user_id))];
+      const businessIds = [...new Set(businessPosts.map(post => post.actor_id).filter(Boolean))] as string[];
+
+      const { data: profiles } = userIds.length > 0
+        ? await supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', userIds)
+        : { data: [] };
+
+      const { data: businessAccounts } = businessIds.length > 0
+        ? await supabase.from('business_accounts').select('id, name, logo_url, is_verified, category, location').in('id', businessIds)
+        : { data: [] };
+
+      const courseIds = sortedPosts
+        .flatMap(post => (post.post_tags || [])
+          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
+          .map((tag: any) => tag.taggable_entities?.entity_id)
+        )
+        .filter(Boolean) as string[];
+
+      const uniqueCourseIds = [...new Set(courseIds)];
+      const { data: golfCourses } = uniqueCourseIds.length > 0
+        ? await supabase.from('golf_courses').select('id, name, country, sub_country, region').in('id', uniqueCourseIds)
+        : { data: [] };
+
+      const courseMap = new Map((golfCourses || []).map(c => [c.id, c]));
+
+      // Format posts
+      const formattedPosts = sortedPosts.map(post => {
+        const isBusinessPost = post.actor_type === 'business';
+        const userProfile = !isBusinessPost ? profiles?.find(p => p.id === post.user_id) : null;
+        const businessAccount = isBusinessPost && post.actor_id ? businessAccounts?.find(b => b.id === post.actor_id) : null;
+        
+        const allMedia = post.post_media || [];
+        const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0];
+        
+        if (!primaryMedia) return null;
+        
+        const isValid = (primaryMedia.media_type === 'image' && isValidImageUrl(primaryMedia.media_url)) ||
+                        (primaryMedia.media_type === 'video' && !!primaryMedia.media_url);
+        if (!isValid) return null;
+
+        const durationSeconds = primaryMedia.media_type === 'video' ? primaryMedia.duration_seconds : undefined;
+        
+        const golfCourseTag = (post.post_tags || []).find((tag: any) => tag.taggable_entities?.entity_type === 'golf_club');
+        let golfCourse = null;
+        if (golfCourseTag?.taggable_entities) {
+          const courseId = golfCourseTag.taggable_entities.entity_id;
+          const fullCourse = courseMap.get(courseId);
+          golfCourse = fullCourse ? {
+            id: fullCourse.id, name: fullCourse.name, country: fullCourse.country || '',
+            sub_country: fullCourse.sub_country, region: fullCourse.region,
+          } : { id: courseId, name: golfCourseTag.taggable_entities.name, country: '' };
+        }
+
+        const toNum = (v: any): number | undefined => {
+          const n = typeof v === 'string' ? parseFloat(v) : v;
+          return Number.isFinite(n) ? n : undefined;
+        };
+
+        let width = toNum(primaryMedia.media_width) ?? toNum(primaryMedia.width);
+        let height = toNum(primaryMedia.media_height) ?? toNum(primaryMedia.height);
+        let aspectRatio = toNum(primaryMedia.aspect_ratio);
+        const rotation = toNum(primaryMedia.rotation);
+        if (rotation && (rotation % 180) !== 0 && width && height) {
+          [width, height] = [height, width];
+          aspectRatio = width / height;
+        } else if (!aspectRatio && width && height && height > 0) {
+          aspectRatio = width / height;
+        }
+
+        return {
+          id: post.id,
+          type: primaryMedia.media_type as 'video' | 'image',
+          src: primaryMedia.media_url,
+          thumbnailSrc: primaryMedia.media_type === 'video' ? getStreamPoster(primaryMedia.media_url, '1s') || undefined : undefined,
+          title: post.content || 'Post',
+          likes: post.post_likes?.[0]?.count || 0,
+          comments: post.post_comments?.[0]?.count || 0,
+          shares: Math.floor(Math.random() * 50) + 1,
+          duration: durationSeconds ? `${durationSeconds}s` : undefined,
+          durationSeconds,
+          aspectRatio, width, height,
+          createdAt: post.created_at,
+          actorType: (post.actor_type || 'personal') as 'personal' | 'business',
+          actorId: post.actor_id || post.user_id,
+          user: isBusinessPost && businessAccount
+            ? { id: businessAccount.id, name: businessAccount.name || 'Business', avatar: businessAccount.logo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', verified: businessAccount.is_verified || false }
+            : { id: post.user_id, name: userProfile?.display_name || userProfile?.username || 'User', username: userProfile?.username, avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', verified: false },
+          business: isBusinessPost && businessAccount ? {
+            id: businessAccount.id, name: businessAccount.name, logoUrl: businessAccount.logo_url,
+            isVerified: businessAccount.is_verified, category: businessAccount.category, location: businessAccount.location,
+          } : undefined,
+          golfCourse,
+          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
+          isFollowing: true, // Friends first means they're followed
+          media: allMedia.filter((m: any) => isValidImageUrl(m.media_url)),
+        };
+      }).filter(Boolean) as ExploreContentItem[];
+
+      return formattedPosts;
+    } catch (error) {
+      console.error('Error fetching friends-first posts:', error);
+      return [];
+    }
+  };
+
   const fetchRealPosts = async (
     currentOffset: number, 
     postsPerPage: number, 
@@ -368,6 +583,11 @@ export const useRealPostsFetcher = () => {
       // Get current user to filter out their personal posts (business posts OK)
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       const currentUserId = currentUser?.id;
+
+      // For friends-first, use RPC for global ordering
+      if (sortOption === 'friends-first' && currentUserId) {
+        return await fetchFriendsFirstPosts(currentOffset, postsPerPage, mediaFilter, durationFilter);
+      }
 
       // Build the base query with select - includes actor_type/actor_id for business profiles
       let query = supabase
@@ -459,9 +679,6 @@ export const useRealPostsFetcher = () => {
         query = query
           .order('comment_count', { ascending: false })
           .order('created_at', { ascending: false }); // tie-breaker
-      } else if (sortOption === 'friends-first') {
-        // Friends-first needs client-side sorting after fetch
-        query = query.order('created_at', { ascending: false });
       } else {
         // 'newest' or default
         query = query.order('created_at', { ascending: false });
@@ -472,31 +689,7 @@ export const useRealPostsFetcher = () => {
       const toIndex = currentOffset + postsPerPage - 1;
       query = query.range(fromIndex, toIndex);
 
-      const { data: rawPostsData, error } = await query;
-      
-      let postsData = rawPostsData || [];
-      
-      // For friends-first, apply client-side sorting
-      if (sortOption === 'friends-first' && currentUserId && postsData.length > 0) {
-        const { data: following } = await supabase
-          .from('user_follows')
-          .select('following_id')
-          .eq('follower_id', currentUserId);
-        
-        const followingIds = new Set(following?.map(f => f.following_id) || []);
-        
-        postsData = [...postsData].sort((a: any, b: any) => {
-          const aIsFriend = followingIds.has(a.user_id);
-          const bIsFriend = followingIds.has(b.user_id);
-          
-          // Friends first
-          if (aIsFriend && !bIsFriend) return -1;
-          if (!aIsFriend && bIsFriend) return 1;
-          
-          // Then by date (newest first)
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
-      }
+      const { data: postsData, error } = await query;
 
       if (error) {
         console.error('Error fetching posts:', error);
