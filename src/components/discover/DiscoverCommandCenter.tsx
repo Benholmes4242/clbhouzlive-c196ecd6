@@ -117,9 +117,9 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   // Sort options content (inline to avoid hook issues with inner components)
   const sortOptionsContent = (
     <div 
-      className="px-4 overflow-y-auto"
+      className="px-4 pb-6 overflow-y-auto"
       style={{
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 100px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
         maxHeight: 'calc(75vh - 140px)',
       }}
     >
