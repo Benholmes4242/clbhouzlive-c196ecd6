@@ -50,7 +50,7 @@ export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
           {/* Backdrop - matches Visibility sheet: bg-black/40, no blur */}
           <div className="absolute inset-0 bg-black/40" />
           
-          {/* Sheet */}
+          {/* Sheet - using hardcoded white bg for debugging */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -58,15 +58,18 @@ export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             onAnimationStart={() => console.log('[StandardBottomSheet] animation START')}
             onAnimationComplete={() => console.log('[StandardBottomSheet] animation COMPLETE')}
-            className={`absolute bottom-0 left-0 right-0 rounded-t-2xl bg-background ${className || ''}`}
+            className={`absolute bottom-0 left-0 right-0 rounded-t-2xl ${className || ''}`}
             style={{ 
               paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+              background: '#ffffff',
+              minHeight: '200px',
+              border: '3px solid red',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+              <div className="w-10 h-1 rounded-full" style={{ background: '#999' }} />
             </div>
 
             {/* Header - Left-aligned title + close X */}
