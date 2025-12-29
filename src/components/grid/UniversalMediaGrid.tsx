@@ -356,9 +356,15 @@ export function UniversalMediaGrid({
   
   return (
     <>
-      <div ref={gridRef} className="pb-4">
+      <div ref={gridRef} className="relative pb-4">
+        {/* Sentinel positioned at 800px to trigger infinite scroll early */}
+        <div 
+          ref={sentinelRef} 
+          data-scroll-sentinel 
+          className="absolute top-[800px] left-0 w-full h-px pointer-events-none"
+          aria-hidden="true"
+        />
         {renderGrid()}
-        <div ref={sentinelRef} data-scroll-sentinel className="h-px w-full" />
       </div>
       
       {/* Loading indicator for infinite scroll */}
