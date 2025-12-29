@@ -35,6 +35,11 @@ import {
 import MediaTile from './MediaTile';
 import HeroTile from './HeroTile';
 import { TilePlaceholder } from './TilePlaceholder';
+import {
+  logObserverSetup,
+  logObserverCallback,
+  logObserverDisconnect,
+} from '@/utils/debugWatchPage';
 
 // Debug logging
 const DEBUG = false;
@@ -113,11 +118,32 @@ export function UniversalMediaGrid({
     if (!mergedConfig.infiniteScroll || !onLoadMore) return;
 
     const sentinel = sentinelRef.current;
+    
+    // Debug: Log observer setup
+    logObserverSetup({
+      rootMargin: '400px 0px',
+      threshold: 0,
+      hasSentinel: !!sentinel,
+      sentinelRect: sentinel?.getBoundingClientRect(),
+    });
+    
     if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const first = entries[0];
+        const willTrigger = first?.isIntersecting && hasMoreRef.current && !loadingRef.current && !isLoadingRef.current;
+        
+        // Debug: Log observer callback
+        logObserverCallback({
+          isIntersecting: first?.isIntersecting ?? false,
+          intersectionRatio: first?.intersectionRatio ?? 0,
+          boundingClientRect: first?.boundingClientRect ?? new DOMRect(),
+          hasMore: hasMoreRef.current,
+          isLoading: loadingRef.current || isLoadingRef.current,
+          willTrigger,
+        });
+        
         if (!first?.isIntersecting) return;
         
         // Use refs for latest values - avoids stale closure problem
@@ -139,7 +165,10 @@ export function UniversalMediaGrid({
     );
 
     observer.observe(sentinel);
-    return () => observer.disconnect();
+    return () => {
+      logObserverDisconnect();
+      observer.disconnect();
+    };
   }, [mergedConfig.infiniteScroll, onLoadMore]);
   
   // Handle item click
