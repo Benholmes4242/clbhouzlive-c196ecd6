@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { triggerHaptic } from '@/lib/ui/haptics';
@@ -31,6 +31,11 @@ export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
   children,
   className,
 }) => {
+  useEffect(() => {
+    console.log('[StandardBottomSheet] isOpen changed:', isOpen);
+  }, [isOpen]);
+
+  console.log('[StandardBottomSheet] render, isOpen:', isOpen);
   return (
     <AnimatePresence>
       {isOpen && (
@@ -51,45 +56,36 @@ export const StandardBottomSheet: React.FC<StandardBottomSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className={`absolute bottom-0 left-0 right-0 rounded-t-2xl ${className || ''}`}
+            onAnimationStart={() => console.log('[StandardBottomSheet] animation START')}
+            onAnimationComplete={() => console.log('[StandardBottomSheet] animation COMPLETE')}
+            className={`absolute bottom-0 left-0 right-0 rounded-t-2xl bg-background ${className || ''}`}
             style={{ 
-              background: 'var(--cm-surface-card)',
               paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Handle - matches Visibility sheet */}
+            {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div 
-                className="w-10 h-1 rounded-full"
-                style={{ background: 'var(--cm-border)' }}
-              />
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
             </div>
 
-            {/* Header - Left-aligned title + close X (matches Visibility sheet) */}
+            {/* Header - Left-aligned title + close X */}
             <div className="flex items-center justify-between px-4 pb-3">
               <div>
-                <h3 
-                  className="text-lg font-semibold"
-                  style={{ color: 'var(--cm-text-primary)' }}
-                >
+                <h3 className="text-lg font-semibold text-foreground">
                   {title}
                 </h3>
                 {subtitle && (
-                  <p 
-                    className="text-xs mt-0.5"
-                    style={{ color: 'var(--cm-text-tertiary)' }}
-                  >
+                  <p className="text-xs mt-0.5 text-muted-foreground">
                     {subtitle}
                   </p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ background: 'var(--cm-surface-alt)' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-muted"
               >
-                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
 
