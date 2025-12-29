@@ -114,15 +114,14 @@ export function UniversalMediaGrid({
   }, [hasMore, isLoading]);
 
   // Infinite scroll handler (IntersectionObserver sentinel; works with nested scroll containers)
+  // Re-observe when items.length changes to recalculate sentinel position after content loads
   useEffect(() => {
     if (!mergedConfig.infiniteScroll || !onLoadMore) return;
 
     const sentinel = sentinelRef.current;
     
     // Debug: Log observer setup
-    // Using 1200px rootMargin to trigger loading when sentinel is within 1200px of viewport
-    // This ensures smooth infinite scroll on tall grids (20 cards = ~3000px height)
-    const ROOT_MARGIN = '1200px 0px';
+    const ROOT_MARGIN = '400px 0px';
     
     logObserverSetup({
       rootMargin: ROOT_MARGIN,
@@ -130,6 +129,8 @@ export function UniversalMediaGrid({
       hasSentinel: !!sentinel,
       sentinelRect: sentinel?.getBoundingClientRect(),
     });
+    
+    console.log('🟠 [Scroll] OBSERVER_RE-SETUP', { itemCount: items.length });
     
     if (!sentinel) return;
 
@@ -163,7 +164,7 @@ export function UniversalMediaGrid({
       },
       {
         root: null,
-        rootMargin: ROOT_MARGIN, // Uses 1200px defined above
+        rootMargin: ROOT_MARGIN,
         threshold: 0,
       }
     );
@@ -173,7 +174,7 @@ export function UniversalMediaGrid({
       logObserverDisconnect();
       observer.disconnect();
     };
-  }, [mergedConfig.infiniteScroll, onLoadMore]);
+  }, [mergedConfig.infiniteScroll, onLoadMore, items.length]); // Re-observe when content changes
   
   // Handle item click
   const handleItemClick = useCallback((item: UniversalMediaItem, index: number) => {
