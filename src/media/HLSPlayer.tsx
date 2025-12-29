@@ -10,7 +10,7 @@
  * - Native HLS on iOS, HLS.js fallback
  */
 
-import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo } from 'react';
+import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle, memo, useMemo } from 'react';
 import { Play, RefreshCw, Volume2, VolumeX } from 'lucide-react';
 import { safePlay, isIOS } from '@/utils/safePlay';
 import { loadHlsJs } from '@/utils/hlsLoader';
@@ -38,6 +38,11 @@ import {
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
 import { FLAGS } from '@/config/flags';
+import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
+import { VideoErrorState } from '@/media/components/VideoErrorState';
+
+// First frame timeout in ms (prevents infinite spinner)
+const FIRST_FRAME_TIMEOUT_MS = 8000;
 
 const getTimestamp = () => performance.now().toFixed(2);
 const logDebug = (event: string, data?: any) => {
@@ -51,6 +56,7 @@ const logDebug = (event: string, data?: any) => {
 export interface HLSPlayerProps {
   // Source
   src: string;
+  /** @deprecated Use usePausedVideo instead. Poster image shown before video loads. */
   poster?: string;
   mp4FallbackUrl?: string; // Optional MP4 fallback URL to try when HLS fails
   
@@ -89,10 +95,18 @@ export interface HLSPlayerProps {
   mediaId?: string; // Required for scrubber intent tracking
   
   // Video System Refactor: Poster vs Paused Video Mode
-  // When true: Skip poster, render paused video showing first frame (new architecture)
-  // When false/undefined: Use feature flag FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER
-  // This prop allows per-component override for gradual rollout
+  /**
+   * If true, video renders in paused state (first frame visible) instead of poster.
+   * If undefined, uses global FLAGS.USE_PAUSED_VIDEO_INSTEAD_OF_POSTER flag.
+   * @default undefined (controlled by feature flag)
+   */
   usePausedVideo?: boolean;
+  
+  /**
+   * Custom loading component to show while first frame loads (paused video mode only).
+   * If not provided, uses default VideoLoadingSpinner.
+   */
+  customLoadingComponent?: React.ReactNode;
 }
 
 export interface HLSPlayerRef {
@@ -136,6 +150,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   showScrubber,
   mediaId,
   usePausedVideo,
+  customLoadingComponent,
 }, ref) => {
   // ============ Feature Flag: Poster vs Paused Video Mode ============
   // Component-level prop takes precedence, otherwise use global feature flag
@@ -199,6 +214,16 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (mediaId) {
         endVideoSession(mediaId);
       }
+      
+      // Cleanup first-frame timeout
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
+        firstFrameTimeoutRef.current = null;
+      }
+      if (firstFrameCleanupRef.current) {
+        firstFrameCleanupRef.current();
+        firstFrameCleanupRef.current = null;
+      }
     };
   }, []);
   
@@ -210,10 +235,25 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [hasError, setHasError] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [hasFirstFrame, setHasFirstFrame] = useState(false); // Track first frame readiness
+  const [firstFrameError, setFirstFrameError] = useState(false); // Track first frame timeout/error
   const [triedMp4Fallback, setTriedMp4Fallback] = useState(false); // Track if MP4 fallback was attempted
   const [showUnavailable, setShowUnavailable] = useState(false); // Show "Video unavailable" overlay
   const [lastError, setLastError] = useState<string | null>(null); // Last error message for debug
   
+  // Ref for first-frame timeout cleanup
+  const firstFrameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const firstFrameCleanupRef = useRef<(() => void) | null>(null);
+  
+  // ============ Derived State for Poster vs Paused Video Mode ============
+  const shouldShowPoster = useMemo(() => {
+    return shouldUsePoster && !!poster && !hasFirstFrame;
+  }, [shouldUsePoster, poster, hasFirstFrame]);
+  
+  const shouldShowLoadingSpinner = useMemo(() => {
+    const usePausedMode = !shouldUsePoster;
+    return usePausedMode && !hasFirstFrame && !firstFrameError && !hasError;
+  }, [shouldUsePoster, hasFirstFrame, firstFrameError, hasError]);
+
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);
   const [bufferedPct, setBufferedPct] = useState(0);
@@ -921,21 +961,41 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (firstFrameRequestedRef.current) return;
     firstFrameRequestedRef.current = true;
     
+    // Clear any existing timeout
+    if (firstFrameTimeoutRef.current) {
+      clearTimeout(firstFrameTimeoutRef.current);
+      firstFrameTimeoutRef.current = null;
+    }
+    
+    const cleanup = () => {
+      // Clear timeout
+      if (firstFrameTimeoutRef.current) {
+        clearTimeout(firstFrameTimeoutRef.current);
+        firstFrameTimeoutRef.current = null;
+      }
+      // Execute any stored cleanup function
+      if (firstFrameCleanupRef.current) {
+        firstFrameCleanupRef.current();
+        firstFrameCleanupRef.current = null;
+      }
+      // Cleanup timeupdate listener
+      if (timeUpdateListenerRef.current) {
+        video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
+        timeUpdateListenerRef.current = null;
+      }
+    };
+    
     const markReady = () => {
       if (!mountedRef.current) return;
+      
+      cleanup();
       
       logDebug('FIRST_FRAME_DETECTED', {
         currentTime: video.currentTime,
         readyState: video.readyState,
         mediaId: mediaId?.slice(0, 8),
-        willHidePoster: true
+        willHidePoster: shouldUsePoster
       });
-      
-      // Cleanup any fallback listener
-      if (timeUpdateListenerRef.current) {
-        video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
-        timeUpdateListenerRef.current = null;
-      }
       
       // Record TTFF (only once per play cycle)
       if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
@@ -950,11 +1010,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       // CRITICAL FIX: Hide poster and show video IMMEDIATELY via direct DOM manipulation
       // This prevents the 60ms black flash caused by async React state updates
-      const posterEl = posterRef.current;
-      if (posterEl) {
-        posterEl.style.opacity = '0';
-        posterEl.style.pointerEvents = 'none';
-        logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
+      if (shouldUsePoster) {
+        const posterEl = posterRef.current;
+        if (posterEl) {
+          posterEl.style.opacity = '0';
+          posterEl.style.pointerEvents = 'none';
+          logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
+        }
       }
       
       // Show video immediately
@@ -963,14 +1025,50 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       // Then update React state for tracking (non-blocking)
       setHasFirstFrame(true);
+      setFirstFrameError(false);
       setIsPosterVisible(false);
     };
+    
+    const markError = () => {
+      if (!mountedRef.current) return;
+      
+      cleanup();
+      
+      logDebug('FIRST_FRAME_TIMEOUT', {
+        mediaId: mediaId?.slice(0, 8),
+        timeoutMs: FIRST_FRAME_TIMEOUT_MS,
+      });
+      
+      // Only set error state in paused-video mode (poster mode has its own fallback)
+      if (!shouldUsePoster) {
+        setFirstFrameError(true);
+      }
+      
+      // Track timeout event
+      if (mediaId) {
+        recordFailure(mediaId, 'first_frame_timeout', false);
+      }
+    };
+    
+    // Set timeout to prevent infinite spinner (only in paused-video mode)
+    if (!shouldUsePoster) {
+      firstFrameTimeoutRef.current = setTimeout(() => {
+        console.warn(`[HLSPlayer] First frame timeout for ${mediaId?.slice(0, 8)} after ${FIRST_FRAME_TIMEOUT_MS}ms`);
+        markError();
+      }, FIRST_FRAME_TIMEOUT_MS);
+    }
 
     const anyVideo = video as any;
 
     // Best option: requestVideoFrameCallback (WKWebView supports this)
     if (typeof anyVideo.requestVideoFrameCallback === 'function') {
-      anyVideo.requestVideoFrameCallback(() => markReady());
+      const callbackId = anyVideo.requestVideoFrameCallback(() => markReady());
+      // Store cleanup function for cancelVideoFrameCallback
+      if (typeof anyVideo.cancelVideoFrameCallback === 'function') {
+        firstFrameCleanupRef.current = () => {
+          try { anyVideo.cancelVideoFrameCallback(callbackId); } catch {}
+        };
+      }
       return;
     }
 
@@ -985,7 +1083,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Store ref for cleanup
     timeUpdateListenerRef.current = onTime;
     video.addEventListener('timeupdate', onTime, { passive: true });
-  }, [mediaId]);
+  }, [mediaId, shouldUsePoster]);
   
   const handleLoadedData = useCallback(() => {
     if (!mountedRef.current) return;
@@ -1269,8 +1367,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Reset all error states
     setShowUnavailable(false);
     setHasError(false);
+    setFirstFrameError(false);
+    setHasFirstFrame(false);
     setLastError(null);
     setTriedMp4Fallback(false);
+    
+    // Reset first-frame detection guards
+    firstFrameRequestedRef.current = false;
+    ttffFiredRef.current = false;
     
     // Clear format markers
     videoEl.removeAttribute('data-format-error');
@@ -1417,6 +1521,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         onPlaying={handlePlayingEvent}
         onClick={handleClick}
       />
+      
+      {/* Loading Spinner - Paused video mode only, shows while waiting for first frame */}
+      {shouldShowLoadingSpinner && (
+        customLoadingComponent || <VideoLoadingSpinner size="md" />
+      )}
+      
+      {/* First Frame Error State - Paused video mode only, shows on timeout */}
+      {firstFrameError && !hasError && !showUnavailable && (
+        <VideoErrorState 
+          message="Video taking too long to load"
+          onRetry={handleRetry}
+          showRetry
+        />
+      )}
       
       {/* Play Button Overlay */}
       {showPlayButton && !isPlaying && !hasError && isReady && (
