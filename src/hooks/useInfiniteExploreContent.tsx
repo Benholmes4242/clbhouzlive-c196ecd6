@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
+import { logDataFetch, logLoadMore } from '@/utils/debugWatchPage';
 
 const POSTS_PER_PAGE = 20; // Increased for better performance
 const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
@@ -115,7 +116,21 @@ export const useInfiniteExploreContent = (
   }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, activeFilter, subFilter, durationFilter, sortOption]);
 
   const loadMore = useCallback(async (abortSignal?: AbortSignal) => {
+    // Debug: Log load more call
+    logLoadMore({
+      currentCount: content.length,
+      hasMore,
+      isLoading: loading,
+      action: 'called',
+    });
+
     if (loading || !hasMore) {
+      logLoadMore({
+        currentCount: content.length,
+        hasMore,
+        isLoading: loading,
+        action: 'skipped',
+      });
       return;
     }
     
@@ -191,6 +206,22 @@ export const useInfiniteExploreContent = (
       }
       
       if (posts.length > 0) {
+        // Debug: Log successful fetch
+        logLoadMore({
+          currentCount: content.length,
+          hasMore: true,
+          isLoading: false,
+          action: 'success',
+          newItemsCount: posts.length,
+        });
+        
+        // Debug: Log data fetch details
+        logDataFetch({
+          firstPageCount: posts.length,
+          totalItems: content.length + posts.length,
+          filterKey: currentFilter,
+        });
+
         // Update content cache for current filter
         setContentCache(prev => {
           const updated: FilterStateMap<ExploreContentItem[]> = {
