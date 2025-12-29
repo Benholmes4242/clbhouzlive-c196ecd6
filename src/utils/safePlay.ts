@@ -144,6 +144,9 @@ export async function safePlay(
   }
   
   // Validate blob URL if present
+  // IMPORTANT: HLS.js creates MediaSource blob URLs that we DON'T validate
+  // because they can appear invalid before data is loaded but work fine during playback.
+  // The video.play() call itself is the best validation - it will fail if the blob is truly broken.
   if (currentSrc.startsWith('blob:')) {
     // Check regeneration limit to prevent infinite loops
     const regenCount = BlobUrlManager.getRegenerationCount(mediaId);
@@ -153,7 +156,7 @@ export async function safePlay(
       return false;
     }
     
-    // Check for previous format error marker
+    // Check for previous format error marker - this means the blob was actually tried and failed
     if (video.getAttribute('data-format-error') === '1') {
       devWarn(`[safePlay] 🚫 Blob URL already failed for video ${videoId}, attempting regeneration...`);
       
@@ -177,29 +180,11 @@ export async function safePlay(
       }
     }
     
-    // Validate blob URL using registry + video readyState (NOT HTTP fetch - blob URLs aren't network resources!)
-    const isValid = validateBlobUrl(currentSrc, mediaId, video);
-    if (!isValid) {
-      devLog(`[safePlay] 🚫 Blob URL not valid for ${mediaId}, attempting regeneration...`);
-      
-      if (generation !== undefined) {
-        BlobUrlManager.markGenerationFailed(mediaId, generation);
-      }
-      
-      if (onRegenerateSource) {
-        try {
-          BlobUrlManager.incrementRegeneration(mediaId);
-          await onRegenerateSource(mediaId);
-          await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (err) {
-          devWarn(`[safePlay] 🚫 Source regeneration failed for ${videoId}:`, err);
-          return false;
-        }
-      } else {
-        devWarn(`[safePlay] 🚫 Blob URL invalid and no regeneration handler available`);
-        return false;
-      }
-    }
+    // SKIP blob URL validation for HLS.js MediaSource blobs
+    // HLS.js manages its own MediaSource lifecycle and blob URLs may appear
+    // "invalid" before data is loaded but work perfectly fine when played.
+    // Let the actual play() call be the validator - if it fails, we'll handle it.
+    devLog(`[safePlay] Skipping blob URL validation for HLS.js MediaSource blob ${mediaId.slice(0, 8)}`);
   }
   
   // Ensure proper preconditions for autoplay

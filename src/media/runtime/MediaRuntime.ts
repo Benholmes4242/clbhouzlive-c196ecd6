@@ -361,8 +361,33 @@ class MediaRuntimeCore {
           if (playerRef?.detach && playerRef?.attach) {
             console.log(`[MediaRuntime] Regenerating HLS source for ${id.slice(0, 8)}`);
             playerRef.detach();
-            await new Promise(resolve => requestAnimationFrame(resolve));
+            
+            // Wait for cleanup to complete (requestAnimationFrame is too short for HLS.js async setup)
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
             playerRef.attach();
+            
+            // Wait for HLS.js to start loading the new source
+            // HLS.js setup is async and needs time to create MediaSource and load manifest
+            await new Promise<void>((resolve) => {
+              const video = currentNode.videoElement;
+              
+              // Wait for loadedmetadata or timeout
+              const onLoadedMetadata = () => {
+                video.removeEventListener('loadedmetadata', onLoadedMetadata);
+                clearTimeout(timeout);
+                resolve();
+              };
+              
+              video.addEventListener('loadedmetadata', onLoadedMetadata, { once: true });
+              
+              // Timeout after 3 seconds if no metadata loaded
+              const timeout = setTimeout(() => {
+                video.removeEventListener('loadedmetadata', onLoadedMetadata);
+                console.warn(`[MediaRuntime] Regeneration timeout for ${id.slice(0, 8)} - proceeding anyway`);
+                resolve();
+              }, 3000);
+            });
           }
         };
         

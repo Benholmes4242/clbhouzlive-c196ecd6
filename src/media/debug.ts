@@ -14,4 +14,5 @@ export const DEBUG_MEDIA_TELEMETRY = DEBUG_MEDIA;
 export const DEBUG_CLUBHOUSE_FEED = DEBUG_MEDIA;
 
 // Force HLS.js even on Safari/native-capable browsers (for debugging)
-export const FORCE_HLS_JS = true;
+// DISABLED: Causing format errors on desktop - let native playback work where supported
+export const FORCE_HLS_JS = false;
