@@ -90,13 +90,22 @@ export function UniversalMediaGrid({
   }, [items, mergedConfig.autoplayPattern, mergedConfig.autoplayNth]);
   
   // Viewport tracking for lazy loading
-  const { visibleIndices, registerTile, shouldRender } = useViewportTracking({
+  // For portrait-grid (Watch page), render all items initially to avoid blank tiles
+  // The IntersectionObserver-based approach has issues with placeholder visibility
+  const skipVirtualization = mergedConfig.layout === 'portrait-grid' || mergedConfig.layout === 'mixed-grid';
+  
+  const { visibleIndices, registerTile, shouldRender: viewportShouldRender } = useViewportTracking({
     totalItems: processedItems.length,
-    initialVisible: mergedConfig.initialVisible ?? 6,
+    initialVisible: skipVirtualization ? processedItems.length : (mergedConfig.initialVisible ?? 6),
     preloadViewports: mergedConfig.preloadViewports ?? 2,
     estimatedRowHeight: mergedConfig.layout === 'portrait-grid' ? 250 : 200,
     keepMounted: true,
   });
+  
+  // For grids without virtualization, always render all items
+  const shouldRender = useCallback((index: number): boolean => {
+    return skipVirtualization ? true : viewportShouldRender(index);
+  }, [skipVirtualization, viewportShouldRender]);
   
   // MediaRuntime integration
   const { registerMedia, playingIds, setScrolling } = useGridMediaRuntime({
