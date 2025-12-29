@@ -102,6 +102,7 @@ export function useBlobUrlManager() {
 // Singleton for global access (used by MediaRuntime)
 class BlobUrlManagerSingleton {
   private blobUrls = new Map<string, BlobUrlState>();
+  private regenerationCounts = new Map<string, number>(); // Track regeneration attempts
 
   registerBlobUrl(mediaId: string, blobUrl: string) {
     const existing = this.blobUrls.get(mediaId);
@@ -128,6 +129,23 @@ class BlobUrlManagerSingleton {
     });
   }
 
+  /**
+   * Check if a blob URL is registered for a media ID
+   * This is the correct way to validate blob URLs (not HTTP fetch!)
+   */
+  hasBlobUrl(mediaId: string): boolean {
+    const state = this.blobUrls.get(mediaId);
+    return state !== undefined && !state.revokedAt;
+  }
+
+  /**
+   * Get the current blob URL for a media ID
+   */
+  getBlobUrl(mediaId: string): string | undefined {
+    const state = this.blobUrls.get(mediaId);
+    return state?.revokedAt ? undefined : state?.url;
+  }
+
   markGenerationFailed(mediaId: string, generation: number) {
     const state = this.blobUrls.get(mediaId);
     if (state) {
@@ -145,6 +163,26 @@ class BlobUrlManagerSingleton {
     if (state) {
       state.failedGenerations.clear();
     }
+    // Also reset regeneration count on success
+    this.regenerationCounts.delete(mediaId);
+  }
+
+  /**
+   * Track regeneration attempts and check if limit exceeded
+   */
+  incrementRegeneration(mediaId: string): number {
+    const current = this.regenerationCounts.get(mediaId) ?? 0;
+    const newCount = current + 1;
+    this.regenerationCounts.set(mediaId, newCount);
+    return newCount;
+  }
+
+  getRegenerationCount(mediaId: string): number {
+    return this.regenerationCounts.get(mediaId) ?? 0;
+  }
+
+  resetRegenerationCount(mediaId: string) {
+    this.regenerationCounts.delete(mediaId);
   }
 
   cleanup(mediaId: string) {
@@ -155,6 +193,7 @@ class BlobUrlManagerSingleton {
       } catch {}
     }
     this.blobUrls.delete(mediaId);
+    this.regenerationCounts.delete(mediaId);
   }
 }
 
