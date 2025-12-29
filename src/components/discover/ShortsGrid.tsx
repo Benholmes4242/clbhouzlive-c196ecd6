@@ -160,23 +160,21 @@ export default function ShortsGrid({
     const unified = exploreItemsToUniversal(mixedItems);
     
     // Add orientation metadata for mixed-grid layout
-    // Autoplay pattern: 1st portrait (pos 0) + landscape (pos 4) of each 5-tile cycle
+    // Autoplay pattern: every 3rd card (3rd, 6th, 9th, 12th, etc.) - 1-indexed
     return unified.map((item, index) => {
-      const positionInCycle = index % 5; // 0-4 within each cycle
-      const isLandscapeSlot = positionInCycle === 4; // 5th position is landscape
       const aspectRatio = item.aspectRatio || 
         (item.mediaWidth && item.mediaHeight && item.mediaHeight > 0 
           ? item.mediaWidth / item.mediaHeight 
           : 1);
       const isActuallyLandscape = aspectRatio >= AR_LANDSCAPE_THRESHOLD;
       
-      // Autoplay: 1st portrait (position 0) and landscape (position 4) of each cycle
-      const isAutoplayCandidate = positionInCycle === 0 || positionInCycle === 4;
+      // Autoplay: every 3rd item (indices 2, 5, 8, 11... = positions 3, 6, 9, 12...)
+      const isAutoplayCandidate = (index + 1) % 3 === 0;
       
       return {
         ...item,
         orientation: isActuallyLandscape ? 'landscape' as const : 'portrait' as const,
-        tileVariant: isLandscapeSlot && isActuallyLandscape ? 'landscape' as const : 'portrait' as const,
+        tileVariant: isActuallyLandscape ? 'landscape' as const : 'portrait' as const,
         isAutoplayCandidate,
       };
     });
