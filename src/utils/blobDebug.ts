@@ -39,15 +39,25 @@ export function debugBlobUrls(): void {
 }
 
 // Test if a blob URL is still valid
+// NOTE: Blob URLs CANNOT be validated via fetch - they are in-memory references, not network resources
+// Instead, we check if a video element can load from the blob URL
 export async function testBlobUrl(blobUrl: string): Promise<boolean> {
-  try {
-    const response = await fetch(blobUrl, { method: 'HEAD' });
-    console.log(`Blob URL valid: ${response.ok}`, response.status);
-    return response.ok;
-  } catch (error) {
-    console.log('Blob URL invalid:', error);
-    return false;
+  console.warn('⚠️ Blob URLs cannot be tested via fetch. They are in-memory references.');
+  console.log('To test, look at the video element readyState or check for errors on play().');
+  
+  // Find video element using this blob URL
+  const videos = document.querySelectorAll('video');
+  for (const vid of videos) {
+    const video = vid as HTMLVideoElement;
+    if (video.src === blobUrl || video.currentSrc === blobUrl) {
+      const isValid = video.readyState >= 1 && !video.error;
+      console.log(`Blob URL check via video element: readyState=${video.readyState}, error=${video.error?.message || 'none'}, valid=${isValid}`);
+      return isValid;
+    }
   }
+  
+  console.log('No video element found using this blob URL');
+  return false;
 }
 
 // Test all video blob URLs
