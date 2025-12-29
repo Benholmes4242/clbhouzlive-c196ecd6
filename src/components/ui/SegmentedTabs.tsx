@@ -34,7 +34,8 @@ export function SegmentedTabs({ options, value, onChange, className = '' }: Segm
             key={option.value}
             value={option.value}
             className="rounded-sq-sm text-sm px-3 py-1.5 font-medium 
-              data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground data-[state=active]:font-semibold
+              data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-foreground data-[state=active]:font-semibold
+              data-[state=active]:border-b-2 data-[state=active]:border-primary/60
               text-muted-foreground hover:text-foreground 
               active:scale-[0.97] 
               transition-all duration-motion-fast ease-standard"

@@ -292,7 +292,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             ) : (
               <ExternalLink className="h-4 w-4" />
             )}
-            {websiteLoading ? 'Opening...' : 'Visit Website'}
+            {websiteLoading ? 'Opening...' : 'Official course website'}
           </Button>
         </section>
       ) : null}

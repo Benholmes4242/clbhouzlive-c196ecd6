@@ -137,12 +137,12 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                 });
                 navigate(`/courses?${params.toString()}`);
               }}
-              className="w-full flex items-center justify-between px-0 pb-2 text-base hover:opacity-70 transition-opacity"
+              className="w-full flex items-center justify-between px-0 pb-2 text-base group hover:opacity-70 transition-opacity"
             >
               <span>
-                See more courses in <span className="font-semibold">{subCountryLabel}</span>
+                Explore more <span className="font-semibold">{subCountryLabel}</span> courses
               </span>
-              <span className="text-muted-foreground">›</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
             </button>
           )}
 
@@ -177,12 +177,12 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="w-full flex items-center justify-between px-0 pt-2 text-base hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between px-0 pt-2 text-base group hover:opacity-70 transition-opacity"
           >
             <span>
-              See Top 100 in <span className="font-semibold">{primaryListName}</span>
+              Explore <span className="font-semibold">{primaryListName} Top 100</span>
             </span>
-            <span className="text-muted-foreground">›</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>
