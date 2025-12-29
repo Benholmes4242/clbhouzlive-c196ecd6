@@ -298,10 +298,10 @@ export function markAutoplayCandidates(items: UnifiedMediaItem[]): UnifiedMediaI
       };
     }
     
-    // All videos are autoplay candidates - MediaRuntime decides based on visibility
+    // Every 3rd video is an autoplay candidate (indices 0, 3, 6, 9, 12...)
     return {
       ...item,
-      isAutoplayCandidate: true,
+      isAutoplayCandidate: index % 3 === 0,
       sortIndex: index,
       aspectRatio,
       orientation,

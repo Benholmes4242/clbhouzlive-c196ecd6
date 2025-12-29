@@ -82,7 +82,7 @@ const MAX_RETRIES = 1;
 const PLAY_RETRY_MAX = 3; // Max retries for requestPlay with backoff
 const PLAY_RETRY_BASE_DELAY = 100; // Base delay for exponential backoff
 // Concurrent video limits by surface
-const MAX_CONCURRENT_GRID_VIDEOS = 3; // Allow up to 3 grid videos simultaneously
+const MAX_CONCURRENT_GRID_VIDEOS = Infinity; // No limit on simultaneous grid videos
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
 // Surface priority (lower = higher priority)
