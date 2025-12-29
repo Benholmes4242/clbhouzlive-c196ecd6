@@ -409,6 +409,8 @@ export const useRealPostsFetcher = () => {
       }
 
       const postIds = orderedIds.map((row: { post_id: string }) => row.post_id);
+      // Create a map of post ID -> is_friend for accurate isFollowing values
+      const isFriendMap = new Map(orderedIds.map((row: { post_id: string; is_friend: boolean }) => [row.post_id, row.is_friend]));
 
       // Fetch full post data for these IDs
       const { data: postsData, error: postsError } = await supabase
@@ -559,7 +561,7 @@ export const useRealPostsFetcher = () => {
           } : undefined,
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: true, // Friends first means they're followed
+          isFollowing: isFriendMap.get(post.id) ?? false, // Use actual is_friend value from RPC
           media: allMedia.filter((m: any) => isValidImageUrl(m.media_url)),
         };
       }).filter(Boolean) as ExploreContentItem[];
