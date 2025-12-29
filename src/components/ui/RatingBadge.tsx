@@ -26,8 +26,10 @@ interface RatingBadgeProps {
  * border, and text in the tier's color.
  */
 export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
-  // Use the tier's accent color
-  const accentColor = tierData.accent || tierData.bgDark;
+  // Use the tier's bgLight for a saturated background (like Played button uses emerald-50)
+  // and accent for text/border (like Played uses emerald-700)
+  const bgColor = tierData.bgLight;
+  const accentColor = tierData.accent;
   
   return (
     <span
@@ -38,8 +40,8 @@ export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
         className
       )}
       style={{
-        borderColor: `${accentColor}40`,
-        backgroundColor: `${accentColor}15`,
+        borderColor: accentColor,
+        backgroundColor: bgColor,
         color: accentColor,
       }}
     >
