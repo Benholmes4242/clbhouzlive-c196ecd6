@@ -68,12 +68,8 @@ const Clubhouse = () => {
     signalFirstFrameReady 
   } = useClubhouseSkeletonTiming(posts.length > 0);
   
-  // Show skeleton during rehydration
-  if (isRehydrating) {
-    return <ClubhouseSkeleton />;
-  }
-
   // Track loading posts state for boot timeline (audit only)
+  // IMPORTANT: All hooks must be declared BEFORE any early returns
   const wasShowingLoadingRef = useRef(false);
   useEffect(() => {
     const showingLoading = isLoading && posts.length === 0;
@@ -90,6 +86,11 @@ const Clubhouse = () => {
   const handleFirstFrameReady = useCallback(() => {
     signalFirstFrameReady();
   }, [signalFirstFrameReady]);
+  
+  // Show skeleton during rehydration - MUST be after all hooks
+  if (isRehydrating) {
+    return <ClubhouseSkeleton />;
+  }
 
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();
