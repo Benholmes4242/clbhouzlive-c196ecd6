@@ -115,69 +115,36 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const SortPill = () => {
-    const pillClasses = cn(
-      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-      "transition-colors active:scale-[0.98]",
-      isNonDefaultSort
-        ? "bg-foreground/15 text-foreground border border-foreground/30"
-        : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
-    );
-    
-    return (
-      <>
-        <button
-          type="button"
-          className={pillClasses}
-          onPointerDown={(e) => {
-            sortTapStartRef.current = { x: e.clientX, y: e.clientY };
-            console.log('Sort pill pointerdown', { pointerType: e.pointerType, x: e.clientX, y: e.clientY });
-          }}
-          onPointerUp={(e) => {
-            const start = sortTapStartRef.current;
-            sortTapStartRef.current = null;
+  const sortPillClasses = cn(
+    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
+    "transition-colors active:scale-[0.98]",
+    isNonDefaultSort
+      ? "bg-foreground/15 text-foreground border border-foreground/30"
+      : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
+  );
 
-            const dx = start ? Math.abs(e.clientX - start.x) : null;
-            const dy = start ? Math.abs(e.clientY - start.y) : null;
-            console.log('Sort pill pointerup', { pointerType: e.pointerType, x: e.clientX, y: e.clientY, dx, dy });
+  const handleSortPillPointerDown = (e: React.PointerEvent) => {
+    sortTapStartRef.current = { x: e.clientX, y: e.clientY };
+    console.log('Sort pill pointerdown', { pointerType: e.pointerType, x: e.clientX, y: e.clientY });
+  };
 
-            // If onClick is getting swallowed (common in horizontal scrollers on iOS), open on a clean tap.
-            if (start && (dx ?? 999) < 10 && (dy ?? 999) < 10) {
-              setDrawerOpen(true);
-            }
-          }}
-          onClick={() => {
-            console.log('Sort pill clicked');
-            setDrawerOpen(true);
-          }}
-        >
-          <ArrowUpDown className="w-3.5 h-3.5" />
-          <span>Sort</span>
-        </button>
-        <div style={{ fontSize: 12, opacity: 0.7 }}>
-          sortOpen: {String(drawerOpen)}
-        </div>
-        <StandardBottomSheet
-          isOpen={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          title="Sort by"
-          subtitle="Choose how results are ordered"
-        >
-          <div className="space-y-2">
-            {SORT_OPTIONS.map((option) => (
-              <SheetOptionRow
-                key={option.id}
-                label={option.label}
-                description={option.description}
-                selected={sortValue === option.id}
-                onSelect={() => handleSortSelect(option.id)}
-                icon={option.icon}
-              />
-            ))}
-          </div>
-        </StandardBottomSheet>
-      </>
-    );
+  const handleSortPillPointerUp = (e: React.PointerEvent) => {
+    const start = sortTapStartRef.current;
+    sortTapStartRef.current = null;
+
+    const dx = start ? Math.abs(e.clientX - start.x) : null;
+    const dy = start ? Math.abs(e.clientY - start.y) : null;
+    console.log('Sort pill pointerup', { pointerType: e.pointerType, x: e.clientX, y: e.clientY, dx, dy });
+
+    // If onClick is getting swallowed (common in horizontal scrollers on iOS), open on a clean tap.
+    if (start && (dx ?? 999) < 10 && (dy ?? 999) < 10) {
+      setDrawerOpen(true);
+    }
+  };
+
+  const handleSortPillClick = () => {
+    console.log('Sort pill clicked');
+    setDrawerOpen(true);
   };
 
   return (
@@ -243,7 +210,16 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               }}
             >
               {/* Sort Pill */}
-              <SortPill />
+              <button
+                type="button"
+                className={sortPillClasses}
+                onPointerDown={handleSortPillPointerDown}
+                onPointerUp={handleSortPillPointerUp}
+                onClick={handleSortPillClick}
+              >
+                <ArrowUpDown className="w-3.5 h-3.5" />
+                <span>Sort</span>
+              </button>
 
               {/* Divider */}
               <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />
@@ -282,6 +258,27 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
 
       {/* Bottom spacing gap */}
       <div className="h-4" />
+
+      {/* Sort Bottom Sheet - rendered outside scroll container */}
+      <StandardBottomSheet
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title="Sort by"
+        subtitle="Choose how results are ordered"
+      >
+        <div className="space-y-2">
+          {SORT_OPTIONS.map((option) => (
+            <SheetOptionRow
+              key={option.id}
+              label={option.label}
+              description={option.description}
+              selected={sortValue === option.id}
+              onSelect={() => handleSortSelect(option.id)}
+              icon={option.icon}
+            />
+          ))}
+        </div>
+      </StandardBottomSheet>
     </div>
   );
 };
