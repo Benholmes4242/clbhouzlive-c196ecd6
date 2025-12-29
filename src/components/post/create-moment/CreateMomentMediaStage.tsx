@@ -77,43 +77,41 @@ export default function CreateMomentMediaStage({
         />
 
         {/* Top scrim for badges */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/28 to-transparent z-10" 
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-        />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent z-10" />
 
         {/* Bottom scrim */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/30 to-transparent z-10" />
 
-        {/* Media counter - top left */}
+        {/* Media counter - top left - DARK GLASS */}
         <div 
           className="absolute left-4 z-20 flex items-center gap-2"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
-          <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1">
-            <span className="font-medium">{activeIndex + 1}/{media.length}</span>
+          <div className="rounded-full bg-black/60 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 flex items-center gap-1 font-medium">
+            <span>{activeIndex + 1}/{media.length}</span>
           </div>
         </div>
 
-        {/* Remove media button - top right */}
+        {/* Remove media button - top right - DARK GLASS */}
         <div 
           className="absolute right-4 z-20"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
           <button
             onClick={() => onRemoveMedia(activeIndex)}
-            className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] w-8 h-8 flex items-center justify-center transition-all hover:bg-white/70 active:scale-95"
+            className="rounded-full bg-black/60 backdrop-blur-sm w-8 h-8 flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
             aria-label="Remove current media"
           >
-            <X className="w-4 h-4 text-[rgba(25,25,28,0.85)]" />
+            <X className="w-4 h-4 text-white/90" />
           </button>
         </div>
 
-        {/* Video duration - bottom left */}
+        {/* Video duration - bottom left - DARK GLASS */}
         {currentItem?.type === 'video' && currentItem?.duration && (
           <div className="absolute bottom-[8px] left-4 z-20">
-            <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1.5">
+            <div className="rounded-full bg-black/60 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 flex items-center gap-1.5 font-medium">
               <Play className="w-2.5 h-2.5" />
-              <span className="font-medium">{formatDuration(currentItem.duration)}</span>
+              <span>{formatDuration(currentItem.duration)}</span>
             </div>
           </div>
         )}

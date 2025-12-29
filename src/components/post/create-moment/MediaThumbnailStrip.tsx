@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Star, GripVertical } from "lucide-react";
+import { Play, Sparkles, GripVertical } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
+import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
 import {
   DndContext,
   closestCenter,
@@ -48,6 +49,9 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect }: S
     transition,
     isDragging,
   } = useSortable({ id: item.id });
+  
+  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -59,47 +63,114 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect }: S
   const edits = getEdits(item.id);
   const filterClass = edits?.filter ? `filter-${edits.filter}` : '';
 
+  // Generate video thumbnail from first frame
+  useEffect(() => {
+    if (item.type !== 'video' || !item.previewUrl) return;
+    
+    // Try to use poster URL first (for Stream videos)
+    const posterUrl = buildVideoPosterUrl(item.previewUrl, { width: 112, height: 112 });
+    if (posterUrl && !posterUrl.startsWith('blob:')) {
+      setVideoThumbnail(posterUrl);
+      return;
+    }
+    
+    // For local files, generate from video element
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    video.crossOrigin = 'anonymous';
+    
+    video.onloadeddata = () => {
+      video.currentTime = 0.1; // Seek to 0.1s for thumbnail
+    };
+    
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 112;
+        canvas.height = 112;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Draw centered crop
+          const scale = Math.max(112 / video.videoWidth, 112 / video.videoHeight);
+          const sw = 112 / scale;
+          const sh = 112 / scale;
+          const sx = (video.videoWidth - sw) / 2;
+          const sy = (video.videoHeight - sh) / 2;
+          ctx.drawImage(video, sx, sy, sw, sh, 0, 0, 112, 112);
+          setVideoThumbnail(canvas.toDataURL('image/jpeg', 0.7));
+        }
+      } catch (e) {
+        console.warn('Failed to generate video thumbnail:', e);
+      }
+    };
+    
+    video.src = item.previewUrl;
+    video.load();
+    
+    return () => {
+      video.src = '';
+    };
+  }, [item.type, item.previewUrl]);
+
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
       className={`
-        relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden cursor-pointer
+        relative flex-shrink-0 w-14 h-14 rounded-lg cursor-pointer
         transition-all duration-150
-        ${isActive ? 'ring-2 ring-white ring-offset-1 ring-offset-black/50' : 'opacity-70 hover:opacity-100'}
         ${isDragging ? 'scale-105 shadow-xl' : ''}
       `}
       whileTap={{ scale: 0.95 }}
       onClick={onSelect}
     >
-      {/* Thumbnail image */}
-      {item.type === 'image' ? (
-        <img
-          src={item.previewUrl}
-          alt={`Thumbnail ${index + 1}`}
-          className={`w-full h-full object-cover ${filterClass}`}
-          draggable={false}
-        />
-      ) : (
-        <video
-          src={item.previewUrl}
-          className={`w-full h-full object-cover ${filterClass}`}
-          muted
-          playsInline
-        />
-      )}
+      {/* Selection indicator - using inset shadow to avoid clipping */}
+      <div 
+        className={`
+          absolute inset-0 rounded-lg overflow-hidden
+          ${isActive ? 'ring-2 ring-white ring-inset shadow-[inset_0_0_0_2px_white]' : 'opacity-70 hover:opacity-100'}
+        `}
+      >
+        {/* Thumbnail image */}
+        {item.type === 'image' ? (
+          <img
+            src={item.previewUrl}
+            alt={`Thumbnail ${index + 1}`}
+            className={`w-full h-full object-cover ${filterClass}`}
+            draggable={false}
+          />
+        ) : (
+          <>
+            {/* Video thumbnail - show generated/poster image instead of video element */}
+            {videoThumbnail ? (
+              <img
+                src={videoThumbnail}
+                alt={`Video thumbnail ${index + 1}`}
+                className={`w-full h-full object-cover ${filterClass}`}
+                draggable={false}
+              />
+            ) : (
+              <div className="w-full h-full bg-black/40 flex items-center justify-center">
+                <Play className="w-4 h-4 text-white/60" />
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
-      {/* Video indicator */}
+      {/* Video indicator - DARK GLASS */}
       {item.type === 'video' && (
-        <div className="absolute bottom-1 left-1 rounded bg-black/60 px-1 py-0.5">
+        <div className="absolute bottom-1 left-1 rounded bg-black/60 backdrop-blur-sm px-1 py-0.5">
           <Play className="w-2.5 h-2.5 text-white fill-white" />
         </div>
       )}
 
-      {/* Cover indicator */}
+      {/* Cover indicator - modern sparkle style */}
       {isCover && (
-        <div className="absolute top-1 right-1 rounded bg-amber-500 px-1 py-0.5">
-          <Star className="w-2.5 h-2.5 text-white fill-white" />
+        <div className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-white/90 shadow-sm flex items-center justify-center">
+          <Sparkles className="w-3 h-3 text-amber-500 fill-amber-500" />
         </div>
       )}
 
@@ -107,7 +178,7 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect }: S
       <div 
         {...attributes} 
         {...listeners}
-        className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors touch-none"
+        className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors touch-none rounded-lg"
       >
         <GripVertical className="w-4 h-4 text-white/0 hover:text-white/60 transition-colors" />
       </div>
