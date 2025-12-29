@@ -1,15 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Search, X, ArrowUpDown, Check } from 'lucide-react';
+import { Search, X, ArrowUpDown, Clock, Heart, MessageCircle, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { motion } from 'framer-motion';
-import { SortBottomSheet } from './SortBottomSheet';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { triggerHaptic } from '@/lib/ui/haptics';
 
 export type SortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
 
@@ -34,12 +39,43 @@ interface DiscoverCommandCenterProps {
   className?: string;
 }
 
-const SORT_OPTIONS: { id: SortOption; label: string }[] = [
-  { id: 'newest', label: 'Newest first' },
-  { id: 'most-liked', label: 'Most liked' },
-  { id: 'most-discussed', label: 'Most discussed' },
-  { id: 'friends-first', label: 'Friends first' },
+const SORT_OPTIONS: { id: SortOption; label: string; icon: React.ReactNode }[] = [
+  { id: 'newest', label: 'Newest first', icon: <Clock className="w-5 h-5" /> },
+  { id: 'most-liked', label: 'Most liked', icon: <Heart className="w-5 h-5" /> },
+  { id: 'most-discussed', label: 'Most discussed', icon: <MessageCircle className="w-5 h-5" /> },
+  { id: 'friends-first', label: 'Friends first', icon: <Users className="w-5 h-5" /> },
 ];
+
+// Animated checkmark with draw-in effect (matches MomentAudienceSheet)
+const AnimatedCheck: React.FC = () => (
+  <motion.svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    initial="hidden"
+    animate="visible"
+  >
+    <motion.path
+      d="M4 10L8 14L16 6"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      variants={{
+        hidden: { pathLength: 0, opacity: 0 },
+        visible: { 
+          pathLength: 1, 
+          opacity: 1,
+          transition: { 
+            pathLength: { duration: 0.3, ease: "easeOut" },
+            opacity: { duration: 0.1 }
+          }
+        }
+      }}
+    />
+  </motion.svg>
+);
 
 /**
  * DiscoverCommandCenter - Unified control block for all Discover tabs
@@ -89,6 +125,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   };
 
   const handleSortSelect = (sort: SortOption) => {
+    triggerHaptic('selection');
     onSortChange(sort);
     setDrawerOpen(false);
   };
@@ -104,7 +141,58 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Desktop sort dropdown content uses the inline options below
+  // Sort content styled to match MomentAudienceSheet (Visibility sheet)
+  const SortContent = () => (
+    <div className="px-4 pb-4 space-y-2">
+      {SORT_OPTIONS.map((option) => {
+        const isSelected = sortValue === option.id;
+        return (
+          <motion.button
+            key={option.id}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => handleSortSelect(option.id)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl transition-all"
+            style={{
+              background: isSelected 
+                ? 'var(--cm-surface-slate)' 
+                : 'var(--cm-surface-alt)',
+              border: isSelected 
+                ? 'none' 
+                : '1px solid var(--cm-border-subtle)',
+              boxShadow: isSelected 
+                ? '0 2px 8px rgba(0, 0, 0, 0.12)' 
+                : 'none',
+            }}
+          >
+            {/* Leading icon circle */}
+            <div 
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ 
+                background: isSelected ? 'rgba(255,255,255,0.15)' : 'var(--cm-surface-card)',
+                color: isSelected ? 'white' : 'var(--cm-icon-primary)',
+              }}
+            >
+              {option.icon}
+            </div>
+            
+            {/* Label */}
+            <div className="flex-1 text-left">
+              <p 
+                className="font-medium text-sm"
+                style={{ color: isSelected ? 'white' : 'var(--cm-text-primary)' }}
+              >
+                {option.label}
+              </p>
+            </div>
+            
+            {/* Trailing animated checkmark */}
+            {isSelected && <AnimatedCheck />}
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+
   const SortPill = () => {
     const pillClasses = cn(
       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
@@ -116,21 +204,48 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     
     if (isMobile) {
       return (
-        <>
-          <button 
-            className={pillClasses}
-            onClick={() => setDrawerOpen(true)}
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <DrawerTrigger asChild>
+            <button className={pillClasses}>
+              <ArrowUpDown className="w-3.5 h-3.5" />
+              <span>Sort</span>
+            </button>
+          </DrawerTrigger>
+          <DrawerContent 
+            className="rounded-t-2xl border-0"
+            style={{ 
+              background: 'var(--cm-surface-card)',
+              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+            }}
           >
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            <span>Sort</span>
-          </button>
-          <SortBottomSheet
-            isOpen={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            sortValue={sortValue}
-            onSortChange={handleSortSelect}
-          />
-        </>
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div 
+                className="w-10 h-1 rounded-full"
+                style={{ background: 'var(--cm-border)' }}
+              />
+            </div>
+
+            {/* Header - Left title + close X on right */}
+            <div className="flex items-center justify-between px-4 pb-4">
+              <h3 
+                className="text-lg font-semibold"
+                style={{ color: 'var(--cm-text-primary)' }}
+              >
+                Sort by
+              </h3>
+              <button
+                onClick={() => setDrawerOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--cm-surface-alt)' }}
+              >
+                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+              </button>
+            </div>
+
+            <SortContent />
+          </DrawerContent>
+        </Drawer>
       );
     }
 
@@ -162,7 +277,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                 <span>{option.label}</span>
                 <div className="w-5 flex justify-end">
                   {isActive && (
-                    <Check className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
+                    <X className="w-4 h-4 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
                   )}
                 </div>
               </DropdownMenuItem>
