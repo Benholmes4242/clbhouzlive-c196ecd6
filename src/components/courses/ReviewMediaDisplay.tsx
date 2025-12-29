@@ -108,7 +108,6 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
                         <HLSPlayer
                           ref={playerRef}
                           src={videoProps.hlsUrl}
-                          poster={videoProps.poster}
                           mp4FallbackUrl={videoProps.mp4Fallback}
                           muted={false}
                           autoplay={true}

@@ -92,7 +92,6 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     <HLSPlayer
       ref={playerRef}
       src={hlsUrl}
-      poster={poster}
       muted={muted}
       loop={loop}
       autoplay={false}

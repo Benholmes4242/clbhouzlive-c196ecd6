@@ -614,7 +614,6 @@ export const VideoPlayerModal: React.FC = () => {
                   <HLSPlayer
                     ref={videoRef}
                     src={videoData.hlsUrl}
-                    poster={videoData.posterUrl}
                     autoplay={hasAutoStarted && !showResumeOverlay}
                     loop={false}
                     muted={false}

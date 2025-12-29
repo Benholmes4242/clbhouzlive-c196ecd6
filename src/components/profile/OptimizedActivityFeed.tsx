@@ -66,7 +66,6 @@ const OptimizedActivityFeed: React.FC<OptimizedActivityFeedProps> = ({
                         className="w-full h-64 object-cover"
                         controls
                         preload="metadata"
-                        poster={media.media_url.replace('.mov', '-thumbnail.jpg')}
                       />
                     )}
                   </div>

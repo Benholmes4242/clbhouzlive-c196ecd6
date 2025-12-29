@@ -118,7 +118,6 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, muted, setMute
         <video 
           ref={videoRef}
           className="highlights__video"
-          poster={posterUrl || undefined}
           muted={muted}
           playsInline
           loop

@@ -41,7 +41,6 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
         primaryMedia.media_type === 'video' ? (
           <video
             src={primaryMedia.media_url}
-            poster={primaryMedia.thumbnail_url}
             autoPlay
             muted
             loop

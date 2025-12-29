@@ -112,7 +112,6 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
               <video
                 ref={videoRef}
                 src={currentMoment.mediaUrl}
-                poster={currentMoment.posterUrl}
                 controls
                 playsInline
                 className="max-w-full max-h-full object-contain"
