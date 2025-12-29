@@ -108,7 +108,7 @@ export function startVideoSession(
  * Record time to first frame
  * Call when video fires 'playing' event for the first time
  */
-export function recordTTFF(mediaId: string): number | null {
+export function recordTTFF(mediaId: string, usedPoster?: boolean): number | null {
   const session = activeSessions.get(mediaId);
   if (!session || session.ttff !== null) return session?.ttff ?? null;
   
@@ -117,7 +117,7 @@ export function recordTTFF(mediaId: string): number | null {
   session.firstFrameTime = performance.now();
   sessionMetrics.ttff.push(ttff);
   
-  // Send to analytics
+  // Send to analytics with poster mode tracking
   track('video_ttff', {
     mediaId,
     surface: session.surface,
@@ -126,6 +126,8 @@ export function recordTTFF(mediaId: string): number | null {
     connection: session.connectionType,
     is_slow: ttff > 1000,
     is_fast: ttff < 500,
+    // NEW: Track poster vs paused video mode for A/B comparison
+    used_poster: usedPoster ?? true, // Default to true for backward compat
   });
   
   // Log performance warning if slow
