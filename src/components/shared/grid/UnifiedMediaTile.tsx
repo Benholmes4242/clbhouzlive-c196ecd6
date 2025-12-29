@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect, useState } from 'react';
+import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig } from './types';
 import { OverlayCorners } from '@/components/shared/overlay';
@@ -257,4 +257,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   );
 };
 
-export default UnifiedMediaTile;
+UnifiedMediaTile.displayName = 'UnifiedMediaTile';
+
+export default memo(UnifiedMediaTile);
