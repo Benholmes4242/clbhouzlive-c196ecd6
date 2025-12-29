@@ -22,27 +22,20 @@ interface RatingBadgeProps {
  * Reusable rating badge component that uses tier data from getScoreTier()
  * for consistent badge styling across the app.
  * 
- * Uses the same simple pill style as the "Played" button - solid background,
- * border, and text in the tier's color.
+ * Colors are sourced from the Global Colour System via getScoreTier().
+ * Text always uses dark slate (#0F172A) for consistency with milestone badges.
  */
 export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
-  // Use the tier's bgLight for a saturated background (like Played button uses emerald-50)
-  // and accent for text/border (like Played uses emerald-700)
-  const bgColor = tierData.bgLight;
-  const accentColor = tierData.accent;
-  
   return (
     <span
       className={cn(
         'inline-flex items-center justify-center',
-        'rounded-full border px-2.5 py-[4px] text-[11px] font-medium',
-        'transition-colors',
+        'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
         className
       )}
       style={{
-        borderColor: accentColor,
-        backgroundColor: bgColor,
-        color: accentColor,
+        background: `linear-gradient(145deg, ${tierData.bgLight}, ${tierData.bgDark})`,
+        color: '#0F172A', // Dark slate text - always
       }}
     >
       {label ?? tierData.label}
