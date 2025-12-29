@@ -379,6 +379,8 @@ export const useRealPostsFetcher = () => {
           user_id,
           actor_type,
           actor_id,
+          like_count,
+          comment_count,
           post_media!inner (
             id,
             media_type,
@@ -448,68 +450,53 @@ export const useRealPostsFetcher = () => {
         }
       }
 
-      // Apply ordering and pagination AFTER filters
-      // For "newest" - order by created_at in database (most efficient)
-      // For sort options that need aggregates (likes/comments), fetch larger batch and sort in JS
-      // This is a workaround since Supabase JS client can't ORDER BY aggregates
+      // Apply ordering based on sort option - uses DB-level like_count/comment_count columns
+      if (sortOption === 'most-liked') {
+        query = query
+          .order('like_count', { ascending: false })
+          .order('created_at', { ascending: false }); // tie-breaker
+      } else if (sortOption === 'most-discussed') {
+        query = query
+          .order('comment_count', { ascending: false })
+          .order('created_at', { ascending: false }); // tie-breaker
+      } else if (sortOption === 'friends-first') {
+        // Friends-first needs client-side sorting after fetch
+        query = query.order('created_at', { ascending: false });
+      } else {
+        // 'newest' or default
+        query = query.order('created_at', { ascending: false });
+      }
       
-      const needsAggregateSorting = sortOption === 'most-liked' || sortOption === 'most-discussed';
-      const fetchMultiplier = needsAggregateSorting ? 5 : 1; // Fetch 5x more for aggregate sorts
-      const fetchCount = postsPerPage * fetchMultiplier;
-      
-      query = query
-        .order('created_at', { ascending: false })
-        .range(0, fetchCount - 1); // For aggregate sorts, always start from 0 to get best candidates
+      // Apply proper pagination using offset
+      const fromIndex = currentOffset;
+      const toIndex = currentOffset + postsPerPage - 1;
+      query = query.range(fromIndex, toIndex);
 
       const { data: rawPostsData, error } = await query;
       
-      // Sort the full fetched batch by the chosen criteria
-      let sortedData = rawPostsData || [];
+      let postsData = rawPostsData || [];
       
-      if (sortedData.length > 0 && sortOption) {
-        if (sortOption === 'most-liked') {
-          sortedData = [...sortedData].sort((a: any, b: any) => {
-            const aLikes = a.post_likes?.[0]?.count || 0;
-            const bLikes = b.post_likes?.[0]?.count || 0;
-            return bLikes - aLikes; // Highest likes first
-          });
-        } else if (sortOption === 'most-discussed') {
-          sortedData = [...sortedData].sort((a: any, b: any) => {
-            const aComments = a.post_comments?.[0]?.count || 0;
-            const bComments = b.post_comments?.[0]?.count || 0;
-            return bComments - aComments; // Most comments first
-          });
-        } else if (sortOption === 'friends-first') {
-          // Get user's following list for friends-first sorting
-          if (currentUserId) {
-            const { data: following } = await supabase
-              .from('user_follows')
-              .select('following_id')
-              .eq('follower_id', currentUserId);
-            
-            const followingIds = new Set(following?.map(f => f.following_id) || []);
-            
-            sortedData = [...sortedData].sort((a: any, b: any) => {
-              const aIsFriend = followingIds.has(a.user_id);
-              const bIsFriend = followingIds.has(b.user_id);
-              
-              // Friends first
-              if (aIsFriend && !bIsFriend) return -1;
-              if (!aIsFriend && bIsFriend) return 1;
-              
-              // Then by date (newest first)
-              return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-            });
-          }
-        }
-        // 'newest' or undefined - already sorted by created_at from database
+      // For friends-first, apply client-side sorting
+      if (sortOption === 'friends-first' && currentUserId && postsData.length > 0) {
+        const { data: following } = await supabase
+          .from('user_follows')
+          .select('following_id')
+          .eq('follower_id', currentUserId);
+        
+        const followingIds = new Set(following?.map(f => f.following_id) || []);
+        
+        postsData = [...postsData].sort((a: any, b: any) => {
+          const aIsFriend = followingIds.has(a.user_id);
+          const bIsFriend = followingIds.has(b.user_id);
+          
+          // Friends first
+          if (aIsFriend && !bIsFriend) return -1;
+          if (!aIsFriend && bIsFriend) return 1;
+          
+          // Then by date (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
       }
-      
-      // Apply pagination AFTER sorting for aggregate sorts
-      // For normal sorts, this just slices the already-correct results
-      const postsData = needsAggregateSorting
-        ? sortedData.slice(currentOffset, currentOffset + postsPerPage)
-        : sortedData.slice(0, postsPerPage);
 
       if (error) {
         console.error('Error fetching posts:', error);
