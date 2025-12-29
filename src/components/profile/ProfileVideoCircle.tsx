@@ -216,7 +216,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           <video
             ref={videoRef}
             src={videoUrl}
-            poster={thumbnailUrl}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
               showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
             }`}

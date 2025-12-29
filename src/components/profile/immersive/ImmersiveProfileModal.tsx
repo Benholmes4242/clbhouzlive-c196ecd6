@@ -501,7 +501,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
           <EnhancedVideoPlayer
             ref={videoRef}
             src={currentItem.media_url}
-            poster={currentItem.thumbnail_url}
             autoplay={true}
             muted={isGloballyMuted}
             loop={false} // Disable loop so video can end and trigger onEnded

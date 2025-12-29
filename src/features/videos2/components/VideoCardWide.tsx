@@ -98,7 +98,6 @@ export function VideoCardWide({ video, onVideoClick, onEchoToggle }: VideoCardWi
           ref={playerRef}
           src={video.hlsUrl || ''}
           mp4FallbackUrl={video.src}
-          poster={video.poster}
           muted={true}
           autoplay={autoplay}
           loop={true}

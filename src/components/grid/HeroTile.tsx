@@ -113,7 +113,6 @@ const HeroTile = memo<HeroTileProps>(({
         <HLSPlayer
           ref={playerRef}
           src={item.playbackUrl}
-          poster={thumbnailSrc}
           autoplay={isPlaying && shouldAutoplay}
           muted
           loop

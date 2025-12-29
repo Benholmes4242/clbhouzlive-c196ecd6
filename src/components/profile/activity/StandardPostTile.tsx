@@ -116,7 +116,6 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
         <HLSPlayer
           ref={playerRef}
           src={item.playbackUrl}
-          poster={thumbnailSrc}
           onLoadedData={handleCanPlay}
           loop
           mediaId={item.postId}

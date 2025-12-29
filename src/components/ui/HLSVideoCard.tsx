@@ -322,7 +322,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         playsInline
         muted={isMuted}
         controls={showControls}
-        poster={poster}
         preload="metadata"
         onClick={handleVideoClick}
         onEnded={onEnded}

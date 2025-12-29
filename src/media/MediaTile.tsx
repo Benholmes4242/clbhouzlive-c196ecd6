@@ -162,7 +162,6 @@ const MediaTile: React.FC<MediaTileProps> = ({
         <HLSPlayer
           ref={playerRef}
           src={src}
-          poster={poster}
           muted={muted}
           autoplay={isPlaying}
           aspectRatio={aspectRatio}

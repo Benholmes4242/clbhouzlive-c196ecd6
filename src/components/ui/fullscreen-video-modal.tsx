@@ -103,7 +103,6 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
           <video
             ref={videoRef}
             src={videoData.src}
-            poster={videoData.poster}
             className="w-full h-full object-contain"
             autoPlay
             loop

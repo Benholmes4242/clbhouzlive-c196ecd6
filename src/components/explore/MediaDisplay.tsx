@@ -236,7 +236,6 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               <EnhancedVideoPlayer
                 ref={videoRefCallback}
                 src={media.media_url}
-                poster={thumbnailUrl || undefined}
                 autoplay={true}
                 muted={effectiveMuted}
                 loop={loop}

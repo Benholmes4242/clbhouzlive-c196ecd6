@@ -44,7 +44,6 @@ export function HubSwingDetailPage() {
     return (
       <GlassVideo
         src={videoSrc}
-        poster={thumbnail}
         ratio={16/9}
       />
     );

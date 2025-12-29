@@ -171,7 +171,6 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={posterUrl || '/placeholder.svg'}
           autoplay={isPlaying}
           muted
           loop

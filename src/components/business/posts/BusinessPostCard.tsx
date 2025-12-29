@@ -367,7 +367,6 @@ export default function BusinessPostCard({
               <HLSPlayer
                   ref={playerRef}
                   src={hlsUrl}
-                  poster={thumbnailUrl || undefined}
                   autoplay={isPlaying}
                   muted
                   loop

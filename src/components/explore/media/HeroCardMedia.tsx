@@ -112,7 +112,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         <HLSPlayer
           ref={playerRef}
           src={hlsUrl}
-          poster={poster}
           muted
           loop
           autoplay={shouldAutoPlay}

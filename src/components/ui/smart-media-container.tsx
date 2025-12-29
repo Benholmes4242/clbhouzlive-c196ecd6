@@ -90,7 +90,6 @@ const SmartMediaContainer: React.FC<SmartMediaContainerProps> = ({
           loadedMedia.has(currentIndex) ? (
             <EnhancedVideoPlayer
               src={currentMedia.url}
-              poster={currentMedia.poster ?? currentMedia.posterUrl ?? undefined}
               autoplay={autoplay && isInView}
               muted={true}
               loop={true}

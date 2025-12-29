@@ -29,7 +29,6 @@ export const ReviewMediaStrip: React.FC<ReviewMediaStripProps> = ({ media, onMed
             <>
               <video
                 src={item.media_url}
-                poster={item.poster_url || undefined}
                 className="w-full h-full object-cover"
                 preload="metadata"
               />

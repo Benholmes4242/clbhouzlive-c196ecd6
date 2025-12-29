@@ -81,7 +81,6 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
           <video
             ref={videoRef}
             src={url}
-            poster={posterUrl}
             loop
             muted
             playsInline

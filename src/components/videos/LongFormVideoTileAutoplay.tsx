@@ -137,7 +137,6 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
             <HLSPlayer
               ref={playerRef}
               src={video.mediaUrl!}
-              poster={video.thumbnailUrl}
               autoplay={isPlaying}
               muted
               loop

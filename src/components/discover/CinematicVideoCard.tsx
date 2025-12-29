@@ -72,7 +72,6 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         <video
           ref={videoRef}
           src={videoUrl}
-          poster={thumbnailUrl}
           playsInline
           className="w-full h-full object-cover"
           onClick={() => onMediaClick?.(item)}

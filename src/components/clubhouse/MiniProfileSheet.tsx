@@ -63,7 +63,6 @@ function RecentPostTile({
       <div className="recent-post-tile relative aspect-square bg-white/5 rounded-2xl overflow-hidden">
         <VideoThumbPlayer
           url={media.url}
-          poster={media.posterUrl ?? ''}
           ioRoot={ioRoot}
           className="w-full h-full"
         />
