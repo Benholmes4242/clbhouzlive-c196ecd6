@@ -309,7 +309,6 @@ interface AIChatHistoryProps {
                   )}
                   <HLSVideoPlayer
                     src={analysis.videoUrl || analysis.videoSrc}
-                    poster={analysis.videoThumbnail || analysis.videoPoster}
                     className="w-full h-full"
                   />
                 </div>

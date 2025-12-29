@@ -40,7 +40,6 @@ export const MomentCard: React.FC<MomentCardProps> = ({
           <video
             ref={videoRef}
             src={moment.mediaUrl}
-            poster={moment.posterUrl}
             className={cn(
               'w-full h-full object-cover transition-opacity duration-300',
               isLoaded ? 'opacity-100' : 'opacity-0'

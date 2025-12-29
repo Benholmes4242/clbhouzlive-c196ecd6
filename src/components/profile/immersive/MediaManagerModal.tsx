@@ -263,7 +263,6 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                               <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
                                 <video
                                   src={item.media_url}
-                                  poster={item.thumbnail_url}
                                   className="w-full h-full object-cover"
                                   muted
                                 />

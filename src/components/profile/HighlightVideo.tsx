@@ -138,7 +138,6 @@ const HighlightVideo = memo(function HighlightVideo({
         <video 
           ref={videoRef}
           className="highlights__video"
-          poster={posterUrl || undefined}
           muted={muted}
           playsInline
           preload="auto"

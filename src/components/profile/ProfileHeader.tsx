@@ -86,7 +86,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             muted
             loop
             playsInline
-            poster={userMedia}
           >
             <source src={userMedia} type="video/mp4" />
           </video>
@@ -130,7 +129,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               muted
               loop
               playsInline
-              poster={userMedia}
               onLoadedData={() => setIsLoaded(true)}
             >
               <source src={userMedia} type="video/mp4" />

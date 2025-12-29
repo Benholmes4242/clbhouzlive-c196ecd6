@@ -67,7 +67,6 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
     <HLSPlayer
       ref={playerRef}
       src={hlsUrl}
-      poster={videoPoster}
       className={className}
       objectFit={objectFit === 'smart' ? 'cover' : objectFit}
       showMuteButton={false}

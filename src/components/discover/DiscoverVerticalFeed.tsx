@@ -115,7 +115,6 @@ const VideoWithAutoplay: React.FC<{
       {hlsUrl ? (
         <HLSVideoCard
           hlsUrl={hlsUrl}
-          poster={poster}
           className="absolute inset-0 w-full h-full fullscreenVideoStage"
           aspectRatio="auto"
           muted={muted}

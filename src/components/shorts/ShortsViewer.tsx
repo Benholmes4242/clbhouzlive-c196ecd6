@@ -173,7 +173,6 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       <video
         ref={videoRef}
         src={currentItem.src}
-        poster={currentItem.thumbnailSrc}
         className="absolute inset-0 h-full w-full object-contain"
         playsInline
         autoPlay

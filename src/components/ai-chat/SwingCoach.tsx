@@ -1424,7 +1424,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                     ) : uploadedVideo.type.startsWith('video/') ? (
                       <video 
                         src={videoPreview} 
-                        poster={videoPoster}
                         className="w-full h-auto aspect-[16/9] object-cover"
                         playsInline
                         muted
