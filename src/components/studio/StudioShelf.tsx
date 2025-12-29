@@ -68,9 +68,10 @@ export default function StudioShelf({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - Clbhouz style */}
           <motion.div
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
+            className="fixed inset-0 z-[9998]"
+            style={{ background: 'var(--cm-backdrop)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -78,33 +79,49 @@ export default function StudioShelf({
             onClick={onClose}
           />
 
-          {/* Studio Shelf */}
+          {/* Studio Shelf - Clbhouz sheet styling */}
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[9999] bg-white rounded-t-3xl shadow-2xl overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[9999] rounded-t-2xl overflow-hidden flex flex-col"
             style={{
               maxHeight: '75vh',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              background: 'var(--cm-surface-card)',
+              boxShadow: 'var(--cm-shadow-soft)',
             }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ 
               type: 'spring',
-              damping: 30,
+              damping: 28,
               stiffness: 300,
-              duration: 0.24 
             }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 bg-white">
-              <h3 className="text-lg font-semibold text-zinc-900">Studio</h3>
+            {/* Grabber */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div 
+                className="w-10 h-1 rounded-full"
+                style={{ background: 'var(--cm-border)' }}
+              />
+            </div>
+
+            {/* Header - Clbhouz style */}
+            <div 
+              className="flex items-center justify-between px-4 pb-3"
+              style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
+            >
+              <h3 
+                className="text-lg font-semibold"
+                style={{ color: 'var(--cm-text-primary)' }}
+              >
+                Studio
+              </h3>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-zinc-100 transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                style={{ background: 'var(--cm-surface-alt)' }}
                 aria-label="Close Studio"
               >
-                <X className="w-5 h-5 text-zinc-600" />
+                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
               </button>
             </div>
 
@@ -197,19 +214,35 @@ export default function StudioShelf({
                   >
                     <div className="text-center px-6 py-12">
                       <div className="text-4xl mb-3">✨</div>
-                      <p className="text-zinc-600 font-medium">Select a tool to get started</p>
-                      <p className="text-sm text-zinc-500 mt-1">Add music, text, filters, or edit your media</p>
+                      <p className="font-medium" style={{ color: 'var(--cm-text-primary)' }}>
+                        Select a tool to get started
+                      </p>
+                      <p className="text-sm mt-1" style={{ color: 'var(--cm-text-secondary)' }}>
+                        Add music, text, filters, or edit your media
+                      </p>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Footer */}
-            <div className="p-4 border-t border-zinc-200 bg-white flex gap-3">
+            {/* Footer - Clbhouz style with safe area */}
+            <div 
+              className="px-4 pt-3 flex gap-3"
+              style={{ 
+                borderTop: '1px solid var(--cm-border-subtle)',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+                background: 'var(--cm-surface-card)',
+              }}
+            >
               <button
                 onClick={onClose}
-                className="flex-1 py-3 rounded-xl border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
+                className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                style={{ 
+                  background: 'var(--cm-surface-alt)',
+                  border: '1px solid var(--cm-border-subtle)',
+                  color: 'var(--cm-text-primary)',
+                }}
               >
                 Cancel
               </button>
@@ -217,7 +250,11 @@ export default function StudioShelf({
                 onClick={() => {
                   onClose();
                 }}
-                className="flex-1 py-3 rounded-xl bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
+                className="flex-1 py-3 rounded-xl font-semibold transition-colors"
+                style={{ 
+                  background: 'var(--cm-surface-slate)',
+                  color: 'white',
+                }}
               >
                 Done
               </button>

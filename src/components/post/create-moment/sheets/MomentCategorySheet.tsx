@@ -192,7 +192,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                   color: 'var(--cm-text-primary)',
                   caretColor: 'var(--cm-surface-slate)',
                 }}
-                autoFocus
+                // NO autoFocus - keyboard only appears when user taps
               />
             </div>
           </div>

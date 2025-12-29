@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, X } from 'lucide-react';
 import { useLongPress } from '@/hooks/useLongPress';
 import { useCappedLoading } from '@/hooks/useCappedLoading';
@@ -28,20 +28,14 @@ interface CarouselSlideProps {
 export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, onSetCover, coverIndex = 0 }: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState<string>('00:00');
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
   
   const showSkeleton = useCappedLoading(loaded, 600);
   const filterClass = getFilterClass(item.filterId);
   
-  console.log('[CarouselSlide] filter mapping', {
-    id: item.id,
-    type: item.type,
-    filterId: item.filterId,
-    filterClass,
-  });
-
   // TEMP: inline filter to verify behaviour
   const testStyle =
     item.filterId === 'bw'
@@ -61,8 +55,8 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
   // Generate base URL for media
   const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
   
-  // Use thumbnail URLs for composer previews to save memory
-  const src = item.type === 'video' 
+  // Use thumbnail URLs for poster images
+  const posterUrl = item.type === 'video' 
     ? buildVideoPosterUrl(baseUrl, { width: 600, height: 600 })
     : buildImageThumbnailUrl(baseUrl, { width: 600, height: 600 });
 
@@ -75,91 +69,115 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
     };
   }, [onVideoRef]);
 
-  const formatDuration = (seconds: number): string => {
+  // Pause video when slide becomes inactive
+  useEffect(() => {
+    if (!isActive && videoRef.current && !videoRef.current.paused) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [isActive]);
+
+  // Format duration/time as countdown
+  const formatTime = (seconds: number): string => {
+    if (!seconds || !isFinite(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // NOTE: handleVideoPlay removed - video element is hidden and used only for metadata extraction
+  // Toggle play/pause on tap
+  const handleVideoTap = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    
+    haptic('light');
+    
+    if (video.paused) {
+      video.play().catch(console.error);
+    } else {
+      video.pause();
+    }
+  }, []);
 
-  // Generate video thumbnail
-  const generateThumbnail = async (videoElement: HTMLVideoElement): Promise<string> => {
-    return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      videoElement.addEventListener('loadeddata', () => {
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
-        
-        // Seek to 1 second or 10% of duration, whichever is smaller
-        const seekTime = Math.min(1, videoElement.duration * 0.1);
-        videoElement.currentTime = seekTime;
-        
-        videoElement.addEventListener('seeked', () => {
-          if (ctx) {
-            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.8));
-          }
-        }, { once: true });
-      }, { once: true });
-    });
-  };
+  // Handle video time update for countdown
+  const handleTimeUpdate = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      setCurrentTime(video.currentTime);
+    }
+  }, []);
+
+  // Handle video metadata load
+  const handleLoadedMetadata = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      setDuration(video.duration);
+      setLoaded(true);
+    }
+  }, []);
+
+  // Calculate remaining time for countdown
+  const remainingTime = Math.max(0, duration - currentTime);
 
   if (item.type === 'video') {
     return (
-      <div className="relative w-full h-full overflow-hidden select-none" {...longPressProps}>
+      <div 
+        className="relative w-full h-full overflow-hidden select-none" 
+        {...longPressProps}
+        onClick={handleVideoTap}
+      >
         {/* Skeleton loading state */}
         <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
           <div className="w-full h-full animate-pulse bg-white/10" />
         </div>
 
-        {/* Use poster image only - no video element to save memory */}
-        <img
-          src={src}
-          alt={item.alt || `Video thumbnail ${item.id}`}
-          onLoad={() => setLoaded(true)}
-          className={cn("w-full h-full object-cover transition-all duration-300",
+        {/* Video element - visible and playable */}
+        <video
+          ref={videoRef}
+          src={baseUrl}
+          poster={posterUrl}
+          preload="metadata"
+          playsInline
+          controls={false}
+          muted={false}
+          loop
+          className={cn(
+            "w-full h-full object-cover transition-all duration-300",
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
             filterClass
           )}
           style={testStyle}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
-
-        {/* Hidden video element for metadata only */}
-        <video
-          ref={videoRef}
-          src={baseUrl}
-          preload="metadata"
-          playsInline
-          controls={false}
-          muted
-          className="hidden"
-          onLoadedMetadata={(e) => {
-            const video = e.target as HTMLVideoElement;
-            setDuration(formatDuration(video.duration || 0));
-          }}
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={handleTimeUpdate}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
+          onEnded={() => {
+            setIsPlaying(false);
+            setCurrentTime(0);
+          }}
         />
 
-        {/* Play icon overlay */}
-        {loaded && (
+        {/* Play icon overlay - ONLY visible when paused - SMALLER DARK GLASS */}
+        {loaded && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-[10px] border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.24)] flex items-center justify-center">
-              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+            <div className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-4 h-4 text-white fill-white ml-0.5" />
             </div>
           </div>
         )}
 
-        {/* Video badge in corner */}
+        {/* Video badge in corner - DARK GLASS consistent */}
         <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white/90">
           Video
         </div>
+
+        {/* Countdown timer - bottom left - DARK GLASS - shows remaining time when playing */}
+        {loaded && duration > 0 && (
+          <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white/90">
+            {isPlaying ? formatTime(remainingTime) : formatTime(duration)}
+          </div>
+        )}
       </div>
     );
   }
@@ -172,7 +190,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
       </div>
 
       <img
-        src={src}
+        src={posterUrl}
         alt={item.alt || `Media item ${item.id}`}
         onLoad={() => setLoaded(true)}
         className={cn("w-full h-full object-cover transition-all duration-300",
