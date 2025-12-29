@@ -120,8 +120,12 @@ export function UniversalMediaGrid({
     const sentinel = sentinelRef.current;
     
     // Debug: Log observer setup
+    // Using 1200px rootMargin to trigger loading when sentinel is within 1200px of viewport
+    // This ensures smooth infinite scroll on tall grids (20 cards = ~3000px height)
+    const ROOT_MARGIN = '1200px 0px';
+    
     logObserverSetup({
-      rootMargin: '400px 0px',
+      rootMargin: ROOT_MARGIN,
       threshold: 0,
       hasSentinel: !!sentinel,
       sentinelRect: sentinel?.getBoundingClientRect(),
@@ -159,7 +163,7 @@ export function UniversalMediaGrid({
       },
       {
         root: null,
-        rootMargin: '400px 0px', // Trigger at ~70-80% scroll for seamless loading
+        rootMargin: ROOT_MARGIN, // Uses 1200px defined above
         threshold: 0,
       }
     );
