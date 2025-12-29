@@ -2,14 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Search, X, ArrowUpDown, Check } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
+import { motion } from 'framer-motion';
+import { SortBottomSheet } from './SortBottomSheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,36 +104,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const SortContent = () => (
-    <div className="px-4 pb-2 space-y-1.5">
-      {SORT_OPTIONS.map((option) => {
-        const isActive = sortValue === option.id;
-        return (
-          <button
-            key={option.id}
-            onClick={() => handleSortSelect(option.id)}
-            className={cn(
-              "w-full flex items-center justify-between rounded-2xl px-4 py-3.5",
-              "text-[15px] transition-all duration-150",
-              "active:scale-[0.98]",
-              isActive
-                ? "bg-slate-100/80 dark:bg-white/10 border border-slate-300/50 dark:border-white/15 font-semibold text-slate-900 dark:text-white"
-                : "text-slate-800 dark:text-white/90 active:bg-slate-100/70 dark:active:bg-white/10"
-            )}
-          >
-            <span>{option.label}</span>
-            {/* Fixed width container to prevent layout shift */}
-            <div className="w-5 flex justify-end">
-              {isActive && (
-                <Check className="w-4.5 h-4.5 text-slate-600 dark:text-slate-300" strokeWidth={2.5} />
-              )}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-
+  // Desktop sort dropdown content uses the inline options below
   const SortPill = () => {
     const pillClasses = cn(
       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
@@ -151,25 +116,21 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     
     if (isMobile) {
       return (
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>
-            <button className={pillClasses}>
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <span>Sort</span>
-            </button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader className="pb-1">
-              <DrawerTitle className="text-center text-[17px] font-semibold text-slate-900 dark:text-white">
-                Sort by
-              </DrawerTitle>
-              <p className="text-center text-xs text-slate-500 dark:text-white/50 mt-0.5">
-                Choose how results are ordered
-              </p>
-            </DrawerHeader>
-            <SortContent />
-          </DrawerContent>
-        </Drawer>
+        <>
+          <button 
+            className={pillClasses}
+            onClick={() => setDrawerOpen(true)}
+          >
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            <span>Sort</span>
+          </button>
+          <SortBottomSheet
+            isOpen={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            sortValue={sortValue}
+            onSortChange={handleSortSelect}
+          />
+        </>
       );
     }
 
