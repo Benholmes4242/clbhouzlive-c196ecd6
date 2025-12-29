@@ -4086,11 +4086,13 @@ export type Database = {
           actor_type: string
           badges: string[]
           categories: string[]
+          comment_count: number
           content: string | null
           course_id: string | null
           created_at: string
           id: string
           is_pinned: boolean | null
+          like_count: number
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
@@ -4104,11 +4106,13 @@ export type Database = {
           actor_type?: string
           badges?: string[]
           categories?: string[]
+          comment_count?: number
           content?: string | null
           course_id?: string | null
           created_at?: string
           id?: string
           is_pinned?: boolean | null
+          like_count?: number
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
@@ -4122,11 +4126,13 @@ export type Database = {
           actor_type?: string
           badges?: string[]
           categories?: string[]
+          comment_count?: number
           content?: string | null
           course_id?: string | null
           created_at?: string
           id?: string
           is_pinned?: boolean | null
+          like_count?: number
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
