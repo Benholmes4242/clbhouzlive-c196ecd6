@@ -115,62 +115,45 @@ export default function ShortsGrid({
     return { portraitVideos: portrait, landscapeVideos: landscape };
   }, [items]);
 
-  // STRICT PATTERN: 4 portraits + 1 landscape per cycle
-  // Builds complete cycles when possible; falls back to showing items as-is
-  // so search results never render an empty grid just because there are no landscapes.
+  // Simple rule: Landscapes only placed when portraits in current row is even (0 or 2)
+  // This prevents white gaps while keeping a natural feed flow
   const mixedItems = useMemo(() => {
     const result: ClusteredExploreItem[] = [];
     let portraitIndex = 0;
     let landscapeIndex = 0;
+    let portraitsInCurrentRow = 0; // Track 0, 1, or 2 portraits in current row
 
-    const PORTRAITS_PER_CYCLE = 4;
-    const LANDSCAPES_PER_CYCLE = 1;
-
-    // Calculate maximum complete cycles we can create
-    const maxCycles = Math.floor(
-      Math.min(
-        portraitVideos.length / PORTRAITS_PER_CYCLE,
-        landscapeVideos.length / LANDSCAPES_PER_CYCLE
-      )
-    );
-
-    // If we can't form even one complete cycle (common for filtered/search results),
-    // just render the items in their original order.
-    if (maxCycles === 0) {
-      return items;
-    }
-
-    // Build grid with complete cycles
-    for (let cycle = 0; cycle < maxCycles; cycle++) {
-      // Add 4 portrait videos
-      for (let i = 0; i < PORTRAITS_PER_CYCLE; i++) {
-        if (portraitIndex < portraitVideos.length) {
-          result.push(portraitVideos[portraitIndex]);
-          portraitIndex++;
-        }
-      }
-
-      // Add 1 landscape video
-      if (landscapeIndex < landscapeVideos.length) {
+    // Process all items - interleave portraits and landscapes naturally
+    while (portraitIndex < portraitVideos.length || landscapeIndex < landscapeVideos.length) {
+      // Can we place a landscape? Only if row has even portraits (0 or 2)
+      const canPlaceLandscape = landscapeIndex < landscapeVideos.length && portraitsInCurrentRow % 2 === 0;
+      
+      // If we can place a landscape and have one available, do it
+      if (canPlaceLandscape) {
         result.push(landscapeVideos[landscapeIndex]);
         landscapeIndex++;
+        portraitsInCurrentRow = 0; // Landscape takes full row, reset
+      } 
+      // Otherwise add a portrait if available
+      else if (portraitIndex < portraitVideos.length) {
+        result.push(portraitVideos[portraitIndex]);
+        portraitIndex++;
+        portraitsInCurrentRow++;
+        if (portraitsInCurrentRow === 2) {
+          portraitsInCurrentRow = 0; // Row complete, reset
+        }
       }
-    }
-
-    // Add any remaining portrait videos that didn't fit into complete cycles
-    while (portraitIndex < portraitVideos.length) {
-      result.push(portraitVideos[portraitIndex]);
-      portraitIndex++;
-    }
-
-    // Add any remaining landscape videos that didn't fit into complete cycles
-    while (landscapeIndex < landscapeVideos.length) {
-      result.push(landscapeVideos[landscapeIndex]);
-      landscapeIndex++;
+      // Only landscapes left but can't place (odd portraits) - add remaining portraits first
+      else {
+        // This shouldn't happen but safety: just add remaining landscapes
+        result.push(landscapeVideos[landscapeIndex]);
+        landscapeIndex++;
+        portraitsInCurrentRow = 0;
+      }
     }
 
     return result;
-  }, [portraitVideos, landscapeVideos, items]);
+  }, [portraitVideos, landscapeVideos]);
   
   // Convert mixed items to unified format with orientation metadata
   const unifiedItems = useMemo(() => {
