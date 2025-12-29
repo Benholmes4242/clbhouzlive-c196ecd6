@@ -111,6 +111,9 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
           <ArrowUpDown className="w-3.5 h-3.5" />
           <span>Sort</span>
         </button>
+        <div style={{ fontSize: 12, opacity: 0.7 }}>
+          sortOpen: {String(drawerOpen)}
+        </div>
         <StandardBottomSheet
           isOpen={drawerOpen}
           onClose={() => setDrawerOpen(false)}
