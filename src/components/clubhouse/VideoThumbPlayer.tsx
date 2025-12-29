@@ -14,7 +14,7 @@ declare global {
 
 interface VideoThumbPlayerProps {
   url: string;
-  poster?: string; // Now optional - paused video mode doesn't need poster
+  poster?: string;
   ioRoot?: Element | null;
   className?: string;
 }
