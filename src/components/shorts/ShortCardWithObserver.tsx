@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCard from './ShortCard';
 import { useMediaAutoplay } from '@/media';
+import { logTimerMount, logTimerUnmount, logVideoPlayState } from '@/utils/debugWatchPage';
 
 interface ShortCardWithObserverProps {
   item: ExploreContentItem;
@@ -84,6 +85,14 @@ export default function ShortCardWithObserver({
   useEffect(() => {
     if (!isVideo) return;
     
+    // Debug: Log mount
+    logTimerMount(item.id, { 
+      variant, 
+      gridPosition, 
+      isCandidate,
+      isVideo 
+    });
+    
     const registerVideo = () => {
       const element = findVideoElement();
       
@@ -107,6 +116,8 @@ export default function ShortCardWithObserver({
     
     return () => {
       clearTimeout(timer);
+      // Debug: Log unmount
+      logTimerUnmount(item.id);
       // Unregister on cleanup
       if (registeredIdRef.current) {
         registerMedia({ id: registeredIdRef.current, element: null });
@@ -114,11 +125,19 @@ export default function ShortCardWithObserver({
         videoElementRef.current = null;
       }
     };
-  }, [item.id, isVideo, isCandidate, gridPosition, registerMedia, findVideoElement]);
+  }, [item.id, isVideo, isCandidate, gridPosition, registerMedia, findVideoElement, variant]);
   
   // Notify parent of visibility changes (based on playingIds)
   useEffect(() => {
     const isPlaying = playingIds.has(item.id);
+    
+    // Debug: Log play state changes
+    logVideoPlayState(item.id, {
+      isPlaying,
+      isVisible: isPlaying,
+      isInViewport: true, // If it's playing, it's in viewport
+    });
+    
     onVisibilityChange?.(item.id, isPlaying);
   }, [playingIds, item.id, onVisibilityChange]);
 

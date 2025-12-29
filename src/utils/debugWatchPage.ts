@@ -31,7 +31,7 @@ const COLORS = {
 export const logTimerMount = (videoId: string, data?: Record<string, any>) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] VideoTile Mounted`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] VIDEO_MOUNTED`,
     `color: ${COLORS.timer}; font-weight: bold`,
     { videoId: videoId?.slice(0, 8), ...data }
   );
@@ -40,7 +40,7 @@ export const logTimerMount = (videoId: string, data?: Record<string, any>) => {
 export const logTimerUnmount = (videoId: string) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] VideoTile Unmounted`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] VIDEO_UNMOUNTED`,
     `color: ${COLORS.error}; font-weight: bold`,
     { videoId: videoId?.slice(0, 8) }
   );
@@ -49,7 +49,7 @@ export const logTimerUnmount = (videoId: string) => {
 export const logTimerStateChange = (videoId: string, currentTime: number, duration: number) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] Timer State Changed`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] STATE_CHANGE`,
     `color: ${COLORS.info}; font-weight: bold`,
     {
       videoId: videoId?.slice(0, 8),
@@ -68,7 +68,7 @@ export const logVideoPlayState = (videoId: string, data: {
 }) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] Video Play State`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] PLAY_STATE`,
     `color: ${COLORS.success}; font-weight: bold`,
     { videoId: videoId?.slice(0, 8), ...data }
   );
@@ -77,7 +77,7 @@ export const logVideoPlayState = (videoId: string, data: {
 export const logTimerStart = (videoId: string, startTime: number) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] ▶️ START Timer`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] ▶️ STARTED`,
     `color: ${COLORS.success}; font-weight: bold`,
     { videoId: videoId?.slice(0, 8), startTime }
   );
@@ -86,7 +86,7 @@ export const logTimerStart = (videoId: string, startTime: number) => {
 export const logTimerStop = (videoId: string, stoppedAt: number) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] ⏸️ STOP Timer`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] ⏹️ STOPPED`,
     `color: ${COLORS.error}; font-weight: bold`,
     { videoId: videoId?.slice(0, 8), stoppedAt }
   );
@@ -95,7 +95,7 @@ export const logTimerStop = (videoId: string, stoppedAt: number) => {
 export const logTimerPaused = (videoId: string, reason: string) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log(
-    `%c[${getTimestamp()}ms] [Timer Debug] ⏸️ Timer Paused`,
+    `%c[${getTimestamp()}ms] 🟣 [Timer] ⏸️ PAUSED`,
     `color: ${COLORS.loading}; font-weight: bold`,
     { videoId: videoId?.slice(0, 8), reason }
   );
@@ -106,13 +106,13 @@ export const logTimerPaused = (videoId: string, reason: string) => {
 export const logGridMount = () => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${COLORS.cards}; font-weight: bold`);
-  console.log(`%c[${getTimestamp()}ms] [Cards Debug] 🎬 VideosGrid MOUNTED`, `color: ${COLORS.cards}; font-weight: bold; font-size: 14px`);
+  console.log(`%c[${getTimestamp()}ms] 💗 [Cards] GRID_MOUNTED`, `color: ${COLORS.cards}; font-weight: bold; font-size: 14px`);
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${COLORS.cards}; font-weight: bold`);
 };
 
 export const logVideosArrayUpdate = (videos: any[], source: string = 'unknown') => {
   if (!DEBUG_WATCH_PAGE) return;
-  console.group(`%c[${getTimestamp()}ms] [Cards Debug] 📊 Videos Array Updated (${source})`, `color: ${COLORS.timer}; font-weight: bold`);
+  console.group(`%c[${getTimestamp()}ms] 💗 [Cards] ARRAY_UPDATED (${source})`, `color: ${COLORS.timer}; font-weight: bold`);
   console.log('Total videos in array:', videos?.length || 0);
   console.log('First 10 videos:', videos?.slice(0, 10).map(v => ({
     id: v?.id?.slice(0, 8),
@@ -129,7 +129,7 @@ export const logLazyTilesState = (data: {
   visibleIndices: number[];
 }) => {
   if (!DEBUG_WATCH_PAGE) return;
-  console.group(`%c[${getTimestamp()}ms] [Cards Debug] 👁️ Lazy Tiles State`, `color: ${COLORS.visibility}; font-weight: bold`);
+  console.group(`%c[${getTimestamp()}ms] 💗 [Cards] LAZY_TILES_STATE`, `color: ${COLORS.visibility}; font-weight: bold`);
   console.log('initialVisible config:', data.initialVisible);
   console.log('Total items:', data.totalItems);
   console.log('Visible indices count:', data.visibleCount);
@@ -146,7 +146,7 @@ export const logRenderedCards = () => {
       return rect.height > 0 && rect.width > 0;
     });
 
-    console.group(`%c[${getTimestamp()}ms] [Cards Debug] 🖼️ RENDERED CARDS IN DOM`, `color: ${COLORS.success}; font-weight: bold; font-size: 14px`);
+    console.group(`%c[${getTimestamp()}ms] 💗 [Cards] RENDERED_IN_DOM`, `color: ${COLORS.success}; font-weight: bold; font-size: 14px`);
     console.log('Total rendered (data-lazy-index):', renderedCards.length);
     console.log('Visible (height > 0):', visibleCards.length);
     console.log('Rendered indices:', Array.from(renderedCards).slice(0, 20).map(el => el.getAttribute('data-lazy-index')));
@@ -161,7 +161,7 @@ export const logDataFetch = (data: {
   filterKey?: string;
 }) => {
   if (!DEBUG_WATCH_PAGE) return;
-  console.group(`%c[${getTimestamp()}ms] [Cards Debug] 🔄 Data Fetch State`, `color: ${COLORS.timer}; font-weight: bold`);
+  console.group(`%c[${getTimestamp()}ms] 💗 [Cards] DATA_FETCH`, `color: ${COLORS.timer}; font-weight: bold`);
   console.log('Filter key:', data.filterKey);
   console.log('First page count:', data.firstPageCount);
   console.log('Total items:', data.totalItems);
@@ -178,13 +178,13 @@ export const logObserverSetup = (config: {
 }) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${COLORS.scroll}; font-weight: bold`);
-  console.log(`%c[${getTimestamp()}ms] [Infinite Scroll] 🔍 Setting Up Observer`, `color: ${COLORS.scroll}; font-weight: bold; font-size: 14px`);
+  console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] OBSERVER_SETUP`, `color: ${COLORS.scroll}; font-weight: bold; font-size: 14px`);
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${COLORS.scroll}; font-weight: bold`);
   
   if (!config.hasSentinel) {
-    console.error(`%c[${getTimestamp()}ms] [Infinite Scroll] ❌ NO SENTINEL ELEMENT!`, `color: ${COLORS.error}; font-weight: bold; font-size: 16px`);
+    console.error(`%c[${getTimestamp()}ms] 🟠 [Scroll] ❌ NO_SENTINEL!`, `color: ${COLORS.error}; font-weight: bold; font-size: 16px`);
   } else {
-    console.log(`%c[${getTimestamp()}ms] [Infinite Scroll] ✅ Sentinel Found`, `color: ${COLORS.success}; font-weight: bold`, {
+    console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] ✅ SENTINEL_FOUND`, `color: ${COLORS.success}; font-weight: bold`, {
       rect: config.sentinelRect,
       rootMargin: config.rootMargin,
       threshold: config.threshold,
@@ -202,22 +202,22 @@ export const logObserverCallback = (data: {
 }) => {
   if (!DEBUG_WATCH_PAGE) return;
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: #a855f7; font-weight: bold`);
-  console.log(`%c[${getTimestamp()}ms] [Infinite Scroll] 🔔 OBSERVER CALLBACK FIRED`, `color: #a855f7; font-weight: bold; font-size: 16px`);
+  console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] OBSERVER_CALLBACK`, `color: #a855f7; font-weight: bold; font-size: 16px`);
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: #a855f7; font-weight: bold`);
   
-  console.group(`%c[${getTimestamp()}ms] [Infinite Scroll] 📍 Intersection Entry`, `color: ${COLORS.visibility}; font-weight: bold`);
+  console.group(`%c[${getTimestamp()}ms] 🟠 [Scroll] INTERSECTION_ENTRY`, `color: ${COLORS.visibility}; font-weight: bold`);
   console.log('isIntersecting:', data.isIntersecting);
   console.log('intersectionRatio:', data.intersectionRatio);
   console.log('boundingClientRect.top:', data.boundingClientRect.top);
   console.log('boundingClientRect.bottom:', data.boundingClientRect.bottom);
   console.groupEnd();
 
-  console.group(`%c[${getTimestamp()}ms] [Infinite Scroll] 🎛️ Ref States`, `color: ${COLORS.timer}; font-weight: bold`);
+  console.group(`%c[${getTimestamp()}ms] 🟠 [Scroll] REF_STATES`, `color: ${COLORS.timer}; font-weight: bold`);
   console.log('hasMore:', data.hasMore ? '✅ YES' : '❌ NO');
   console.log('isLoading:', data.isLoading ? '⏳ YES (loading)' : '✅ NO (ready)');
   console.groupEnd();
 
-  console.group(`%c[${getTimestamp()}ms] [Infinite Scroll] ✅ Condition Checks`, `color: ${COLORS.success}; font-weight: bold`);
+  console.group(`%c[${getTimestamp()}ms] 🟠 [Scroll] CONDITIONS`, `color: ${COLORS.success}; font-weight: bold`);
   console.log('isIntersecting?', data.isIntersecting ? '✅ YES' : '❌ NO');
   console.log('hasMore?', data.hasMore ? '✅ YES' : '❌ NO');
   console.log('!isLoading?', !data.isLoading ? '✅ YES' : '❌ NO (is loading)');
@@ -225,9 +225,9 @@ export const logObserverCallback = (data: {
   console.groupEnd();
 
   if (data.willTrigger) {
-    console.log(`%c[${getTimestamp()}ms] [Infinite Scroll] 🚀 TRIGGERING LOAD MORE!`, `color: ${COLORS.success}; font-weight: bold; font-size: 18px`);
+    console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] 🚀 TRIGGERING_LOAD!`, `color: ${COLORS.success}; font-weight: bold; font-size: 18px`);
   } else {
-    console.log(`%c[${getTimestamp()}ms] [Infinite Scroll] ⏸️ NOT TRIGGERING - Conditions not met`, `color: ${COLORS.loading}; font-weight: bold`);
+    console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] ⏸️ NOT_TRIGGERING`, `color: ${COLORS.loading}; font-weight: bold`);
     if (!data.isIntersecting) {
       console.log(`%c  Reason: Sentinel not intersecting viewport`, `color: ${COLORS.loading}`);
     }
@@ -250,7 +250,7 @@ export const logScrollPosition = (data: {
   // Only log when near sentinel (within 600px)
   if (Math.abs(data.distanceFromBottom) > 600) return;
   
-  console.log(`%c[${getTimestamp()}ms] [Scroll Tracking] 📏 Sentinel Position`, `color: #6366f1; font-weight: bold`, {
+  console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] SENTINEL_POSITION`, `color: #6366f1; font-weight: bold`, {
     distanceFromViewportBottom: data.distanceFromBottom,
     sentinelTop: data.sentinelTop,
     viewportHeight: data.viewportHeight,
@@ -285,7 +285,7 @@ export const logLoadMore = (data: {
 
 export const logObserverDisconnect = () => {
   if (!DEBUG_WATCH_PAGE) return;
-  console.log(`%c[${getTimestamp()}ms] [Infinite Scroll] 🔌 DISCONNECTING Observer`, `color: ${COLORS.error}; font-weight: bold`);
+  console.log(`%c[${getTimestamp()}ms] 🟠 [Scroll] OBSERVER_DISCONNECT`, `color: ${COLORS.error}; font-weight: bold`);
 };
 
 // ============ MediaRuntime Debug Logging ============
