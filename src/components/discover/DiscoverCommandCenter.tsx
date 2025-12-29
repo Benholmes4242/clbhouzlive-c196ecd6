@@ -119,7 +119,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     <div 
       className="px-4 overflow-y-auto"
       style={{
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 84px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 100px)',
         maxHeight: 'calc(75vh - 140px)',
       }}
     >
