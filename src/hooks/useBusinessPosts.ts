@@ -35,6 +35,8 @@ export interface BusinessPost {
     media_url: string;
     media_type: string;
     poster_url: string | null;
+    filter_id: string | null;
+    studio_edits: any | null;
   }>;
   post_tags: PostTag[];
 }
@@ -70,7 +72,9 @@ export function useBusinessPosts(businessId?: string) {
             id,
             media_url,
             media_type,
-            poster_url
+            poster_url,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,
