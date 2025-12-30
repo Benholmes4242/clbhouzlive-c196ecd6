@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronUp, ChevronDown, User } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -19,6 +19,7 @@ const columns: { key: SortKey; label: string; shortLabel?: string; format?: (v: 
 ];
 
 export function PlayerStatsTab() {
+  const navigate = useNavigate();
   const [sortKey, setSortKey] = useState<SortKey>('events_played');
   const [sortAsc, setSortAsc] = useState(false);
   
@@ -103,7 +104,7 @@ export function PlayerStatsTab() {
             <tr 
               key={stat.id}
               className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
-              onClick={() => window.location.href = `/tourhub/player/${stat.player_id}`}
+              onClick={() => navigate(`/tourhub/player/${stat.player_id}`)}
             >
               <td className="py-3 px-4">
                 <div className="flex items-center gap-3">
