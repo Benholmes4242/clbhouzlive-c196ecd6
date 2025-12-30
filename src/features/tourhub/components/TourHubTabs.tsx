@@ -17,29 +17,30 @@ interface TourHubTabsProps {
   className?: string;
 }
 
-const tabs: { value: TourHubTab; label: string }[] = [
-  { value: 'overview', label: 'Overview' },
-  { value: 'schedule', label: 'Schedule' },
-  { value: 'players', label: 'Players' },
-  { value: 'player-stats', label: 'Player Statistics' },
-  { value: 'leaderboards', label: 'Leaderboards' },
-  { value: 'summary', label: 'Tournament Summary' },
-  { value: 'tee-times', label: 'Tee Times' },
-  { value: 'hole-stats', label: 'Hole Statistics' },
+const tabs: { value: TourHubTab; label: string; shortLabel: string }[] = [
+  { value: 'overview', label: 'Overview', shortLabel: 'Overview' },
+  { value: 'schedule', label: 'Schedule', shortLabel: 'Schedule' },
+  { value: 'players', label: 'Players', shortLabel: 'Players' },
+  { value: 'player-stats', label: 'Player Statistics', shortLabel: 'Stats' },
+  { value: 'leaderboards', label: 'Leaderboards', shortLabel: 'Leaders' },
+  { value: 'summary', label: 'Tournament Summary', shortLabel: 'Summary' },
+  { value: 'tee-times', label: 'Tee Times', shortLabel: 'Tee Times' },
+  { value: 'hole-stats', label: 'Hole Statistics', shortLabel: 'Holes' },
 ];
 
 export function TourHubTabs({ activeTab, onTabChange, className }: TourHubTabsProps) {
   return (
-    <div className={cn("w-full overflow-x-auto scrollbar-hide", className)}>
+    <div className={cn("w-full max-w-full overflow-x-auto scrollbar-hide", className)}>
       <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TourHubTab)}>
-        <TabsList className="inline-flex h-11 items-center justify-start gap-1 bg-muted/50 p-1 rounded-lg w-max min-w-full">
+        <TabsList className="inline-flex h-11 items-center justify-start gap-1 bg-muted/50 p-1 rounded-lg w-max">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex-none px-3 sm:px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
             >
-              {tab.label}
+              <span className="sm:hidden">{tab.shortLabel}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
             </TabsTrigger>
           ))}
         </TabsList>

@@ -69,20 +69,24 @@ export function PlayerStatsTab() {
     return <TourHubEmptyState variant="players" />;
   }
   
+  // Define which columns to hide on mobile
+  const hiddenOnMobile = ['top_10s', 'scoring_average', 'driving_distance', 'greens_in_reg', 'putting_average'];
+  
   return (
-    <div className="overflow-x-auto -mx-4 px-4">
-      <table className="w-full min-w-[800px]">
+    <div className="w-full max-w-full overflow-x-auto -mx-4 px-4">
+      <table className="w-full min-w-[480px] md:min-w-[800px]">
         <thead className="sticky top-0 z-10">
           <tr className="bg-muted/80 backdrop-blur-sm">
-            <th className="text-left py-3 px-4 text-sm font-semibold text-foreground rounded-l-lg">
+            <th className="text-left py-3 px-3 md:px-4 text-sm font-semibold text-foreground rounded-l-lg sticky left-0 bg-muted/80">
               Player
             </th>
             {columns.map((col, i) => (
               <th 
                 key={col.key}
                 className={cn(
-                  "text-right py-3 px-3 text-sm font-semibold cursor-pointer transition-colors hover:bg-muted",
-                  i === columns.length - 1 && "rounded-r-lg"
+                  "text-right py-3 px-2 md:px-3 text-sm font-semibold cursor-pointer transition-colors hover:bg-muted",
+                  i === columns.length - 1 && "rounded-r-lg",
+                  hiddenOnMobile.includes(col.key) && "hidden md:table-cell"
                 )}
                 onClick={() => handleSort(col.key)}
               >
@@ -106,30 +110,36 @@ export function PlayerStatsTab() {
               className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
               onClick={() => navigate(`/tourhub/player/${stat.player_id}`)}
             >
-              <td className="py-3 px-4">
-                <div className="flex items-center gap-3">
-                  <span className="w-6 text-center text-sm font-medium text-muted-foreground">
+              <td className="py-3 px-3 md:px-4 sticky left-0 bg-background">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <span className="w-5 md:w-6 text-center text-xs md:text-sm font-medium text-muted-foreground">
                     {index + 1}
                   </span>
-                  <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
                     {stat.player?.photo_url ? (
                       <img 
                         src={stat.player.photo_url} 
                         alt={stat.player.full_name}
-                        className="w-9 h-9 object-cover"
+                        className="w-8 h-8 md:w-9 md:h-9 object-cover"
                       />
                     ) : (
-                      <User className="w-4 h-4 text-muted-foreground" />
+                      <User className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground" />
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-foreground truncate">{stat.player?.full_name || 'Unknown'}</p>
-                    <p className="text-xs text-muted-foreground truncate">{stat.player?.country}</p>
+                    <p className="font-medium text-foreground text-sm md:text-base truncate max-w-[100px] md:max-w-none">{stat.player?.full_name || 'Unknown'}</p>
+                    <p className="text-xs text-muted-foreground truncate hidden md:block">{stat.player?.country}</p>
                   </div>
                 </div>
               </td>
               {columns.map((col) => (
-                <td key={col.key} className="py-3 px-3 text-right text-sm">
+                <td 
+                  key={col.key} 
+                  className={cn(
+                    "py-3 px-2 md:px-3 text-right text-sm",
+                    hiddenOnMobile.includes(col.key) && "hidden md:table-cell"
+                  )}
+                >
                   <span className={stat[col.key] !== null && stat[col.key] !== undefined ? 'text-foreground' : 'text-muted-foreground'}>
                     {col.format ? col.format(stat[col.key]) : (stat[col.key] ?? '—')}
                   </span>
