@@ -152,6 +152,7 @@ const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").t
 const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
 const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
 const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
+const MediaPage = lazy(() => import("./pages/admin/MediaPage").then(m => ({ default: m.MediaPage })));
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
@@ -388,6 +389,11 @@ function AppRoutes() {
           <Route path="tour" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminTourPage /></Suspense>
+            </PanelGuard>
+          } />
+          <Route path="media" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><MediaPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="test-lab" element={

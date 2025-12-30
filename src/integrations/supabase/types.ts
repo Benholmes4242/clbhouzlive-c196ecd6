@@ -4857,6 +4857,72 @@ export type Database = {
         }
         Relationships: []
       }
+      sr_editorial_items: {
+        Row: {
+          assets: Json | null
+          byline: string | null
+          content_long: string | null
+          content_long_html: string | null
+          created: string | null
+          created_at: string | null
+          dateline: string | null
+          id: string
+          league: string
+          original_link: string | null
+          provider: string
+          provider_content_id: string | null
+          refs: Json | null
+          sport: string
+          title: string | null
+          type: string
+          updated: string | null
+          updated_at: string | null
+          version: string | null
+        }
+        Insert: {
+          assets?: Json | null
+          byline?: string | null
+          content_long?: string | null
+          content_long_html?: string | null
+          created?: string | null
+          created_at?: string | null
+          dateline?: string | null
+          id: string
+          league: string
+          original_link?: string | null
+          provider: string
+          provider_content_id?: string | null
+          refs?: Json | null
+          sport?: string
+          title?: string | null
+          type: string
+          updated?: string | null
+          updated_at?: string | null
+          version?: string | null
+        }
+        Update: {
+          assets?: Json | null
+          byline?: string | null
+          content_long?: string | null
+          content_long_html?: string | null
+          created?: string | null
+          created_at?: string | null
+          dateline?: string | null
+          id?: string
+          league?: string
+          original_link?: string | null
+          provider?: string
+          provider_content_id?: string | null
+          refs?: Json | null
+          sport?: string
+          title?: string | null
+          type?: string
+          updated?: string | null
+          updated_at?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       sr_hole_statistics: {
         Row: {
           birdies: number | null
@@ -4999,6 +5065,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sr_media_assets: {
+        Row: {
+          copyright: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          kind: string
+          last_seen_at: string | null
+          league: string
+          links: Json | null
+          manifest_source_url: string | null
+          provider: string
+          refs: Json | null
+          sport: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          copyright?: string | null
+          created_at?: string | null
+          description?: string | null
+          id: string
+          kind: string
+          last_seen_at?: string | null
+          league: string
+          links?: Json | null
+          manifest_source_url?: string | null
+          provider: string
+          refs?: Json | null
+          sport?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          copyright?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          last_seen_at?: string | null
+          league?: string
+          links?: Json | null
+          manifest_source_url?: string | null
+          provider?: string
+          refs?: Json | null
+          sport?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sr_media_provider_availability: {
+        Row: {
+          asset_type: string
+          error_message: string | null
+          http_status: number | null
+          id: string
+          last_checked_at: string | null
+          league: string
+          manifest_url: string | null
+          provider: string
+          sport: string
+          status: string
+        }
+        Insert: {
+          asset_type: string
+          error_message?: string | null
+          http_status?: number | null
+          id?: string
+          last_checked_at?: string | null
+          league: string
+          manifest_url?: string | null
+          provider: string
+          sport?: string
+          status?: string
+        }
+        Update: {
+          asset_type?: string
+          error_message?: string | null
+          http_status?: number | null
+          id?: string
+          last_checked_at?: string | null
+          league?: string
+          manifest_url?: string | null
+          provider?: string
+          sport?: string
+          status?: string
+        }
+        Relationships: []
       }
       sr_player_profiles: {
         Row: {
