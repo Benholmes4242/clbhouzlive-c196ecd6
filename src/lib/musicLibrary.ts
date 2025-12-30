@@ -16,26 +16,15 @@ export interface MusicTrack {
 }
 
 /**
- * Generate a signed URL for audio playback via the Worker endpoint
- * Uses absolute URL to work in preview/dev environments
+ * Generate audio URL through the proxy edge function
+ * This bypasses CORS issues with direct R2 access
  */
-const R2_PUBLIC_BASE = 'https://pub-9f6095ba86ef4833a86c1e06bec47b40.r2.dev';
-
-/**
- * Encode R2 key path segments for URL safety (handles spaces, special chars)
- * Splits by /, encodes each segment, then rejoins
- */
-function encodeR2Path(r2Key: string): string {
-  return r2Key
-    .split('/')
-    .map(segment => encodeURIComponent(segment))
-    .join('/');
-}
+const SUPABASE_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
 
 export function getSignedAudioUrl(r2Key: string): string {
-  // Direct public R2 URL with properly encoded path
-  const encodedPath = encodeR2Path(r2Key);
-  return `${R2_PUBLIC_BASE}/${encodedPath}`;
+  // Use the audio-proxy edge function to bypass CORS
+  // The edge function handles encoding internally
+  return `${SUPABASE_URL}/functions/v1/audio-proxy?key=${encodeURIComponent(r2Key)}`;
 }
 
 // ============================================================================
