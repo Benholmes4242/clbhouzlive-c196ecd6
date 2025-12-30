@@ -230,9 +230,38 @@ async function syncPlayers(supabase: any, apiKey: string, year: number) {
 
 // Sync world rankings
 async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
-  const url = `${getBaseUrl()}/${year}/players/wgr.json`;
-  console.log(`Fetching world rankings from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+  // World Golf Rankings uses a different endpoint structure - not year-based
+  // Try the standard rankings endpoint first
+  const possibleUrls = [
+    `https://api.sportradar.com/golf/trial/v3/en/players/wgr.json`,
+    `${getBaseUrl()}/players/wgr.json`,
+    `https://api.sportradar.com/golf/trial/pga/v3/en/players/rankings.json`,
+  ];
+  
+  let data: any = null;
+  let successUrl = '';
+  
+  for (const url of possibleUrls) {
+    try {
+      console.log(`Trying world rankings from: ${url}`);
+      data = await fetchSportradar(url, apiKey);
+      successUrl = url;
+      console.log(`Successfully fetched rankings from: ${url}`);
+      break;
+    } catch (e) {
+      console.log(`URL failed: ${url} - ${e.message}`);
+    }
+  }
+  
+  if (!data) {
+    // If all URLs fail, return gracefully with a message
+    console.log('World rankings endpoint not available - this may be a trial API limitation');
+    return { 
+      records: 0, 
+      message: 'World rankings not available. This endpoint may not be included in the trial API. Consider upgrading to a production API key.' 
+    };
+  }
+  
   const rankings = data.rankings || data.players || [];
   let totalRecords = 0;
   const rankingDate = new Date().toISOString().split('T')[0];
@@ -275,7 +304,7 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
     }
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} rankings` };
+  return { records: totalRecords, message: `Synced ${totalRecords} rankings from ${successUrl || 'API'}` };
 }
 
 // Sync tournament leaderboard
