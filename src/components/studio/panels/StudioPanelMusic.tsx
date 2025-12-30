@@ -37,65 +37,61 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
     };
   }, []);
 
-  const handlePreviewToggle = async (track: MusicTrack) => {
+  const handlePreviewToggle = (track: MusicTrack) => {
     if (previewingTrack === track.id) {
       // Stop preview
       audioRef.current?.pause();
       setPreviewingTrack(null);
-    } else {
-      // Start new preview
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      
-      // Get the signed URL and resolve the redirect to get the actual audio URL
-      const signedUrl = getSignedAudioUrl(track.r2Key);
-      
-      try {
-        // Fetch with redirect: 'follow' to get the final audio URL
-        // We need to resolve the redirect first since Audio elements don't handle 302s well
-        const response = await fetch(signedUrl, { method: 'HEAD', redirect: 'follow' });
-        const audioUrl = response.url;
-        
-        console.log('[StudioMusic] Resolved audio URL:', { 
-          trackId: track.id, 
-          signedUrl, 
-          audioUrl 
+      return;
+    }
+
+    // Start new preview
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+
+    // Use signed Worker URL for playback (worker should 302 -> /api/audio/play)
+    // Avoid fetch() here: it requires CORS, while the Audio element can follow redirects directly.
+    const signedUrl = getSignedAudioUrl(track.r2Key);
+    const audio = new Audio(signedUrl);
+    audio.volume = volume / 100;
+
+    // Add error handling with detailed logging
+    audio.onerror = (e) => {
+      console.error('[StudioMusic] Audio load failed:', {
+        trackId: track.id,
+        r2Key: track.r2Key,
+        signedUrl,
+        currentSrc: audio.currentSrc,
+        error: e,
+        errorCode: audio.error?.code,
+        errorMessage: audio.error?.message,
+      });
+      setPreviewingTrack(null);
+    };
+
+    audio.play()
+      .then(() => {
+        console.log('[StudioMusic] Playing:', {
+          trackId: track.id,
+          r2Key: track.r2Key,
+          signedUrl,
+          currentSrc: audio.currentSrc,
         });
-        
-        const audio = new Audio(audioUrl);
-        audio.volume = volume / 100;
-        audio.crossOrigin = 'anonymous';
-        
-        // Add error handling with detailed logging
-        audio.onerror = (e) => {
-          console.error('[StudioMusic] Audio load failed:', {
-            trackId: track.id,
-            r2Key: track.r2Key,
-            audioUrl,
-            error: e,
-            errorCode: audio.error?.code,
-            errorMessage: audio.error?.message,
-          });
-          setPreviewingTrack(null);
-        };
-        
-        await audio.play();
-        console.log('[StudioMusic] Playing:', { trackId: track.id, r2Key: track.r2Key });
-        
-        audio.addEventListener('ended', () => setPreviewingTrack(null));
-        audioRef.current = audio;
-        setPreviewingTrack(track.id);
-      } catch (err: any) {
+      })
+      .catch((err) => {
         console.error('[StudioMusic] Play failed:', {
           trackId: track.id,
           r2Key: track.r2Key,
           signedUrl,
-          error: err.message,
+          error: err?.message ?? String(err),
         });
         setPreviewingTrack(null);
-      }
-    }
+      });
+
+    audio.addEventListener('ended', () => setPreviewingTrack(null));
+    audioRef.current = audio;
+    setPreviewingTrack(track.id);
   };
 
   const handleSelectTrack = (track: MusicTrack) => {
