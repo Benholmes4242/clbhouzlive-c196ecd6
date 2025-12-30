@@ -83,10 +83,10 @@ export default function CreateMomentMediaStage({
           {activeIndex + 1}/{media.length}
         </div>
 
-        {/* Remove media button - top right - matching bottom pill style */}
+        {/* Remove media button - top right - circle container */}
         <button
           onClick={() => onRemoveMedia(activeIndex)}
-          className="absolute right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
+          className="absolute right-2 z-20 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
           aria-label="Remove current media"
         >
