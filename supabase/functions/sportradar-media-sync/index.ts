@@ -5,19 +5,39 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Golf leagues to check - can be expanded
-const GOLF_LEAGUES = ['pga', 'lpga', 'dpwt', 'korn_ferry'];
-const PROVIDERS = ['ap', 'getty'];
+// Golf leagues to check - focused set for golf
+const GOLF_LEAGUES = ['pga', 'lpga', 'pgatour', 'dpwt', 'korn_ferry', 'european'];
 
-const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'trial';
+// Get the appropriate API key for each service
+const getImagesApiKey = (provider: string): string | null => {
+  if (provider === 'ap') {
+    return Deno.env.get('SPORTRADAR_IMAGES_AP_KEY') || null;
+  } else if (provider === 'getty') {
+    return Deno.env.get('SPORTRADAR_IMAGES_GETTY_KEY') || null;
+  }
+  return null;
+};
 
-// Images API v3 base URL
+const getContentApiKey = (): string | null => {
+  return Deno.env.get('SPORTRADAR_CONTENT_AP_KEY') || null;
+};
+
+// Access level: t3 for trial, p3 for production
+const getAccessLevel = (): string => {
+  const level = Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 't';
+  // Handle if someone accidentally put the full value
+  if (level === 'trial' || level === 't' || level === 't3') return 't';
+  if (level === 'production' || level === 'p' || level === 'p3') return 'p';
+  return 't'; // default to trial
+};
+
+// IMPORTANT: Images API uses api.sportradar.COM
 const getImagesBaseUrl = (provider: string, league: string) => 
   `https://api.sportradar.com/golf-images-${getAccessLevel()}3/${provider}/${league}`;
 
-// Editorial Content API v3 base URL  
+// IMPORTANT: Content/Editorial API uses api.sportradar.US
 const getContentBaseUrl = (provider: string, league: string) =>
-  `https://api.sportradar.com/content-golf-${getAccessLevel()}3/${provider}/${league}`;
+  `https://api.sportradar.us/content-golf-${getAccessLevel()}3/${provider}/${league}`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -27,11 +47,17 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const sportradarApiKey = Deno.env.get('SPORTRADAR_API_KEY');
 
-    if (!sportradarApiKey) {
+    // Validate we have at least one Images key
+    const apImagesKey = getImagesApiKey('ap');
+    const gettyImagesKey = getImagesApiKey('getty');
+    const contentKey = getContentApiKey();
+
+    console.log(`[sportradar-media-sync] Keys configured: AP Images=${!!apImagesKey}, Getty Images=${!!gettyImagesKey}, Content=${!!contentKey}`);
+
+    if (!apImagesKey && !gettyImagesKey) {
       return new Response(
-        JSON.stringify({ error: 'SPORTRADAR_API_KEY not configured' }),
+        JSON.stringify({ error: 'No Images API keys configured. Need SPORTRADAR_IMAGES_AP_KEY or SPORTRADAR_IMAGES_GETTY_KEY' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -44,7 +70,7 @@ Deno.serve(async (req) => {
       provider,
       year,
       date,
-      assetType // 'headshots' | 'logos' | 'venues'
+      assetType
     } = body;
 
     console.log(`[sportradar-media-sync] action=${action}, league=${league}, provider=${provider}, accessLevel=${getAccessLevel()}`);
@@ -53,25 +79,25 @@ Deno.serve(async (req) => {
 
     switch (action) {
       case 'pull_headshots':
-        result = await pullHeadshots(supabase, sportradarApiKey, league, provider);
+        result = await pullHeadshots(supabase, league, provider);
         break;
       case 'pull_logos':
-        result = await pullLogos(supabase, sportradarApiKey, league, provider, year || 2025);
+        result = await pullLogos(supabase, league, provider, year || 2025);
         break;
       case 'pull_venues':
-        result = await pullVenues(supabase, sportradarApiKey, league, provider);
+        result = await pullVenues(supabase, league, provider);
         break;
       case 'pull_news':
-        result = await pullEditorial(supabase, sportradarApiKey, league, provider, 'news', date);
+        result = await pullEditorial(supabase, league, provider, 'news', date);
         break;
       case 'pull_analysis':
-        result = await pullEditorial(supabase, sportradarApiKey, league, provider, 'analysis', date);
+        result = await pullEditorial(supabase, league, provider, 'analysis', date);
         break;
       case 'check_availability':
-        result = await checkProviderAvailability(supabase, sportradarApiKey);
+        result = await checkProviderAvailability(supabase);
         break;
       case 'pull_all':
-        result = await pullAllMedia(supabase, sportradarApiKey);
+        result = await pullAllMedia(supabase);
         break;
       default:
         return new Response(
@@ -95,30 +121,38 @@ Deno.serve(async (req) => {
 });
 
 // Fetch XML manifest from Sportradar, following redirects
-async function fetchManifest(url: string, apiKey: string, description: string): Promise<{ ok: boolean; status: number; data?: string; error?: string }> {
-  console.log(`[${description}] Fetching: ${url}`);
+async function fetchManifest(url: string, apiKey: string, description: string): Promise<{ ok: boolean; status: number; data?: string; error?: string; urlCalled?: string }> {
+  const fullUrl = `${url}?api_key=${apiKey}`;
+  const safeUrl = url; // Log URL without key
+  
+  console.log(`[${description}] Fetching: ${safeUrl}`);
   
   try {
-    const response = await fetch(url, {
+    const response = await fetch(fullUrl, {
       headers: {
-        'x-api-key': apiKey,
         'Accept': 'application/xml'
       },
       redirect: 'follow'
     });
     
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      console.log(`[${description}] HTTP ${response.status}: ${errorText.substring(0, 200)}`);
-      return { ok: false, status: response.status, error: errorText.substring(0, 200) };
+      console.log(`[${description}] HTTP ${response.status}: ${responseText.substring(0, 300)}`);
+      return { ok: false, status: response.status, error: responseText.substring(0, 300), urlCalled: safeUrl };
     }
     
-    const data = await response.text();
-    console.log(`[${description}] HTTP ${response.status} - Got ${data.length} bytes`);
-    return { ok: true, status: response.status, data };
+    // Check if response is HTML (authentication error)
+    if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+      console.log(`[${description}] Got HTML response (likely auth error): ${responseText.substring(0, 200)}`);
+      return { ok: false, status: response.status, error: 'Authentication Error - received HTML instead of XML', urlCalled: safeUrl };
+    }
+    
+    console.log(`[${description}] HTTP ${response.status} - Got ${responseText.length} bytes of XML`);
+    return { ok: true, status: response.status, data: responseText, urlCalled: safeUrl };
   } catch (e) {
     console.error(`[${description}] Fetch error: ${e.message}`);
-    return { ok: false, status: 0, error: e.message };
+    return { ok: false, status: 0, error: e.message, urlCalled: safeUrl };
   }
 }
 
@@ -127,7 +161,6 @@ function parseManifestXml(xml: string, kind: 'headshot' | 'logo' | 'venue'): any
   const assets: any[] = [];
   
   // Simple XML parsing for asset elements
-  // Format: <asset id="..." title="..." ...><link href="..." rel="..." /></asset>
   const assetRegex = /<asset([^>]*)>([\s\S]*?)<\/asset>/gi;
   const attrRegex = /(\w+)="([^"]*)"/g;
   const linkRegex = /<link([^>]*?)\/>/gi;
@@ -182,7 +215,12 @@ function parseManifestXml(xml: string, kind: 'headshot' | 'logo' | 'venue'): any
 }
 
 // Pull player headshots manifest
-async function pullHeadshots(supabase: any, apiKey: string, league: string, provider: string) {
+async function pullHeadshots(supabase: any, league: string, provider: string) {
+  const apiKey = getImagesApiKey(provider);
+  if (!apiKey) {
+    return { records: 0, message: `No API key for ${provider} images`, debug: { provider } };
+  }
+  
   const manifestUrl = `${getImagesBaseUrl(provider, league)}/players/manifest.xml`;
   const result = await fetchManifest(manifestUrl, apiKey, `Headshots ${provider}/${league}`);
   
@@ -190,7 +228,7 @@ async function pullHeadshots(supabase: any, apiKey: string, league: string, prov
   await updateAvailability(supabase, league, provider, 'headshots', result);
   
   if (!result.ok || !result.data) {
-    return { records: 0, message: `Headshots not available: ${result.error}`, debug: { manifestUrl, status: result.status } };
+    return { records: 0, message: `Headshots not available: ${result.error}`, debug: { manifestUrl: result.urlCalled, status: result.status } };
   }
   
   const assets = parseManifestXml(result.data, 'headshot');
@@ -210,7 +248,7 @@ async function pullHeadshots(supabase: any, apiKey: string, league: string, prov
       copyright: asset.copyright,
       refs: asset.refs,
       links: asset.links,
-      manifest_source_url: manifestUrl,
+      manifest_source_url: result.urlCalled,
       last_seen_at: new Date().toISOString(),
       updated_at: asset.updated ? new Date(asset.updated).toISOString() : new Date().toISOString()
     }, { onConflict: 'id' });
@@ -221,12 +259,17 @@ async function pullHeadshots(supabase: any, apiKey: string, league: string, prov
   return { 
     records: upserted, 
     message: `Synced ${upserted} headshots from ${provider}/${league}`,
-    debug: { manifestUrl, totalParsed: assets.length }
+    debug: { manifestUrl: result.urlCalled, totalParsed: assets.length }
   };
 }
 
 // Pull logos manifest
-async function pullLogos(supabase: any, apiKey: string, league: string, provider: string, year: number) {
+async function pullLogos(supabase: any, league: string, provider: string, year: number) {
+  const apiKey = getImagesApiKey(provider);
+  if (!apiKey) {
+    return { records: 0, message: `No API key for ${provider} images`, debug: { provider } };
+  }
+  
   const manifestUrl = `${getImagesBaseUrl(provider, league)}/logos/${year}/manifest.xml`;
   const result = await fetchManifest(manifestUrl, apiKey, `Logos ${provider}/${league}/${year}`);
   
@@ -234,7 +277,7 @@ async function pullLogos(supabase: any, apiKey: string, league: string, provider
   await updateAvailability(supabase, league, provider, 'logos', result);
   
   if (!result.ok || !result.data) {
-    return { records: 0, message: `Logos not available: ${result.error}`, debug: { manifestUrl, status: result.status } };
+    return { records: 0, message: `Logos not available: ${result.error}`, debug: { manifestUrl: result.urlCalled, status: result.status } };
   }
   
   const assets = parseManifestXml(result.data, 'logo');
@@ -254,7 +297,7 @@ async function pullLogos(supabase: any, apiKey: string, league: string, provider
       copyright: asset.copyright,
       refs: asset.refs,
       links: asset.links,
-      manifest_source_url: manifestUrl,
+      manifest_source_url: result.urlCalled,
       last_seen_at: new Date().toISOString(),
       updated_at: asset.updated ? new Date(asset.updated).toISOString() : new Date().toISOString()
     }, { onConflict: 'id' });
@@ -265,12 +308,17 @@ async function pullLogos(supabase: any, apiKey: string, league: string, provider
   return { 
     records: upserted, 
     message: `Synced ${upserted} logos from ${provider}/${league}`,
-    debug: { manifestUrl, totalParsed: assets.length }
+    debug: { manifestUrl: result.urlCalled, totalParsed: assets.length }
   };
 }
 
 // Pull venues manifest
-async function pullVenues(supabase: any, apiKey: string, league: string, provider: string) {
+async function pullVenues(supabase: any, league: string, provider: string) {
+  const apiKey = getImagesApiKey(provider);
+  if (!apiKey) {
+    return { records: 0, message: `No API key for ${provider} images`, debug: { provider } };
+  }
+  
   const manifestUrl = `${getImagesBaseUrl(provider, league)}/venues/manifest.xml`;
   const result = await fetchManifest(manifestUrl, apiKey, `Venues ${provider}/${league}`);
   
@@ -278,7 +326,7 @@ async function pullVenues(supabase: any, apiKey: string, league: string, provide
   await updateAvailability(supabase, league, provider, 'venues', result);
   
   if (!result.ok || !result.data) {
-    return { records: 0, message: `Venues not available: ${result.error}`, debug: { manifestUrl, status: result.status } };
+    return { records: 0, message: `Venues not available: ${result.error}`, debug: { manifestUrl: result.urlCalled, status: result.status } };
   }
   
   const assets = parseManifestXml(result.data, 'venue');
@@ -298,7 +346,7 @@ async function pullVenues(supabase: any, apiKey: string, league: string, provide
       copyright: asset.copyright,
       refs: asset.refs,
       links: asset.links,
-      manifest_source_url: manifestUrl,
+      manifest_source_url: result.urlCalled,
       last_seen_at: new Date().toISOString(),
       updated_at: asset.updated ? new Date(asset.updated).toISOString() : new Date().toISOString()
     }, { onConflict: 'id' });
@@ -309,12 +357,17 @@ async function pullVenues(supabase: any, apiKey: string, league: string, provide
   return { 
     records: upserted, 
     message: `Synced ${upserted} venues from ${provider}/${league}`,
-    debug: { manifestUrl, totalParsed: assets.length }
+    debug: { manifestUrl: result.urlCalled, totalParsed: assets.length }
   };
 }
 
-// Pull editorial content (news/analysis)
-async function pullEditorial(supabase: any, apiKey: string, league: string, provider: string, type: 'news' | 'analysis', dateStr?: string) {
+// Pull editorial content (news/analysis) - uses api.sportradar.US
+async function pullEditorial(supabase: any, league: string, provider: string, type: 'news' | 'analysis', dateStr?: string) {
+  const apiKey = getContentApiKey();
+  if (!apiKey) {
+    return { records: 0, message: 'No Content API key configured (SPORTRADAR_CONTENT_AP_KEY)', debug: {} };
+  }
+  
   const date = dateStr ? new Date(dateStr) : new Date();
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -324,7 +377,7 @@ async function pullEditorial(supabase: any, apiKey: string, league: string, prov
   const result = await fetchManifest(contentUrl, apiKey, `Editorial ${type} ${provider}/${league}`);
   
   if (!result.ok || !result.data) {
-    return { records: 0, message: `Editorial ${type} not available: ${result.error}`, debug: { contentUrl, status: result.status } };
+    return { records: 0, message: `Editorial ${type} not available: ${result.error}`, debug: { contentUrl: result.urlCalled, status: result.status } };
   }
   
   // Parse editorial items from XML
@@ -360,7 +413,7 @@ async function pullEditorial(supabase: any, apiKey: string, league: string, prov
   return { 
     records: upserted, 
     message: `Synced ${upserted} ${type} items from ${provider}/${league}`,
-    debug: { contentUrl, totalParsed: items.length }
+    debug: { contentUrl: result.urlCalled, totalParsed: items.length }
   };
 }
 
@@ -417,7 +470,7 @@ function extractXmlTag(xml: string, tagName: string): string | null {
 }
 
 // Update provider availability status
-async function updateAvailability(supabase: any, league: string, provider: string, assetType: string, result: { ok: boolean; status: number; error?: string }) {
+async function updateAvailability(supabase: any, league: string, provider: string, assetType: string, result: { ok: boolean; status: number; error?: string; urlCalled?: string }) {
   await supabase.from('sr_media_provider_availability').upsert({
     sport: 'golf',
     league,
@@ -426,16 +479,24 @@ async function updateAvailability(supabase: any, league: string, provider: strin
     status: result.ok ? 'available' : 'unavailable',
     last_checked_at: new Date().toISOString(),
     http_status: result.status,
-    error_message: result.error || null
+    error_message: result.error || null,
+    manifest_url: result.urlCalled || null
   }, { onConflict: 'sport,league,provider,asset_type' });
 }
 
 // Check all provider/league combinations for availability
-async function checkProviderAvailability(supabase: any, apiKey: string) {
+async function checkProviderAvailability(supabase: any) {
   const results: any[] = [];
+  const providers = ['ap', 'getty'];
   
   for (const league of GOLF_LEAGUES) {
-    for (const provider of PROVIDERS) {
+    for (const provider of providers) {
+      const apiKey = getImagesApiKey(provider);
+      if (!apiKey) {
+        console.log(`[checkAvailability] Skipping ${provider} - no API key`);
+        continue;
+      }
+      
       for (const assetType of ['headshots', 'logos', 'venues']) {
         let manifestUrl: string;
         switch (assetType) {
@@ -464,7 +525,7 @@ async function checkProviderAvailability(supabase: any, apiKey: string) {
           last_checked_at: new Date().toISOString(),
           http_status: result.status,
           error_message: result.error || null,
-          manifest_url: manifestUrl
+          manifest_url: result.urlCalled || null
         }, { onConflict: 'sport,league,provider,asset_type' });
         
         results.push({
@@ -472,29 +533,61 @@ async function checkProviderAvailability(supabase: any, apiKey: string) {
           provider,
           assetType,
           status: result.ok ? 'available' : 'unavailable',
-          httpStatus: result.status
+          httpStatus: result.status,
+          url: result.urlCalled
         });
         
         // Small delay to avoid rate limiting
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise(r => setTimeout(r, 250));
       }
     }
   }
   
+  // Also check editorial content
+  const contentKey = getContentApiKey();
+  if (contentKey) {
+    for (const league of GOLF_LEAGUES) {
+      for (const type of ['news', 'analysis']) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        
+        const contentUrl = `${getContentBaseUrl('ap', league)}/${type}/${year}/${month}/${day}/all.xml`;
+        console.log(`[checkAvailability] Checking editorial ${type} for ${league}...`);
+        
+        const result = await fetchManifest(contentUrl, contentKey, `Editorial availability check`);
+        
+        results.push({
+          league,
+          provider: 'ap',
+          assetType: type,
+          status: result.ok ? 'available' : 'unavailable',
+          httpStatus: result.status,
+          url: result.urlCalled
+        });
+        
+        await new Promise(r => setTimeout(r, 250));
+      }
+    }
+  }
+  
+  const availableCount = results.filter(r => r.status === 'available').length;
+  
   return { 
     records: results.length, 
-    message: `Checked ${results.length} provider/league combinations`,
-    debug: { results }
+    message: `Checked ${results.length} combinations. ${availableCount} available.`,
+    debug: { results, accessLevel: getAccessLevel() }
   };
 }
 
 // Pull all available media (headshots, logos, venues) for all leagues/providers
-async function pullAllMedia(supabase: any, apiKey: string) {
+async function pullAllMedia(supabase: any) {
   let totalRecords = 0;
   const results: any[] = [];
   
   // First check availability
-  await checkProviderAvailability(supabase, apiKey);
+  await checkProviderAvailability(supabase);
   
   // Get available combinations
   const { data: available } = await supabase
@@ -504,7 +597,7 @@ async function pullAllMedia(supabase: any, apiKey: string) {
     .eq('status', 'available');
   
   if (!available || available.length === 0) {
-    return { records: 0, message: 'No available provider/league combinations found' };
+    return { records: 0, message: 'No available provider/league combinations found. Run Check Availability first.' };
   }
   
   for (const combo of available) {
@@ -512,13 +605,13 @@ async function pullAllMedia(supabase: any, apiKey: string) {
     
     switch (combo.asset_type) {
       case 'headshots':
-        result = await pullHeadshots(supabase, apiKey, combo.league, combo.provider);
+        result = await pullHeadshots(supabase, combo.league, combo.provider);
         break;
       case 'logos':
-        result = await pullLogos(supabase, apiKey, combo.league, combo.provider, 2025);
+        result = await pullLogos(supabase, combo.league, combo.provider, 2025);
         break;
       case 'venues':
-        result = await pullVenues(supabase, apiKey, combo.league, combo.provider);
+        result = await pullVenues(supabase, combo.league, combo.provider);
         break;
       default:
         continue;
