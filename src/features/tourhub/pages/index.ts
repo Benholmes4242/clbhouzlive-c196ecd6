@@ -4,3 +4,5 @@ export { TourHubTourPage } from './TourHubTourPage';
 export { TourHubEventPage } from './TourHubEventPage';
 export { TourHubPlayerPage } from './TourHubPlayerPage';
 export { TourHubRankingsPage } from './TourHubRankingsPage';
+export { TourHubMainPage } from './TourHubMainPage';
+export { TournamentDetailPage } from './TournamentDetailPage';
