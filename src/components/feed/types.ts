@@ -53,6 +53,8 @@ export interface UserPostWithType {
     id: string;
     media_type: 'image' | 'video';
     media_url: string;
+    filter_id?: string | null;
+    studio_edits?: any | null;
   }[];
   post_tags: {
     id: string;

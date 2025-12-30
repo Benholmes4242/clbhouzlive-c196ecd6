@@ -18,7 +18,7 @@ interface FullscreenVideoModalProps {
       username?: string;
     };
     content?: string;
-    studioEdits?: (any | null)[];
+    studioEdit?: any | null;  // Single object for single-video modal
   } | null;
 }
 
@@ -33,16 +33,11 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const mediaId = useId();
 
-  // Detect if post has music from studioEdits - Option A enforcement
+  // Detect if post has music from studioEdit - Option A enforcement
   const { postHasMusic, activeMusic } = useMemo(() => {
-    const studioEdits = videoData?.studioEdits ?? [];
-    const hasMusic = studioEdits.some(ed => {
-      const music = (ed as any)?.music;
-      return !!(music?.url || music?.r2Key);
-    });
-    const music = studioEdits
-      .map(ed => (ed as any)?.music)
-      .find(m => m?.url || m?.r2Key) ?? null;
+    const studioEdit = videoData?.studioEdit;
+    const music = (studioEdit as any)?.music ?? null;
+    const hasMusic = !!(music?.url || music?.r2Key);
     
     // Debug log only when playable URL exists
     if (music?.url) {
@@ -50,7 +45,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
     }
     
     return { postHasMusic: hasMusic, activeMusic: music };
-  }, [videoData?.studioEdits]);
+  }, [videoData?.studioEdit]);
 
   // Handle ESC key to close modal
   useEffect(() => {
