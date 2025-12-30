@@ -8,10 +8,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { 
   RefreshCw, Calendar, MapPin, Trophy, DollarSign, ChevronDown, ChevronRight,
-  Users, Crown, LayoutGrid, Clock, BarChart3, User, TrendingUp, Globe, Layers
+  Users, Crown, LayoutGrid, Clock, BarChart3, User, TrendingUp, Globe, Layers, Image
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import MediaAssetsManagement from '@/components/admin/media/MediaAssetsManagement';
 
 interface Tournament {
   id: string;
@@ -71,6 +72,7 @@ const DATA_SECTIONS: DataSection[] = [
   { id: 'hole_stats', title: 'Hole Statistics', description: 'How the field performed on each hole', icon: <TrendingUp className="h-4 w-4" />, action: 'hole_stats', needsTournament: true, countKey: 'hole_stats' },
   { id: 'player_stats', title: 'Player Statistics', description: 'Season stats (FedEx Cup points, etc.)', icon: <BarChart3 className="h-4 w-4" />, action: 'player_stats', countKey: 'player_stats' },
   { id: 'courses', title: 'Course Info', description: 'Latitude/longitude, layouts, hole details', icon: <Globe className="h-4 w-4" />, action: 'summary', countKey: 'courses' },
+  { id: 'media', title: 'Media Assets', description: 'Player headshots, logos, venue images from AP & Getty', icon: <Image className="h-4 w-4" />, action: 'media', countKey: 'media' },
 ];
 
 export function AdminTourPage() {
@@ -84,7 +86,7 @@ export function AdminTourPage() {
   const { data: counts } = useQuery({
     queryKey: ['sr-counts'],
     queryFn: async () => {
-      const [tournaments, seasons, players, rankings, leaderboards, summaries, scorecards, tee_times, hole_stats, player_stats, courses] = await Promise.all([
+      const [tournaments, seasons, players, rankings, leaderboards, summaries, scorecards, tee_times, hole_stats, player_stats, courses, media] = await Promise.all([
         supabase.from('sr_tournaments').select('id', { count: 'exact', head: true }),
         supabase.from('sr_seasons').select('id', { count: 'exact', head: true }),
         supabase.from('sr_players').select('id', { count: 'exact', head: true }),
@@ -96,6 +98,7 @@ export function AdminTourPage() {
         supabase.from('sr_hole_statistics').select('id', { count: 'exact', head: true }),
         supabase.from('sr_player_statistics').select('id', { count: 'exact', head: true }),
         supabase.from('sr_courses').select('id', { count: 'exact', head: true }),
+        supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }),
       ]);
       return {
         tournaments: tournaments.count || 0,
@@ -109,6 +112,7 @@ export function AdminTourPage() {
         hole_stats: hole_stats.count || 0,
         player_stats: player_stats.count || 0,
         courses: courses.count || 0,
+        media: media.count || 0,
       };
     },
   });
@@ -531,6 +535,9 @@ export function AdminTourPage() {
             )}
           </div>
         );
+
+      case 'media':
+        return <MediaAssetsManagement />;
 
       default:
         return (
