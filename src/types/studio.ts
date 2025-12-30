@@ -19,7 +19,8 @@ export type StudioEdits = {
     trackId: string;
     title: string;
     artist?: string;
-    url: string;       // audio file URL
+    r2Key: string;     // R2 object key - resolve via getSignedAudioUrl()
+    url?: string;      // deprecated: legacy URL field for backwards compatibility
     startAt?: number;  // seconds
     volume?: number;   // 0..1
   } | null;

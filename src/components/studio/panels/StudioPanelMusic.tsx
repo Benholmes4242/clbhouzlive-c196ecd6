@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, Play, Pause, Music2, Volume2 } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
-import { MUSIC_LIBRARY, MUSIC_CATEGORIES, MusicTrack } from '@/lib/musicLibrary';
+import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
 type StudioPanelMusicProps = {
   edits: StudioEdits;
@@ -11,26 +11,25 @@ type StudioPanelMusicProps = {
 };
 
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeMood, setActiveMood] = useState<string>('all');
   const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
   const [volume, setVolume] = useState((edits?.music?.volume ?? 0.8) * 100);
   const [searchQuery, setSearchQuery] = useState('');
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Filter tracks by category and search
+  // Filter tracks by mood and search
   const filteredTracks = MUSIC_LIBRARY.filter(track => {
-    const matchesCategory = activeCategory === 'all' || track.category === activeCategory;
+    const matchesMood = activeMood === 'all' || track.mood === activeMood;
     const matchesSearch = !searchQuery || 
       track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       track.artist.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesMood && matchesSearch;
   });
 
-  // Handle preview playback
+  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
-      // Cleanup audio on unmount
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -48,26 +47,34 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      const audio = new Audio(track.url);
+      
+      // Use signed Worker URL for playback
+      const signedUrl = getSignedAudioUrl(track.r2Key);
+      const audio = new Audio(signedUrl);
       audio.volume = volume / 100;
       
-      // Add error handling for blocked/failed audio
+      // Add error handling with detailed logging
       audio.onerror = (e) => {
         console.error('[StudioMusic] Audio load failed:', {
           trackId: track.id,
-          url: track.url,
+          r2Key: track.r2Key,
+          signedUrl,
           error: e,
+          errorCode: audio.error?.code,
+          errorMessage: audio.error?.message,
         });
         setPreviewingTrack(null);
       };
       
       audio.play()
         .then(() => {
-          console.log('[StudioMusic] Playing:', track.id);
+          console.log('[StudioMusic] Playing:', { trackId: track.id, r2Key: track.r2Key });
         })
         .catch((err) => {
           console.error('[StudioMusic] Play failed:', {
             trackId: track.id,
+            r2Key: track.r2Key,
+            signedUrl,
             error: err.message,
           });
           setPreviewingTrack(null);
@@ -86,12 +93,13 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       audioRef.current.pause();
       setPreviewingTrack(null);
     }
+    // Store r2Key instead of url - SoundtrackStrip will resolve the signed URL
     updateEdits({
       music: {
         trackId: track.id,
         title: track.title,
         artist: track.artist,
-        url: track.url,
+        r2Key: track.r2Key,
         startAt: 0,
         volume: volume / 100
       }
@@ -135,23 +143,23 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         </div>
       </div>
 
-      {/* Category Tabs */}
+      {/* Mood Tabs */}
       <div 
         className="flex gap-2 px-4 py-3 overflow-x-auto"
         style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
       >
-        {MUSIC_CATEGORIES.map(cat => (
+        {MUSIC_MOODS.map(mood => (
           <button
-            key={cat.key}
-            onClick={() => setActiveCategory(cat.key)}
+            key={mood.key}
+            onClick={() => setActiveMood(mood.key)}
             className="px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors"
             style={{
-              background: activeCategory === cat.key ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-              color: activeCategory === cat.key ? 'white' : 'var(--cm-text-secondary)',
-              border: activeCategory === cat.key ? 'none' : '1px solid var(--cm-border-subtle)',
+              background: activeMood === mood.key ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+              color: activeMood === mood.key ? 'white' : 'var(--cm-text-secondary)',
+              border: activeMood === mood.key ? 'none' : '1px solid var(--cm-border-subtle)',
             }}
           >
-            {cat.label}
+            {mood.label}
           </button>
         ))}
       </div>
@@ -215,7 +223,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                   className="text-sm truncate"
                   style={{ color: 'var(--cm-text-secondary)' }}
                 >
-                  {track.artist}
+                  {track.artist} • {track.mood}
                 </div>
               </div>
 

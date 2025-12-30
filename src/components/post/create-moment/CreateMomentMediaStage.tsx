@@ -97,11 +97,11 @@ export default function CreateMomentMediaStage({
         {/* Soundtrack strip - centered bottom when music is selected */}
         {currentItem && (() => {
           const edits = getEdits(currentItem.id);
-          if (edits?.music?.url) {
+          if (edits?.music?.r2Key || edits?.music?.url) {
             return (
               <div className="absolute bottom-[8px] left-1/2 -translate-x-1/2 z-20 max-w-[200px]">
                 <SoundtrackStrip 
-                  music={edits.music as { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }}
+                  music={edits.music as { trackId: string; title: string; artist?: string; r2Key?: string; url?: string; startAt?: number; volume?: number }}
                   variant="preview"
                 />
               </div>

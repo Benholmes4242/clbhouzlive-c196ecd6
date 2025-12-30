@@ -78,13 +78,14 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
         )}
 
         {/* Soundtrack strip with playback - bottom left */}
-        {music?.url && (
+        {(music?.r2Key || music?.url) && (
           <div className="absolute bottom-2 left-2 z-10 max-w-[180px]">
             <SoundtrackStrip 
               music={{
                 trackId: music.trackId,
                 title: music.title,
                 artist: music.artist,
+                r2Key: music.r2Key,
                 url: music.url,
                 startAt: music.startAt,
                 volume: music.volume,
