@@ -77,7 +77,7 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
       const { data: posts, error: pErr } = await supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, actor_type, actor_id,
+          id, content, created_at, user_id, actor_type, actor_id, categories,
           post_media (id, media_type, media_url, duration_seconds, width, height)
         `)
         .or(orFilters.join(','))
@@ -188,6 +188,7 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
           creator,
           user,
           business,
+          categories: post.categories || [],
           title: post.content || '',
           likes: 0, // De-emphasized per Phase 4
           comments: 0,

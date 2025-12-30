@@ -8,6 +8,7 @@ export type MomentCategoryDef = {
   keywords?: string[];
   courseBoost?: boolean;
   mediaBoost?: ('video' | 'photo')[];
+  discoverEnabled?: boolean; // If true, appears in Discover filter pills
 };
 
 export type MomentBadgeDef = {
@@ -29,12 +30,14 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     emoji: '📚',
     keywords: ['tip', 'tips', 'advice', 'lesson', 'coach', 'coaching', 'teach', 'learn', 'technique', 'drill', 'practice tip', 'how to', 'tutorial', 'improve', 'fix', 'correct'],
     mediaBoost: ['video'],
+    discoverEnabled: true,
   },
   {
     id: 'funny',
     label: 'Funny',
     emoji: '😂',
     keywords: ['funny', 'lol', 'haha', 'hilarious', 'fail', 'oops', 'blooper', 'mishap', 'embarrassing', 'comedy', 'joke', 'laugh'],
+    discoverEnabled: true,
   },
   {
     id: 'course-vlog',
@@ -43,6 +46,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: ['vlog', 'playing', 'round', 'first time', 'bucket list', 'dream course'],
     courseBoost: true,
     mediaBoost: ['video'],
+    discoverEnabled: true,
   },
   {
     id: 'my-round',
@@ -57,6 +61,7 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     label: 'Challenge',
     emoji: '🏆',
     keywords: ['challenge', 'bet', 'competition', 'contest', 'match', 'vs', 'versus', 'compete'],
+    discoverEnabled: true,
   },
   {
     id: 'review',
@@ -71,12 +76,14 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     emoji: '🏌️',
     keywords: ['swing', 'driver', 'iron', 'wedge', 'putter', 'form', 'backswing', 'downswing', 'tempo', 'speed', 'club'],
     mediaBoost: ['video'],
+    discoverEnabled: true,
   },
   {
     id: 'hole-in-one',
     label: 'Hole in One',
     emoji: '🎯',
     keywords: ['hole in one', 'hole-in-one', 'hio', 'ace', 'aced it', 'one shot'],
+    discoverEnabled: true,
   },
   {
     id: 'gear',
@@ -111,6 +118,11 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     keywords: [],
   },
 ];
+
+// Get categories enabled for Discover filtering
+export function getDiscoverCategories(): MomentCategoryDef[] {
+  return MOMENT_CATEGORIES.filter(c => c.discoverEnabled);
+}
 
 // Score badges - separate from categories
 export const MOMENT_BADGES: MomentBadgeDef[] = [

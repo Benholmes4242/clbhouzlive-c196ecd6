@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 
 interface SortingChip {
   id: string;
@@ -12,13 +13,14 @@ interface SortingChipsProps {
   onChipSelect: (chipId: string | null) => void;
 }
 
+// Build chips from canonical category definitions
 const sortingChips: SortingChip[] = [
   { id: 'all', label: 'All', keyword: '' },
-  { id: 'funny', label: 'Funny Golf Moments', keyword: 'funny' },
-  { id: 'tips', label: 'Tips & Lessons', keyword: 'tips' },
-  { id: 'shots', label: 'Best Shots', keyword: 'shot' },
-  { id: 'courses', label: 'Top Courses', keyword: 'course' },
-  { id: 'reactions', label: 'Player Reactions', keyword: 'reaction' },
+  ...getDiscoverCategories().map(cat => ({
+    id: cat.id,
+    label: cat.label,
+    keyword: cat.id, // Use category ID as keyword for filtering
+  })),
 ];
 
 const SortingChips: React.FC<SortingChipsProps> = ({ selectedChip, onChipSelect }) => {
