@@ -241,8 +241,15 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 </span>
               </div>
               
-              {/* Caption preview (collapsed) */}
-              {!isExpanded && caption && (
+              {/* Golf course (collapsed) - shows "📍 Course Name" */}
+              {!isExpanded && golfCourse?.name && (
+                <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
+                  📍 {golfCourse.name}
+                </p>
+              )}
+              
+              {/* Caption preview (collapsed) - only if no golf course */}
+              {!isExpanded && !golfCourse?.name && caption && (
                 <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
                   {truncatedCaption}
                 </p>
