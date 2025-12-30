@@ -204,6 +204,20 @@ export function AdminTourPage() {
     },
   });
 
+  // Fetch player statistics
+  const { data: playerStats } = useQuery({
+    queryKey: ['sr-player-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sr_player_statistics')
+        .select('*, sr_players(first_name, last_name, country_code)')
+        .order('fedex_points', { ascending: false, nullsFirst: false })
+        .limit(100);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Sync mutation
   const syncMutation = useMutation({
     mutationFn: async ({ action, tournamentId }: { action: string; tournamentId?: string }) => {
@@ -458,6 +472,30 @@ export function AdminTourPage() {
             ))}
             {(!courses || courses.length === 0) && (
               <div className="col-span-full text-center py-8 text-muted-foreground">No courses synced yet</div>
+            )}
+          </div>
+        );
+
+      case 'player_stats':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {playerStats?.map((stat: any) => (
+              <div key={stat.id} className="p-4 rounded-lg border border-border bg-card">
+                <div className="font-medium">
+                  {stat.sr_players?.first_name} {stat.sr_players?.last_name}
+                </div>
+                <div className="text-sm text-muted-foreground space-y-1 mt-2">
+                  {stat.fedex_points && <div>🏆 FedEx: {stat.fedex_points.toLocaleString()} pts</div>}
+                  {stat.events_played && <div>📅 {stat.events_played} events</div>}
+                  {stat.scoring_avg && <div>⛳ Avg: {stat.scoring_avg.toFixed(2)}</div>}
+                  {stat.sr_players?.country_code && <div>🌍 {stat.sr_players.country_code}</div>}
+                </div>
+              </div>
+            ))}
+            {(!playerStats || playerStats.length === 0) && (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                No player statistics synced yet
+              </div>
             )}
           </div>
         );
