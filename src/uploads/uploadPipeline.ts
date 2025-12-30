@@ -23,8 +23,16 @@ const getCloudflareR2 = async () => {
 /**
  * Enqueue and immediately start processing a post upload.
  * Returns the jobId synchronously - processing happens in background.
+ * 
+ * @throws Error if no files are provided (posts require at least one media file)
  */
 export function enqueuePostUpload(input: UploadJobInput): string {
+  // Validate: posts MUST have at least one media file
+  if (!input.files || input.files.length === 0) {
+    console.error('[uploadPipeline] enqueuePostUpload called with no files - rejecting');
+    throw new Error('At least one media file is required to create a post');
+  }
+
   const jobId = uploadManager.enqueue(input);
   
   // Start processing in background (don't await)
@@ -120,13 +128,20 @@ async function processJob(jobId: string): Promise<void> {
     return;
   }
 
-  // Skip if already complete or no files
+  // Skip if already complete
   if (job.status === 'complete') {
     uploadManager.clearProcessing(jobId);
     return;
   }
 
-  console.log(`[uploadPipeline] Processing job ${jobId}`);
+  // CRITICAL: Fail fast if no files - don't create orphaned posts
+  if (!job.files || job.files.length === 0) {
+    console.error(`[uploadPipeline] Job ${jobId} has no files - aborting`);
+    uploadManager.markFailed(jobId, 'No media files to upload');
+    return;
+  }
+
+  console.log(`[uploadPipeline] Processing job ${jobId} with ${job.files.length} files`);
 
   // Track uploaded stream UIDs for cleanup on failure
   const uploadedStreamUids: string[] = [];
