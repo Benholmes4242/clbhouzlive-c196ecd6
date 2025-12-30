@@ -11,14 +11,16 @@ interface PostActionsProps {
     shares: number;
   };
   isVideoPost?: boolean;
+  /** When true, the post has a music track and original video audio is muted */
+  postHasMusic?: boolean;
 }
 
-const PostActions = ({ stats, isVideoPost = false }: PostActionsProps) => {
+const PostActions = ({ stats, isVideoPost = false, postHasMusic = false }: PostActionsProps) => {
   return (
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center space-x-4">
         {/* Mute toggle button - positioned first (above like button) */}
-        <FeedMuteToggle isVideoPost={isVideoPost} />
+        <FeedMuteToggle isVideoPost={isVideoPost} postHasMusic={postHasMusic} />
         
         <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
           <Heart className="h-4 w-4" />
