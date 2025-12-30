@@ -29,16 +29,32 @@ export default function SoundtrackStrip({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Resolve the audio URL - prefer direct url, fallback to r2Key resolution
+  // Always route through the audio-proxy to avoid CORS issues
   const getAudioUrl = (): string => {
-    // Primary: use the stored url (already resolved public R2 URL)
+    const R2_PUBLIC_BASE = 'https://pub-9f6095ba86ef4833a86c1e06bec47b40.r2.dev/';
+    const PROXY_BASE = 'https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/audio-proxy?key=';
+    
+    // If url exists, check if it's already a proxy URL or needs conversion
     if (music.url) {
+      // Already using proxy - return as-is
+      if (music.url.includes('/functions/v1/audio-proxy')) {
+        return music.url;
+      }
+      // Legacy direct R2 URL - extract key and route through proxy
+      if (music.url.startsWith(R2_PUBLIC_BASE)) {
+        const r2Key = decodeURIComponent(music.url.replace(R2_PUBLIC_BASE, ''));
+        return `${PROXY_BASE}${encodeURIComponent(r2Key)}`;
+      }
+      // Unknown URL format - try using as-is (shouldn't happen)
+      console.warn('[SoundtrackStrip] Unknown audio URL format:', music.url);
       return music.url;
     }
-    // Fallback: resolve from r2Key for legacy data
+    
+    // Fallback: resolve from r2Key
     if (music.r2Key) {
       return getSignedAudioUrl(music.r2Key);
     }
+    
     return '';
   };
 
