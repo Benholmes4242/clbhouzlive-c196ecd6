@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import CoursePostBadge from '../CoursePostBadge';
@@ -6,6 +6,7 @@ import { PostMedia, GolfCourse } from './types';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserPostMediaProps {
   media: PostMedia[];
@@ -22,21 +23,47 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   onMediaClick,
   isClubhouse = false
 }) => {
+  const { toast } = useToast();
+
+  // Check if any media in this post has music attached
+  // When music exists, all videos in the post should be muted
+  const postHasMusic = useMemo(() => {
+    return media.some(m => {
+      const studioEdits = m.studio_edits as any;
+      return studioEdits?.music?.url || studioEdits?.music?.r2Key;
+    });
+  }, [media]);
+
+  // Get the active music track (from any media item) for display
+  const activeMusic = useMemo(() => {
+    for (const m of media) {
+      const music = (m.studio_edits as any)?.music;
+      if (music?.url || music?.r2Key) {
+        return music;
+      }
+    }
+    return null;
+  }, [media]);
+
+  const handleMuteBlocked = () => {
+    toast({
+      description: "Original audio is muted because a track is applied.",
+      duration: 2000,
+    });
+  };
+
   if (!media || media.length === 0) return null;
 
-  const carouselItems = media.map((mediaItem) => {
+  const carouselItems = media.map((mediaItem, index) => {
     // Use filter_id first (new column), fallback to studio_edits.filter (old data)
     const filterId = mediaItem.filter_id || (mediaItem.studio_edits as any)?.filter;
     const filterClass = getFilterClass(filterId);
-    
-    // Get music from studio_edits
-    const music = (mediaItem.studio_edits as any)?.music;
     
     console.log('[Feed] slide filter', {
       postMediaId: mediaItem.id,
       filterId,
       filterClass,
-      hasMusic: !!music,
+      postHasMusic,
     });
     
     return (
@@ -69,7 +96,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           <EnhancedVideoPlayer
             src={mediaItem.media_url}
             autoplay={shouldAutoplay}
-            muted={true}
+            muted={true}  // Always muted in feed - music handled separately
             loop={true}
             className={cn("w-full h-full", filterClass)}
             enableHLS={true}
@@ -77,18 +104,18 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           />
         )}
 
-        {/* Soundtrack strip with playback - bottom left */}
-        {(music?.r2Key || music?.url) && (
+        {/* Soundtrack strip - show on every slide when post has music */}
+        {activeMusic && (
           <div className="absolute bottom-2 left-2 z-10 max-w-[180px]">
             <SoundtrackStrip 
               music={{
-                trackId: music.trackId,
-                title: music.title,
-                artist: music.artist,
-                r2Key: music.r2Key,
-                url: music.url,
-                startAt: music.startAt,
-                volume: music.volume,
+                trackId: activeMusic.trackId,
+                title: activeMusic.title,
+                artist: activeMusic.artist,
+                url: activeMusic.url,
+                r2Key: activeMusic.r2Key,
+                startAt: activeMusic.startAt,
+                volume: activeMusic.volume,
               }}
               variant="published"
             />

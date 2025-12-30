@@ -101,14 +101,16 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       audioRef.current.pause();
       setPreviewingTrack(null);
     }
-    // Store r2Key instead of url - SoundtrackStrip will resolve the signed URL
+    // Store resolved public URL for direct playback (not r2Key)
     // Also set audioMode to music_only to mute original video audio
+    const resolvedUrl = getSignedAudioUrl(track.r2Key);
     updateEdits({
       music: {
         trackId: track.id,
         title: track.title,
         artist: track.artist,
-        r2Key: track.r2Key,
+        r2Key: track.r2Key,  // Keep for reference
+        url: resolvedUrl,    // Primary playback URL
         startAt: 0,
         volume: volume / 100
       },
