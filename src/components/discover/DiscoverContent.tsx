@@ -142,21 +142,15 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
   });
 }
 
-// Shorts filter pills - aligned with categoryDefinitions.ts for consistent filtering
-// Keys match category IDs from MOMENT_CATEGORIES
+// Shorts filter pills - dynamically built from canonical categoryDefinitions
 const SHORTS_PILLS = [
-  { key: 'all', label: 'All' },
-  { key: 'funny', label: 'Funny' },
-  { key: 'challenge', label: 'Challenge' },
-  { key: 'tips-coaching', label: 'Tips & Coaching' },
-  { key: 'course-vlog', label: 'Course Vlog' },
-  { key: 'swing', label: 'Swing' },
-  { key: 'hole-in-one', label: 'Hole in One' },
+  { key: 'all', label: 'All', emoji: undefined as string | undefined },
+  ...getDiscoverCategories().map((cat) => ({
+    key: cat.id,
+    label: cat.label,
+    emoji: cat.emoji,
+  })),
 ];
-
-const CATEGORY_EMOJI_BY_ID: Record<string, string> = Object.fromEntries(
-  getDiscoverCategories().map((c) => [c.id, c.emoji] as const)
-);
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
   const navigate = useNavigate();
@@ -184,20 +178,16 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const searchQuery = externalSearchQuery || watchSearchQuery;
   
   // Convert pills to DiscoverCommandCenter format
-  const watchPills: Pill[] = SHORTS_PILLS.map((pill) => {
-    const emoji = pill.key !== 'all' ? CATEGORY_EMOJI_BY_ID[pill.key] : undefined;
-
-    return {
-      key: pill.key,
-      label: pill.label,
-      selected: watchActiveFilter === pill.key,
-      icon: emoji ? (
-        <span aria-hidden="true" className="text-[14px] leading-none">
-          {emoji}
-        </span>
-      ) : undefined,
-    };
-  });
+  const watchPills: Pill[] = SHORTS_PILLS.map((pill) => ({
+    key: pill.key,
+    label: pill.label,
+    selected: watchActiveFilter === pill.key,
+    icon: pill.emoji ? (
+      <span aria-hidden="true" className="text-[14px] leading-none">
+        {pill.emoji}
+      </span>
+    ) : undefined,
+  }));
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
