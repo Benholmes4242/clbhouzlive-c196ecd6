@@ -21,6 +21,7 @@ import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 import { useHeroPreload } from '@/hooks/useHeroPreload';
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
@@ -153,6 +154,10 @@ const SHORTS_PILLS = [
   { key: 'hole-in-one', label: 'Hole in One' },
 ];
 
+const CATEGORY_EMOJI_BY_ID: Record<string, string> = Object.fromEntries(
+  getDiscoverCategories().map((c) => [c.id, c.emoji] as const)
+);
+
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
   const navigate = useNavigate();
   const { main, sub, duration } = useDiscoverQuery();
@@ -179,11 +184,20 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const searchQuery = externalSearchQuery || watchSearchQuery;
   
   // Convert pills to DiscoverCommandCenter format
-  const watchPills: Pill[] = SHORTS_PILLS.map(pill => ({
-    key: pill.key,
-    label: pill.label,
-    selected: watchActiveFilter === pill.key,
-  }));
+  const watchPills: Pill[] = SHORTS_PILLS.map((pill) => {
+    const emoji = pill.key !== 'all' ? CATEGORY_EMOJI_BY_ID[pill.key] : undefined;
+
+    return {
+      key: pill.key,
+      label: pill.label,
+      selected: watchActiveFilter === pill.key,
+      icon: emoji ? (
+        <span aria-hidden="true" className="text-[14px] leading-none">
+          {emoji}
+        </span>
+      ) : undefined,
+    };
+  });
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
