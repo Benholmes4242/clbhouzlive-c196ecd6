@@ -37,7 +37,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
     };
   }, []);
 
-  const handlePreviewToggle = (track: MusicTrack) => {
+  const handlePreviewToggle = async (track: MusicTrack) => {
     if (previewingTrack === track.id) {
       // Stop preview
       audioRef.current?.pause();
@@ -48,41 +48,53 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         audioRef.current.pause();
       }
       
-      // Use signed Worker URL for playback
+      // Get the signed URL and resolve the redirect to get the actual audio URL
       const signedUrl = getSignedAudioUrl(track.r2Key);
-      const audio = new Audio(signedUrl);
-      audio.volume = volume / 100;
       
-      // Add error handling with detailed logging
-      audio.onerror = (e) => {
-        console.error('[StudioMusic] Audio load failed:', {
+      try {
+        // Fetch with redirect: 'follow' to get the final audio URL
+        // We need to resolve the redirect first since Audio elements don't handle 302s well
+        const response = await fetch(signedUrl, { method: 'HEAD', redirect: 'follow' });
+        const audioUrl = response.url;
+        
+        console.log('[StudioMusic] Resolved audio URL:', { 
+          trackId: track.id, 
+          signedUrl, 
+          audioUrl 
+        });
+        
+        const audio = new Audio(audioUrl);
+        audio.volume = volume / 100;
+        audio.crossOrigin = 'anonymous';
+        
+        // Add error handling with detailed logging
+        audio.onerror = (e) => {
+          console.error('[StudioMusic] Audio load failed:', {
+            trackId: track.id,
+            r2Key: track.r2Key,
+            audioUrl,
+            error: e,
+            errorCode: audio.error?.code,
+            errorMessage: audio.error?.message,
+          });
+          setPreviewingTrack(null);
+        };
+        
+        await audio.play();
+        console.log('[StudioMusic] Playing:', { trackId: track.id, r2Key: track.r2Key });
+        
+        audio.addEventListener('ended', () => setPreviewingTrack(null));
+        audioRef.current = audio;
+        setPreviewingTrack(track.id);
+      } catch (err: any) {
+        console.error('[StudioMusic] Play failed:', {
           trackId: track.id,
           r2Key: track.r2Key,
           signedUrl,
-          error: e,
-          errorCode: audio.error?.code,
-          errorMessage: audio.error?.message,
+          error: err.message,
         });
         setPreviewingTrack(null);
-      };
-      
-      audio.play()
-        .then(() => {
-          console.log('[StudioMusic] Playing:', { trackId: track.id, r2Key: track.r2Key });
-        })
-        .catch((err) => {
-          console.error('[StudioMusic] Play failed:', {
-            trackId: track.id,
-            r2Key: track.r2Key,
-            signedUrl,
-            error: err.message,
-          });
-          setPreviewingTrack(null);
-        });
-      
-      audio.addEventListener('ended', () => setPreviewingTrack(null));
-      audioRef.current = audio;
-      setPreviewingTrack(track.id);
+      }
     }
   };
 
