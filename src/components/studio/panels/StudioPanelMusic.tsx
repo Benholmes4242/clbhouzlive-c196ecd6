@@ -50,7 +50,29 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       }
       const audio = new Audio(track.url);
       audio.volume = volume / 100;
-      audio.play().catch(console.error);
+      
+      // Add error handling for blocked/failed audio
+      audio.onerror = (e) => {
+        console.error('[StudioMusic] Audio load failed:', {
+          trackId: track.id,
+          url: track.url,
+          error: e,
+        });
+        setPreviewingTrack(null);
+      };
+      
+      audio.play()
+        .then(() => {
+          console.log('[StudioMusic] Playing:', track.id);
+        })
+        .catch((err) => {
+          console.error('[StudioMusic] Play failed:', {
+            trackId: track.id,
+            error: err.message,
+          });
+          setPreviewingTrack(null);
+        });
+      
       audio.addEventListener('ended', () => setPreviewingTrack(null));
       audioRef.current = audio;
       setPreviewingTrack(track.id);
@@ -134,8 +156,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         ))}
       </div>
 
-      {/* Track list */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Track list - scrollable with min-h-0 */}
+      <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
         {filteredTracks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <Music2 
