@@ -77,11 +77,11 @@ export default function CreateMomentMediaStage({
 
         {/* Media counter - top left - DARK GLASS */}
         <div 
-          className="absolute left-4 z-20 flex items-center gap-2"
+          className="absolute left-4 z-20"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
-          <div className="rounded-full bg-black/60 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 flex items-center gap-1 font-medium">
-            <span>{activeIndex + 1}/{media.length}</span>
+          <div className="px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white/90">
+            {activeIndex + 1}/{media.length}
           </div>
         </div>
 
