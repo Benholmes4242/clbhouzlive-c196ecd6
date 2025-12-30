@@ -31,7 +31,7 @@ const tabs: { value: TourHubTab; label: string; shortLabel: string }[] = [
 export function TourHubTabs({ activeTab, onTabChange, className }: TourHubTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TourHubTab)}>
-      <div className={cn("w-full max-w-full overflow-x-auto whitespace-nowrap scrollbar-hide", className)}>
+      <div className={cn("w-full max-w-full overflow-x-auto whitespace-nowrap overscroll-x-contain scrollbar-hide", className)}>
         <TabsList className="inline-flex h-11 items-center justify-start gap-1 bg-muted/50 p-1 rounded-lg w-max">
           {tabs.map((tab) => (
             <TabsTrigger
@@ -69,7 +69,7 @@ const tournamentTabs: { value: TournamentDetailTab; label: string }[] = [
 export function TournamentDetailTabs({ activeTab, onTabChange, className }: TournamentDetailTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TournamentDetailTab)}>
-      <div className={cn("w-full max-w-full overflow-x-auto whitespace-nowrap scrollbar-hide", className)}>
+      <div className={cn("w-full max-w-full overflow-x-auto whitespace-nowrap overscroll-x-contain scrollbar-hide", className)}>
         <TabsList className="inline-flex h-10 items-center justify-start gap-1 bg-muted/50 p-1 rounded-lg w-max">
           {tournamentTabs.map((tab) => (
             <TabsTrigger
