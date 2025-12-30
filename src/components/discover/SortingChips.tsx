@@ -6,6 +6,7 @@ interface SortingChip {
   id: string;
   label: string;
   keyword: string;
+  emoji?: string;
 }
 
 interface SortingChipsProps {
@@ -19,7 +20,8 @@ const sortingChips: SortingChip[] = [
   ...getDiscoverCategories().map(cat => ({
     id: cat.id,
     label: cat.label,
-    keyword: cat.id, // Use category ID as keyword for filtering
+    emoji: cat.emoji,
+    keyword: cat.id,
   })),
 ];
 
@@ -44,7 +46,10 @@ const SortingChips: React.FC<SortingChipsProps> = ({ selectedChip, onChipSelect 
                 isSelected && "pill--active"
               )}
             >
-              <span>{chip.label}</span>
+              <span className="inline-flex items-center gap-1.5">
+                {chip.emoji && <span aria-hidden="true">{chip.emoji}</span>}
+                <span>{chip.label}</span>
+              </span>
             </button>
           );
         })}
