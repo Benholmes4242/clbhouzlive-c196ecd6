@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { Play, X, GripVertical } from "lucide-react";
+import { X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
@@ -29,14 +29,6 @@ export default function CreateMomentMediaStage({
   getEdits,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
-
-  // Format video duration helper
-  const formatDuration = (seconds: number | undefined): string => {
-    if (!seconds || !isFinite(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   if (media.length === 0) {
     return null;
@@ -107,15 +99,6 @@ export default function CreateMomentMediaStage({
           </button>
         </div>
 
-        {/* Video duration - bottom left - DARK GLASS */}
-        {currentItem?.type === 'video' && currentItem?.duration && (
-          <div className="absolute bottom-[8px] left-4 z-20">
-            <div className="rounded-full bg-black/60 backdrop-blur-sm text-white/90 text-xs px-3 py-1.5 flex items-center gap-1.5 font-medium">
-              <Play className="w-2.5 h-2.5" />
-              <span>{formatDuration(currentItem.duration)}</span>
-            </div>
-          </div>
-        )}
 
         {/* Soundtrack strip - bottom right when music is selected */}
         {currentItem && (() => {
