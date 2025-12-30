@@ -21,9 +21,21 @@ export interface MusicTrack {
  */
 const R2_PUBLIC_BASE = 'https://pub-9f6095ba86ef4833a86c1e06bec47b40.r2.dev';
 
+/**
+ * Encode R2 key path segments for URL safety (handles spaces, special chars)
+ * Splits by /, encodes each segment, then rejoins
+ */
+function encodeR2Path(r2Key: string): string {
+  return r2Key
+    .split('/')
+    .map(segment => encodeURIComponent(segment))
+    .join('/');
+}
+
 export function getSignedAudioUrl(r2Key: string): string {
-  // Direct public R2 URL - no signing needed
-  return `${R2_PUBLIC_BASE}/${r2Key}`;
+  // Direct public R2 URL with properly encoded path
+  const encodedPath = encodeR2Path(r2Key);
+  return `${R2_PUBLIC_BASE}/${encodedPath}`;
 }
 
 // ============================================================================

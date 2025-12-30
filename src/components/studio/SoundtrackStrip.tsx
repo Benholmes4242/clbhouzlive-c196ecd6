@@ -55,16 +55,37 @@ export default function SoundtrackStrip({
     audio.currentTime = music.startAt ?? 0;
     audioRef.current = audio;
 
-    // Add error logging
-    audio.onerror = (e) => {
+    // Add detailed error logging with network diagnostics
+    audio.onerror = async (e) => {
+      const errorCode = audio.error?.code;
+      const errorMessage = audio.error?.message;
+      
       console.error('[SoundtrackStrip] Audio load failed:', {
         trackId: music.trackId,
         r2Key: music.r2Key,
         audioUrl,
+        currentSrc: audio.currentSrc,
+        networkState: audio.networkState,
+        readyState: audio.readyState,
         error: e,
-        errorCode: audio.error?.code,
-        errorMessage: audio.error?.message,
+        errorCode,
+        errorMessage,
       });
+      
+      // Perform HEAD request to diagnose the issue
+      try {
+        const headResponse = await fetch(audioUrl, { method: 'HEAD' });
+        console.error('[SoundtrackStrip] HEAD diagnostics:', {
+          url: audioUrl,
+          status: headResponse.status,
+          contentType: headResponse.headers.get('content-type'),
+          contentLength: headResponse.headers.get('content-length'),
+          acceptRanges: headResponse.headers.get('accept-ranges'),
+          cors: headResponse.headers.get('access-control-allow-origin'),
+        });
+      } catch (fetchErr) {
+        console.error('[SoundtrackStrip] HEAD request failed:', fetchErr);
+      }
     };
 
     audio.addEventListener('ended', () => {
