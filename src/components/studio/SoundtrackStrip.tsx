@@ -7,8 +7,8 @@ export interface SoundtrackData {
   trackId: string;
   title: string;
   artist?: string;
-  r2Key?: string;      // R2 object key - primary source
-  url?: string;        // Legacy URL field for backwards compatibility
+  url?: string;        // Primary playback URL (public R2)
+  r2Key?: string;      // R2 object key - fallback for legacy data
   startAt?: number;
   volume?: number;
 }
@@ -29,13 +29,17 @@ export default function SoundtrackStrip({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Resolve the audio URL - prefer r2Key, fallback to legacy url
+  // Resolve the audio URL - prefer direct url, fallback to r2Key resolution
   const getAudioUrl = (): string => {
+    // Primary: use the stored url (already resolved public R2 URL)
+    if (music.url) {
+      return music.url;
+    }
+    // Fallback: resolve from r2Key for legacy data
     if (music.r2Key) {
       return getSignedAudioUrl(music.r2Key);
     }
-    // Fallback for legacy data that might still have url field
-    return music.url || '';
+    return '';
   };
 
   // Create audio element on mount
