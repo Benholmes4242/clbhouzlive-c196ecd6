@@ -6,11 +6,14 @@ const corsHeaders = {
 }
 
 // URL Builders - Match Sportradar docs exactly
+// Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
+const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'trial';
+
 // Base for tour-scoped endpoints: /golf/{access_level}/{tour}/v3/{lang}
-const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/trial/${tour}/v3/en`;
+const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/${getAccessLevel()}/${tour}/v3/en`;
 
 // Base for global endpoints (no tour): /golf/{access_level}/v3/{lang}
-const getGlobalBaseUrl = () => `https://api.sportradar.com/golf/trial/v3/en`;
+const getGlobalBaseUrl = () => `https://api.sportradar.com/golf/${getAccessLevel()}/v3/en`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -43,7 +46,17 @@ Deno.serve(async (req) => {
 
     const effectiveYear = year || seasonYear || 2025;
     const effectiveTour = tourId || 'pga';
-    console.log(`Sportradar sync: action=${action}, tour=${effectiveTour}, year=${effectiveYear}, tournamentId=${tournamentId}`);
+    
+    // Validate roundType is strictly 'stroke' or 'match' - default to 'stroke' with warning
+    let effectiveRoundType = roundType;
+    if (roundType && roundType !== 'stroke' && roundType !== 'match') {
+      console.warn(`[roundType validation] Invalid roundType '${roundType}' - must be 'stroke' or 'match'. Defaulting to 'stroke'.`);
+      effectiveRoundType = 'stroke';
+    } else if (!roundType) {
+      effectiveRoundType = 'stroke';
+    }
+    
+    console.log(`Sportradar sync: action=${action}, tour=${effectiveTour}, year=${effectiveYear}, tournamentId=${tournamentId}, accessLevel=${getAccessLevel()}, roundType=${effectiveRoundType}`);
 
     // Create sync log entry
     const { data: syncLog } = await supabase
@@ -79,10 +92,10 @@ Deno.serve(async (req) => {
           result = await syncTournamentSummary(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
           break;
         case 'scorecards':
-          result = await syncScorecards(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId, roundType, roundNumber);
+          result = await syncScorecards(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId, effectiveRoundType, roundNumber);
           break;
         case 'tee_times':
-          result = await syncTeeTimes(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId, roundType, roundNumber);
+          result = await syncTeeTimes(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId, effectiveRoundType, roundNumber);
           break;
         case 'hole_stats':
           result = await syncHoleStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
@@ -138,12 +151,16 @@ Deno.serve(async (req) => {
 });
 
 // Helper to fetch from Sportradar with detailed logging
+// Uses x-api-key header auth (NOT query param) per Sportradar Golf v3 docs
 async function fetchSportradar(url: string, apiKey: string, description: string) {
-  const fullUrl = `${url}?api_key=${apiKey}`;
-  const redactedUrl = `${url}?api_key=***REDACTED***`;
-  console.log(`[${description}] Calling: ${redactedUrl}`);
+  console.log(`[${description}] Calling: ${url}`);
   
-  const response = await fetch(fullUrl);
+  const response = await fetch(url, {
+    headers: {
+      'x-api-key': apiKey,
+      'Accept': 'application/json'
+    }
+  });
   const statusCode = response.status;
   
   if (!response.ok) {
@@ -302,7 +319,7 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
     return { 
       records: 0, 
       message: `World rankings not available: ${e.message}`,
-      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+      debug: { url, error: e.message }
     };
   }
   
@@ -350,7 +367,7 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
   return { 
     records: totalRecords, 
     message: `Synced ${totalRecords} rankings`,
-    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+    debug: { url }
   };
 }
 
@@ -371,7 +388,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
     return { 
       records: 0, 
       message: `Leaderboard not available: ${e.message}`,
-      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+      debug: { url, error: e.message }
     };
   }
 
@@ -435,7 +452,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
   return { 
     records: totalRecords, 
     message: `Synced ${totalRecords} leaderboard entries`,
-    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+    debug: { url }
   };
 }
 
@@ -456,7 +473,7 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
     return { 
       records: 0, 
       message: `Summary not available: ${e.message}`,
-      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+      debug: { url, error: e.message }
     };
   }
 
@@ -523,7 +540,7 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
   return { 
     records: error ? 0 : 1, 
     message: `Synced tournament summary`,
-    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+    debug: { url }
   };
 }
 
@@ -563,7 +580,7 @@ async function syncScorecards(
     
     try {
       const data = await fetchSportradar(url, apiKey, `Scorecards R${round}`);
-      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'success' });
+      debugInfo.push({ round, url, status: 'success' });
 
       const players = data.players || data.round?.players || [];
       for (const player of players) {
@@ -604,7 +621,7 @@ async function syncScorecards(
         }
       }
     } catch (e) {
-      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'error', error: e.message });
+      debugInfo.push({ round, url, status: 'error', error: e.message });
       console.log(`Round ${round} scorecards not available: ${e.message}`);
     }
   }
@@ -652,7 +669,7 @@ async function syncTeeTimes(
     
     try {
       const data = await fetchSportradar(url, apiKey, `TeeTimes R${round}`);
-      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'success' });
+      debugInfo.push({ round, url, status: 'success' });
 
       const groups = data.round?.tee_times || data.tee_times || [];
       for (const group of groups) {
@@ -697,7 +714,7 @@ async function syncTeeTimes(
         }
       }
     } catch (e) {
-      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'error', error: e.message });
+      debugInfo.push({ round, url, status: 'error', error: e.message });
       console.log(`Round ${round} tee times not available: ${e.message}`);
     }
   }
@@ -737,7 +754,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
     return { 
       records: 0, 
       message: `Hole statistics not available: ${e.message}`,
-      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+      debug: { url, error: e.message }
     };
   }
 
@@ -772,7 +789,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, y
   return { 
     records: totalRecords, 
     message: `Synced ${totalRecords} hole statistics`,
-    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+    debug: { url }
   };
 }
 
