@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import HLSPlayer from '@/media/HLSPlayer';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { useModalState } from '@/hooks/useModalDetector';
@@ -18,6 +18,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
+import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 interface FullscreenMediaModalProps {
   isOpen: boolean;
   onClose: (videoPosition?: number, videoMuted?: boolean) => void;
@@ -55,6 +56,8 @@ interface FullscreenMediaModalProps {
   onPostEdit?: (postId: string) => void;
   // Filter data
   filterIds?: (string | null)[];
+  // Studio edits (music, filters, etc.) per media item
+  studioEdits?: (any | null)[];
 }
 
 // Helper function to check if element is in viewport
@@ -92,7 +95,8 @@ const FullscreenMediaModal = ({
   postId,
   onPostDeleted,
   onPostEdit,
-  filterIds
+  filterIds,
+  studioEdits
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
@@ -106,6 +110,19 @@ const FullscreenMediaModal = ({
   // Get filter class for current media
   const currentFilterId = filterIds?.[currentIndex] || null;
   const filterClass = getFilterClass(currentFilterId);
+  
+  // Detect if post has music from studioEdits - Option A enforcement
+  const { postHasMusic, activeMusic } = useMemo(() => {
+    const hasMusic = (studioEdits ?? []).some(ed => {
+      const music = (ed as any)?.music;
+      return !!(music?.url || music?.r2Key);
+    });
+    const music = (studioEdits ?? [])
+      .map(ed => (ed as any)?.music)
+      .find(m => m?.url || m?.r2Key) ?? null;
+    return { postHasMusic: hasMusic, activeMusic: music };
+  }, [studioEdits]);
+  
   const videoRef = useRef<HTMLVideoElement>(null); // Keep for compatibility but EnhancedVideoPlayer manages its own video
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
@@ -456,13 +473,31 @@ const FullscreenMediaModal = ({
                 key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
                 src={mediaUrls[currentIndex]}
                 className={cn("w-full h-full object-contain", filterClass)}
-                muted={isMuted}
+                muted={postHasMusic ? true : isMuted}
                 loop={true}
                 autoplay={true}
                 showMuteButton={false}
                 showPlayButton={false}
                 mediaId={`modal-${fullscreenVideoId.current}-${currentIndex}`}
                 externallyManaged={false}
+              />
+            </div>
+          )}
+          
+          {/* SoundtrackStrip for music posts - Option A: music controls audio */}
+          {activeMusic && (
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 max-w-[240px]">
+              <SoundtrackStrip 
+                music={{
+                  trackId: activeMusic.trackId || '',
+                  title: activeMusic.title || 'Unknown Track',
+                  artist: activeMusic.artist,
+                  r2Key: activeMusic.r2Key,
+                  url: activeMusic.url,
+                  startAt: activeMusic.startAt,
+                  volume: activeMusic.volume
+                }}
+                variant="published"
               />
             </div>
           )}

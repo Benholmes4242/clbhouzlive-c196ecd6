@@ -38,6 +38,8 @@ interface PostData {
     id: string;
     media_url: string;
     media_type: string;
+    filter_id?: string | null;
+    studio_edits?: any;
   }>;
   post_tags?: any[];
 }
@@ -58,7 +60,7 @@ export const useFullscreenPostNavigation = () => {
         .from('posts')
         .select(`
           *,
-          post_media(*),
+          post_media(id, media_url, media_type, filter_id, studio_edits, display_order, poster_url),
           post_tags(
             id,
             tagged_entity_id,
@@ -108,6 +110,8 @@ export const useFullscreenPostNavigation = () => {
   const postToMediaItem = useCallback((post: PostData, mediaIndex: number = 0): PostMediaContext => {
     const mediaUrls = post.post_media.map(m => m.media_url);
     const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
+    const filterIds = post.post_media.map(m => m.filter_id ?? null);
+    const studioEdits = post.post_media.map(m => m.studio_edits ?? null);
     const items: MediaItem[] = mediaUrls.map((u, i) => ({
       id: `${post.id}-media-${i}`,
       type: mediaTypes[i] || 'image',
@@ -119,6 +123,8 @@ export const useFullscreenPostNavigation = () => {
       items,
       mediaUrls,
       mediaTypes,
+      filterIds,
+      studioEdits,
       displayName: post.user.display_name || post.user.username || 'User',
       user: { id: post.user.id, profile_photo_url: post.user.profile_photo_url },
       content: post.content,
