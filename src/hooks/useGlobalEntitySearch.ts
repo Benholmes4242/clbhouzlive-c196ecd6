@@ -188,7 +188,9 @@ const searchVideos = async (query: string, limit: number = 6): Promise<VideoResu
       post_media!inner(
         media_url,
         duration_seconds,
-        poster_url
+        poster_url,
+        filter_id,
+        studio_edits
       ),
       user_profiles(
         id,

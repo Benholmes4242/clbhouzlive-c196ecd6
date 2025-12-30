@@ -50,7 +50,9 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             post_media!inner (
               id,
               media_type,
-              media_url
+              media_url,
+              filter_id,
+              studio_edits
             )
           `)
           .eq('user_id', userId)

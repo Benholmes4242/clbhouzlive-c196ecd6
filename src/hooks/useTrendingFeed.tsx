@@ -93,7 +93,9 @@ export const useTrendingFeed = () => {
           post_media: post.post_media?.map((m: any) => ({
             id: m.id,
             media_type: m.media_type as 'image' | 'video',
-            media_url: m.media_url
+            media_url: m.media_url,
+            filter_id: m.filter_id,
+            studio_edits: m.studio_edits
           })) || [],
           post_tags: [] // Disabled for performance
         };

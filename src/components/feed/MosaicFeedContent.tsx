@@ -50,13 +50,19 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     }));
   };
 
-  const handleMaximizeClick = (item: VideoPost | UserPostWithType) => {
+  const handleMaximizeClick = (item: VideoPost | UserPostWithType, mediaIndex?: number) => {
     const modalData = getMediaDataForModal(item);
+    const idx = mediaIndex ?? currentMediaIndex[item.id] ?? 0;
+    
+    // Use the currently displayed media index for fullscreen
+    const mediaUrl = Array.isArray(modalData.mediaUrl) ? modalData.mediaUrl[idx] : modalData.mediaUrl;
+    const studioEdit = Array.isArray(modalData.studioEdits) ? [modalData.studioEdits[idx]] : modalData.studioEdits;
+    
     modalManager.openModal({
-      src: Array.isArray(modalData.mediaUrl) ? modalData.mediaUrl[0] : modalData.mediaUrl,
+      src: mediaUrl,
       user: modalData.user,
       content: modalData.content,
-      studioEdits: modalData.studioEdits
+      studioEdits: studioEdit
     });
   };
 
@@ -172,8 +178,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const aspectRatio = getCardType(index);
 
     const handleTileClick = () => {
-      // Always open fullscreen modal when clicking on tile
-      handleMaximizeClick(item);
+      // Always open fullscreen modal when clicking on tile, passing current media index
+      handleMaximizeClick(item, currentIndex);
     };
 
     return (

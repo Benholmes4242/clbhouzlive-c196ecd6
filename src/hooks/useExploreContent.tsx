@@ -41,7 +41,9 @@ export const useExploreContent = () => {
           post_media!inner (
             id,
             media_type,
-            media_url
+            media_url,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,
