@@ -116,13 +116,38 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       )}
 
       {/* Golf Course CTA - one-line gap after caption */}
-      {golfCourse && (
+      {golfCourse?.name && (
         <div className={cn(caption && "mt-2")}>
           <CourseLocationRow
             course={golfCourse}
             showChevron
             isDark
           />
+
+          {/* Fallback when location fields are missing (CourseLocationRow hides itself) */}
+          {!(golfCourse.country && (golfCourse.region || golfCourse.sub_country)) && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const courseIdentifier = golfCourse.slug || golfCourse.id;
+                if (courseIdentifier) {
+                  navigate(`/courses/${courseIdentifier}`);
+                }
+              }}
+              disabled={!(golfCourse.slug || golfCourse.id)}
+              className={cn(
+                "py-1 text-left transition-opacity",
+                (golfCourse.slug || golfCourse.id) && "hover:opacity-80 active:opacity-70"
+              )}
+            >
+              <span className="text-[13px] font-medium text-white/70">
+                <span className="opacity-80">Played at </span>
+                <span className="font-semibold text-white/90">{golfCourse.name}</span>
+              </span>
+            </button>
+          )}
         </div>
       )}
 
@@ -241,15 +266,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 </span>
               </div>
               
-              {/* Golf course (collapsed) - shows "📍 Course Name" */}
-              {!isExpanded && golfCourse?.name && (
-                <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
-                  📍 {golfCourse.name}
-                </p>
-              )}
-              
-              {/* Caption preview (collapsed) - only if no golf course */}
-              {!isExpanded && !golfCourse?.name && caption && (
+              {/* Caption preview (collapsed) */}
+              {!isExpanded && caption && (
                 <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
                   {truncatedCaption}
                 </p>
