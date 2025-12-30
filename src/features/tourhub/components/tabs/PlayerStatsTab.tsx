@@ -74,7 +74,7 @@ export function PlayerStatsTab() {
   
   return (
     <div className="w-full max-w-full overflow-x-auto">
-      <table className="w-full min-w-[640px] md:min-w-0">
+      <table className="w-full min-w-[360px] sm:min-w-[520px] md:min-w-0">
         <thead className="sticky top-0 z-10">
           <tr className="bg-muted/80 backdrop-blur-sm">
             <th className="text-left py-3 px-3 text-sm font-semibold text-foreground rounded-l-lg">
