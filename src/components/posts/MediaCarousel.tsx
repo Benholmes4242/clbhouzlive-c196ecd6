@@ -219,33 +219,33 @@ const MediaCarousel = ({
         })()}
       </div>
 
-      {/* Navigation arrows - DARK GLASS */}
+      {/* Navigation arrows - matching pill style */}
       {hasMultipleItems && (
         <>
           <button
             onClick={handlePrevious}
             disabled={!loop && activeIndex === 0}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 
-                     h-8 w-8 rounded-full bg-black/60 backdrop-blur-sm
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 
+                     px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm
                      flex items-center justify-center hover:bg-black/70
                      active:scale-[0.98] transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous media"
           >
-            <ChevronLeft className="h-4 w-4 text-white/90" />
+            <ChevronLeft className="w-3 h-3 text-white/90" />
           </button>
 
           <button
             onClick={handleNext}
             disabled={!loop && activeIndex === items.length - 1}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 
-                     h-8 w-8 rounded-full bg-black/60 backdrop-blur-sm
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 
+                     px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm
                      flex items-center justify-center hover:bg-black/70
                      active:scale-[0.98] transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next media"
           >
-            <ChevronRight className="h-4 w-4 text-white/90" />
+            <ChevronRight className="w-3 h-3 text-white/90" />
           </button>
         </>
       )}

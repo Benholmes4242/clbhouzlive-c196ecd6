@@ -158,11 +158,11 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           }}
         />
 
-        {/* Play icon overlay - ONLY visible when paused - DARK GLASS */}
+        {/* Play icon overlay - ONLY visible when paused - matching pill style */}
         {loaded && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-              <Play className="w-4 h-4 text-white/90 fill-white/90 ml-0.5" />
+            <div className="px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-3 h-3 text-white/90 fill-white/90 ml-0.5" />
             </div>
           </div>
         )}
