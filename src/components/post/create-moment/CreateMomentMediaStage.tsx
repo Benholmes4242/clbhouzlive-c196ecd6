@@ -75,29 +75,23 @@ export default function CreateMomentMediaStage({
         {/* Bottom scrim */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/30 to-transparent z-10" />
 
-        {/* Media counter - top left - DARK GLASS */}
+        {/* Media counter - top left - matching bottom pill style */}
         <div 
-          className="absolute left-4 z-20"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+          className="absolute left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium text-white/90"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
         >
-          <div className="px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white/90">
-            {activeIndex + 1}/{media.length}
-          </div>
+          {activeIndex + 1}/{media.length}
         </div>
 
-        {/* Remove media button - top right - DARK GLASS */}
-        <div 
-          className="absolute right-4 z-20"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+        {/* Remove media button - top right - matching bottom pill style */}
+        <button
+          onClick={() => onRemoveMedia(activeIndex)}
+          className="absolute right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+          aria-label="Remove current media"
         >
-          <button
-            onClick={() => onRemoveMedia(activeIndex)}
-            className="rounded-full bg-black/60 backdrop-blur-sm w-8 h-8 flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
-            aria-label="Remove current media"
-          >
-            <X className="w-4 h-4 text-white/90" />
-          </button>
-        </div>
+          <X className="w-3 h-3 text-white/90" />
+        </button>
 
 
         {/* Soundtrack strip - centered bottom when music is selected */}
