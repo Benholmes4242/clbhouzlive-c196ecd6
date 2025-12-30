@@ -21,7 +21,7 @@ import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
-import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
+import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
 import { useHeroPreload } from '@/hooks/useHeroPreload';
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
@@ -142,14 +142,16 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
   });
 }
 
-// Shorts filter pills - dynamically built from canonical categoryDefinitions
+// Shorts filter pills - dynamically built from ALL categories (excluding 'other')
 const SHORTS_PILLS = [
   { key: 'all', label: 'All', emoji: undefined as string | undefined },
-  ...getDiscoverCategories().map((cat) => ({
-    key: cat.id,
-    label: cat.label,
-    emoji: cat.emoji,
-  })),
+  ...MOMENT_CATEGORIES
+    .filter((cat) => cat.id !== 'other')
+    .map((cat) => ({
+      key: cat.id,
+      label: cat.label,
+      emoji: cat.emoji,
+    })),
 ];
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
