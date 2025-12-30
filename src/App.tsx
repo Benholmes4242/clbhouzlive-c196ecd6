@@ -183,6 +183,7 @@ const TourHubPlayerPage = lazy(() => import("./features/tourhub/pages").then(m =
 const TourHubRankingsPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubRankingsPage })));
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
 const TournamentDetailPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TournamentDetailPage })));
+const PlayerProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.PlayerProfilePage })));
 
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
@@ -415,7 +416,7 @@ function AppRoutes() {
         {/* Tour Hub routes */}
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<GenericPageSkeleton />}><TournamentDetailPage /></Suspense>} />
-        <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubPlayerPage /></Suspense>} />
+        <Route path="/tourhub/player/:playerId" element={<Suspense fallback={<GenericPageSkeleton />}><PlayerProfilePage /></Suspense>} />
         <Route path="/tourhub/live" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubLivePage /></Suspense>} />
         <Route path="/tourhub/tour/:tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubTourPage /></Suspense>} />
         <Route path="/tourhub/event/:tour/:eventId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubEventPage /></Suspense>} />

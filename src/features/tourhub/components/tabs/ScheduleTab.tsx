@@ -1,27 +1,20 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { format, isAfter, isBefore } from 'date-fns';
-import { Calendar, MapPin, DollarSign, Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTourSeason, useTourTournaments } from '../../hooks/useTourHubData';
+import { TournamentCard } from '../TournamentCard';
 import { TourHubEmptyState } from '../TourHubEmptyState';
-
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    scheduled: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-    inprogress: 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
-    created: 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
-    closed: 'bg-muted text-muted-foreground border-border',
-  };
-  
-  return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize border ${colors[status] || colors.created}`}>
-      {status === 'inprogress' ? 'Live' : status}
-    </span>
-  );
-}
+import { isAfter } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type FilterType = 'all' | 'upcoming' | 'completed' | 'live';
+
+const filterOptions: { value: FilterType; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'upcoming', label: 'Upcoming' },
+  { value: 'live', label: 'Live' },
+  { value: 'completed', label: 'Completed' },
+];
 
 export function ScheduleTab() {
   const [search, setSearch] = useState('');
@@ -35,7 +28,6 @@ export function ScheduleTab() {
     
     let filtered = [...tournaments];
     
-    // Apply status filter
     const now = new Date();
     switch (filter) {
       case 'upcoming':
@@ -49,7 +41,6 @@ export function ScheduleTab() {
         break;
     }
     
-    // Apply search filter
     if (search) {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(t => 
@@ -65,9 +56,12 @@ export function ScheduleTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 animate-pulse">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-24 bg-muted rounded-lg" />
-        ))}
+        <div className="h-10 bg-muted rounded-lg w-full max-w-md" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-36 bg-muted rounded-xl" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -80,10 +74,10 @@ export function ScheduleTab() {
     <div className="space-y-4">
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search tournaments..."
+            placeholder="Search tournaments, venues, cities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -91,74 +85,33 @@ export function ScheduleTab() {
         </div>
         
         <div className="flex gap-2">
-          {(['all', 'upcoming', 'live', 'completed'] as const).map((f) => (
+          {filterOptions.map((opt) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors capitalize ${
-                filter === f 
+              key={opt.value}
+              onClick={() => setFilter(opt.value)}
+              className={cn(
+                "px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                filter === opt.value 
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
+              )}
             >
-              {f}
+              {opt.label}
             </button>
           ))}
         </div>
       </div>
       
-      {/* Tournament Count */}
+      {/* Count */}
       <p className="text-sm text-muted-foreground">
         {filteredTournaments.length} tournament{filteredTournaments.length !== 1 ? 's' : ''}
+        {search && tournaments && filteredTournaments.length !== tournaments.length && ' (filtered)'}
       </p>
       
-      {/* Tournament List */}
-      <div className="space-y-3">
+      {/* Tournament Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredTournaments.map((tournament) => (
-          <Link
-            key={tournament.id}
-            to={`/tourhub/tournament/${tournament.id}`}
-            className="block bg-card border border-border rounded-lg p-4 hover:border-primary/50 transition-colors group"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
-                    {tournament.name}
-                  </h3>
-                  <StatusBadge status={tournament.status} />
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
-                  </span>
-                  
-                  {(tournament.venue_name || tournament.venue_city) && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" />
-                      {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(', ')}
-                    </span>
-                  )}
-                  
-                  {tournament.purse && (
-                    <span className="flex items-center gap-1">
-                      <DollarSign className="w-3.5 h-3.5" />
-                      ${(tournament.purse / 1_000_000).toFixed(1)}M
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              {tournament.venue_par && tournament.venue_yardage && (
-                <div className="text-right text-sm text-muted-foreground">
-                  <p>Par {tournament.venue_par}</p>
-                  <p>{tournament.venue_yardage.toLocaleString()} yards</p>
-                </div>
-              )}
-            </div>
-          </Link>
+          <TournamentCard key={tournament.id} tournament={tournament} />
         ))}
       </div>
       

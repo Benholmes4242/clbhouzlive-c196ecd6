@@ -1,20 +1,23 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { format, isAfter, isBefore } from 'date-fns';
-import { Calendar, Trophy, Users, TrendingUp, ArrowRight, MapPin } from 'lucide-react';
+import { format, isAfter } from 'date-fns';
+import { Calendar, Trophy, TrendingUp, ArrowRight, MapPin, Users } from 'lucide-react';
 import { useTourSeason, useTourTournaments, useTourPlayerStatistics } from '../../hooks/useTourHubData';
+import { TournamentCard } from '../TournamentCard';
 
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    scheduled: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    inprogress: 'bg-green-500/10 text-green-600 dark:text-green-400',
-    created: 'bg-gray-500/10 text-gray-600 dark:text-gray-400',
-    closed: 'bg-muted text-muted-foreground',
+function SeasonStatusBadge({ status }: { status: string }) {
+  const config: Record<string, { bg: string; text: string }> = {
+    'in progress': { bg: 'bg-green-500/15', text: 'text-green-600 dark:text-green-400' },
+    'active': { bg: 'bg-blue-500/15', text: 'text-blue-600 dark:text-blue-400' },
+    'upcoming': { bg: 'bg-amber-500/15', text: 'text-amber-600 dark:text-amber-400' },
+    'completed': { bg: 'bg-muted', text: 'text-muted-foreground' },
   };
   
+  const c = config[status] || config.active;
+  
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium capitalize ${colors[status] || colors.created}`}>
-      {status === 'inprogress' ? 'In Progress' : status}
+    <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${c.bg} ${c.text}`}>
+      {status}
     </span>
   );
 }
@@ -37,7 +40,6 @@ export function OverviewTab() {
     const completed = tournaments.filter(t => t.status === 'closed');
     const inProgress = tournaments.find(t => t.status === 'inprogress');
     
-    // Next tournament is either in progress or first upcoming
     const nextTournament = inProgress || upcoming[0];
     const recentTournament = completed[completed.length - 1];
     
@@ -59,73 +61,69 @@ export function OverviewTab() {
     };
   }, [tournaments]);
   
-  // Top 5 players by events played (since FedEx data may be null)
+  // Top 5 players
   const topPlayers = useMemo(() => {
     if (!playerStats) return [];
-    return playerStats
-      .filter(s => s.player)
-      .slice(0, 5);
+    return playerStats.filter(s => s.player).slice(0, 5);
   }, [playerStats]);
   
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-32 bg-muted rounded-lg" />
+        <div className="h-36 bg-muted rounded-xl" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="h-48 bg-muted rounded-lg" />
-          <div className="h-48 bg-muted rounded-lg" />
+          <div className="h-44 bg-muted rounded-xl" />
+          <div className="h-44 bg-muted rounded-xl" />
         </div>
+        <div className="h-64 bg-muted rounded-xl" />
       </div>
     );
   }
   
   return (
     <div className="space-y-6">
-      {/* Season Card */}
-      <div className="bg-card border border-border rounded-lg p-6">
-        <div className="flex items-start justify-between mb-4">
+      {/* Season Summary Card */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-xl font-bold text-foreground">{season?.tour_name || 'PGA Tour'}</h2>
             <p className="text-muted-foreground">{season?.name || `${new Date().getFullYear()} Season`}</p>
           </div>
-          <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium capitalize">
-            {seasonStatus}
-          </span>
+          <SeasonStatusBadge status={seasonStatus} />
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-3 rounded-lg bg-muted/50">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="text-center p-4 rounded-lg bg-muted/40">
             <div className="text-2xl font-bold text-foreground">{tournaments?.length || 0}</div>
-            <div className="text-xs text-muted-foreground">Total Events</div>
+            <div className="text-xs text-muted-foreground mt-1">Total Events</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-muted/50">
+          <div className="text-center p-4 rounded-lg bg-muted/40">
             <div className="text-2xl font-bold text-foreground">{completedCount}</div>
-            <div className="text-xs text-muted-foreground">Completed</div>
+            <div className="text-xs text-muted-foreground mt-1">Completed</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-muted/50">
+          <div className="text-center p-4 rounded-lg bg-muted/40">
             <div className="text-2xl font-bold text-foreground">{upcomingCount}</div>
-            <div className="text-xs text-muted-foreground">Remaining</div>
+            <div className="text-xs text-muted-foreground mt-1">Remaining</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-muted/50">
+          <div className="text-center p-4 rounded-lg bg-muted/40">
             <div className="text-2xl font-bold text-foreground">{playerStats?.length || 0}</div>
-            <div className="text-xs text-muted-foreground">Players</div>
+            <div className="text-xs text-muted-foreground mt-1">Players</div>
           </div>
         </div>
       </div>
       
-      {/* Next / Recent Tournament */}
+      {/* Next + Most Recent Tournament */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {nextTournament && (
           <Link 
             to={`/tourhub/tournament/${nextTournament.id}`}
-            className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-colors group"
+            className="bg-card border border-border rounded-xl p-5 transition-all hover:border-primary/40 hover:shadow-md group"
           >
             <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
+              <Calendar className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">
                 {nextTournament.status === 'inprogress' ? 'Currently Playing' : 'Next Event'}
               </span>
-              <StatusBadge status={nextTournament.status} />
             </div>
             
             <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
@@ -137,14 +135,14 @@ export function OverviewTab() {
             </p>
             
             {(nextTournament.venue_name || nextTournament.venue_city) && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
                 {[nextTournament.venue_name, nextTournament.venue_city, nextTournament.venue_country].filter(Boolean).join(' • ')}
               </div>
             )}
             
             {nextTournament.purse && (
-              <p className="mt-2 text-sm font-medium text-foreground">
+              <p className="mt-3 text-sm font-medium text-foreground">
                 ${(nextTournament.purse / 1_000_000).toFixed(1)}M Purse
               </p>
             )}
@@ -154,12 +152,11 @@ export function OverviewTab() {
         {recentTournament && (
           <Link 
             to={`/tourhub/tournament/${recentTournament.id}`}
-            className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-colors group"
+            className="bg-card border border-border rounded-xl p-5 transition-all hover:border-primary/40 hover:shadow-md group"
           >
             <div className="flex items-center gap-2 mb-3">
-              <Trophy className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Most Recent</span>
-              <StatusBadge status={recentTournament.status} />
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medium text-muted-foreground">Most Recent</span>
             </div>
             
             <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
@@ -179,23 +176,23 @@ export function OverviewTab() {
         )}
       </div>
       
-      {/* Top Players */}
+      {/* Top Players Snapshot */}
       {topPlayers.length > 0 && (
-        <div className="bg-card border border-border rounded-lg p-5">
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-muted-foreground" />
+              <TrendingUp className="w-5 h-5 text-primary" />
               <h3 className="font-semibold text-foreground">Top Players</h3>
             </div>
             <Link 
               to="/tourhub?tab=player-stats"
               className="text-sm text-primary hover:underline flex items-center gap-1"
             >
-              View all <ArrowRight className="w-3 h-3" />
+              View all <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-2">
             {topPlayers.map((stat, index) => (
               <Link
                 key={stat.id}
@@ -203,7 +200,7 @@ export function OverviewTab() {
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+                  <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
                     {index + 1}
                   </span>
                   <div>
@@ -219,6 +216,18 @@ export function OverviewTab() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      )}
+      
+      {topPlayers.length === 0 && (
+        <div className="bg-card border border-border rounded-xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-5 h-5 text-muted-foreground" />
+            <h3 className="font-semibold text-foreground">Top Players</h3>
+          </div>
+          <div className="text-center py-6">
+            <p className="text-muted-foreground">No player stats synced yet.</p>
           </div>
         </div>
       )}
