@@ -5,8 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Base URL - correct format: /golf/trial/{tour}/v3/en
-const getBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/trial/${tour}/v3/en`;
+// URL Builders - Match Sportradar docs exactly
+// Base for tour-scoped endpoints: /golf/{access_level}/{tour}/v3/{lang}
+const getTourBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/trial/${tour}/v3/en`;
+
+// Base for global endpoints (no tour): /golf/{access_level}/v3/{lang}
+const getGlobalBaseUrl = () => `https://api.sportradar.com/golf/trial/v3/en`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -26,59 +30,74 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { action, tourId, year, tournamentId, playerId } = await req.json();
+    const { 
+      action, 
+      tourId, 
+      year, 
+      tournamentId, 
+      playerId,
+      seasonYear,      // Required for tournament-specific endpoints
+      roundType,       // Required for scorecards/tee times (stroke, match, etc.)
+      roundNumber      // Required for scorecards/tee times (1-4)
+    } = await req.json();
 
-    const effectiveYear = year || 2025;
-    console.log(`Sportradar sync: action=${action}, tourId=${tourId}, year=${effectiveYear}`);
+    const effectiveYear = year || seasonYear || 2025;
+    const effectiveTour = tourId || 'pga';
+    console.log(`Sportradar sync: action=${action}, tour=${effectiveTour}, year=${effectiveYear}, tournamentId=${tournamentId}`);
 
     // Create sync log entry
     const { data: syncLog } = await supabase
       .from('sr_sync_log')
-      .insert({ sync_type: action || 'schedule', tour_id: tourId, status: 'pending' })
+      .insert({ 
+        sync_type: action || 'schedule', 
+        tour_id: effectiveTour, 
+        status: 'pending',
+        tournament_id: tournamentId || null
+      })
       .select()
       .single();
 
     const syncLogId = syncLog?.id;
 
     try {
-      let result: { records: number; message: string };
+      let result: { records: number; message: string; debug?: any };
 
       switch (action) {
         case 'schedule':
-          result = await syncSchedule(supabase, sportradarApiKey, effectiveYear);
+          result = await syncSchedule(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
         case 'players':
-          result = await syncPlayers(supabase, sportradarApiKey, effectiveYear);
+          result = await syncPlayers(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
         case 'rankings':
           result = await syncWorldRankings(supabase, sportradarApiKey, effectiveYear);
           break;
         case 'leaderboard':
-          result = await syncLeaderboard(supabase, sportradarApiKey, tournamentId);
+          result = await syncLeaderboard(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
           break;
         case 'summary':
-          result = await syncTournamentSummary(supabase, sportradarApiKey, tournamentId);
+          result = await syncTournamentSummary(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
           break;
         case 'scorecards':
-          result = await syncScorecards(supabase, sportradarApiKey, tournamentId);
+          result = await syncScorecards(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId, roundType, roundNumber);
           break;
         case 'tee_times':
-          result = await syncTeeTimes(supabase, sportradarApiKey, tournamentId);
+          result = await syncTeeTimes(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId, roundType, roundNumber);
           break;
         case 'hole_stats':
-          result = await syncHoleStatistics(supabase, sportradarApiKey, tournamentId);
+          result = await syncHoleStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear, tournamentId);
           break;
         case 'player_profile':
-          result = await syncPlayerProfile(supabase, sportradarApiKey, playerId);
+          result = await syncPlayerProfile(supabase, sportradarApiKey, effectiveTour, playerId);
           break;
         case 'player_stats':
-          result = await syncPlayerStatistics(supabase, sportradarApiKey, effectiveYear);
+          result = await syncPlayerStatistics(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
         case 'seasons':
-          result = await syncSeasons(supabase, sportradarApiKey, effectiveYear);
+          result = await syncSeasons(supabase, sportradarApiKey);
           break;
         default:
-          result = await syncSchedule(supabase, sportradarApiKey, effectiveYear);
+          result = await syncSchedule(supabase, sportradarApiKey, effectiveTour, effectiveYear);
       }
 
       // Update sync log with success
@@ -94,7 +113,7 @@ Deno.serve(async (req) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, message: result.message, records_synced: result.records }),
+        JSON.stringify({ success: true, message: result.message, records_synced: result.records, debug: result.debug }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
 
@@ -118,27 +137,37 @@ Deno.serve(async (req) => {
   }
 });
 
-// Helper to fetch from Sportradar with rate limiting
-async function fetchSportradar(url: string, apiKey: string) {
-  const response = await fetch(`${url}?api_key=${apiKey}`);
+// Helper to fetch from Sportradar with detailed logging
+async function fetchSportradar(url: string, apiKey: string, description: string) {
+  const fullUrl = `${url}?api_key=${apiKey}`;
+  const redactedUrl = `${url}?api_key=***REDACTED***`;
+  console.log(`[${description}] Calling: ${redactedUrl}`);
+  
+  const response = await fetch(fullUrl);
+  const statusCode = response.status;
+  
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`Sportradar API error: ${response.status} - ${errorText}`);
-    throw new Error(`Sportradar API error: ${response.status}`);
+    console.error(`[${description}] HTTP ${statusCode}: ${errorText.substring(0, 500)}`);
+    throw new Error(`Sportradar API error: ${statusCode} - ${errorText.substring(0, 200)}`);
   }
-  return response.json();
+  
+  const data = await response.json();
+  console.log(`[${description}] HTTP ${statusCode} - Success`);
+  return data;
 }
 
-// Sync tournament schedule
-async function syncSchedule(supabase: any, apiKey: string, year: number) {
-  const url = `${getBaseUrl()}/${year}/tournaments/schedule.json`;
-  console.log(`Fetching schedule from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+// ============================================================================
+// SCHEDULE - Tour-scoped: /{year}/tournaments/schedule.json
+// ============================================================================
+async function syncSchedule(supabase: any, apiKey: string, tour: string, year: number) {
+  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/schedule.json`;
+  const data = await fetchSportradar(url, apiKey, 'Schedule');
   const seasons = data.seasons || [data];
   let totalRecords = 0;
 
   for (const season of seasons) {
-    const seasonSrId = season.id || `pga-${year}`;
+    const seasonSrId = season.id || `${tour}-${year}`;
     const { data: existingSeason } = await supabase
       .from('sr_seasons')
       .select('id')
@@ -149,7 +178,7 @@ async function syncSchedule(supabase: any, apiKey: string, year: number) {
     if (existingSeason) {
       seasonDbId = existingSeason.id;
       await supabase.from('sr_seasons').update({
-        tour_id: season.tour?.id || 'pga',
+        tour_id: season.tour?.id || tour,
         tour_name: season.tour?.name || 'PGA Tour',
         year: season.year || year,
         name: season.name || `${year} Season`,
@@ -157,7 +186,7 @@ async function syncSchedule(supabase: any, apiKey: string, year: number) {
     } else {
       const { data: newSeason, error } = await supabase.from('sr_seasons').insert({
         sr_id: seasonSrId,
-        tour_id: season.tour?.id || 'pga',
+        tour_id: season.tour?.id || tour,
         tour_name: season.tour?.name || 'PGA Tour',
         year: season.year || year,
         name: season.name || `${year} Season`,
@@ -178,6 +207,8 @@ async function syncSchedule(supabase: any, apiKey: string, year: number) {
         purse: tournament.purse ? parseFloat(tournament.purse) : null,
         currency: tournament.currency,
         points_type: tournament.points_type,
+        event_type: tournament.event_type,
+        scoring_system: tournament.scoring_system,
         venue_name: tournament.venue?.name,
         venue_city: tournament.venue?.city,
         venue_state: tournament.venue?.state,
@@ -197,11 +228,12 @@ async function syncSchedule(supabase: any, apiKey: string, year: number) {
   return { records: totalRecords, message: `Synced ${totalRecords} tournaments` };
 }
 
-// Sync players list
-async function syncPlayers(supabase: any, apiKey: string, year: number) {
-  const url = `${getBaseUrl()}/${year}/players/profiles.json`;
-  console.log(`Fetching players from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+// ============================================================================
+// PLAYERS - Tour-scoped: /{year}/players/profiles.json
+// ============================================================================
+async function syncPlayers(supabase: any, apiKey: string, tour: string, year: number) {
+  const url = `${getTourBaseUrl(tour)}/${year}/players/profiles.json`;
+  const data = await fetchSportradar(url, apiKey, 'Players');
   const players = data.players || [];
   let totalRecords = 0;
 
@@ -228,37 +260,49 @@ async function syncPlayers(supabase: any, apiKey: string, year: number) {
   return { records: totalRecords, message: `Synced ${totalRecords} players` };
 }
 
-// Sync world rankings
+// ============================================================================
+// SEASONS - Global (no tour): /golf/{access_level}/v3/{lang}/seasons.json
+// ============================================================================
+async function syncSeasons(supabase: any, apiKey: string) {
+  const url = `${getGlobalBaseUrl()}/seasons.json`;
+  const data = await fetchSportradar(url, apiKey, 'Seasons');
+  const seasons = data.seasons || [];
+  let totalRecords = 0;
+
+  for (const season of seasons) {
+    const { error } = await supabase.from('sr_seasons').upsert({
+      sr_id: season.id,
+      tour_id: season.tour?.id || 'pga',
+      tour_name: season.tour?.name || 'PGA Tour',
+      year: season.year,
+      name: season.name,
+    }, { onConflict: 'sr_id' });
+    if (!error) totalRecords++;
+  }
+
+  return { 
+    records: totalRecords, 
+    message: `Synced ${totalRecords} seasons`,
+    debug: { url: url.replace(apiKey, '***') }
+  };
+}
+
+// ============================================================================
+// WORLD RANKINGS (OWGR) - Global: /players/wgr/{year}/rankings.json
+// ============================================================================
 async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
-  // World Golf Rankings uses a different endpoint structure - not year-based
-  // Try the standard rankings endpoint first
-  const possibleUrls = [
-    `https://api.sportradar.com/golf/trial/v3/en/players/wgr.json`,
-    `${getBaseUrl()}/players/wgr.json`,
-    `https://api.sportradar.com/golf/trial/pga/v3/en/players/rankings.json`,
-  ];
+  // Per docs: /golf/{access_level}/v3/{lang}/players/wgr/{year}/rankings.json
+  const url = `${getGlobalBaseUrl()}/players/wgr/${year}/rankings.json`;
   
   let data: any = null;
-  let successUrl = '';
-  
-  for (const url of possibleUrls) {
-    try {
-      console.log(`Trying world rankings from: ${url}`);
-      data = await fetchSportradar(url, apiKey);
-      successUrl = url;
-      console.log(`Successfully fetched rankings from: ${url}`);
-      break;
-    } catch (e) {
-      console.log(`URL failed: ${url} - ${e.message}`);
-    }
-  }
-  
-  if (!data) {
-    // If all URLs fail, return gracefully with a message
-    console.log('World rankings endpoint not available - this may be a trial API limitation');
+  try {
+    data = await fetchSportradar(url, apiKey, 'World Rankings');
+  } catch (e) {
+    console.log(`World rankings endpoint failed: ${e.message}`);
     return { 
       records: 0, 
-      message: 'World rankings not available. This endpoint may not be included in the trial API. Consider upgrading to a production API key.' 
+      message: `World rankings not available: ${e.message}`,
+      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
     };
   }
   
@@ -267,7 +311,6 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
   const rankingDate = new Date().toISOString().split('T')[0];
 
   for (const ranking of rankings) {
-    // First ensure player exists
     const { data: existingPlayer } = await supabase
       .from('sr_players')
       .select('id')
@@ -304,30 +347,48 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
     }
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} rankings from ${successUrl || 'API'}` };
+  return { 
+    records: totalRecords, 
+    message: `Synced ${totalRecords} rankings`,
+    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+  };
 }
 
-// Sync tournament leaderboard
-async function syncLeaderboard(supabase: any, apiKey: string, tournamentSrId: string) {
-  if (!tournamentSrId) throw new Error('Tournament ID required');
+// ============================================================================
+// LEADERBOARD - Tour-scoped: /{year}/tournaments/{tournament_id}/leaderboard.json
+// ============================================================================
+async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
+  if (!tournamentSrId) {
+    return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
+  }
 
-  const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/leaderboard.json`;
-  console.log(`Fetching leaderboard from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/leaderboard.json`;
+  
+  let data: any;
+  try {
+    data = await fetchSportradar(url, apiKey, 'Leaderboard');
+  } catch (e) {
+    return { 
+      records: 0, 
+      message: `Leaderboard not available: ${e.message}`,
+      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+    };
+  }
+
   const leaderboard = data.leaderboard || [];
   let totalRecords = 0;
 
-  // Get tournament DB ID
   const { data: tournament } = await supabase
     .from('sr_tournaments')
     .select('id')
     .eq('sr_id', tournamentSrId)
     .maybeSingle();
 
-  if (!tournament) throw new Error('Tournament not found in database');
+  if (!tournament) {
+    return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
+  }
 
   for (const entry of leaderboard) {
-    // Ensure player exists
     let playerId: string | null = null;
     const { data: existingPlayer } = await supabase
       .from('sr_players')
@@ -371,16 +432,33 @@ async function syncLeaderboard(supabase: any, apiKey: string, tournamentSrId: st
     }
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} leaderboard entries` };
+  return { 
+    records: totalRecords, 
+    message: `Synced ${totalRecords} leaderboard entries`,
+    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+  };
 }
 
-// Sync tournament summary
-async function syncTournamentSummary(supabase: any, apiKey: string, tournamentSrId: string) {
-  if (!tournamentSrId) throw new Error('Tournament ID required');
+// ============================================================================
+// SUMMARY - Tour-scoped: /{year}/tournaments/{tournament_id}/summary.json
+// ============================================================================
+async function syncTournamentSummary(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
+  if (!tournamentSrId) {
+    return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
+  }
 
-  const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/summary.json`;
-  console.log(`Fetching tournament summary from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/summary.json`;
+  
+  let data: any;
+  try {
+    data = await fetchSportradar(url, apiKey, 'Summary');
+  } catch (e) {
+    return { 
+      records: 0, 
+      message: `Summary not available: ${e.message}`,
+      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+    };
+  }
 
   const { data: tournament } = await supabase
     .from('sr_tournaments')
@@ -388,7 +466,9 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tournamentSr
     .eq('sr_id', tournamentSrId)
     .maybeSingle();
 
-  if (!tournament) throw new Error('Tournament not found in database');
+  if (!tournament) {
+    return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
+  }
 
   const { error } = await supabase.from('sr_tournament_summaries').upsert({
     tournament_id: tournament.id,
@@ -417,7 +497,6 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tournamentSr
         raw_data: course,
       }, { onConflict: 'sr_id' });
 
-      // Sync hole info if available
       if (course.holes) {
         const { data: courseDb } = await supabase
           .from('sr_courses')
@@ -441,12 +520,28 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tournamentSr
     }
   }
 
-  return { records: error ? 0 : 1, message: `Synced tournament summary` };
+  return { 
+    records: error ? 0 : 1, 
+    message: `Synced tournament summary`,
+    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+  };
 }
 
-// Sync scorecards
-async function syncScorecards(supabase: any, apiKey: string, tournamentSrId: string) {
-  if (!tournamentSrId) throw new Error('Tournament ID required');
+// ============================================================================
+// SCORECARDS - Tour-scoped: /{year}/tournaments/{id}/{round_type}/{round_number}/scores.json
+// ============================================================================
+async function syncScorecards(
+  supabase: any, 
+  apiKey: string, 
+  tour: string,
+  year: number,
+  tournamentSrId: string, 
+  roundType: string = 'stroke',
+  roundNumber?: number
+) {
+  if (!tournamentSrId) {
+    return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
+  }
 
   const { data: tournament } = await supabase
     .from('sr_tournaments')
@@ -454,16 +549,21 @@ async function syncScorecards(supabase: any, apiKey: string, tournamentSrId: str
     .eq('sr_id', tournamentSrId)
     .maybeSingle();
 
-  if (!tournament) throw new Error('Tournament not found in database');
+  if (!tournament) {
+    return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
+  }
 
   let totalRecords = 0;
+  const roundsToFetch = roundNumber ? [roundNumber] : [1, 2, 3, 4];
+  const debugInfo: any[] = [];
 
-  // Fetch scorecards for each round (1-4)
-  for (let round = 1; round <= 4; round++) {
+  for (const round of roundsToFetch) {
+    // Per docs: /{year}/tournaments/{id}/{round_type}/{round_number}/scores.json
+    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${round}/scores.json`;
+    
     try {
-      const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/rounds/${round}/scorecards.json`;
-      console.log(`Fetching scorecards from: ${url}`);
-      const data = await fetchSportradar(url, apiKey);
+      const data = await fetchSportradar(url, apiKey, `Scorecards R${round}`);
+      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'success' });
 
       const players = data.players || data.round?.players || [];
       for (const player of players) {
@@ -504,16 +604,33 @@ async function syncScorecards(supabase: any, apiKey: string, tournamentSrId: str
         }
       }
     } catch (e) {
+      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'error', error: e.message });
       console.log(`Round ${round} scorecards not available: ${e.message}`);
     }
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} scorecard entries` };
+  return { 
+    records: totalRecords, 
+    message: `Synced ${totalRecords} scorecard entries`,
+    debug: { rounds: debugInfo }
+  };
 }
 
-// Sync tee times
-async function syncTeeTimes(supabase: any, apiKey: string, tournamentSrId: string) {
-  if (!tournamentSrId) throw new Error('Tournament ID required');
+// ============================================================================
+// TEE TIMES - Tour-scoped: /{year}/tournaments/{id}/{round_type}/{round_number}/teetimes.json
+// ============================================================================
+async function syncTeeTimes(
+  supabase: any, 
+  apiKey: string, 
+  tour: string,
+  year: number,
+  tournamentSrId: string,
+  roundType: string = 'stroke',
+  roundNumber?: number
+) {
+  if (!tournamentSrId) {
+    return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
+  }
 
   const { data: tournament } = await supabase
     .from('sr_tournaments')
@@ -521,15 +638,21 @@ async function syncTeeTimes(supabase: any, apiKey: string, tournamentSrId: strin
     .eq('sr_id', tournamentSrId)
     .maybeSingle();
 
-  if (!tournament) throw new Error('Tournament not found in database');
+  if (!tournament) {
+    return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
+  }
 
   let totalRecords = 0;
+  const roundsToFetch = roundNumber ? [roundNumber] : [1, 2, 3, 4];
+  const debugInfo: any[] = [];
 
-  for (let round = 1; round <= 4; round++) {
+  for (const round of roundsToFetch) {
+    // Per docs: /{year}/tournaments/{id}/{round_type}/{round_number}/teetimes.json
+    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${round}/teetimes.json`;
+    
     try {
-      const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/rounds/${round}/teetimes.json`;
-      console.log(`Fetching tee times from: ${url}`);
-      const data = await fetchSportradar(url, apiKey);
+      const data = await fetchSportradar(url, apiKey, `TeeTimes R${round}`);
+      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'success' });
 
       const groups = data.round?.tee_times || data.tee_times || [];
       for (const group of groups) {
@@ -574,16 +697,25 @@ async function syncTeeTimes(supabase: any, apiKey: string, tournamentSrId: strin
         }
       }
     } catch (e) {
+      debugInfo.push({ round, url: url.replace(/api_key=[^&]+/, 'api_key=***'), status: 'error', error: e.message });
       console.log(`Round ${round} tee times not available: ${e.message}`);
     }
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} tee time groups` };
+  return { 
+    records: totalRecords, 
+    message: `Synced ${totalRecords} tee time groups`,
+    debug: { rounds: debugInfo }
+  };
 }
 
-// Sync hole statistics
-async function syncHoleStatistics(supabase: any, apiKey: string, tournamentSrId: string) {
-  if (!tournamentSrId) throw new Error('Tournament ID required');
+// ============================================================================
+// HOLE STATISTICS - Tour-scoped: /{year}/tournaments/{id}/hole-statistics.json
+// ============================================================================
+async function syncHoleStatistics(supabase: any, apiKey: string, tour: string, year: number, tournamentSrId: string) {
+  if (!tournamentSrId) {
+    return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
+  }
 
   const { data: tournament } = await supabase
     .from('sr_tournaments')
@@ -591,57 +723,71 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tournamentSrId:
     .eq('sr_id', tournamentSrId)
     .maybeSingle();
 
-  if (!tournament) throw new Error('Tournament not found in database');
-
-  let totalRecords = 0;
-
-  try {
-  const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/hole_statistics.json`;
-  console.log(`Fetching hole statistics from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
-
-    const rounds = data.rounds || [{ holes: data.holes }];
-    for (const round of rounds) {
-      const roundNum = round.number || null;
-      const holes = round.holes || [];
-
-      for (const hole of holes) {
-        const { error } = await supabase.from('sr_hole_statistics').upsert({
-          tournament_id: tournament.id,
-          round_number: roundNum,
-          hole_number: hole.number,
-          par: hole.par,
-          yardage: hole.yardage,
-          scoring_average: hole.scoring_average,
-          eagles: hole.eagles,
-          birdies: hole.birdies,
-          pars: hole.pars,
-          bogeys: hole.bogeys,
-          double_bogeys: hole.double_bogeys,
-          other: hole.other,
-          rank: hole.rank,
-          raw_data: hole,
-        }, { onConflict: 'tournament_id,round_number,hole_number' });
-        if (!error) totalRecords++;
-      }
-    }
-  } catch (e) {
-    console.log(`Hole statistics not available: ${e.message}`);
+  if (!tournament) {
+    return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} hole statistics` };
+  // Per docs: /{year}/tournaments/{id}/hole-statistics.json (hyphen, not underscore)
+  const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/hole-statistics.json`;
+  
+  let data: any;
+  try {
+    data = await fetchSportradar(url, apiKey, 'Hole Statistics');
+  } catch (e) {
+    return { 
+      records: 0, 
+      message: `Hole statistics not available: ${e.message}`,
+      debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***'), error: e.message }
+    };
+  }
+
+  let totalRecords = 0;
+  const rounds = data.rounds || [{ holes: data.holes }];
+
+  for (const round of rounds) {
+    const roundNum = round.number || null;
+    const holes = round.holes || [];
+
+    for (const hole of holes) {
+      const { error } = await supabase.from('sr_hole_statistics').upsert({
+        tournament_id: tournament.id,
+        round_number: roundNum,
+        hole_number: hole.number,
+        par: hole.par,
+        yardage: hole.yardage,
+        scoring_average: hole.scoring_average,
+        eagles: hole.eagles,
+        birdies: hole.birdies,
+        pars: hole.pars,
+        bogeys: hole.bogeys,
+        double_bogeys: hole.double_bogeys,
+        other: hole.other,
+        rank: hole.rank,
+        raw_data: hole,
+      }, { onConflict: 'tournament_id,round_number,hole_number' });
+      if (!error) totalRecords++;
+    }
+  }
+
+  return { 
+    records: totalRecords, 
+    message: `Synced ${totalRecords} hole statistics`,
+    debug: { url: url.replace(/api_key=[^&]+/, 'api_key=***') }
+  };
 }
 
-// Sync player profile
-async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: string) {
-  if (!playerSrId) throw new Error('Player ID required');
+// ============================================================================
+// PLAYER PROFILE - Tour-scoped: /players/{player_id}/profile.json
+// ============================================================================
+async function syncPlayerProfile(supabase: any, apiKey: string, tour: string, playerSrId: string) {
+  if (!playerSrId) {
+    return { records: 0, message: 'Player ID required', debug: { error: 'missing_player_id' } };
+  }
 
-  const url = `${getBaseUrl()}/players/${playerSrId}/profile.json`;
-  console.log(`Fetching player profile from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+  const url = `${getTourBaseUrl(tour)}/players/${playerSrId}/profile.json`;
+  const data = await fetchSportradar(url, apiKey, 'Player Profile');
   const player = data.player || data;
 
-  // Update or insert player
   const { data: dbPlayer } = await supabase.from('sr_players').upsert({
     sr_id: playerSrId,
     first_name: player.first_name,
@@ -660,7 +806,6 @@ async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: stri
   }, { onConflict: 'sr_id' }).select().single();
 
   if (dbPlayer) {
-    // Update profile
     await supabase.from('sr_player_profiles').upsert({
       player_id: dbPlayer.id,
       bio: player.bio,
@@ -676,15 +821,15 @@ async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: stri
   return { records: 1, message: `Synced player profile` };
 }
 
-// Sync player statistics for a season
-async function syncPlayerStatistics(supabase: any, apiKey: string, year: number) {
-  const url = `${getBaseUrl()}/${year}/players/statistics.json`;
-  console.log(`Fetching player statistics from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
+// ============================================================================
+// PLAYER STATISTICS - Tour-scoped: /{year}/players/statistics.json
+// ============================================================================
+async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string, year: number) {
+  const url = `${getTourBaseUrl(tour)}/${year}/players/statistics.json`;
+  const data = await fetchSportradar(url, apiKey, 'Player Statistics');
   const players = data.players || [];
   let totalRecords = 0;
 
-  // Get season ID
   const { data: season } = await supabase
     .from('sr_seasons')
     .select('id')
@@ -727,26 +872,4 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, year: number)
   }
 
   return { records: totalRecords, message: `Synced ${totalRecords} player statistics` };
-}
-
-// Sync all seasons
-async function syncSeasons(supabase: any, apiKey: string, year: number) {
-  const url = `${getBaseUrl()}/seasons.json`;
-  console.log(`Fetching seasons from: ${url}`);
-  const data = await fetchSportradar(url, apiKey);
-  const seasons = data.seasons || [];
-  let totalRecords = 0;
-
-  for (const season of seasons) {
-    const { error } = await supabase.from('sr_seasons').upsert({
-      sr_id: season.id,
-      tour_id: season.tour?.id || 'pga',
-      tour_name: season.tour?.name || 'PGA Tour',
-      year: season.year,
-      name: season.name,
-    }, { onConflict: 'sr_id' });
-    if (!error) totalRecords++;
-  }
-
-  return { records: totalRecords, message: `Synced ${totalRecords} seasons` };
 }
