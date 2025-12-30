@@ -33,6 +33,9 @@ interface Tournament {
   is_featured: boolean;
   created_at: string;
   updated_at: string;
+  event_type?: string | null;
+  scoring_system?: string | null;
+  season_id?: string | null;
 }
 
 interface SyncLog {
@@ -74,7 +77,8 @@ export function AdminTourPage() {
   const queryClient = useQueryClient();
   const [syncing, setSyncing] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(['schedule']));
-  const [selectedTournament, setSelectedTournament] = useState<string | null>(null);
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [selectedRound, setSelectedRound] = useState<number>(1);
 
   // Fetch all counts
   const { data: counts } = useQuery({
@@ -223,18 +227,41 @@ export function AdminTourPage() {
     },
   });
 
-  // Sync mutation
+  // Sync mutation - now passes all required params for tournament-specific endpoints
   const syncMutation = useMutation({
-    mutationFn: async ({ action, tournamentId }: { action: string; tournamentId?: string }) => {
+    mutationFn: async ({ 
+      action, 
+      tournamentId,
+      seasonYear,
+      roundType,
+      roundNumber 
+    }: { 
+      action: string; 
+      tournamentId?: string;
+      seasonYear?: number;
+      roundType?: string;
+      roundNumber?: number;
+    }) => {
       setSyncing(action);
       const { data, error } = await supabase.functions.invoke('sportradar-sync', {
-        body: { action, tourId: 'pga', year: 2025, tournamentId },
+        body: { 
+          action, 
+          tourId: 'pga', 
+          year: 2025,
+          tournamentId,
+          seasonYear: seasonYear || 2025,
+          roundType: roundType || 'stroke',
+          roundNumber
+        },
       });
       if (error) throw error;
       return data;
     },
     onSuccess: (data) => {
       toast.success(`Sync complete: ${data.message}`);
+      if (data.debug) {
+        console.log('Sync debug info:', data.debug);
+      }
       queryClient.invalidateQueries({ queryKey: ['sr-tournaments'] });
       queryClient.invalidateQueries({ queryKey: ['sr-sync-logs'] });
       queryClient.invalidateQueries({ queryKey: ['sr-counts'] });
@@ -344,10 +371,10 @@ export function AdminTourPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      setSelectedTournament(tournament.sr_id);
+                      setSelectedTournament(tournament);
                       toast.info(`Selected: ${tournament.name}`);
                     }}
-                    className={selectedTournament === tournament.sr_id ? 'border-primary' : ''}
+                    className={selectedTournament?.sr_id === tournament.sr_id ? 'border-primary' : ''}
                   >
                     Select
                   </Button>
@@ -623,7 +650,15 @@ export function AdminTourPage() {
                             toast.error('Please select a tournament first');
                             return;
                           }
-                          syncMutation.mutate({ action: section.action, tournamentId: selectedTournament || undefined });
+                          // Get round type from tournament's scoring_system (default to 'stroke')
+                          const roundType = selectedTournament?.scoring_system || 'stroke';
+                          syncMutation.mutate({ 
+                            action: section.action, 
+                            tournamentId: selectedTournament?.sr_id,
+                            seasonYear: 2025,
+                            roundType,
+                            roundNumber: selectedRound
+                          });
                         }}
                         disabled={syncing === section.action}
                         className="gap-1"
