@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Music2, Play, Pause, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getSignedAudioUrl } from '@/lib/musicLibrary';
 
 export interface SoundtrackData {
   trackId: string;
   title: string;
   artist?: string;
-  url: string;
+  r2Key?: string;      // R2 object key - primary source
+  url?: string;        // Legacy URL field for backwards compatibility
   startAt?: number;
   volume?: number;
 }
@@ -27,12 +29,39 @@ export default function SoundtrackStrip({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Resolve the audio URL - prefer r2Key, fallback to legacy url
+  const getAudioUrl = (): string => {
+    if (music.r2Key) {
+      return getSignedAudioUrl(music.r2Key);
+    }
+    // Fallback for legacy data that might still have url field
+    return music.url || '';
+  };
+
   // Create audio element on mount
   useEffect(() => {
-    const audio = new Audio(music.url);
+    const audioUrl = getAudioUrl();
+    if (!audioUrl) {
+      console.warn('[SoundtrackStrip] No audio URL available:', { trackId: music.trackId, r2Key: music.r2Key, url: music.url });
+      return;
+    }
+
+    const audio = new Audio(audioUrl);
     audio.volume = music.volume ?? 0.8;
     audio.currentTime = music.startAt ?? 0;
     audioRef.current = audio;
+
+    // Add error logging
+    audio.onerror = (e) => {
+      console.error('[SoundtrackStrip] Audio load failed:', {
+        trackId: music.trackId,
+        r2Key: music.r2Key,
+        audioUrl,
+        error: e,
+        errorCode: audio.error?.code,
+        errorMessage: audio.error?.message,
+      });
+    };
 
     audio.addEventListener('ended', () => {
       setIsPlaying(false);
@@ -44,7 +73,7 @@ export default function SoundtrackStrip({
       audio.src = '';
       audioRef.current = null;
     };
-  }, [music.url, music.volume, music.startAt, onStop]);
+  }, [music.r2Key, music.url, music.volume, music.startAt, onStop]);
 
   // Stop playback when unmounting (e.g., swiping away)
   useEffect(() => {
@@ -66,7 +95,17 @@ export default function SoundtrackStrip({
       setIsPlaying(false);
       onStop?.();
     } else {
-      audioRef.current.play().catch(console.error);
+      audioRef.current.play()
+        .then(() => {
+          console.log('[SoundtrackStrip] Playing:', { trackId: music.trackId, r2Key: music.r2Key });
+        })
+        .catch((err) => {
+          console.error('[SoundtrackStrip] Play failed:', {
+            trackId: music.trackId,
+            r2Key: music.r2Key,
+            error: err.message,
+          });
+        });
       setIsPlaying(true);
       onPlay?.();
     }
