@@ -57,7 +57,7 @@ const PROVIDERS = [
 ];
 
 export default function MediaAssetsManagement() {
-  const [activeTab, setActiveTab] = useState<'headshots' | 'logos' | 'venues' | 'availability' | 'news'>('headshots');
+  const [activeTab, setActiveTab] = useState<'headshots' | 'logos' | 'venues' | 'availability' | 'news' | 'analysis'>('headshots');
   const [searchQuery, setSearchQuery] = useState('');
   const [leagueFilter, setLeagueFilter] = useState('all');
   const [providerFilter, setProviderFilter] = useState('all');
@@ -107,19 +107,50 @@ export default function MediaAssetsManagement() {
     },
   });
 
+  // Fetch editorial items
+  const { data: editorialItems, isLoading: editorialLoading } = useQuery({
+    queryKey: ['sr-editorial-items', activeTab, leagueFilter, providerFilter],
+    queryFn: async () => {
+      if (activeTab !== 'news' && activeTab !== 'analysis') return [];
+      
+      let query = supabase
+        .from('sr_editorial_items')
+        .select('*')
+        .eq('type', activeTab)
+        .order('created', { ascending: false })
+        .limit(100);
+      
+      if (leagueFilter !== 'all') {
+        query = query.eq('league', leagueFilter);
+      }
+      if (providerFilter !== 'all') {
+        query = query.eq('provider', providerFilter);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    enabled: activeTab === 'news' || activeTab === 'analysis',
+  });
+
   // Fetch asset counts by kind
   const { data: assetCounts } = useQuery({
     queryKey: ['sr-media-counts'],
     queryFn: async () => {
-      const [headshots, logos, venues] = await Promise.all([
+      const [headshots, logos, venues, newsCount, analysisCount] = await Promise.all([
         supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }).eq('kind', 'headshot'),
         supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }).eq('kind', 'logo'),
         supabase.from('sr_media_assets').select('id', { count: 'exact', head: true }).eq('kind', 'venue'),
+        supabase.from('sr_editorial_items').select('id', { count: 'exact', head: true }).eq('type', 'news'),
+        supabase.from('sr_editorial_items').select('id', { count: 'exact', head: true }).eq('type', 'analysis'),
       ]);
       return {
         headshots: headshots.count || 0,
         logos: logos.count || 0,
         venues: venues.count || 0,
+        news: newsCount.count || 0,
+        analysis: analysisCount.count || 0,
       };
     },
   });
@@ -162,6 +193,71 @@ export default function MediaAssetsManagement() {
       if (links[size]) return links[size];
     }
     return Object.values(links)[0] || null;
+  };
+
+  const renderEditorialContent = (type: 'news' | 'analysis') => {
+    if (editorialLoading) {
+      return <div className="text-center py-8 text-muted-foreground">Loading {type}...</div>;
+    }
+
+    if (!editorialItems || editorialItems.length === 0) {
+      return (
+        <div className="text-center py-8 text-muted-foreground">
+          <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>No {type} items found. Try syncing from Sportradar.</p>
+          <Button 
+            variant="outline" 
+            className="mt-4"
+            onClick={() => syncMutation.mutate(`pull_${type}`)}
+            disabled={syncMutation.isPending}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+            Sync {type.charAt(0).toUpperCase() + type.slice(1)}
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => syncMutation.mutate(`pull_${type}`)}
+            disabled={syncMutation.isPending}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+            Sync {type.charAt(0).toUpperCase() + type.slice(1)}
+          </Button>
+        </div>
+        {editorialItems.map((item: any) => (
+          <Card key={item.id}>
+            <CardHeader className="py-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-base">{item.title || 'Untitled'}</CardTitle>
+                  {item.byline && <CardDescription className="text-xs mt-1">{item.byline}</CardDescription>}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="capitalize">{item.provider}</Badge>
+                  <Badge variant="secondary" className="uppercase">{item.league}</Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {item.dateline && <p className="text-xs text-muted-foreground mb-2">{item.dateline}</p>}
+              <p className="text-sm line-clamp-3">{item.content_long?.substring(0, 300)}...</p>
+              {item.created && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Published: {format(new Date(item.created), 'MMM d, yyyy HH:mm')}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   };
 
   const renderAssetTable = () => {
@@ -414,12 +510,20 @@ export default function MediaAssetsManagement() {
           </TabsTrigger>
           <TabsTrigger value="availability" className="gap-2">
             <CheckCircle className="h-4 w-4" />
-            Availability Map
+            Availability
+          </TabsTrigger>
+          <TabsTrigger value="news" className="gap-2">
+            <Newspaper className="h-4 w-4" />
+            News
+          </TabsTrigger>
+          <TabsTrigger value="analysis" className="gap-2">
+            <FileText className="h-4 w-4" />
+            Analysis
           </TabsTrigger>
         </TabsList>
 
-        {/* Filters for asset tabs */}
-        {activeTab !== 'availability' && activeTab !== 'news' && (
+        {/* Filters for asset and editorial tabs */}
+        {activeTab !== 'availability' && (
           <div className="flex gap-3 mt-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -479,6 +583,14 @@ export default function MediaAssetsManagement() {
 
         <TabsContent value="availability" className="mt-4">
           {renderAvailabilityMap()}
+        </TabsContent>
+
+        <TabsContent value="news" className="mt-4">
+          {renderEditorialContent('news')}
+        </TabsContent>
+
+        <TabsContent value="analysis" className="mt-4">
+          {renderEditorialContent('analysis')}
         </TabsContent>
       </Tabs>
     </div>

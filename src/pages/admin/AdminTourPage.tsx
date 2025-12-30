@@ -649,30 +649,33 @@ export function AdminTourPage() {
                       <Badge variant="outline">
                         {counts?.[section.countKey as keyof typeof counts] || 0} records
                       </Badge>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (section.needsTournament && !selectedTournament) {
-                            toast.error('Please select a tournament first');
-                            return;
-                          }
-                          // Get round type from tournament's scoring_system (default to 'stroke')
-                          const roundType = selectedTournament?.scoring_system || 'stroke';
-                          syncMutation.mutate({ 
-                            action: section.action, 
-                            tournamentId: selectedTournament?.sr_id,
-                            seasonYear: 2025,
-                            roundType,
-                            roundNumber: selectedRound
-                          });
-                        }}
-                        disabled={syncing === section.action}
-                        className="gap-1"
-                      >
-                        <RefreshCw className={`h-3 w-3 ${syncing === section.action ? 'animate-spin' : ''}`} />
-                        Sync
-                      </Button>
+                      {/* Media Assets section doesn't need a sync button - it has its own UI */}
+                      {section.id !== 'media' && (
+                        <Button
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (section.needsTournament && !selectedTournament) {
+                              toast.error('Please select a tournament first');
+                              return;
+                            }
+                            // Get round type from tournament's scoring_system (default to 'stroke')
+                            const roundType = selectedTournament?.scoring_system || 'stroke';
+                            syncMutation.mutate({ 
+                              action: section.action, 
+                              tournamentId: selectedTournament?.sr_id,
+                              seasonYear: 2025,
+                              roundType,
+                              roundNumber: selectedRound
+                            });
+                          }}
+                          disabled={syncing === section.action}
+                          className="gap-1"
+                        >
+                          <RefreshCw className={`h-3 w-3 ${syncing === section.action ? 'animate-spin' : ''}`} />
+                          Sync
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
