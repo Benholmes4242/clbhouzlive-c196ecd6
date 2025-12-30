@@ -60,6 +60,7 @@ export const useRealPostsFetcher = () => {
           user_id,
           actor_type,
           actor_id,
+          categories,
           post_media!inner (
             id,
             media_type,
@@ -340,6 +341,7 @@ export const useRealPostsFetcher = () => {
             location: businessAccount.location,
           } : undefined,
           golfCourse,
+          categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: true,
           media: allMedia.filter(m => isValidImageUrl(m.media_url)),
@@ -424,6 +426,7 @@ export const useRealPostsFetcher = () => {
           actor_id,
           like_count,
           comment_count,
+          categories,
           post_media!inner (
             id,
             media_type,
@@ -560,6 +563,7 @@ export const useRealPostsFetcher = () => {
             isVerified: businessAccount.is_verified, category: businessAccount.category, location: businessAccount.location,
           } : undefined,
           golfCourse,
+          categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: isFriendMap.get(post.id) ?? false, // Use actual is_friend value from RPC
           media: allMedia.filter((m: any) => isValidImageUrl(m.media_url)),
@@ -603,6 +607,7 @@ export const useRealPostsFetcher = () => {
           actor_id,
           like_count,
           comment_count,
+          categories,
           post_media!inner (
             id,
             media_type,
@@ -908,6 +913,7 @@ export const useRealPostsFetcher = () => {
             location: businessAccount.location,
           } : undefined,
           golfCourse,
+          categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
           media: allMedia.filter(m => isValidImageUrl(m.media_url)),
@@ -1067,6 +1073,7 @@ export const useRealPostsFetcher = () => {
             user_id,
             actor_type,
             actor_id,
+            categories,
             post_media!inner (
               id,
               media_type,
@@ -1353,6 +1360,7 @@ export const useRealPostsFetcher = () => {
           user,
           business,
           golfCourse,
+          categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
           media: [{

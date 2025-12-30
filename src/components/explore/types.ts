@@ -80,6 +80,7 @@ export interface ExploreContentItem {
   aspectRatio?: number; // Video aspect ratio (width/height) for eligibility checking
   width?: number; // Encoded media width
   height?: number; // Encoded media height
+  categories?: string[]; // Category IDs from Create Moment (e.g., 'funny', 'tips-coaching')
 }
 
 export interface CTAContentItem {

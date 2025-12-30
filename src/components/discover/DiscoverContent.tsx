@@ -116,32 +116,41 @@ function getFilterTypeFromPills(main: string): string {
 }
 
 
-// Apply tag filtering to content
+// Apply tag filtering to content using posts.categories array
 function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): ExploreContentItem[] {
   if (!selectedTags.length) return content;
   
   return content.filter(item => {
+    // Primary: Check structured categories array (from Create Moment)
+    if (item.categories && item.categories.length > 0) {
+      return selectedTags.some(tag => 
+        item.categories!.some(cat => 
+          cat.toLowerCase() === tag.toLowerCase()
+        )
+      );
+    }
+    
+    // Fallback: Text search for legacy posts without categories
     const title = item.title?.toLowerCase() || '';
     const description = item.ctaDescription?.toLowerCase() || '';
     
-    // Check if any of the selected tags appear in title or description
     return selectedTags.some(tag => 
       title.includes(tag.toLowerCase()) || 
-      description.includes(tag.toLowerCase()) ||
-      title.includes(`#${tag.toLowerCase()}`) ||
-      description.includes(`#${tag.toLowerCase()}`)
+      description.includes(tag.toLowerCase())
     );
   });
 }
 
-// Shorts filter pills
+// Shorts filter pills - aligned with categoryDefinitions.ts for consistent filtering
+// Keys match category IDs from MOMENT_CATEGORIES
 const SHORTS_PILLS = [
   { key: 'all', label: 'All' },
   { key: 'funny', label: 'Funny' },
   { key: 'challenge', label: 'Challenge' },
-  { key: 'tips', label: 'Tips' },
+  { key: 'tips-coaching', label: 'Tips & Coaching' },
   { key: 'course-vlog', label: 'Course Vlog' },
-  { key: 'trick-shots', label: 'Trick Shots' },
+  { key: 'swing', label: 'Swing' },
+  { key: 'hole-in-one', label: 'Hole in One' },
 ];
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
