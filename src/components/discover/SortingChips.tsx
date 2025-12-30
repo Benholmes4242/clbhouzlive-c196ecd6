@@ -17,10 +17,10 @@ interface SortingChipsProps {
 // Build chips from canonical category definitions
 const sortingChips: SortingChip[] = [
   { id: 'all', label: 'All', keyword: '' },
-  ...getDiscoverCategories().map(cat => ({
+  ...getDiscoverCategories().map((cat) => ({
     id: cat.id,
     label: cat.label,
-    emoji: cat.emoji,
+    emoji: cat.emoji ?? '',
     keyword: cat.id,
   })),
 ];
