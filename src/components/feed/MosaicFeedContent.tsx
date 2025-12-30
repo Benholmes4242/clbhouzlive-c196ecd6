@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -9,6 +9,7 @@ import { VideoPost, UserPostWithType } from './types';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
+import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import Masonry from 'react-masonry-css';
 
 interface MosaicFeedContentProps {
@@ -54,7 +55,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     modalManager.openModal({
       src: Array.isArray(modalData.mediaUrl) ? modalData.mediaUrl[0] : modalData.mediaUrl,
       user: modalData.user,
-      content: modalData.content
+      content: modalData.content,
+      studioEdits: modalData.studioEdits
     });
   };
 
@@ -64,6 +66,9 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     if (isUserPost) {
       const userPost = item as UserPostWithType;
       const media = userPost.post_media;
+      
+      // Extract studioEdits from post_media
+      const studioEdits = media.map((m: any) => m.studio_edits ?? null);
       
       return {
         mediaUrl: media.length === 1 ? media[0].media_url : media.map(m => m.media_url),
@@ -75,6 +80,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         displayName: userPost.user.display_name || userPost.user.username,
         content: userPost.content,
         postTags: userPost.post_tags,
+        studioEdits,
         initialIndex: 0
       };
     } else {
@@ -91,6 +97,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         displayName: videoPost.user.name,
         content: videoPost.content.description,
         postTags: undefined,
+        studioEdits: undefined,
         initialIndex: 0
       };
     }
@@ -100,10 +107,26 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const MediaTile: React.FC<{ item: VideoPost | UserPostWithType; index: number }> = ({ item, index }) => {
     const isUserPost = item.type === 'user_post';
     const media = isUserPost 
-      ? (item as UserPostWithType).post_media.map(pm => ({ media_url: pm.media_url, media_type: pm.media_type }))
-      : [{ media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || '', media_type: (item as VideoPost).content.type }];
+      ? (item as UserPostWithType).post_media.map(pm => ({ 
+          media_url: pm.media_url, 
+          media_type: pm.media_type,
+          studio_edits: (pm as any).studio_edits 
+        }))
+      : [{ media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || '', media_type: (item as VideoPost).content.type, studio_edits: null }];
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
+    
+    // Detect music from studioEdits
+    const { postHasMusic, activeMusic } = useMemo(() => {
+      const hasMusic = media.some(m => {
+        const music = (m.studio_edits as any)?.music;
+        return !!(music?.url || music?.r2Key);
+      });
+      const music = media
+        .map(m => (m.studio_edits as any)?.music)
+        .find(m => m?.url || m?.r2Key) ?? null;
+      return { postHasMusic: hasMusic, activeMusic: music };
+    }, [media]);
     
     // Check if this item has video
     const hasVideo = media.some(m => m.media_type === 'video');
@@ -336,6 +359,24 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
               </div>
             </div>
           </div>
+          
+          {/* SoundtrackStrip for music posts */}
+          {activeMusic && (
+            <div className="absolute bottom-3 left-2 z-30 max-w-[140px]">
+              <SoundtrackStrip 
+                music={{
+                  trackId: activeMusic.trackId || '',
+                  title: activeMusic.title || 'Unknown Track',
+                  artist: activeMusic.artist,
+                  r2Key: activeMusic.r2Key,
+                  url: activeMusic.url,
+                  startAt: activeMusic.startAt,
+                  volume: activeMusic.volume
+                }}
+                variant="published"
+              />
+            </div>
+          )}
         </div>
       </div>
     );

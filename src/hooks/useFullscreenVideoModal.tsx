@@ -11,6 +11,7 @@ interface VideoModalData {
     username?: string;
   };
   content?: string;
+  studioEdits?: (any | null)[];
 }
 
 /**
