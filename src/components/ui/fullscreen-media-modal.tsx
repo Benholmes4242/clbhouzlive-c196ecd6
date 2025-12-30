@@ -121,8 +121,8 @@ const FullscreenMediaModal = ({
       .map(ed => (ed as any)?.music)
       .find(m => m?.url || m?.r2Key) ?? null;
     
-    // Debug log for runtime confirmation
-    if (hasMusic || music) {
+    // Debug log only when playable URL exists
+    if (music?.url) {
       console.log('[FullscreenModal] music detected', { postHasMusic: hasMusic, activeMusic: music });
     }
     
