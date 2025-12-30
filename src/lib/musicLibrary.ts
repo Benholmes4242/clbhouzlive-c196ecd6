@@ -22,27 +22,6 @@ export function getSignedAudioUrl(r2Key: string): string {
   return `/api/audio/sign?key=${encodeURIComponent(r2Key)}`;
 }
 
-/**
- * Helper to prettify filename into title
- */
-function prettifyFilename(filename: string): string {
-  return filename
-    .replace(/\.mp3$/i, '')
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
-
-/**
- * Helper to create slug from filename
- */
-function slugify(filename: string): string {
-  return filename
-    .replace(/\.mp3$/i, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
 // ============================================================================
 // MUSIC LIBRARY - Tracks from R2 clbhouz-audio bucket
 // R2 Keys are case-sensitive and match: Tracks/<Folder>/<Filename>.mp3
@@ -53,200 +32,172 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
   // AMBIENT
   // ───────────────────────────────────────────────────────────────────────────
   {
-    id: 'ambient-dawn-chorus',
-    title: 'Dawn Chorus',
+    id: 'ethereal-angels',
+    title: 'Ethereal Angels',
     artist: 'Clbhouz Sounds',
     mood: 'ambient',
     duration: '2:30',
-    durationSec: 150,
-    r2Key: 'Tracks/Ambient/Dawn-Chorus.mp3',
+    r2Key: 'Tracks/Ambient/Ethereal Angels.mp3',
   },
   {
-    id: 'ambient-morning-mist',
-    title: 'Morning Mist',
+    id: 'intangable-world',
+    title: 'Intangable World',
     artist: 'Clbhouz Sounds',
     mood: 'ambient',
     duration: '3:00',
-    durationSec: 180,
-    r2Key: 'Tracks/Ambient/Morning-Mist.mp3',
-  },
-  {
-    id: 'ambient-green-serenity',
-    title: 'Green Serenity',
-    artist: 'Clbhouz Sounds',
-    mood: 'ambient',
-    duration: '2:45',
-    durationSec: 165,
-    r2Key: 'Tracks/Ambient/Green-Serenity.mp3',
-  },
-  {
-    id: 'ambient-links-at-dawn',
-    title: 'Links At Dawn',
-    artist: 'Clbhouz Sounds',
-    mood: 'ambient',
-    duration: '2:50',
-    durationSec: 170,
-    r2Key: 'Tracks/Ambient/Links-At-Dawn.mp3',
+    r2Key: 'Tracks/Ambient/Intangable World.mp3',
   },
 
   // ───────────────────────────────────────────────────────────────────────────
   // CALM
   // ───────────────────────────────────────────────────────────────────────────
   {
-    id: 'calm-fairway-dreams',
-    title: 'Fairway Dreams',
+    id: 'calm-business',
+    title: 'Calm Business',
     artist: 'Clbhouz Sounds',
     mood: 'calm',
     duration: '2:30',
-    durationSec: 150,
-    r2Key: 'Tracks/Calm/Fairway-Dreams.mp3',
+    r2Key: 'Tracks/Calm/Calm Business.mp3',
   },
   {
-    id: 'calm-sunset-putt',
-    title: 'Sunset Putt',
+    id: 'corporate-dreams',
+    title: 'Corporate Dreams',
     artist: 'Clbhouz Sounds',
     mood: 'calm',
-    duration: '3:12',
-    durationSec: 192,
-    r2Key: 'Tracks/Calm/Sunset-Putt.mp3',
+    duration: '3:00',
+    r2Key: 'Tracks/Calm/Corporate Dreams.mp3',
   },
   {
-    id: 'calm-morning-dew',
-    title: 'Morning Dew',
+    id: 'lonely-traveller',
+    title: 'Lonely Traveller',
     artist: 'Clbhouz Sounds',
     mood: 'calm',
     duration: '2:45',
-    durationSec: 165,
-    r2Key: 'Tracks/Calm/Morning-Dew.mp3',
-  },
-  {
-    id: 'calm-peaceful-greens',
-    title: 'Peaceful Greens',
-    artist: 'Clbhouz Sounds',
-    mood: 'calm',
-    duration: '2:20',
-    durationSec: 140,
-    r2Key: 'Tracks/Calm/Peaceful-Greens.mp3',
+    r2Key: 'Tracks/Calm/Lonely Traveller.mp3',
   },
 
   // ───────────────────────────────────────────────────────────────────────────
   // CINEMATIC
   // ───────────────────────────────────────────────────────────────────────────
   {
-    id: 'cinematic-the-perfect-drive',
-    title: 'The Perfect Drive',
+    id: 'celestial-choir',
+    title: 'Celestial Choir',
     artist: 'Clbhouz Sounds',
     mood: 'cinematic',
     duration: '2:30',
-    durationSec: 150,
-    r2Key: 'Tracks/Cinematic/The-Perfect-Drive.mp3',
+    r2Key: 'Tracks/Cinematic/Celestial Choir.mp3',
   },
   {
-    id: 'cinematic-championship-moment',
-    title: 'Championship Moment',
+    id: 'powerful-opening',
+    title: 'Powerful Opening',
     artist: 'Clbhouz Sounds',
     mood: 'cinematic',
     duration: '3:00',
-    durationSec: 180,
-    r2Key: 'Tracks/Cinematic/Championship-Moment.mp3',
+    r2Key: 'Tracks/Cinematic/Powerful Opening.mp3',
   },
   {
-    id: 'cinematic-epic-finish',
-    title: 'Epic Finish',
+    id: 'steep-descent',
+    title: 'Steep Descent',
     artist: 'Clbhouz Sounds',
     mood: 'cinematic',
     duration: '2:40',
-    durationSec: 160,
-    r2Key: 'Tracks/Cinematic/Epic-Finish.mp3',
+    r2Key: 'Tracks/Cinematic/Steep Descent.mp3',
   },
   {
-    id: 'cinematic-glory-shot',
-    title: 'Glory Shot',
+    id: 'the-dark-side',
+    title: 'The Dark Side',
     artist: 'Clbhouz Sounds',
     mood: 'cinematic',
     duration: '2:15',
-    durationSec: 135,
-    r2Key: 'Tracks/Cinematic/Glory-Shot.mp3',
+    r2Key: 'Tracks/Cinematic/The Dark Side.mp3',
   },
 
   // ───────────────────────────────────────────────────────────────────────────
   // HYPE
   // ───────────────────────────────────────────────────────────────────────────
   {
-    id: 'hype-birdie-energy',
-    title: 'Birdie Energy',
+    id: 'battle-of-the-navy',
+    title: 'Battle of the Navy',
     artist: 'Clbhouz Sounds',
     mood: 'hype',
     duration: '2:15',
-    durationSec: 135,
-    r2Key: 'Tracks/Hype/Birdie-Energy.mp3',
+    r2Key: 'Tracks/Hype/Battle of the Navy.mp3',
   },
   {
-    id: 'hype-eagle-rush',
-    title: 'Eagle Rush',
+    id: 'epic-sport',
+    title: 'Epic Sport',
     artist: 'Clbhouz Sounds',
     mood: 'hype',
     duration: '2:00',
-    durationSec: 120,
-    r2Key: 'Tracks/Hype/Eagle-Rush.mp3',
+    r2Key: 'Tracks/Hype/Epic Sport.mp3',
   },
   {
-    id: 'hype-power-drive',
-    title: 'Power Drive',
+    id: 'indestructable',
+    title: 'Indestructable',
     artist: 'Clbhouz Sounds',
     mood: 'hype',
     duration: '1:45',
-    durationSec: 105,
-    r2Key: 'Tracks/Hype/Power-Drive.mp3',
+    r2Key: 'Tracks/Hype/Indestructable.mp3',
   },
   {
-    id: 'hype-ace-moment',
-    title: 'Ace Moment',
+    id: 'million-dolla-live',
+    title: 'Million Dolla Live',
     artist: 'Clbhouz Sounds',
     mood: 'hype',
     duration: '2:10',
-    durationSec: 130,
-    r2Key: 'Tracks/Hype/Ace-Moment.mp3',
+    r2Key: 'Tracks/Hype/Million Dolla Live.mp3',
+  },
+  {
+    id: 'slap-deep-house',
+    title: 'Slap Deep House',
+    artist: 'Clbhouz Sounds',
+    mood: 'hype',
+    duration: '2:30',
+    r2Key: 'Tracks/Hype/Slap deep House.mp3',
+  },
+  {
+    id: 'video-game-boss',
+    title: 'Video Game Boss',
+    artist: 'Clbhouz Sounds',
+    mood: 'hype',
+    duration: '2:20',
+    r2Key: 'Tracks/Hype/Video Game Boss.mp3',
   },
 
   // ───────────────────────────────────────────────────────────────────────────
   // UPBEAT
   // ───────────────────────────────────────────────────────────────────────────
   {
-    id: 'upbeat-par-celebration',
-    title: 'Par Celebration',
+    id: 'last-task',
+    title: 'Last Task',
     artist: 'Clbhouz Sounds',
     mood: 'upbeat',
     duration: '1:45',
-    durationSec: 105,
-    r2Key: 'Tracks/Upbeat/Par-Celebration.mp3',
+    r2Key: 'Tracks/Upbeat/Last Task.mp3',
   },
   {
-    id: 'upbeat-sunny-round',
-    title: 'Sunny Round',
+    id: 'sport-rock',
+    title: 'Sport Rock',
     artist: 'Clbhouz Sounds',
     mood: 'upbeat',
     duration: '2:20',
-    durationSec: 140,
-    r2Key: 'Tracks/Upbeat/Sunny-Round.mp3',
+    r2Key: 'Tracks/Upbeat/Sport Rock.mp3',
   },
   {
-    id: 'upbeat-good-vibes',
-    title: 'Good Vibes',
+    id: 'sports-legends-background-music',
+    title: 'Sports Legends Background Music',
     artist: 'Clbhouz Sounds',
     mood: 'upbeat',
     duration: '2:30',
-    durationSec: 150,
-    r2Key: 'Tracks/Upbeat/Good-Vibes.mp3',
+    r2Key: 'Tracks/Upbeat/Sports Legends Background Music.mp3',
   },
   {
-    id: 'upbeat-weekend-golf',
-    title: 'Weekend Golf',
+    id: 'wacky-fight',
+    title: 'Wacky Fight',
     artist: 'Clbhouz Sounds',
     mood: 'upbeat',
     duration: '2:15',
-    durationSec: 135,
-    r2Key: 'Tracks/Upbeat/Weekend-Golf.mp3',
+    r2Key: 'Tracks/Upbeat/Wacky Fight.mp3',
   },
 ];
 
