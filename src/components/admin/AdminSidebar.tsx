@@ -89,6 +89,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
     { to: "/admin/businesses",    label: "Business Directory" },
     { to: "/admin/verification", label: "Verification", badge: pendingVerificationCount, tooltip: "There are verification requests awaiting review." },
     { to: "/admin/tour",          label: "Tour Data" },
+    { to: "/admin/media",         label: "Media Assets" },
     { to: "/admin/golf-courses",  label: "Golf Courses" },
     { to: "/admin/logos",         label: "Logos" },
     { to: "/admin/country-flags", label: "Country Flags" },
