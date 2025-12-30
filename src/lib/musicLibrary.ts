@@ -19,10 +19,11 @@ export interface MusicTrack {
  * Generate a signed URL for audio playback via the Worker endpoint
  * Uses absolute URL to work in preview/dev environments
  */
-const AUDIO_API_BASE = 'https://clbhouz.co.uk';
+const R2_PUBLIC_BASE = 'https://pub-9f6095ba86ef4833a86c1e06bec47b40.r2.dev';
 
 export function getSignedAudioUrl(r2Key: string): string {
-  return `${AUDIO_API_BASE}/api/audio/sign?key=${encodeURIComponent(r2Key)}`;
+  // Direct public R2 URL - no signing needed
+  return `${R2_PUBLIC_BASE}/${r2Key}`;
 }
 
 // ============================================================================
