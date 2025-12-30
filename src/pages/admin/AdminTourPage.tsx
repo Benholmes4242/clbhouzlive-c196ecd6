@@ -191,6 +191,19 @@ export function AdminTourPage() {
     },
   });
 
+  // Fetch seasons
+  const { data: seasons } = useQuery({
+    queryKey: ['sr-seasons'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sr_seasons')
+        .select('*')
+        .order('year', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Sync mutation
   const syncMutation = useMutation({
     mutationFn: async ({ action, tournamentId }: { action: string; tournamentId?: string }) => {
@@ -321,6 +334,27 @@ export function AdminTourPage() {
                   </Button>
                 </div>
               ))
+            )}
+          </div>
+        );
+
+      case 'seasons':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {seasons?.map((season) => (
+              <div key={season.id} className="p-4 rounded-lg border border-border bg-card">
+                <div className="font-medium">{season.name}</div>
+                <div className="text-sm text-muted-foreground space-y-1 mt-2">
+                  <div>🏌️ {season.tour_name}</div>
+                  <div>📅 {season.year}</div>
+                  <div className="text-xs opacity-75">ID: {season.sr_id}</div>
+                </div>
+              </div>
+            ))}
+            {(!seasons || seasons.length === 0) && (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                No seasons synced yet
+              </div>
             )}
           </div>
         );
