@@ -120,6 +120,12 @@ const FullscreenMediaModal = ({
     const music = (studioEdits ?? [])
       .map(ed => (ed as any)?.music)
       .find(m => m?.url || m?.r2Key) ?? null;
+    
+    // Debug log for runtime confirmation
+    if (hasMusic || music) {
+      console.log('[FullscreenModal] music detected', { postHasMusic: hasMusic, activeMusic: music });
+    }
+    
     return { postHasMusic: hasMusic, activeMusic: music };
   }, [studioEdits]);
   
