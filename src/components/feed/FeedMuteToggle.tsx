@@ -1,5 +1,5 @@
 import React from 'react';
-import { VolumeX, Volume2, Music } from 'lucide-react';
+import { VolumeX, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
@@ -40,16 +40,12 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
       <Button 
         variant="ghost" 
         size="sm" 
-        className="text-muted-foreground hover:text-primary"
+        className="text-muted-foreground hover:text-primary flex items-center gap-1"
         onClick={handleToggle}
-        title={isGloballyMuted ? "Unmute track" : "Mute track"}
+        title={isGloballyMuted ? "Turn music on" : "Turn music off"}
       >
-        {isGloballyMuted ? (
-          <VolumeX className="h-3 w-3 mr-1" />
-        ) : (
-          <Music className="h-3 w-3 mr-1" />
-        )}
-        {isGloballyMuted ? 'Unmute' : 'Track'}
+        {isGloballyMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        {isGloballyMuted ? 'Music Off' : 'Music On'}
       </Button>
     );
   }
