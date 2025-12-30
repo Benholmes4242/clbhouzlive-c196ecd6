@@ -107,19 +107,23 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     [filteredPosts]
   );
 
-  // For lightbox - extract all media URLs and types
+  // For lightbox - extract all media URLs, types, filterIds, and studioEdits
   const allMediaData = useMemo(() => {
     const urls: string[] = [];
     const types: ('image' | 'video')[] = [];
+    const filterIds: (string | null)[] = [];
+    const studioEdits: (any | null)[] = [];
     
     postsWithMedia.forEach(post => {
       post.post_media.forEach(media => {
         urls.push(media.media_url);
         types.push(media.media_type);
+        filterIds.push(media.filter_id ?? null);
+        studioEdits.push(media.studio_edits ?? null);
       });
     });
     
-    return { urls, types };
+    return { urls, types, filterIds, studioEdits };
   }, [postsWithMedia]);
 
   // Handle post click - find the media index for lightbox
@@ -198,6 +202,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           onClose={() => setModalOpen(false)}
           mediaUrl={allMediaData.urls}
           mediaType={allMediaData.types}
+          filterIds={allMediaData.filterIds}
+          studioEdits={allMediaData.studioEdits}
           initialIndex={modalStartIndex}
         />
       )}

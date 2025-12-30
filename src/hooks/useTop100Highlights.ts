@@ -42,7 +42,9 @@ export const useTop100Highlights = (userId: string) => {
           post_media (
             id,
             media_type,
-            media_url
+            media_url,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             taggable_entities (

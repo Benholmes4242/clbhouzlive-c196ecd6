@@ -55,7 +55,9 @@ export function useCreatorFeatures(userId?: string) {
             id,
             media_url,
             media_type,
-            poster_url
+            poster_url,
+            filter_id,
+            studio_edits
           )
         `)
         .eq('id', creatorData.featured_post_id)
@@ -89,7 +91,9 @@ export function useCreatorFeatures(userId?: string) {
             id,
             media_url,
             media_type,
-            poster_url
+            poster_url,
+            filter_id,
+            studio_edits
           )
         `)
         .in('id', pinnedIds);
