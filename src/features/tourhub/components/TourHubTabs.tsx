@@ -68,14 +68,14 @@ const tournamentTabs: { value: TournamentDetailTab; label: string }[] = [
 
 export function TournamentDetailTabs({ activeTab, onTabChange, className }: TournamentDetailTabsProps) {
   return (
-    <div className={cn("w-full overflow-x-auto scrollbar-hide", className)}>
+    <div className={cn("w-full max-w-full overflow-x-auto scrollbar-hide", className)}>
       <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TournamentDetailTab)}>
-        <TabsList className="inline-flex h-10 items-center justify-start gap-1 bg-muted/50 p-1 rounded-lg w-max min-w-full">
+        <TabsList className="inline-flex h-10 items-center justify-start gap-1 bg-muted/50 p-1 rounded-lg w-max">
           {tournamentTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="px-4 py-1.5 text-sm font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex-none px-3 sm:px-4 py-1.5 text-sm font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
             >
               {tab.label}
             </TabsTrigger>
