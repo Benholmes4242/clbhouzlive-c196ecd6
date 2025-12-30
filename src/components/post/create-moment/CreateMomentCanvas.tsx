@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import CourseTagInput from "@/components/posts/CourseTagInput";
+import { IdentitySelector } from "@/components/identity/IdentitySelector";
+import { useActiveActor } from "@/context/ActiveActorContext";
 import { GolfCourse, TaggableEntity } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
 
@@ -30,6 +32,7 @@ export default function CreateMomentCanvas({
   selectedTags,
   onTagsChange,
 }: CreateMomentCanvasProps) {
+  const { availableActors } = useActiveActor();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
@@ -104,6 +107,22 @@ export default function CreateMomentCanvas({
       }}
       data-ecm-scroll-container="true"
     >
+      {/* Posting As Selector */}
+      {availableActors.length > 1 && (
+        <div 
+          className="flex items-center justify-between py-1"
+          style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
+        >
+          <div>
+            <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Posting as</span>
+            <p className="text-[9px] mt-0.5" style={{ color: 'var(--cm-text-tertiary)', opacity: 0.7 }}>
+              This moment will appear on this profile
+            </p>
+          </div>
+          <IdentitySelector compact variant="light" />
+        </div>
+      )}
+
       {/* Caption Input - Large, emotional core */}
       <div className="flex flex-col relative">
         <textarea
