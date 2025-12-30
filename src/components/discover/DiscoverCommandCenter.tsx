@@ -343,8 +343,12 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                       : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
                   )}
                 >
-                  {pill.icon && <span className="w-4 h-4">{pill.icon}</span>}
-                  <span>{pill.label}</span>
+                  {pill.icon && (
+                    <span className="flex items-center justify-center w-4 h-4 leading-none">
+                      {pill.icon}
+                    </span>
+                  )}
+                  <span className="leading-none">{pill.label}</span>
                 </motion.button>
               ))}
             </div>
