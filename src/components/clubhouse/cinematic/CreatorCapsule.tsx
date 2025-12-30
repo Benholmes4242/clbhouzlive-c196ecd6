@@ -116,38 +116,13 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       )}
 
       {/* Golf Course CTA - one-line gap after caption */}
-      {golfCourse?.name && (
+      {golfCourse && (
         <div className={cn(caption && "mt-2")}>
           <CourseLocationRow
             course={golfCourse}
             showChevron
             isDark
           />
-
-          {/* Fallback when location fields are missing (CourseLocationRow hides itself) */}
-          {!(golfCourse.country && (golfCourse.region || golfCourse.sub_country)) && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                const courseIdentifier = golfCourse.slug || golfCourse.id;
-                if (courseIdentifier) {
-                  navigate(`/courses/${courseIdentifier}`);
-                }
-              }}
-              disabled={!(golfCourse.slug || golfCourse.id)}
-              className={cn(
-                "py-1 text-left transition-opacity",
-                (golfCourse.slug || golfCourse.id) && "hover:opacity-80 active:opacity-70"
-              )}
-            >
-              <span className="text-[13px] font-medium text-white/70">
-                <span className="opacity-80">Played at </span>
-                <span className="font-semibold text-white/90">{golfCourse.name}</span>
-              </span>
-            </button>
-          )}
         </div>
       )}
 
