@@ -56,13 +56,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     // Use the currently displayed media index for fullscreen
     const mediaUrl = Array.isArray(modalData.mediaUrl) ? modalData.mediaUrl[idx] : modalData.mediaUrl;
-    const studioEdit = Array.isArray(modalData.studioEdits) ? [modalData.studioEdits[idx]] : modalData.studioEdits;
+    const studioEdit = Array.isArray(modalData.studioEdits) ? modalData.studioEdits[idx] : modalData.studioEdits;
     
     modalManager.openModal({
       src: mediaUrl,
       user: modalData.user,
       content: modalData.content,
-      studioEdits: studioEdit
+      studioEdit  // Single object, not array
     });
   };
 

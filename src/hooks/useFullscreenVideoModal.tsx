@@ -11,7 +11,7 @@ interface VideoModalData {
     username?: string;
   };
   content?: string;
-  studioEdits?: (any | null)[];
+  studioEdit?: any | null;  // Single object for single-video modal
 }
 
 /**

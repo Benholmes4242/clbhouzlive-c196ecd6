@@ -8,6 +8,8 @@ interface PostMedia {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
+  filter_id?: string | null;
+  studio_edits?: any | null;
 }
 
 interface PostTag {
@@ -87,7 +89,7 @@ export const useUserPosts = () => {
           .in('id', userIds),
         supabase
           .from('post_media')
-          .select('id, media_type, media_url, post_id')
+          .select('id, media_type, media_url, post_id, filter_id, studio_edits')
           .in('post_id', postIds)
       ]);
 
@@ -126,7 +128,9 @@ export const useUserPosts = () => {
           post_media: media.map(m => ({
             id: m.id,
             media_type: m.media_type as 'image' | 'video',
-            media_url: m.media_url
+            media_url: m.media_url,
+            filter_id: m.filter_id,
+            studio_edits: m.studio_edits
           })),
           post_tags: tags
         };
