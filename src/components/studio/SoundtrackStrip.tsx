@@ -52,78 +52,104 @@ export default function SoundtrackStrip({
 
     const audio = new Audio();
     audio.crossOrigin = 'anonymous'; // Required for CORS audio
-    audio.preload = 'metadata';
+    audio.preload = 'auto'; // Changed from 'metadata' to ensure full buffering
     audio.volume = music.volume ?? 0.8;
-    audio.src = audioUrl; // Set src after crossOrigin
     audioRef.current = audio;
     
+    let hasLoaded = false;
+    let errorTimeout: ReturnType<typeof setTimeout> | null = null;
+    
+    // Track successful load
+    const handleCanPlay = () => {
+      hasLoaded = true;
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        errorTimeout = null;
+      }
+      console.log('[SoundtrackStrip] Audio ready:', { trackId: music.trackId });
+    };
+    
     // Set startAt after audio is loadable
-    audio.addEventListener('loadedmetadata', () => {
+    const handleLoadedMetadata = () => {
       if (music.startAt && music.startAt > 0) {
         audio.currentTime = music.startAt;
       }
-    }, { once: true });
+    };
+    
+    audio.addEventListener('canplay', handleCanPlay, { once: true });
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata, { once: true });
+    
+    // Set src last to trigger loading
+    audio.src = audioUrl;
 
-    // Add detailed error logging with network diagnostics
+    // Add error logging - but only if we haven't successfully loaded
     audio.onerror = async (e) => {
-      const errorCode = audio.error?.code;
-      const errorMessage = audio.error?.message;
-      
-      console.error('[SoundtrackStrip] Audio load failed:', {
-        trackId: music.trackId,
-        r2Key: music.r2Key,
-        audioUrl,
-        currentSrc: audio.currentSrc,
-        networkState: audio.networkState,
-        readyState: audio.readyState,
-        error: e,
-        errorCode,
-        errorMessage,
-      });
-      
-      // Perform HEAD request to diagnose the issue
-      try {
-        const headResponse = await fetch(audioUrl, { method: 'HEAD' });
-        const contentType = headResponse.headers.get('content-type');
-        const contentLength = headResponse.headers.get('content-length');
-        
-        console.error('[SoundtrackStrip] HEAD diagnostics:', {
-          url: audioUrl,
-          status: headResponse.status,
-          contentType,
-          contentLength,
-          acceptRanges: headResponse.headers.get('accept-ranges'),
-          cors: headResponse.headers.get('access-control-allow-origin'),
-        });
-        
-        // Fallback: if HEAD returns odd results (wrong content-type or blocked),
-        // try GET with Range header to confirm it's serving audio bytes
-        const isOddResponse = !contentType?.includes('audio') || 
-                              headResponse.status !== 200 ||
-                              contentType?.includes('html');
-        
-        if (isOddResponse) {
-          try {
-            const rangeResponse = await fetch(audioUrl, {
-              method: 'GET',
-              headers: { 'Range': 'bytes=0-1' }
-            });
-            const rangeBytes = await rangeResponse.arrayBuffer();
-            console.error('[SoundtrackStrip] GET Range fallback:', {
-              url: audioUrl,
-              status: rangeResponse.status,
-              contentType: rangeResponse.headers.get('content-type'),
-              contentRange: rangeResponse.headers.get('content-range'),
-              bytesReceived: rangeBytes.byteLength,
-              firstBytes: Array.from(new Uint8Array(rangeBytes)).map(b => b.toString(16).padStart(2, '0')).join(' '),
-            });
-          } catch (rangeErr) {
-            console.error('[SoundtrackStrip] GET Range fallback failed:', rangeErr);
-          }
+      // Give a short delay to see if canplay fires (some browsers fire transient errors)
+      errorTimeout = setTimeout(async () => {
+        if (hasLoaded) {
+          console.log('[SoundtrackStrip] Ignoring transient error, audio already loaded');
+          return;
         }
-      } catch (fetchErr) {
-        console.error('[SoundtrackStrip] HEAD request failed:', fetchErr);
-      }
+        
+        const errorCode = audio.error?.code;
+        const errorMessage = audio.error?.message;
+        
+        console.error('[SoundtrackStrip] Audio load failed:', {
+          trackId: music.trackId,
+          r2Key: music.r2Key,
+          audioUrl,
+          currentSrc: audio.currentSrc,
+          networkState: audio.networkState,
+          readyState: audio.readyState,
+          error: e,
+          errorCode,
+          errorMessage,
+        });
+      
+        // Perform HEAD request to diagnose the issue
+        try {
+          const headResponse = await fetch(audioUrl, { method: 'HEAD' });
+          const contentType = headResponse.headers.get('content-type');
+          const contentLength = headResponse.headers.get('content-length');
+          
+          console.error('[SoundtrackStrip] HEAD diagnostics:', {
+            url: audioUrl,
+            status: headResponse.status,
+            contentType,
+            contentLength,
+            acceptRanges: headResponse.headers.get('accept-ranges'),
+            cors: headResponse.headers.get('access-control-allow-origin'),
+          });
+          
+          // Fallback: if HEAD returns odd results (wrong content-type or blocked),
+          // try GET with Range header to confirm it's serving audio bytes
+          const isOddResponse = !contentType?.includes('audio') || 
+                                headResponse.status !== 200 ||
+                                contentType?.includes('html');
+          
+          if (isOddResponse) {
+            try {
+              const rangeResponse = await fetch(audioUrl, {
+                method: 'GET',
+                headers: { 'Range': 'bytes=0-1' }
+              });
+              const rangeBytes = await rangeResponse.arrayBuffer();
+              console.error('[SoundtrackStrip] GET Range fallback:', {
+                url: audioUrl,
+                status: rangeResponse.status,
+                contentType: rangeResponse.headers.get('content-type'),
+                contentRange: rangeResponse.headers.get('content-range'),
+                bytesReceived: rangeBytes.byteLength,
+                firstBytes: Array.from(new Uint8Array(rangeBytes)).map(b => b.toString(16).padStart(2, '0')).join(' '),
+              });
+            } catch (rangeErr) {
+              console.error('[SoundtrackStrip] GET Range fallback failed:', rangeErr);
+            }
+          }
+        } catch (fetchErr) {
+          console.error('[SoundtrackStrip] HEAD request failed:', fetchErr);
+        }
+      }, 500); // Wait 500ms before treating as real error
     };
 
     audio.addEventListener('ended', () => {
@@ -132,6 +158,7 @@ export default function SoundtrackStrip({
     });
 
     return () => {
+      if (errorTimeout) clearTimeout(errorTimeout);
       audio.pause();
       audio.src = '';
       audioRef.current = null;
