@@ -5,9 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Base URL without trailing path - we'll build full URLs per endpoint
-const API_BASE = 'https://api.sportradar.com/golf/trial/v3/en';
-const TOUR = 'pga';
+// Base URL - correct format: /golf/trial/{tour}/v3/en
+const getBaseUrl = (tour: string = 'pga') => `https://api.sportradar.com/golf/trial/${tour}/v3/en`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -132,7 +131,7 @@ async function fetchSportradar(url: string, apiKey: string) {
 
 // Sync tournament schedule
 async function syncSchedule(supabase: any, apiKey: string, year: number) {
-  const url = `${API_BASE}/${TOUR}/${year}/tournaments/schedule.json`;
+  const url = `${getBaseUrl()}/${year}/tournaments/schedule.json`;
   console.log(`Fetching schedule from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const seasons = data.seasons || [data];
@@ -200,7 +199,7 @@ async function syncSchedule(supabase: any, apiKey: string, year: number) {
 
 // Sync players list
 async function syncPlayers(supabase: any, apiKey: string, year: number) {
-  const url = `${API_BASE}/${TOUR}/${year}/players/profiles.json`;
+  const url = `${getBaseUrl()}/${year}/players/profiles.json`;
   console.log(`Fetching players from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const players = data.players || [];
@@ -231,7 +230,7 @@ async function syncPlayers(supabase: any, apiKey: string, year: number) {
 
 // Sync world rankings
 async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
-  const url = `${API_BASE}/${TOUR}/${year}/players/wgr.json`;
+  const url = `${getBaseUrl()}/${year}/players/wgr.json`;
   console.log(`Fetching world rankings from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const rankings = data.rankings || data.players || [];
@@ -283,7 +282,7 @@ async function syncWorldRankings(supabase: any, apiKey: string, year: number) {
 async function syncLeaderboard(supabase: any, apiKey: string, tournamentSrId: string) {
   if (!tournamentSrId) throw new Error('Tournament ID required');
 
-  const url = `${API_BASE}/${TOUR}/tournaments/${tournamentSrId}/leaderboard.json`;
+  const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/leaderboard.json`;
   console.log(`Fetching leaderboard from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const leaderboard = data.leaderboard || [];
@@ -350,7 +349,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tournamentSrId: st
 async function syncTournamentSummary(supabase: any, apiKey: string, tournamentSrId: string) {
   if (!tournamentSrId) throw new Error('Tournament ID required');
 
-  const url = `${API_BASE}/${TOUR}/tournaments/${tournamentSrId}/summary.json`;
+  const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/summary.json`;
   console.log(`Fetching tournament summary from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
 
@@ -433,7 +432,7 @@ async function syncScorecards(supabase: any, apiKey: string, tournamentSrId: str
   // Fetch scorecards for each round (1-4)
   for (let round = 1; round <= 4; round++) {
     try {
-      const url = `${API_BASE}/${TOUR}/tournaments/${tournamentSrId}/rounds/${round}/scorecards.json`;
+      const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/rounds/${round}/scorecards.json`;
       console.log(`Fetching scorecards from: ${url}`);
       const data = await fetchSportradar(url, apiKey);
 
@@ -499,7 +498,7 @@ async function syncTeeTimes(supabase: any, apiKey: string, tournamentSrId: strin
 
   for (let round = 1; round <= 4; round++) {
     try {
-      const url = `${API_BASE}/${TOUR}/tournaments/${tournamentSrId}/rounds/${round}/teetimes.json`;
+      const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/rounds/${round}/teetimes.json`;
       console.log(`Fetching tee times from: ${url}`);
       const data = await fetchSportradar(url, apiKey);
 
@@ -568,7 +567,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tournamentSrId:
   let totalRecords = 0;
 
   try {
-  const url = `${API_BASE}/${TOUR}/tournaments/${tournamentSrId}/hole_statistics.json`;
+  const url = `${getBaseUrl()}/tournaments/${tournamentSrId}/hole_statistics.json`;
   console.log(`Fetching hole statistics from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
 
@@ -608,7 +607,7 @@ async function syncHoleStatistics(supabase: any, apiKey: string, tournamentSrId:
 async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: string) {
   if (!playerSrId) throw new Error('Player ID required');
 
-  const url = `${API_BASE}/${TOUR}/players/${playerSrId}/profile.json`;
+  const url = `${getBaseUrl()}/players/${playerSrId}/profile.json`;
   console.log(`Fetching player profile from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const player = data.player || data;
@@ -650,7 +649,7 @@ async function syncPlayerProfile(supabase: any, apiKey: string, playerSrId: stri
 
 // Sync player statistics for a season
 async function syncPlayerStatistics(supabase: any, apiKey: string, year: number) {
-  const url = `${API_BASE}/${TOUR}/${year}/players/statistics.json`;
+  const url = `${getBaseUrl()}/${year}/players/statistics.json`;
   console.log(`Fetching player statistics from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const players = data.players || [];
@@ -703,7 +702,7 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, year: number)
 
 // Sync all seasons
 async function syncSeasons(supabase: any, apiKey: string, year: number) {
-  const url = `${API_BASE}/${TOUR}/seasons.json`;
+  const url = `${getBaseUrl()}/seasons.json`;
   console.log(`Fetching seasons from: ${url}`);
   const data = await fetchSportradar(url, apiKey);
   const seasons = data.seasons || [];
