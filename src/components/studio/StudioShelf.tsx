@@ -81,9 +81,8 @@ export default function StudioShelf({
 
           {/* Studio Shelf - Clbhouz sheet styling */}
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[9999] rounded-t-2xl overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[9999] h-[75vh] rounded-t-2xl overflow-hidden flex flex-col"
             style={{
-              maxHeight: '75vh',
               background: 'var(--cm-surface-card)',
               boxShadow: 'var(--cm-shadow-soft)',
             }}
