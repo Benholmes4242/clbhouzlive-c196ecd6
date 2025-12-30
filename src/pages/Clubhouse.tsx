@@ -26,6 +26,10 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 
 const Clubhouse = () => {
+  // ============================================================================
+  // ALL HOOKS MUST BE DECLARED FIRST - before any early returns
+  // ============================================================================
+  
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
   
@@ -69,7 +73,6 @@ const Clubhouse = () => {
   } = useClubhouseSkeletonTiming(posts.length > 0);
   
   // Track loading posts state for boot timeline (audit only)
-  // IMPORTANT: All hooks must be declared BEFORE any early returns
   const wasShowingLoadingRef = useRef(false);
   useEffect(() => {
     const showingLoading = isLoading && posts.length === 0;
@@ -86,11 +89,6 @@ const Clubhouse = () => {
   const handleFirstFrameReady = useCallback(() => {
     signalFirstFrameReady();
   }, [signalFirstFrameReady]);
-  
-  // Show skeleton during rehydration - MUST be after all hooks
-  if (isRehydrating) {
-    return <ClubhouseSkeleton />;
-  }
 
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();
@@ -118,7 +116,6 @@ const Clubhouse = () => {
     hideToast
   } = useSnapModal();
 
-
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
   const { user } = useSupabaseSession();
@@ -133,12 +130,6 @@ const Clubhouse = () => {
       setShowRecapModal(true);
     }
   }, [seasonRecap]);
-  
-  // Comments now use CommentsPage (slide-in from right) - no drawer state needed
-  
-  // ⚠️ HEADER/FOOTER AUTO-HIDE DISABLED
-  // Chrome is always visible on Clubhouse - no hide logic, no timers, no animations
-  // Glass creator capsule + right-hand action rail are out of scope
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
@@ -212,6 +203,19 @@ const Clubhouse = () => {
     }
   });
 
+  // ============================================================================
+  // EARLY RETURNS - Safe now that ALL hooks are declared above
+  // ============================================================================
+  
+  // Show skeleton during rehydration
+  if (isRehydrating) {
+    return <ClubhouseSkeleton />;
+  }
+
+  // ============================================================================
+  // EVENT HANDLERS (not hooks, can be after early returns)
+  // ============================================================================
+
   const handleLike = (postId: string) => {
     if (!user?.id) return;
     if (likeMutation.isPending) return; // Prevent duplicate submissions
@@ -223,7 +227,6 @@ const Clubhouse = () => {
     });
   };
 
-  // Handle post change
   const handleCurrentPostChange = (index: number) => {
     setCurrentPostIndex(index);
   };
@@ -232,15 +235,6 @@ const Clubhouse = () => {
     closeComposer();
     setLocalSelectedTags([]);
   };
-
-  // Mark body for Clubhouse-specific CSS overrides
-  useEffect(() => {
-    document.body.classList.add('route-clubhouse');
-    return () => document.body.classList.remove('route-clubhouse');
-  }, []);
-
-  // No loading state needed - Suspense at route level handles it
-  // if (isLoading && posts.length === 0) return null;
 
   return (
     <PageRoot 
