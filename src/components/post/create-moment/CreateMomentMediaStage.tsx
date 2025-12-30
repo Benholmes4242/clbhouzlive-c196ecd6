@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -6,6 +7,7 @@ import { MediaNavigationDots } from "@/components/posts/user-post/overlays/Media
 import { StudioEdits } from "@/types/studio";
 import MediaThumbnailStrip from "./MediaThumbnailStrip";
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
+import { useToast } from "@/hooks/use-toast";
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
@@ -29,6 +31,33 @@ export default function CreateMomentMediaStage({
   getEdits,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
+  const { toast } = useToast();
+
+  // Check if any media has music attached (music applies to the whole post)
+  const hasMusic = useMemo(() => {
+    return media.some(item => {
+      const edits = getEdits(item.id);
+      return edits?.music?.r2Key || edits?.music?.url;
+    });
+  }, [media, getEdits]);
+
+  // Get the active music track (from any media item)
+  const activeMusic = useMemo(() => {
+    for (const item of media) {
+      const edits = getEdits(item.id);
+      if (edits?.music?.r2Key || edits?.music?.url) {
+        return edits.music;
+      }
+    }
+    return null;
+  }, [media, getEdits]);
+
+  const handleMuteBlocked = () => {
+    toast({
+      description: "Original audio is muted because a track is applied.",
+      duration: 2000,
+    });
+  };
 
   if (media.length === 0) {
     return null;
@@ -67,6 +96,8 @@ export default function CreateMomentMediaStage({
           enableSwipe
           loop={false}
           className="h-full w-full"
+          forceVideoMuted={hasMusic}
+          onMuteBlocked={handleMuteBlocked}
         />
 
         {/* Top scrim for badges */}
@@ -94,21 +125,15 @@ export default function CreateMomentMediaStage({
         </button>
 
 
-        {/* Soundtrack strip - centered bottom when music is selected */}
-        {currentItem && (() => {
-          const edits = getEdits(currentItem.id);
-          if (edits?.music?.r2Key || edits?.music?.url) {
-            return (
-              <div className="absolute bottom-[8px] left-1/2 -translate-x-1/2 z-20 max-w-[200px]">
-                <SoundtrackStrip 
-                  music={edits.music as { trackId: string; title: string; artist?: string; r2Key?: string; url?: string; startAt?: number; volume?: number }}
-                  variant="preview"
-                />
-              </div>
-            );
-          }
-          return null;
-        })()}
+        {/* Soundtrack strip - centered bottom when music is selected (shows for whole post) */}
+        {activeMusic && (
+          <div className="absolute bottom-[8px] left-1/2 -translate-x-1/2 z-20 max-w-[200px]">
+            <SoundtrackStrip 
+              music={activeMusic as { trackId: string; title: string; artist?: string; r2Key?: string; url?: string; startAt?: number; volume?: number }}
+              variant="preview"
+            />
+          </div>
+        )}
 
         {/* Navigation dots - centered bottom */}
         <MediaNavigationDots

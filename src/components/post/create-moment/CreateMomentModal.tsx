@@ -409,10 +409,10 @@ export default function CreateMomentModal({
 
     const files = media.map(item => item.file);
     
-    // Build full studio edits including filter and music
+    // Build full studio edits including filter, music, and audioMode
     const studioEditsByMediaId = media.reduce((acc, item) => {
       const edits = getEdits?.(item.id);
-      if (edits && (edits.filter || edits.music)) {
+      if (edits && (edits.filter || edits.music || edits.audioMode)) {
         acc[item.id] = {
           ...(edits.filter && { filter: edits.filter }),
           ...(edits.music && { 
@@ -420,15 +420,16 @@ export default function CreateMomentModal({
               trackId: edits.music.trackId,
               title: edits.music.title,
               artist: edits.music.artist,
-              url: edits.music.url,
+              url: edits.music.url || '',
               startAt: edits.music.startAt ?? 0,
               volume: edits.music.volume ?? 0.8,
             }
           }),
+          audioMode: edits.music ? 'music_only' as const : 'original' as const,
         };
       }
       return acc;
-    }, {} as Record<string, { filter?: string; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number } }>);
+    }, {} as Record<string, { filter?: string; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; audioMode?: 'original' | 'music_only' }>);
     
     // Enqueue upload and close immediately
     enqueuePostUpload({

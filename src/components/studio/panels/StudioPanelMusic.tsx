@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Play, Pause, Music2, Volume2 } from 'lucide-react';
+import { Search, Play, Pause, Music2, Volume2, VolumeX } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
 import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
@@ -102,6 +102,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       setPreviewingTrack(null);
     }
     // Store r2Key instead of url - SoundtrackStrip will resolve the signed URL
+    // Also set audioMode to music_only to mute original video audio
     updateEdits({
       music: {
         trackId: track.id,
@@ -110,7 +111,20 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         r2Key: track.r2Key,
         startAt: 0,
         volume: volume / 100
-      }
+      },
+      audioMode: 'music_only'
+    });
+  };
+
+  const handleRemoveTrack = () => {
+    setSelectedTrack('');
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setPreviewingTrack(null);
+    }
+    updateEdits({
+      music: null,
+      audioMode: 'original'
     });
   };
 
@@ -126,6 +140,51 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
   return (
     <div className="flex flex-col h-full">
+      {/* Music mutes original audio notice */}
+      <div 
+        className="px-4 py-2 flex items-center gap-2"
+        style={{ 
+          background: 'var(--cm-surface-alt)',
+          borderBottom: '1px solid var(--cm-border-subtle)',
+        }}
+      >
+        <VolumeX className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--cm-text-tertiary)' }} />
+        <p className="text-[11px]" style={{ color: 'var(--cm-text-secondary)' }}>
+          Adding a track will mute original video audio
+        </p>
+      </div>
+
+      {/* Music enabled indicator when track selected */}
+      {selectedTrack && (
+        <div 
+          className="px-4 py-2 flex items-center justify-between"
+          style={{ 
+            background: 'rgba(34, 197, 94, 0.1)',
+            borderBottom: '1px solid var(--cm-border-subtle)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ background: '#22C55E' }}
+            />
+            <span className="text-[12px] font-medium" style={{ color: '#22C55E' }}>
+              Music enabled
+            </span>
+          </div>
+          <button
+            onClick={handleRemoveTrack}
+            className="text-[11px] px-2 py-1 rounded-md transition-colors"
+            style={{ 
+              background: 'var(--cm-surface-alt)',
+              color: 'var(--cm-text-secondary)',
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+
       {/* Search */}
       <div 
         className="p-4"

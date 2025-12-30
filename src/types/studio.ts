@@ -10,6 +10,8 @@ export type TextOverlay = {
   color?: string;   // hex
 };
 
+export type AudioMode = 'original' | 'music_only';
+
 export type StudioEdits = {
   filter?: FilterId;
   crop?: { ratio: 'original' | '1:1' | '4:5' | '16:9' };
@@ -24,6 +26,7 @@ export type StudioEdits = {
     startAt?: number;  // seconds
     volume?: number;   // 0..1
   } | null;
+  audioMode?: AudioMode;  // Controls whether original video audio plays
 };
 
 export type StudioState = Record<string /* mediaId */, StudioEdits>;

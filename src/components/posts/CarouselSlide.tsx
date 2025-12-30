@@ -23,9 +23,22 @@ interface CarouselSlideProps {
   onVideoRef?: (ref: HTMLVideoElement | null) => void;
   onSetCover?: (index: number) => void;
   coverIndex?: number;
+  /** Force video to be muted (e.g., when music track is active) */
+  forceVideoMuted?: boolean;
+  /** Callback when user attempts to unmute while music is active */
+  onMuteBlocked?: () => void;
 }
 
-export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, onSetCover, coverIndex = 0 }: CarouselSlideProps) {
+export default function CarouselSlide({ 
+  item, 
+  index = 0, 
+  isActive, 
+  onVideoRef, 
+  onSetCover, 
+  coverIndex = 0,
+  forceVideoMuted = false,
+  onMuteBlocked
+}: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -140,7 +153,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           preload="metadata"
           playsInline
           controls={false}
-          muted={false}
+          muted={forceVideoMuted}
           loop
           className={cn(
             "w-full h-full object-cover transition-all duration-300",
@@ -155,6 +168,13 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           onEnded={() => {
             setIsPlaying(false);
             setCurrentTime(0);
+          }}
+          onVolumeChange={(e) => {
+            // If music is active and user tries to unmute, force mute and notify
+            if (forceVideoMuted && !e.currentTarget.muted) {
+              e.currentTarget.muted = true;
+              onMuteBlocked?.();
+            }
           }}
         />
 
