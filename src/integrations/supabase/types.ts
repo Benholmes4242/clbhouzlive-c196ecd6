@@ -4762,6 +4762,161 @@ export type Database = {
         }
         Relationships: []
       }
+      sr_seasons: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sr_id: string
+          tour_id: string
+          tour_name: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sr_id: string
+          tour_id: string
+          tour_name: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sr_id?: string
+          tour_id?: string
+          tour_name?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      sr_sync_log: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          records_synced: number | null
+          season_id: string | null
+          started_at: string
+          status: string
+          sync_type: string
+          tour_id: string | null
+          tournament_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_synced?: number | null
+          season_id?: string | null
+          started_at?: string
+          status: string
+          sync_type: string
+          tour_id?: string | null
+          tournament_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_synced?: number | null
+          season_id?: string | null
+          started_at?: string
+          status?: string
+          sync_type?: string
+          tour_id?: string | null
+          tournament_id?: string | null
+        }
+        Relationships: []
+      }
+      sr_tournaments: {
+        Row: {
+          created_at: string
+          currency: string | null
+          defending_champion: string | null
+          end_date: string | null
+          id: string
+          is_featured: boolean | null
+          name: string
+          points_type: string | null
+          purse: number | null
+          raw_data: Json | null
+          season_id: string | null
+          sr_id: string
+          start_date: string | null
+          status: string | null
+          updated_at: string
+          venue_city: string | null
+          venue_country: string | null
+          venue_course_name: string | null
+          venue_name: string | null
+          venue_par: number | null
+          venue_state: string | null
+          venue_yardage: number | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          defending_champion?: string | null
+          end_date?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name: string
+          points_type?: string | null
+          purse?: number | null
+          raw_data?: Json | null
+          season_id?: string | null
+          sr_id: string
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+          venue_city?: string | null
+          venue_country?: string | null
+          venue_course_name?: string | null
+          venue_name?: string | null
+          venue_par?: number | null
+          venue_state?: string | null
+          venue_yardage?: number | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          defending_champion?: string | null
+          end_date?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name?: string
+          points_type?: string | null
+          purse?: number | null
+          raw_data?: Json | null
+          season_id?: string | null
+          sr_id?: string
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+          venue_city?: string | null
+          venue_country?: string | null
+          venue_course_name?: string | null
+          venue_name?: string | null
+          venue_par?: number | null
+          venue_state?: string | null
+          venue_yardage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_tournaments_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "sr_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       streaks: {
         Row: {
           daily_streak: number | null

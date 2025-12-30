@@ -151,6 +151,7 @@ const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ defaul
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
 const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
 const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
+const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
@@ -381,6 +382,11 @@ function AppRoutes() {
           <Route path="team" element={<Suspense fallback={<GenericPageSkeleton />}><TeamPage /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSettingsPage /></Suspense>} />
           <Route path="top100-geocoding" element={<Suspense fallback={<GenericPageSkeleton />}><Top100GeocodingPage /></Suspense>} />
+          <Route path="tour" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><AdminTourPage /></Suspense>
+            </PanelGuard>
+          } />
           <Route path="test-lab" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminTestLabPage /></Suspense>
