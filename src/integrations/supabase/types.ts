@@ -4762,6 +4762,492 @@ export type Database = {
         }
         Relationships: []
       }
+      sr_course_holes: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          description: string | null
+          hole_number: number
+          id: string
+          par: number | null
+          raw_data: Json | null
+          yardage: number | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          hole_number: number
+          id?: string
+          par?: number | null
+          raw_data?: Json | null
+          yardage?: number | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          hole_number?: number
+          id?: string
+          par?: number | null
+          raw_data?: Json | null
+          yardage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_course_holes_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "sr_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_courses: {
+        Row: {
+          city: string | null
+          country: string | null
+          country_code: string | null
+          created_at: string | null
+          holes: number | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          par: number | null
+          raw_data: Json | null
+          sr_id: string
+          state: string | null
+          updated_at: string | null
+          yardage: number | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          holes?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          par?: number | null
+          raw_data?: Json | null
+          sr_id: string
+          state?: string | null
+          updated_at?: string | null
+          yardage?: number | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          holes?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          par?: number | null
+          raw_data?: Json | null
+          sr_id?: string
+          state?: string | null
+          updated_at?: string | null
+          yardage?: number | null
+        }
+        Relationships: []
+      }
+      sr_hole_statistics: {
+        Row: {
+          birdies: number | null
+          bogeys: number | null
+          created_at: string | null
+          double_bogeys: number | null
+          eagles: number | null
+          hole_number: number
+          id: string
+          other: number | null
+          par: number | null
+          pars: number | null
+          rank: number | null
+          raw_data: Json | null
+          round_number: number | null
+          scoring_average: number | null
+          tournament_id: string | null
+          yardage: number | null
+        }
+        Insert: {
+          birdies?: number | null
+          bogeys?: number | null
+          created_at?: string | null
+          double_bogeys?: number | null
+          eagles?: number | null
+          hole_number: number
+          id?: string
+          other?: number | null
+          par?: number | null
+          pars?: number | null
+          rank?: number | null
+          raw_data?: Json | null
+          round_number?: number | null
+          scoring_average?: number | null
+          tournament_id?: string | null
+          yardage?: number | null
+        }
+        Update: {
+          birdies?: number | null
+          bogeys?: number | null
+          created_at?: string | null
+          double_bogeys?: number | null
+          eagles?: number | null
+          hole_number?: number
+          id?: string
+          other?: number | null
+          par?: number | null
+          pars?: number | null
+          rank?: number | null
+          raw_data?: Json | null
+          round_number?: number | null
+          scoring_average?: number | null
+          tournament_id?: string | null
+          yardage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_hole_statistics_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_leaderboards: {
+        Row: {
+          created_at: string | null
+          id: string
+          money: number | null
+          player_id: string | null
+          points: number | null
+          position: number | null
+          position_tied: boolean | null
+          raw_data: Json | null
+          round_1: number | null
+          round_2: number | null
+          round_3: number | null
+          round_4: number | null
+          score: number | null
+          status: string | null
+          strokes: number | null
+          thru: number | null
+          tournament_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          money?: number | null
+          player_id?: string | null
+          points?: number | null
+          position?: number | null
+          position_tied?: boolean | null
+          raw_data?: Json | null
+          round_1?: number | null
+          round_2?: number | null
+          round_3?: number | null
+          round_4?: number | null
+          score?: number | null
+          status?: string | null
+          strokes?: number | null
+          thru?: number | null
+          tournament_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          money?: number | null
+          player_id?: string | null
+          points?: number | null
+          position?: number | null
+          position_tied?: boolean | null
+          raw_data?: Json | null
+          round_1?: number | null
+          round_2?: number | null
+          round_3?: number | null
+          round_4?: number | null
+          score?: number | null
+          status?: string | null
+          strokes?: number | null
+          thru?: number | null
+          tournament_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_leaderboards_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_leaderboards_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_player_profiles: {
+        Row: {
+          best_world_ranking: number | null
+          bio: string | null
+          career_earnings: number | null
+          career_wins: number | null
+          created_at: string | null
+          id: string
+          majors_won: number | null
+          pga_tour_wins: number | null
+          player_id: string | null
+          raw_data: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          best_world_ranking?: number | null
+          bio?: string | null
+          career_earnings?: number | null
+          career_wins?: number | null
+          created_at?: string | null
+          id?: string
+          majors_won?: number | null
+          pga_tour_wins?: number | null
+          player_id?: string | null
+          raw_data?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          best_world_ranking?: number | null
+          bio?: string | null
+          career_earnings?: number | null
+          career_wins?: number | null
+          created_at?: string | null
+          id?: string
+          majors_won?: number | null
+          pga_tour_wins?: number | null
+          player_id?: string | null
+          raw_data?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_player_profiles_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_player_statistics: {
+        Row: {
+          created_at: string | null
+          cuts_made: number | null
+          driving_accuracy: number | null
+          driving_distance: number | null
+          events_played: number | null
+          fedex_points: number | null
+          fedex_rank: number | null
+          greens_in_reg: number | null
+          id: string
+          player_id: string | null
+          putting_average: number | null
+          raw_data: Json | null
+          sand_saves: number | null
+          scoring_average: number | null
+          season_id: string | null
+          top_10s: number | null
+          top_25s: number | null
+          updated_at: string | null
+          wins: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          cuts_made?: number | null
+          driving_accuracy?: number | null
+          driving_distance?: number | null
+          events_played?: number | null
+          fedex_points?: number | null
+          fedex_rank?: number | null
+          greens_in_reg?: number | null
+          id?: string
+          player_id?: string | null
+          putting_average?: number | null
+          raw_data?: Json | null
+          sand_saves?: number | null
+          scoring_average?: number | null
+          season_id?: string | null
+          top_10s?: number | null
+          top_25s?: number | null
+          updated_at?: string | null
+          wins?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          cuts_made?: number | null
+          driving_accuracy?: number | null
+          driving_distance?: number | null
+          events_played?: number | null
+          fedex_points?: number | null
+          fedex_rank?: number | null
+          greens_in_reg?: number | null
+          id?: string
+          player_id?: string | null
+          putting_average?: number | null
+          raw_data?: Json | null
+          sand_saves?: number | null
+          scoring_average?: number | null
+          season_id?: string | null
+          top_10s?: number | null
+          top_25s?: number | null
+          updated_at?: string | null
+          wins?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_player_statistics_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_player_statistics_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "sr_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_players: {
+        Row: {
+          birth_date: string | null
+          birth_place: string | null
+          college: string | null
+          country: string | null
+          country_code: string | null
+          created_at: string | null
+          first_name: string | null
+          full_name: string | null
+          height: string | null
+          id: string
+          last_name: string | null
+          photo_url: string | null
+          raw_data: Json | null
+          residence: string | null
+          sr_id: string
+          turned_pro: number | null
+          updated_at: string | null
+          weight: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          birth_place?: string | null
+          college?: string | null
+          country?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          full_name?: string | null
+          height?: string | null
+          id?: string
+          last_name?: string | null
+          photo_url?: string | null
+          raw_data?: Json | null
+          residence?: string | null
+          sr_id: string
+          turned_pro?: number | null
+          updated_at?: string | null
+          weight?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          birth_place?: string | null
+          college?: string | null
+          country?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          full_name?: string | null
+          height?: string | null
+          id?: string
+          last_name?: string | null
+          photo_url?: string | null
+          raw_data?: Json | null
+          residence?: string | null
+          sr_id?: string
+          turned_pro?: number | null
+          updated_at?: string | null
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      sr_scorecards: {
+        Row: {
+          created_at: string | null
+          hole_number: number
+          id: string
+          par: number | null
+          player_id: string | null
+          raw_data: Json | null
+          round_number: number
+          score_to_par: number | null
+          strokes: number | null
+          tournament_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hole_number: number
+          id?: string
+          par?: number | null
+          player_id?: string | null
+          raw_data?: Json | null
+          round_number: number
+          score_to_par?: number | null
+          strokes?: number | null
+          tournament_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hole_number?: number
+          id?: string
+          par?: number | null
+          player_id?: string | null
+          raw_data?: Json | null
+          round_number?: number
+          score_to_par?: number | null
+          strokes?: number | null
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_scorecards_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_scorecards_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sr_seasons: {
         Row: {
           created_at: string
@@ -4833,6 +5319,127 @@ export type Database = {
           tournament_id?: string | null
         }
         Relationships: []
+      }
+      sr_tee_time_players: {
+        Row: {
+          created_at: string | null
+          id: string
+          player_id: string | null
+          position: number | null
+          tee_time_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          player_id?: string | null
+          position?: number | null
+          tee_time_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          player_id?: string | null
+          position?: number | null
+          tee_time_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_tee_time_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_tee_time_players_tee_time_id_fkey"
+            columns: ["tee_time_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tee_times"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_tee_times: {
+        Row: {
+          created_at: string | null
+          id: string
+          raw_data: Json | null
+          round_number: number
+          tee_number: number | null
+          tee_time: string
+          tournament_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          raw_data?: Json | null
+          round_number: number
+          tee_number?: number | null
+          tee_time: string
+          tournament_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          raw_data?: Json | null
+          round_number?: number
+          tee_number?: number | null
+          tee_time?: string
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_tee_times_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_tournament_summaries: {
+        Row: {
+          course_conditions: string | null
+          created_at: string | null
+          cut_score: number | null
+          field_size: number | null
+          id: string
+          raw_data: Json | null
+          tournament_id: string | null
+          updated_at: string | null
+          weather_conditions: string | null
+        }
+        Insert: {
+          course_conditions?: string | null
+          created_at?: string | null
+          cut_score?: number | null
+          field_size?: number | null
+          id?: string
+          raw_data?: Json | null
+          tournament_id?: string | null
+          updated_at?: string | null
+          weather_conditions?: string | null
+        }
+        Update: {
+          course_conditions?: string | null
+          created_at?: string | null
+          cut_score?: number | null
+          field_size?: number | null
+          id?: string
+          raw_data?: Json | null
+          tournament_id?: string | null
+          updated_at?: string | null
+          weather_conditions?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_tournament_summaries_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sr_tournaments: {
         Row: {
@@ -4913,6 +5520,53 @@ export type Database = {
             columns: ["season_id"]
             isOneToOne: false
             referencedRelation: "sr_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sr_world_rankings: {
+        Row: {
+          created_at: string | null
+          events_played: number | null
+          id: string
+          player_id: string | null
+          points: number | null
+          points_gained: number | null
+          points_lost: number | null
+          rank: number
+          ranking_date: string
+          raw_data: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          events_played?: number | null
+          id?: string
+          player_id?: string | null
+          points?: number | null
+          points_gained?: number | null
+          points_lost?: number | null
+          rank: number
+          ranking_date: string
+          raw_data?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          events_played?: number | null
+          id?: string
+          player_id?: string | null
+          points?: number | null
+          points_gained?: number | null
+          points_lost?: number | null
+          rank?: number
+          ranking_date?: string
+          raw_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_world_rankings_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
             referencedColumns: ["id"]
           },
         ]
