@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import ClubhouseVerticalGrid from '@/components/grid/ClubhouseVerticalGrid';
@@ -47,9 +47,14 @@ const Clubhouse = () => {
   // Cinema Dim: register this page as Clubhouse
   const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
   
-  useEffect(() => {
+  // Use useLayoutEffect for route class to prevent flash
+  useLayoutEffect(() => {
+    document.body.classList.add('route-clubhouse');
     setIsClubhousePage(true);
-    return () => setIsClubhousePage(false);
+    return () => {
+      document.body.classList.remove('route-clubhouse');
+      setIsClubhousePage(false);
+    };
   }, [setIsClubhousePage]);
   
   const location = useLocation();
@@ -131,9 +136,12 @@ const Clubhouse = () => {
     }
   }, [seasonRecap]);
 
+  // Stable key for post IDs to ensure query refreshes when posts change
+  const postIdsKey = useMemo(() => posts.map(p => p.id).join(','), [posts]);
+
   // Check which posts the user has liked
-  const { data: likedPosts } = useQuery({
-    queryKey: ['post-likes', user?.id],
+  const { data: likedPosts = [] } = useQuery({
+    queryKey: ['post-likes', user?.id, postIdsKey],
     queryFn: async () => {
       if (!user?.id) return [];
       
@@ -183,15 +191,19 @@ const Clubhouse = () => {
       }
     },
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(['post-likes', user?.id], (oldData: string[] | undefined) => {
-        if (!oldData) return variables.action === 'like' ? [variables.postId] : [];
-        
-        if (variables.action === 'like') {
-          return [...oldData, variables.postId];
-        } else {
-          return oldData.filter(id => id !== variables.postId);
+      // Update all post-likes queries for this user (handles varying postIds keys)
+      queryClient.setQueriesData(
+        { queryKey: ['post-likes', user?.id] },
+        (oldData: string[] | undefined) => {
+          if (!oldData) return variables.action === 'like' ? [variables.postId] : [];
+          
+          if (variables.action === 'like') {
+            return [...oldData, variables.postId];
+          } else {
+            return oldData.filter(id => id !== variables.postId);
+          }
         }
-      });
+      );
     },
     onError: (error) => {
       console.error('Like/unlike error:', error);
