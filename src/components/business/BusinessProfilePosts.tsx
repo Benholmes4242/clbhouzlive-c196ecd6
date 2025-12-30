@@ -24,8 +24,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getStreamPoster } from '@/utils/stream';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { MediaItem } from '@/types/media';
 
 interface BusinessProfilePostsProps {
   businessId: string;
@@ -246,7 +244,6 @@ interface LinkedInPostCardProps {
 
 function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 }: LinkedInPostCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const primaryMedia = post.post_media?.[0];
   const isVideo = primaryMedia?.media_type === 'video';
   const hasMultipleMedia = (post.post_media?.length || 0) > 1;
@@ -274,18 +271,6 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
   const thumbnailUrl = isVideo 
     ? (primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600))
     : primaryMedia?.media_url;
-
-  // Prepare media data for fullscreen modal
-  const mediaUrls = post.post_media?.map(m => m.media_url) || [];
-  const mediaTypes = post.post_media?.map(m => m.media_type as 'image' | 'video') || [];
-  const filterIds = post.post_media?.map(m => m.filter_id ?? null) || [];
-  const studioEdits = post.post_media?.map(m => m.studio_edits ?? null) || [];
-
-  const handleMediaClick = () => {
-    if (post.post_media && post.post_media.length > 0) {
-      setIsFullscreenOpen(true);
-    }
-  };
 
   return (
     <div className="border-b border-border/30 pb-2">
@@ -349,10 +334,7 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
 
       {/* Media - full bleed with negative margins to break out of parent px-5 */}
       {primaryMedia && (
-        <div 
-          className="relative -mx-5 cursor-pointer"
-          onClick={handleMediaClick}
-        >
+        <div className="relative -mx-5">
           {isVideo ? (
             <div className="relative aspect-[4/5] bg-muted">
               <img
@@ -393,20 +375,6 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
         <ActionButton icon={Repeat2} label="Repost" />
         <ActionButton icon={Send} label="Send" />
       </div>
-
-      {/* Fullscreen media modal with studioEdits for music playback */}
-      <FullscreenMediaModal
-        isOpen={isFullscreenOpen}
-        onClose={() => setIsFullscreenOpen(false)}
-        mediaUrl={mediaUrls}
-        mediaType={mediaTypes}
-        content={post.content}
-        displayName={businessName}
-        user={{ id: post.actor_id || post.user_id, displayName: businessName, profile_photo_url: businessLogo }}
-        postId={post.id}
-        filterIds={filterIds}
-        studioEdits={studioEdits}
-      />
     </div>
   );
 }

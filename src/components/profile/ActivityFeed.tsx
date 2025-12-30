@@ -60,7 +60,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   useRealtimePersonalPosts(userId);
   
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
+  const [modalStartIndex, setModalStartIndex] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
@@ -107,25 +107,33 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     [filteredPosts]
   );
 
-  // Handle post click - store selected post for modal
-  const handlePostPress = useCallback((postId: string) => {
-    const post = postsWithMedia.find(p => p.id === postId);
-    if (post) {
-      setSelectedPost(post);
-      setModalOpen(true);
-    }
+  // For lightbox - extract all media URLs and types
+  const allMediaData = useMemo(() => {
+    const urls: string[] = [];
+    const types: ('image' | 'video')[] = [];
+    
+    postsWithMedia.forEach(post => {
+      post.post_media.forEach(media => {
+        urls.push(media.media_url);
+        types.push(media.media_type);
+      });
+    });
+    
+    return { urls, types };
   }, [postsWithMedia]);
 
-  // Extract modal data from selected post only (not flattened across all posts)
-  const selectedPostMediaData = useMemo(() => {
-    if (!selectedPost) return null;
-    return {
-      urls: selectedPost.post_media.map(m => m.media_url),
-      types: selectedPost.post_media.map(m => m.media_type as 'image' | 'video'),
-      filterIds: selectedPost.post_media.map(m => m.filter_id ?? null),
-      studioEdits: selectedPost.post_media.map(m => m.studio_edits ?? null),
-    };
-  }, [selectedPost]);
+  // Handle post click - find the media index for lightbox
+  const handlePostPress = useCallback((postId: string) => {
+    let mediaIndex = 0;
+    for (const post of postsWithMedia) {
+      if (post.id === postId) {
+        setModalStartIndex(mediaIndex);
+        setModalOpen(true);
+        return;
+      }
+      mediaIndex += post.post_media.length;
+    }
+  }, [postsWithMedia]);
 
   return (
     <>
@@ -183,19 +191,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         onChange={setFilters}
       />
 
-      {/* Fullscreen Media Modal - only mount when open and we have a selected post */}
-      {modalOpen && selectedPostMediaData && (
+      {/* Fullscreen Media Modal - only mount when open to prevent pauseAllAndSetActive on initial render */}
+      {modalOpen && (
         <FullscreenMediaModal
           isOpen={modalOpen}
-          onClose={() => {
-            setModalOpen(false);
-            setSelectedPost(null);
-          }}
-          mediaUrl={selectedPostMediaData.urls}
-          mediaType={selectedPostMediaData.types}
-          filterIds={selectedPostMediaData.filterIds}
-          studioEdits={selectedPostMediaData.studioEdits}
-          initialIndex={0}
+          onClose={() => setModalOpen(false)}
+          mediaUrl={allMediaData.urls}
+          mediaType={allMediaData.types}
+          initialIndex={modalStartIndex}
         />
       )}
 

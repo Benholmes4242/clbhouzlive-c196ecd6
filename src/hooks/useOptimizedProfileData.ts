@@ -66,7 +66,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
           .from('posts')
           .select(`
             id, content, created_at, user_id,
-            post_media(id, media_type, media_url, filter_id, studio_edits)
+            post_media(id, media_type, media_url)
           `)
           .eq('user_id', userId)
           .order('created_at', { ascending: false })
