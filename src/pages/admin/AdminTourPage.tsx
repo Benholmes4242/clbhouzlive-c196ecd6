@@ -130,11 +130,16 @@ export function AdminTourPage() {
         .from('sr_sync_log')
         .select('*')
         .order('started_at', { ascending: false })
-        .limit(10);
+        .limit(50);
       if (error) throw error;
       return data as SyncLog[];
     },
   });
+
+  // Get latest sync status per endpoint type
+  const getLatestSyncForAction = (action: string) => {
+    return syncLogs?.find(log => log.sync_type === action);
+  };
 
   // Fetch players
   const { data: players } = useQuery({
@@ -584,6 +589,29 @@ export function AdminTourPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
+                      {/* Sync Status Indicator */}
+                      {(() => {
+                        const latestSync = getLatestSyncForAction(section.action);
+                        if (latestSync) {
+                          const isError = latestSync.status === 'error';
+                          const timeAgo = latestSync.completed_at 
+                            ? format(parseISO(latestSync.completed_at), 'MMM d, h:mm a')
+                            : 'pending';
+                          return (
+                            <div className={`text-xs text-right max-w-[180px] ${isError ? 'text-destructive' : 'text-muted-foreground'}`}>
+                              <div className="truncate">
+                                {isError ? '❌ ' : '✓ '}{timeAgo}
+                              </div>
+                              {isError && latestSync.error_message && (
+                                <div className="truncate text-[10px] opacity-75" title={latestSync.error_message}>
+                                  {latestSync.error_message}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                       <Badge variant="outline">
                         {counts?.[section.countKey as keyof typeof counts] || 0} records
                       </Badge>
