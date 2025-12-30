@@ -300,6 +300,8 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         totalPosts={userPosts.length}
         initialVideoPosition={currentMedia?.videoPosition}
         initialVideoMuted={currentMedia?.videoMuted}
+        filterIds={currentMedia?.filterIds}
+        studioEdits={currentMedia?.studioEdits}
         postId={post.id}
         onPostDeleted={() => {
           onDeletePost?.();

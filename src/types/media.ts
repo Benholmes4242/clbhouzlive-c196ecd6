@@ -32,6 +32,8 @@ export interface PostMediaContext {
   initialIndex?: number;
   videoPosition?: number;
   videoMuted?: boolean;
+  studioEdits?: (any | null)[];       // studio edits per media item (filter, music, etc.)
+  filterIds?: (string | null)[];      // filter IDs per media item
 }
 
 /** Raw DB row shape(s). Extend if needed. */
