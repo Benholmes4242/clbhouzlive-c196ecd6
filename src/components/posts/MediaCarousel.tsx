@@ -23,6 +23,10 @@ interface MediaCarouselProps {
   enableSwipe?: boolean;
   loop?: boolean;
   className?: string;
+  /** Force all videos to be muted (e.g., when music track is active) */
+  forceVideoMuted?: boolean;
+  /** Callback when user attempts to unmute while music is active */
+  onMuteBlocked?: () => void;
 }
 
 const MediaCarousel = ({ 
@@ -33,7 +37,9 @@ const MediaCarousel = ({
   coverIndex = 0,
   enableSwipe = true,
   loop = false,
-  className = '' 
+  className = '',
+  forceVideoMuted = false,
+  onMuteBlocked
 }: MediaCarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
@@ -214,6 +220,8 @@ const MediaCarousel = ({
               onVideoRef={registerVideoRef(activeIndex)}
               onSetCover={onSetCover}
               coverIndex={coverIndex}
+              forceVideoMuted={forceVideoMuted}
+              onMuteBlocked={onMuteBlocked}
             />
           );
         })()}

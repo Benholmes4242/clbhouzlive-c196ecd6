@@ -1,5 +1,8 @@
 // Upload job types
 
+// Audio mode for posts - music_only mutes original video audio
+export type AudioModePayload = 'original' | 'music_only';
+
 // Studio edits payload that can be persisted
 export interface StudioEditsPayload {
   filter?: string;
@@ -22,6 +25,7 @@ export interface StudioEditsPayload {
   }>;
   crop?: { ratio: string };
   rotate?: number;
+  audioMode?: AudioModePayload;
 }
 
 export type UploadJobStatus =
