@@ -75,14 +75,43 @@ export default function SoundtrackStrip({
       // Perform HEAD request to diagnose the issue
       try {
         const headResponse = await fetch(audioUrl, { method: 'HEAD' });
+        const contentType = headResponse.headers.get('content-type');
+        const contentLength = headResponse.headers.get('content-length');
+        
         console.error('[SoundtrackStrip] HEAD diagnostics:', {
           url: audioUrl,
           status: headResponse.status,
-          contentType: headResponse.headers.get('content-type'),
-          contentLength: headResponse.headers.get('content-length'),
+          contentType,
+          contentLength,
           acceptRanges: headResponse.headers.get('accept-ranges'),
           cors: headResponse.headers.get('access-control-allow-origin'),
         });
+        
+        // Fallback: if HEAD returns odd results (wrong content-type or blocked),
+        // try GET with Range header to confirm it's serving audio bytes
+        const isOddResponse = !contentType?.includes('audio') || 
+                              headResponse.status !== 200 ||
+                              contentType?.includes('html');
+        
+        if (isOddResponse) {
+          try {
+            const rangeResponse = await fetch(audioUrl, {
+              method: 'GET',
+              headers: { 'Range': 'bytes=0-1' }
+            });
+            const rangeBytes = await rangeResponse.arrayBuffer();
+            console.error('[SoundtrackStrip] GET Range fallback:', {
+              url: audioUrl,
+              status: rangeResponse.status,
+              contentType: rangeResponse.headers.get('content-type'),
+              contentRange: rangeResponse.headers.get('content-range'),
+              bytesReceived: rangeBytes.byteLength,
+              firstBytes: Array.from(new Uint8Array(rangeBytes)).map(b => b.toString(16).padStart(2, '0')).join(' '),
+            });
+          } catch (rangeErr) {
+            console.error('[SoundtrackStrip] GET Range fallback failed:', rangeErr);
+          }
+        }
       } catch (fetchErr) {
         console.error('[SoundtrackStrip] HEAD request failed:', fetchErr);
       }
