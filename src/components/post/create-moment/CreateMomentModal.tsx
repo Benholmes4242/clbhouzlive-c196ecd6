@@ -407,7 +407,15 @@ export default function CreateMomentModal({
       return;
     }
 
-    const files = media.map(item => item.file);
+    // Extract files from media items and filter out any undefined/null
+    const files = media.map(item => item.file).filter((f): f is File => f instanceof File);
+    
+    // CRITICAL: Validate we actually have files to upload
+    if (files.length === 0) {
+      console.error('[CreateMomentModal] No valid files found in media items');
+      // Don't close modal - show error instead
+      return;
+    }
     
     // Build full studio edits including filter, music, and audioMode
     const studioEditsByMediaId = media.reduce((acc, item) => {
@@ -431,23 +439,28 @@ export default function CreateMomentModal({
       return acc;
     }, {} as Record<string, { filter?: string; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; audioMode?: 'original' | 'music_only' }>);
     
-    // Enqueue upload and close immediately
-    enqueuePostUpload({
-      userId: user.id,
-      actorType: activeActor?.type === 'business' ? 'business' : 'personal',
-      actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
-      caption,
-      courseInfo: course ? { id: course.id, name: course.name, country: course.country || '' } : undefined,
-      selectedTags,
-      files,
-      mediaItems: media,
-      studioEditsByMediaId,
-      categories: selectedCategories,
-      visibility,
-    });
-    
-    clearDraft();
-    onClose();
+    try {
+      // Enqueue upload and close immediately
+      enqueuePostUpload({
+        userId: user.id,
+        actorType: activeActor?.type === 'business' ? 'business' : 'personal',
+        actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+        caption,
+        courseInfo: course ? { id: course.id, name: course.name, country: course.country || '' } : undefined,
+        selectedTags,
+        files,
+        mediaItems: media,
+        studioEditsByMediaId,
+        categories: selectedCategories,
+        visibility,
+      });
+      
+      clearDraft();
+      onClose();
+    } catch (error) {
+      console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
+      // Don't close modal on error - let user retry
+    }
   };
 
   // Restore draft handler
