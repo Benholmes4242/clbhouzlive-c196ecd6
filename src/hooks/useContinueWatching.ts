@@ -70,7 +70,9 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
               media_type,
               media_url,
               duration_seconds,
-              poster_url
+              poster_url,
+              filter_id,
+              studio_edits
             ),
             post_likes(count),
             post_views(count)

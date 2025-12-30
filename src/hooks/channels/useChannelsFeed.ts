@@ -73,7 +73,9 @@ export const useChannelsFeed = ({ subFilter = 'all' }: UseChannelsFeedProps = {}
             poster_url,
             stream_id,
             width,
-            height
+            height,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,

@@ -114,7 +114,9 @@ export const useRelatedLongFormVideos = (
         post_media!inner(
           media_url,
           duration_seconds,
-          poster_url
+          poster_url,
+          filter_id,
+          studio_edits
         ),
         post_tags(
           taggable_entities(
