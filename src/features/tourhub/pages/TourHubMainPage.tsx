@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { TourHubShell } from '../components/TourHubShell';
+import { TourHubHeader } from '../components/TourHubHeader';
 import { TourHubTabs, type TourHubTab } from '../components/TourHubTabs';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { OverviewTab, ScheduleTab, PlayersTab, PlayerStatsTab } from '../components/tabs';
-import { useSearchParams } from 'react-router-dom';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
+  
+  // Sync tab with URL
+  useEffect(() => {
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   
   const handleTabChange = (tab: TourHubTab) => {
     setActiveTab(tab);
@@ -40,10 +48,7 @@ export function TourHubMainPage() {
   
   return (
     <TourHubShell>
-      <header className="pt-6 pb-4">
-        <h1 className="text-2xl font-bold text-foreground">Tour Hub</h1>
-        <p className="text-muted-foreground mt-1">PGA Tour • 2025 Season</p>
-      </header>
+      <TourHubHeader />
       
       <TourHubTabs activeTab={activeTab} onTabChange={handleTabChange} className="mb-6" />
       
