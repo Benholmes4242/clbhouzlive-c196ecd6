@@ -1,5 +1,29 @@
 // Upload job types
 
+// Studio edits payload that can be persisted
+export interface StudioEditsPayload {
+  filter?: string;
+  music?: {
+    trackId: string;
+    title: string;
+    artist?: string;
+    url: string;
+    startAt?: number;
+    volume?: number;
+  } | null;
+  textOverlays?: Array<{
+    id: string;
+    text: string;
+    x: number;
+    y: number;
+    scale: number;
+    style: string;
+    color?: string;
+  }>;
+  crop?: { ratio: string };
+  rotate?: number;
+}
+
 export type UploadJobStatus =
   | 'queued'
   | 'creating_post'
@@ -31,7 +55,7 @@ export interface UploadJob {
   } | null;
   selectedTags?: any[];
   mediaItems?: Array<{ id: string; file: File }>;
-  studioEditsByMediaId?: Record<string, { filter?: string }>;
+  studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   
   // v2 fields
   categories?: string[];
@@ -60,7 +84,7 @@ export interface UploadJobInput {
   selectedTags?: any[];
   files: File[];
   mediaItems?: Array<{ id: string; file: File }>;
-  studioEditsByMediaId?: Record<string, { filter?: string }>;
+  studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   // New v2 fields
   categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';

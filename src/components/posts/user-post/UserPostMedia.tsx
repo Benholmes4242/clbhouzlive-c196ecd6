@@ -5,6 +5,7 @@ import CoursePostBadge from '../CoursePostBadge';
 import { PostMedia, GolfCourse } from './types';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
+import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 
 interface UserPostMediaProps {
   media: PostMedia[];
@@ -28,10 +29,14 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     const filterId = mediaItem.filter_id || (mediaItem.studio_edits as any)?.filter;
     const filterClass = getFilterClass(filterId);
     
+    // Get music from studio_edits
+    const music = (mediaItem.studio_edits as any)?.music;
+    
     console.log('[Feed] slide filter', {
       postMediaId: mediaItem.id,
       filterId,
       filterClass,
+      hasMusic: !!music,
     });
     
     return (
@@ -70,6 +75,23 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
             enableHLS={true}
             onClick={() => onMediaClick(mediaItem.media_url, 'video')}
           />
+        )}
+
+        {/* Soundtrack strip with playback - bottom left */}
+        {music?.url && (
+          <div className="absolute bottom-2 left-2 z-10 max-w-[180px]">
+            <SoundtrackStrip 
+              music={{
+                trackId: music.trackId,
+                title: music.title,
+                artist: music.artist,
+                url: music.url,
+                startAt: music.startAt,
+                volume: music.volume,
+              }}
+              variant="published"
+            />
+          </div>
         )}
       </div>
     );
