@@ -50,10 +50,19 @@ export default function SoundtrackStrip({
       return;
     }
 
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous'; // Required for CORS audio
+    audio.preload = 'metadata';
     audio.volume = music.volume ?? 0.8;
-    audio.currentTime = music.startAt ?? 0;
+    audio.src = audioUrl; // Set src after crossOrigin
     audioRef.current = audio;
+    
+    // Set startAt after audio is loadable
+    audio.addEventListener('loadedmetadata', () => {
+      if (music.startAt && music.startAt > 0) {
+        audio.currentTime = music.startAt;
+      }
+    }, { once: true });
 
     // Add detailed error logging with network diagnostics
     audio.onerror = async (e) => {
