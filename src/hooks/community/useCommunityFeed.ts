@@ -95,7 +95,7 @@ export function useCommunityFeed({
         .from('posts')
         .select(`
           id, content, created_at, user_id,
-          post_media (id, media_type, media_url, duration_seconds, width, height)
+          post_media (id, media_type, media_url, duration_seconds, width, height, filter_id, studio_edits)
         `)
         .in('user_id', Array.from(communityIds));
 

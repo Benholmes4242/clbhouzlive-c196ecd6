@@ -211,11 +211,17 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           media.filter_id || (media.studio_edits as any)?.filter || null
         );
 
+        // Extract studio edits (music, etc.) for FullscreenMediaModal
+        const studioEdits = (selectedPost.post_media || []).map(media => 
+          media.studio_edits ?? null
+        );
+
         console.log('🚨 SOCIAL ACTIVITY MODAL RENDERING!', {
           postId: selectedPost.id,
           mediaCount: mediaItems.length,
           mediaUrls: mediaItems.map(m => m.url),
-          mediaTypes: mediaItems.map(m => m.type)
+          mediaTypes: mediaItems.map(m => m.type),
+          hasMusic: studioEdits.some(ed => (ed as any)?.music)
         });
 
         return (
@@ -225,6 +231,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
             mediaUrl={mediaItems.map(m => m.url)}
             mediaType={mediaItems.map(m => m.type)}
             filterIds={filterIds}
+            studioEdits={studioEdits}
             initialIndex={0}
             alt={`Post media`}
             golfCourse={(() => {
