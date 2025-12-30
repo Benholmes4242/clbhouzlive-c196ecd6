@@ -211,6 +211,9 @@ async function processJob(jobId: string): Promise<void> {
         const filterId = edits?.filter ?? null;
 
         // Create media record with stream_id and poster_url for videos
+        // Cast studio_edits to Json type for Supabase
+        const studioEditsJson = edits ? JSON.parse(JSON.stringify(edits)) : null;
+        
         const { data: mediaRecord, error: mediaError } = await supabase
           .from('post_media')
           .insert({
@@ -218,7 +221,7 @@ async function processJob(jobId: string): Promise<void> {
             media_type: mediaType,
             media_url: publicUrl,
             display_order: index,
-            studio_edits: edits || null,
+            studio_edits: studioEditsJson,
             filter_id: filterId,
             stream_id: streamId,
             poster_url: posterUrl,

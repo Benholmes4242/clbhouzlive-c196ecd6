@@ -19,6 +19,7 @@ export type StudioEdits = {
     trackId: string;
     title: string;
     artist?: string;
+    url: string;       // audio file URL
     startAt?: number;  // seconds
     volume?: number;   // 0..1
   } | null;

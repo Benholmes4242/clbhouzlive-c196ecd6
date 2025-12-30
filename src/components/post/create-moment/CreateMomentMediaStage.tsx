@@ -5,6 +5,7 @@ import MediaCarousel from "@/components/posts/MediaCarousel";
 import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
 import { StudioEdits } from "@/types/studio";
 import MediaThumbnailStrip from "./MediaThumbnailStrip";
+import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
@@ -115,6 +116,22 @@ export default function CreateMomentMediaStage({
             </div>
           </div>
         )}
+
+        {/* Soundtrack strip - bottom right when music is selected */}
+        {currentItem && (() => {
+          const edits = getEdits(currentItem.id);
+          if (edits?.music?.url) {
+            return (
+              <div className="absolute bottom-[8px] right-4 z-20 max-w-[200px]">
+                <SoundtrackStrip 
+                  music={edits.music as { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }}
+                  variant="preview"
+                />
+              </div>
+            );
+          }
+          return null;
+        })()}
 
         {/* Navigation dots - centered bottom */}
         <MediaNavigationDots

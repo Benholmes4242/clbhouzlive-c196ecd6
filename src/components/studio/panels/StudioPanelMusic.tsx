@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Search, TrendingUp, Mic, Bookmark } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Search, Play, Pause, Music2, Volume2 } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
+import { MUSIC_LIBRARY, MUSIC_CATEGORIES, MusicTrack } from '@/lib/musicLibrary';
 
 type StudioPanelMusicProps = {
   edits: StudioEdits;
@@ -9,122 +10,270 @@ type StudioPanelMusicProps = {
   onReset: () => void;
 };
 
-const MOCK_TRACKS = [
-  { id: '1', title: 'Summer Vibes', artist: 'Artist One', duration: '3:24', url: '/audio/track1.mp3' },
-  { id: '2', title: 'Chill Beat', artist: 'Artist Two', duration: '2:45', url: '/audio/track2.mp3' },
-  { id: '3', title: 'Uplifting', artist: 'Artist Three', duration: '4:12', url: '/audio/track3.mp3' },
-];
-
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
-  const [activeTab, setActiveTab] = useState<'foryou' | 'trending' | 'original' | 'saved'>('foryou');
-  const [selectedTrack, setSelectedTrack] = useState(edits?.music?.trackId || '');
-  const [volume, setVolume] = useState((edits?.music?.volume ?? 0.9) * 100);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
+  const [volume, setVolume] = useState((edits?.music?.volume ?? 0.8) * 100);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleSelectTrack = (track: typeof MOCK_TRACKS[0]) => {
+  // Filter tracks by category and search
+  const filteredTracks = MUSIC_LIBRARY.filter(track => {
+    const matchesCategory = activeCategory === 'all' || track.category === activeCategory;
+    const matchesSearch = !searchQuery || 
+      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      track.artist.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  // Handle preview playback
+  useEffect(() => {
+    return () => {
+      // Cleanup audio on unmount
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handlePreviewToggle = (track: MusicTrack) => {
+    if (previewingTrack === track.id) {
+      // Stop preview
+      audioRef.current?.pause();
+      setPreviewingTrack(null);
+    } else {
+      // Start new preview
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      const audio = new Audio(track.url);
+      audio.volume = volume / 100;
+      audio.play().catch(console.error);
+      audio.addEventListener('ended', () => setPreviewingTrack(null));
+      audioRef.current = audio;
+      setPreviewingTrack(track.id);
+    }
+  };
+
+  const handleSelectTrack = (track: MusicTrack) => {
     setSelectedTrack(track.id);
+    // Stop any preview
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setPreviewingTrack(null);
+    }
     updateEdits({
       music: {
         trackId: track.id,
         title: track.title,
         artist: track.artist,
+        url: track.url,
         startAt: 0,
         volume: volume / 100
       }
     });
   };
 
+  const handleVolumeChange = (v: number) => {
+    setVolume(v);
+    if (audioRef.current) {
+      audioRef.current.volume = v / 100;
+    }
+    if (edits?.music) {
+      updateEdits({ music: { ...edits.music, volume: v / 100 } });
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Search */}
-      <div className="p-4 border-b border-zinc-200">
+      <div 
+        className="p-4"
+        style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
+      >
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+          <Search 
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" 
+            style={{ color: 'var(--cm-text-tertiary)' }}
+          />
           <input
             type="text"
             placeholder="Search music..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-zinc-200 focus:outline-none focus:border-[rgba(255,156,64,0.5)]"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none"
+            style={{ 
+              background: 'var(--cm-surface-alt)',
+              border: '1px solid var(--cm-border-subtle)',
+              color: 'var(--cm-text-primary)',
+            }}
           />
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 px-4 py-3 border-b border-zinc-200 overflow-x-auto">
-        {[
-          { key: 'foryou', label: 'For you', icon: null },
-          { key: 'trending', label: 'Trending', icon: <TrendingUp className="w-4 h-4" /> },
-          { key: 'original', label: 'Original', icon: <Mic className="w-4 h-4" /> },
-          { key: 'saved', label: 'Saved', icon: <Bookmark className="w-4 h-4" /> },
-        ].map(tab => (
+      {/* Category Tabs */}
+      <div 
+        className="flex gap-2 px-4 py-3 overflow-x-auto"
+        style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
+      >
+        {MUSIC_CATEGORIES.map(cat => (
           <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key as any)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              activeTab === tab.key
-                ? 'bg-zinc-900 text-white'
-                : 'bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50'
-            }`}
+            key={cat.key}
+            onClick={() => setActiveCategory(cat.key)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors"
+            style={{
+              background: activeCategory === cat.key ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+              color: activeCategory === cat.key ? 'white' : 'var(--cm-text-secondary)',
+              border: activeCategory === cat.key ? 'none' : '1px solid var(--cm-border-subtle)',
+            }}
           >
-            {tab.icon}
-            {tab.label}
+            {cat.label}
           </button>
         ))}
       </div>
 
       {/* Track list */}
       <div className="flex-1 overflow-y-auto">
-        {MOCK_TRACKS.map(track => (
-          <button
-            key={track.id}
-            onClick={() => handleSelectTrack(track)}
-            className={`w-full px-4 py-3 flex items-center justify-between border-b border-zinc-100 hover:bg-zinc-50 transition-colors ${
-              selectedTrack === track.id ? 'bg-zinc-50' : ''
-            }`}
-          >
-            <div className="flex-1 text-left">
-              <div className="font-medium text-zinc-900">{track.title}</div>
-              <div className="text-sm text-zinc-500">{track.artist}</div>
+        {filteredTracks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <Music2 
+              className="w-12 h-12 mb-3" 
+              style={{ color: 'var(--cm-text-tertiary)' }} 
+            />
+            <p 
+              className="text-sm text-center"
+              style={{ color: 'var(--cm-text-secondary)' }}
+            >
+              No tracks found
+            </p>
+          </div>
+        ) : (
+          filteredTracks.map(track => (
+            <div
+              key={track.id}
+              className="px-4 py-3 flex items-center gap-3 transition-colors cursor-pointer"
+              style={{ 
+                borderBottom: '1px solid var(--cm-border-subtle)',
+                background: selectedTrack === track.id ? 'var(--cm-surface-alt)' : 'transparent',
+              }}
+              onClick={() => handleSelectTrack(track)}
+            >
+              {/* Preview button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePreviewToggle(track);
+                }}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                style={{ 
+                  background: previewingTrack === track.id ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                }}
+              >
+                {previewingTrack === track.id ? (
+                  <Pause className="w-4 h-4 text-white" />
+                ) : (
+                  <Play 
+                    className="w-4 h-4 ml-0.5" 
+                    style={{ color: 'var(--cm-text-primary)' }}
+                  />
+                )}
+              </button>
+
+              {/* Track info */}
+              <div className="flex-1 min-w-0">
+                <div 
+                  className="font-medium truncate"
+                  style={{ color: 'var(--cm-text-primary)' }}
+                >
+                  {track.title}
+                </div>
+                <div 
+                  className="text-sm truncate"
+                  style={{ color: 'var(--cm-text-secondary)' }}
+                >
+                  {track.artist}
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div 
+                className="text-sm flex-shrink-0"
+                style={{ color: 'var(--cm-text-tertiary)' }}
+              >
+                {track.duration}
+              </div>
+
+              {/* Selected indicator */}
+              {selectedTrack === track.id && (
+                <div 
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ background: 'var(--cm-surface-slate)' }}
+                />
+              )}
             </div>
-            <div className="text-sm text-zinc-400">{track.duration}</div>
-          </button>
-        ))}
+          ))
+        )}
       </div>
 
-      {/* Controls */}
+      {/* Volume control when track selected */}
       {selectedTrack && (
-        <div className="p-4 border-t border-zinc-200 bg-white space-y-3">
-          <div>
-            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Volume</label>
+        <div 
+          className="p-4 space-y-3"
+          style={{ 
+            borderTop: '1px solid var(--cm-border-subtle)',
+            background: 'var(--cm-surface-card)',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <Volume2 
+              className="w-4 h-4 flex-shrink-0" 
+              style={{ color: 'var(--cm-text-secondary)' }}
+            />
             <input
               type="range"
               min="0"
               max="100"
               value={volume}
-              onChange={(e) => {
-                const v = parseInt(e.target.value);
-                setVolume(v);
-                if (edits?.music) {
-                  updateEdits({ music: { ...edits.music, volume: v / 100 } });
-                }
-              }}
-              className="w-full"
+              onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
+              className="flex-1"
+              style={{ accentColor: 'var(--cm-surface-slate)' }}
             />
-            <div className="text-xs text-zinc-500 mt-1">{volume}%</div>
+            <span 
+              className="text-xs w-8 text-right"
+              style={{ color: 'var(--cm-text-tertiary)' }}
+            >
+              {volume}%
+            </span>
           </div>
         </div>
       )}
 
       {/* Actions */}
-      <div className="p-4 border-t border-zinc-200 flex gap-3">
+      <div 
+        className="p-4 flex gap-3"
+        style={{ borderTop: '1px solid var(--cm-border-subtle)' }}
+      >
         <button
           onClick={onReset}
-          className="flex-1 py-2.5 rounded-lg border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
+          className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
+          style={{ 
+            background: 'var(--cm-surface-alt)',
+            border: '1px solid var(--cm-border-subtle)',
+            color: 'var(--cm-text-primary)',
+          }}
         >
           Reset
         </button>
         <button
           onClick={onApply}
           disabled={!selectedTrack}
-          className="flex-1 py-2.5 rounded-lg bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-2.5 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ 
+            background: 'var(--cm-surface-slate)',
+            color: 'white',
+          }}
         >
           Apply
         </button>
