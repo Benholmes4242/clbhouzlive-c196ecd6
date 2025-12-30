@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState, useId } from 'react';
+import React, { useEffect, useRef, useState, useId, useMemo } from 'react';
 import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 
 interface FullscreenVideoModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface FullscreenVideoModalProps {
       username?: string;
     };
     content?: string;
+    studioEdits?: (any | null)[];
   } | null;
 }
 
@@ -30,6 +32,25 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const mediaId = useId();
+
+  // Detect if post has music from studioEdits - Option A enforcement
+  const { postHasMusic, activeMusic } = useMemo(() => {
+    const studioEdits = videoData?.studioEdits ?? [];
+    const hasMusic = studioEdits.some(ed => {
+      const music = (ed as any)?.music;
+      return !!(music?.url || music?.r2Key);
+    });
+    const music = studioEdits
+      .map(ed => (ed as any)?.music)
+      .find(m => m?.url || m?.r2Key) ?? null;
+    
+    // Debug log only when playable URL exists
+    if (music?.url) {
+      console.log('[FullscreenVideoModal] music detected', { postHasMusic: hasMusic, activeMusic: music });
+    }
+    
+    return { postHasMusic: hasMusic, activeMusic: music };
+  }, [videoData?.studioEdits]);
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -57,8 +78,9 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
     }
   };
 
-  // Toggle mute
+  // Toggle mute - disabled when music exists (Option A)
   const toggleMute = () => {
+    if (postHasMusic) return; // Option A: can't unmute video when music exists
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
       setIsMuted(videoRef.current.muted);
@@ -106,7 +128,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
             className="w-full h-full object-contain"
             autoPlay
             loop
-            muted={isMuted}
+            muted={postHasMusic ? true : isMuted}
             playsInline
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
@@ -131,19 +153,21 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
                 </div>
               </div>
 
-              {/* Volume control */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-white/10"
-                onClick={toggleMute}
-              >
-                {isMuted ? (
-                  <VolumeX className="h-5 w-5" />
-                ) : (
-                  <Volume2 className="h-5 w-5" />
-                )}
-              </Button>
+              {/* Volume control - hidden when music exists (Option A) */}
+              {!postHasMusic && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10"
+                  onClick={toggleMute}
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-5 w-5" />
+                  ) : (
+                    <Volume2 className="h-5 w-5" />
+                  )}
+                </Button>
+              )}
             </div>
 
             {/* Center play/pause button */}
@@ -171,6 +195,24 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
               </div>
             )}
           </div>
+          
+          {/* SoundtrackStrip for music posts - Option A: music controls audio */}
+          {activeMusic && (
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 max-w-[240px]">
+              <SoundtrackStrip 
+                music={{
+                  trackId: activeMusic.trackId || '',
+                  title: activeMusic.title || 'Unknown Track',
+                  artist: activeMusic.artist,
+                  r2Key: activeMusic.r2Key,
+                  url: activeMusic.url,
+                  startAt: activeMusic.startAt,
+                  volume: activeMusic.volume
+                }}
+                variant="published"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

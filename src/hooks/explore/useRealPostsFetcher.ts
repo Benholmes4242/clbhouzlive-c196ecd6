@@ -69,7 +69,9 @@ export const useRealPostsFetcher = () => {
             height,
             aspect_ratio,
             orientation,
-            duration_seconds
+            duration_seconds,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,
@@ -437,7 +439,9 @@ export const useRealPostsFetcher = () => {
             aspect_ratio,
             media_width,
             media_height,
-            image_orientation
+            image_orientation,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,
@@ -618,7 +622,9 @@ export const useRealPostsFetcher = () => {
             aspect_ratio,
             media_width,
             media_height,
-            image_orientation
+            image_orientation,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,

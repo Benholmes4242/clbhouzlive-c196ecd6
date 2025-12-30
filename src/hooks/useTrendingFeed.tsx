@@ -53,7 +53,7 @@ export const useTrendingFeed = () => {
           created_at,
           user_id,
           actor_type,
-          post_media!inner(id, media_type, media_url)
+          post_media!inner(id, media_type, media_url, filter_id, studio_edits)
         `)
         .in('user_id', allConnectedUserIds)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts

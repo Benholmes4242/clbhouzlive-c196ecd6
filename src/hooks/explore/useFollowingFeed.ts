@@ -49,7 +49,7 @@ export function useFollowingFeed(pageSize = 12) {
         .from('posts')
         .select(`
           id, content, created_at, user_id,
-          post_media!inner (id, media_type, media_url, duration_seconds, width, height)
+          post_media!inner (id, media_type, media_url, duration_seconds, width, height, filter_id, studio_edits)
         `)
         .in('user_id', followedIds)
         .eq('post_media.media_type', 'video')
@@ -64,7 +64,7 @@ export function useFollowingFeed(pageSize = 12) {
         .from('posts')
         .select(`
           id, content, created_at, user_id,
-          post_media!inner (id, media_type, media_url, width, height)
+          post_media!inner (id, media_type, media_url, width, height, filter_id, studio_edits)
         `)
         .in('user_id', followedIds)
         .eq('post_media.media_type', 'image')
