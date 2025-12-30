@@ -128,8 +128,8 @@ export default function StudioShelf({
             {/* Tool Rail */}
             <StudioToolRail activeTool={activeTool} setActiveTool={setActiveTool} />
 
-            {/* Tool Panels */}
-            <div className="flex-1 overflow-hidden">
+            {/* Tool Panels - scrollable area with min-h-0 for proper flex scroll */}
+            <div className="flex-1 min-h-0 overflow-hidden">
               <AnimatePresence mode="wait">
                 {activeTool === 'music' && (
                   <motion.div

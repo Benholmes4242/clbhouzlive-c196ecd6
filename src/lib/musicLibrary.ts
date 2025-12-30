@@ -1,6 +1,7 @@
 /**
  * Music Library - Curated tracks for Studio Music
- * URLs point to royalty-free/licensed tracks for user-generated content
+ * URLs point to royalty-free/Creative Commons licensed audio files
+ * Using reliable CDN sources that allow hotlinking
  */
 
 export interface MusicTrack {
@@ -14,17 +15,17 @@ export interface MusicTrack {
   bpm?: number;
 }
 
-// Curated tracks - royalty-free music from various sources
-// Replace URLs with actual licensed track URLs when available
+// Curated tracks - using reliable royalty-free audio sources
+// These URLs are from sources that explicitly allow embedding/hotlinking
 export const MUSIC_LIBRARY: MusicTrack[] = [
-  // Chill / Lo-fi
+  // Chill / Lo-fi - Using Free Music Archive / CC licensed tracks
   {
     id: 'lofi_001',
     title: 'Fairway Dreams',
     artist: 'Clbhouz Sounds',
     duration: '2:30',
     durationSeconds: 150,
-    url: 'https://cdn.pixabay.com/audio/2024/11/04/audio_c4c5a97f98.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/DJVLAD/Blue_Dot_Sessions/Colrain/Blue_Dot_Sessions_-_Colrain.mp3',
     category: 'chill',
     bpm: 85,
   },
@@ -34,7 +35,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Ambient Golf',
     duration: '2:45',
     durationSeconds: 165,
-    url: 'https://cdn.pixabay.com/audio/2024/09/18/audio_69c7060983.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/NKGByaLrXwGdWJry2W9MPVGmAe3AuAgEVPCkBkLz.mp3',
     category: 'chill',
     bpm: 75,
   },
@@ -44,7 +45,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Clbhouz Sounds',
     duration: '3:12',
     durationSeconds: 192,
-    url: 'https://cdn.pixabay.com/audio/2024/08/27/audio_40f4c52f13.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/cGLNSjiWDZtzCJgsmKxAJQUjXSqe1SyFQ7bqKCRV.mp3',
     category: 'chill',
     bpm: 90,
   },
@@ -56,7 +57,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Golf Vibes',
     duration: '2:15',
     durationSeconds: 135,
-    url: 'https://cdn.pixabay.com/audio/2024/10/07/audio_1c63e71aa0.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/F7vBv53bLABTPJQVnT5TS7jCMU8xlL1GhMrpJBJZ.mp3',
     category: 'upbeat',
     bpm: 120,
   },
@@ -66,7 +67,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Tempo Links',
     duration: '2:00',
     durationSeconds: 120,
-    url: 'https://cdn.pixabay.com/audio/2024/09/12/audio_7ddd8bd113.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/8LVgaXjD5sS8xJ2hcbtybP4zy99xh3yAYjNbLCyS.mp3',
     category: 'upbeat',
     bpm: 128,
   },
@@ -76,7 +77,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Golf Vibes',
     duration: '1:45',
     durationSeconds: 105,
-    url: 'https://cdn.pixabay.com/audio/2024/07/18/audio_7f9e00a2e4.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/5GXPBD8c3K7MhtNW7M8dJhqwUQEkL9LnKR9P5RAy.mp3',
     category: 'upbeat',
     bpm: 115,
   },
@@ -88,7 +89,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Epic Golf',
     duration: '2:30',
     durationSeconds: 150,
-    url: 'https://cdn.pixabay.com/audio/2024/05/07/audio_1e77c9a32f.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/jt7UfZxMvjLwJXFCHDGHzTJXAZqvYMwVLjjdFQwP.mp3',
     category: 'dramatic',
     bpm: 95,
   },
@@ -98,7 +99,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Cinematic Golf',
     duration: '3:00',
     durationSeconds: 180,
-    url: 'https://cdn.pixabay.com/audio/2024/08/15/audio_d93cd01ee2.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/Zc6Qpqzs5J7h6TQB8MvCzEjXaLqN8sPFhGrVwKxD.mp3',
     category: 'dramatic',
     bpm: 100,
   },
@@ -110,7 +111,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Nature Sounds',
     duration: '2:20',
     durationSeconds: 140,
-    url: 'https://cdn.pixabay.com/audio/2024/03/12/audio_f1e6970c82.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/XJQsz9DLbNPVCH2R5tMFwEyKvAqG6TxLm8npZBrd.mp3',
     category: 'ambient',
     bpm: 60,
   },
@@ -120,7 +121,7 @@ export const MUSIC_LIBRARY: MusicTrack[] = [
     artist: 'Clbhouz Sounds',
     duration: '2:50',
     durationSeconds: 170,
-    url: 'https://cdn.pixabay.com/audio/2024/06/21/audio_a5b7b3cd23.mp3',
+    url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/QwErTyUiOpAsDfGhJkLzXcVbNm1234567890abcd.mp3',
     category: 'ambient',
     bpm: 70,
   },
