@@ -64,6 +64,19 @@ export interface MomentPost {
   date: string;
   likesCount: number;
   commentsCount: number;
+  studioEdits?: {
+    textOverlays?: Array<{
+      id: string;
+      text: string;
+      x: number;
+      y: number;
+      scale: number;
+      style: 'modern' | 'classic' | 'signature';
+      color?: string;
+    }>;
+    filter?: string;
+    music?: any;
+  };
 }
 
 export interface Trophy {

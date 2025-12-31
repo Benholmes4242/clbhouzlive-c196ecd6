@@ -417,10 +417,17 @@ export default function CreateMomentModal({
       return;
     }
     
-    // Build full studio edits including filter, music, and audioMode
+    // Build full studio edits including filter, music, audioMode, and textOverlays
     const studioEditsByMediaId = media.reduce((acc, item) => {
       const edits = getEdits?.(item.id);
-      if (edits && (edits.filter || edits.music || edits.audioMode)) {
+      const hasEdits = !!edits && (
+        !!edits.filter || 
+        !!edits.music || 
+        !!edits.audioMode || 
+        (edits.textOverlays?.length ?? 0) > 0
+      );
+      
+      if (hasEdits) {
         acc[item.id] = {
           ...(edits.filter && { filter: edits.filter }),
           ...(edits.music && { 
@@ -433,11 +440,12 @@ export default function CreateMomentModal({
               volume: edits.music.volume ?? 0.8,
             }
           }),
-          audioMode: edits.music ? 'music_only' as const : 'original' as const,
+          ...(edits.textOverlays?.length ? { textOverlays: edits.textOverlays } : {}),
+          audioMode: edits.music ? 'music_only' as const : (edits.audioMode ?? 'original' as const),
         };
       }
       return acc;
-    }, {} as Record<string, { filter?: string; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; audioMode?: 'original' | 'music_only' }>);
+    }, {} as Record<string, { filter?: string; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
     
     try {
       // Enqueue upload and close immediately

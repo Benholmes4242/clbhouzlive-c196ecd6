@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -7,6 +7,7 @@ import { MediaNavigationDots } from "@/components/posts/user-post/overlays/Media
 import { StudioEdits } from "@/types/studio";
 import MediaThumbnailStrip from "./MediaThumbnailStrip";
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
+import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
 import { useToast } from "@/hooks/use-toast";
 
 interface CreateMomentMediaStageProps {
@@ -99,6 +100,14 @@ export default function CreateMomentMediaStage({
           forceVideoMuted={hasMusic}
           onMuteBlocked={handleMuteBlocked}
         />
+
+        {/* Text overlays for current media */}
+        {currentItem && (
+          <TextOverlayRenderer
+            textOverlays={getEdits(currentItem.id)?.textOverlays ?? []}
+            isEditable={false}
+          />
+        )}
 
         {/* Top scrim for badges */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent z-10" />

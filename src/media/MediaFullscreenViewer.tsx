@@ -20,6 +20,7 @@ import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
 import { useMediaSystemSafe } from './MediaSystemProvider';
 import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
 import { MediaRuntime } from './runtime/MediaRuntime';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 // Warm pool size: preload ±1 adjacent videos
 const WARM_POOL_SIZE = 1;
@@ -44,6 +45,19 @@ export interface MediaFullscreenItem {
     id: string;
     name: string;
     country?: string;
+  };
+  studioEdits?: {
+    textOverlays?: Array<{
+      id: string;
+      text: string;
+      x: number;
+      y: number;
+      scale: number;
+      style: 'modern' | 'classic' | 'signature';
+      color?: string;
+    }>;
+    filter?: string;
+    music?: any;
   };
 }
 
@@ -258,6 +272,14 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             draggable={false}
           />
         )}
+        
+        {/* Text overlays from studioEdits */}
+        {currentItem.studioEdits?.textOverlays?.length ? (
+          <TextOverlayRenderer
+            textOverlays={currentItem.studioEdits.textOverlays}
+            isEditable={false}
+          />
+        ) : null}
         
         {/* Hidden Warm Pool: Previous Item (for instant navigation) */}
         {prevItem?.type === 'video' && (

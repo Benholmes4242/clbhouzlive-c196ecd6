@@ -10,6 +10,7 @@ import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin } from 'luci
 import { format } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface MomentFullscreenViewerProps {
   moments: MomentPost[];
@@ -123,6 +124,14 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
                 className="max-w-full max-h-full object-contain"
               />
             )}
+            
+            {/* Text overlays from studioEdits */}
+            {currentMoment.studioEdits?.textOverlays?.length ? (
+              <TextOverlayRenderer
+                textOverlays={currentMoment.studioEdits.textOverlays}
+                isEditable={false}
+              />
+            ) : null}
           </div>
 
           {/* Bottom Info Overlay */}

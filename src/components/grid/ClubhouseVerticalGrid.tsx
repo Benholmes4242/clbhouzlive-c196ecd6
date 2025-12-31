@@ -37,6 +37,7 @@ import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { logFirstCardRender } from '@/utils/bootTimeline';
 
 import { ClubhouseMusicPlayer } from '@/components/clubhouse/ClubhouseMusicPlayer';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -694,6 +695,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         />
                       </div>
                     )}
+                    
+                    {/* Text overlays from studio_edits */}
+                    {studioEdits?.textOverlays?.length > 0 && (
+                      <TextOverlayRenderer
+                        textOverlays={studioEdits.textOverlays}
+                        isEditable={false}
+                      />
+                    )}
                   </>
                 ) : (
                   <div className="relative w-full h-full bg-black overflow-hidden">
@@ -711,6 +720,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                       }}
                     />
+                    
+                    {/* Text overlays from studio_edits */}
+                    {studioEdits?.textOverlays?.length > 0 && (
+                      <TextOverlayRenderer
+                        textOverlays={studioEdits.textOverlays}
+                        isEditable={false}
+                      />
+                    )}
                     
                     <div 
                       className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"

@@ -20,6 +20,7 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 
@@ -545,6 +546,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                          />
                        </div>
                      )}
+                     {/* Text overlays from studio_edits */}
+                     {studioEdits?.textOverlays?.length > 0 && (
+                       <TextOverlayRenderer
+                         textOverlays={studioEdits.textOverlays}
+                         isEditable={false}
+                       />
+                     )}
                   </div>
                 ) : (
                   <div className="relative w-full h-full bg-media-loading">
@@ -557,6 +565,14 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                       }}
                     />
+                    
+                    {/* Text overlays from studio_edits */}
+                    {studioEdits?.textOverlays?.length > 0 && (
+                      <TextOverlayRenderer
+                        textOverlays={studioEdits.textOverlays}
+                        isEditable={false}
+                      />
+                    )}
                   </div>
                 )}
 
