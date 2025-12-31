@@ -117,7 +117,7 @@ export default function CreateMomentMediaStage({
                 previewUrl: item.previewUrl,
                 file: item.file,
                 alt: `Media item ${item.id}`,
-                filterId: edits?.filter
+                studioEdits: edits
               };
             })}
             initialIndex={activeIndex}

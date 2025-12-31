@@ -7,6 +7,8 @@ import { useToast } from '@/hooks/use-toast';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
+import { StudioEdits } from '@/types/studio';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 
 interface CarouselSlideProps {
   item: {
@@ -16,7 +18,6 @@ interface CarouselSlideProps {
     url?: string;
     file?: File;
     alt?: string;
-    filterId?: string;
   };
   index?: number;
   isActive: boolean;
@@ -27,6 +28,8 @@ interface CarouselSlideProps {
   forceVideoMuted?: boolean;
   /** Callback when user attempts to unmute while music is active */
   onMuteBlocked?: () => void;
+  /** Full studio edits for this media */
+  studioEdits?: StudioEdits;
 }
 
 export default function CarouselSlide({ 
@@ -37,7 +40,8 @@ export default function CarouselSlide({
   onSetCover, 
   coverIndex = 0,
   forceVideoMuted = false,
-  onMuteBlocked
+  onMuteBlocked,
+  studioEdits
 }: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -47,17 +51,9 @@ export default function CarouselSlide({
   const { toast } = useToast();
   
   const showSkeleton = useCappedLoading(loaded, 600);
-  const filterClass = getFilterClass(item.filterId);
-  
-  // TEMP: inline filter to verify behaviour
-  const testStyle =
-    item.filterId === 'bw'
-      ? { filter: 'grayscale(1) contrast(1.2)' }
-      : item.filterId === 'vivid'
-      ? { filter: 'contrast(1.15) saturate(1.25)' }
-      : item.filterId === 'dramatic'
-      ? { filter: 'contrast(1.25) saturate(1.05) brightness(0.95)' }
-      : undefined;
+  const filterClass = getFilterClass(studioEdits?.filter);
+  const cropClass = getCropWrapperClass(studioEdits?.crop);
+  const pixelStyle = getPixelLayerStyle(studioEdits);
   
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
@@ -136,7 +132,7 @@ export default function CarouselSlide({
   if (item.type === 'video') {
     return (
       <div 
-        className="relative w-full h-full overflow-hidden select-none" 
+        className={cn(cropClass, "select-none")} 
         {...longPressProps}
         onClick={handleVideoTap}
       >
@@ -145,7 +141,7 @@ export default function CarouselSlide({
           <div className="w-full h-full animate-pulse bg-white/10" />
         </div>
 
-        {/* Video element - visible and playable */}
+        {/* Video element with pixel layer styles */}
         <video
           ref={videoRef}
           src={baseUrl}
@@ -160,7 +156,7 @@ export default function CarouselSlide({
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
             filterClass
           )}
-          style={testStyle}
+          style={pixelStyle}
           onLoadedMetadata={handleLoadedMetadata}
           onTimeUpdate={handleTimeUpdate}
           onPlay={() => setIsPlaying(true)}
@@ -203,7 +199,7 @@ export default function CarouselSlide({
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden select-none" {...longPressProps}>
+    <div className={cn(cropClass, "select-none")} {...longPressProps}>
       {/* Skeleton loading state */}
       <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
         <div className="w-full h-full animate-pulse bg-white/10" />
@@ -217,7 +213,7 @@ export default function CarouselSlide({
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
         )}
-        style={testStyle}
+        style={pixelStyle}
         loading="lazy"
         decoding="async"
         draggable={false}
