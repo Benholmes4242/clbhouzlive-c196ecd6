@@ -671,6 +671,9 @@ export default function TextOverlayRenderer({
     e: React.PointerEvent,
     overlay: TextOverlay
   ) => {
+    // Failsafe: always select the overlay even if rotation can't start
+    handleSelectOverlay(overlay.id);
+    
     if (!isEditable || !containerRef?.current) return;
     e.preventDefault();
     e.stopPropagation();
