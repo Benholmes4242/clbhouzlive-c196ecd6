@@ -346,7 +346,13 @@ export const useRealPostsFetcher = () => {
           categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: true,
-          media: allMedia.filter(m => isValidImageUrl(m.media_url)),
+          media: allMedia.filter(m => isValidImageUrl(m.media_url)).map((m: any) => ({
+            id: m.id,
+            media_type: m.media_type,
+            media_url: m.media_url,
+            filter_id: m.filter_id,
+            studio_edits: m.studio_edits,
+          })),
           audioTrack: generateAudioTrack()
         };
 
@@ -570,7 +576,13 @@ export const useRealPostsFetcher = () => {
           categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: isFriendMap.get(post.id) ?? false, // Use actual is_friend value from RPC
-          media: allMedia.filter((m: any) => isValidImageUrl(m.media_url)),
+          media: allMedia.filter((m: any) => isValidImageUrl(m.media_url)).map((m: any) => ({
+            id: m.id,
+            media_type: m.media_type,
+            media_url: m.media_url,
+            filter_id: m.filter_id,
+            studio_edits: m.studio_edits,
+          })),
         };
       }).filter(Boolean) as ExploreContentItem[];
 
@@ -922,7 +934,13 @@ export const useRealPostsFetcher = () => {
           categories: post.categories || [],
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
-          media: allMedia.filter(m => isValidImageUrl(m.media_url)),
+          media: allMedia.filter(m => isValidImageUrl(m.media_url)).map((m: any) => ({
+            id: m.id,
+            media_type: m.media_type,
+            media_url: m.media_url,
+            filter_id: m.filter_id,
+            studio_edits: m.studio_edits,
+          })),
           audioTrack: generateAudioTrack()
         };
 

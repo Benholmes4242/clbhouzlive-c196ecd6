@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check, UserPlus, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -19,6 +19,9 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -424,6 +427,18 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           const currentMediaIndex = mediaIndices[item.id] || 0;
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
            const hasMultipleMedia = mediaItems.length > 1;
+           
+          // Check if this post has music attached
+          const studioEdits = (currentMedia as any)?.studio_edits;
+          const musicData = studioEdits?.music;
+          const postHasMusic = !!(musicData?.url || musicData?.r2Key);
+          const audioMode = studioEdits?.audioMode || 'original';
+          const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
+          const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
+          
+          // Get filter class for current media
+          const filterId = (currentMedia as any)?.filter_id || studioEdits?.filter;
+          const filterClass = getFilterClass(filterId);
 
            // Navigation handlers for this specific item
            const handlePrevMedia = (e?: React.MouseEvent) => {
@@ -506,19 +521,37 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                      <EnhancedVideoPlayer
                        src={currentMedia.media_url}
                        autoplay={index === currentIndex}
-                       muted={isGloballyMuted}
+                       muted={videoMuted}
                        loop={true}
-                       className="w-full h-full"
+                       className={cn("w-full h-full", filterClass)}
                        enableHLS={true}
                        objectFit="contain"
                      />
+                     
+                     {/* Music player for posts with music */}
+                     {postHasMusic && musicData && index === currentIndex && (
+                       <div className="absolute bottom-20 left-4 z-40 max-w-[200px]">
+                         <SoundtrackStrip
+                           music={{
+                             trackId: musicData.trackId || '',
+                             title: musicData.title || 'Unknown Track',
+                             artist: musicData.artist,
+                             r2Key: musicData.r2Key,
+                             url: musicData.url,
+                             startAt: musicData.startAt,
+                             volume: musicData.volume
+                           }}
+                           variant="published"
+                         />
+                       </div>
+                     )}
                   </div>
                 ) : (
                   <div className="relative w-full h-full bg-media-loading">
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className="w-full h-full object-contain"
+                      className={cn("w-full h-full object-contain", filterClass)}
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
