@@ -28,6 +28,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { getFilterClass } from '@/utils/studioFilters';
 
 interface VideoData {
   id: string;
@@ -45,6 +46,7 @@ interface VideoData {
   durationSeconds?: number;
   category?: string;
   studioEdits?: any; // Text overlays, filters, etc.
+  filterId?: string | null; // Filter applied to the video
 }
 
 /**
@@ -215,6 +217,7 @@ export const VideoPlayerModal: React.FC = () => {
           durationSeconds: media.duration_seconds,
           category: categoryTag?.tagged_entity?.slug,
           studioEdits: media.studio_edits,
+          filterId: media.filter_id ?? (media.studio_edits as any)?.filter ?? null,
         });
       } catch (err) {
         console.error('Error loading video:', err);
@@ -614,19 +617,22 @@ export const VideoPlayerModal: React.FC = () => {
                 </div>
               ) : videoData ? (
                 <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
-                  <HLSPlayer
-                    ref={videoRef}
-                    src={videoData.hlsUrl}
-                    autoplay={hasAutoStarted && !showResumeOverlay}
-                    loop={false}
-                    muted={false}
-                    className="w-full h-full"
-                    objectFit="contain"
-                    showMuteButton={false}
-                    onEnded={handleVideoEnded}
-                    onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
-                    onLoadedData={handleLoadedMetadata}
-                  />
+                  {/* Filtered pixel layer */}
+                  <div className={cn("w-full h-full", getFilterClass(videoData.filterId))}>
+                    <HLSPlayer
+                      ref={videoRef}
+                      src={videoData.hlsUrl}
+                      autoplay={hasAutoStarted && !showResumeOverlay}
+                      loop={false}
+                      muted={false}
+                      className="w-full h-full"
+                      objectFit="contain"
+                      showMuteButton={false}
+                      onEnded={handleVideoEnded}
+                      onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
+                      onLoadedData={handleLoadedMetadata}
+                    />
+                  </div>
                   
                   {/* Text overlays from studio edits */}
                   {videoData.studioEdits?.textOverlays && videoData.studioEdits.textOverlays.length > 0 && (

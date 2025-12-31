@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 interface HighlightVideo {
   id: string;
@@ -20,6 +22,7 @@ interface HighlightVideo {
   usaRank?: number | null;
   country: string;
   averageRating?: number | null;
+  filterId?: string | null;
 }
 
 interface DepthStackCarouselProps {
@@ -93,30 +96,36 @@ const VideoCard: React.FC<{
     onVideoPlay?.(video.id);
   };
 
+  // Compute filter class
+  const filterClass = getFilterClass(video.filterId);
+
   return (
     <div 
       ref={cardRef}
       className="relative aspect-video h-[266px] rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
     >
-      {hlsUrl ? (
-        <HLSPlayer
-          ref={playerRef}
-          src={hlsUrl}
-          muted={true}
-          autoplay={autoplay}
-          loop={true}
-          managedByMediaRuntime={true}
-          mediaId={mediaId}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <img 
-          src={poster}
-          alt={video.courseName}
-          className="w-full h-full object-cover"
-        />
-      )}
+      {/* Filtered pixel layer */}
+      <div className={cn("w-full h-full", filterClass)}>
+        {hlsUrl ? (
+          <HLSPlayer
+            ref={playerRef}
+            src={hlsUrl}
+            muted={true}
+            autoplay={autoplay}
+            loop={true}
+            managedByMediaRuntime={true}
+            mediaId={mediaId}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <img 
+            src={poster}
+            alt={video.courseName}
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
       
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30 pointer-events-none" />

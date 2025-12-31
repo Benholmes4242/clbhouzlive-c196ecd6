@@ -11,6 +11,8 @@ import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { TextOverlay } from '@/types/studio';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 import { MediaItem } from '@/types/media';
 
@@ -145,6 +147,10 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
+  // Compute filter class - prefer filter_id, fallback to studioEdits.filter
+  const filterId = (media as any)?.filter_id ?? studioEdits?.filter ?? null;
+  const filterClass = getFilterClass(filterId);
+
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
       {/* Loading Skeleton - only show for images */}
@@ -157,14 +163,17 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       {media.media_type === 'video' && !isInvalidSrc ? (
         shouldAutoplay ? (
           <div className="relative w-full h-full">
-            <EnhancedVideoPlayer
-              src={media.media_url}
-              autoplay={shouldAutoplay}
-              muted={videoIsMuted} // Use exclusive video audio state
-              loop={loop}
-              className="w-full h-full pointer-events-none"
-              enableHLS={true}
-            />
+            {/* Filtered pixel layer */}
+            <div className={cn("w-full h-full", filterClass)}>
+              <EnhancedVideoPlayer
+                src={media.media_url}
+                autoplay={shouldAutoplay}
+                muted={videoIsMuted} // Use exclusive video audio state
+                loop={loop}
+                className="w-full h-full pointer-events-none"
+                enableHLS={true}
+              />
+            </div>
             
             {/* Sound Toggle for autoplaying videos */}
             <div className="absolute top-3 right-3 z-30">
@@ -179,27 +188,30 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         ) : (
           /* Video thumbnail - use Cloudflare thumbnail or video element with first frame */
           <div className="relative w-full h-full">
-            {hasCloudflareThumb ? (
-               <HighQualityImage
-                 src={thumbnailUrl}
-                 alt={itemTitle || 'Video thumbnail'}
-                 className="w-full h-full object-cover"
-                  onLoad={handleImageLoad}
+            {/* Filtered pixel layer */}
+            <div className={cn("w-full h-full", filterClass)}>
+              {hasCloudflareThumb ? (
+                 <HighQualityImage
+                   src={thumbnailUrl}
+                   alt={itemTitle || 'Video thumbnail'}
+                   className="w-full h-full object-cover"
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                   width={1200}
+                   height={1600}
+                 />
+              ) : (
+                /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
+                <video
+                  src={media.media_url}
+                  className="w-full h-full object-cover"
+                  preload="metadata"
+                  muted
+                  onLoadedMetadata={handleImageLoad}
                   onError={handleImageError}
-                 width={1200}
-                 height={1600}
-               />
-            ) : (
-              /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
-              <video
-                src={media.media_url}
-                className="w-full h-full object-cover"
-                preload="metadata"
-                muted
-                onLoadedMetadata={handleImageLoad}
-                onError={handleImageError}
-              />
-            )}
+                />
+              )}
+            </div>
             
             {/* Play icon for non-autoplaying videos */}
             {!hidePlayButton && (
@@ -213,15 +225,18 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         )
       ) : (
         <div className="relative w-full h-full">
-           <HighQualityImage
-             src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
-             alt={itemTitle || 'Content'}
-             className="w-full h-full object-cover"
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-             width={1200}
-             height={1600}
-           />
+          {/* Filtered pixel layer */}
+          <div className={cn("w-full h-full", filterClass)}>
+             <HighQualityImage
+               src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
+               alt={itemTitle || 'Content'}
+               className="w-full h-full object-cover"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+               width={1200}
+               height={1600}
+             />
+          </div>
         </div>
       )}
       

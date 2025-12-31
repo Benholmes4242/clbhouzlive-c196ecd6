@@ -17,6 +17,7 @@ interface HighlightVideo {
   usaRank?: number | null;
   country: string;
   averageRating?: number | null;
+  filterId?: string | null;
 }
 
 interface LatestHighlightsProps {
@@ -170,7 +171,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
               regionalRank: course.regional_rank,
               usaRank: course.usa_rank,
               country: course.country,
-              averageRating: courseRating?.average_rating ? Math.round(courseRating.average_rating * 10) / 10 : null
+              averageRating: courseRating?.average_rating ? Math.round(courseRating.average_rating * 10) / 10 : null,
+              filterId: media?.filter_id ?? (media?.studio_edits as any)?.filter ?? null,
             };
 
             return highlight;
