@@ -35,8 +35,12 @@ export default function StudioPanelFilter({
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
 
   const handleSelectFilter = (filterId: FilterId) => {
+    console.log('[StudioPanelFilter] Filter clicked:', filterId);
+    console.log('[StudioPanelFilter] Previous selectedFilter:', selectedFilter);
+    console.log('[StudioPanelFilter] Current edits.filter:', edits?.filter);
     setSelectedFilter(filterId);
     updateEdits({ filter: filterId });
+    console.log('[StudioPanelFilter] Called updateEdits with:', { filter: filterId });
   };
 
   const selectedLabel = FILTER_OPTIONS.find(f => f.id === selectedFilter)?.label || 'Pure';
