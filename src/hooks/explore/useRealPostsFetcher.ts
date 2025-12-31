@@ -60,6 +60,7 @@ export const useRealPostsFetcher = () => {
           user_id,
           actor_type,
           actor_id,
+          course_id,
           categories,
           post_media!inner (
             id,
@@ -146,15 +147,20 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
-      // Extract all golf course IDs from post tags for batch fetching
-      const courseIds = postsData
+      // Extract all golf course IDs from post tags AND direct course_id FK for batch fetching
+      const courseIdsFromTags = postsData
         .flatMap(post => (post.post_tags || [])
           .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
           .map((tag: any) => tag.taggable_entities?.entity_id)
         )
         .filter(Boolean) as string[];
       
-      const uniqueCourseIds = [...new Set(courseIds)];
+      // Also collect direct course_id from posts (newer posts use this instead of tags)
+      const courseIdsFromPosts = postsData
+        .map(post => post.course_id)
+        .filter(Boolean) as string[];
+      
+      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
       
       // Batch fetch golf course details
       const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
@@ -212,7 +218,7 @@ export const useRealPostsFetcher = () => {
           }
         }
 
-        // Find golf course from post tags and hydrate with full details
+        // Find golf course from post tags OR direct course_id FK
         const golfCourseTag = (post.post_tags || []).find(
           (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
@@ -220,10 +226,10 @@ export const useRealPostsFetcher = () => {
         let golfCourse = null;
         
         if (golfCourseTag?.taggable_entities) {
+          // Option 1: Course linked via post_tags (older posts)
           const courseId = golfCourseTag.taggable_entities.entity_id;
           const fullCourse = courseMap.get(courseId);
           
-          // Use full course details if available
           golfCourse = fullCourse ? {
             id: fullCourse.id,
             name: fullCourse.name,
@@ -235,6 +241,18 @@ export const useRealPostsFetcher = () => {
             name: golfCourseTag.taggable_entities.name,
             country: '',
           };
+        } else if (post.course_id) {
+          // Option 2: Course linked via direct FK (newer posts)
+          const fullCourse = courseMap.get(post.course_id);
+          if (fullCourse) {
+            golfCourse = {
+              id: fullCourse.id,
+              name: fullCourse.name,
+              country: fullCourse.country || '',
+              sub_country: fullCourse.sub_country,
+              region: fullCourse.region,
+            };
+          }
         }
 
         // Generate random audio track for video posts (demo purposes)
@@ -432,6 +450,7 @@ export const useRealPostsFetcher = () => {
           user_id,
           actor_type,
           actor_id,
+          course_id,
           like_count,
           comment_count,
           categories,
@@ -492,14 +511,18 @@ export const useRealPostsFetcher = () => {
         ? await supabase.from('business_accounts').select('id, name, logo_url, is_verified, category, location').in('id', businessIds)
         : { data: [] };
 
-      const courseIds = sortedPosts
+      const courseIdsFromTags = sortedPosts
         .flatMap(post => (post.post_tags || [])
           .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
           .map((tag: any) => tag.taggable_entities?.entity_id)
         )
         .filter(Boolean) as string[];
+      
+      const courseIdsFromPosts = sortedPosts
+        .map(post => post.course_id)
+        .filter(Boolean) as string[];
 
-      const uniqueCourseIds = [...new Set(courseIds)];
+      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
       const { data: golfCourses } = uniqueCourseIds.length > 0
         ? await supabase.from('golf_courses').select('id, name, country, sub_country, region').in('id', uniqueCourseIds)
         : { data: [] };
@@ -532,6 +555,14 @@ export const useRealPostsFetcher = () => {
             id: fullCourse.id, name: fullCourse.name, country: fullCourse.country || '',
             sub_country: fullCourse.sub_country, region: fullCourse.region,
           } : { id: courseId, name: golfCourseTag.taggable_entities.name, country: '' };
+        } else if (post.course_id) {
+          const fullCourse = courseMap.get(post.course_id);
+          if (fullCourse) {
+            golfCourse = {
+              id: fullCourse.id, name: fullCourse.name, country: fullCourse.country || '',
+              sub_country: fullCourse.sub_country, region: fullCourse.region,
+            };
+          }
         }
 
         const toNum = (v: any): number | undefined => {
@@ -621,6 +652,7 @@ export const useRealPostsFetcher = () => {
           user_id,
           actor_type,
           actor_id,
+          course_id,
           like_count,
           comment_count,
           categories,
@@ -761,15 +793,19 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
-      // Extract all golf course IDs from post tags for batch fetching
-      const courseIds = postsData
+      // Extract all golf course IDs from post tags AND direct course_id for batch fetching
+      const courseIdsFromTags = postsData
         .flatMap(post => (post.post_tags || [])
           .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
           .map((tag: any) => tag.taggable_entities?.entity_id)
         )
         .filter(Boolean) as string[];
       
-      const uniqueCourseIds = [...new Set(courseIds)];
+      const courseIdsFromPosts = postsData
+        .map(post => post.course_id)
+        .filter(Boolean) as string[];
+      
+      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
       
       // Batch fetch golf course details
       const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
@@ -825,7 +861,7 @@ export const useRealPostsFetcher = () => {
           }
         }
 
-        // Find golf course from post tags and hydrate with full details
+        // Find golf course from post tags OR direct course_id FK
         const golfCourseTag = (post.post_tags || []).find(
           (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
@@ -836,7 +872,6 @@ export const useRealPostsFetcher = () => {
           const courseId = golfCourseTag.taggable_entities.entity_id;
           const fullCourse = courseMap.get(courseId);
           
-          // Use full course details if available
           golfCourse = fullCourse ? {
             id: fullCourse.id,
             name: fullCourse.name,
@@ -848,6 +883,17 @@ export const useRealPostsFetcher = () => {
             name: golfCourseTag.taggable_entities.name,
             country: '',
           };
+        } else if (post.course_id) {
+          const fullCourse = courseMap.get(post.course_id);
+          if (fullCourse) {
+            golfCourse = {
+              id: fullCourse.id,
+              name: fullCourse.name,
+              country: fullCourse.country || '',
+              sub_country: fullCourse.sub_country,
+              region: fullCourse.region,
+            };
+          }
         }
 
         // Generate random audio track for video posts (demo purposes)
@@ -1097,6 +1143,7 @@ export const useRealPostsFetcher = () => {
             user_id,
             actor_type,
             actor_id,
+            course_id,
             categories,
             post_media!inner (
               id,
@@ -1224,14 +1271,18 @@ export const useRealPostsFetcher = () => {
       // ===== Golf course hydration (CRITICAL for "Played at …" row) =====
       const DEBUG_COURSE_LOCATION = import.meta.env.DEV;
 
-      const courseIds = validPosts
+      const courseIdsFromTags = validPosts
         .flatMap((post: any) => (post.post_tags || [])
           .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
           .map((tag: any) => tag.taggable_entities?.entity_id)
         )
         .filter(Boolean) as string[];
+      
+      const courseIdsFromPosts = validPosts
+        .map((post: any) => post.course_id)
+        .filter(Boolean) as string[];
 
-      const uniqueCourseIds = [...new Set(courseIds)];
+      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
 
       if (DEBUG_COURSE_LOCATION) {
         console.log('[ClubhouseCourseHydration] uniqueCourseIds', uniqueCourseIds.length, uniqueCourseIds.slice(0, 20));
@@ -1272,7 +1323,7 @@ export const useRealPostsFetcher = () => {
           userProfile = profiles?.find(profile => profile.id === post.user_id);
         }
 
-        // Find golf course from tags and hydrate from golf_courses
+        // Find golf course from tags OR direct course_id FK
         const golfCourseTag = (post.post_tags || []).find(
           (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
@@ -1307,6 +1358,18 @@ export const useRealPostsFetcher = () => {
             name: golfCourseTag.taggable_entities.name,
             country: '',
           };
+        } else if (post.course_id) {
+          // Fallback to direct course_id FK (newer posts)
+          const fullCourse = courseMap.get(post.course_id);
+          if (fullCourse) {
+            golfCourse = {
+              id: fullCourse.id,
+              name: fullCourse.name,
+              country: fullCourse.country || '',
+              sub_country: fullCourse.sub_country,
+              region: fullCourse.region,
+            };
+          }
         }
         const durationSeconds = firstMedia.duration_seconds;
 
