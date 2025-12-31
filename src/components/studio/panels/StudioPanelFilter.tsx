@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StudioEdits, FilterId } from '@/types/studio';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,11 @@ export default function StudioPanelFilter({
   previewUrl 
 }: StudioPanelFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
+
+  // Sync local state with edits prop (for when switching media items)
+  useEffect(() => {
+    setSelectedFilter(edits?.filter || 'normal');
+  }, [edits?.filter]);
 
   const handleSelectFilter = (filterId: FilterId) => {
     setSelectedFilter(filterId);
