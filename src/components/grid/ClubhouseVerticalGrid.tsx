@@ -842,25 +842,38 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       )}
 
       {/* Creator Capsule */}
-      {filteredPosts[currentIndex] && (
-        <CreatorCapsule
-          user={{
-            id: filteredPosts[currentIndex].user?.id || '',
-            name: filteredPosts[currentIndex].user?.name || 'Unknown User',
-            username: filteredPosts[currentIndex].user?.username,
-            avatar: filteredPosts[currentIndex].user?.avatar
-          }}
-          caption={removeGolfCourseFromContent(
-            (filteredPosts[currentIndex].title as string | null) ?? 
-            (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
-          )}
-          golfCourse={filteredPosts[currentIndex].golfCourse}
-          isFollowing={isFollowing === true}
-          isOwnPost={filteredPosts[currentIndex].user?.id === user?.id}
-          isVisible={true}
-          onFollow={handleFollowToggle}
-        />
-      )}
+      {filteredPosts[currentIndex] && (() => {
+        const currentMediaItem = filteredPosts[currentIndex].media?.[0] as any;
+        const currentStudioEdits = currentMediaItem?.studio_edits;
+        const currentMusicData = currentStudioEdits?.music;
+        const currentAudioMode = currentStudioEdits?.audioMode || 'original';
+        const showMusicTrack = currentAudioMode === 'music_only' && currentMusicData?.title;
+        
+        return (
+          <CreatorCapsule
+            user={{
+              id: filteredPosts[currentIndex].user?.id || '',
+              name: filteredPosts[currentIndex].user?.name || 'Unknown User',
+              username: filteredPosts[currentIndex].user?.username,
+              avatar: filteredPosts[currentIndex].user?.avatar
+            }}
+            caption={removeGolfCourseFromContent(
+              (filteredPosts[currentIndex].title as string | null) ?? 
+              (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
+            )}
+            golfCourse={filteredPosts[currentIndex].golfCourse}
+            musicTrack={showMusicTrack ? {
+              title: currentMusicData.title,
+              artist: currentMusicData.artist
+            } : null}
+            isFollowing={isFollowing === true}
+            isOwnPost={filteredPosts[currentIndex].user?.id === user?.id}
+            isVisible={true}
+            onFollow={handleFollowToggle}
+            onMusicTap={() => setGlobalMute(!isGloballyMuted)}
+          />
+        );
+      })()}
 
     </div>
   );
