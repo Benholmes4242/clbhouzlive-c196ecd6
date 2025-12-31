@@ -71,6 +71,8 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
             rawCourseId={rawCourseId}
             shouldAutoplay={shouldAutoplay}
             onMediaClick={onMediaClick}
+            postMusic={post.studio_music}
+            audioMode={post.audio_mode}
           />
 
           <UserPostActions />

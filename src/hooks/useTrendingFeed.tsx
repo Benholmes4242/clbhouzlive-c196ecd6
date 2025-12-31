@@ -53,6 +53,8 @@ export const useTrendingFeed = () => {
           created_at,
           user_id,
           actor_type,
+          studio_music,
+          audio_mode,
           post_media!inner(id, media_type, media_url, filter_id, studio_edits)
         `)
         .in('user_id', allConnectedUserIds)
@@ -84,6 +86,8 @@ export const useTrendingFeed = () => {
           id: post.id,
           content: post.content,
           created_at: post.created_at,
+          studio_music: (post as any).studio_music ?? null,
+          audio_mode: (post as any).audio_mode ?? null,
           user: {
             id: post.user_id,
             display_name: userProfile?.display_name || null,

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import CoursePostBadge from '../CoursePostBadge';
-import { PostMedia, GolfCourse } from './types';
+import { PostMedia, GolfCourse, PostMusicData } from './types';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,10 @@ interface UserPostMediaProps {
   shouldAutoplay: boolean;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   isClubhouse?: boolean;
+  /** Post-level music (new - takes priority over legacy per-media music) */
+  postMusic?: PostMusicData | null;
+  /** Post-level audio mode */
+  audioMode?: 'original' | 'music_only' | null;
 }
 
 export const UserPostMedia: React.FC<UserPostMediaProps> = ({
@@ -26,29 +30,29 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   rawCourseId,
   shouldAutoplay,
   onMediaClick,
-  isClubhouse = false
+  isClubhouse = false,
+  postMusic,
+  audioMode
 }) => {
   const { toast } = useToast();
 
-  // Check if any media in this post has music attached
-  // When music exists, all videos in the post should be muted
-  const postHasMusic = useMemo(() => {
-    return media.some(m => {
-      const studioEdits = m.studio_edits as any;
-      return studioEdits?.music?.url || studioEdits?.music?.r2Key;
-    });
-  }, [media]);
-
-  // Get the active music track (from any media item) for display
-  const activeMusic = useMemo(() => {
+  // Resolve music: post-level takes priority, fallback to legacy per-media
+  const { postHasMusic, activeMusic } = useMemo(() => {
+    // Check post-level music first (new)
+    if (postMusic?.url || postMusic?.r2Key) {
+      return { postHasMusic: true, activeMusic: postMusic };
+    }
+    
+    // Fallback to legacy per-media music
     for (const m of media) {
-      const music = (m.studio_edits as any)?.music;
-      if (music?.url || music?.r2Key) {
-        return music;
+      const legacyMusic = (m.studio_edits as any)?.music;
+      if (legacyMusic?.url || legacyMusic?.r2Key) {
+        return { postHasMusic: true, activeMusic: legacyMusic as PostMusicData };
       }
     }
-    return null;
-  }, [media]);
+    
+    return { postHasMusic: false, activeMusic: null };
+  }, [postMusic, media]);
 
   const handleMuteBlocked = () => {
     toast({

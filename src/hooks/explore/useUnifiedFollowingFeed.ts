@@ -78,6 +78,7 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
         .from('posts')
         .select(`
           id, content, created_at, user_id, actor_type, actor_id, categories,
+          studio_music, audio_mode,
           post_media (id, media_type, media_url, duration_seconds, width, height, filter_id, studio_edits)
         `)
         .or(orFilters.join(','))
