@@ -9,6 +9,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityGridItem } from '@/components/profile/ActivityGrid';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 // Import ActivityPost type inline to avoid circular dependencies
 interface ActivityPostMedia {
@@ -66,7 +67,7 @@ function getOrientation(aspectRatio?: number): 'portrait' | 'landscape' | 'squar
  */
 function getHlsUrl(src: string): string | undefined {
   const uid = uidFromNode({ src });
-  return uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : undefined;
+  return uid ? generateStreamHlsUrl(uid) : undefined;
 }
 
 /**
@@ -76,7 +77,7 @@ function getThumbnailUrl(src: string, explicitThumbnail?: string): string {
   if (explicitThumbnail) return explicitThumbnail;
   const uid = uidFromNode({ src });
   return uid 
-    ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` 
+    ? generateStreamThumbnailUrl(uid, { height: 600 })
     : src;
 }
 

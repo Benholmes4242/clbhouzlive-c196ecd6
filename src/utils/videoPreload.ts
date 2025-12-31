@@ -1,5 +1,6 @@
 // Enhanced video preloading utilities with HLS support
 import { getCloudflareStreamHLS } from '@/utils/cloudflareStreamAPI';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 let cache = new Map<string, string>();
 let HlsClass: any | null = null;
@@ -32,8 +33,8 @@ export async function getHlsUrl(uid: string): Promise<string> {
     console.warn('Failed to get HLS URL for', uid, error);
   }
   
-  // Fallback to constructed URL
-  const fallbackUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+  // Fallback to constructed URL using centralized config
+  const fallbackUrl = generateStreamHlsUrl(uid);
   cache.set(uid, fallbackUrl);
   return fallbackUrl;
 }

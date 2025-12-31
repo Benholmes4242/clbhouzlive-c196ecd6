@@ -50,7 +50,7 @@
   --clb-base-filter: contrast(0.9) brightness(1.08) saturate(0.9);
 }
 
-/* Base filter composition - combines base filter with user adjustments */
+/* Base filter composition - applies the base filter directly */
 .clb-filter-normal,
 .clb-filter-vivid,
 .clb-filter-bw,
@@ -61,8 +61,6 @@
 .clb-filter-matte,
 .clb-filter-pop,
 .clb-filter-fade {
-  /* Ensure the adjustment var always exists (default empty) so filter composition is valid */
-  --clb-adjust-filter: ;
-  filter: var(--clb-base-filter, none) var(--clb-adjust-filter);
+  filter: var(--clb-base-filter, none);
   transition: filter 0.2s ease-out;
 }

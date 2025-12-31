@@ -5,6 +5,7 @@ import { LongFormVideoTileAutoplay, LongFormVideo } from './LongFormVideoTileAut
 import type { RegisterMediaFn } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface VideoSectionProps {
   title: string;
@@ -53,8 +54,7 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
     
     const uid = uidFromNode({ media_url: mediaUrl });
     if (uid) {
-      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
-      preloadHlsManifest(hlsUrl);
+      preloadHlsManifest(generateStreamHlsUrl(uid));
       hasPreloadedFirst.current = true;
     }
   }, [videos]);

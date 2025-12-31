@@ -11,6 +11,8 @@
  * // Returns: 'https://customer-4ah4gni80ytefpck.cloudflarestream.com/abc123/thumbnails/thumbnail.jpg?time=2s'
  */
 
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+
 /**
  * Extracts Stream ID from a Cloudflare Stream URL
  * @param url - The Stream URL (e.g., https://customer-xxxx.cloudflarestream.com/<STREAM_ID>/manifest/video.m3u8)
@@ -54,6 +56,8 @@ export function getStreamPoster(urlOrId: string, time = '1s', height?: number): 
     
   if (!streamId) return null;
   
-  const heightParam = height ? `&height=${height}` : '';
-  return `https://videodelivery.net/${streamId}/thumbnails/thumbnail.jpg?time=${time}${heightParam}`;
+  return generateStreamThumbnailUrl(streamId, { 
+    time: parseInt(time, 10) || 1,
+    height: height 
+  });
 }
