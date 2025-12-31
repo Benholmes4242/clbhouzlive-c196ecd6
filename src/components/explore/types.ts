@@ -68,6 +68,8 @@ export interface ExploreContentItem {
     id: string;
     media_type: 'video' | 'image';
     media_url: string;
+    filter_id?: string | null;
+    studio_edits?: any | null;
   }[];
   audioTrack?: {
     title: string;
