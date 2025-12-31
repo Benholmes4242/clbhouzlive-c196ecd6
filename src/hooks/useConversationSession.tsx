@@ -32,21 +32,13 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
   // Initialize conversation session on modal open - only when isModalOpen is true
   useEffect(() => {
-    console.log('🔄 Modal state changed:', { 
-      isModalOpen, 
-      lastOpen: lastOpenStateRef.current,
-      hasCurrentSession: !!currentSession 
-    });
-    
     if (isModalOpen && !lastOpenStateRef.current) {
       // Modal just opened - start new session
-      console.log('📂 Modal opened, starting new session');
       startNewSession();
       sessionStartTimeRef.current = new Date();
       lastOpenStateRef.current = true;
     } else if (!isModalOpen && lastOpenStateRef.current) {
       // Modal just closed - no need to save here since we save after each message
-      console.log('🔚 Modal closed, session already saved after each message');
       setCurrentSession(null);
       sessionStartTimeRef.current = null;
       lastOpenStateRef.current = false;
@@ -59,15 +51,9 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   }, []);
 
   const loadConversations = async () => {
-    console.log('🐛 LOAD DEBUG - Starting to load conversations from Supabase...');
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log('❌ LOAD DEBUG - No user authenticated');
-        return;
-      }
-
-      console.log('🐛 LOAD DEBUG - User authenticated, querying conversations:', user.id);
+      if (!user) return;
 
       const { data, error } = await supabase
         .from('conversations')
