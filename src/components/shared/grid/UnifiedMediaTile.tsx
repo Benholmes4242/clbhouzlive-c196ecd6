@@ -170,6 +170,15 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   // Get filter class for studio filters
   const filterClass = getFilterClass(item.filterId);
   
+  // DEBUG: Log filter application
+  if (item.filterId) {
+    console.log('[UnifiedMediaTile FILTER]', {
+      postId: item.postId,
+      filterId: item.filterId,
+      filterClass,
+    });
+  }
+  
   // Determine top-left override content (priority: milestone > multi-media)
   const hasMultiMedia = item.additionalMediaCount && item.additionalMediaCount > 0;
   
