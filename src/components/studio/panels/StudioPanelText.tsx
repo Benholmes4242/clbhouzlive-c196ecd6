@@ -171,11 +171,19 @@ export default function StudioPanelText({
             const isTopLayer = reverseIndex === 0;
             
             return (
-              <button
+              <div
                 key={box.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => handleSelectBox(box.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelectBox(box.id);
+                  }
+                }}
                 className={cn(
-                  "w-full p-3 rounded-lg border text-left transition-colors",
+                  "w-full p-3 rounded-lg border text-left transition-colors cursor-pointer",
                   isSelected
                     ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
                     : 'border-zinc-200 bg-white hover:bg-zinc-50'
@@ -212,7 +220,7 @@ export default function StudioPanelText({
                   {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
                   {box.rotation ? ` • ${Math.round(box.rotation)}°` : ''}
                 </div>
-              </button>
+              </div>
             );
           })
         )}
