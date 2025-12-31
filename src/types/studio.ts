@@ -1,4 +1,14 @@
-export type FilterId = 'normal' | 'vivid' | 'bw' | 'dramatic';
+export type FilterId =
+  | 'normal'
+  | 'vivid'
+  | 'bw'
+  | 'dramatic'
+  | 'warm'
+  | 'cool'
+  | 'vintage'
+  | 'matte'
+  | 'pop'
+  | 'fade';
 
 export type TextStyle = 
   | 'modern_bold'
