@@ -135,7 +135,18 @@ export default function CreateMomentModal({
   const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
-  const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
+  
+  // CRITICAL: Derive activeMediaId with null guard - never use empty string
+  const activeMediaId = media[activeIndex]?.id ?? null;
+  const activeMediaItem = activeMediaId ? media[activeIndex] : null;
+  const currentFilter = activeMediaId ? getEdits(activeMediaId)?.filter : undefined;
+  
+  // Clamp activeIndex when media array shrinks (prevents invalid index)
+  useEffect(() => {
+    if (media.length > 0 && activeIndex >= media.length) {
+      setActiveIndex(Math.max(0, media.length - 1));
+    }
+  }, [media.length, activeIndex]);
 
   // Modal context sync
   useEffect(() => {
@@ -560,8 +571,9 @@ export default function CreateMomentModal({
               style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', left: '50%', transform: 'translateX(-50%)' }}
             />
           )}
-          {hasMedia ? (
+          {hasMedia && activeMediaId ? (
             <CreateMomentMediaStage
+              key={activeMediaId}
               media={media}
               activeIndex={activeIndex}
               coverIndex={coverIndex}
@@ -576,6 +588,11 @@ export default function CreateMomentModal({
               activeOverlayId={activeOverlayId}
               onSelectOverlay={setActiveOverlayId}
             />
+          ) : hasMedia ? (
+            // Media exists but activeMediaId not yet resolved (brief loading state)
+            <div className="flex-1 flex items-center justify-center bg-black/20">
+              <span className="text-white/50 text-sm">Loading...</span>
+            </div>
           ) : (
             <CreateMomentHero
               hasMedia={false}
@@ -690,18 +707,28 @@ export default function CreateMomentModal({
         </AnimatePresence>
       </div>
 
-      {/* Studio Shelf */}
+      {/* Studio Shelf - only render with valid activeMediaId */}
       <StudioShelf
         open={studioOpen}
         onClose={closeStudio}
         activeTool={activeTool}
         setActiveTool={setActiveTool}
-        activeMediaId={media[activeIndex]?.id || ''}
-        activeMediaType={media[activeIndex]?.type || 'image'}
-        activeMediaThumbnailUrl={media[activeIndex]?.thumbnailUrl || media[activeIndex]?.previewUrl || null}
-        edits={getEdits(media[activeIndex]?.id || '')}
-        updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
-        clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
+        activeMediaId={activeMediaId ?? ''}
+        activeMediaType={activeMediaItem?.type ?? 'image'}
+        activeMediaThumbnailUrl={activeMediaItem?.thumbnailUrl ?? activeMediaItem?.previewUrl ?? null}
+        edits={activeMediaId ? getEdits(activeMediaId) : {}}
+        updateEdits={(patch) => {
+          // GUARD: Never write edits without a valid media ID
+          if (!activeMediaId) {
+            console.warn('[CreateMomentModal] Attempted to update edits without valid activeMediaId');
+            return;
+          }
+          updateEdits(activeMediaId, patch);
+        }}
+        clearEdits={() => {
+          if (!activeMediaId) return;
+          clearEdits(activeMediaId);
+        }}
         postEdits={postEdits}
         updatePostEdits={updatePostEdits}
         isPositioningText={isPositioningText}

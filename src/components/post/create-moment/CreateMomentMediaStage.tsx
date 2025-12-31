@@ -120,7 +120,7 @@ export default function CreateMomentMediaStage({
                 studioEdits: edits
               };
             })}
-            initialIndex={activeIndex}
+            currentIndex={activeIndex}
             onIndexChange={onIndexChange}
             onSetCover={onSetCover}
             coverIndex={coverIndex}
