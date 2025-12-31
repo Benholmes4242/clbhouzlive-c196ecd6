@@ -46,7 +46,8 @@ export interface BusinessPost {
  */
 export function useBusinessPosts(businessId?: string) {
   return useQuery({
-    queryKey: postKeys.actorPosts('business', businessId ?? ''),
+    // v2: Added studio_edits to query, bust cache to get fresh data
+    queryKey: [...postKeys.actorPosts('business', businessId ?? ''), 'v2'],
     enabled: !!businessId,
     queryFn: async () => {
       // Get current user for visibility filtering
