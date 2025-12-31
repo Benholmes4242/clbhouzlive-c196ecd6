@@ -17,11 +17,9 @@ interface MediaItem {
 
 interface MediaCarouselProps {
   items: MediaItem[];
-  /** @deprecated Use currentIndex instead */
-  initialIndex?: number;
-  /** Controlled index - parent is single source of truth */
-  currentIndex?: number;
-  onIndexChange?: (index: number) => void;
+  /** Controlled index - parent is single source of truth (REQUIRED) */
+  currentIndex: number;
+  onIndexChange: (index: number) => void;
   onSetCover?: (index: number) => void;
   coverIndex?: number;
   enableSwipe?: boolean;
@@ -35,7 +33,6 @@ interface MediaCarouselProps {
 
 const MediaCarousel = ({ 
   items, 
-  initialIndex = 0,
   currentIndex,
   onIndexChange,
   onSetCover,
@@ -46,11 +43,8 @@ const MediaCarousel = ({
   forceVideoMuted = false,
   onMuteBlocked
 }: MediaCarouselProps) => {
-  // CONTROLLED MODE: Use currentIndex from parent if provided, otherwise fall back to initialIndex
-  const isControlled = currentIndex !== undefined;
-  const activeIndex = isControlled 
-    ? Math.max(0, Math.min(currentIndex, items.length - 1))
-    : 0; // Fallback for uncontrolled (legacy) usage
+  // CONTROLLED MODE: Parent is single source of truth, clamp to valid range
+  const activeIndex = Math.max(0, Math.min(currentIndex, Math.max(0, items.length - 1)));
   
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
