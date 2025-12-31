@@ -290,9 +290,11 @@ async function processJob(jobId: string): Promise<void> {
     }
 
     // Persist post-level studio edits (music, badge) to posts table
+    console.log(`[uploadPipeline] job.postStudioEdits:`, JSON.stringify(job.postStudioEdits));
     if (job.postStudioEdits) {
       const { music, audioMode, achievementBadgeId } = job.postStudioEdits;
       const hasPostLevelEdits = !!music || !!audioMode || !!achievementBadgeId;
+      console.log(`[uploadPipeline] hasPostLevelEdits: ${hasPostLevelEdits}, music:`, music, 'audioMode:', audioMode);
       
       if (hasPostLevelEdits) {
         try {

@@ -479,6 +479,9 @@ export default function CreateMomentModal({
       ...(postEdits.achievementBadgeId && { achievementBadgeId: postEdits.achievementBadgeId }),
     };
     
+    console.log('[CreateMomentModal] postEdits state:', JSON.stringify(postEdits));
+    console.log('[CreateMomentModal] postLevelEdits to send:', JSON.stringify(postLevelEdits));
+    
     try {
       // Enqueue upload and close immediately
       enqueuePostUpload({

@@ -57,6 +57,7 @@ class UploadManager {
     });
 
     console.log(`[UploadManager] Enqueued job ${jobId} with ${input.files.length} files`);
+    console.log(`[UploadManager] postStudioEdits received:`, JSON.stringify(input.postStudioEdits));
 
     return jobId;
   }
