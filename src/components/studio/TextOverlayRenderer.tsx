@@ -102,19 +102,24 @@ export default function TextOverlayRenderer({
   }
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-30">
+    <div 
+      className="absolute inset-0 overflow-hidden z-30"
+      style={{ pointerEvents: isEditable ? 'auto' : 'none' }}
+    >
       {textOverlays.map((overlay) => {
         const fontClass = FONT_STYLES[overlay.style] || FONT_STYLES.modern;
-        const fontSize = Math.round(16 * overlay.scale);
+        // Clamp font size between 12-48px for readability
+        const fontSize = Math.max(12, Math.min(48, Math.round(16 * overlay.scale)));
 
         return (
           <div
             key={overlay.id}
-            className={`absolute ${isEditable ? 'pointer-events-auto cursor-move' : ''}`}
+            className={`absolute ${isEditable ? 'cursor-move' : ''}`}
             style={{
               left: `${overlay.x * 100}%`,
               top: `${overlay.y * 100}%`,
               transform: 'translate(-50%, -50%)',
+              zIndex: 5,
             }}
             onMouseDown={isEditable ? (e) => handleDragStart(e, overlay) : undefined}
             onTouchStart={isEditable ? (e) => handleDragStart(e, overlay) : undefined}
