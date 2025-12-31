@@ -114,8 +114,8 @@ export default function CreateMomentCanvas({
           style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
         >
           <div>
-            <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Posting as</span>
-            <p className="text-[9px] mt-0.5" style={{ color: 'var(--cm-text-tertiary)', opacity: 0.7 }}>
+            <span className="text-[14px] font-semibold" style={{ color: 'var(--cm-text-primary)' }}>Posting as</span>
+            <p className="text-[12px] mt-0.5" style={{ color: 'var(--cm-text-primary)', opacity: 0.7 }}>
               This moment will appear on this profile
             </p>
           </div>
