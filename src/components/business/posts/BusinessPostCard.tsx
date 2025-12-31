@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -143,9 +144,12 @@ export default function BusinessPostCard({
     ? primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600)
     : primaryMedia?.media_url;
   
-  // Get filter class for studio filters
-  const filterId = (primaryMedia as any)?.filter_id ?? (primaryMedia as any)?.studio_edits?.filter ?? null;
+  // Get filter class and edit styles for studio edits
+  const studioEdits = (primaryMedia as any)?.studio_edits;
+  const filterId = (primaryMedia as any)?.filter_id ?? studioEdits?.filter ?? null;
   const filterClass = getFilterClass(filterId);
+  const cropClass = getCropWrapperClass(studioEdits?.crop);
+  const pixelStyle = getPixelLayerStyle(studioEdits);
 
   // Register video for autoplay (ALL videos for business, not every 3rd)
   // Uses cardRef as observeTarget so IntersectionObserver observes the full card, not the video element
@@ -361,7 +365,7 @@ export default function BusinessPostCard({
         {/* Media - centered with safety net */}
         {primaryMedia && (
           <div
-            className="relative w-full overflow-hidden flex justify-center items-center"
+            className={cn("relative w-full overflow-hidden flex justify-center items-center", cropClass)}
             style={{
               aspectRatio: isVideo ? '16 / 9' : undefined,
               maxHeight: isVideo ? undefined : '500px',
@@ -370,8 +374,8 @@ export default function BusinessPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-                {/* Filtered pixel layer */}
-                <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+                {/* Filtered + rotated pixel layer */}
+                <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
                   <HLSPlayer
                     ref={playerRef}
                     src={hlsUrl}
@@ -392,12 +396,12 @@ export default function BusinessPostCard({
                 )}
               </>
             ) : isVideo ? (
-              <div className={cn("relative w-full h-full bg-muted", filterClass)}>
+              <div className={cn("relative w-full h-full bg-muted", filterClass)} style={pixelStyle}>
                 <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
                 {/* Play button overlay - OUTSIDE filtered layer */}
               </div>
             ) : (
-              <div className={cn("w-full h-full", filterClass)}>
+              <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
                 <img
                   src={primaryMedia.media_url}
                   alt=""
