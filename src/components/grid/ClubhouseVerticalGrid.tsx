@@ -765,12 +765,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 </div>
               )}
 
-              {/* Top 100 Pills */}
-              {item.golfCourse?.id && (
-                <div className="absolute top-20 left-4 z-30 animate-fade-in">
-                  <Top100OverlayPills courseId={item.golfCourse.id} />
-                </div>
-              )}
             </div>
           );
         })}
