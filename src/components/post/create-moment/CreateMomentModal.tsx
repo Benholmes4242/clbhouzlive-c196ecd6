@@ -699,6 +699,7 @@ export default function CreateMomentModal({
         setActiveTool={setActiveTool}
         activeMediaId={media[activeIndex]?.id || ''}
         activeMediaType={media[activeIndex]?.type || 'image'}
+        activeMediaPreviewUrl={media[activeIndex]?.previewUrl || null}
         edits={getEdits(media[activeIndex]?.id || '')}
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}

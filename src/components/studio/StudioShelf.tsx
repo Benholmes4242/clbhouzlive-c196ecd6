@@ -15,6 +15,7 @@ type StudioShelfProps = {
   setActiveTool: (tool: StudioTool) => void;
   activeMediaId: string;
   activeMediaType: 'image' | 'video';
+  activeMediaPreviewUrl?: string | null;
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
@@ -33,6 +34,7 @@ export default function StudioShelf({
   setActiveTool,
   activeMediaId,
   activeMediaType,
+  activeMediaPreviewUrl,
   edits,
   updateEdits,
   clearEdits,
@@ -207,6 +209,7 @@ export default function StudioShelf({
                       updateEdits={updateEdits}
                       onApply={handleApply}
                       onReset={handleReset}
+                      previewUrl={activeMediaPreviewUrl}
                     />
                   </motion.div>
                 )}
