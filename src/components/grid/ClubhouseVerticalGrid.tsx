@@ -36,6 +36,7 @@ import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featur
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { logFirstCardRender } from '@/utils/bootTimeline';
 import { DEBUG_MUSIC_PROPAGATION, logMusicDetection } from '@/media/debug-music';
+import { ClubhouseMusicPlayer } from '@/components/clubhouse/ClubhouseMusicPlayer';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -592,18 +593,24 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const mediaItem = item.media?.[0] as any;
           const studioEdits = mediaItem?.studio_edits;
           const musicData = studioEdits?.music;
-          const hasMusic = !!musicData?.url || studioEdits?.audioMode === 'music_only';
+          const postHasMusic = !!musicData?.url || !!musicData?.r2Key;
+          const audioMode = studioEdits?.audioMode || 'original';
+          
+          // When audioMode is 'music_only', the video's original audio should be muted
+          // so the music track can play instead
+          const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
+          const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
           
           logMusicDetection({
             surface: 'clubhouse_vertical_grid',
             postId: item.id,
             postMediaId: mediaItem?.id || 'unknown',
-            hasMusic,
-            audioMode: studioEdits?.audioMode || 'original',
-            musicUrl: musicData?.url || null,
+            hasMusic: postHasMusic,
+            audioMode,
+            musicUrl: musicData?.url || musicData?.r2Key || null,
             studioEditsPresent: !!studioEdits,
-            videoMuted: isGloballyMuted,
-            soundtrackStripMounted: false, // Clubhouse doesn't render SoundtrackStrip
+            videoMuted,
+            soundtrackStripMounted: postHasMusic, // ClubhouseMusicPlayer is rendered for posts with music
           });
           
           return (
@@ -657,7 +664,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         }
                       }}
                       src={currentMedia.media_url}
-                      muted={isGloballyMuted}
+                      muted={videoMuted}
                       className="w-full h-full"
                       isMobile={isMobile}
                       // Enforce immediate autoplay for the very first card on initial landing
@@ -685,6 +692,26 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                             </svg>
                           )}
                         </div>
+                      </div>
+                    )}
+                    
+                    {/* Music Player for posts with music_only audioMode */}
+                    {postHasMusic && musicData && (
+                      <div className="absolute bottom-20 left-4 z-40 max-w-[200px]">
+                        <ClubhouseMusicPlayer
+                          music={{
+                            trackId: musicData.trackId,
+                            title: musicData.title,
+                            artist: musicData.artist,
+                            url: musicData.url,
+                            r2Key: musicData.r2Key,
+                            startAt: musicData.startAt,
+                            volume: musicData.volume,
+                          }}
+                          isActive={index === currentIndex}
+                          isGloballyMuted={isGloballyMuted}
+                          postId={item.id}
+                        />
                       </div>
                     )}
                   </>
