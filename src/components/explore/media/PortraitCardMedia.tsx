@@ -8,6 +8,7 @@ import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 /**
  * Portrait Card Media Component
@@ -38,9 +39,9 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
   useEffect(() => {
     if (!uid) return;
     
-    // Set fallback URLs immediately
-    const fallbackHlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
-    const fallbackPoster = `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+    // Set fallback URLs immediately using centralized config
+    const fallbackHlsUrl = generateStreamHlsUrl(uid);
+    const fallbackPoster = generateStreamThumbnailUrl(uid, { height: 600 });
     
     setHlsUrl(fallbackHlsUrl);
     setPoster(fallbackPoster);

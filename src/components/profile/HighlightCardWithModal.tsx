@@ -7,6 +7,7 @@ import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 
 interface HighlightCardWithModalProps {
@@ -40,14 +41,14 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
   // For videos, use the HLS URL directly
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const streamId = videoId ? extractCloudflareStreamId(`https://videodelivery.net/${videoId}/manifest/video.m3u8`) : null;
+  const streamId = videoId ? extractCloudflareStreamId(generateStreamHlsUrl(videoId)) : null;
   
   // Use high-res Cloudflare Stream thumbnail for crisp quality
   const posterUrl = streamId 
     ? generateThumbnailUrl(streamId, { width: 640, height: 360, time: 5 })
     : null;
   
-  const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : null;
+  const hlsUrl = videoId ? generateStreamHlsUrl(videoId) : null;
 
   // Use grid-style video visibility for autoplay
   const { containerRef, isVisible, isNear } = useVideoVisibility({
