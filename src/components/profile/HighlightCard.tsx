@@ -4,6 +4,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { useHlsUrlCache } from '@/hooks/useHlsUrlCache';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface HighlightCardProps {
   highlight: Top100Highlight;
@@ -25,7 +26,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, muted, setMute
 
   // For videos, use the HLS URL directly
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const streamId = videoId ? extractCloudflareStreamId(`https://videodelivery.net/${videoId}/manifest/video.m3u8`) : null;
+  const streamId = videoId ? extractCloudflareStreamId(generateStreamHlsUrl(videoId)) : null;
   
   // Use high-res Cloudflare Stream thumbnail for crisp quality
   const posterUrl = streamId 

@@ -9,6 +9,7 @@ import { CardMediaProps } from './CardMediaTypes';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 /**
  * Hero Card Media Component (4×4 large features, special highlight slots) - mobile view only
@@ -40,9 +41,9 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   useEffect(() => {
     if (!uid) return;
     
-    // Set fallback URLs immediately
-    const fallbackHlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
-    const fallbackPoster = `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+    // Set fallback URLs immediately using centralized config
+    const fallbackHlsUrl = generateStreamHlsUrl(uid);
+    const fallbackPoster = generateStreamThumbnailUrl(uid, { height: 600 });
     
     setHlsUrl(fallbackHlsUrl);
     setPoster(fallbackPoster);

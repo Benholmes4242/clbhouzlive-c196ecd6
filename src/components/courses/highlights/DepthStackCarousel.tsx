@@ -168,7 +168,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     hasPreloadedFirst.current = true;
     const uid = uidFromNode({ src: firstWithVideo.videoUrl });
     if (uid) {
-      preloadHlsManifest(`https://videodelivery.net/${uid}/manifest/video.m3u8`);
+      preloadHlsManifest(generateStreamHlsUrl(uid));
     }
   }, [carouselItems]);
 

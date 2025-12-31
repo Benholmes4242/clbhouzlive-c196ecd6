@@ -1,4 +1,5 @@
 import { ExtendedMediaItem } from '../types';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 // Helper to extract Stream UID and generate poster URL
 const getVideoPosterUrl = (videoUrl: string, mediaArray?: any[]): string | null => {
@@ -13,7 +14,7 @@ const getVideoPosterUrl = (videoUrl: string, mediaArray?: any[]): string | null 
     const parts = url.pathname.split('/').filter(Boolean);
     const streamUid = parts[0];
     if (streamUid) {
-      return `https://videodelivery.net/${streamUid}/thumbnails/thumbnail.jpg?height=600`;
+      return generateStreamThumbnailUrl(streamUid, { height: 600 });
     }
   } catch {
     // Fall back to video URL itself

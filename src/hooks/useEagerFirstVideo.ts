@@ -11,6 +11,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface VideoItem {
   id: string;
@@ -72,7 +73,7 @@ export function useEagerFirstVideo<T extends VideoItem>({
     // Preload HLS manifest immediately
     const uid = uidFromNode({ src: videoUrl });
     if (uid) {
-      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      const hlsUrl = generateStreamHlsUrl(uid);
       
       if (import.meta.env.DEV) {
         console.log(`[${performance.now().toFixed(2)}ms] [useEagerFirstVideo] PRELOAD`, { 

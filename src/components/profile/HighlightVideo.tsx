@@ -5,6 +5,7 @@ import { getHlsUrl, attachHlsIfNeeded } from '@/utils/videoPreload';
 import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media/useMediaAutoplay';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface HighlightVideoProps {
   highlight: Top100Highlight;
@@ -39,7 +40,7 @@ const HighlightVideo = memo(function HighlightVideo({
 
   // For videos, use the HLS URL directly
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const streamId = videoId ? extractCloudflareStreamId(`https://videodelivery.net/${videoId}/manifest/video.m3u8`) : null;
+  const streamId = videoId ? extractCloudflareStreamId(generateStreamHlsUrl(videoId)) : null;
   
   // Use high-res Cloudflare Stream thumbnail for crisp quality
   const posterUrl = streamId 

@@ -3,6 +3,7 @@ import { Play } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface ReviewMedia {
   id: string;
@@ -34,8 +35,8 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
     const uid = uidFromNode({ src: mediaItem.media_url });
     if (uid) {
       return {
-        hlsUrl: `https://videodelivery.net/${uid}/manifest/video.m3u8`,
-        poster: `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`,
+        hlsUrl: generateStreamHlsUrl(uid),
+        poster: generateStreamThumbnailUrl(uid, { height: 600 }),
         mp4Fallback: mediaItem.media_url
       };
     }
