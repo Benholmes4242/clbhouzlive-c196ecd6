@@ -111,6 +111,10 @@ export default function CreateMomentMediaStage({
           <MediaCarousel
             items={media.map((item) => {
               const edits = getEdits(item.id);
+              console.log('[CreateMomentMediaStage] Passing edits for', item.id, ':', {
+                filter: edits?.filter,
+                hasEdits: !!edits
+              });
               return {
                 id: item.id,
                 type: item.type,

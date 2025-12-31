@@ -55,6 +55,14 @@ export default function CarouselSlide({
   const cropClass = getCropWrapperClass(studioEdits?.crop);
   const pixelStyle = getPixelLayerStyle(studioEdits);
   
+  // Debug logging for filter application
+  console.log('[CarouselSlide] studioEdits received:', { 
+    filter: studioEdits?.filter, 
+    filterClass,
+    itemId: item.id,
+    isActive
+  });
+  
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
     toast({ description: 'Cover set' });
