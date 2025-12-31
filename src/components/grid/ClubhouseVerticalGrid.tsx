@@ -35,6 +35,7 @@ import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { logFirstCardRender } from '@/utils/bootTimeline';
+import { logMusicDetection } from '@/media/debug-music';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -577,6 +578,24 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           if (index === 0) {
             logFirstCardRender(item.id);
           }
+          
+          // Music debug logging for Clubhouse
+          const mediaItem = item.media?.[0] as any;
+          const studioEdits = mediaItem?.studio_edits;
+          const musicData = studioEdits?.music;
+          const hasMusic = !!musicData?.url || studioEdits?.audioMode === 'music_only';
+          
+          logMusicDetection({
+            surface: 'clubhouse_vertical_grid',
+            postId: item.id,
+            postMediaId: mediaItem?.id || 'unknown',
+            hasMusic,
+            audioMode: studioEdits?.audioMode || 'original',
+            musicUrl: musicData?.url || null,
+            studioEditsPresent: !!studioEdits,
+            videoMuted: isGloballyMuted,
+            soundtrackStripMounted: false, // Clubhouse doesn't render SoundtrackStrip
+          });
           
           return (
             <div
