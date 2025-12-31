@@ -136,17 +136,20 @@ export default function CreateMomentModal({
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
   
+  // SYNCHRONOUS safe index - prevents transient out-of-range during render
+  const safeIndex = media.length > 0 ? Math.min(activeIndex, media.length - 1) : 0;
+  
   // CRITICAL: Derive activeMediaId with null guard - never use empty string
-  const activeMediaId = media[activeIndex]?.id ?? null;
-  const activeMediaItem = activeMediaId ? media[activeIndex] : null;
+  const activeMediaId = media[safeIndex]?.id ?? null;
+  const activeMediaItem = activeMediaId ? media[safeIndex] : null;
   const currentFilter = activeMediaId ? getEdits(activeMediaId)?.filter : undefined;
   
-  // Clamp activeIndex when media array shrinks (prevents invalid index)
+  // Heal state if it drifted (effect runs after render, safeIndex handles current render)
   useEffect(() => {
-    if (media.length > 0 && activeIndex >= media.length) {
-      setActiveIndex(Math.max(0, media.length - 1));
+    if (media.length > 0 && activeIndex !== safeIndex) {
+      setActiveIndex(safeIndex);
     }
-  }, [media.length, activeIndex]);
+  }, [media.length, activeIndex, safeIndex]);
 
   // Modal context sync
   useEffect(() => {
@@ -575,7 +578,7 @@ export default function CreateMomentModal({
             <CreateMomentMediaStage
               key={activeMediaId}
               media={media}
-              activeIndex={activeIndex}
+              activeIndex={safeIndex}
               coverIndex={coverIndex}
               onIndexChange={setActiveIndex}
               onSetCover={setCoverIndex}
