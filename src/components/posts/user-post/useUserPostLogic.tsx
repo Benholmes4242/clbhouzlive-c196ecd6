@@ -7,6 +7,7 @@ import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { UserPostData, GolfCourse } from './types';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { hasGolfCourseReference, getRawCourseId } from '@/utils/resolveGolfCourse';
 
 interface UseUserPostLogicProps {
   post: UserPostData;
@@ -48,54 +49,49 @@ export const useUserPostLogic = ({
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
   // Extract golf course from post.course_id, content, or tags
+  // Uses canonical resolver pattern with safety net
   useEffect(() => {
-    // Priority 1: Use real course_id from database if available
-    if (post.course_id) {
-      const fetchCourseById = async () => {
+    const fetchGolfCourse = async () => {
+      // Get the course ID using canonical helper
+      const courseId = getRawCourseId(post);
+      
+      // Priority 1: Fetch by course_id (from post.course_id or tag)
+      if (courseId) {
         try {
           const { data: courseData, error } = await supabase
             .from('golf_courses')
             .select('id, name, country, region')
-            .eq('id', post.course_id)
-            .single();
+            .eq('id', courseId)
+            .maybeSingle();
 
           if (!error && courseData) {
             setGolfCourse(courseData);
+            return;
+          }
+          
+          // Safety net: if fetch failed but we have the ID, show minimal data
+          if (import.meta.env.DEV) {
+            console.warn(`[useUserPostLogic] Course fetch failed for ID "${courseId}", using fallback`);
+          }
+          
+          // Try to get name from tag if available
+          const tagName = golfClubTags[0]?.name;
+          if (tagName) {
+            setGolfCourse({ id: courseId, name: tagName, country: '', region: '' });
+            return;
           }
         } catch (error) {
           console.error('Error fetching golf course by ID:', error);
         }
-      };
-      fetchCourseById();
-      return;
-    }
+      }
 
-    // Priority 2: Extract from post content text
-    const extractedCourse = extractGolfCourseFromContent(post.content);
-    if (extractedCourse) {
-      setGolfCourse({
-        ...extractedCourse,
-        region: extractedCourse.region || ''
-      });
-      return;
-    }
-
-    // Priority 3: Fallback to tags if available
-    const fetchGolfCourse = async () => {
-      if (golfClubTags.length > 0 && !golfCourse) {
-        try {
-          const { data: courseData, error } = await supabase
-            .from('golf_courses')
-            .select('id, name, country, region')
-            .eq('id', golfClubTags[0].entity_id)
-            .single();
-
-          if (!error && courseData) {
-            setGolfCourse(courseData);
-          }
-        } catch (error) {
-          console.error('Error fetching golf course:', error);
-        }
+      // Priority 2: Extract from post content text (legacy fallback)
+      const extractedCourse = extractGolfCourseFromContent(post.content);
+      if (extractedCourse) {
+        setGolfCourse({
+          ...extractedCourse,
+          region: extractedCourse.region || ''
+        });
       }
     };
 
@@ -121,6 +117,9 @@ export const useUserPostLogic = ({
     // This method can be removed or simplified based on the component's needs
   };
 
+  // Get raw course ID for UI safety net
+  const rawCourseId = getRawCourseId(post);
+  
   return {
     displayName,
     avatarUrl,
@@ -129,6 +128,7 @@ export const useUserPostLogic = ({
     timeAgo,
     isOwnPost,
     golfCourse,
+    rawCourseId,
     handleDeletePost,
     handleProfileClick,
     handlePostClick,

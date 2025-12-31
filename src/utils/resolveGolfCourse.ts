@@ -58,6 +58,8 @@ export function resolveGolfCourse(
   post: PostWithCourseData,
   courseMap?: Map<string, CourseDetails>
 ): ResolvedGolfCourse | null {
+  const isDev = import.meta.env.DEV;
+  
   // Priority 1: Direct course_id FK (preferred for newer posts)
   if (post.course_id) {
     const fullCourse = courseMap?.get(post.course_id);
@@ -70,6 +72,15 @@ export function resolveGolfCourse(
         sub_country: fullCourse.sub_country || undefined,
       };
     }
+    
+    // Contract test: course_id exists but not in courseMap
+    if (isDev && courseMap && courseMap.size > 0) {
+      console.warn(
+        `[resolveGolfCourse] ⚠️ post.course_id "${post.course_id}" exists but not found in courseMap (size: ${courseMap.size}). ` +
+        `Returning minimal course data. Check if course was fetched.`
+      );
+    }
+    
     // Return minimal info if we have the ID but no enrichment
     return {
       id: post.course_id,
@@ -93,6 +104,14 @@ export function resolveGolfCourse(
       };
     }
     
+    // Contract test: tag exists but course not in courseMap
+    if (isDev && courseMap && courseMap.size > 0) {
+      console.warn(
+        `[resolveGolfCourse] ⚠️ golf_club tag found with entity_id "${courseId}" but not in courseMap (size: ${courseMap.size}). ` +
+        `Returning tag data. Check if course was fetched.`
+      );
+    }
+    
     return {
       id: courseId,
       name: golfClubTag.name || '',
@@ -100,6 +119,25 @@ export function resolveGolfCourse(
   }
 
   return null;
+}
+
+/**
+ * Check if a post has any golf course reference (for UI safety net).
+ * Use this to show "Played at" row even if full resolution fails.
+ */
+export function hasGolfCourseReference(post: PostWithCourseData): boolean {
+  if (post.course_id) return true;
+  return !!findGolfClubTag(post.post_tags);
+}
+
+/**
+ * Get the raw course ID from a post without full resolution.
+ * Useful for UI fallback when courseMap lookup fails.
+ */
+export function getRawCourseId(post: PostWithCourseData): string | null {
+  if (post.course_id) return post.course_id;
+  const tag = findGolfClubTag(post.post_tags);
+  return tag?.entityId || null;
 }
 
 /**
