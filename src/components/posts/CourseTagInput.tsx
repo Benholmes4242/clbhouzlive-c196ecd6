@@ -199,6 +199,7 @@ const CourseTagInput = ({
         {selectedCourse ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0 8px' }}>
             <div style={lightStyles.pill}>
+              <MapPin style={{ width: '14px', height: '14px', color: 'var(--cm-icon-secondary)', flexShrink: 0 }} />
               <span style={lightStyles.pillName}>{selectedCourse.name}</span>
               <button
                 onClick={handleRemoveCourse}
