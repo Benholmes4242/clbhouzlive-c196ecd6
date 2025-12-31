@@ -6,13 +6,8 @@
  * Logs music detection at every playback surface to trace where music chain breaks.
  */
 
-export const DEBUG_MUSIC_PROPAGATION = (): boolean => {
-  try {
-    return localStorage.getItem('DEBUG_MUSIC_PROPAGATION') === 'true';
-  } catch {
-    return false;
-  }
-};
+// ENABLED: Always on for debugging music propagation issues
+export const DEBUG_MUSIC_PROPAGATION = (): boolean => true;
 
 export interface MusicDebugLog {
   surface: string;
