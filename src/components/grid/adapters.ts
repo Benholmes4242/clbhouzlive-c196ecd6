@@ -8,6 +8,7 @@ import { UniversalMediaItem, AR_LANDSCAPE_THRESHOLD, AR_PORTRAIT_THRESHOLD } fro
 import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityGridItem } from '@/components/profile/ActivityGrid';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 
 // Import ActivityPost type inline to avoid circular dependencies
 interface ActivityPostMedia {
@@ -39,6 +40,7 @@ interface ActivityPost {
   shares: number;
   timeAgo: string;
   created_at: string;
+  course_id?: string | null;
   post_media: ActivityPostMedia[];
   post_tags: ActivityPostTag[];
   user: {
@@ -188,10 +190,9 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
   if (!media || media.length === 0) return null;
 
   const primaryMedia = media[0];
-  const golfCourseTag = post.post_tags?.find(tag => tag.entity_type === 'golf_club');
-  // Use tag first, fallback to course_id
-  const golfCourseId = golfCourseTag?.entity_id || (post as any).course_id;
-  const golfCourseName = golfCourseTag?.name;
+  
+  // Use canonical resolver
+  const golfCourse = resolveGolfCourse(post);
   const isMilestone = post.content?.toLowerCase().includes('milestone') || 
     post.post_tags?.some(tag => tag.name?.toLowerCase().includes('achievement'));
 
@@ -224,8 +225,8 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
     likes: post.likes,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
-    courseName: golfCourseName,
-    golfCourseId,
+    courseName: golfCourse?.name,
+    golfCourseId: golfCourse?.id,
     
     // Creator info
     creator: post.user ? {

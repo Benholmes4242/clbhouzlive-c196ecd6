@@ -9,6 +9,7 @@ import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
+import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
@@ -32,43 +33,20 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       currentUserId: userId
     });
 
-    // Helper function to extract golf course from post.course_id, tags, or content
-    const extractGolfCourse = (post: ActivityPost) => {
-      // Priority 1: Use course_id from database
-      if (post.course_id) {
+    // Use canonical resolver, with content fallback for very old posts
+    const extractGolfCourseData = (post: ActivityPost) => {
+      // Try canonical resolver first (handles course_id + tags)
+      const resolved = resolveGolfCourse(post);
+      if (resolved) {
         return {
-          id: post.course_id,
-          name: '', // Will be fetched when component mounts
-          country: '',
-          region: ''
+          id: resolved.id,
+          name: resolved.name || '',
+          country: resolved.country || '',
+          region: resolved.region || ''
         };
       }
       
-      // Priority 2: Try to extract from post tags
-      const golfCourseTag = post.post_tags?.find(tag => 
-        tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
-      );
-      
-      if (golfCourseTag) {
-        // Handle both tag formats
-        if (golfCourseTag.entity_type === 'golf_club') {
-          return {
-            id: golfCourseTag.entity_id,
-            name: golfCourseTag.name,
-            country: '',
-            region: ''
-          };
-        } else if (golfCourseTag.tagged_entity) {
-          return {
-            id: golfCourseTag.tagged_entity.entity_id,
-            name: golfCourseTag.tagged_entity.name,
-            country: '',
-            region: ''
-          };
-        }
-      }
-      
-      // Priority 3: Try to extract from content
+      // Fallback: Try to extract from content (very old posts)
       const courseFromContent = extractGolfCourseFromContent(post.content);
       if (courseFromContent) {
         return courseFromContent;
@@ -85,7 +63,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: post.user,
       post_media: post.post_media || [],
       post_tags: post.post_tags || [],
-      golfCourse: extractGolfCourse(post)
+      golfCourse: extractGolfCourseData(post)
     };
     
     // Transform all posts
@@ -96,7 +74,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: p.user,
       post_media: p.post_media || [],
       post_tags: p.post_tags || [],
-      golfCourse: extractGolfCourse(p)
+      golfCourse: extractGolfCourseData(p)
     }));
     
     // This function is now simplified - posts handle their own modals
@@ -229,29 +207,16 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
             initialIndex={0}
             alt={`Post media`}
             golfCourse={(() => {
-              // Extract golf course data from post tags or content
-              const golfCourseTag = selectedPost.post_tags?.find(tag => 
-                tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
-              );
-              
-              if (golfCourseTag) {
-                // Handle both tag formats
-                if (golfCourseTag.entity_type === 'golf_club') {
-                  return {
-                    id: golfCourseTag.entity_id,
-                    name: golfCourseTag.name,
-                    country: ''
-                  };
-                } else if (golfCourseTag.tagged_entity) {
-                  return {
-                    id: golfCourseTag.tagged_entity.entity_id,
-                    name: golfCourseTag.tagged_entity.name,
-                    country: ''
-                  };
-                }
+              // Use canonical resolver
+              const resolved = resolveGolfCourse(selectedPost);
+              if (resolved) {
+                return {
+                  id: resolved.id,
+                  name: resolved.name,
+                  country: resolved.country || ''
+                };
               }
-              
-              // Fallback to content extraction
+              // Fallback to content extraction for very old posts
               return extractGolfCourseFromContent(selectedPost.content);
             })()}
             user={selectedPost.user}

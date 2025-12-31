@@ -4,6 +4,7 @@ import { isValidImageUrl } from './urlValidation';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { getStreamPoster } from '@/utils/stream';
 import { buildVisibilityFilter } from '@/utils/visibilityFilter';
+import { collectCourseIds, resolveGolfCourse } from '@/utils/resolveGolfCourse';
 
 export const useRealPostsFetcher = () => {
   const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
@@ -147,20 +148,8 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
-      // Extract all golf course IDs from post tags AND direct course_id FK for batch fetching
-      const courseIdsFromTags = postsData
-        .flatMap(post => (post.post_tags || [])
-          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
-          .map((tag: any) => tag.taggable_entities?.entity_id)
-        )
-        .filter(Boolean) as string[];
-      
-      // Also collect direct course_id from posts (newer posts use this instead of tags)
-      const courseIdsFromPosts = postsData
-        .map(post => post.course_id)
-        .filter(Boolean) as string[];
-      
-      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
+      // Use canonical helper to collect all course IDs
+      const uniqueCourseIds = collectCourseIds(postsData);
       
       // Batch fetch golf course details
       const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
@@ -511,18 +500,8 @@ export const useRealPostsFetcher = () => {
         ? await supabase.from('business_accounts').select('id, name, logo_url, is_verified, category, location').in('id', businessIds)
         : { data: [] };
 
-      const courseIdsFromTags = sortedPosts
-        .flatMap(post => (post.post_tags || [])
-          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
-          .map((tag: any) => tag.taggable_entities?.entity_id)
-        )
-        .filter(Boolean) as string[];
-      
-      const courseIdsFromPosts = sortedPosts
-        .map(post => post.course_id)
-        .filter(Boolean) as string[];
-
-      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
+      // Use canonical helper to collect all course IDs
+      const uniqueCourseIds = collectCourseIds(sortedPosts);
       const { data: golfCourses } = uniqueCourseIds.length > 0
         ? await supabase.from('golf_courses').select('id, name, country, sub_country, region').in('id', uniqueCourseIds)
         : { data: [] };
@@ -793,19 +772,8 @@ export const useRealPostsFetcher = () => {
         // Don't fail - just continue without business data
       }
 
-      // Extract all golf course IDs from post tags AND direct course_id for batch fetching
-      const courseIdsFromTags = postsData
-        .flatMap(post => (post.post_tags || [])
-          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
-          .map((tag: any) => tag.taggable_entities?.entity_id)
-        )
-        .filter(Boolean) as string[];
-      
-      const courseIdsFromPosts = postsData
-        .map(post => post.course_id)
-        .filter(Boolean) as string[];
-      
-      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
+      // Use canonical helper to collect all course IDs
+      const uniqueCourseIds = collectCourseIds(postsData);
       
       // Batch fetch golf course details
       const { data: golfCourses, error: coursesError } = uniqueCourseIds.length > 0
@@ -1271,18 +1239,8 @@ export const useRealPostsFetcher = () => {
       // ===== Golf course hydration (CRITICAL for "Played at …" row) =====
       const DEBUG_COURSE_LOCATION = import.meta.env.DEV;
 
-      const courseIdsFromTags = validPosts
-        .flatMap((post: any) => (post.post_tags || [])
-          .filter((tag: any) => tag.taggable_entities?.entity_type === 'golf_club')
-          .map((tag: any) => tag.taggable_entities?.entity_id)
-        )
-        .filter(Boolean) as string[];
-      
-      const courseIdsFromPosts = validPosts
-        .map((post: any) => post.course_id)
-        .filter(Boolean) as string[];
-
-      const uniqueCourseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
+      // Use canonical helper to collect all course IDs
+      const uniqueCourseIds = collectCourseIds(validPosts);
 
       if (DEBUG_COURSE_LOCATION) {
         console.log('[ClubhouseCourseHydration] uniqueCourseIds', uniqueCourseIds.length, uniqueCourseIds.slice(0, 20));
