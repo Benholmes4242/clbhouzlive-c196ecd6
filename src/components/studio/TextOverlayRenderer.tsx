@@ -331,9 +331,9 @@ export default function TextOverlayRenderer({
     
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Capture pointer so moves keep firing even if pointer leaves element
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    e.currentTarget.setPointerCapture(e.pointerId);
     pointerIdRef.current = e.pointerId;
     
     handleSelectOverlay(overlay.id);
@@ -550,9 +550,9 @@ export default function TextOverlayRenderer({
     if (!isEditable || !containerRef?.current) return;
     e.preventDefault();
     e.stopPropagation();
-    
-    // Capture pointer for rotation handle
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
+    // Capture pointer for rotation handle (use currentTarget so SVG clicks still work)
+    e.currentTarget.setPointerCapture(e.pointerId);
     rotatePointerIdRef.current = e.pointerId;
     
     const rect = containerRef.current.getBoundingClientRect();
