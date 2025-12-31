@@ -4081,9 +4081,11 @@ export type Database = {
       }
       posts: {
         Row: {
+          achievement_badge_id: string | null
           achievement_id: string | null
           actor_id: string
           actor_type: string
+          audio_mode: string | null
           badges: string[]
           categories: string[]
           comment_count: number
@@ -4096,14 +4098,17 @@ export type Database = {
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
+          studio_music: Json | null
           updated_at: string
           user_id: string
           visibility: Database["public"]["Enums"]["post_visibility"]
         }
         Insert: {
+          achievement_badge_id?: string | null
           achievement_id?: string | null
           actor_id: string
           actor_type?: string
+          audio_mode?: string | null
           badges?: string[]
           categories?: string[]
           comment_count?: number
@@ -4116,14 +4121,17 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          studio_music?: Json | null
           updated_at?: string
           user_id: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
         }
         Update: {
+          achievement_badge_id?: string | null
           achievement_id?: string | null
           actor_id?: string
           actor_type?: string
+          audio_mode?: string | null
           badges?: string[]
           categories?: string[]
           comment_count?: number
@@ -4136,6 +4144,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          studio_music?: Json | null
           updated_at?: string
           user_id?: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
