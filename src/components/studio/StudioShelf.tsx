@@ -21,6 +21,9 @@ type StudioShelfProps = {
   // Position mode state - lifted up so CreateMomentMediaStage can use it
   isPositioningText?: boolean;
   onTogglePositionMode?: () => void;
+  // Active overlay selection (synced with renderer)
+  activeOverlayId?: string | null;
+  onSelectOverlay?: (id: string | null) => void;
 };
 
 export default function StudioShelf({
@@ -34,7 +37,9 @@ export default function StudioShelf({
   updateEdits,
   clearEdits,
   isPositioningText = false,
-  onTogglePositionMode
+  onTogglePositionMode,
+  activeOverlayId,
+  onSelectOverlay
 }: StudioShelfProps) {
   // Focus trap and keyboard handling
   useEffect(() => {
@@ -178,6 +183,8 @@ export default function StudioShelf({
                       onReset={handleReset}
                       isPositioningText={isPositioningText}
                       onTogglePositionMode={onTogglePositionMode}
+                      activeOverlayId={activeOverlayId}
+                      onSelectOverlay={onSelectOverlay}
                     />
                   </motion.div>
                 )}

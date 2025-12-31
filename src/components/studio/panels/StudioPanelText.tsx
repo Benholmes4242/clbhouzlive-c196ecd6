@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Move, ArrowLeft } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Plus, Move, ArrowLeft, Layers, ChevronUp } from 'lucide-react';
 import { StudioEdits, TextOverlay, TextStyle } from '@/types/studio';
 import { nanoid } from 'nanoid';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,8 @@ type StudioPanelTextProps = {
   onReset: () => void;
   isPositioningText?: boolean;
   onTogglePositionMode?: () => void;
+  activeOverlayId?: string | null;
+  onSelectOverlay?: (id: string | null) => void;
 };
 
 // 8 style presets with preview labels
@@ -48,20 +50,34 @@ export default function StudioPanelText({
   onApply, 
   onReset,
   isPositioningText = false,
-  onTogglePositionMode
+  onTogglePositionMode,
+  activeOverlayId,
+  onSelectOverlay
 }: StudioPanelTextProps) {
   const [textBoxes, setTextBoxes] = useState<TextOverlay[]>(edits?.textOverlays || []);
-  const [selectedBox, setSelectedBox] = useState<string | null>(null);
+  
+  // Use external selection if provided, else internal
+  const [internalSelectedBox, setInternalSelectedBox] = useState<string | null>(null);
+  const selectedBox = activeOverlayId !== undefined ? activeOverlayId : internalSelectedBox;
+  
+  const handleSelectBox = useCallback((id: string | null) => {
+    if (onSelectOverlay) {
+      onSelectOverlay(id);
+    } else {
+      setInternalSelectedBox(id);
+    }
+  }, [onSelectOverlay]);
 
   // Sync with external edits changes
   useEffect(() => {
     setTextBoxes(edits?.textOverlays || []);
   }, [edits?.textOverlays]);
 
-  const addTextBox = () => {
-    // Cascade positioning: stack subsequent overlays below center
+  const addTextBox = useCallback(() => {
+    // Cascade positioning within safe area: stack subsequent overlays below center
+    const baseY = 0.4; // Start a bit above center for safe area
     const yOffset = textBoxes.length * 0.08;
-    const newY = Math.min(0.5 + yOffset, 0.85);
+    const newY = Math.min(baseY + yOffset, 0.75); // Stay within safe bottom margin
     
     const newBox: TextOverlay = {
       id: nanoid(),
@@ -75,24 +91,39 @@ export default function StudioPanelText({
     };
     const updated = [...textBoxes, newBox];
     setTextBoxes(updated);
-    setSelectedBox(newBox.id);
+    handleSelectBox(newBox.id); // Auto-select new overlay
     updateEdits({ textOverlays: updated });
-  };
+  }, [textBoxes, updateEdits, handleSelectBox]);
 
-  const updateBox = (id: string, changes: Partial<TextOverlay>) => {
+  const updateBox = useCallback((id: string, changes: Partial<TextOverlay>) => {
     const updated = textBoxes.map(box => 
       box.id === id ? { ...box, ...changes } : box
     );
     setTextBoxes(updated);
     updateEdits({ textOverlays: updated });
-  };
+  }, [textBoxes, updateEdits]);
 
-  const removeBox = (id: string) => {
+  const removeBox = useCallback((id: string) => {
     const updated = textBoxes.filter(box => box.id !== id);
     setTextBoxes(updated);
     updateEdits({ textOverlays: updated });
-    if (selectedBox === id) setSelectedBox(null);
-  };
+    if (selectedBox === id) {
+      // Select the last remaining overlay, or null
+      handleSelectBox(updated.length > 0 ? updated[updated.length - 1].id : null);
+    }
+  }, [textBoxes, updateEdits, selectedBox, handleSelectBox]);
+  
+  // Bring selected overlay to front (move to end of array)
+  const bringToFront = useCallback((id: string) => {
+    const index = textBoxes.findIndex(box => box.id === id);
+    if (index === -1 || index === textBoxes.length - 1) return;
+    
+    const updated = [...textBoxes];
+    const [item] = updated.splice(index, 1);
+    updated.push(item);
+    setTextBoxes(updated);
+    updateEdits({ textOverlays: updated });
+  }, [textBoxes, updateEdits]);
 
   const selected = textBoxes.find(box => box.id === selectedBox);
 
@@ -119,42 +150,71 @@ export default function StudioPanelText({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Text boxes list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      {/* Layers header */}
+      <div className="px-4 pt-3 pb-2 flex items-center gap-2">
+        <Layers className="w-4 h-4 text-zinc-500" />
+        <span className="text-sm font-medium text-zinc-700">Layers</span>
+        <span className="text-xs text-zinc-400 ml-auto">{textBoxes.length} text{textBoxes.length !== 1 ? 's' : ''}</span>
+      </div>
+      
+      {/* Text boxes list (Layers) */}
+      <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
         {textBoxes.length === 0 ? (
           <div className="text-center py-8 text-zinc-500">
             <p className="text-sm">No text added yet</p>
             <p className="text-xs mt-1">Tap + to add text to your media</p>
           </div>
         ) : (
-          textBoxes.map(box => (
-            <button
-              key={box.id}
-              onClick={() => setSelectedBox(box.id)}
-              className={cn(
-                "w-full p-3 rounded-lg border text-left transition-colors",
-                selectedBox === box.id
-                  ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
-                  : 'border-zinc-200 bg-white hover:bg-zinc-50'
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-zinc-900 truncate">{box.text}</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeBox(box.id);
-                  }}
-                  className="text-zinc-400 hover:text-red-500 text-xs"
-                >
-                  Remove
-                </button>
-              </div>
-              <div className="text-xs text-zinc-500 mt-1">
-                {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
-              </div>
-            </button>
-          ))
+          // Render in reverse order so newest appears at top
+          [...textBoxes].reverse().map((box, reverseIndex) => {
+            const isSelected = selectedBox === box.id;
+            const isTopLayer = reverseIndex === 0;
+            
+            return (
+              <button
+                key={box.id}
+                onClick={() => handleSelectBox(box.id)}
+                className={cn(
+                  "w-full p-3 rounded-lg border text-left transition-colors",
+                  isSelected
+                    ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
+                    : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-zinc-900 truncate flex-1">{box.text}</span>
+                  <div className="flex items-center gap-2">
+                    {/* Bring to front button */}
+                    {!isTopLayer && isSelected && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          bringToFront(box.id);
+                        }}
+                        className="text-zinc-400 hover:text-zinc-600 p-1"
+                        title="Bring to front"
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeBox(box.id);
+                      }}
+                      className="text-zinc-400 hover:text-red-500 text-xs"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                <div className="text-xs text-zinc-500 mt-1">
+                  {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
+                  {box.rotation ? ` • ${Math.round(box.rotation)}°` : ''}
+                </div>
+              </button>
+            );
+          })
         )}
       </div>
 
