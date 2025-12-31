@@ -33,17 +33,32 @@ export interface MusicDebugLog {
  */
 export function logMusicDetection(log: Omit<MusicDebugLog, 'timestamp'>): void {
   if (!DEBUG_MUSIC_PROPAGATION()) return;
-  
+
   const fullLog: MusicDebugLog = {
     ...log,
     timestamp: Date.now(),
   };
-  
+
   const emoji = log.hasMusic ? '🎵' : '🔇';
-  const status = log.hasMusic 
+  const status = log.hasMusic
     ? `MUSIC DETECTED (${log.musicUrl ? 'URL present' : 'NO URL!'})`
     : 'NO MUSIC';
-  
+
+  // Plain, easy-to-search log (useful if styled logs are hidden)
+  console.log('[MusicDebug]', {
+    surface: fullLog.surface,
+    postId: fullLog.postId,
+    postMediaId: fullLog.postMediaId,
+    hasMusic: fullLog.hasMusic,
+    audioMode: fullLog.audioMode,
+    musicUrl: fullLog.musicUrl,
+    studioEditsPresent: fullLog.studioEditsPresent,
+    videoMuted: fullLog.videoMuted,
+    soundtrackStripMounted: fullLog.soundtrackStripMounted,
+    timestamp: fullLog.timestamp,
+  });
+
+  // Styled log for readability
   console.log(
     `%c[MusicDebug] ${emoji} ${log.surface}`,
     log.hasMusic ? 'color: #22c55e; font-weight: bold' : 'color: #ef4444',

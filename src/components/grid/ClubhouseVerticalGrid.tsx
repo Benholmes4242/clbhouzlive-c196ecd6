@@ -35,7 +35,7 @@ import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { logFirstCardRender } from '@/utils/bootTimeline';
-import { logMusicDetection } from '@/media/debug-music';
+import { DEBUG_MUSIC_PROPAGATION, logMusicDetection } from '@/media/debug-music';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -211,6 +211,15 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     
     return filtered;
   }, [posts, isPortrait]);
+
+  useEffect(() => {
+    if (!DEBUG_MUSIC_PROPAGATION()) return;
+    console.log('[MusicDebug] ClubhouseVerticalGrid mounted', {
+      postsIn: posts.length,
+      postsFiltered: filteredPosts.length,
+      isGloballyMuted,
+    });
+  }, [posts.length, filteredPosts.length, isGloballyMuted]);
 
   // Use vertical feed logic hook
   const {
