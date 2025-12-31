@@ -39,6 +39,7 @@ export const useTop100Highlights = (userId: string) => {
           id,
           content,
           created_at,
+          course_id,
           post_media (
             id,
             media_type,
@@ -67,14 +68,19 @@ export const useTop100Highlights = (userId: string) => {
       console.log('Found posts:', data.length);
       console.log('Posts data:', JSON.stringify(data, null, 2));
 
-      // Get all golf club entity IDs from the posts
+      // Get all golf club entity IDs from the posts (from tags OR course_id FK)
       const golfClubEntityIds = new Set<string>();
       data.forEach(post => {
+        // Check post_tags first
         post.post_tags?.forEach(tag => {
           if (tag.taggable_entities?.entity_type === 'golf_club') {
             golfClubEntityIds.add(tag.taggable_entities.entity_id);
           }
         });
+        // Fallback to course_id FK
+        if (post.course_id) {
+          golfClubEntityIds.add(post.course_id);
+        }
       });
 
       if (golfClubEntityIds.size === 0) {
@@ -107,7 +113,8 @@ export const useTop100Highlights = (userId: string) => {
       
       data.forEach(post => {
         if (post.post_media && post.post_media.length > 0) {
-          // Find golf club tags and check if any correspond to Top-100 courses
+          // First try golf club tags
+          let foundCourse = false;
           post.post_tags?.forEach(tag => {
             if (tag.taggable_entities?.entity_type === 'golf_club') {
               const courseData = courseMap.get(tag.taggable_entities.entity_id);
@@ -127,10 +134,33 @@ export const useTop100Highlights = (userId: string) => {
                     post_media: post.post_media,
                     golf_course: courseData
                   });
+                  foundCourse = true;
                 }
               }
             }
           });
+          
+          // Fallback to course_id FK if no golf club tag
+          if (!foundCourse && post.course_id) {
+            const courseData = courseMap.get(post.course_id);
+            if (courseData) {
+              const isTop100 = (
+                (courseData.global_rank && courseData.global_rank <= 100) ||
+                (courseData.regional_rank && courseData.regional_rank <= 100) ||
+                (courseData.usa_rank && courseData.usa_rank <= 100)
+              );
+
+              if (isTop100) {
+                transformedData.push({
+                  id: post.id,
+                  content: post.content,
+                  created_at: post.created_at,
+                  post_media: post.post_media,
+                  golf_course: courseData
+                });
+              }
+            }
+          }
         }
       });
 

@@ -47,6 +47,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             id,
             content,
             created_at,
+            course_id,
             post_media!inner (
               id,
               media_type,
@@ -89,8 +90,11 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
           return;
         }
 
-        // Get golf course details for tagged courses
-        const courseIds = tags?.map(tag => tag.taggable_entities.entity_id) || [];
+        // Collect course IDs from both tags AND course_id FK
+        const courseIdsFromTags = tags?.map(tag => tag.taggable_entities.entity_id) || [];
+        const courseIdsFromPosts = posts.map(p => p.course_id).filter(Boolean) as string[];
+        const courseIds = [...new Set([...courseIdsFromTags, ...courseIdsFromPosts])];
+        
         if (courseIds.length === 0) {
           setHighlights([]);
           return;
@@ -130,12 +134,13 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
         // Combine the data and filter for posts that have golf course tags
         const transformedHighlights: HighlightVideo[] = posts
           .map(post => {
-            // Find the tag for this post
+            // Find the tag for this post (or use course_id FK)
             const postTag = tags?.find(tag => tag.post_id === post.id);
-            if (!postTag) return null;
+            const courseIdToUse = postTag?.taggable_entities.entity_id || post.course_id;
+            if (!courseIdToUse) return null;
 
             // Find the course details
-            const course = courses?.find(c => c.id === postTag.taggable_entities.entity_id);
+            const course = courses?.find(c => c.id === courseIdToUse);
             if (!course) return null;
 
             const media = post.post_media[0];
