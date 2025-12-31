@@ -436,19 +436,23 @@ export default function CreateMomentModal({
       return;
     }
     
-    // Build full studio edits including filter, music, audioMode, and textOverlays
+    // Build full studio edits including filter, music, audioMode, textOverlays, crop, and rotate
     const studioEditsByMediaId = media.reduce((acc, item) => {
       const edits = getEdits?.(item.id);
       const hasEdits = !!edits && (
         !!edits.filter || 
         !!edits.music || 
         !!edits.audioMode || 
-        (edits.textOverlays?.length ?? 0) > 0
+        (edits.textOverlays?.length ?? 0) > 0 ||
+        !!edits.crop?.ratio ||
+        !!edits.rotate
       );
       
       if (hasEdits) {
         acc[item.id] = {
           ...(edits.filter && { filter: edits.filter }),
+          ...(edits.crop?.ratio && { crop: { ratio: edits.crop.ratio } }),
+          ...(edits.rotate && { rotate: edits.rotate }),
           ...(edits.music && { 
             music: {
               trackId: edits.music.trackId,
@@ -464,7 +468,7 @@ export default function CreateMomentModal({
         };
       }
       return acc;
-    }, {} as Record<string, { filter?: string; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
+    }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
     
     try {
       // Enqueue upload and close immediately
