@@ -55,25 +55,38 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
 
   const triggerClasses = variant === 'dark'
     ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15 transition-colors`
-    : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border border-border/60 bg-background/60 hover:bg-background/80 transition-colors`;
+    : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border hover:opacity-90 transition-colors`;
+
+  const lightTriggerStyle = variant === 'light' ? {
+    background: 'var(--cm-surface-alt)',
+    borderColor: 'var(--cm-border)',
+  } : undefined;
 
   const textClasses = variant === 'dark'
     ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-white leading-none`
     : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px]`;
 
+  const lightTextStyle = variant === 'light' ? {
+    color: 'var(--cm-text-primary)',
+  } : undefined;
+
   const chevronClasses = variant === 'dark'
     ? 'h-3 w-3 text-white/50'
-    : 'h-3 w-3 text-muted-foreground';
+    : 'h-3 w-3';
+
+  const lightChevronStyle = variant === 'light' ? {
+    color: 'var(--cm-text-secondary)',
+  } : undefined;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={triggerClasses} style={triggerStyles}>
+        <button className={triggerClasses} style={lightTriggerStyle}>
           {renderAvatar(activeActor)}
-          <span className={textClasses}>
+          <span className={textClasses} style={lightTextStyle}>
             {activeActor.name}
           </span>
-          <ChevronDown className={chevronClasses} />
+          <ChevronDown className={chevronClasses} style={lightChevronStyle} />
         </button>
       </DropdownMenuTrigger>
 
