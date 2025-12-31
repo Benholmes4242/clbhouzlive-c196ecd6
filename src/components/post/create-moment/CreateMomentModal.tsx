@@ -105,12 +105,21 @@ export default function CreateMomentModal({
   // Position mode state for text tool
   const [isPositioningText, setIsPositioningText] = useState(false);
   
+  // Active overlay selection for multi-text stacking
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+  
   // Reset position mode when tool changes
   useEffect(() => {
     if (activeTool !== 'text') {
       setIsPositioningText(false);
+      setActiveOverlayId(null);
     }
   }, [activeTool]);
+  
+  // Toggle position mode handler
+  const handleTogglePositionMode = () => {
+    setIsPositioningText(prev => !prev);
+  };
 
   const { hasDraft, saveDraft, clearDraft, restoreDraft } = useDraftPersistence();
 
@@ -565,6 +574,8 @@ export default function CreateMomentModal({
               activeTool={activeTool}
               onUpdateEdits={updateEdits}
               isPositioningText={isPositioningText}
+              activeOverlayId={activeOverlayId}
+              onSelectOverlay={setActiveOverlayId}
             />
           ) : (
             <CreateMomentHero
@@ -691,6 +702,10 @@ export default function CreateMomentModal({
         edits={getEdits(media[activeIndex]?.id || '')}
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
+        isPositioningText={isPositioningText}
+        onTogglePositionMode={handleTogglePositionMode}
+        activeOverlayId={activeOverlayId}
+        onSelectOverlay={setActiveOverlayId}
       />
 
       {/* Bottom Sheets */}
