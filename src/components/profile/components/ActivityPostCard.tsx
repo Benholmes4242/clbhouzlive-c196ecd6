@@ -77,12 +77,13 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
             </div>
           ) : (
             <div className={cn("w-full h-full", cropClass)}>
-              <img
-                src={currentMedia.media_url}
-                alt="Post media"
-                className={cn("w-full h-full object-cover", filterClass)}
-                style={pixelStyle}
-              />
+              <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                <img
+                  src={currentMedia.media_url}
+                  alt="Post media"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           )}
 
