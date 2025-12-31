@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 
@@ -50,9 +51,9 @@ const VideoCard: React.FC<{
 
   // Get HLS URL and poster from video URL
   const uid = video.videoUrl ? uidFromNode({ src: video.videoUrl }) : null;
-  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
+  const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
   const poster = uid 
-    ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` 
+    ? generateStreamThumbnailUrl(uid, { height: 600 })
     : video.thumbnail;
 
   // Intersection observer for attach/autoplay
