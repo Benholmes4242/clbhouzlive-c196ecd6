@@ -226,6 +226,20 @@ const FullscreenMediaModal = ({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
+  // Debug log helper for navigation events
+  const logNavigationEvent = useCallback((direction: 'next' | 'previous', trigger: 'swipe' | 'keyboard' | 'click') => {
+    console.log('[MusicDebug] 🔄 NAVIGATION', {
+      direction,
+      trigger,
+      postId,
+      currentPostIndex,
+      totalPosts,
+      studioEditsPresent: Array.isArray(studioEdits) && studioEdits.length > 0,
+      hasMusic: postHasMusic,
+      musicUrl: activeMusic?.url || activeMusic?.r2Key || null,
+    });
+  }, [postId, currentPostIndex, totalPosts, studioEdits, postHasMusic, activeMusic]);
+
   // Swipe handlers for mobile - horizontal for media navigation, vertical for post navigation
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
@@ -236,6 +250,7 @@ const FullscreenMediaModal = ({
         }
         // For single video in post navigation mode, go to next post
         else if (canNavigatePosts && canGoNext && onNextPost) {
+          logNavigationEvent('next', 'swipe');
           onNextPost();
         }
       }
@@ -248,17 +263,20 @@ const FullscreenMediaModal = ({
         }
         // For single video in post navigation mode, go to previous post
         else if (canNavigatePosts && canGoPrevious && onPreviousPost) {
+          logNavigationEvent('previous', 'swipe');
           onPreviousPost();
         }
       }
     },
     onSwipedDown: (eventData) => {
       if (isMobile && canNavigatePosts && canGoNext && onNextPost) {
+        logNavigationEvent('next', 'swipe');
         onNextPost();
       }
     },
     onSwipedUp: (eventData) => {
       if (isMobile && canNavigatePosts && canGoPrevious && onPreviousPost) {
+        logNavigationEvent('previous', 'swipe');
         onPreviousPost();
       }
     },
@@ -342,12 +360,14 @@ const FullscreenMediaModal = ({
         if (hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
           setCurrentIndex(prev => prev + 1);
         } else if (canNavigatePosts && onNextPost) {
+          logNavigationEvent('next', 'keyboard');
           onNextPost();
         }
       } else if (e.key === 'ArrowLeft') {
         if (hasMultipleMedia && currentIndex > 0) {
           setCurrentIndex(prev => prev - 1);
         } else if (canNavigatePosts && onPreviousPost) {
+          logNavigationEvent('previous', 'keyboard');
           onPreviousPost();
         }
       }
@@ -355,7 +375,7 @@ const FullscreenMediaModal = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, hasMultipleMedia, currentIndex, mediaUrls.length, canNavigatePosts, onNextPost, onPreviousPost, onClose]);
+  }, [isOpen, hasMultipleMedia, currentIndex, mediaUrls.length, canNavigatePosts, onNextPost, onPreviousPost, onClose, logNavigationEvent]);
 
   // Phase 2 Fix #8: Body scroll lock using CSS class instead of dynamic <style> injection
   useEffect(() => {
