@@ -16,6 +16,7 @@ type StudioShelfProps = {
   activeMediaId: string;
   activeMediaType: 'image' | 'video';
   activeMediaPreviewUrl?: string | null;
+  activeMediaThumbnailUrl?: string | null; // For filter thumbnails (videos need a poster image)
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
@@ -35,6 +36,7 @@ export default function StudioShelf({
   activeMediaId,
   activeMediaType,
   activeMediaPreviewUrl,
+  activeMediaThumbnailUrl,
   edits,
   updateEdits,
   clearEdits,
@@ -209,7 +211,7 @@ export default function StudioShelf({
                       updateEdits={updateEdits}
                       onApply={handleApply}
                       onReset={handleReset}
-                      previewUrl={activeMediaPreviewUrl}
+                      previewUrl={activeMediaThumbnailUrl || activeMediaPreviewUrl}
                     />
                   </motion.div>
                 )}

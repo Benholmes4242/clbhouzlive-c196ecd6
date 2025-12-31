@@ -8,12 +8,21 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
 
       // Optional: read duration with a timeout using a separate blob URL
       let duration: number | undefined = undefined;
+      let thumbnailUrl: string | undefined = undefined;
+      
       if (type === 'video') {
         try {
           const tmpUrl = URL.createObjectURL(file);
           duration = await readVideoDuration(tmpUrl, 1200);
         } catch {
           duration = undefined;
+        }
+        
+        // Generate thumbnail for video
+        try {
+          thumbnailUrl = await generateVideoPoster(file);
+        } catch {
+          thumbnailUrl = undefined;
         }
       }
 
@@ -22,6 +31,7 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
         type,
         file,
         previewUrl,
+        thumbnailUrl: type === 'video' ? thumbnailUrl : previewUrl, // images use previewUrl as thumbnail
         duration,
       } as ComposerMediaItem;
     } catch (e) {
@@ -32,6 +42,7 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
         type: file.type.startsWith('video') ? 'video' : 'image',
         file,
         previewUrl: url,
+        thumbnailUrl: url, // fallback uses same URL
       } as ComposerMediaItem;
     }
   });
@@ -83,6 +94,10 @@ export function revokeMediaItemUrls(items: ComposerMediaItem[]) {
   items.forEach(item => {
     if (item.previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(item.previewUrl);
+    }
+    // Also revoke thumbnail URL if different from previewUrl
+    if (item.thumbnailUrl && item.thumbnailUrl !== item.previewUrl && item.thumbnailUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(item.thumbnailUrl);
     }
   });
 }
