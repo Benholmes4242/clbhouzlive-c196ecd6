@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 
 interface FullscreenMediaModalProps {
@@ -487,6 +488,14 @@ const FullscreenMediaModal = ({
                 externallyManaged={false}
               />
             </div>
+          )}
+          
+          {/* Text overlays from studioEdits */}
+          {studioEdits?.[currentIndex] && (studioEdits[currentIndex] as any)?.textOverlays?.length > 0 && (
+            <TextOverlayRenderer
+              textOverlays={(studioEdits[currentIndex] as any).textOverlays}
+              isEditable={false}
+            />
           )}
           
           {/* SoundtrackStrip for music posts - Option A: music controls audio */}
