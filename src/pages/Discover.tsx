@@ -35,7 +35,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import Top100Pills from '@/components/courses/Top100Pills';
-import { logMissingStudioEdits } from '@/media/debug-music';
+
 
 // Lazy load heavy/inactive components for better initial bundle size
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
@@ -216,13 +216,6 @@ const Discover = () => {
       mediaItem.url === item.src || mediaItem.id === item.id
     );
     if (clickedIndex !== -1) {
-      // Log missing studioEdits for discover surface
-      logMissingStudioEdits('discover_grid', 'FullscreenMediaModal opened without studioEdits', {
-        itemId: item.id,
-        clickedIndex,
-        note: 'Discover grid does not pass studioEdits or filterIds to modal'
-      });
-      
       setModalStartIndex(clickedIndex);
       setModalOpen(true);
     }

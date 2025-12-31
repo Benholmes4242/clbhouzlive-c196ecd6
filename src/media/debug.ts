@@ -4,7 +4,7 @@
  */
 
 // Master switch for all media debug logging
-export const DEBUG_MEDIA = true; // ENABLED for HLS diagnostics
+export const DEBUG_MEDIA = false; // DISABLED - Music is working
 
 // Granular flags (only apply if DEBUG_MEDIA is true)
 export const DEBUG_HLS_PLAYER = DEBUG_MEDIA;

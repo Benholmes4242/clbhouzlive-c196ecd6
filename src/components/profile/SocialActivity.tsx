@@ -9,7 +9,7 @@ import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
-import { logMusicDetection, logMissingStudioEdits } from '@/media/debug-music';
+
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
   userId,
@@ -217,29 +217,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           media.studio_edits || null
         );
         
-        // Debug logging for music propagation
-        const hasMusic = studioEdits.some(ed => {
-          const music = (ed as any)?.music;
-          return !!(music?.url || music?.r2Key);
-        });
-        
-        logMusicDetection({
-          surface: 'profile_activity_modal',
-          postId: selectedPost.id,
-          hasMusic,
-          musicUrl: studioEdits.find(ed => (ed as any)?.music?.url)?.music?.url || null,
-          audioMode: (studioEdits[0] as any)?.audioMode || null,
-          studioEditsPresent: studioEdits.some(ed => ed !== null),
-          studioEditsValue: studioEdits,
-        });
-
-        console.log('🚨 SOCIAL ACTIVITY MODAL RENDERING!', {
-          postId: selectedPost.id,
-          mediaCount: mediaItems.length,
-          mediaUrls: mediaItems.map(m => m.url),
-          mediaTypes: mediaItems.map(m => m.type),
-          hasStudioEdits: studioEdits.some(ed => ed !== null),
-        });
 
         return (
           <FullscreenMediaModal

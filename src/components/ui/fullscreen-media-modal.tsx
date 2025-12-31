@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
-import { logMusicDetection, logFullscreenModalProps } from '@/media/debug-music';
+
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -126,24 +126,6 @@ const FullscreenMediaModal = ({
     return { postHasMusic: hasMusic, activeMusic: music };
   }, [studioEdits]);
   
-  // Debug logging for music propagation audit
-  useEffect(() => {
-    if (!isOpen) return;
-    
-    logFullscreenModalProps('fullscreen_media_modal', studioEdits, postId);
-    
-    logMusicDetection({
-      surface: 'fullscreen_media_modal',
-      postId,
-      hasMusic: postHasMusic,
-      musicUrl: activeMusic?.url || activeMusic?.r2Key || null,
-      audioMode: studioEdits?.[currentIndex]?.audioMode || null,
-      videoMuted: postHasMusic ? true : isMuted,
-      studioEditsPresent: Array.isArray(studioEdits) && studioEdits.length > 0,
-      studioEditsValue: studioEdits,
-      soundtrackStripMounted: !!activeMusic,
-    });
-  }, [isOpen, postId, postHasMusic, activeMusic, studioEdits, currentIndex, isMuted]);
   
   const videoRef = useRef<HTMLVideoElement>(null); // Keep for compatibility but EnhancedVideoPlayer manages its own video
   const isMobile = useIsMobile();
@@ -226,19 +208,6 @@ const FullscreenMediaModal = ({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
-  // Debug log helper for navigation events
-  const logNavigationEvent = useCallback((direction: 'next' | 'previous', trigger: 'swipe' | 'keyboard' | 'click') => {
-    console.log('[MusicDebug] 🔄 NAVIGATION', {
-      direction,
-      trigger,
-      postId,
-      currentPostIndex,
-      totalPosts,
-      studioEditsPresent: Array.isArray(studioEdits) && studioEdits.length > 0,
-      hasMusic: postHasMusic,
-      musicUrl: activeMusic?.url || activeMusic?.r2Key || null,
-    });
-  }, [postId, currentPostIndex, totalPosts, studioEdits, postHasMusic, activeMusic]);
 
   // Swipe handlers for mobile - horizontal for media navigation, vertical for post navigation
   const swipeHandlers = useSwipeable({
@@ -250,7 +219,6 @@ const FullscreenMediaModal = ({
         }
         // For single video in post navigation mode, go to next post
         else if (canNavigatePosts && canGoNext && onNextPost) {
-          logNavigationEvent('next', 'swipe');
           onNextPost();
         }
       }
@@ -263,20 +231,17 @@ const FullscreenMediaModal = ({
         }
         // For single video in post navigation mode, go to previous post
         else if (canNavigatePosts && canGoPrevious && onPreviousPost) {
-          logNavigationEvent('previous', 'swipe');
           onPreviousPost();
         }
       }
     },
     onSwipedDown: (eventData) => {
       if (isMobile && canNavigatePosts && canGoNext && onNextPost) {
-        logNavigationEvent('next', 'swipe');
         onNextPost();
       }
     },
     onSwipedUp: (eventData) => {
       if (isMobile && canNavigatePosts && canGoPrevious && onPreviousPost) {
-        logNavigationEvent('previous', 'swipe');
         onPreviousPost();
       }
     },
@@ -360,14 +325,12 @@ const FullscreenMediaModal = ({
         if (hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
           setCurrentIndex(prev => prev + 1);
         } else if (canNavigatePosts && onNextPost) {
-          logNavigationEvent('next', 'keyboard');
           onNextPost();
         }
       } else if (e.key === 'ArrowLeft') {
         if (hasMultipleMedia && currentIndex > 0) {
           setCurrentIndex(prev => prev - 1);
         } else if (canNavigatePosts && onPreviousPost) {
-          logNavigationEvent('previous', 'keyboard');
           onPreviousPost();
         }
       }
@@ -375,7 +338,7 @@ const FullscreenMediaModal = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, hasMultipleMedia, currentIndex, mediaUrls.length, canNavigatePosts, onNextPost, onPreviousPost, onClose, logNavigationEvent]);
+  }, [isOpen, hasMultipleMedia, currentIndex, mediaUrls.length, canNavigatePosts, onNextPost, onPreviousPost, onClose]);
 
   // Phase 2 Fix #8: Body scroll lock using CSS class instead of dynamic <style> injection
   useEffect(() => {

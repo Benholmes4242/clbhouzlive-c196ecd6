@@ -35,7 +35,7 @@ import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { logFirstCardRender } from '@/utils/bootTimeline';
-import { DEBUG_MUSIC_PROPAGATION, logMusicDetection } from '@/media/debug-music';
+
 import { ClubhouseMusicPlayer } from '@/components/clubhouse/ClubhouseMusicPlayer';
 
 interface ClubhouseVerticalGridProps {
@@ -213,14 +213,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return filtered;
   }, [posts, isPortrait]);
 
-  useEffect(() => {
-    if (!DEBUG_MUSIC_PROPAGATION()) return;
-    console.log('[MusicDebug] ClubhouseVerticalGrid mounted', {
-      postsIn: posts.length,
-      postsFiltered: filteredPosts.length,
-      isGloballyMuted,
-    });
-  }, [posts.length, filteredPosts.length, isGloballyMuted]);
 
   // Use vertical feed logic hook
   const {
@@ -600,18 +592,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           // so the music track can play instead
           const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
           const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
-          
-          logMusicDetection({
-            surface: 'clubhouse_vertical_grid',
-            postId: item.id,
-            postMediaId: mediaItem?.id || 'unknown',
-            hasMusic: postHasMusic,
-            audioMode,
-            musicUrl: musicData?.url || musicData?.r2Key || null,
-            studioEditsPresent: !!studioEdits,
-            videoMuted,
-            soundtrackStripMounted: postHasMusic, // ClubhouseMusicPlayer is rendered for posts with music
-          });
           
           return (
             <div

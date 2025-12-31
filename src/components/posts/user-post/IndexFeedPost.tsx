@@ -15,7 +15,7 @@ import { MediaNavigationDots } from './overlays/MediaNavigationDots';
 import { MediaContainer } from './MediaContainer';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenPostNavigation } from '@/hooks/useFullscreenPostNavigation';
-import { logMusicDetection, logMissingStudioEdits } from '@/media/debug-music';
+
 
 interface IndexFeedPostProps {
   post: UserPostData;
@@ -148,26 +148,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
     const filterIds = post.post_media.map(m => m.filter_id ?? null);
     const studioEdits = post.post_media.map(m => m.studio_edits ?? null);
-    
-    // Debug logging for music propagation
-    const hasMusic = studioEdits.some(ed => {
-      const music = (ed as any)?.music;
-      return !!(music?.url || music?.r2Key);
-    });
-    
-    const musicData = studioEdits.find(ed => (ed as any)?.music?.url || (ed as any)?.music?.r2Key);
-    
-    logMusicDetection({
-      surface: 'clubhouse_feed_maximize',
-      postId: post.id,
-      postMediaId: currentMediaMemo.id,
-      hasMusic,
-      musicUrl: (musicData as any)?.music?.url || null,
-      audioMode: (studioEdits[currentMediaIndex] as any)?.audioMode || null,
-      videoMuted,
-      studioEditsPresent: studioEdits.some(ed => ed !== null),
-      studioEditsValue: studioEdits,
-    });
     
     // Open with post navigation enabled, passing current video position and mute state
     await openFullscreenMedia(
