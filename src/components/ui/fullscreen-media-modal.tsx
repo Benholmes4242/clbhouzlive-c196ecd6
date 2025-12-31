@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import { logMusicDetection, logFullscreenModalProps } from '@/media/debug-music';
+
 interface FullscreenMediaModalProps {
   isOpen: boolean;
   onClose: (videoPosition?: number, videoMuted?: boolean) => void;
@@ -121,13 +123,27 @@ const FullscreenMediaModal = ({
       .map(ed => (ed as any)?.music)
       .find(m => m?.url || m?.r2Key) ?? null;
     
-    // Debug log only when playable URL exists
-    if (music?.url) {
-      console.log('[FullscreenModal] music detected', { postHasMusic: hasMusic, activeMusic: music });
-    }
-    
     return { postHasMusic: hasMusic, activeMusic: music };
   }, [studioEdits]);
+  
+  // Debug logging for music propagation audit
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    logFullscreenModalProps('fullscreen_media_modal', studioEdits, postId);
+    
+    logMusicDetection({
+      surface: 'fullscreen_media_modal',
+      postId,
+      hasMusic: postHasMusic,
+      musicUrl: activeMusic?.url || activeMusic?.r2Key || null,
+      audioMode: studioEdits?.[currentIndex]?.audioMode || null,
+      videoMuted: postHasMusic ? true : isMuted,
+      studioEditsPresent: Array.isArray(studioEdits) && studioEdits.length > 0,
+      studioEditsValue: studioEdits,
+      soundtrackStripMounted: !!activeMusic,
+    });
+  }, [isOpen, postId, postHasMusic, activeMusic, studioEdits, currentIndex, isMuted]);
   
   const videoRef = useRef<HTMLVideoElement>(null); // Keep for compatibility but EnhancedVideoPlayer manages its own video
   const isMobile = useIsMobile();

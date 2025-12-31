@@ -24,6 +24,7 @@ export interface MusicDebugLog {
   videoMuted?: boolean;
   studioEditsPresent: boolean;
   studioEditsValue?: any;
+  soundtrackStripMounted?: boolean;
   timestamp: number;
 }
 
@@ -55,6 +56,7 @@ export function logMusicDetection(log: Omit<MusicDebugLog, 'timestamp'>): void {
       studioEditsPresent: log.studioEditsPresent,
       studioEdits: log.studioEditsValue,
       musicUrl: log.musicUrl,
+      soundtrackStripMounted: log.soundtrackStripMounted,
     }
   );
 }
@@ -112,6 +114,64 @@ export function logFullscreenModalProps(
       studioEditsCount: studioEdits?.length ?? 0,
       hasMusicInEdits: hasMusic,
       rawStudioEdits: studioEdits,
+    }
+  );
+}
+
+/**
+ * Extract music data from studioEdits array
+ */
+export function extractMusicFromStudioEdits(studioEdits: any[] | undefined): {
+  hasMusic: boolean;
+  musicUrl: string | null;
+  audioMode: string | null;
+  trackId: string | null;
+} {
+  if (!studioEdits || !Array.isArray(studioEdits)) {
+    return { hasMusic: false, musicUrl: null, audioMode: null, trackId: null };
+  }
+  
+  for (const edit of studioEdits) {
+    const music = edit?.music;
+    if (music?.url || music?.r2Key) {
+      return {
+        hasMusic: true,
+        musicUrl: music.url || music.r2Key || null,
+        audioMode: edit?.audioMode || null,
+        trackId: music.trackId || null,
+      };
+    }
+  }
+  
+  return { hasMusic: false, musicUrl: null, audioMode: null, trackId: null };
+}
+
+/**
+ * Log video route page music detection
+ */
+export function logVideoRouteMusic(
+  videoId: string,
+  studioEdits: any,
+  videoMuted: boolean,
+  soundtrackStripMounted: boolean
+): void {
+  if (!DEBUG_MUSIC_PROPAGATION()) return;
+  
+  const { hasMusic, musicUrl, audioMode } = extractMusicFromStudioEdits(
+    Array.isArray(studioEdits) ? studioEdits : studioEdits ? [studioEdits] : []
+  );
+  
+  console.log(
+    `%c[MusicDebug] 📺 /video/:id Route`,
+    hasMusic ? 'color: #22c55e; font-weight: bold' : 'color: #ef4444',
+    {
+      videoId,
+      hasMusic,
+      musicUrl,
+      audioMode,
+      videoMuted,
+      soundtrackStripMounted,
+      optionAEnforced: hasMusic ? videoMuted === true : 'N/A',
     }
   );
 }
