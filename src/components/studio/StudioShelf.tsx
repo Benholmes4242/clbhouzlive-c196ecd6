@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { StudioEdits, StudioTool } from '@/types/studio';
+import { StudioEdits, StudioTool, PostStudioEdits } from '@/types/studio';
 import StudioToolRail from './StudioToolRail';
 import StudioPanelMusic from './panels/StudioPanelMusic';
 import StudioPanelText from './panels/StudioPanelText';
@@ -16,9 +16,13 @@ type StudioShelfProps = {
   activeMediaId: string;
   activeMediaType: 'image' | 'video';
   activeMediaPreviewUrl?: string | null;
+  // Per-media edits (filter, crop, rotate, text)
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
+  // Post-level edits (music, badge)
+  postEdits: PostStudioEdits;
+  updatePostEdits: (patch: Partial<PostStudioEdits>) => void;
   // Position mode state - lifted up so CreateMomentMediaStage can use it
   isPositioningText?: boolean;
   onTogglePositionMode?: () => void;
@@ -38,6 +42,8 @@ export default function StudioShelf({
   edits,
   updateEdits,
   clearEdits,
+  postEdits,
+  updatePostEdits,
   isPositioningText = false,
   onTogglePositionMode,
   activeOverlayId,
@@ -66,7 +72,8 @@ export default function StudioShelf({
   const handleReset = () => {
     // Reset current tool's edits
     if (activeTool === 'music') {
-      updateEdits({ music: null });
+      // Music is post-level
+      updatePostEdits({ music: null, audioMode: 'original' });
     } else if (activeTool === 'text') {
       updateEdits({ textOverlays: [] });
     } else if (activeTool === 'filter') {
@@ -165,8 +172,8 @@ export default function StudioShelf({
                     transition={{ duration: 0.15 }}
                   >
                     <StudioPanelMusic
-                      edits={edits}
-                      updateEdits={updateEdits}
+                      postEdits={postEdits}
+                      updatePostEdits={updatePostEdits}
                       onApply={handleApply}
                       onReset={handleReset}
                     />

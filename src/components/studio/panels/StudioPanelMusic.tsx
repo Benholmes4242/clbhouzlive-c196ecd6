@@ -1,18 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, Play, Pause, Music2, VolumeX } from 'lucide-react';
-import { StudioEdits } from '@/types/studio';
+import { PostStudioEdits } from '@/types/studio';
 import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
 type StudioPanelMusicProps = {
-  edits: StudioEdits;
-  updateEdits: (patch: Partial<StudioEdits>) => void;
+  postEdits: PostStudioEdits;
+  updatePostEdits: (patch: Partial<PostStudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
 };
 
-export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
+export default function StudioPanelMusic({ postEdits, updatePostEdits, onApply, onReset }: StudioPanelMusicProps) {
   const [activeMood, setActiveMood] = useState<string>('all');
-  const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
+  const [selectedTrack, setSelectedTrack] = useState<string>(postEdits?.music?.trackId || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -102,8 +102,9 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
     }
     // Store resolved public URL for direct playback (not r2Key)
     // Also set audioMode to music_only to mute original video audio
+    // Post-level edits - applies to entire post
     const resolvedUrl = getSignedAudioUrl(track.r2Key);
-    updateEdits({
+    updatePostEdits({
       music: {
         trackId: track.id,
         title: track.title,
@@ -123,7 +124,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       audioRef.current.pause();
       setPreviewingTrack(null);
     }
-    updateEdits({
+    // Post-level edits
+    updatePostEdits({
       music: null,
       audioMode: 'original'
     });

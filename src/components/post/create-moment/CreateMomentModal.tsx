@@ -93,13 +93,17 @@ export default function CreateMomentModal({
   const {
     studioOpen,
     activeTool,
+    postEdits,
     openStudio,
     closeStudio,
     setActiveTool,
     updateEdits,
     clearEdits,
     getEdits,
-    hasEdits
+    hasEdits,
+    updatePostEdits,
+    clearPostEdits,
+    resetAllEdits
   } = useStudio();
 
   // Position mode state for text tool
@@ -233,12 +237,8 @@ export default function CreateMomentModal({
         setShowDraftPrompt(true);
       }
       
-      // Clear studio edits
-      mediaItems.forEach(item => {
-        if (hasEdits(item.id)) {
-          clearEdits(item.id);
-        }
-      });
+      // Clear all studio edits (per-media and post-level)
+      resetAllEdits();
     }
 
     wasOpenRef.current = isOpen;
@@ -436,39 +436,33 @@ export default function CreateMomentModal({
       return;
     }
     
-    // Build full studio edits including filter, music, audioMode, textOverlays, crop, and rotate
+    // Build per-media studio edits (filter, crop, rotate, text only - NO music/audioMode)
     const studioEditsByMediaId = media.reduce((acc, item) => {
       const edits = getEdits?.(item.id);
-      const hasEdits = !!edits && (
+      const hasPerMediaEdits = !!edits && (
         !!edits.filter || 
-        !!edits.music || 
-        !!edits.audioMode || 
         (edits.textOverlays?.length ?? 0) > 0 ||
         !!edits.crop?.ratio ||
         !!edits.rotate
       );
       
-      if (hasEdits) {
+      if (hasPerMediaEdits) {
         acc[item.id] = {
           ...(edits.filter && { filter: edits.filter }),
           ...(edits.crop?.ratio && { crop: { ratio: edits.crop.ratio } }),
           ...(edits.rotate && { rotate: edits.rotate }),
-          ...(edits.music && { 
-            music: {
-              trackId: edits.music.trackId,
-              title: edits.music.title,
-              artist: edits.music.artist,
-              url: edits.music.url || '',
-              startAt: edits.music.startAt ?? 0,
-              volume: edits.music.volume ?? 0.8,
-            }
-          }),
           ...(edits.textOverlays?.length ? { textOverlays: edits.textOverlays } : {}),
-          audioMode: edits.music ? 'music_only' as const : (edits.audioMode ?? 'original' as const),
         };
       }
       return acc;
-    }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
+    }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }> }>);
+
+    // Post-level edits (music, badge) - applies to entire post
+    const postLevelEdits = {
+      ...(postEdits.music && { music: postEdits.music }),
+      ...(postEdits.audioMode && { audioMode: postEdits.audioMode }),
+      ...(postEdits.achievementBadgeId && { achievementBadgeId: postEdits.achievementBadgeId }),
+    };
     
     try {
       // Enqueue upload and close immediately
@@ -482,6 +476,7 @@ export default function CreateMomentModal({
         files,
         mediaItems: media,
         studioEditsByMediaId,
+        postStudioEdits: postLevelEdits,
         categories: selectedCategories,
         visibility,
       });
@@ -707,6 +702,8 @@ export default function CreateMomentModal({
         edits={getEdits(media[activeIndex]?.id || '')}
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
+        postEdits={postEdits}
+        updatePostEdits={updatePostEdits}
         isPositioningText={isPositioningText}
         onTogglePositionMode={handleTogglePositionMode}
         activeOverlayId={activeOverlayId}
