@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { ChevronUp, User } from 'lucide-react';
+import { ChevronUp, User, Music } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 
@@ -23,6 +23,11 @@ interface GolfCourseInfo {
   slug?: string | null;
 }
 
+interface MusicTrackInfo {
+  title?: string;
+  artist?: string;
+}
+
 interface CreatorCapsuleProps {
   user: {
     id: string;
@@ -32,22 +37,28 @@ interface CreatorCapsuleProps {
   };
   caption?: string;
   golfCourse?: GolfCourseInfo | null;
+  /** Music track info - only shown when audioMode === 'music_only' */
+  musicTrack?: MusicTrackInfo | null;
   isFollowing?: boolean;
   isOwnPost?: boolean;
   isVisible: boolean;
   onFollow?: () => void;
   onViewProfile?: () => void;
+  /** Optional callback when music row is tapped (e.g., toggle mute) */
+  onMusicTap?: () => void;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   user,
   caption,
   golfCourse,
+  musicTrack,
   isFollowing = false,
   isOwnPost = false,
   isVisible,
   onFollow,
   onViewProfile,
+  onMusicTap,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
@@ -124,6 +135,27 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             isDark
           />
         </div>
+      )}
+
+      {/* Music Track Row - same spacing as golf course */}
+      {musicTrack?.title && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMusicTap?.();
+          }}
+          className={cn(
+            "flex items-center gap-2 w-full text-left",
+            onMusicTap && "hover:opacity-80 transition-opacity"
+          )}
+        >
+          <Music className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
+          <span className="text-[12px] text-white/60 truncate">
+            {musicTrack.title}
+            {musicTrack.artist && ` • ${musicTrack.artist}`}
+          </span>
+        </button>
       )}
 
       {/* Action buttons */}
