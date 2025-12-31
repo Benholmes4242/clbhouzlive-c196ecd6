@@ -14,6 +14,8 @@ import CreatorOverlay from '@/components/discover/CreatorOverlay';
 import { devlog } from '@/utils/log';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { TextOverlay } from '@/types/studio';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 import { MediaItem } from '@/types/media';
 
@@ -222,6 +224,10 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   const stageDataAttr = stage === 'grid' ? 'grid' : stage;
   const fitClass = stage === 'grid' ? '!object-cover' : 'object-contain';
 
+  // Compute filter class - prefer filter_id, fallback to studioEdits.filter
+  const filterId = (media as any)?.filter_id ?? studioEdits?.filter ?? null;
+  const filterClass = getFilterClass(filterId);
+
   // Apply loading-gated background color
   const wrapperClass = `relative w-full h-full overflow-hidden ${isLoading ? 'bg-muted' : 'bg-transparent'}`;
 
@@ -245,15 +251,18 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               className="relative w-full h-full"
               {...(isDiscoverPage ? discoverPreview : {})}
             >
-              <EnhancedVideoPlayer
-                ref={videoRefCallback}
-                src={media.media_url}
-                autoplay={true}
-                muted={effectiveMuted}
-                loop={loop}
-                className={`w-full h-full pointer-events-none ${fitClass}`}
-                enableHLS={true}
-              />
+              {/* Filtered pixel layer */}
+              <div className={cn("w-full h-full", filterClass)}>
+                <EnhancedVideoPlayer
+                  ref={videoRefCallback}
+                  src={media.media_url}
+                  autoplay={true}
+                  muted={effectiveMuted}
+                  loop={loop}
+                  className={`w-full h-full pointer-events-none ${fitClass}`}
+                  enableHLS={true}
+                />
+              </div>
               
               {/* Sound Toggle for autoplaying videos - only show if not in Discover preview mode */}
               {!isDiscoverPage && (
@@ -285,36 +294,39 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               </div>
             )}
             
-            {hasCloudflareThumb ? (
-               <HighQualityImage
-                 src={thumbnailUrl}
-                 alt={itemTitle || 'Video thumbnail'}
-                  className={`w-full h-full ${fitClass}`}
-                  onLoad={handleImageLoad}
-                  onError={handleImageError}
-                 width={1200}
-                 height={1600}
-                 isAboveTheFold={isAboveTheFold}
-               />
-            ) : (
-              /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
-              <video
-                src={media.media_url}
-                className={`w-full h-full videoEl ${fitClass} transition-opacity duration-200 ${
-                  mediaLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
-                preload="metadata"
-                muted
-                onLoadedMetadata={() => {
-                  setMediaLoaded(true);
-                  handleImageLoad(); // This now calls onLoaded
-                }}
-                onError={() => {
-                  setMediaLoaded(true);
-                  handleImageError(); // This now calls onLoaded
-                }}
-              />
-            )}
+            {/* Filtered pixel layer */}
+            <div className={cn("w-full h-full", filterClass)}>
+              {hasCloudflareThumb ? (
+                 <HighQualityImage
+                   src={thumbnailUrl}
+                   alt={itemTitle || 'Video thumbnail'}
+                    className={`w-full h-full ${fitClass}`}
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                   width={1200}
+                   height={1600}
+                   isAboveTheFold={isAboveTheFold}
+                 />
+              ) : (
+                /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
+                <video
+                  src={media.media_url}
+                  className={`w-full h-full videoEl ${fitClass} transition-opacity duration-200 ${
+                    mediaLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  preload="metadata"
+                  muted
+                  onLoadedMetadata={() => {
+                    setMediaLoaded(true);
+                    handleImageLoad(); // This now calls onLoaded
+                  }}
+                  onError={() => {
+                    setMediaLoaded(true);
+                    handleImageError(); // This now calls onLoaded
+                  }}
+                />
+              )}
+            </div>
             
             {/* Play icon for non-autoplaying videos */}
             {!hidePlayButton && (
@@ -335,16 +347,19 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       ) : (
         /* Image display with high quality optimization */
         <div className="relative w-full h-full">
-          <HighQualityImage
-            src={media.media_url}
-            alt={itemTitle || 'Photo'}
-            className={`w-full h-full ${fitClass}`}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            width={1200}
-            height={1600}
-            isAboveTheFold={isAboveTheFold}
-          />
+          {/* Filtered pixel layer */}
+          <div className={cn("w-full h-full", filterClass)}>
+            <HighQualityImage
+              src={media.media_url}
+              alt={itemTitle || 'Photo'}
+              className={`w-full h-full ${fitClass}`}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              width={1200}
+              height={1600}
+              isAboveTheFold={isAboveTheFold}
+            />
+          </div>
           
           {/* Creator overlay for Discover page */}
           {isDiscoverPage && user && (
