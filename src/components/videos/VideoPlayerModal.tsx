@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 
 interface VideoData {
   id: string;
@@ -617,22 +618,30 @@ export const VideoPlayerModal: React.FC = () => {
                 </div>
               ) : videoData ? (
                 <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
-                  {/* Filtered pixel layer */}
-                  <div className={cn("w-full h-full", getFilterClass(videoData.filterId))}>
-                    <HLSPlayer
-                      ref={videoRef}
-                      src={videoData.hlsUrl}
-                      autoplay={hasAutoStarted && !showResumeOverlay}
-                      loop={false}
-                      muted={false}
-                      className="w-full h-full"
-                      objectFit="contain"
-                      showMuteButton={false}
-                      onEnded={handleVideoEnded}
-                      onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
-                      onLoadedData={handleLoadedMetadata}
-                    />
-                  </div>
+                  {/* Filtered pixel layer with crop/rotate */}
+                  {(() => {
+                    const cropClass = getCropWrapperClass(videoData.studioEdits?.crop);
+                    const pixelStyle = getPixelLayerStyle(videoData.studioEdits);
+                    return (
+                      <div className={cn("w-full h-full", cropClass)}>
+                        <div className={cn("w-full h-full", getFilterClass(videoData.filterId))} style={pixelStyle}>
+                          <HLSPlayer
+                            ref={videoRef}
+                            src={videoData.hlsUrl}
+                            autoplay={hasAutoStarted && !showResumeOverlay}
+                            loop={false}
+                            muted={false}
+                            className="w-full h-full"
+                            objectFit="contain"
+                            showMuteButton={false}
+                            onEnded={handleVideoEnded}
+                            onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
+                            onLoadedData={handleLoadedMetadata}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
                   
                   {/* Text overlays from studio edits */}
                   {videoData.studioEdits?.textOverlays && videoData.studioEdits.textOverlays.length > 0 && (

@@ -12,6 +12,9 @@ import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import Masonry from 'react-masonry-css';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { cn } from '@/lib/utils';
 
 interface MosaicFeedContentProps {
   optimisticPosts: any[];
@@ -194,36 +197,47 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 className="flex transition-transform duration-300 ease-out h-full"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
-                {media.map((mediaItem, idx) => (
-                  <div key={idx} className="flex-shrink-0 w-full h-full relative">
-                     {mediaItem.media_type === 'video' ? (
-                        <FeedVideoPlayer
-                          ref={idx === currentIndex ? videoPlayerRef : undefined}
-                          src={mediaItem.media_url}
-                          className="w-full h-full object-cover rounded-lg"
-                         muted={true}
-                         loop={true}
-                         playsInline
-                         preload={idx === currentIndex ? "metadata" : "none"}
-                         onClick={handleTileClick}
-                       />
-                     ) : (
-                       <img
-                         src={mediaItem.media_url}
-                         alt="Golf content"
-                          className="w-full h-full object-cover rounded-lg"
-                         loading="lazy"
-                       />
-                     )}
-                     {/* Text overlays from studio_edits */}
-                     {(mediaItem.studio_edits as any)?.textOverlays?.length > 0 && (
-                       <TextOverlayRenderer
-                         textOverlays={(mediaItem.studio_edits as any).textOverlays}
-                         isEditable={false}
-                       />
-                     )}
-                  </div>
-                ))}
+                {media.map((mediaItem, idx) => {
+                  const studioEdits = mediaItem.studio_edits as any;
+                  const filterClass = getFilterClass(studioEdits?.filter);
+                  const cropClass = getCropWrapperClass(studioEdits?.crop);
+                  const pixelStyle = getPixelLayerStyle(studioEdits);
+                  
+                  return (
+                    <div key={idx} className="flex-shrink-0 w-full h-full relative">
+                      <div className={cn("w-full h-full", cropClass)}>
+                        <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                          {mediaItem.media_type === 'video' ? (
+                            <FeedVideoPlayer
+                              ref={idx === currentIndex ? videoPlayerRef : undefined}
+                              src={mediaItem.media_url}
+                              className="w-full h-full object-cover rounded-lg"
+                              muted={true}
+                              loop={true}
+                              playsInline
+                              preload={idx === currentIndex ? "metadata" : "none"}
+                              onClick={handleTileClick}
+                            />
+                          ) : (
+                            <img
+                              src={mediaItem.media_url}
+                              alt="Golf content"
+                              className="w-full h-full object-cover rounded-lg"
+                              loading="lazy"
+                            />
+                          )}
+                        </div>
+                      </div>
+                      {/* Text overlays from studio_edits */}
+                      {studioEdits?.textOverlays?.length > 0 && (
+                        <TextOverlayRenderer
+                          textOverlays={studioEdits.textOverlays}
+                          isEditable={false}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               
               {/* Carousel Navigation */}
@@ -261,25 +275,38 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
           ) : (
             // Single media
             <div className="w-full h-full relative">
-               {media[0]?.media_type === 'video' ? (
-                 <FeedVideoPlayer
-                   ref={videoPlayerRef}
-                   src={media[0].media_url}
-                    className="w-full h-full object-cover rounded-lg"
-                   muted={true}
-                   loop={true}
-                   playsInline
-                   preload="metadata"
-                   onClick={handleTileClick}
-                 />
-               ) : (
-                 <img
-                   src={media[0]?.media_url}
-                   alt="Golf content"
-                    className="w-full h-full object-cover rounded-lg"
-                   loading="lazy"
-                 />
-              )}
+              {(() => {
+                const studioEdits = media[0]?.studio_edits as any;
+                const filterClass = getFilterClass(studioEdits?.filter);
+                const cropClass = getCropWrapperClass(studioEdits?.crop);
+                const pixelStyle = getPixelLayerStyle(studioEdits);
+                
+                return (
+                  <div className={cn("w-full h-full", cropClass)}>
+                    <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                      {media[0]?.media_type === 'video' ? (
+                        <FeedVideoPlayer
+                          ref={videoPlayerRef}
+                          src={media[0].media_url}
+                          className="w-full h-full object-cover rounded-lg"
+                          muted={true}
+                          loop={true}
+                          playsInline
+                          preload="metadata"
+                          onClick={handleTileClick}
+                        />
+                      ) : (
+                        <img
+                          src={media[0]?.media_url}
+                          alt="Golf content"
+                          className="w-full h-full object-cover rounded-lg"
+                          loading="lazy"
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               {/* Text overlays from studio_edits */}
               {(media[0]?.studio_edits as any)?.textOverlays?.length > 0 && (
                 <TextOverlayRenderer

@@ -4,6 +4,9 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
 import { getStreamPoster } from '@/utils/stream';
 import { devlog } from '@/utils/log';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { cn } from '@/lib/utils';
 
 /**
  * Square Card Media Component
@@ -29,6 +32,12 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
        'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=640&h=640&fit=crop&crop=center')
     : media.media_url;
 
+  // Get studio edits for crop/rotate
+  const studioEdits = (media as any).studio_edits;
+  const filterClass = getFilterClass(studioEdits?.filter);
+  const cropClass = getCropWrapperClass(studioEdits?.crop);
+  const pixelStyle = getPixelLayerStyle(studioEdits);
+
   // DEBUG: Log image load attempts
   React.useEffect(() => {
     devlog('[SquareCardMedia] Rendered with', {
@@ -46,20 +55,24 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
       data-media-id={media.id}
       data-role="square-card"
     >
-      <HighQualityImage
-        src={imageUrl}
-        alt="Media content"
-        className="w-full h-full object-cover"
-        isAboveTheFold={isAboveTheFold}
-        onLoad={() => {
-          devlog('[SquareCardMedia] Image loaded', media.id?.substring(0, 8), imageUrl);
-          onLoaded?.();
-        }}
-        onError={() => {
-          devlog('[SquareCardMedia] Image error', media.id?.substring(0, 8), imageUrl);
-          onLoaded?.();
-        }}
-      />
+      <div className={cn("w-full h-full", cropClass)}>
+        <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+          <HighQualityImage
+            src={imageUrl}
+            alt="Media content"
+            className="w-full h-full object-cover"
+            isAboveTheFold={isAboveTheFold}
+            onLoad={() => {
+              devlog('[SquareCardMedia] Image loaded', media.id?.substring(0, 8), imageUrl);
+              onLoaded?.();
+            }}
+            onError={() => {
+              devlog('[SquareCardMedia] Image error', media.id?.substring(0, 8), imageUrl);
+              onLoaded?.();
+            }}
+          />
+        </div>
+      </div>
       
       {/* Video play icon in bottom right for video sources */}
       {media.media_type === 'video' && (

@@ -4,6 +4,7 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import CoursePostBadge from '../CoursePostBadge';
 import { PostMedia, GolfCourse } from './types';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
@@ -60,11 +61,14 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
 
   const carouselItems = media.map((mediaItem, index) => {
     // Use filter_id first (new column), fallback to studio_edits.filter (old data)
-    const filterId = mediaItem.filter_id || (mediaItem.studio_edits as any)?.filter;
+    const studioEdits = mediaItem.studio_edits as any;
+    const filterId = mediaItem.filter_id || studioEdits?.filter;
     const filterClass = getFilterClass(filterId);
+    const cropClass = getCropWrapperClass(studioEdits?.crop);
+    const pixelStyle = getPixelLayerStyle(studioEdits);
     
     // Extract text overlays from studio_edits
-    const textOverlays = (mediaItem.studio_edits as any)?.textOverlays || [];
+    const textOverlays = studioEdits?.textOverlays || [];
     
     console.log('[Feed] slide filter', {
       postMediaId: mediaItem.id,
@@ -99,25 +103,31 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           </div>
         )}
         
-        {mediaItem.media_type === 'image' ? (
-          <img
-            src={mediaItem.media_url}
-            alt="Post content"
-            className={cn("w-full h-full object-cover object-center cursor-pointer", filterClass)}
-            loading="lazy"
-            onClick={() => onMediaClick(mediaItem.media_url, 'image')}
-          />
-        ) : (
-          <EnhancedVideoPlayer
-            src={mediaItem.media_url}
-            autoplay={shouldAutoplay}
-            muted={true}  // Always muted in feed - music handled separately
-            loop={true}
-            className={cn("w-full h-full", filterClass)}
-            enableHLS={true}
-            onClick={() => onMediaClick(mediaItem.media_url, 'video')}
-          />
-        )}
+        <div className={cn("w-full h-full", cropClass)}>
+          {mediaItem.media_type === 'image' ? (
+            <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+              <img
+                src={mediaItem.media_url}
+                alt="Post content"
+                className="w-full h-full object-cover object-center cursor-pointer"
+                loading="lazy"
+                onClick={() => onMediaClick(mediaItem.media_url, 'image')}
+              />
+            </div>
+          ) : (
+            <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+              <EnhancedVideoPlayer
+                src={mediaItem.media_url}
+                autoplay={shouldAutoplay}
+                muted={true}  // Always muted in feed - music handled separately
+                loop={true}
+                className="w-full h-full"
+                enableHLS={true}
+                onClick={() => onMediaClick(mediaItem.media_url, 'video')}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Text overlays from studio_edits */}
         {textOverlays.length > 0 && (

@@ -27,6 +27,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 
 // Video ref management - keep only current + neighbors to prevent memory leaks
 const MAX_VIDEO_REFS = 20;
