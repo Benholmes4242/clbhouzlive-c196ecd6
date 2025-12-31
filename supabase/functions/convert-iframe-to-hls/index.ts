@@ -81,8 +81,9 @@ serve(async (req) => {
             continue
           }
           
-          // Generate HLS manifest URL
-          const newHlsUrl = `https://videodelivery.net/${videoId}/manifest/video.m3u8`
+          // Generate HLS manifest URL using customer subdomain
+          const CUSTOMER_SUBDOMAIN = 'customer-4ah4gni80ytefpck.cloudflarestream.com'
+          const newHlsUrl = `https://${CUSTOMER_SUBDOMAIN}/${videoId}/manifest/video.m3u8`
           
           // Update the database record
           const { error: updateError } = await supabase
