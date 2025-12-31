@@ -84,7 +84,11 @@ export default function StudioShelf({
           {/* Backdrop - Clbhouz style */}
           <motion.div
             className="fixed inset-0 z-[9998]"
-            style={{ background: isCollapsed ? 'transparent' : 'var(--cm-backdrop)' }}
+            style={{
+              background: isCollapsed ? 'transparent' : 'var(--cm-backdrop)',
+              // Critical: when collapsed (Position Mode), don't block interactions with the media canvas
+              pointerEvents: isCollapsed ? 'none' : 'auto',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
