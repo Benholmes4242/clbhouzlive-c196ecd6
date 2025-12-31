@@ -22,6 +22,8 @@ interface CreateMomentMediaStageProps {
   // Studio integration for editable text overlays
   activeTool?: StudioTool;
   onUpdateEdits?: (mediaId: string, patch: Partial<StudioEdits>) => void;
+  // Position mode - enables drag/pinch/rotate
+  isPositioningText?: boolean;
 }
 
 export default function CreateMomentMediaStage({
@@ -35,6 +37,7 @@ export default function CreateMomentMediaStage({
   getEdits,
   activeTool,
   onUpdateEdits,
+  isPositioningText = false,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
@@ -78,6 +81,10 @@ export default function CreateMomentMediaStage({
 
   const currentItem = media[activeIndex];
   const isTextToolActive = activeTool === 'text';
+  // Enable editing ONLY when in position mode (isPositioningText)
+  const isTextEditable = isTextToolActive && isPositioningText;
+  // Disable swipe ONLY when actively positioning text (not just when text tool is open)
+  const isDraggingText = isTextToolActive && isPositioningText;
   const currentEdits = currentItem ? getEdits(currentItem.id) : undefined;
 
   return (
@@ -108,21 +115,30 @@ export default function CreateMomentMediaStage({
           onIndexChange={onIndexChange}
           onSetCover={onSetCover}
           coverIndex={coverIndex}
-          enableSwipe={!isTextToolActive} // Disable swipe when dragging text
+          enableSwipe={!isDraggingText} // Only disable swipe when positioning
           loop={false}
           className="h-full w-full"
           forceVideoMuted={hasMusic}
           onMuteBlocked={handleMuteBlocked}
         />
 
-        {/* Text overlays for current media - editable when text tool is active */}
+        {/* Text overlays for current media - editable only in position mode */}
         {currentItem && (
           <TextOverlayRenderer
             textOverlays={currentEdits?.textOverlays ?? []}
-            isEditable={isTextToolActive}
-            onChange={isTextToolActive ? handleTextOverlayChange : undefined}
+            isEditable={isTextEditable}
+            onChange={isTextEditable ? handleTextOverlayChange : undefined}
             containerRef={stageContainerRef}
           />
+        )}
+
+        {/* Position mode hint overlay */}
+        {isTextEditable && (
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full bg-black/60 backdrop-blur-sm">
+            <p className="text-xs text-white/90 whitespace-nowrap">
+              Drag to place • Pinch to resize • Tap Done when finished
+            </p>
+          </div>
         )}
 
         {/* Top scrim for badges */}
