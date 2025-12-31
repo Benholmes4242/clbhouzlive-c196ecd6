@@ -1,5 +1,5 @@
 /**
- * Studio Edit utilities for crop, rotate, contrast, brightness
+ * Studio Edit utilities for crop and rotate
  * Applied to pixel layer only (text overlays remain unaffected)
  */
 
@@ -40,39 +40,12 @@ export function getRotateStyle(rotate?: number): React.CSSProperties {
 }
 
 /**
- * Get inline style for contrast/brightness adjustments
- * These are combined with the base filter via CSS variables
- */
-export function getAdjustmentsStyle(
-  contrast?: number,
-  brightness?: number
-): React.CSSProperties {
-  const c = contrast ?? 1;
-  const b = brightness ?? 1;
-  
-  // Only apply if different from defaults
-  if (c === 1 && b === 1) {
-    return {};
-  }
-  
-  return {
-    '--clb-adjust-filter': `contrast(${c}) brightness(${b})`,
-  } as React.CSSProperties;
-}
-
-/**
- * Get combined pixel layer styles (rotation + adjustments)
+ * Get combined pixel layer styles (rotation only now)
  */
 export function getPixelLayerStyle(edits?: StudioEdits): React.CSSProperties {
   if (!edits) return {};
   
-  const rotateStyle = getRotateStyle(edits.rotate);
-  const adjustStyle = getAdjustmentsStyle(edits.contrast, edits.brightness);
-  
-  return {
-    ...rotateStyle,
-    ...adjustStyle,
-  };
+  return getRotateStyle(edits.rotate);
 }
 
 /**
@@ -83,8 +56,6 @@ export function hasEditSettings(edits?: StudioEdits): boolean {
   
   return !!(
     (edits.crop?.ratio && edits.crop.ratio !== 'original') ||
-    edits.rotate ||
-    (typeof edits.contrast === 'number' && edits.contrast !== 1) ||
-    (typeof edits.brightness === 'number' && edits.brightness !== 1)
+    edits.rotate
   );
 }

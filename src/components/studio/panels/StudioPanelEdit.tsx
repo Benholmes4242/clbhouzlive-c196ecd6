@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { RotateCw } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
-import { Slider } from '@/components/ui/slider';
 
 type StudioPanelEditProps = {
   edits: StudioEdits;
@@ -18,8 +17,6 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
     edits?.crop?.ratio || 'original'
   );
   const [rotation, setRotation] = useState(edits?.rotate || 0);
-  const [contrast, setContrast] = useState(edits?.contrast ?? 1);
-  const [brightness, setBrightness] = useState(edits?.brightness ?? 1);
 
   const handleRotate = () => {
     const newRotation = (rotation + 90) % 360;
@@ -30,18 +27,6 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
   const handleCropRatio = (ratio: typeof CROP_RATIOS[number]) => {
     setCropRatio(ratio);
     updateEdits({ crop: { ratio } });
-  };
-
-  const handleContrastChange = (value: number[]) => {
-    const newContrast = value[0];
-    setContrast(newContrast);
-    updateEdits({ contrast: newContrast });
-  };
-
-  const handleBrightnessChange = (value: number[]) => {
-    const newBrightness = value[0];
-    setBrightness(newBrightness);
-    updateEdits({ brightness: newBrightness });
   };
 
   return (
@@ -80,38 +65,6 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
               <span className="text-xs text-zinc-500">({rotation}°)</span>
             )}
           </button>
-        </div>
-
-        {/* Contrast slider */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-body-sm font-medium text-zinc-700">Contrast</label>
-            <span className="text-xs text-zinc-500">{Math.round(contrast * 100)}%</span>
-          </div>
-          <Slider
-            value={[contrast]}
-            onValueChange={handleContrastChange}
-            min={0.8}
-            max={1.4}
-            step={0.02}
-            className="w-full"
-          />
-        </div>
-
-        {/* Brightness slider */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-body-sm font-medium text-zinc-700">Brightness</label>
-            <span className="text-xs text-zinc-500">{Math.round(brightness * 100)}%</span>
-          </div>
-          <Slider
-            value={[brightness]}
-            onValueChange={handleBrightnessChange}
-            min={0.8}
-            max={1.3}
-            step={0.02}
-            className="w-full"
-          />
         </div>
       </div>
 

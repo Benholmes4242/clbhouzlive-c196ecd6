@@ -126,9 +126,7 @@ export const useOptimisticPostSubmission = () => {
               !!edits.rotate ||
               !!edits.music ||
               !!edits.audioMode ||
-              (edits.textOverlays?.length ?? 0) > 0 ||
-              typeof edits.contrast === 'number' ||
-              typeof edits.brightness === 'number';
+              (edits.textOverlays?.length ?? 0) > 0;
             
             return hasAnyEdits ? edits : null;
           });
