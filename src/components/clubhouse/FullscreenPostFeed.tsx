@@ -156,6 +156,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           currentIndex={currentIndex}
           loop={true}
           muted={isMuted}
+          studioEdits={currentPost.media?.[0]?.studio_edits}
         />
       </div>
 

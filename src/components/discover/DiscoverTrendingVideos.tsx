@@ -166,6 +166,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   loop={true}
                   hidePlayButton={true}
                   videoRefCallback={videoRefCallback}
+                  studioEdits={video.media?.[0]?.studio_edits}
                 />
                 
                 {/* Overlay */}
