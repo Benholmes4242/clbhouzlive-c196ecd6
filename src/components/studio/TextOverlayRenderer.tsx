@@ -83,53 +83,40 @@ const TEXT_VARIANTS: Record<TextStyle, TextVariantConfig> = {
   modern_bold: {
     fontClass: 'font-sans font-extrabold tracking-tight',
     textTransform: 'none',
-    shadowStyle: '0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)',
   },
   classic_serif: {
     fontClass: 'font-serif font-medium italic',
     textTransform: 'none',
-    shadowStyle: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)',
   },
   signature: {
     fontClass: 'font-cursive font-normal',
     textTransform: 'none',
-    shadowStyle: '0 2px 10px rgba(0,0,0,0.45)',
   },
   impact: {
     fontClass: 'font-sans font-black tracking-wider',
     textTransform: 'uppercase',
-    shadowStyle: '0 4px 16px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.5)',
   },
   outline: {
     fontClass: 'font-sans font-bold tracking-wide',
     textTransform: 'uppercase',
-    strokeStyle: '2px',
-    shadowStyle: '0 2px 8px rgba(0,0,0,0.3)',
   },
   neon: {
     fontClass: 'font-sans font-bold tracking-normal',
     textTransform: 'none',
-    glowStyle: '0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor',
   },
   glass: {
     fontClass: 'font-sans font-semibold tracking-normal',
     textTransform: 'none',
-    bgClass: 'bg-white/15 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20',
-    shadowStyle: 'none',
   },
   scoreboard: {
     fontClass: 'font-mono font-bold tracking-widest',
     textTransform: 'uppercase',
-    bgClass: 'bg-black/70 px-3 py-1 rounded-sm border border-white/10',
-    shadowStyle: 'none',
   },
   modern: {
     fontClass: 'font-sans font-bold tracking-tight',
-    shadowStyle: '0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.4)',
   },
   classic: {
     fontClass: 'font-serif font-medium italic',
-    shadowStyle: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)',
   },
 };
 
