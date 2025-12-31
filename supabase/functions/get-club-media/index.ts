@@ -154,7 +154,8 @@ serve(async (req) => {
     }
 
 
-    // Helper to generate safe thumbnail URL
+    // Helper to generate safe thumbnail URL using customer subdomain
+    const CUSTOMER_SUBDOMAIN = 'customer-4ah4gni80ytefpck.cloudflarestream.com'
     const getSafeThumbnailUrl = (mediaUrl: string, mediaType: string): string => {
       const isVideo = mediaType === 'video'
       
@@ -162,7 +163,7 @@ serve(async (req) => {
         // For videos, extract UID and generate thumbnail URL
         const uid = extractStreamUidFromHls(mediaUrl)
         return uid 
-          ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`
+          ? `https://${CUSTOMER_SUBDOMAIN}/${uid}/thumbnails/thumbnail.jpg`
           : mediaUrl // fallback to original if can't extract UID
       } else {
         // For images, use the R2 URL directly
