@@ -29,7 +29,6 @@ const ENHANCE_OPTIONS: EnhanceOption[] = [
     label: 'AI Caption',
     description: 'Generate a caption with AI',
     icon: <Type className="w-5 h-5" />,
-    comingSoon: true,
   },
   {
     id: 'smart-compilation',
@@ -53,6 +52,7 @@ interface EnhanceMomentSheetProps {
   onClose: () => void;
   onOpenStudio: () => void;
   onOpenBadges?: () => void;
+  onOpenAiCaption?: () => void;
 }
 
 /**
@@ -64,6 +64,7 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
   onClose,
   onOpenStudio,
   onOpenBadges,
+  onOpenAiCaption,
 }) => {
   const handleOptionClick = (optionId: string) => {
     if (optionId === 'filters') {
@@ -72,6 +73,9 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
     } else if (optionId === 'badges' && onOpenBadges) {
       onClose();
       onOpenBadges();
+    } else if (optionId === 'ai-caption' && onOpenAiCaption) {
+      onClose();
+      onOpenAiCaption();
     }
     // Other options are coming soon - no action
   };

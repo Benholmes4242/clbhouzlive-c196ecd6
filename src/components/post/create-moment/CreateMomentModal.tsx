@@ -20,7 +20,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet } from "./sheets";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet } from "./sheets";
 import { useDraftPersistence } from "./useDraftPersistence";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 
@@ -75,6 +75,7 @@ export default function CreateMomentModal({
   const [showAudienceSheet, setShowAudienceSheet] = useState(false);
   const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
+  const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -769,6 +770,10 @@ export default function CreateMomentModal({
           setShowEnhanceSheet(false);
           setShowBadgesSheet(true);
         }}
+        onOpenAiCaption={() => {
+          setShowEnhanceSheet(false);
+          setShowAiCaptionSheet(true);
+        }}
       />
 
       <MomentBadgesSheet
@@ -776,6 +781,20 @@ export default function CreateMomentModal({
         onClose={() => setShowBadgesSheet(false)}
         selectedBadges={selectedBadges}
         onBadgesChange={setSelectedBadges}
+      />
+
+      <AiCaptionSheet
+        isOpen={showAiCaptionSheet}
+        onClose={() => setShowAiCaptionSheet(false)}
+        onInsertCaption={(text, mode) => {
+          if (mode === 'replace') {
+            setCaption(text);
+          } else {
+            setCaption(prev => prev.trim() ? `${prev}\n\n${text}` : text);
+          }
+        }}
+        existingCaption={caption}
+        courseName={course?.name}
       />
     </div>
   );
