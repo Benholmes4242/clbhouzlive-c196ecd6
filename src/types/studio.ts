@@ -40,8 +40,6 @@ export type StudioEdits = {
   filter?: FilterId;
   crop?: { ratio: 'original' | '1:1' | '4:5' | '16:9' };
   rotate?: number;  // degrees, multiples of 90
-  contrast?: number;   // 0.8-1.4, default 1
-  brightness?: number; // 0.8-1.3, default 1
   textOverlays?: TextOverlay[];
   music?: {
     trackId: string;
