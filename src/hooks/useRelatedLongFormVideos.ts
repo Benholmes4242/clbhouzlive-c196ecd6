@@ -82,6 +82,10 @@ export const useRelatedLongFormVideos = (
         const golfTag = post.post_tags?.find(
           (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
+        
+        // Golf course: prefer tag, fallback to course_id FK
+        const golfCourseId = golfTag?.taggable_entities?.entity_id || post.course_id || undefined;
+        const golfCourseName = golfTag?.taggable_entities?.name || undefined;
 
         // Get counts from aggregated relations
         const views = post.post_views?.[0]?.count || 0;
@@ -98,8 +102,8 @@ export const useRelatedLongFormVideos = (
           durationSeconds: media?.duration_seconds || 0,
           views,
           createdAt: post.created_at,
-          golfCourseId: golfTag?.taggable_entities?.entity_id,
-          golfCourseName: golfTag?.taggable_entities?.name,
+          golfCourseId,
+          golfCourseName,
           isTrending: false,
           _score: calculateScore(views, likes),
         } as LongFormVideo & { _score: number };
@@ -111,6 +115,7 @@ export const useRelatedLongFormVideos = (
         content,
         created_at,
         user_id,
+        course_id,
         post_media!inner(
           media_url,
           duration_seconds,

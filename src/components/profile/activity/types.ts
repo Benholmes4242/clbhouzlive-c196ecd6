@@ -45,6 +45,7 @@ export interface ActivityPost {
   shares: number;
   timeAgo: string;
   created_at: string;
+  course_id?: string | null;
   post_media: Array<{
     id: string;
     media_type: 'image' | 'video';

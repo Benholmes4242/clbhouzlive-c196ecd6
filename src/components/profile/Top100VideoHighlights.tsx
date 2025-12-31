@@ -63,14 +63,15 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
           content,
           created_at,
           user_id,
+          course_id,
           post_media!inner (
             media_url,
             media_type,
             filter_id,
             studio_edits
           ),
-          post_tags!inner (
-            taggable_entities!inner (
+          post_tags (
+            taggable_entities (
               name,
               entity_id,
               entity_type
@@ -79,9 +80,8 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
         `)
         .eq('user_id', userId)
         .eq('post_media.media_type', 'video')
-        .eq('post_tags.taggable_entities.entity_type', 'golf_club')
         .order('created_at', { ascending: false })
-        .limit(5); // Changed to 5 videos
+        .limit(20); // Fetch more, then filter for top 100
 
       if (error) {
         console.error('Error fetching video highlights:', error);
@@ -92,8 +92,11 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
       const processedHighlights: VideoHighlight[] = [];
       
       for (const post of data || []) {
-        // Get course details to check ranking
-        const courseId = post.post_tags[0]?.taggable_entities?.entity_id;
+        // Get course ID from tags OR direct course_id FK
+        const golfClubTag = post.post_tags?.find(
+          (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
+        );
+        const courseId = golfClubTag?.taggable_entities?.entity_id || post.course_id;
         if (!courseId) continue;
 
         const { data: courseData } = await supabase

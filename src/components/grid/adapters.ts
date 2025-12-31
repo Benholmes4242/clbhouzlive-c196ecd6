@@ -189,6 +189,9 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
 
   const primaryMedia = media[0];
   const golfCourseTag = post.post_tags?.find(tag => tag.entity_type === 'golf_club');
+  // Use tag first, fallback to course_id
+  const golfCourseId = golfCourseTag?.entity_id || (post as any).course_id;
+  const golfCourseName = golfCourseTag?.name;
   const isMilestone = post.content?.toLowerCase().includes('milestone') || 
     post.post_tags?.some(tag => tag.name?.toLowerCase().includes('achievement'));
 
@@ -221,8 +224,8 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
     likes: post.likes,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
-    courseName: golfCourseTag?.name,
-    golfCourseId: golfCourseTag?.entity_id,
+    courseName: golfCourseName,
+    golfCourseId,
     
     // Creator info
     creator: post.user ? {
