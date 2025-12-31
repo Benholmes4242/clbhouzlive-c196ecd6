@@ -8,6 +8,8 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
 
       // Optional: read duration with a timeout using a separate blob URL
       let duration: number | undefined = undefined;
+      let thumbnailUrl: string | undefined = undefined;
+      
       if (type === 'video') {
         try {
           const tmpUrl = URL.createObjectURL(file);
@@ -15,6 +17,16 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
         } catch {
           duration = undefined;
         }
+        
+        // Generate thumbnail for video (used in filter previews)
+        try {
+          thumbnailUrl = await generateVideoThumbnail(file);
+        } catch {
+          thumbnailUrl = undefined;
+        }
+      } else {
+        // For images, use the previewUrl as thumbnail
+        thumbnailUrl = previewUrl;
       }
 
       return {
@@ -22,6 +34,7 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
         type,
         file,
         previewUrl,
+        thumbnailUrl,
         duration,
       } as ComposerMediaItem;
     } catch (e) {
@@ -32,6 +45,7 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
         type: file.type.startsWith('video') ? 'video' : 'image',
         file,
         previewUrl: url,
+        thumbnailUrl: file.type.startsWith('video') ? undefined : url,
       } as ComposerMediaItem;
     }
   });
@@ -43,6 +57,66 @@ export async function normalizeFilesToMediaItems(files: File[]): Promise<Compose
 
   if (!items.length) throw new Error('All media normalization failed');
   return items;
+}
+
+// Generate a thumbnail from a video file for filter previews
+async function generateVideoThumbnail(videoFile: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    
+    const blobUrl = URL.createObjectURL(videoFile);
+    
+    video.onloadeddata = () => {
+      video.currentTime = 0.1; // Seek to 0.1s for thumbnail
+    };
+    
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        // Use smaller size for thumbnail (saves memory)
+        const scale = Math.min(1, 400 / Math.max(video.videoWidth, video.videoHeight));
+        canvas.width = video.videoWidth * scale;
+        canvas.height = video.videoHeight * scale;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          URL.revokeObjectURL(blobUrl);
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+        
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(blobUrl);
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            reject(new Error('Could not generate video thumbnail'));
+          }
+        }, 'image/jpeg', 0.7);
+      } catch (e) {
+        URL.revokeObjectURL(blobUrl);
+        reject(e);
+      }
+    };
+    
+    video.onerror = () => {
+      URL.revokeObjectURL(blobUrl);
+      reject(new Error('Could not load video'));
+    };
+    
+    // Timeout after 3 seconds
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+      reject(new Error('Video thumbnail generation timed out'));
+    }, 3000);
+    
+    video.src = blobUrl;
+  });
 }
 
 function readVideoDuration(src: string, timeoutMs = 1200): Promise<number | undefined> {
@@ -81,8 +155,12 @@ function readVideoDuration(src: string, timeoutMs = 1200): Promise<number | unde
 // Helper to revoke object URLs to prevent memory leaks
 export function revokeMediaItemUrls(items: ComposerMediaItem[]) {
   items.forEach(item => {
-    if (item.previewUrl.startsWith('blob:')) {
+    if (item.previewUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(item.previewUrl);
+    }
+    // Also revoke thumbnail URL if it's different from previewUrl
+    if (item.thumbnailUrl && item.thumbnailUrl !== item.previewUrl && item.thumbnailUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(item.thumbnailUrl);
     }
   });
 }

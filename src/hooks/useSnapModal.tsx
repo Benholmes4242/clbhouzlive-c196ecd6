@@ -26,6 +26,7 @@ export interface ComposerMediaItem {
   type: ComposerMediaType;
   file: File;
   previewUrl: string; // blob URL
+  thumbnailUrl?: string; // image blob URL for filter previews (generated from video)
   duration?: number;  // optional for video
 }
 
@@ -125,11 +126,13 @@ export const useSnapModal = () => {
       try {
         const minimal: ComposerMediaItem[] = files.map((f, i) => {
           const url = URL.createObjectURL(f);
+          const isVideo = f.type.startsWith('video');
           return {
             id: `${Date.now()}-${i}`,
-            type: f.type.startsWith('video') ? 'video' : 'image',
+            type: isVideo ? 'video' : 'image',
             file: f,
             previewUrl: url,
+            thumbnailUrl: isVideo ? undefined : url, // Images use previewUrl, videos need generation
           };
         });
         setMediaItems(minimal);
