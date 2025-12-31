@@ -187,6 +187,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   currentIndex={actualIndex}
                   loop={true}
                   videoRefCallback={videoRefCallback}
+                  studioEdits={video.media?.[0]?.studio_edits}
                 />
                 
                 {/* Overlay */}

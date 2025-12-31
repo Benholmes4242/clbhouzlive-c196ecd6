@@ -12,6 +12,8 @@ import { CardType } from './media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import CreatorOverlay from '@/components/discover/CreatorOverlay';
 import { devlog } from '@/utils/log';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { TextOverlay } from '@/types/studio';
 
 import { MediaItem } from '@/types/media';
 
@@ -19,6 +21,13 @@ interface LocalMediaItem {
   id: string;
   media_type: 'video' | 'image';
   media_url: string;
+}
+
+interface StudioEdits {
+  filter?: string;
+  textOverlays?: TextOverlay[];
+  music?: any;
+  audioMode?: string;
 }
 
 interface MediaDisplayProps {
@@ -55,6 +64,8 @@ interface MediaDisplayProps {
   onCreatorClick?: (e: React.MouseEvent) => void;
   // Video ref callback for media autoplay registration
   videoRefCallback?: (el: HTMLVideoElement | null) => void;
+  // Studio edits for text overlays, filters, etc.
+  studioEdits?: StudioEdits;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -79,7 +90,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   user,
   isDiscoverPage = false,
   onCreatorClick,
-  videoRefCallback
+  videoRefCallback,
+  studioEdits,
 }) => {
   // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
@@ -339,6 +351,14 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
           )}
         </div>
+      )}
+      
+      {/* Text overlays from studio edits */}
+      {studioEdits?.textOverlays && studioEdits.textOverlays.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={studioEdits.textOverlays}
+          isEditable={false}
+        />
       )}
     </div>
   );

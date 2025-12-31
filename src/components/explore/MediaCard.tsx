@@ -90,6 +90,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           loop={true}
           stage={stage}
           isAboveTheFold={isAboveTheFold}
+          studioEdits={currentMedia.studio_edits}
         />
 
         <MediaControls

@@ -9,6 +9,8 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import SmartCardMedia from '@/components/explore/media/SmartCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { TextOverlay } from '@/types/studio';
 
 import { MediaItem } from '@/types/media';
 
@@ -16,6 +18,13 @@ interface LocalMediaItem {
   id: string;
   media_type: 'video' | 'image';
   media_url: string;
+}
+
+interface StudioEdits {
+  filter?: string;
+  textOverlays?: TextOverlay[];
+  music?: any;
+  audioMode?: string;
 }
 
 interface MediaDisplayProps {
@@ -35,6 +44,8 @@ interface MediaDisplayProps {
   useSmartMedia?: boolean;
   onMediaClick?: () => void;
   showFeaturedBadge?: boolean;
+  // Studio edits for text overlays, filters, etc.
+  studioEdits?: StudioEdits;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -52,7 +63,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   cardType,
   useSmartMedia = false,
   onMediaClick,
-  showFeaturedBadge = true
+  showFeaturedBadge = true,
+  studioEdits,
 }) => {
   // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
@@ -211,6 +223,14 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
              height={1600}
            />
         </div>
+      )}
+      
+      {/* Text overlays from studio edits */}
+      {studioEdits?.textOverlays && studioEdits.textOverlays.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={studioEdits.textOverlays}
+          isEditable={false}
+        />
       )}
     </div>
   );

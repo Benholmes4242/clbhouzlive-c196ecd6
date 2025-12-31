@@ -27,6 +27,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface VideoData {
   id: string;
@@ -43,6 +44,7 @@ interface VideoData {
   golfCourseId?: string;
   durationSeconds?: number;
   category?: string;
+  studioEdits?: any; // Text overlays, filters, etc.
 }
 
 /**
@@ -212,6 +214,7 @@ export const VideoPlayerModal: React.FC = () => {
           golfCourseId: golfTag?.tagged_entity?.entity_id,
           durationSeconds: media.duration_seconds,
           category: categoryTag?.tagged_entity?.slug,
+          studioEdits: media.studio_edits,
         });
       } catch (err) {
         console.error('Error loading video:', err);
@@ -624,6 +627,14 @@ export const VideoPlayerModal: React.FC = () => {
                     onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
                     onLoadedData={handleLoadedMetadata}
                   />
+                  
+                  {/* Text overlays from studio edits */}
+                  {videoData.studioEdits?.textOverlays && videoData.studioEdits.textOverlays.length > 0 && (
+                    <TextOverlayRenderer
+                      textOverlays={videoData.studioEdits.textOverlays}
+                      isEditable={false}
+                    />
+                  )}
                   
                   {/* Resume overlay */}
                   {showResumeOverlay && (
