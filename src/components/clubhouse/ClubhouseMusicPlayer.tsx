@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Music2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSignedAudioUrl } from '@/lib/musicLibrary';
-import { DEBUG_MUSIC_PROPAGATION } from '@/media/debug-music';
+
 
 interface MusicData {
   trackId?: string;
@@ -70,12 +70,7 @@ export function ClubhouseMusicPlayer({
   // Create audio element on mount
   useEffect(() => {
     const audioUrl = getAudioUrl();
-    if (!audioUrl) {
-      if (DEBUG_MUSIC_PROPAGATION()) {
-        console.warn('[ClubhouseMusicPlayer] No audio URL', { postId, music });
-      }
-      return;
-    }
+    if (!audioUrl) return;
 
     const audio = new Audio();
     audio.crossOrigin = 'anonymous';
@@ -90,11 +85,6 @@ export function ClubhouseMusicPlayer({
       }
     });
 
-    audio.addEventListener('canplay', () => {
-      if (DEBUG_MUSIC_PROPAGATION()) {
-        console.log('[ClubhouseMusicPlayer] Audio ready:', { postId, trackId: music.trackId });
-      }
-    });
 
     audio.addEventListener('play', () => setIsPlaying(true));
     audio.addEventListener('pause', () => setIsPlaying(false));
@@ -120,11 +110,7 @@ export function ClubhouseMusicPlayer({
 
     if (isActive && !isGloballyMuted) {
       // Play music when this post becomes active
-      audio.play().catch((err) => {
-        if (DEBUG_MUSIC_PROPAGATION()) {
-          console.warn('[ClubhouseMusicPlayer] Autoplay failed:', err.message);
-        }
-      });
+      audio.play().catch(() => {});
     } else {
       // Pause when not active or globally muted
       audio.pause();
