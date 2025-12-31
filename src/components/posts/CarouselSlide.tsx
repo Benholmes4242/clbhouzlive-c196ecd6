@@ -60,7 +60,10 @@ export default function CarouselSlide({
     filter: studioEdits?.filter, 
     filterClass,
     itemId: item.id,
-    isActive
+    isActive,
+    itemType: item.type,
+    previewUrl: item.previewUrl?.substring(0, 50),
+    baseUrl: (item.previewUrl || item.url || '')?.substring(0, 50)
   });
   
   const longPressProps = useLongPress(() => {
