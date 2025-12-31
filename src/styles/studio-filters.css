@@ -8,39 +8,39 @@
 }
 
 .clb-filter-vivid {
-  filter: contrast(1.1) saturate(1.15);
-}
-
-.clb-filter-bw {
-  filter: grayscale(1) contrast(1.05);
+  filter: contrast(1.12) saturate(1.18);
 }
 
 .clb-filter-dramatic {
   filter: contrast(1.25) saturate(1.05) brightness(0.95);
 }
 
+.clb-filter-bw {
+  filter: grayscale(1) contrast(1.05);
+}
+
 .clb-filter-warm {
-  filter: saturate(1.1) contrast(1.05) sepia(0.18) hue-rotate(-8deg) brightness(1.02);
+  filter: sepia(0.15) saturate(1.1) brightness(1.05);
 }
 
 .clb-filter-cool {
-  filter: saturate(1.05) contrast(1.08) hue-rotate(10deg) brightness(0.98);
-}
-
-.clb-filter-vintage {
-  filter: sepia(0.35) contrast(1.05) saturate(0.9) brightness(1.02);
+  filter: hue-rotate(-10deg) saturate(0.95) brightness(1.02);
 }
 
 .clb-filter-matte {
-  filter: contrast(0.92) saturate(0.95) brightness(1.06);
+  filter: contrast(0.92) saturate(0.9) brightness(1.04);
 }
 
-.clb-filter-pop {
-  filter: saturate(1.25) contrast(1.15) brightness(1.02);
+.clb-filter-vintage {
+  filter: sepia(0.25) contrast(0.95) saturate(0.85);
 }
 
 .clb-filter-fade {
-  filter: contrast(0.9) saturate(0.85) brightness(1.08);
+  filter: contrast(0.9) brightness(1.08) saturate(0.9);
+}
+
+.clb-filter-pop {
+  filter: contrast(1.2) saturate(1.25);
 }
 
 /* Ensure smooth transitions when switching filters */
