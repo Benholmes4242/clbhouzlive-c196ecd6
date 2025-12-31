@@ -61,6 +61,8 @@
 .clb-filter-matte,
 .clb-filter-pop,
 .clb-filter-fade {
-  filter: var(--clb-base-filter, none) var(--clb-adjust-filter, );
+  /* Ensure the adjustment var always exists (default empty) so filter composition is valid */
+  --clb-adjust-filter: ;
+  filter: var(--clb-base-filter, none) var(--clb-adjust-filter);
   transition: filter 0.2s ease-out;
 }
