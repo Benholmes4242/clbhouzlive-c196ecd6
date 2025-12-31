@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { StudioEdits, StudioTool, PostStudioEdits } from '@/types/studio';
+import { StudioEdits, StudioTool } from '@/types/studio';
 import StudioToolRail from './StudioToolRail';
 import StudioPanelMusic from './panels/StudioPanelMusic';
 import StudioPanelText from './panels/StudioPanelText';
@@ -15,14 +15,10 @@ type StudioShelfProps = {
   setActiveTool: (tool: StudioTool) => void;
   activeMediaId: string;
   activeMediaType: 'image' | 'video';
-  activeMediaThumbnailUrl?: string | null;
-  // Per-media edits (filter, crop, rotate, text)
+  activeMediaPreviewUrl?: string | null;
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
-  // Post-level edits (music, badge)
-  postEdits: PostStudioEdits;
-  updatePostEdits: (patch: Partial<PostStudioEdits>) => void;
   // Position mode state - lifted up so CreateMomentMediaStage can use it
   isPositioningText?: boolean;
   onTogglePositionMode?: () => void;
@@ -38,12 +34,10 @@ export default function StudioShelf({
   setActiveTool,
   activeMediaId,
   activeMediaType,
-  activeMediaThumbnailUrl,
+  activeMediaPreviewUrl,
   edits,
   updateEdits,
   clearEdits,
-  postEdits,
-  updatePostEdits,
   isPositioningText = false,
   onTogglePositionMode,
   activeOverlayId,
@@ -72,8 +66,7 @@ export default function StudioShelf({
   const handleReset = () => {
     // Reset current tool's edits
     if (activeTool === 'music') {
-      // Music is post-level
-      updatePostEdits({ music: null, audioMode: 'original' });
+      updateEdits({ music: null });
     } else if (activeTool === 'text') {
       updateEdits({ textOverlays: [] });
     } else if (activeTool === 'filter') {
@@ -172,8 +165,8 @@ export default function StudioShelf({
                     transition={{ duration: 0.15 }}
                   >
                     <StudioPanelMusic
-                      postEdits={postEdits}
-                      updatePostEdits={updatePostEdits}
+                      edits={edits}
+                      updateEdits={updateEdits}
                       onApply={handleApply}
                       onReset={handleReset}
                     />
@@ -216,7 +209,7 @@ export default function StudioShelf({
                       updateEdits={updateEdits}
                       onApply={handleApply}
                       onReset={handleReset}
-                      previewUrl={activeMediaThumbnailUrl}
+                      previewUrl={activeMediaPreviewUrl}
                     />
                   </motion.div>
                 )}

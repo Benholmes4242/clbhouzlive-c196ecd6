@@ -48,7 +48,7 @@ export function useFollowingFeed(pageSize = 12) {
       const { data: videoPosts, error: vErr } = await supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, studio_music, audio_mode,
+          id, content, created_at, user_id,
           post_media!inner (id, media_type, media_url, duration_seconds, width, height, filter_id, studio_edits)
         `)
         .in('user_id', followedIds)
@@ -63,7 +63,7 @@ export function useFollowingFeed(pageSize = 12) {
       const { data: photoPosts, error: pErr } = await supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, studio_music, audio_mode,
+          id, content, created_at, user_id,
           post_media!inner (id, media_type, media_url, width, height, filter_id, studio_edits)
         `)
         .in('user_id', followedIds)
@@ -102,8 +102,6 @@ export function useFollowingFeed(pageSize = 12) {
           src: m.media_url,
           duration: m.duration_seconds ? `${m.duration_seconds}s` : undefined,
           durationSeconds: m.duration_seconds ?? undefined,
-          studio_music: post.studio_music ?? null,
-          audio_mode: post.audio_mode ?? null,
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',

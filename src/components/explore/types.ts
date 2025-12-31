@@ -24,10 +24,6 @@ export interface ExploreContentItem {
   thumbnailSrc?: string;
   createdAt?: string | Date; // Date the content was posted
   
-  // Post-level music (new - takes priority over per-media)
-  studio_music?: any | null;
-  audio_mode?: 'original' | 'music_only' | null;
-  
   // Actor/author info (polymorphic)
   actorType?: 'personal' | 'business' | null;
   actorId?: string | null;

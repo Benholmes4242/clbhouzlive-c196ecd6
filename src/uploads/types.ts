@@ -3,9 +3,17 @@
 // Audio mode for posts - music_only mutes original video audio
 export type AudioModePayload = 'original' | 'music_only';
 
-// Per-media studio edits payload (stored on post_media)
+// Studio edits payload that can be persisted
 export interface StudioEditsPayload {
   filter?: string;
+  music?: {
+    trackId: string;
+    title: string;
+    artist?: string;
+    url: string;
+    startAt?: number;
+    volume?: number;
+  } | null;
   textOverlays?: Array<{
     id: string;
     text: string;
@@ -17,31 +25,7 @@ export interface StudioEditsPayload {
   }>;
   crop?: { ratio: string };
   rotate?: number;
-  // LEGACY: music/audioMode - kept for backwards compat read, don't write
-  music?: {
-    trackId: string;
-    title: string;
-    artist?: string;
-    url: string;
-    startAt?: number;
-    volume?: number;
-  } | null;
   audioMode?: AudioModePayload;
-}
-
-// Post-level studio edits payload (stored on posts table)
-export interface PostStudioEditsPayload {
-  music?: {
-    trackId: string;
-    title: string;
-    artist?: string;
-    url: string;
-    r2Key?: string;
-    startAt?: number;
-    volume?: number;
-  } | null;
-  audioMode?: AudioModePayload;
-  achievementBadgeId?: string | null;
 }
 
 export type UploadJobStatus =
@@ -76,7 +60,6 @@ export interface UploadJob {
   selectedTags?: any[];
   mediaItems?: Array<{ id: string; file: File }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
-  postStudioEdits?: PostStudioEditsPayload;
   
   // v2 fields
   categories?: string[];
@@ -106,7 +89,6 @@ export interface UploadJobInput {
   files: File[];
   mediaItems?: Array<{ id: string; file: File }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
-  postStudioEdits?: PostStudioEditsPayload;
   // New v2 fields
   categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';

@@ -63,8 +63,6 @@ export const useRealPostsFetcher = () => {
           actor_id,
           course_id,
           categories,
-          studio_music,
-          audio_mode,
           post_media!inner (
             id,
             media_type,
@@ -339,8 +337,6 @@ export const useRealPostsFetcher = () => {
           width,
           height,
           createdAt: post.created_at,
-          studio_music: (post as any).studio_music ?? null,
-          audio_mode: (post as any).audio_mode ?? null,
           actorType: (post.actor_type || 'personal') as 'personal' | 'business',
           actorId: post.actor_id || post.user_id,
           creator,
@@ -364,11 +360,7 @@ export const useRealPostsFetcher = () => {
             filter_id: m.filter_id,
             studio_edits: m.studio_edits,
           })),
-          audioTrack: (post as any).studio_music ? {
-            title: (post as any).studio_music.title || 'Unknown Track',
-            artist: (post as any).studio_music.artist || undefined,
-            isOriginal: false
-          } : undefined
+          audioTrack: generateAudioTrack()
         };
 
         return formattedPost;
@@ -643,8 +635,6 @@ export const useRealPostsFetcher = () => {
           like_count,
           comment_count,
           categories,
-          studio_music,
-          audio_mode,
           post_media!inner (
             id,
             media_type,
@@ -928,8 +918,6 @@ export const useRealPostsFetcher = () => {
           width,
           height,
           createdAt: post.created_at,
-          studio_music: (post as any).studio_music ?? null,
-          audio_mode: (post as any).audio_mode ?? null,
           actorType: (post.actor_type || 'personal') as 'personal' | 'business',
           actorId: post.actor_id || post.user_id,
           // Polymorphic user object - use business profile if available
@@ -967,11 +955,7 @@ export const useRealPostsFetcher = () => {
             filter_id: m.filter_id,
             studio_edits: m.studio_edits,
           })),
-          audioTrack: (post as any).studio_music ? {
-            title: (post as any).studio_music.title || 'Unknown Track',
-            artist: (post as any).studio_music.artist || undefined,
-            isOriginal: false
-          } : undefined
+          audioTrack: generateAudioTrack()
         };
 
         return formattedPost;
@@ -1129,8 +1113,6 @@ export const useRealPostsFetcher = () => {
             actor_id,
             course_id,
             categories,
-            studio_music,
-            audio_mode,
             post_media!inner (
               id,
               media_type,
@@ -1419,8 +1401,6 @@ export const useRealPostsFetcher = () => {
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds: durationSeconds ?? undefined,
           createdAt: post.created_at,
-          studio_music: post.studio_music ?? null,
-          audio_mode: post.audio_mode ?? null,
           actorType: (post.actor_type || 'personal') as 'personal' | 'business',
           actorId: post.actor_id || post.user_id,
           creator,
@@ -1440,10 +1420,10 @@ export const useRealPostsFetcher = () => {
             studio_edits: firstMedia.studio_edits,
             filter_id: firstMedia.filter_id
           } as any],
-          audioTrack: post.studio_music ? {
-            title: post.studio_music.title || 'Unknown Track',
-            artist: post.studio_music.artist || undefined,
-            isOriginal: false
+          audioTrack: Math.random() > 0.6 ? {
+            title: ["Eye of the Tiger", "The Final Countdown", "Original Audio"][Math.floor(Math.random() * 3)],
+            artist: Math.random() > 0.5 ? "Survivor" : undefined,
+            isOriginal: Math.random() > 0.5
           } : undefined
         };
       });

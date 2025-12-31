@@ -1,17 +1,11 @@
 import { useState, useCallback } from 'react';
-import { StudioEdits, StudioState, StudioTool, PostStudioEdits } from '@/types/studio';
+import { StudioEdits, StudioState, StudioTool } from '@/types/studio';
 
 export function useStudio() {
   const [studioOpen, setStudioOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
-  
-  // Per-media edits (filter, crop, rotate, text)
   const [studioState, setStudioState] = useState<StudioState>({});
-  
-  // Post-level edits (music, badge) - applies to entire post
-  const [postEdits, setPostEdits] = useState<PostStudioEdits>({});
 
-  // Per-media edit operations
   const updateEdits = useCallback((mediaId: string, patch: Partial<StudioEdits>) => {
     setStudioState(prev => ({
       ...prev,
@@ -35,15 +29,6 @@ export function useStudio() {
     return !!mediaEdits && Object.keys(mediaEdits).length > 0;
   }, [studioState]);
 
-  // Post-level edit operations
-  const updatePostEdits = useCallback((patch: Partial<PostStudioEdits>) => {
-    setPostEdits(prev => ({ ...prev, ...patch }));
-  }, []);
-
-  const clearPostEdits = useCallback(() => {
-    setPostEdits({});
-  }, []);
-
   const openStudio = useCallback(() => {
     setStudioOpen(true);
     setActiveTool(null);
@@ -54,26 +39,16 @@ export function useStudio() {
     setActiveTool(null);
   }, []);
 
-  // Reset all edits (called when starting new post)
-  const resetAllEdits = useCallback(() => {
-    setStudioState({});
-    setPostEdits({});
-  }, []);
-
   return {
     studioOpen,
     activeTool,
     studioState,
-    postEdits,
     openStudio,
     closeStudio,
     setActiveTool,
     updateEdits,
     clearEdits,
     getEdits,
-    hasEdits,
-    updatePostEdits,
-    clearPostEdits,
-    resetAllEdits
+    hasEdits
   };
 }

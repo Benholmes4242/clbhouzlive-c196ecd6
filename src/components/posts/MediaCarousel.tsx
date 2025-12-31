@@ -17,9 +17,8 @@ interface MediaItem {
 
 interface MediaCarouselProps {
   items: MediaItem[];
-  /** Controlled index - parent is single source of truth (REQUIRED) */
-  currentIndex: number;
-  onIndexChange: (index: number) => void;
+  initialIndex?: number;
+  onIndexChange?: (index: number) => void;
   onSetCover?: (index: number) => void;
   coverIndex?: number;
   enableSwipe?: boolean;
@@ -33,7 +32,7 @@ interface MediaCarouselProps {
 
 const MediaCarousel = ({ 
   items, 
-  currentIndex,
+  initialIndex = 0, 
   onIndexChange,
   onSetCover,
   coverIndex = 0,
@@ -43,9 +42,7 @@ const MediaCarousel = ({
   forceVideoMuted = false,
   onMuteBlocked
 }: MediaCarouselProps) => {
-  // CONTROLLED MODE: Parent is single source of truth, clamp to valid range
-  const activeIndex = Math.max(0, Math.min(currentIndex, Math.max(0, items.length - 1)));
-  
+  const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
@@ -95,18 +92,17 @@ const MediaCarousel = ({
     });
   }, [activeIndex]);
 
-  // Haptic feedback tracking (only fire on user-driven changes)
+  // Handle index changes with haptic feedback
   const hasMountedRef = useRef(false);
-  const prevIndexRef = useRef(activeIndex);
-  
   useEffect(() => {
-    // Fire haptic only on user-driven index changes (not initial mount or prop changes)
-    if (hasMountedRef.current && prevIndexRef.current !== activeIndex) {
+    onIndexChange?.(activeIndex);
+    // Fire haptic only on user-driven changes (not initial mount)
+    if (hasMountedRef.current) {
       haptic('light');
+    } else {
+      hasMountedRef.current = true;
     }
-    hasMountedRef.current = true;
-    prevIndexRef.current = activeIndex;
-  }, [activeIndex]);
+  }, [activeIndex, onIndexChange]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -131,18 +127,18 @@ const MediaCarousel = ({
 
   const handlePrevious = () => {
     if (!hasMultipleItems) return;
-    const nextIndex = activeIndex > 0 
-      ? activeIndex - 1 
-      : (loop ? items.length - 1 : 0);
-    onIndexChange?.(nextIndex);
+    setActiveIndex(prev => {
+      if (prev > 0) return prev - 1;
+      return loop ? items.length - 1 : 0;
+    });
   };
 
   const handleNext = () => {
     if (!hasMultipleItems) return;
-    const nextIndex = activeIndex < items.length - 1 
-      ? activeIndex + 1 
-      : (loop ? 0 : items.length - 1);
-    onIndexChange?.(nextIndex);
+    setActiveIndex(prev => {
+      if (prev < items.length - 1) return prev + 1;
+      return loop ? 0 : items.length - 1;
+    });
   };
 
   // Touch/drag handlers

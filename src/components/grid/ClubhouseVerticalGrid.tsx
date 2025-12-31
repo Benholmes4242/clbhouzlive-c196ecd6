@@ -593,14 +593,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             logFirstCardRender(item.id);
           }
           
-          // Music: prefer post-level studio_music, fallback to legacy per-media
+          // Music debug logging for Clubhouse
           const mediaItem = item.media?.[0] as any;
           const studioEdits = mediaItem?.studio_edits;
-          const postMusic = item.studio_music;
-          const legacyMusic = studioEdits?.music;
-          const musicData = postMusic ?? legacyMusic;
-          const postHasMusic = !!(musicData?.url || musicData?.r2Key);
-          const audioMode = item.audio_mode ?? studioEdits?.audioMode ?? 'original';
+          const musicData = studioEdits?.music;
+          const postHasMusic = !!musicData?.url || !!musicData?.r2Key;
+          const audioMode = studioEdits?.audioMode || 'original';
           
           // Filter: prefer filter_id column, fallback to studioEdits.filter
           const filterId = mediaItem?.filter_id ?? studioEdits?.filter ?? null;
@@ -893,12 +891,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
       {/* Creator Capsule */}
       {filteredPosts[currentIndex] && (() => {
-        const currentPost = filteredPosts[currentIndex];
-        const currentMediaItem = currentPost.media?.[0] as any;
+        const currentMediaItem = filteredPosts[currentIndex].media?.[0] as any;
         const currentStudioEdits = currentMediaItem?.studio_edits;
-        // Post-level music takes priority
-        const currentMusicData = currentPost.studio_music ?? currentStudioEdits?.music;
-        const currentAudioMode = currentPost.audio_mode ?? currentStudioEdits?.audioMode ?? 'original';
+        const currentMusicData = currentStudioEdits?.music;
+        const currentAudioMode = currentStudioEdits?.audioMode || 'original';
         const showMusicTrack = currentAudioMode === 'music_only' && currentMusicData?.title;
         
         return (

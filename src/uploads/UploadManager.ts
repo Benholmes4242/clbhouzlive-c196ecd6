@@ -33,9 +33,6 @@ class UploadManager {
       files: input.files,
       mediaItems: input.mediaItems,
       studioEditsByMediaId: input.studioEditsByMediaId,
-      postStudioEdits: input.postStudioEdits, // Music, audioMode, achievementBadgeId
-      categories: input.categories,
-      visibility: input.visibility,
       createdAt: new Date().toISOString(),
       status: 'queued',
       progress: {
@@ -57,7 +54,6 @@ class UploadManager {
     });
 
     console.log(`[UploadManager] Enqueued job ${jobId} with ${input.files.length} files`);
-    console.log(`[UploadManager] postStudioEdits received:`, JSON.stringify(input.postStudioEdits));
 
     return jobId;
   }

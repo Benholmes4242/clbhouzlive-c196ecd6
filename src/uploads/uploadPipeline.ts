@@ -289,43 +289,6 @@ async function processJob(jobId: string): Promise<void> {
       }
     }
 
-    // Persist post-level studio edits (music, badge) to posts table
-    console.log(`[uploadPipeline] job.postStudioEdits:`, JSON.stringify(job.postStudioEdits));
-    if (job.postStudioEdits) {
-      const { music, audioMode, achievementBadgeId } = job.postStudioEdits;
-      const hasPostLevelEdits = !!music || !!audioMode || !!achievementBadgeId;
-      console.log(`[uploadPipeline] hasPostLevelEdits: ${hasPostLevelEdits}, music:`, music, 'audioMode:', audioMode);
-      
-      if (hasPostLevelEdits) {
-        try {
-          const updatePayload: Record<string, any> = {};
-          
-          if (music) {
-            updatePayload.studio_music = music;
-          }
-          if (audioMode) {
-            updatePayload.audio_mode = audioMode;
-          }
-          if (achievementBadgeId) {
-            updatePayload.achievement_badge_id = achievementBadgeId;
-          }
-          
-          const { error: postEditError } = await supabase
-            .from('posts')
-            .update(updatePayload)
-            .eq('id', postId);
-          
-          if (postEditError) {
-            console.warn(`[uploadPipeline] Post-level edits error (non-fatal):`, postEditError);
-          } else {
-            console.log(`[uploadPipeline] Saved post-level studio edits for ${postId}`);
-          }
-        } catch (postEditError) {
-          console.warn(`[uploadPipeline] Post-level edits error (non-fatal):`, postEditError);
-        }
-      }
-    }
-
     // Mark stream assets as attached (success path)
     if (uploadedStreamUids.length > 0) {
       await markStreamAssetsAttached(uploadedStreamUids, postId);

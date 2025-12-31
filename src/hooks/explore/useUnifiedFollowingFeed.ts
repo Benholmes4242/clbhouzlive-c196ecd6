@@ -78,7 +78,6 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
         .from('posts')
         .select(`
           id, content, created_at, user_id, actor_type, actor_id, categories,
-          studio_music, audio_mode,
           post_media (id, media_type, media_url, duration_seconds, width, height, filter_id, studio_edits)
         `)
         .or(orFilters.join(','))
@@ -184,8 +183,6 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
           duration: m.duration_seconds ? `${m.duration_seconds}s` : undefined,
           durationSeconds: m.duration_seconds ?? undefined,
           createdAt: post.created_at,
-          studio_music: post.studio_music ?? null,
-          audio_mode: post.audio_mode ?? null,
           actorType: (post.actor_type || 'personal') as 'personal' | 'business',
           actorId: post.actor_id || post.user_id,
           creator,

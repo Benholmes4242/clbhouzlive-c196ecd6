@@ -21,9 +21,7 @@ interface FullscreenVideoModalProps {
       username?: string;
     };
     content?: string;
-    studioEdit?: any | null;  // Single object for single-video modal (legacy per-media edits)
-    postMusic?: any | null;   // Post-level music (new - takes priority)
-    audioMode?: 'original' | 'music_only' | null;
+    studioEdit?: any | null;  // Single object for single-video modal
   } | null;
 }
 
@@ -38,21 +36,19 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const mediaId = useId();
 
-  // Detect if post has music: post-level takes priority, fallback to legacy per-media
+  // Detect if post has music from studioEdit - Option A enforcement
   const { postHasMusic, activeMusic } = useMemo(() => {
-    // Check post-level music first (new)
-    const postMusic = videoData?.postMusic;
-    if (postMusic?.url || postMusic?.r2Key) {
-      return { postHasMusic: true, activeMusic: postMusic };
+    const studioEdit = videoData?.studioEdit;
+    const music = (studioEdit as any)?.music ?? null;
+    const hasMusic = !!(music?.url || music?.r2Key);
+    
+    // Debug log only when playable URL exists
+    if (music?.url) {
+      console.log('[FullscreenVideoModal] music detected', { postHasMusic: hasMusic, activeMusic: music });
     }
     
-    // Fallback to legacy per-media music
-    const studioEdit = videoData?.studioEdit;
-    const legacyMusic = (studioEdit as any)?.music ?? null;
-    const hasLegacyMusic = !!(legacyMusic?.url || legacyMusic?.r2Key);
-    
-    return { postHasMusic: hasLegacyMusic, activeMusic: legacyMusic };
-  }, [videoData?.postMusic, videoData?.studioEdit]);
+    return { postHasMusic: hasMusic, activeMusic: music };
+  }, [videoData?.studioEdit]);
 
   // Handle ESC key to close modal
   useEffect(() => {

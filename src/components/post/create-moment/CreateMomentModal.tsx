@@ -20,7 +20,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet } from "./sheets";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet } from "./sheets";
 import { useDraftPersistence } from "./useDraftPersistence";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 
@@ -75,7 +75,6 @@ export default function CreateMomentModal({
   const [showAudienceSheet, setShowAudienceSheet] = useState(false);
   const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
-  const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -94,17 +93,13 @@ export default function CreateMomentModal({
   const {
     studioOpen,
     activeTool,
-    postEdits,
     openStudio,
     closeStudio,
     setActiveTool,
     updateEdits,
     clearEdits,
     getEdits,
-    hasEdits,
-    updatePostEdits,
-    clearPostEdits,
-    resetAllEdits
+    hasEdits
   } = useStudio();
 
   // Position mode state for text tool
@@ -136,21 +131,7 @@ export default function CreateMomentModal({
   const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
-  
-  // SYNCHRONOUS safe index - prevents transient out-of-range during render
-  const safeIndex = media.length > 0 ? Math.min(activeIndex, media.length - 1) : 0;
-  
-  // CRITICAL: Derive activeMediaId with null guard - never use empty string
-  const activeMediaId = media[safeIndex]?.id ?? null;
-  const activeMediaItem = activeMediaId ? media[safeIndex] : null;
-  const currentFilter = activeMediaId ? getEdits(activeMediaId)?.filter : undefined;
-  
-  // Heal state if it drifted (effect runs after render, safeIndex handles current render)
-  useEffect(() => {
-    if (media.length > 0 && activeIndex !== safeIndex) {
-      setActiveIndex(safeIndex);
-    }
-  }, [media.length, activeIndex, safeIndex]);
+  const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
 
   // Modal context sync
   useEffect(() => {
@@ -252,8 +233,12 @@ export default function CreateMomentModal({
         setShowDraftPrompt(true);
       }
       
-      // Clear all studio edits (per-media and post-level)
-      resetAllEdits();
+      // Clear studio edits
+      mediaItems.forEach(item => {
+        if (hasEdits(item.id)) {
+          clearEdits(item.id);
+        }
+      });
     }
 
     wasOpenRef.current = isOpen;
@@ -451,36 +436,39 @@ export default function CreateMomentModal({
       return;
     }
     
-    // Build per-media studio edits (filter, crop, rotate, text only - NO music/audioMode)
+    // Build full studio edits including filter, music, audioMode, textOverlays, crop, and rotate
     const studioEditsByMediaId = media.reduce((acc, item) => {
       const edits = getEdits?.(item.id);
-      const hasPerMediaEdits = !!edits && (
+      const hasEdits = !!edits && (
         !!edits.filter || 
+        !!edits.music || 
+        !!edits.audioMode || 
         (edits.textOverlays?.length ?? 0) > 0 ||
         !!edits.crop?.ratio ||
         !!edits.rotate
       );
       
-      if (hasPerMediaEdits) {
+      if (hasEdits) {
         acc[item.id] = {
           ...(edits.filter && { filter: edits.filter }),
           ...(edits.crop?.ratio && { crop: { ratio: edits.crop.ratio } }),
           ...(edits.rotate && { rotate: edits.rotate }),
+          ...(edits.music && { 
+            music: {
+              trackId: edits.music.trackId,
+              title: edits.music.title,
+              artist: edits.music.artist,
+              url: edits.music.url || '',
+              startAt: edits.music.startAt ?? 0,
+              volume: edits.music.volume ?? 0.8,
+            }
+          }),
           ...(edits.textOverlays?.length ? { textOverlays: edits.textOverlays } : {}),
+          audioMode: edits.music ? 'music_only' as const : (edits.audioMode ?? 'original' as const),
         };
       }
       return acc;
-    }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }> }>);
-
-    // Post-level edits (music, badge) - applies to entire post
-    const postLevelEdits = {
-      ...(postEdits.music && { music: postEdits.music }),
-      ...(postEdits.audioMode && { audioMode: postEdits.audioMode }),
-      ...(postEdits.achievementBadgeId && { achievementBadgeId: postEdits.achievementBadgeId }),
-    };
-    
-    console.log('[CreateMomentModal] postEdits state:', JSON.stringify(postEdits));
-    console.log('[CreateMomentModal] postLevelEdits to send:', JSON.stringify(postLevelEdits));
+    }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
     
     try {
       // Enqueue upload and close immediately
@@ -494,7 +482,6 @@ export default function CreateMomentModal({
         files,
         mediaItems: media,
         studioEditsByMediaId,
-        postStudioEdits: postLevelEdits,
         categories: selectedCategories,
         visibility,
       });
@@ -578,11 +565,10 @@ export default function CreateMomentModal({
               style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', left: '50%', transform: 'translateX(-50%)' }}
             />
           )}
-          {hasMedia && activeMediaId ? (
+          {hasMedia ? (
             <CreateMomentMediaStage
-              key={activeMediaId}
               media={media}
-              activeIndex={safeIndex}
+              activeIndex={activeIndex}
               coverIndex={coverIndex}
               onIndexChange={setActiveIndex}
               onSetCover={setCoverIndex}
@@ -595,11 +581,6 @@ export default function CreateMomentModal({
               activeOverlayId={activeOverlayId}
               onSelectOverlay={setActiveOverlayId}
             />
-          ) : hasMedia ? (
-            // Media exists but activeMediaId not yet resolved (brief loading state)
-            <div className="flex-1 flex items-center justify-center bg-black/20">
-              <span className="text-white/50 text-sm">Loading...</span>
-            </div>
           ) : (
             <CreateMomentHero
               hasMedia={false}
@@ -714,30 +695,18 @@ export default function CreateMomentModal({
         </AnimatePresence>
       </div>
 
-      {/* Studio Shelf - only render with valid activeMediaId */}
+      {/* Studio Shelf */}
       <StudioShelf
         open={studioOpen}
         onClose={closeStudio}
         activeTool={activeTool}
         setActiveTool={setActiveTool}
-        activeMediaId={activeMediaId ?? ''}
-        activeMediaType={activeMediaItem?.type ?? 'image'}
-        activeMediaThumbnailUrl={activeMediaItem?.thumbnailUrl ?? activeMediaItem?.previewUrl ?? null}
-        edits={activeMediaId ? getEdits(activeMediaId) : {}}
-        updateEdits={(patch) => {
-          // GUARD: Never write edits without a valid media ID
-          if (!activeMediaId) {
-            console.warn('[CreateMomentModal] Attempted to update edits without valid activeMediaId');
-            return;
-          }
-          updateEdits(activeMediaId, patch);
-        }}
-        clearEdits={() => {
-          if (!activeMediaId) return;
-          clearEdits(activeMediaId);
-        }}
-        postEdits={postEdits}
-        updatePostEdits={updatePostEdits}
+        activeMediaId={media[activeIndex]?.id || ''}
+        activeMediaType={media[activeIndex]?.type || 'image'}
+        activeMediaPreviewUrl={media[activeIndex]?.previewUrl || null}
+        edits={getEdits(media[activeIndex]?.id || '')}
+        updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
+        clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
         isPositioningText={isPositioningText}
         onTogglePositionMode={handleTogglePositionMode}
         activeOverlayId={activeOverlayId}
@@ -773,10 +742,6 @@ export default function CreateMomentModal({
           setShowEnhanceSheet(false);
           setShowBadgesSheet(true);
         }}
-        onOpenAiCaption={() => {
-          setShowEnhanceSheet(false);
-          setShowAiCaptionSheet(true);
-        }}
       />
 
       <MomentBadgesSheet
@@ -784,20 +749,6 @@ export default function CreateMomentModal({
         onClose={() => setShowBadgesSheet(false)}
         selectedBadges={selectedBadges}
         onBadgesChange={setSelectedBadges}
-      />
-
-      <AiCaptionSheet
-        isOpen={showAiCaptionSheet}
-        onClose={() => setShowAiCaptionSheet(false)}
-        onInsertCaption={(text, mode) => {
-          if (mode === 'replace') {
-            setCaption(text);
-          } else {
-            setCaption(prev => prev.trim() ? `${prev}\n\n${text}` : text);
-          }
-        }}
-        existingCaption={caption}
-        courseName={course?.name}
       />
     </div>
   );
