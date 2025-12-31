@@ -87,16 +87,6 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
 
   const primaryMedia = media[0];
   
-  // DEBUG: Log filter data for profile posts
-  if (primaryMedia.filter_id || (primaryMedia.studio_edits as any)?.filter) {
-    console.log('[PROFILE MEDIA FILTER]', {
-      postId: post.id,
-      mediaId: primaryMedia.id,
-      filter_id: primaryMedia.filter_id,
-      studioFilter: (primaryMedia.studio_edits as any)?.filter,
-    });
-  }
-  
   // Use canonical resolver
   const golfCourse = resolveGolfCourse(post);
   const isMilestone = post.content?.toLowerCase().includes('milestone') || 
