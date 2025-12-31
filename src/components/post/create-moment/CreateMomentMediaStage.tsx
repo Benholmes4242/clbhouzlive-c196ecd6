@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback } from "react";
+import { useMemo, useRef, useCallback, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -24,6 +24,9 @@ interface CreateMomentMediaStageProps {
   onUpdateEdits?: (mediaId: string, patch: Partial<StudioEdits>) => void;
   // Position mode - enables drag/pinch/rotate
   isPositioningText?: boolean;
+  // Active overlay selection (synced with panel)
+  activeOverlayId?: string | null;
+  onSelectOverlay?: (id: string | null) => void;
 }
 
 export default function CreateMomentMediaStage({
@@ -38,6 +41,8 @@ export default function CreateMomentMediaStage({
   activeTool,
   onUpdateEdits,
   isPositioningText = false,
+  activeOverlayId,
+  onSelectOverlay,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
@@ -129,6 +134,9 @@ export default function CreateMomentMediaStage({
             isEditable={isTextEditable}
             onChange={isTextEditable ? handleTextOverlayChange : undefined}
             containerRef={stageContainerRef}
+            activeOverlayId={activeOverlayId}
+            onSelectOverlay={onSelectOverlay}
+            safeAreaContext="create"
           />
         )}
 

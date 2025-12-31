@@ -4,16 +4,20 @@
  * Features:
  * - 8 style variants (modern_bold, classic_serif, signature, impact, outline, neon, glass, scoreboard)
  * - Drag to reposition (in edit/position mode)
- * - Pinch to scale (touch)
- * - Rotation handle (drag to rotate)
- * - Snap-to-center guides
- * - Selection model for active overlay
+ * - Pinch to scale (touch) - scales entire wrapper for proportional bg scaling
+ * - Rotation handle (drag to rotate) with 15° snapping
+ * - Enhanced snap guides: center, thirds, safe margins with hysteresis
+ * - UI-safe margins based on context
+ * - Selection model with z-ordering
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { TextOverlay, TextStyle } from '@/types/studio';
 import { cn } from '@/lib/utils';
 import { RotateCw } from 'lucide-react';
+
+// Safe area context type
+type SafeAreaContext = 'create' | 'fullscreen' | 'feed';
 
 interface TextOverlayRendererProps {
   textOverlays: TextOverlay[];
@@ -22,15 +26,48 @@ interface TextOverlayRendererProps {
   containerRef?: React.RefObject<HTMLDivElement>;
   activeOverlayId?: string | null;
   onSelectOverlay?: (id: string | null) => void;
+  safeAreaContext?: SafeAreaContext;
 }
 
-// Snap configuration
-const SNAP_TOLERANCE = 0.02; // 2% of container
-const SNAP_RELEASE_TOLERANCE = 0.03;
+// ===== SNAP CONFIGURATION =====
+// Snap targets (normalized 0..1)
+const SNAP_TARGETS_X = [0.5, 1/3, 2/3, 0.1, 0.9]; // center, thirds, safe margins
+const SNAP_TARGETS_Y = [0.5, 1/3, 2/3, 0.1, 0.9];
 
-// Scale bounds
+// Snap tolerances with hysteresis
+const SNAP_IN_TOLERANCE = 0.02;  // 2% to snap in
+const SNAP_OUT_TOLERANCE = 0.03; // 3% to snap out
+
+// Guide types for styling
+type GuideType = 'center' | 'thirds' | 'safe';
+type ActiveGuide = { position: number; type: GuideType };
+
+// ===== ROTATION SNAPPING =====
+const ROTATION_SNAP_STEP = 15; // degrees
+const ROTATION_SNAP_IN = 4;   // degrees
+const ROTATION_SNAP_OUT = 6;  // degrees
+const CARDINAL_ANGLES = [0, 90, 180, -90, -180, 270];
+const CARDINAL_SNAP_TOLERANCE = 6; // stronger snap at cardinals
+
+// ===== SCALE BOUNDS =====
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 3.0;
+const BASE_FONT_SIZE = 20; // Fixed base, scaling via transform
+
+// ===== SAFE AREA INSETS =====
+type SafeInsets = { top: number; right: number; bottom: number; left: number };
+
+function getSafeInsets(context: SafeAreaContext): SafeInsets {
+  switch (context) {
+    case 'create':
+      return { top: 40, right: 16, bottom: 100, left: 16 };
+    case 'fullscreen':
+      return { top: 56, right: 16, bottom: 140, left: 16 };
+    case 'feed':
+    default:
+      return { top: 16, right: 16, bottom: 80, left: 16 };
+  }
+}
 
 // 8 text style variants with distinctive visual characteristics
 type TextVariantConfig = {
@@ -43,58 +80,49 @@ type TextVariantConfig = {
 };
 
 const TEXT_VARIANTS: Record<TextStyle, TextVariantConfig> = {
-  // Modern Bold - Clean sans-serif with strong presence
   modern_bold: {
     fontClass: 'font-sans font-extrabold tracking-tight',
     textTransform: 'none',
     shadowStyle: '0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)',
   },
-  // Classic Serif - Elegant editorial style
   classic_serif: {
     fontClass: 'font-serif font-medium italic',
     textTransform: 'none',
     shadowStyle: '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)',
   },
-  // Signature - Handwritten cursive feel
   signature: {
     fontClass: 'font-cursive font-normal',
     textTransform: 'none',
     shadowStyle: '0 2px 10px rgba(0,0,0,0.45)',
   },
-  // Impact - Bold uppercase sports/action style
   impact: {
     fontClass: 'font-sans font-black tracking-wider',
     textTransform: 'uppercase',
     shadowStyle: '0 4px 16px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.5)',
   },
-  // Outline - Text with visible stroke/outline
   outline: {
     fontClass: 'font-sans font-bold tracking-wide',
     textTransform: 'uppercase',
     strokeStyle: '2px',
     shadowStyle: '0 2px 8px rgba(0,0,0,0.3)',
   },
-  // Neon - Glowing effect
   neon: {
     fontClass: 'font-sans font-bold tracking-normal',
     textTransform: 'none',
     glowStyle: '0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor',
   },
-  // Glass - Frosted glass pill background
   glass: {
     fontClass: 'font-sans font-semibold tracking-normal',
     textTransform: 'none',
     bgClass: 'bg-white/15 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20',
     shadowStyle: 'none',
   },
-  // Scoreboard - Monospace sports ticker style
   scoreboard: {
     fontClass: 'font-mono font-bold tracking-widest',
     textTransform: 'uppercase',
     bgClass: 'bg-black/70 px-3 py-1 rounded-sm border border-white/10',
     shadowStyle: 'none',
   },
-  // Legacy support mappings
   modern: {
     fontClass: 'font-sans font-bold tracking-tight',
     shadowStyle: '0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.4)',
@@ -111,6 +139,84 @@ function touchDistance(t1: React.Touch, t2: React.Touch): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+function getGuideType(target: number): GuideType {
+  if (target === 0.5) return 'center';
+  if (target === 1/3 || target === 2/3) return 'thirds';
+  return 'safe';
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+// Snap value with hysteresis
+function snapWithHysteresis(
+  value: number,
+  targets: number[],
+  currentlySnappedTo: number | null,
+  snapIn: number,
+  snapOut: number
+): { snapped: number; target: number | null } {
+  // Check if we should stay snapped (hysteresis)
+  if (currentlySnappedTo !== null) {
+    const delta = Math.abs(value - currentlySnappedTo);
+    if (delta <= snapOut) {
+      return { snapped: currentlySnappedTo, target: currentlySnappedTo };
+    }
+  }
+  
+  // Find nearest target
+  let nearestTarget: number | null = null;
+  let nearestDelta = Infinity;
+  
+  for (const target of targets) {
+    const delta = Math.abs(value - target);
+    if (delta < nearestDelta) {
+      nearestDelta = delta;
+      nearestTarget = target;
+    }
+  }
+  
+  // Snap if within tolerance
+  if (nearestTarget !== null && nearestDelta <= snapIn) {
+    return { snapped: nearestTarget, target: nearestTarget };
+  }
+  
+  return { snapped: value, target: null };
+}
+
+// Rotation snapping with 15° steps and cardinal priority
+function snapRotation(
+  raw: number,
+  currentlySnappedTo: number | null
+): { snapped: number; isSnapped: boolean } {
+  // Check cardinal angles first (stronger snap)
+  for (const cardinal of CARDINAL_ANGLES) {
+    const delta = Math.abs(raw - cardinal);
+    if (delta <= CARDINAL_SNAP_TOLERANCE) {
+      return { snapped: cardinal, isSnapped: true };
+    }
+  }
+  
+  // Hysteresis for current snap
+  if (currentlySnappedTo !== null) {
+    const delta = Math.abs(raw - currentlySnappedTo);
+    if (delta <= ROTATION_SNAP_OUT) {
+      return { snapped: currentlySnappedTo, isSnapped: true };
+    }
+  }
+  
+  // Snap to nearest 15° step
+  const nearest = Math.round(raw / ROTATION_SNAP_STEP) * ROTATION_SNAP_STEP;
+  const delta = Math.abs(raw - nearest);
+  
+  if (delta <= ROTATION_SNAP_IN) {
+    return { snapped: nearest, isSnapped: true };
+  }
+  
+  return { snapped: raw, isSnapped: false };
+}
+
 export default function TextOverlayRenderer({
   textOverlays,
   isEditable = false,
@@ -118,14 +224,49 @@ export default function TextOverlayRenderer({
   containerRef,
   activeOverlayId,
   onSelectOverlay,
+  safeAreaContext = 'feed',
 }: TextOverlayRendererProps) {
-  // Guide visibility state
-  const [showGuideX, setShowGuideX] = useState(false);
-  const [showGuideY, setShowGuideY] = useState(false);
+  // Active guides state
+  const [activeGuideX, setActiveGuideX] = useState<ActiveGuide | null>(null);
+  const [activeGuideY, setActiveGuideY] = useState<ActiveGuide | null>(null);
+  const [rotationLabel, setRotationLabel] = useState<number | null>(null);
+  
+  // Snap state refs for hysteresis
+  const snappedXRef = useRef<number | null>(null);
+  const snappedYRef = useRef<number | null>(null);
+  const snappedRotationRef = useRef<number | null>(null);
   
   // Internal active overlay if not controlled
   const [internalActiveId, setInternalActiveId] = useState<string | null>(null);
   const currentActiveId = activeOverlayId !== undefined ? activeOverlayId : internalActiveId;
+  
+  // Compute safe bounds based on container and context
+  const safeBounds = useMemo(() => {
+    if (!containerRef?.current) {
+      return { minX: 0.05, maxX: 0.95, minY: 0.05, maxY: 0.95 };
+    }
+    const rect = containerRef.current.getBoundingClientRect();
+    const insets = getSafeInsets(safeAreaContext);
+    return {
+      minX: insets.left / rect.width,
+      maxX: 1 - insets.right / rect.width,
+      minY: insets.top / rect.height,
+      maxY: 1 - insets.bottom / rect.height,
+    };
+  }, [containerRef, safeAreaContext]);
+  
+  // Dynamic snap targets including safe bounds
+  const snapTargetsX = useMemo(() => [0.5, 1/3, 2/3, safeBounds.minX, safeBounds.maxX], [safeBounds]);
+  const snapTargetsY = useMemo(() => [0.5, 1/3, 2/3, safeBounds.minY, safeBounds.maxY], [safeBounds]);
+  
+  // Sort overlays by z-order: active on top, then by position
+  const sortedOverlays = useMemo(() => {
+    return [...textOverlays].sort((a, b) => {
+      if (a.id === currentActiveId) return 1;
+      if (b.id === currentActiveId) return -1;
+      return 0;
+    });
+  }, [textOverlays, currentActiveId]);
   
   const handleSelectOverlay = useCallback((id: string | null) => {
     if (onSelectOverlay) {
@@ -175,10 +316,17 @@ export default function TextOverlayRenderer({
     overlay: TextOverlay
   ) => {
     if (!isEditable) return;
+    
+    // Only allow dragging the active overlay
+    if (currentActiveId && overlay.id !== currentActiveId) {
+      // Just select it, don't start drag
+      handleSelectOverlay(overlay.id);
+      return;
+    }
+    
     e.preventDefault();
     e.stopPropagation();
     
-    // Select this overlay
     handleSelectOverlay(overlay.id);
 
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -191,8 +339,11 @@ export default function TextOverlayRenderer({
       originalX: overlay.x,
       originalY: overlay.y,
     };
+    
+    // Reset snap state
+    snappedXRef.current = null;
+    snappedYRef.current = null;
 
-    // Add global listeners
     if ('touches' in e) {
       document.addEventListener('touchmove', handleDragMove as any, { passive: false });
       document.addEventListener('touchend', handleDragEnd as any);
@@ -200,15 +351,15 @@ export default function TextOverlayRenderer({
       document.addEventListener('mousemove', handleDragMove as any);
       document.addEventListener('mouseup', handleDragEnd as any);
     }
-  }, [isEditable, handleSelectOverlay]);
+  }, [isEditable, currentActiveId, handleSelectOverlay]);
 
   const handleDragMove = useCallback((e: TouchEvent | MouseEvent) => {
     // Handle pinch if two fingers
     if ('touches' in e && e.touches.length === 2 && pinchRef.current && onChange) {
       e.preventDefault();
-      const dist = touchDistance(e.touches[0], e.touches[1]);
+      const dist = touchDistance(e.touches[0] as unknown as React.Touch, e.touches[1] as unknown as React.Touch);
       const ratio = dist / pinchRef.current.startDistance;
-      const nextScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, pinchRef.current.startScale * ratio));
+      const nextScale = clamp(pinchRef.current.startScale * ratio, MIN_SCALE, MAX_SCALE);
       
       const updated = textOverlays.map(overlay =>
         overlay.id === pinchRef.current?.id
@@ -229,22 +380,23 @@ export default function TextOverlayRenderer({
     const deltaX = (clientX - dragRef.current.startX) / rect.width;
     const deltaY = (clientY - dragRef.current.startY) / rect.height;
 
-    let newX = dragRef.current.originalX + deltaX;
-    let newY = dragRef.current.originalY + deltaY;
+    let rawX = dragRef.current.originalX + deltaX;
+    let rawY = dragRef.current.originalY + deltaY;
     
-    // Apply soft snap to center
-    const nearCenterX = Math.abs(newX - 0.5) <= SNAP_TOLERANCE;
-    const nearCenterY = Math.abs(newY - 0.5) <= SNAP_TOLERANCE;
+    // Apply snapping with hysteresis
+    const snapResultX = snapWithHysteresis(rawX, snapTargetsX, snappedXRef.current, SNAP_IN_TOLERANCE, SNAP_OUT_TOLERANCE);
+    const snapResultY = snapWithHysteresis(rawY, snapTargetsY, snappedYRef.current, SNAP_IN_TOLERANCE, SNAP_OUT_TOLERANCE);
     
-    if (nearCenterX) newX = 0.5;
-    if (nearCenterY) newY = 0.5;
+    snappedXRef.current = snapResultX.target;
+    snappedYRef.current = snapResultY.target;
     
-    setShowGuideX(nearCenterX);
-    setShowGuideY(nearCenterY);
+    // Update guides
+    setActiveGuideX(snapResultX.target !== null ? { position: snapResultX.target, type: getGuideType(snapResultX.target) } : null);
+    setActiveGuideY(snapResultY.target !== null ? { position: snapResultY.target, type: getGuideType(snapResultY.target) } : null);
     
-    // Clamp to 0.05..0.95
-    newX = Math.max(0.05, Math.min(0.95, newX));
-    newY = Math.max(0.05, Math.min(0.95, newY));
+    // Clamp to safe bounds
+    const newX = clamp(snapResultX.snapped, safeBounds.minX, safeBounds.maxX);
+    const newY = clamp(snapResultY.snapped, safeBounds.minY, safeBounds.maxY);
 
     const updated = textOverlays.map(overlay =>
       overlay.id === dragRef.current?.id
@@ -252,13 +404,15 @@ export default function TextOverlayRenderer({
         : overlay
     );
     onChange(updated);
-  }, [textOverlays, onChange, containerRef]);
+  }, [textOverlays, onChange, containerRef, snapTargetsX, snapTargetsY, safeBounds]);
 
   const handleDragEnd = useCallback(() => {
     dragRef.current = null;
     pinchRef.current = null;
-    setShowGuideX(false);
-    setShowGuideY(false);
+    snappedXRef.current = null;
+    snappedYRef.current = null;
+    setActiveGuideX(null);
+    setActiveGuideY(null);
     document.removeEventListener('touchmove', handleDragMove as any);
     document.removeEventListener('touchend', handleDragEnd as any);
     document.removeEventListener('mousemove', handleDragMove as any);
@@ -272,7 +426,6 @@ export default function TextOverlayRenderer({
   ) => {
     if (!isEditable) return;
     
-    // Select this overlay
     handleSelectOverlay(overlay.id);
     
     if (e.touches.length === 2) {
@@ -319,6 +472,8 @@ export default function TextOverlayRenderer({
       startRotation: overlay.rotation ?? 0,
     };
     
+    snappedRotationRef.current = null;
+    
     if ('touches' in e) {
       document.addEventListener('touchmove', handleRotateMove as any, { passive: false });
       document.addEventListener('touchend', handleRotateEnd as any);
@@ -341,25 +496,23 @@ export default function TextOverlayRenderer({
     );
     
     const deltaAngle = currentAngle - rotateRef.current.startAngle;
-    let degrees = deltaAngle * (180 / Math.PI);
-    let nextRotation = rotateRef.current.startRotation + degrees;
-    
-    // Soft snap to 0, 90, 180, -90
-    const snapAngles = [0, 90, 180, -90, -180];
-    for (const snap of snapAngles) {
-      if (Math.abs(nextRotation - snap) < 5) {
-        nextRotation = snap;
-        break;
-      }
-    }
+    const degrees = deltaAngle * (180 / Math.PI);
+    let rawRotation = rotateRef.current.startRotation + degrees;
     
     // Normalize to -180..180
-    while (nextRotation > 180) nextRotation -= 360;
-    while (nextRotation < -180) nextRotation += 360;
+    while (rawRotation > 180) rawRotation -= 360;
+    while (rawRotation < -180) rawRotation += 360;
+    
+    // Apply rotation snapping
+    const snapResult = snapRotation(rawRotation, snappedRotationRef.current);
+    snappedRotationRef.current = snapResult.isSnapped ? snapResult.snapped : null;
+    
+    // Show rotation label when snapped
+    setRotationLabel(snapResult.isSnapped ? Math.round(snapResult.snapped) : null);
     
     const updated = textOverlays.map(overlay =>
       overlay.id === rotateRef.current?.id
-        ? { ...overlay, rotation: nextRotation }
+        ? { ...overlay, rotation: snapResult.snapped }
         : overlay
     );
     onChange(updated);
@@ -367,6 +520,8 @@ export default function TextOverlayRenderer({
   
   const handleRotateEnd = useCallback(() => {
     rotateRef.current = null;
+    snappedRotationRef.current = null;
+    setRotationLabel(null);
     document.removeEventListener('touchmove', handleRotateMove as any);
     document.removeEventListener('touchend', handleRotateEnd as any);
     document.removeEventListener('mousemove', handleRotateMove as any);
@@ -377,36 +532,57 @@ export default function TextOverlayRenderer({
     return null;
   }
 
+  // Render guide line with appropriate styling
+  const renderGuideX = (guide: ActiveGuide) => {
+    const styleClass = guide.type === 'center' 
+      ? 'bg-white/40' 
+      : guide.type === 'thirds' 
+        ? 'bg-white/30 border-l border-dashed border-white/50' 
+        : 'bg-white/20';
+    return (
+      <div 
+        key={`guide-x-${guide.position}`}
+        className={cn("absolute top-0 bottom-0 w-px pointer-events-none z-40", styleClass)}
+        style={{ 
+          left: `${guide.position * 100}%`,
+          boxShadow: '0 0 2px rgba(0,0,0,0.5)',
+        }}
+      />
+    );
+  };
+  
+  const renderGuideY = (guide: ActiveGuide) => {
+    const styleClass = guide.type === 'center' 
+      ? 'bg-white/40' 
+      : guide.type === 'thirds' 
+        ? 'bg-white/30 border-t border-dashed border-white/50' 
+        : 'bg-white/20';
+    return (
+      <div 
+        key={`guide-y-${guide.position}`}
+        className={cn("absolute left-0 right-0 h-px pointer-events-none z-40", styleClass)}
+        style={{ 
+          top: `${guide.position * 100}%`,
+          boxShadow: '0 0 2px rgba(0,0,0,0.5)',
+        }}
+      />
+    );
+  };
+
   return (
     <div 
       className="absolute inset-0 overflow-hidden z-30"
       style={{ pointerEvents: isEditable ? 'auto' : 'none' }}
     >
-      {/* Snap guides - only visible when positioning */}
-      {isEditable && (showGuideX || showGuideY) && (
-        <>
-          {showGuideX && (
-            <div 
-              className="absolute top-0 bottom-0 w-px bg-white/50 pointer-events-none z-40"
-              style={{ left: '50%' }}
-            />
-          )}
-          {showGuideY && (
-            <div 
-              className="absolute left-0 right-0 h-px bg-white/50 pointer-events-none z-40"
-              style={{ top: '50%' }}
-            />
-          )}
-        </>
-      )}
+      {/* Snap guides */}
+      {isEditable && activeGuideX && renderGuideX(activeGuideX)}
+      {isEditable && activeGuideY && renderGuideY(activeGuideY)}
       
-      {textOverlays.map((overlay) => {
+      {sortedOverlays.map((overlay, index) => {
         const variant = TEXT_VARIANTS[overlay.style] || TEXT_VARIANTS.modern_bold;
-        // Scale font size: base 20px, range 12-56px
-        const fontSize = Math.max(12, Math.min(56, Math.round(20 * overlay.scale)));
-        
         const textColor = overlay.color || '#FFFFFF';
         const rotation = overlay.rotation ?? 0;
+        const scale = overlay.scale;
         const isActive = currentActiveId === overlay.id;
         
         // Build text shadow based on variant
@@ -430,8 +606,9 @@ export default function TextOverlayRenderer({
             style={{
               left: `${overlay.x * 100}%`,
               top: `${overlay.y * 100}%`,
-              transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-              zIndex: isActive ? 10 : 5,
+              // Apply scale to entire wrapper so bg/padding scales proportionally
+              transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`,
+              zIndex: isActive ? 10 : 5 + index,
             }}
             onMouseDown={isEditable ? (e) => handleDragStart(e, overlay) : undefined}
             onTouchStart={isEditable ? (e) => handleTouchStart(e, overlay) : undefined}
@@ -444,11 +621,10 @@ export default function TextOverlayRenderer({
               )}
               style={{
                 color: textColor,
-                fontSize: `${fontSize}px`,
+                fontSize: `${BASE_FONT_SIZE}px`, // Fixed base, scaling via transform
                 textShadow,
                 WebkitTextStroke: strokeStyle !== 'none' ? strokeStyle : undefined,
                 textTransform: variant.textTransform || 'none',
-                // Paint order ensures stroke appears behind fill
                 paintOrder: variant.strokeStyle ? 'stroke fill' : undefined,
               }}
             >
@@ -461,19 +637,28 @@ export default function TextOverlayRenderer({
                 <div 
                   className={cn(
                     "absolute -inset-2 rounded-lg border-2 border-dashed pointer-events-none transition-opacity",
-                    isActive ? "border-white opacity-90" : "border-white/40 opacity-50"
+                    isActive ? "border-white opacity-90" : "border-white/30 opacity-40"
                   )}
                 />
                 
                 {/* Rotation handle - only show for active overlay */}
                 {isActive && (
-                  <div
-                    className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/90 shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing"
-                    onMouseDown={(e) => handleRotateStart(e, overlay)}
-                    onTouchStart={(e) => handleRotateStart(e, overlay)}
-                  >
-                    <RotateCw className="w-4 h-4 text-zinc-700" />
-                  </div>
+                  <>
+                    <div
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/90 shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing"
+                      onMouseDown={(e) => handleRotateStart(e, overlay)}
+                      onTouchStart={(e) => handleRotateStart(e, overlay)}
+                    >
+                      <RotateCw className="w-4 h-4 text-zinc-700" />
+                    </div>
+                    
+                    {/* Rotation label when snapped */}
+                    {rotationLabel !== null && (
+                      <div className="absolute -top-14 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium whitespace-nowrap">
+                        {rotationLabel}°
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
