@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CarouselSlide from './CarouselSlide';
 import { haptic } from '@/utils/haptics';
+import { StudioEdits } from '@/types/studio';
 
 interface MediaItem {
   id: string;
@@ -11,7 +12,7 @@ interface MediaItem {
   url?: string;
   file?: File;
   alt?: string;
-  filterId?: string; // Studio filter to apply
+  studioEdits?: StudioEdits; // Full studio edits
 }
 
 interface MediaCarouselProps {
@@ -222,6 +223,7 @@ const MediaCarousel = ({
               coverIndex={coverIndex}
               forceVideoMuted={forceVideoMuted}
               onMuteBlocked={onMuteBlocked}
+              studioEdits={item.studioEdits}
             />
           );
         })()}
