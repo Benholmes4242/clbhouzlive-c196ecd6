@@ -8,6 +8,7 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getStreamPoster } from '@/utils/stream';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 
 interface ActivityPostCardProps {
@@ -41,8 +42,11 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
   const hasMultipleMedia = hasMedia && post.post_media.length > 1;
   const currentMedia = hasMedia ? post.post_media[currentMediaIndex] : null;
   
-  const filterId = (currentMedia as any)?.filter_id || (currentMedia as any)?.studio_edits?.filter;
+  const studioEdits = (currentMedia as any)?.studio_edits;
+  const filterId = (currentMedia as any)?.filter_id || studioEdits?.filter;
   const filterClass = getFilterClass(filterId as any);
+  const cropClass = getCropWrapperClass(studioEdits?.crop);
+  const pixelStyle = getPixelLayerStyle(studioEdits);
 
   return (
     <div 
@@ -52,17 +56,19 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
       {hasMedia && currentMedia ? (
         <>
           {currentMedia.media_type === 'video' ? (
-            <div className="relative w-full h-full">
-              <HighQualityImage
-                src={getStreamPoster(currentMedia.media_url, '1s') || '/placeholder.svg'}
-                alt="Video thumbnail"
-                className={cn("w-full h-full object-cover", filterClass)}
-                width={300}
-                height={300}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder.svg';
-                }}
-              />
+            <div className={cn("relative w-full h-full", cropClass)}>
+              <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                <HighQualityImage
+                  src={getStreamPoster(currentMedia.media_url, '1s') || '/placeholder.svg'}
+                  alt="Video thumbnail"
+                  className="w-full h-full object-cover"
+                  width={300}
+                  height={300}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                  }}
+                />
+              </div>
               <div className="absolute bottom-2 right-2 z-10">
                 <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 flex items-center justify-center">
                   <Play className="w-3 h-3 text-white ml-0.5" fill="currentColor" />
@@ -70,11 +76,14 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
               </div>
             </div>
           ) : (
-            <img
-              src={currentMedia.media_url}
-              alt="Post media"
-              className={cn("w-full h-full object-cover", filterClass)}
-            />
+            <div className={cn("w-full h-full", cropClass)}>
+              <img
+                src={currentMedia.media_url}
+                alt="Post media"
+                className={cn("w-full h-full object-cover", filterClass)}
+                style={pixelStyle}
+              />
+            </div>
           )}
 
           {hasMultipleMedia && (
