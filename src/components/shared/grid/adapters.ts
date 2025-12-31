@@ -6,6 +6,7 @@ import { UnifiedMediaItem, ContentCategory, AR_LANDSCAPE_THRESHOLD } from './typ
 import { getStreamPoster } from '@/utils/stream';
 import { uidFromNode, generateHlsUrl } from '@/utils/cloudflareStreamTransform';
 import { classifyOrientation } from './layoutUtils';
+import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 
 /**
  * Map content tags to ContentCategory
@@ -79,10 +80,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
   if (!media || media.length === 0) return null;
 
   const primaryMedia = media[0];
-  const golfCourseTag = post.post_tags?.find(tag => tag.entity_type === 'golf_club');
-  // Use tag first, fallback to course_id
-  const golfCourseId = golfCourseTag?.entity_id || (post as any).course_id;
-  const golfCourseName = golfCourseTag?.name;
+  
+  // Use canonical resolver
+  const golfCourse = resolveGolfCourse(post);
   const isMilestone = post.content?.toLowerCase().includes('milestone') || 
     post.post_tags?.some(tag => tag.name?.toLowerCase().includes('achievement'));
 
@@ -115,14 +115,14 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     // Landscape eligibility - can be enhanced with more metadata
     isFeatured: false,
     contentCategory: undefined,
-    golfCourseId,
+    golfCourseId: golfCourse?.id,
     
     // Display data
     durationSeconds: primaryMedia.duration_seconds,
     likes: post.likes,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
-    courseName: golfCourseName,
+    courseName: golfCourse?.name,
     
     // Creator info
     creator: post.user ? {
