@@ -33,6 +33,9 @@ class UploadManager {
       files: input.files,
       mediaItems: input.mediaItems,
       studioEditsByMediaId: input.studioEditsByMediaId,
+      postStudioEdits: input.postStudioEdits, // Music, audioMode, achievementBadgeId
+      categories: input.categories,
+      visibility: input.visibility,
       createdAt: new Date().toISOString(),
       status: 'queued',
       progress: {
