@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Heart, MessageCircle, MapPin } from 'lucide-react';
 import { MomentPost } from './types';
 import { formatDistanceToNow } from 'date-fns';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface MomentCardProps {
   moment: MomentPost;
@@ -64,6 +65,14 @@ export const MomentCard: React.FC<MomentCardProps> = ({
         {!isLoaded && (
           <div className="absolute inset-0 bg-slate-800 animate-pulse" />
         )}
+
+        {/* Text overlays from studioEdits */}
+        {moment.studioEdits?.textOverlays?.length ? (
+          <TextOverlayRenderer
+            textOverlays={moment.studioEdits.textOverlays}
+            isEditable={false}
+          />
+        ) : null}
 
         {/* Course tag overlay */}
         {moment.courseName && (

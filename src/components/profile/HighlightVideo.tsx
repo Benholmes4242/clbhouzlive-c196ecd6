@@ -4,6 +4,7 @@ import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTrans
 import { getHlsUrl, attachHlsIfNeeded } from '@/utils/videoPreload';
 import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media/useMediaAutoplay';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface HighlightVideoProps {
   highlight: Top100Highlight;
@@ -124,8 +125,11 @@ const HighlightVideo = memo(function HighlightVideo({
     );
   }
 
+  // Get studio_edits from primaryMedia
+  const studioEdits = (primaryMedia as any)?.studio_edits;
+
   return (
-    <div ref={containerRef} className="highlights__card">
+    <div ref={containerRef} className="highlights__card relative">
       {primaryMedia.media_type === 'image' ? (
         <img
           src={primaryMedia.media_url}
@@ -141,6 +145,14 @@ const HighlightVideo = memo(function HighlightVideo({
           muted={muted}
           playsInline
           preload="auto"
+        />
+      )}
+      
+      {/* Text overlays from studio_edits */}
+      {studioEdits?.textOverlays?.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={studioEdits.textOverlays}
+          isEditable={false}
         />
       )}
     </div>

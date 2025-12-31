@@ -8,6 +8,7 @@ import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 /**
  * Hero Card Media Component (4×4 large features, special highlight slots) - mobile view only
@@ -125,6 +126,14 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         <div className="w-full h-full bg-muted flex items-center justify-center">
           <span className="text-muted-foreground text-sm">Invalid video source</span>
         </div>
+      )}
+      
+      {/* Text overlays from studio_edits */}
+      {(media as any).studio_edits?.textOverlays?.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={(media as any).studio_edits.textOverlays}
+          isEditable={false}
+        />
       )}
       
       {/* Hero overlay gradient for visual appeal */}
