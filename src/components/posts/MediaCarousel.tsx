@@ -213,8 +213,11 @@ const MediaCarousel = ({
       <div className="absolute inset-0 pt-[calc(env(safe-area-inset-top,0px))]">
         {(() => {
           const item = items[activeIndex];
+          // Use item.id + filter as key to force re-render when filter changes
+          const filterKey = item.studioEdits?.filter || 'normal';
           return (
             <CarouselSlide
+              key={`${item.id}-${filterKey}`}
               item={item}
               index={activeIndex}
               isActive={true}
