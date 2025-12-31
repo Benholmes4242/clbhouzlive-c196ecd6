@@ -284,6 +284,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_caption_usage: {
+        Row: {
+          count: number
+          created_at: string
+          id: string
+          updated_at: string
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          usage_date?: string
+          user_id: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          usage_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -4081,9 +4108,11 @@ export type Database = {
       }
       posts: {
         Row: {
+          achievement_badge_id: string | null
           achievement_id: string | null
           actor_id: string
           actor_type: string
+          audio_mode: string | null
           badges: string[]
           categories: string[]
           comment_count: number
@@ -4096,14 +4125,17 @@ export type Database = {
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
+          studio_music: Json | null
           updated_at: string
           user_id: string
           visibility: Database["public"]["Enums"]["post_visibility"]
         }
         Insert: {
+          achievement_badge_id?: string | null
           achievement_id?: string | null
           actor_id: string
           actor_type?: string
+          audio_mode?: string | null
           badges?: string[]
           categories?: string[]
           comment_count?: number
@@ -4116,14 +4148,17 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          studio_music?: Json | null
           updated_at?: string
           user_id: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
         }
         Update: {
+          achievement_badge_id?: string | null
           achievement_id?: string | null
           actor_id?: string
           actor_type?: string
+          audio_mode?: string | null
           badges?: string[]
           categories?: string[]
           comment_count?: number
@@ -4136,6 +4171,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          studio_music?: Json | null
           updated_at?: string
           user_id?: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
