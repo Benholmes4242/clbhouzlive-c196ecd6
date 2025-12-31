@@ -276,6 +276,9 @@ export default function TextOverlayRenderer({
     }
   }, [onSelectOverlay]);
   
+  // Pointer ID for capture (works across mouse/touch/pen)
+  const pointerIdRef = useRef<number | null>(null);
+  
   // Drag state
   const dragRef = useRef<{
     id: string;
@@ -304,13 +307,109 @@ export default function TextOverlayRenderer({
   // Cleanup listeners on unmount
   useEffect(() => {
     return () => {
+      document.removeEventListener('pointermove', handlePointerMove as any);
+      document.removeEventListener('pointerup', handlePointerEnd as any);
+      document.removeEventListener('pointercancel', handlePointerEnd as any);
       document.removeEventListener('touchmove', handleDragMove as any);
       document.removeEventListener('touchend', handleDragEnd as any);
-      document.removeEventListener('mousemove', handleDragMove as any);
-      document.removeEventListener('mouseup', handleDragEnd as any);
     };
   }, []);
 
+  // Pointer-based drag start (unified for mouse/touch/pen)
+  const handlePointerDown = useCallback((
+    e: React.PointerEvent,
+    overlay: TextOverlay
+  ) => {
+    if (!isEditable) return;
+    
+    // Only allow dragging the active overlay
+    if (currentActiveId && overlay.id !== currentActiveId) {
+      // Just select it, don't start drag
+      handleSelectOverlay(overlay.id);
+      return;
+    }
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Capture pointer so moves keep firing even if pointer leaves element
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    pointerIdRef.current = e.pointerId;
+    
+    handleSelectOverlay(overlay.id);
+
+    dragRef.current = {
+      id: overlay.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      originalX: overlay.x,
+      originalY: overlay.y,
+    };
+    
+    // Reset snap state
+    snappedXRef.current = null;
+    snappedYRef.current = null;
+
+    document.addEventListener('pointermove', handlePointerMove as any);
+    document.addEventListener('pointerup', handlePointerEnd as any);
+    document.addEventListener('pointercancel', handlePointerEnd as any);
+  }, [isEditable, currentActiveId, handleSelectOverlay]);
+  
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    if (!dragRef.current || !containerRef?.current || !onChange) return;
+    e.preventDefault();
+
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const deltaX = (clientX - dragRef.current.startX) / rect.width;
+    const deltaY = (clientY - dragRef.current.startY) / rect.height;
+
+    let rawX = dragRef.current.originalX + deltaX;
+    let rawY = dragRef.current.originalY + deltaY;
+    
+    // Apply snapping with hysteresis
+    const snapResultX = snapWithHysteresis(rawX, snapTargetsX, snappedXRef.current, SNAP_IN_TOLERANCE, SNAP_OUT_TOLERANCE);
+    const snapResultY = snapWithHysteresis(rawY, snapTargetsY, snappedYRef.current, SNAP_IN_TOLERANCE, SNAP_OUT_TOLERANCE);
+    
+    snappedXRef.current = snapResultX.target;
+    snappedYRef.current = snapResultY.target;
+    
+    // Update guides
+    setActiveGuideX(snapResultX.target !== null ? { position: snapResultX.target, type: getGuideType(snapResultX.target) } : null);
+    setActiveGuideY(snapResultY.target !== null ? { position: snapResultY.target, type: getGuideType(snapResultY.target) } : null);
+    
+    // Clamp to safe bounds
+    const newX = clamp(snapResultX.snapped, safeBounds.minX, safeBounds.maxX);
+    const newY = clamp(snapResultY.snapped, safeBounds.minY, safeBounds.maxY);
+
+    const updated = textOverlays.map(overlay =>
+      overlay.id === dragRef.current?.id
+        ? { ...overlay, x: newX, y: newY }
+        : overlay
+    );
+    onChange(updated);
+  }, [textOverlays, onChange, containerRef, snapTargetsX, snapTargetsY, safeBounds]);
+
+  const handlePointerEnd = useCallback((e: PointerEvent) => {
+    if (pointerIdRef.current !== null) {
+      try {
+        (e.target as HTMLElement)?.releasePointerCapture(pointerIdRef.current);
+      } catch {}
+    }
+    pointerIdRef.current = null;
+    dragRef.current = null;
+    snappedXRef.current = null;
+    snappedYRef.current = null;
+    setActiveGuideX(null);
+    setActiveGuideY(null);
+    document.removeEventListener('pointermove', handlePointerMove as any);
+    document.removeEventListener('pointerup', handlePointerEnd as any);
+    document.removeEventListener('pointercancel', handlePointerEnd as any);
+  }, [handlePointerMove]);
+
+  // Legacy drag handlers (kept for touch pinch compatibility)
   const handleDragStart = useCallback((
     e: React.TouchEvent | React.MouseEvent,
     overlay: TextOverlay
@@ -319,7 +418,6 @@ export default function TextOverlayRenderer({
     
     // Only allow dragging the active overlay
     if (currentActiveId && overlay.id !== currentActiveId) {
-      // Just select it, don't start drag
       handleSelectOverlay(overlay.id);
       return;
     }
@@ -340,16 +438,12 @@ export default function TextOverlayRenderer({
       originalY: overlay.y,
     };
     
-    // Reset snap state
     snappedXRef.current = null;
     snappedYRef.current = null;
 
     if ('touches' in e) {
       document.addEventListener('touchmove', handleDragMove as any, { passive: false });
       document.addEventListener('touchend', handleDragEnd as any);
-    } else {
-      document.addEventListener('mousemove', handleDragMove as any);
-      document.addEventListener('mouseup', handleDragEnd as any);
     }
   }, [isEditable, currentActiveId, handleSelectOverlay]);
 
@@ -446,23 +540,26 @@ export default function TextOverlayRenderer({
     }
   }, [isEditable, handleDragStart, handleDragMove, handleDragEnd, handleSelectOverlay]);
   
-  // Rotation handle drag
+  // Rotation handle drag - using pointer events
+  const rotatePointerIdRef = useRef<number | null>(null);
+  
   const handleRotateStart = useCallback((
-    e: React.TouchEvent | React.MouseEvent,
+    e: React.PointerEvent,
     overlay: TextOverlay
   ) => {
     if (!isEditable || !containerRef?.current) return;
     e.preventDefault();
     e.stopPropagation();
     
+    // Capture pointer for rotation handle
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    rotatePointerIdRef.current = e.pointerId;
+    
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = rect.left + overlay.x * rect.width;
     const centerY = rect.top + overlay.y * rect.height;
     
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    const startAngle = Math.atan2(clientY - centerY, clientX - centerX);
+    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
     
     rotateRef.current = {
       id: overlay.id,
@@ -474,25 +571,18 @@ export default function TextOverlayRenderer({
     
     snappedRotationRef.current = null;
     
-    if ('touches' in e) {
-      document.addEventListener('touchmove', handleRotateMove as any, { passive: false });
-      document.addEventListener('touchend', handleRotateEnd as any);
-    } else {
-      document.addEventListener('mousemove', handleRotateMove as any);
-      document.addEventListener('mouseup', handleRotateEnd as any);
-    }
+    document.addEventListener('pointermove', handleRotateMove as any);
+    document.addEventListener('pointerup', handleRotateEnd as any);
+    document.addEventListener('pointercancel', handleRotateEnd as any);
   }, [isEditable, containerRef]);
   
-  const handleRotateMove = useCallback((e: TouchEvent | MouseEvent) => {
+  const handleRotateMove = useCallback((e: PointerEvent) => {
     if (!rotateRef.current || !onChange) return;
     e.preventDefault();
     
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
     const currentAngle = Math.atan2(
-      clientY - rotateRef.current.centerY, 
-      clientX - rotateRef.current.centerX
+      e.clientY - rotateRef.current.centerY, 
+      e.clientX - rotateRef.current.centerX
     );
     
     const deltaAngle = currentAngle - rotateRef.current.startAngle;
@@ -518,14 +608,19 @@ export default function TextOverlayRenderer({
     onChange(updated);
   }, [textOverlays, onChange]);
   
-  const handleRotateEnd = useCallback(() => {
+  const handleRotateEnd = useCallback((e?: PointerEvent) => {
+    if (rotatePointerIdRef.current !== null && e) {
+      try {
+        (e.target as HTMLElement)?.releasePointerCapture(rotatePointerIdRef.current);
+      } catch {}
+    }
+    rotatePointerIdRef.current = null;
     rotateRef.current = null;
     snappedRotationRef.current = null;
     setRotationLabel(null);
-    document.removeEventListener('touchmove', handleRotateMove as any);
-    document.removeEventListener('touchend', handleRotateEnd as any);
-    document.removeEventListener('mousemove', handleRotateMove as any);
-    document.removeEventListener('mouseup', handleRotateEnd as any);
+    document.removeEventListener('pointermove', handleRotateMove as any);
+    document.removeEventListener('pointerup', handleRotateEnd as any);
+    document.removeEventListener('pointercancel', handleRotateEnd as any);
   }, [handleRotateMove]);
 
   if (!textOverlays || textOverlays.length === 0) {
@@ -601,7 +696,7 @@ export default function TextOverlayRenderer({
             key={overlay.id}
             className={cn(
               "absolute",
-              isEditable && "cursor-move"
+              isEditable && "cursor-move touch-none select-none"
             )}
             style={{
               left: `${overlay.x * 100}%`,
@@ -609,8 +704,10 @@ export default function TextOverlayRenderer({
               // Apply scale to entire wrapper so bg/padding scales proportionally
               transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`,
               zIndex: isActive ? 10 : 5 + index,
+              touchAction: isEditable ? 'none' : 'auto',
+              pointerEvents: isEditable ? 'auto' : 'none',
             }}
-            onMouseDown={isEditable ? (e) => handleDragStart(e, overlay) : undefined}
+            onPointerDown={isEditable ? (e) => handlePointerDown(e, overlay) : undefined}
             onTouchStart={isEditable ? (e) => handleTouchStart(e, overlay) : undefined}
           >
             <span
@@ -645,9 +742,12 @@ export default function TextOverlayRenderer({
                 {isActive && (
                   <>
                     <div
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/90 shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing"
-                      onMouseDown={(e) => handleRotateStart(e, overlay)}
-                      onTouchStart={(e) => handleRotateStart(e, overlay)}
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/90 shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
+                      style={{ touchAction: 'none' }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        handleRotateStart(e, overlay);
+                      }}
                     >
                       <RotateCw className="w-4 h-4 text-zinc-700" />
                     </div>

@@ -47,6 +47,8 @@ export default function CreateMomentMediaStage({
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
   const stageContainerRef = useRef<HTMLDivElement>(null);
+  // Media container ref for text overlay drag calculations
+  const mediaContainerRef = useRef<HTMLDivElement>(null);
 
   // Check if any media has music attached (music applies to the whole post)
   const hasMusic = useMemo(() => {
@@ -104,41 +106,44 @@ export default function CreateMomentMediaStage({
     >
       {/* Main carousel area */}
       <div ref={stageContainerRef} className="flex-1 relative">
-        <MediaCarousel
-          items={media.map((item) => {
-            const edits = getEdits(item.id);
-            return {
-              id: item.id,
-              type: item.type,
-              previewUrl: item.previewUrl,
-              file: item.file,
-              alt: `Media item ${item.id}`,
-              filterId: edits?.filter
-            };
-          })}
-          initialIndex={activeIndex}
-          onIndexChange={onIndexChange}
-          onSetCover={onSetCover}
-          coverIndex={coverIndex}
-          enableSwipe={!isDraggingText} // Only disable swipe when positioning
-          loop={false}
-          className="h-full w-full"
-          forceVideoMuted={hasMusic}
-          onMuteBlocked={handleMuteBlocked}
-        />
-
-        {/* Text overlays for current media - editable only in position mode */}
-        {currentItem && (
-          <TextOverlayRenderer
-            textOverlays={currentEdits?.textOverlays ?? []}
-            isEditable={isTextEditable}
-            onChange={isTextEditable ? handleTextOverlayChange : undefined}
-            containerRef={stageContainerRef}
-            activeOverlayId={activeOverlayId}
-            onSelectOverlay={onSelectOverlay}
-            safeAreaContext="create"
+        {/* Media container wrapper for drag calculations */}
+        <div ref={mediaContainerRef} className="relative h-full w-full">
+          <MediaCarousel
+            items={media.map((item) => {
+              const edits = getEdits(item.id);
+              return {
+                id: item.id,
+                type: item.type,
+                previewUrl: item.previewUrl,
+                file: item.file,
+                alt: `Media item ${item.id}`,
+                filterId: edits?.filter
+              };
+            })}
+            initialIndex={activeIndex}
+            onIndexChange={onIndexChange}
+            onSetCover={onSetCover}
+            coverIndex={coverIndex}
+            enableSwipe={!isDraggingText} // Only disable swipe when positioning
+            loop={false}
+            className="h-full w-full"
+            forceVideoMuted={hasMusic}
+            onMuteBlocked={handleMuteBlocked}
           />
-        )}
+
+          {/* Text overlays for current media - editable only in position mode */}
+          {currentItem && (
+            <TextOverlayRenderer
+              textOverlays={currentEdits?.textOverlays ?? []}
+              isEditable={isTextEditable}
+              onChange={isTextEditable ? handleTextOverlayChange : undefined}
+              containerRef={mediaContainerRef}
+              activeOverlayId={activeOverlayId}
+              onSelectOverlay={onSelectOverlay}
+              safeAreaContext="create"
+            />
+          )}
+        </div>
 
         {/* Position mode hint overlay */}
         {isTextEditable && (
