@@ -614,6 +614,7 @@ export default function TextOverlayRenderer({
   
   // Stable rotate move handler
   const handleRotateMoveStable = useCallback((e: PointerEvent) => {
+    console.log('[TextOverlay] handleRotateMove fired', { rotateRef: !!rotateRef.current, onChangeRef: !!onChangeRef.current });
     if (!rotateRef.current || !onChangeRef.current) return;
     e.preventDefault();
     
@@ -625,6 +626,8 @@ export default function TextOverlayRenderer({
     const deltaAngle = currentAngle - rotateRef.current.startAngle;
     const degrees = deltaAngle * (180 / Math.PI);
     let rawRotation = rotateRef.current.startRotation + degrees;
+    
+    console.log('[TextOverlay] rotation calculation', { deltaAngle, degrees, rawRotation });
     
     // Normalize to -180..180
     while (rawRotation > 180) rawRotation -= 360;
@@ -642,6 +645,7 @@ export default function TextOverlayRenderer({
         ? { ...overlay, rotation: snapResult.snapped }
         : overlay
     );
+    console.log('[TextOverlay] calling onChange with rotation', snapResult.snapped);
     onChangeRef.current(updated);
   }, []);
   
@@ -671,7 +675,11 @@ export default function TextOverlayRenderer({
     e: React.PointerEvent,
     overlay: TextOverlay
   ) => {
-    if (!isEditable || !containerRef?.current) return;
+    console.log('[TextOverlay] handleRotateStart called', { isEditable, hasContainerRef: !!containerRef?.current, overlay: overlay.id });
+    if (!isEditable || !containerRef?.current) {
+      console.log('[TextOverlay] handleRotateStart early return - missing refs');
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
 
@@ -684,6 +692,8 @@ export default function TextOverlayRenderer({
     const centerY = rect.top + overlay.y * rect.height;
     
     const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+    
+    console.log('[TextOverlay] rotation setup', { centerX, centerY, startAngle, overlayRotation: overlay.rotation });
     
     rotateRef.current = {
       id: overlay.id,
@@ -698,6 +708,7 @@ export default function TextOverlayRenderer({
     document.addEventListener('pointermove', handleRotateMoveRef.current);
     document.addEventListener('pointerup', handleRotateEndRef.current);
     document.addEventListener('pointercancel', handleRotateEndRef.current);
+    console.log('[TextOverlay] rotation event listeners attached');
   }, [isEditable, containerRef]);
 
   if (!textOverlays || textOverlays.length === 0) {
@@ -822,6 +833,7 @@ export default function TextOverlayRenderer({
                       className="absolute -top-8 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white/90 shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
                       style={{ touchAction: 'none' }}
                       onPointerDown={(e) => {
+                        console.log('[TextOverlay] Rotate button onPointerDown fired');
                         e.stopPropagation();
                         handleRotateStart(e, overlay);
                       }}
