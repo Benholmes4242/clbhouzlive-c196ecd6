@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Move, ArrowLeft } from 'lucide-react';
 import { StudioEdits, TextOverlay, TextStyle } from '@/types/studio';
 import { nanoid } from 'nanoid';
 import { cn } from '@/lib/utils';
@@ -9,6 +9,8 @@ type StudioPanelTextProps = {
   updateEdits: (patch: Partial<StudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
+  isPositioningText?: boolean;
+  onTogglePositionMode?: () => void;
 };
 
 // 8 style presets with preview labels
@@ -40,7 +42,14 @@ const PREVIEW_FONTS: Record<TextStyle, string> = {
   classic: 'font-serif italic',
 };
 
-export default function StudioPanelText({ edits, updateEdits, onApply, onReset }: StudioPanelTextProps) {
+export default function StudioPanelText({ 
+  edits, 
+  updateEdits, 
+  onApply, 
+  onReset,
+  isPositioningText = false,
+  onTogglePositionMode
+}: StudioPanelTextProps) {
   const [textBoxes, setTextBoxes] = useState<TextOverlay[]>(edits?.textOverlays || []);
   const [selectedBox, setSelectedBox] = useState<string | null>(null);
 
@@ -60,6 +69,7 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
       x: 0.5,
       y: newY,
       scale: 1.2,
+      rotation: 0,
       style: 'modern_bold',
       color: '#FFFFFF'
     };
@@ -85,6 +95,27 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
   };
 
   const selected = textBoxes.find(box => box.id === selectedBox);
+
+  // Compact view when positioning
+  if (isPositioningText) {
+    return (
+      <div className="flex flex-col h-full max-h-[20vh] py-4 px-4">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-semibold text-zinc-900">Position text</h4>
+          <button
+            onClick={onTogglePositionMode}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-900 text-white font-medium text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to editing
+          </button>
+        </div>
+        <p className="text-xs text-zinc-500 text-center">
+          Drag to move • Pinch to resize • Use handle to rotate
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -141,6 +172,17 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
             />
           </div>
 
+          {/* Position on media button */}
+          {onTogglePositionMode && (
+            <button
+              onClick={onTogglePositionMode}
+              className="w-full py-3 rounded-lg bg-zinc-100 hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 text-zinc-800 font-medium"
+            >
+              <Move className="w-5 h-5" />
+              Position on media
+            </button>
+          )}
+
           {/* Style selector - horizontal scrolling chips */}
           <div>
             <label className="block text-body-sm font-medium text-zinc-700 mb-2">Style</label>
@@ -176,8 +218,8 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
             <label className="block text-sm font-medium text-zinc-700 mb-2">Size</label>
             <input
               type="range"
-              min="0.5"
-              max="2.5"
+              min="0.6"
+              max="3"
               step="0.1"
               value={selected.scale}
               onChange={(e) => updateBox(selected.id, { scale: parseFloat(e.target.value) })}
@@ -205,11 +247,6 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
               ))}
             </div>
           </div>
-
-          {/* Drag hint */}
-          <p className="text-xs text-zinc-400 text-center pt-2">
-            Drag text on the preview to reposition
-          </p>
         </div>
       )}
 

@@ -18,7 +18,8 @@ export type TextOverlay = {
   text: string;
   x: number;        // 0..1 relative position
   y: number;        // 0..1 relative position
-  scale: number;    // 0..1
+  scale: number;    // 0.6..3
+  rotation?: number; // degrees, default 0
   style: TextStyle;
   color?: string;   // hex
 };

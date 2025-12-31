@@ -102,6 +102,16 @@ export default function CreateMomentModal({
     hasEdits
   } = useStudio();
 
+  // Position mode state for text tool
+  const [isPositioningText, setIsPositioningText] = useState(false);
+  
+  // Reset position mode when tool changes
+  useEffect(() => {
+    if (activeTool !== 'text') {
+      setIsPositioningText(false);
+    }
+  }, [activeTool]);
+
   const { hasDraft, saveDraft, clearDraft, restoreDraft } = useDraftPersistence();
 
   // Derived state
@@ -554,6 +564,7 @@ export default function CreateMomentModal({
               getEdits={getEdits}
               activeTool={activeTool}
               onUpdateEdits={updateEdits}
+              isPositioningText={isPositioningText}
             />
           ) : (
             <CreateMomentHero
