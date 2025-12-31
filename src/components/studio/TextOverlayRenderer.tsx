@@ -279,6 +279,9 @@ export default function TextOverlayRenderer({
   // Pointer ID for capture (works across mouse/touch/pen)
   const pointerIdRef = useRef<number | null>(null);
   
+  // Multi-pointer tracking for pinch (pointer events based)
+  const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  
   // Drag state
   const dragRef = useRef<{
     id: string;
@@ -303,15 +306,24 @@ export default function TextOverlayRenderer({
     startAngle: number;
     startRotation: number;
   } | null>(null);
+  
+  // Store latest handlers in refs to avoid stale closures in event listeners
+  const onChangeRef = useRef(onChange);
+  const textOverlaysRef = useRef(textOverlays);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+    textOverlaysRef.current = textOverlays;
+  }, [onChange, textOverlays]);
 
   // Cleanup listeners on unmount
   useEffect(() => {
     return () => {
-      document.removeEventListener('pointermove', handlePointerMove as any);
-      document.removeEventListener('pointerup', handlePointerEnd as any);
-      document.removeEventListener('pointercancel', handlePointerEnd as any);
-      document.removeEventListener('touchmove', handleDragMove as any);
-      document.removeEventListener('touchend', handleDragEnd as any);
+      document.removeEventListener('pointermove', handlePointerMoveRef.current);
+      document.removeEventListener('pointerup', handlePointerEndRef.current);
+      document.removeEventListener('pointercancel', handlePointerEndRef.current);
+      document.removeEventListener('pointermove', handleRotateMoveRef.current);
+      document.removeEventListener('pointerup', handleRotateEndRef.current);
+      document.removeEventListener('pointercancel', handleRotateEndRef.current);
     };
   }, []);
 
@@ -332,31 +344,77 @@ export default function TextOverlayRenderer({
     e.preventDefault();
     e.stopPropagation();
 
+    // Track this pointer for pinch detection
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    
     // Capture pointer so moves keep firing even if pointer leaves element
     e.currentTarget.setPointerCapture(e.pointerId);
     pointerIdRef.current = e.pointerId;
     
     handleSelectOverlay(overlay.id);
-
-    dragRef.current = {
-      id: overlay.id,
-      startX: e.clientX,
-      startY: e.clientY,
-      originalX: overlay.x,
-      originalY: overlay.y,
-    };
+    
+    // Check if this is second pointer (pinch start)
+    if (pointersRef.current.size === 2) {
+      const pointers = Array.from(pointersRef.current.values());
+      const dx = pointers[0].x - pointers[1].x;
+      const dy = pointers[0].y - pointers[1].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      pinchRef.current = {
+        id: overlay.id,
+        startDistance: dist,
+        startScale: overlay.scale,
+      };
+      // Clear drag ref since we're now pinching
+      dragRef.current = null;
+    } else {
+      // Single pointer = drag
+      dragRef.current = {
+        id: overlay.id,
+        startX: e.clientX,
+        startY: e.clientY,
+        originalX: overlay.x,
+        originalY: overlay.y,
+      };
+    }
     
     // Reset snap state
     snappedXRef.current = null;
     snappedYRef.current = null;
 
-    document.addEventListener('pointermove', handlePointerMove as any);
-    document.addEventListener('pointerup', handlePointerEnd as any);
-    document.addEventListener('pointercancel', handlePointerEnd as any);
+    document.addEventListener('pointermove', handlePointerMoveRef.current);
+    document.addEventListener('pointerup', handlePointerEndRef.current);
+    document.addEventListener('pointercancel', handlePointerEndRef.current);
   }, [isEditable, currentActiveId, handleSelectOverlay]);
   
-  const handlePointerMove = useCallback((e: PointerEvent) => {
-    if (!dragRef.current || !containerRef?.current || !onChange) return;
+  // Stable pointer move handler using refs
+  const handlePointerMoveStable = useCallback((e: PointerEvent) => {
+    // Update pointer position for pinch tracking
+    if (pointersRef.current.has(e.pointerId)) {
+      pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+    
+    // Handle pinch if we have 2 pointers
+    if (pointersRef.current.size === 2 && pinchRef.current && onChangeRef.current) {
+      e.preventDefault();
+      const pointers = Array.from(pointersRef.current.values());
+      const dx = pointers[0].x - pointers[1].x;
+      const dy = pointers[0].y - pointers[1].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      const ratio = dist / pinchRef.current.startDistance;
+      const nextScale = clamp(pinchRef.current.startScale * ratio, MIN_SCALE, MAX_SCALE);
+      
+      const updated = textOverlaysRef.current.map(overlay =>
+        overlay.id === pinchRef.current?.id
+          ? { ...overlay, scale: nextScale }
+          : overlay
+      );
+      onChangeRef.current(updated);
+      return;
+    }
+    
+    if (!dragRef.current || !containerRef?.current || !onChangeRef.current) return;
     e.preventDefault();
 
     const clientX = e.clientX;
@@ -384,15 +442,22 @@ export default function TextOverlayRenderer({
     const newX = clamp(snapResultX.snapped, safeBounds.minX, safeBounds.maxX);
     const newY = clamp(snapResultY.snapped, safeBounds.minY, safeBounds.maxY);
 
-    const updated = textOverlays.map(overlay =>
+    const updated = textOverlaysRef.current.map(overlay =>
       overlay.id === dragRef.current?.id
         ? { ...overlay, x: newX, y: newY }
         : overlay
     );
-    onChange(updated);
-  }, [textOverlays, onChange, containerRef, snapTargetsX, snapTargetsY, safeBounds]);
+    onChangeRef.current(updated);
+  }, [containerRef, snapTargetsX, snapTargetsY, safeBounds]);
+  
+  // Store in ref for stable event listener
+  const handlePointerMoveRef = useRef(handlePointerMoveStable);
+  useEffect(() => { handlePointerMoveRef.current = handlePointerMoveStable; }, [handlePointerMoveStable]);
 
-  const handlePointerEnd = useCallback((e: PointerEvent) => {
+  const handlePointerEndStable = useCallback((e: PointerEvent) => {
+    // Remove pointer from tracking
+    pointersRef.current.delete(e.pointerId);
+    
     if (pointerIdRef.current !== null) {
       try {
         (e.target as HTMLElement)?.releasePointerCapture(pointerIdRef.current);
@@ -400,14 +465,18 @@ export default function TextOverlayRenderer({
     }
     pointerIdRef.current = null;
     dragRef.current = null;
+    pinchRef.current = null;
     snappedXRef.current = null;
     snappedYRef.current = null;
     setActiveGuideX(null);
     setActiveGuideY(null);
-    document.removeEventListener('pointermove', handlePointerMove as any);
-    document.removeEventListener('pointerup', handlePointerEnd as any);
-    document.removeEventListener('pointercancel', handlePointerEnd as any);
-  }, [handlePointerMove]);
+    document.removeEventListener('pointermove', handlePointerMoveRef.current);
+    document.removeEventListener('pointerup', handlePointerEndRef.current);
+    document.removeEventListener('pointercancel', handlePointerEndRef.current);
+  }, []);
+  
+  const handlePointerEndRef = useRef(handlePointerEndStable);
+  useEffect(() => { handlePointerEndRef.current = handlePointerEndStable; }, [handlePointerEndStable]);
 
   // Legacy drag handlers (kept for touch pinch compatibility)
   const handleDragStart = useCallback((
@@ -540,8 +609,63 @@ export default function TextOverlayRenderer({
     }
   }, [isEditable, handleDragStart, handleDragMove, handleDragEnd, handleSelectOverlay]);
   
-  // Rotation handle drag - using pointer events
+  // Rotation handle drag - using pointer events with refs to avoid stale closures
   const rotatePointerIdRef = useRef<number | null>(null);
+  
+  // Stable rotate move handler
+  const handleRotateMoveStable = useCallback((e: PointerEvent) => {
+    if (!rotateRef.current || !onChangeRef.current) return;
+    e.preventDefault();
+    
+    const currentAngle = Math.atan2(
+      e.clientY - rotateRef.current.centerY, 
+      e.clientX - rotateRef.current.centerX
+    );
+    
+    const deltaAngle = currentAngle - rotateRef.current.startAngle;
+    const degrees = deltaAngle * (180 / Math.PI);
+    let rawRotation = rotateRef.current.startRotation + degrees;
+    
+    // Normalize to -180..180
+    while (rawRotation > 180) rawRotation -= 360;
+    while (rawRotation < -180) rawRotation += 360;
+    
+    // Apply rotation snapping
+    const snapResult = snapRotation(rawRotation, snappedRotationRef.current);
+    snappedRotationRef.current = snapResult.isSnapped ? snapResult.snapped : null;
+    
+    // Show rotation label when snapped
+    setRotationLabel(snapResult.isSnapped ? Math.round(snapResult.snapped) : null);
+    
+    const updated = textOverlaysRef.current.map(overlay =>
+      overlay.id === rotateRef.current?.id
+        ? { ...overlay, rotation: snapResult.snapped }
+        : overlay
+    );
+    onChangeRef.current(updated);
+  }, []);
+  
+  const handleRotateMoveRef = useRef(handleRotateMoveStable);
+  useEffect(() => { handleRotateMoveRef.current = handleRotateMoveStable; }, [handleRotateMoveStable]);
+  
+  // Stable rotate end handler
+  const handleRotateEndStable = useCallback((e?: PointerEvent) => {
+    if (rotatePointerIdRef.current !== null && e) {
+      try {
+        (e.target as HTMLElement)?.releasePointerCapture(rotatePointerIdRef.current);
+      } catch {}
+    }
+    rotatePointerIdRef.current = null;
+    rotateRef.current = null;
+    snappedRotationRef.current = null;
+    setRotationLabel(null);
+    document.removeEventListener('pointermove', handleRotateMoveRef.current);
+    document.removeEventListener('pointerup', handleRotateEndRef.current);
+    document.removeEventListener('pointercancel', handleRotateEndRef.current);
+  }, []);
+  
+  const handleRotateEndRef = useRef(handleRotateEndStable);
+  useEffect(() => { handleRotateEndRef.current = handleRotateEndStable; }, [handleRotateEndStable]);
   
   const handleRotateStart = useCallback((
     e: React.PointerEvent,
@@ -571,57 +695,10 @@ export default function TextOverlayRenderer({
     
     snappedRotationRef.current = null;
     
-    document.addEventListener('pointermove', handleRotateMove as any);
-    document.addEventListener('pointerup', handleRotateEnd as any);
-    document.addEventListener('pointercancel', handleRotateEnd as any);
+    document.addEventListener('pointermove', handleRotateMoveRef.current);
+    document.addEventListener('pointerup', handleRotateEndRef.current);
+    document.addEventListener('pointercancel', handleRotateEndRef.current);
   }, [isEditable, containerRef]);
-  
-  const handleRotateMove = useCallback((e: PointerEvent) => {
-    if (!rotateRef.current || !onChange) return;
-    e.preventDefault();
-    
-    const currentAngle = Math.atan2(
-      e.clientY - rotateRef.current.centerY, 
-      e.clientX - rotateRef.current.centerX
-    );
-    
-    const deltaAngle = currentAngle - rotateRef.current.startAngle;
-    const degrees = deltaAngle * (180 / Math.PI);
-    let rawRotation = rotateRef.current.startRotation + degrees;
-    
-    // Normalize to -180..180
-    while (rawRotation > 180) rawRotation -= 360;
-    while (rawRotation < -180) rawRotation += 360;
-    
-    // Apply rotation snapping
-    const snapResult = snapRotation(rawRotation, snappedRotationRef.current);
-    snappedRotationRef.current = snapResult.isSnapped ? snapResult.snapped : null;
-    
-    // Show rotation label when snapped
-    setRotationLabel(snapResult.isSnapped ? Math.round(snapResult.snapped) : null);
-    
-    const updated = textOverlays.map(overlay =>
-      overlay.id === rotateRef.current?.id
-        ? { ...overlay, rotation: snapResult.snapped }
-        : overlay
-    );
-    onChange(updated);
-  }, [textOverlays, onChange]);
-  
-  const handleRotateEnd = useCallback((e?: PointerEvent) => {
-    if (rotatePointerIdRef.current !== null && e) {
-      try {
-        (e.target as HTMLElement)?.releasePointerCapture(rotatePointerIdRef.current);
-      } catch {}
-    }
-    rotatePointerIdRef.current = null;
-    rotateRef.current = null;
-    snappedRotationRef.current = null;
-    setRotationLabel(null);
-    document.removeEventListener('pointermove', handleRotateMove as any);
-    document.removeEventListener('pointerup', handleRotateEnd as any);
-    document.removeEventListener('pointercancel', handleRotateEnd as any);
-  }, [handleRotateMove]);
 
   if (!textOverlays || textOverlays.length === 0) {
     return null;
