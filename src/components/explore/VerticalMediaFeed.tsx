@@ -429,11 +429,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
            const hasMultipleMedia = mediaItems.length > 1;
            
-          // Check if this post has music attached
+          // Check if this post has music attached - prefer post-level, fallback to legacy
           const studioEdits = (currentMedia as any)?.studio_edits;
-          const musicData = studioEdits?.music;
+          const postMusic = (item as any).studio_music;
+          const legacyMusic = studioEdits?.music;
+          const musicData = postMusic ?? legacyMusic;
           const postHasMusic = !!(musicData?.url || musicData?.r2Key);
-          const audioMode = studioEdits?.audioMode || 'original';
+          const audioMode = (item as any).audio_mode ?? studioEdits?.audioMode ?? 'original';
           const shouldMuteVideoForMusic = audioMode === 'music_only' && postHasMusic;
           const videoMuted = isGloballyMuted || shouldMuteVideoForMusic;
           
