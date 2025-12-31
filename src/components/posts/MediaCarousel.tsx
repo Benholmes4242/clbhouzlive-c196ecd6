@@ -17,7 +17,10 @@ interface MediaItem {
 
 interface MediaCarouselProps {
   items: MediaItem[];
+  /** @deprecated Use currentIndex instead */
   initialIndex?: number;
+  /** Controlled index - parent is single source of truth */
+  currentIndex?: number;
   onIndexChange?: (index: number) => void;
   onSetCover?: (index: number) => void;
   coverIndex?: number;
@@ -32,7 +35,8 @@ interface MediaCarouselProps {
 
 const MediaCarousel = ({ 
   items, 
-  initialIndex = 0, 
+  initialIndex = 0,
+  currentIndex,
   onIndexChange,
   onSetCover,
   coverIndex = 0,
@@ -42,7 +46,12 @@ const MediaCarousel = ({
   forceVideoMuted = false,
   onMuteBlocked
 }: MediaCarouselProps) => {
-  const [activeIndex, setActiveIndex] = useState(initialIndex);
+  // CONTROLLED MODE: Use currentIndex from parent if provided, otherwise fall back to initialIndex
+  const isControlled = currentIndex !== undefined;
+  const activeIndex = isControlled 
+    ? Math.max(0, Math.min(currentIndex, items.length - 1))
+    : 0; // Fallback for uncontrolled (legacy) usage
+  
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
@@ -92,17 +101,18 @@ const MediaCarousel = ({
     });
   }, [activeIndex]);
 
-  // Handle index changes with haptic feedback
+  // Haptic feedback tracking (only fire on user-driven changes)
   const hasMountedRef = useRef(false);
+  const prevIndexRef = useRef(activeIndex);
+  
   useEffect(() => {
-    onIndexChange?.(activeIndex);
-    // Fire haptic only on user-driven changes (not initial mount)
-    if (hasMountedRef.current) {
+    // Fire haptic only on user-driven index changes (not initial mount or prop changes)
+    if (hasMountedRef.current && prevIndexRef.current !== activeIndex) {
       haptic('light');
-    } else {
-      hasMountedRef.current = true;
     }
-  }, [activeIndex, onIndexChange]);
+    hasMountedRef.current = true;
+    prevIndexRef.current = activeIndex;
+  }, [activeIndex]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -127,18 +137,18 @@ const MediaCarousel = ({
 
   const handlePrevious = () => {
     if (!hasMultipleItems) return;
-    setActiveIndex(prev => {
-      if (prev > 0) return prev - 1;
-      return loop ? items.length - 1 : 0;
-    });
+    const nextIndex = activeIndex > 0 
+      ? activeIndex - 1 
+      : (loop ? items.length - 1 : 0);
+    onIndexChange?.(nextIndex);
   };
 
   const handleNext = () => {
     if (!hasMultipleItems) return;
-    setActiveIndex(prev => {
-      if (prev < items.length - 1) return prev + 1;
-      return loop ? 0 : items.length - 1;
-    });
+    const nextIndex = activeIndex < items.length - 1 
+      ? activeIndex + 1 
+      : (loop ? 0 : items.length - 1);
+    onIndexChange?.(nextIndex);
   };
 
   // Touch/drag handlers
