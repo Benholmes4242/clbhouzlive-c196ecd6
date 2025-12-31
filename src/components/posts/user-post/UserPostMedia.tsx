@@ -6,6 +6,7 @@ import { PostMedia, GolfCourse } from './types';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserPostMediaProps {
@@ -62,6 +63,9 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     const filterId = mediaItem.filter_id || (mediaItem.studio_edits as any)?.filter;
     const filterClass = getFilterClass(filterId);
     
+    // Extract text overlays from studio_edits
+    const textOverlays = (mediaItem.studio_edits as any)?.textOverlays || [];
+    
     console.log('[Feed] slide filter', {
       postMediaId: mediaItem.id,
       filterId,
@@ -112,6 +116,14 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
             className={cn("w-full h-full", filterClass)}
             enableHLS={true}
             onClick={() => onMediaClick(mediaItem.media_url, 'video')}
+          />
+        )}
+
+        {/* Text overlays from studio_edits */}
+        {textOverlays.length > 0 && (
+          <TextOverlayRenderer
+            textOverlays={textOverlays}
+            isEditable={false}
           />
         )}
 

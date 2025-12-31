@@ -10,6 +10,7 @@ import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import Masonry from 'react-masonry-css';
 
 interface MosaicFeedContentProps {
@@ -194,7 +195,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
                 {media.map((mediaItem, idx) => (
-                  <div key={idx} className="flex-shrink-0 w-full h-full">
+                  <div key={idx} className="flex-shrink-0 w-full h-full relative">
                      {mediaItem.media_type === 'video' ? (
                         <FeedVideoPlayer
                           ref={idx === currentIndex ? videoPlayerRef : undefined}
@@ -212,6 +213,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                          alt="Golf content"
                           className="w-full h-full object-cover rounded-lg"
                          loading="lazy"
+                       />
+                     )}
+                     {/* Text overlays from studio_edits */}
+                     {(mediaItem.studio_edits as any)?.textOverlays?.length > 0 && (
+                       <TextOverlayRenderer
+                         textOverlays={(mediaItem.studio_edits as any).textOverlays}
+                         isEditable={false}
                        />
                      )}
                   </div>
@@ -252,7 +260,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           ) : (
             // Single media
-            <div className="w-full h-full">
+            <div className="w-full h-full relative">
                {media[0]?.media_type === 'video' ? (
                  <FeedVideoPlayer
                    ref={videoPlayerRef}
@@ -271,6 +279,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                     className="w-full h-full object-cover rounded-lg"
                    loading="lazy"
                  />
+              )}
+              {/* Text overlays from studio_edits */}
+              {(media[0]?.studio_edits as any)?.textOverlays?.length > 0 && (
+                <TextOverlayRenderer
+                  textOverlays={(media[0].studio_edits as any).textOverlays}
+                  isEditable={false}
+                />
               )}
             </div>
           )}
