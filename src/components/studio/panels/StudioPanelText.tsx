@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
-import { StudioEdits, TextOverlay } from '@/types/studio';
+import { StudioEdits, TextOverlay, TextStyle } from '@/types/studio';
 import { nanoid } from 'nanoid';
+import { cn } from '@/lib/utils';
 
 type StudioPanelTextProps = {
   edits: StudioEdits;
@@ -10,21 +11,56 @@ type StudioPanelTextProps = {
   onReset: () => void;
 };
 
-const FONTS: TextOverlay['style'][] = ['modern', 'classic', 'signature'];
-const COLORS = ['#0a0a0a', '#FFFFFF', '#FF9C40', '#3B82F6', '#EF4444', '#10B981'];
+// 8 style presets with preview labels
+const STYLE_PRESETS: { id: TextStyle; label: string; preview: string }[] = [
+  { id: 'modern_bold', label: 'Bold', preview: 'Aa' },
+  { id: 'classic_serif', label: 'Serif', preview: 'Aa' },
+  { id: 'signature', label: 'Script', preview: 'Aa' },
+  { id: 'impact', label: 'Impact', preview: 'AA' },
+  { id: 'outline', label: 'Outline', preview: 'Aa' },
+  { id: 'neon', label: 'Neon', preview: 'Aa' },
+  { id: 'glass', label: 'Glass', preview: 'Aa' },
+  { id: 'scoreboard', label: 'Score', preview: 'AB' },
+];
+
+const COLORS = ['#FFFFFF', '#0a0a0a', '#FF9C40', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6'];
+
+// Font class preview mapping for style chips
+const PREVIEW_FONTS: Record<TextStyle, string> = {
+  modern_bold: 'font-sans font-extrabold',
+  classic_serif: 'font-serif italic',
+  signature: 'font-cursive',
+  impact: 'font-sans font-black uppercase',
+  outline: 'font-sans font-bold uppercase',
+  neon: 'font-sans font-bold',
+  glass: 'font-sans font-semibold',
+  scoreboard: 'font-mono font-bold uppercase',
+  // Legacy
+  modern: 'font-sans font-bold',
+  classic: 'font-serif italic',
+};
 
 export default function StudioPanelText({ edits, updateEdits, onApply, onReset }: StudioPanelTextProps) {
   const [textBoxes, setTextBoxes] = useState<TextOverlay[]>(edits?.textOverlays || []);
   const [selectedBox, setSelectedBox] = useState<string | null>(null);
 
+  // Sync with external edits changes
+  useEffect(() => {
+    setTextBoxes(edits?.textOverlays || []);
+  }, [edits?.textOverlays]);
+
   const addTextBox = () => {
+    // Cascade positioning: stack subsequent overlays below center
+    const yOffset = textBoxes.length * 0.08;
+    const newY = Math.min(0.5 + yOffset, 0.85);
+    
     const newBox: TextOverlay = {
       id: nanoid(),
       text: 'New text',
       x: 0.5,
-      y: 0.5,
-      scale: 1,
-      style: 'modern',
+      y: newY,
+      scale: 1.2,
+      style: 'modern_bold',
       color: '#FFFFFF'
     };
     const updated = [...textBoxes, newBox];
@@ -64,11 +100,12 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
             <button
               key={box.id}
               onClick={() => setSelectedBox(box.id)}
-              className={`w-full p-3 rounded-lg border text-left transition-colors ${
+              className={cn(
+                "w-full p-3 rounded-lg border text-left transition-colors",
                 selectedBox === box.id
                   ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
                   : 'border-zinc-200 bg-white hover:bg-zinc-50'
-              }`}
+              )}
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium text-zinc-900 truncate">{box.text}</span>
@@ -83,7 +120,7 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
                 </button>
               </div>
               <div className="text-xs text-zinc-500 mt-1">
-                {box.style} • {(box.scale * 100).toFixed(0)}%
+                {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
               </div>
             </button>
           ))
@@ -92,7 +129,8 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
 
       {/* Controls for selected box */}
       {selected && (
-        <div className="p-4 border-t border-zinc-200 bg-white space-y-4">
+        <div className="p-4 border-t border-zinc-200 bg-white space-y-4 max-h-[50vh] overflow-y-auto">
+          {/* Text input */}
           <div>
             <label className="block text-body-sm font-medium text-zinc-700 mb-2">Text</label>
             <input
@@ -103,56 +141,75 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
             />
           </div>
 
+          {/* Style selector - horizontal scrolling chips */}
           <div>
-            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Font</label>
-            <div className="flex gap-2">
-              {FONTS.map(font => (
+            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Style</label>
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+              {STYLE_PRESETS.map(preset => (
                 <button
-                  key={font}
-                  onClick={() => updateBox(selected.id, { style: font })}
-                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors capitalize ${
-                    selected.style === font
+                  key={preset.id}
+                  onClick={() => updateBox(selected.id, { style: preset.id })}
+                  className={cn(
+                    "flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-lg border transition-all min-w-[60px]",
+                    selected.style === preset.id
                       ? 'border-zinc-900 bg-zinc-900 text-white'
                       : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
-                  }`}
+                  )}
                 >
-                  {font}
+                  <span 
+                    className={cn(
+                      "text-base leading-none",
+                      PREVIEW_FONTS[preset.id],
+                      selected.style === preset.id ? 'text-white' : 'text-zinc-900'
+                    )}
+                  >
+                    {preset.preview}
+                  </span>
+                  <span className="text-[10px] font-medium">{preset.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Scale slider */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Scale</label>
+            <label className="block text-sm font-medium text-zinc-700 mb-2">Size</label>
             <input
               type="range"
               min="0.5"
-              max="2"
+              max="2.5"
               step="0.1"
               value={selected.scale}
               onChange={(e) => updateBox(selected.id, { scale: parseFloat(e.target.value) })}
-              className="w-full"
+              className="w-full accent-zinc-900"
             />
             <div className="text-xs text-zinc-500 mt-1">{(selected.scale * 100).toFixed(0)}%</div>
           </div>
 
+          {/* Color picker */}
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-2">Color</label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {COLORS.map(color => (
                 <button
                   key={color}
                   onClick={() => updateBox(selected.id, { color })}
-                  className={`w-10 h-10 rounded-lg border-2 transition-all ${
+                  className={cn(
+                    "w-9 h-9 rounded-lg border-2 transition-all",
                     selected.color === color
-                      ? 'border-zinc-900 scale-110'
-                      : 'border-zinc-200'
-                  }`}
+                      ? 'border-zinc-900 scale-110 ring-2 ring-zinc-900/20'
+                      : 'border-zinc-200 hover:scale-105'
+                  )}
                   style={{ backgroundColor: color }}
                 />
               ))}
             </div>
           </div>
+
+          {/* Drag hint */}
+          <p className="text-xs text-zinc-400 text-center pt-2">
+            Drag text on the preview to reposition
+          </p>
         </div>
       )}
 
