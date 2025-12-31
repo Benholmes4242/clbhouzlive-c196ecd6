@@ -43,6 +43,8 @@ export interface UserPostWithType {
   id: string;
   content: string | null;
   created_at: string;
+  studio_music?: any | null;
+  audio_mode?: 'original' | 'music_only' | null;
   user: {
     id: string;
     display_name: string | null;

@@ -11,7 +11,9 @@ interface VideoModalData {
     username?: string;
   };
   content?: string;
-  studioEdit?: any | null;  // Single object for single-video modal
+  studioEdit?: any | null;  // Single object for single-video modal (legacy per-media edits)
+  postMusic?: any | null;   // Post-level music (new - takes priority)
+  audioMode?: 'original' | 'music_only' | null;
 }
 
 /**

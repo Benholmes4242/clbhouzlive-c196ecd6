@@ -77,7 +77,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       const userPost = item as UserPostWithType;
       const media = userPost.post_media;
       
-      // Extract studioEdits from post_media
+      // Extract studioEdits from post_media (legacy per-media edits)
       const studioEdits = media.map((m: any) => m.studio_edits ?? null);
       
       return {
@@ -91,6 +91,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         content: userPost.content,
         postTags: userPost.post_tags,
         studioEdits,
+        postMusic: userPost.studio_music,
+        audioMode: userPost.audio_mode,
         initialIndex: 0
       };
     } else {
@@ -108,6 +110,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         content: videoPost.content.description,
         postTags: undefined,
         studioEdits: undefined,
+        postMusic: undefined,
+        audioMode: undefined,
         initialIndex: 0
       };
     }
@@ -126,17 +130,26 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
     
-    // Detect music from studioEdits
+    // Detect music: post-level takes priority, fallback to legacy per-media
     const { postHasMusic, activeMusic } = useMemo(() => {
-      const hasMusic = media.some(m => {
-        const music = (m.studio_edits as any)?.music;
-        return !!(music?.url || music?.r2Key);
-      });
-      const music = media
-        .map(m => (m.studio_edits as any)?.music)
-        .find(m => m?.url || m?.r2Key) ?? null;
-      return { postHasMusic: hasMusic, activeMusic: music };
-    }, [media]);
+      // Check post-level music first (new)
+      if (isUserPost) {
+        const postMusic = (item as UserPostWithType).studio_music;
+        if (postMusic?.url || postMusic?.r2Key) {
+          return { postHasMusic: true, activeMusic: postMusic };
+        }
+      }
+      
+      // Fallback to legacy per-media music
+      for (const m of media) {
+        const legacyMusic = (m.studio_edits as any)?.music;
+        if (legacyMusic?.url || legacyMusic?.r2Key) {
+          return { postHasMusic: true, activeMusic: legacyMusic };
+        }
+      }
+      
+      return { postHasMusic: false, activeMusic: null };
+    }, [isUserPost, item, media]);
     
     // Check if this item has video
     const hasVideo = media.some(m => m.media_type === 'video');
