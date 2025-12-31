@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Play, Pause, Music2, Volume2, VolumeX } from 'lucide-react';
+import { Search, Play, Pause, Music2, VolumeX } from 'lucide-react';
 import { StudioEdits } from '@/types/studio';
 import { MUSIC_LIBRARY, MUSIC_MOODS, MusicTrack, getSignedAudioUrl } from '@/lib/musicLibrary';
 
@@ -13,7 +13,6 @@ type StudioPanelMusicProps = {
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
   const [activeMood, setActiveMood] = useState<string>('all');
   const [selectedTrack, setSelectedTrack] = useState<string>(edits?.music?.trackId || '');
-  const [volume, setVolume] = useState((edits?.music?.volume ?? 0.8) * 100);
   const [searchQuery, setSearchQuery] = useState('');
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -54,7 +53,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
     // Avoid fetch() here: it requires CORS, while the Audio element can follow redirects directly.
     const signedUrl = getSignedAudioUrl(track.r2Key);
     const audio = new Audio(signedUrl);
-    audio.volume = volume / 100;
+    audio.volume = 1; // Always 100% volume
 
     // Add error handling with detailed logging
     audio.onerror = (e) => {
@@ -112,7 +111,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         r2Key: track.r2Key,  // Keep for reference
         url: resolvedUrl,    // Primary playback URL
         startAt: 0,
-        volume: volume / 100
+        volume: 1  // Always 100% volume
       },
       audioMode: 'music_only'
     });
@@ -130,15 +129,6 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
     });
   };
 
-  const handleVolumeChange = (v: number) => {
-    setVolume(v);
-    if (audioRef.current) {
-      audioRef.current.volume = v / 100;
-    }
-    if (edits?.music) {
-      updateEdits({ music: { ...edits.music, volume: v / 100 } });
-    }
-  };
 
   return (
     <div className="flex flex-col h-full">
@@ -316,38 +306,6 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         )}
       </div>
 
-      {/* Volume control when track selected */}
-      {selectedTrack && (
-        <div 
-          className="p-4 space-y-3"
-          style={{ 
-            borderTop: '1px solid var(--cm-border-subtle)',
-            background: 'var(--cm-surface-card)',
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <Volume2 
-              className="w-4 h-4 flex-shrink-0" 
-              style={{ color: 'var(--cm-text-secondary)' }}
-            />
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={volume}
-              onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
-              className="flex-1"
-              style={{ accentColor: 'var(--cm-surface-slate)' }}
-            />
-            <span 
-              className="text-xs w-8 text-right"
-              style={{ color: 'var(--cm-text-tertiary)' }}
-            >
-              {volume}%
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Actions */}
       <div 
