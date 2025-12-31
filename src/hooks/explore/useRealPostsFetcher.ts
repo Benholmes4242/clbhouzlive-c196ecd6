@@ -1091,7 +1091,9 @@ export const useRealPostsFetcher = () => {
               height,
               poster_url,
               created_at,
-              display_order
+              display_order,
+              studio_edits,
+              filter_id
             ),
             post_tags (
               id,
@@ -1375,7 +1377,9 @@ export const useRealPostsFetcher = () => {
             media_url: firstMedia.media_url,
             width: firstMedia.width,
             height: firstMedia.height,
-            aspect_ratio: firstMedia.aspect_ratio
+            aspect_ratio: firstMedia.aspect_ratio,
+            studio_edits: firstMedia.studio_edits,
+            filter_id: firstMedia.filter_id
           } as any],
           audioTrack: Math.random() > 0.6 ? {
             title: ["Eye of the Tiger", "The Final Countdown", "Original Audio"][Math.floor(Math.random() * 3)],
