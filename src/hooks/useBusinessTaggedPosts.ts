@@ -35,6 +35,7 @@ export interface TaggedPost {
     media_type: string;
     poster_url: string | null;
     duration_seconds: number | null;
+    studio_edits: any;
   }>;
   post_tags: PostTag[];
   user_profiles: {
@@ -124,7 +125,8 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
             media_url,
             media_type,
             poster_url,
-            duration_seconds
+            duration_seconds,
+            studio_edits
           ),
           post_tags (
             id,

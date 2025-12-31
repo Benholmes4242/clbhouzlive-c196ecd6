@@ -15,6 +15,7 @@ import { PostActionBar } from '@/components/posts/PostActionBar';
 import { toast } from 'sonner';
 import TaggedText from '@/components/posts/TaggedText';
 import PlayedAtLine from '@/components/posts/PlayedAtLine';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -267,6 +268,14 @@ export default function TaggedPostCard({
                 alt=""
                 className="w-full max-w-full h-auto object-cover"
                 style={{ maxHeight: '500px' }}
+              />
+            )}
+
+            {/* Text overlays from studio_edits */}
+            {(primaryMedia as any)?.studio_edits?.textOverlays?.length > 0 && (
+              <TextOverlayRenderer
+                textOverlays={(primaryMedia as any).studio_edits.textOverlays}
+                isEditable={false}
               />
             )}
 
