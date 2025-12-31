@@ -11,6 +11,9 @@ import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useMediaAutoplay } from '@/media';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { cn } from '@/lib/utils';
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -159,32 +162,47 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
         className="relative w-full aspect-[4/5] cursor-pointer" 
         onClick={() => onMediaClick(currentMedia.media_url, currentMedia.media_type)}
       >
-        {currentMedia.media_type === 'video' ? (
-          <>
-            {/* Show skeleton while video is loading */}
-            {isVideoLoading && (
-              <Skeleton className="absolute inset-0 z-10" />
-            )}
-            
-            <EnhancedVideoPlayer
-              ref={videoRefCallback}
-              src={currentMedia.media_url}
-              autoplay={isPlaying}
-              muted={true}
-              loop={true}
-              className="w-full h-full"
-              enableHLS={true}
-              onPlay={() => setIsVideoLoading(false)}
-              onPause={() => {}}
-            />
-          </>
-        ) : (
-          <LazyImage
-            src={currentMedia.media_url}
-            alt="Post content"
-            className="w-full h-full object-cover"
-          />
-        )}
+        {(() => {
+          const studioEdits = (currentMedia as any).studio_edits;
+          const filterClass = getFilterClass(studioEdits?.filter || (currentMedia as any).filter_id);
+          const cropClass = getCropWrapperClass(studioEdits?.crop);
+          const pixelStyle = getPixelLayerStyle(studioEdits);
+          
+          return (
+            <div className={cn("w-full h-full", cropClass)}>
+              {currentMedia.media_type === 'video' ? (
+                <>
+                  {/* Show skeleton while video is loading */}
+                  {isVideoLoading && (
+                    <Skeleton className="absolute inset-0 z-10" />
+                  )}
+                  
+                  <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                    <EnhancedVideoPlayer
+                      ref={videoRefCallback}
+                      src={currentMedia.media_url}
+                      autoplay={isPlaying}
+                      muted={true}
+                      loop={true}
+                      className="w-full h-full"
+                      enableHLS={true}
+                      onPlay={() => setIsVideoLoading(false)}
+                      onPause={() => {}}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                  <LazyImage
+                    src={currentMedia.media_url}
+                    alt="Post content"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* User Info Overlay */}
         <div className="absolute top-3 left-2.5 z-20">

@@ -4,6 +4,9 @@ import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
+import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { cn } from '@/lib/utils';
 
 interface FullscreenVideoModalProps {
   isOpen: boolean;
@@ -116,19 +119,32 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
       {/* Video container */}
       <div className="relative w-full h-full max-w-4xl max-h-[90vh] flex items-center justify-center">
         <div className="relative w-full h-full bg-black rounded-lg overflow-hidden">
-          {/* Video player */}
-          <video
-            ref={videoRef}
-            src={videoData.src}
-            className="w-full h-full object-contain"
-            autoPlay
-            loop
-            muted={postHasMusic ? true : isMuted}
-            playsInline
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onClick={togglePlayPause}
-          />
+          {/* Video player with crop/rotate/filter */}
+          {(() => {
+            const studioEdit = videoData.studioEdit;
+            const filterClass = getFilterClass(studioEdit?.filter);
+            const cropClass = getCropWrapperClass(studioEdit?.crop);
+            const pixelStyle = getPixelLayerStyle(studioEdit);
+            
+            return (
+              <div className={cn("w-full h-full", cropClass)}>
+                <div className={cn("w-full h-full", filterClass)} style={pixelStyle}>
+                  <video
+                    ref={videoRef}
+                    src={videoData.src}
+                    className="w-full h-full object-contain"
+                    autoPlay
+                    loop
+                    muted={postHasMusic ? true : isMuted}
+                    playsInline
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onClick={togglePlayPause}
+                  />
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Video controls overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30">
