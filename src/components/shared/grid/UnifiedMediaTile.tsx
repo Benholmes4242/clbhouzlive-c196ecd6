@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { getFilterClass } from '@/utils/studioFilters';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -166,6 +167,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
   
+  // Get filter class for studio filters
+  const filterClass = getFilterClass(item.filterId);
+  
   // Determine top-left override content (priority: milestone > multi-media)
   const hasMultiMedia = item.additionalMediaCount && item.additionalMediaCount > 0;
   
@@ -202,17 +206,19 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       )}
       onClick={handleClick}
     >
-      {/* Thumbnail - always visible as fallback */}
-      <img
-        src={thumbnailSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
-        draggable={false}
-      />
+      {/* Filtered pixel layer - wraps thumbnail and video */}
+      <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+        {/* Thumbnail - always visible as fallback */}
+        <img
+          src={thumbnailSrc}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          draggable={false}
+        />
 
-      {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
-      {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
+        {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
+        {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
         <HLSPlayer
           ref={playerRef}
@@ -227,9 +233,10 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
         />
-      )}
+        )}
+      </div>
 
-      {/* Text overlays from studioEdits */}
+      {/* Text overlays from studioEdits - OUTSIDE filtered layer */}
       {(item as any).studioEdits?.textOverlays?.length > 0 && (
         <TextOverlayRenderer
           textOverlays={(item as any).studioEdits.textOverlays}

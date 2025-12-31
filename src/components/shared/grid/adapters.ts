@@ -72,6 +72,9 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
     
     // Studio edits (text overlays, etc.)
     studioEdits: item.media?.[0]?.studio_edits,
+    
+    // Filter ID
+    filterId: item.media?.[0]?.filter_id ?? (item.media?.[0]?.studio_edits as any)?.filter ?? null,
   };
 }
 
@@ -139,6 +142,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     
     // Studio edits (text overlays, etc.)
     studioEdits: (primaryMedia as any).studio_edits,
+    
+    // Filter ID
+    filterId: primaryMedia.filter_id ?? (primaryMedia.studio_edits as any)?.filter ?? null,
   };
 }
 

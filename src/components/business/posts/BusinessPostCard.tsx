@@ -22,6 +22,7 @@ import { formatTimeAgo } from '@/utils/formatTime';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { getFilterClass } from '@/utils/studioFilters';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -141,6 +142,10 @@ export default function BusinessPostCard({
   const thumbnailUrl = isVideo
     ? primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600)
     : primaryMedia?.media_url;
+  
+  // Get filter class for studio filters
+  const filterId = (primaryMedia as any)?.filter_id ?? (primaryMedia as any)?.studio_edits?.filter ?? null;
+  const filterClass = getFilterClass(filterId);
 
   // Register video for autoplay (ALL videos for business, not every 3rd)
   // Uses cardRef as observeTarget so IntersectionObserver observes the full card, not the video element
@@ -365,44 +370,53 @@ export default function BusinessPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-              <HLSPlayer
-                  ref={playerRef}
-                  src={hlsUrl}
-                  autoplay={isPlaying}
-                  muted
-                  loop
-                  externallyManaged
-                  onLoadedData={() => {
-                    const el = playerRef.current?.getElement();
-                    if (el) setVideoEl(el);
-                  }}
-                  className="w-full h-full object-cover max-w-full"
-                />
-                {/* Video scrubber - positioned at bottom of media */}
+                {/* Filtered pixel layer */}
+                <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+                  <HLSPlayer
+                    ref={playerRef}
+                    src={hlsUrl}
+                    autoplay={isPlaying}
+                    muted
+                    loop
+                    externallyManaged
+                    onLoadedData={() => {
+                      const el = playerRef.current?.getElement();
+                      if (el) setVideoEl(el);
+                    }}
+                    className="w-full h-full object-cover max-w-full"
+                  />
+                </div>
+                {/* Video scrubber - positioned at bottom of media - OUTSIDE filtered layer */}
                 {videoEl && (
                   <VideoScrubber videoEl={videoEl} height={3} />
                 )}
               </>
             ) : isVideo ? (
-              <div className="relative w-full h-full bg-muted">
+              <div className={cn("relative w-full h-full bg-muted", filterClass)}>
                 <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
-                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
-                  </div>
-                </div>
+                {/* Play button overlay - OUTSIDE filtered layer */}
               </div>
             ) : (
-              <img
-                src={primaryMedia.media_url}
-                alt=""
-                className="w-full max-w-full h-auto object-cover"
-                style={{ maxHeight: '500px' }}
-              />
+              <div className={cn("w-full h-full", filterClass)}>
+                <img
+                  src={primaryMedia.media_url}
+                  alt=""
+                  className="w-full max-w-full h-auto object-cover"
+                  style={{ maxHeight: '500px' }}
+                />
+              </div>
             )}
 
-            {/* Text overlays from studio_edits */}
+            {/* Play button overlay for video poster - OUTSIDE filtered layer */}
+            {isVideo && !hlsUrl && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
+                  <Play className="h-8 w-8 text-white ml-1" fill="white" />
+                </div>
+              </div>
+            )}
+
+            {/* Text overlays from studio_edits - OUTSIDE filtered layer */}
             {(primaryMedia as any)?.studio_edits?.textOverlays?.length > 0 && (
               <TextOverlayRenderer
                 textOverlays={(primaryMedia as any).studio_edits.textOverlays}

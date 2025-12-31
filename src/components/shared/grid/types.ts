@@ -93,6 +93,9 @@ export interface UnifiedMediaItem {
   // Studio edits (text overlays, filters, music)
   studioEdits?: any;
   
+  // Filter ID for studio filters
+  filterId?: string | null;
+  
   // Computed tile display (set by layout utils)
   tileDisplay?: TileDisplayInfo;
 }

@@ -4,12 +4,14 @@ import { ActivityMediaItem } from './types';
 import VideoOverlay from './VideoOverlay';
 import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
+import { getFilterClass } from '@/utils/studioFilters';
 
 interface HeroPostTileProps {
   item: ActivityMediaItem;
   onPress?: (postId: string) => void;
   registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
+  filterId?: string | null;
 }
 
 /**
@@ -21,10 +23,12 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
   item, 
   onPress, 
   registerVideo,
-  isPlaying = false 
+  isPlaying = false,
+  filterId
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const filterClass = getFilterClass(filterId);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
   );
@@ -102,31 +106,43 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
       )}
       onClick={handleClick}
     >
-      {/* 1) Safe thumbnail ALWAYS visible - prevents white flash */}
-      <img
-        src={thumbnailSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
-        draggable={false}
-      />
+      {/* Filtered pixel layer */}
+      <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+        {/* 1) Safe thumbnail ALWAYS visible - prevents white flash */}
+        <img
+          src={thumbnailSrc}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          draggable={false}
+        />
 
-      {/* 2) HLS-aware video fades in over the top once it can play */}
-      {isVideo && isAutoplayCandidate && item.playbackUrl && (
-        <HLSPlayer
-          ref={playerRef}
-          src={item.playbackUrl}
-          onLoadedData={handleCanPlay}
-          loop
-          mediaId={item.postId}
-          className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-opacity duration-150",
-            isVideoReady ? "opacity-100" : "opacity-0"
-          )}
+        {/* 2) HLS-aware video fades in over the top once it can play */}
+        {isVideo && isAutoplayCandidate && item.playbackUrl && (
+          <HLSPlayer
+            ref={playerRef}
+            src={item.playbackUrl}
+            onLoadedData={handleCanPlay}
+            loop
+            mediaId={item.postId}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-opacity duration-150",
+              isVideoReady ? "opacity-100" : "opacity-0"
+            )}
+          />
+        )}
+      </div>
+
+      {/* Bottom gradient overlay for readability - OUTSIDE filtered layer */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+
+      {/* Video overlay with play/pause icon and duration */}
+      {isVideo && (
+        <VideoOverlay
+          durationSeconds={resolvedDurationSeconds}
+          isPlaying={isAutoplayCandidate && isPlaying}
         />
       )}
-
-      {/* Bottom gradient overlay for readability */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
 
       {/* Video overlay with play/pause icon and duration */}
