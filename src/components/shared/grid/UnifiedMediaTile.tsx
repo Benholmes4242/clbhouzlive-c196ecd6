@@ -7,6 +7,7 @@ import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -225,6 +226,14 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           mediaId={item.postId}
           onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
+        />
+      )}
+
+      {/* Text overlays from studioEdits */}
+      {(item as any).studioEdits?.textOverlays?.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={(item as any).studioEdits.textOverlays}
+          isEditable={false}
         />
       )}
 

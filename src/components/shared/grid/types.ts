@@ -90,6 +90,9 @@ export interface UnifiedMediaItem {
   isAutoplayCandidate?: boolean;
   sortIndex?: number;
   
+  // Studio edits (text overlays, filters, music)
+  studioEdits?: any;
+  
   // Computed tile display (set by layout utils)
   tileDisplay?: TileDisplayInfo;
 }

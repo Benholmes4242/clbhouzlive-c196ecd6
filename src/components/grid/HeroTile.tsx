@@ -14,6 +14,7 @@ import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { OverlayCorners } from '@/components/shared/overlay';
 import { Play } from 'lucide-react';
 import { UniversalMediaItem, UniversalGridConfig } from './types';
+import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 interface HeroTileProps {
   item: UniversalMediaItem;
@@ -122,6 +123,14 @@ const HeroTile = memo<HeroTileProps>(({
           mediaId={item.postId}
           onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
+        />
+      )}
+      
+      {/* Text overlays from studio_edits */}
+      {(item as any).studioEdits?.textOverlays?.length > 0 && (
+        <TextOverlayRenderer
+          textOverlays={(item as any).studioEdits.textOverlays}
+          isEditable={false}
         />
       )}
       

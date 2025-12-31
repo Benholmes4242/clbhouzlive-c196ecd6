@@ -69,6 +69,9 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
       avatar: item.user.avatar,
       verified: item.user.verified,
     } : undefined,
+    
+    // Studio edits (text overlays, etc.)
+    studioEdits: item.media?.[0]?.studio_edits,
   };
 }
 
@@ -133,6 +136,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     } : undefined,
     
     sortIndex: overallIndex,
+    
+    // Studio edits (text overlays, etc.)
+    studioEdits: (primaryMedia as any).studio_edits,
   };
 }
 
