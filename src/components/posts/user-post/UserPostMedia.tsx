@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 interface UserPostMediaProps {
   media: PostMedia[];
   golfCourse: GolfCourse | null;
+  /** Raw course ID for safety net - show badge even if full course lookup failed */
+  rawCourseId?: string | null;
   shouldAutoplay: boolean;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   isClubhouse?: boolean;
@@ -19,6 +21,7 @@ interface UserPostMediaProps {
 export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   media,
   golfCourse,
+  rawCourseId,
   shouldAutoplay,
   onMediaClick,
   isClubhouse = false
@@ -66,17 +69,25 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
       postHasMusic,
     });
     
+    // Safety net: show badge if we have course data OR if we have a raw course ID
+    const courseToShow = golfCourse || (rawCourseId ? {
+      id: rawCourseId,
+      name: 'Golf Course', // Fallback name
+      country: '',
+      region: ''
+    } : null);
+    
     return (
       <div key={mediaItem.id} className="w-full aspect-square relative">
         {/* Golf Course Badge overlay on each media item */}
-        {golfCourse && (
+        {courseToShow && (
           <div className="absolute top-2 right-2 z-10">
             <CoursePostBadge 
               course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country,
-                region: golfCourse.region
+                id: courseToShow.id,
+                name: courseToShow.name,
+                country: courseToShow.country,
+                region: courseToShow.region
               }}
               className={isClubhouse ? "m-0" : "m-0"}
               isClubhouse={isClubhouse}

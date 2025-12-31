@@ -5,6 +5,8 @@ import { GolfCourse } from '../types';
 
 interface GolfCourseTagOverlayProps {
   golfCourse: GolfCourse | null;
+  /** Raw course ID for safety net - show badge even if name lookup failed */
+  rawCourseId?: string | null;
   isMobile: boolean;
   showFullTag: boolean;
   onTagClick: (e: React.MouseEvent) => void;
@@ -12,11 +14,24 @@ interface GolfCourseTagOverlayProps {
 
 export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
   golfCourse,
+  rawCourseId,
   isMobile,
   showFullTag,
   onTagClick
 }) => {
-  if (!golfCourse) return null;
+  // Safety net: show badge if we have course data OR if we have a raw course ID
+  const shouldShow = golfCourse || rawCourseId;
+  if (!shouldShow) return null;
+
+  // Use course data if available, otherwise create minimal fallback from rawCourseId
+  const courseData = golfCourse || (rawCourseId ? {
+    id: rawCourseId,
+    name: 'Golf Course', // Fallback name when lookup fails
+    country: '',
+    region: ''
+  } : null);
+
+  if (!courseData) return null;
 
   return (
     <>
@@ -25,10 +40,10 @@ export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
         <div className="absolute top-32 right-6 z-20">
           <CoursePostBadge 
             course={{
-              id: golfCourse.id,
-              name: golfCourse.name,
-              country: golfCourse.country,
-              region: golfCourse.region
+              id: courseData.id,
+              name: courseData.name,
+              country: courseData.country,
+              region: courseData.region
             }}
             className="bg-black/20 backdrop-blur-sm border border-white/30 text-white text-sm font-medium px-3 py-1.5"
           />

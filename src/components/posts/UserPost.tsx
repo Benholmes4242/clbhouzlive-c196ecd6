@@ -25,6 +25,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     timeAgo,
     isOwnPost,
     golfCourse,
+    rawCourseId,
     handleDeletePost,
     handleProfileClick,
     handlePostClick,
@@ -82,6 +83,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
           displayName={displayName}
           timeAgo={timeAgo}
           golfCourse={golfCourse}
+          rawCourseId={rawCourseId}
           onProfileClick={handleProfileClick}
           onMediaClick={handleMediaClick}
           onDeletePost={handleDeletePost}
@@ -93,6 +95,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
           timeAgo={timeAgo}
           isOwnPost={isOwnPost}
           golfCourse={golfCourse}
+          rawCourseId={rawCourseId}
           onProfileClick={handleProfileClick}
           onDeletePost={handleDeletePost}
           onPostUpdated={onPostUpdated}

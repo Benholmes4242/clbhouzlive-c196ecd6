@@ -14,6 +14,7 @@ interface DesktopUserPostProps {
   timeAgo: string;
   isOwnPost: boolean;
   golfCourse: GolfCourse | null;
+  rawCourseId?: string | null;
   onProfileClick: () => void;
   onDeletePost: () => void;
   onPostUpdated?: () => void;
@@ -26,6 +27,7 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
   timeAgo,
   isOwnPost,
   golfCourse,
+  rawCourseId,
   onProfileClick,
   onDeletePost,
   onPostUpdated,
@@ -66,6 +68,7 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
           <UserPostMedia
             media={post.post_media}
             golfCourse={golfCourse}
+            rawCourseId={rawCourseId}
             shouldAutoplay={shouldAutoplay}
             onMediaClick={onMediaClick}
           />

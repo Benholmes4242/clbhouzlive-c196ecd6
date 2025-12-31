@@ -17,6 +17,7 @@ interface MobileUserPostProps {
   displayName: string;
   timeAgo: string;
   golfCourse: GolfCourse | null;
+  rawCourseId?: string | null;
   onProfileClick: () => void;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   onDeletePost: () => void;
@@ -27,6 +28,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   displayName,
   timeAgo,
   golfCourse,
+  rawCourseId,
   onProfileClick,
   onMediaClick,
   onDeletePost
@@ -287,13 +289,13 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
         <div className="bg-background p-4">
-          {/* Golf Course Location - Above Caption */}
-          {golfCourse && (
+          {/* Golf Course Location - Above Caption (with safety net) */}
+          {(golfCourse || rawCourseId) && (
             <div className="mb-2">
               <PlayedAtLine
-                courseId={golfCourse.id}
-                courseName={golfCourse.name}
-                regionText={golfCourse.country || golfCourse.region}
+                courseId={golfCourse?.id || rawCourseId!}
+                courseName={golfCourse?.name || 'Golf Course'}
+                regionText={golfCourse?.country || golfCourse?.region || ''}
               />
             </div>
           )}
