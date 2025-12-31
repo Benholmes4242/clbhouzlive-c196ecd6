@@ -9,6 +9,8 @@ import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { MediaRuntime } from '@/media/runtime';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 type Props = {
   id: string;
@@ -16,6 +18,7 @@ type Props = {
   posterUrl?: string;
   sortIndex: number;
   onClick?: () => void;
+  filterId?: string | null;
 };
 
 export default function ShortsVideoTile({
@@ -23,12 +26,14 @@ export default function ShortsVideoTile({
   hlsUrl,
   posterUrl,
   sortIndex,
-  onClick
+  onClick,
+  filterId
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HLSPlayerRef>(null);
   const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
   const isPlaying = playingIds.has(id);
+  const filterClass = getFilterClass(filterId);
 
   // Register with MediaRuntime via useMediaAutoplay
   useEffect(() => {
@@ -54,19 +59,22 @@ export default function ShortsVideoTile({
       className="group relative aspect-[9/16] overflow-hidden rounded bg-muted cursor-pointer"
       onClick={onClick}
     >
-      <HLSPlayer
-        ref={playerRef}
-        src={hlsUrl}
-        autoplay={isPlaying}
-        muted
-        loop
-        showMuteButton={false}
-        showPlayButton={false}
-        objectFit="cover"
-        className="absolute inset-0 h-full w-full"
-      />
+      {/* Filtered pixel layer */}
+      <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
+          autoplay={isPlaying}
+          muted
+          loop
+          showMuteButton={false}
+          showPlayButton={false}
+          objectFit="cover"
+          className="absolute inset-0 h-full w-full"
+        />
+      </div>
 
-      {/* Hover overlay */}
+      {/* Hover overlay - OUTSIDE filtered layer */}
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-active:opacity-10 group-hover:opacity-10 bg-black" />
     </div>
   );

@@ -1,11 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { getFilterClass } from '@/utils/studioFilters';
 
 interface PostMediaProps {
   thumbnailUrl: string;
   title?: string;
   isVideo?: boolean;
   className?: string;
+  filterId?: string | null;
 }
 
 /**
@@ -16,10 +18,12 @@ const PostMedia: React.FC<PostMediaProps> = ({
   thumbnailUrl,
   title,
   isVideo = false,
-  className
+  className,
+  filterId
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const filterClass = getFilterClass(filterId);
 
   const handleLoad = useCallback(() => {
     setIsLoaded(true);
@@ -48,7 +52,8 @@ const PostMedia: React.FC<PostMediaProps> = ({
           className={cn(
             "w-full h-full object-cover",
             "transition-opacity duration-300",
-            isLoaded ? "opacity-100" : "opacity-0"
+            isLoaded ? "opacity-100" : "opacity-0",
+            filterClass
           )}
         />
       )}

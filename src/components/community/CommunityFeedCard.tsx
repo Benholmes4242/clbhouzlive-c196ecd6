@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 import PostMeta from '@/components/posts/PostMeta';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
+import { getFilterClass } from '@/utils/studioFilters';
 
 interface CommunityFeedCardProps {
   item: CommunityContentItem;
@@ -35,6 +36,7 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   const tileRef = useRef<HTMLDivElement>(null);
   const isVideo = item.type === 'video';
   const hasMedia = !!item.src;
+  const filterClass = getFilterClass((item as any).filterId);
 
   const videoIndexRef = useRef(videoIndex);
   videoIndexRef.current = videoIndex;
@@ -110,20 +112,23 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {isVideo && hasMedia ? (
           <>
-            <HLSPlayer
-              ref={playerRef}
-              src={item.src}
-              autoplay={isPlaying}
-              muted
-              loop
-              aspectRatio="16:9"
-              objectFit="cover"
-              externallyManaged
-              mediaId={item.id}
-              className="absolute inset-0 w-full h-full"
-            />
+            {/* Filtered pixel layer */}
+            <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+              <HLSPlayer
+                ref={playerRef}
+                src={item.src}
+                autoplay={isPlaying}
+                muted
+                loop
+                aspectRatio="16:9"
+                objectFit="cover"
+                externallyManaged
+                mediaId={item.id}
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
             
-            {/* Play overlay on hover (only when not playing) */}
+            {/* Play overlay on hover (only when not playing) - OUTSIDE filtered layer */}
             {!isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/10 transition-colors">
                 <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
@@ -133,17 +138,20 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
             )}
           </>
         ) : hasMedia ? (
-          <img
-            src={item.src}
-            alt={item.title || 'Photo'}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
+          <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+            <img
+              src={item.src}
+              alt={item.title || 'Photo'}
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
         )}
 
-        {/* Subtle hover effect */}
+        {/* Subtle hover effect - OUTSIDE filtered layer */}
+        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
         {/* Likes - bottom left (hidden when 0) */}
