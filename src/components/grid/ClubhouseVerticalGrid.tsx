@@ -38,6 +38,8 @@ import { logFirstCardRender } from '@/utils/bootTimeline';
 
 import { ClubhouseMusicPlayer } from '@/components/clubhouse/ClubhouseMusicPlayer';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -548,6 +550,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             return media.media_url;
           })();
           
+          // Get filter info for placeholder rendering too
+          const placeholderMediaItem = item.media?.[0] as any;
+          const placeholderStudioEdits = placeholderMediaItem?.studio_edits;
+          const placeholderFilterId = placeholderMediaItem?.filter_id ?? placeholderStudioEdits?.filter ?? null;
+          const placeholderFilterClass = getFilterClass(placeholderFilterId);
+          
           // Lightweight placeholder for far items
           if (!isNearbyItem) {
             return (
@@ -567,12 +575,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 }}
               >
                 {placeholderPosterUrl && (
-                  <img
-                    src={placeholderPosterUrl}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
-                  />
+                  <div className={cn("absolute inset-0 w-full h-full", placeholderFilterClass)}>
+                    <img
+                      src={placeholderPosterUrl}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 )}
               </div>
             );
@@ -588,6 +598,10 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           const musicData = studioEdits?.music;
           const postHasMusic = !!musicData?.url || !!musicData?.r2Key;
           const audioMode = studioEdits?.audioMode || 'original';
+          
+          // Filter: prefer filter_id column, fallback to studioEdits.filter
+          const filterId = mediaItem?.filter_id ?? studioEdits?.filter ?? null;
+          const filterClass = getFilterClass(filterId);
           
           // When audioMode is 'music_only', the video's original audio should be muted
           // so the music track can play instead
@@ -636,27 +650,30 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 
                 {currentMedia.media_type === 'video' ? (
                   <>
-                    <VideoWithAutoplay
-                      ref={(el) => {
-                        registerVideoRef(item.id, el);
-                        if (index === currentIndex && el) {
-                          setActiveVideoEl(el);
-                          onActiveVideoRefChange?.(el);
-                        }
-                      }}
-                      src={currentMedia.media_url}
-                      muted={videoMuted}
-                      className="w-full h-full"
-                      isMobile={isMobile}
-                      // Enforce immediate autoplay for the very first card on initial landing
-                      eagerMount={index === 0 && currentIndex === 0}
-                      shouldAttach={index === 0 && currentIndex === 0 ? true : !!shouldAttachMap[item.id]}
-                      autoplay={index === 0 && currentIndex === 0 ? true : !!autoplayMap[item.id]}
-                      isNearby={isNearbyItem}
-                      isActive={index === currentIndex}
-                      postId={item.id}
-                      onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
-                    />
+                    {/* Filtered pixel layer for video */}
+                    <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+                      <VideoWithAutoplay
+                        ref={(el) => {
+                          registerVideoRef(item.id, el);
+                          if (index === currentIndex && el) {
+                            setActiveVideoEl(el);
+                            onActiveVideoRefChange?.(el);
+                          }
+                        }}
+                        src={currentMedia.media_url}
+                        muted={videoMuted}
+                        className="w-full h-full"
+                        isMobile={isMobile}
+                        // Enforce immediate autoplay for the very first card on initial landing
+                        eagerMount={index === 0 && currentIndex === 0}
+                        shouldAttach={index === 0 && currentIndex === 0 ? true : !!shouldAttachMap[item.id]}
+                        autoplay={index === 0 && currentIndex === 0 ? true : !!autoplayMap[item.id]}
+                        isNearby={isNearbyItem}
+                        isActive={index === currentIndex}
+                        postId={item.id}
+                        onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
+                      />
+                    </div>
                     
                     {videoControlsVisible[item.id] && (
                       <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-30">
@@ -706,22 +723,25 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </>
                 ) : (
                   <div className="relative w-full h-full bg-black overflow-hidden">
-                    <img
-                      src={currentMedia.media_url}
-                      alt={item.title || 'Content image'}
-                      className="absolute inset-0 w-full h-full object-cover select-none"
-                      style={{ objectPosition: 'center center' }}
-                      draggable={false}
-                      loading="eager"
-                      onLoad={() => {
-                        if (index === 0) handleFirstFrameReady();
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-                      }}
-                    />
+                    {/* Filtered pixel layer for image */}
+                    <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
+                      <img
+                        src={currentMedia.media_url}
+                        alt={item.title || 'Content image'}
+                        className="absolute inset-0 w-full h-full object-cover select-none"
+                        style={{ objectPosition: 'center center' }}
+                        draggable={false}
+                        loading="eager"
+                        onLoad={() => {
+                          if (index === 0) handleFirstFrameReady();
+                        }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                        }}
+                      />
+                    </div>
                     
-                    {/* Text overlays from studio_edits */}
+                    {/* Text overlays from studio_edits - OUTSIDE filter layer */}
                     {studioEdits?.textOverlays?.length > 0 && (
                       <TextOverlayRenderer
                         textOverlays={studioEdits.textOverlays}
