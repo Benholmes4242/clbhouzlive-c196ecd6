@@ -14,11 +14,22 @@ interface UploadProgress {
   failedFiles: string[];
 }
 
+interface StudioEditsPayload {
+  filter?: string;
+  crop?: { ratio: string };
+  rotate?: number;
+  contrast?: number;
+  brightness?: number;
+  textOverlays?: any[];
+  music?: any;
+  audioMode?: string;
+}
+
 interface BackgroundUploadData {
   postId: string;
   mediaFiles: File[];
   userId: string;
-  studioEditsByIndex?: ({ filter?: string } | null)[];
+  studioEditsByIndex?: (StudioEditsPayload | null)[];
 }
 
 export const useBackgroundUpload = () => {
@@ -181,14 +192,14 @@ export const useBackgroundUpload = () => {
         
         const { data: mediaData, error: mediaError } = await supabase
           .from('post_media')
-          .insert({
+          .insert([{
             post_id: postId,
             media_type: mediaType,
             media_url: publicUrl,
             display_order: index,
-            studio_edits: editsForThisIndex,
+            studio_edits: editsForThisIndex as any,
             filter_id: filterId
-          })
+          }])
           .select()
           .single();
 

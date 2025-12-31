@@ -6,6 +6,8 @@ import { validateFiles } from '@/components/posts/utils/fileValidation';
 import { handlePostTags } from './usePostSubmission/uploadUtils';
 import { createPost } from '@/services/posts/createPost';
 
+import { StudioEdits } from '@/types/studio';
+
 interface PostSubmissionData {
   user: any;
   content: string;
@@ -18,7 +20,7 @@ interface PostSubmissionData {
     country: string;
   } | null;
   achievementId?: string | null;
-  studioEditsByMediaId?: Record<string, { filter?: string }>;
+  studioEditsByMediaId?: Record<string, StudioEdits>;
   /** Actor info for "posting as" feature */
   actorType?: 'personal' | 'business';
   actorId?: string;
@@ -110,11 +112,25 @@ export const useOptimisticPostSubmission = () => {
           console.log('Uploading media files for post creation...');
           
           // Build studio edits array aligned with mediaFiles order
+          // Pass full StudioEdits object (not just filter) so crop/rotate/contrast/brightness persist
           const studioEditsByIndex = mediaFiles.map((file, index) => {
             const mediaItem = mediaItems?.[index];
             const mediaId = mediaItem?.id;
             const edits = mediaId ? studioEditsByMediaId?.[mediaId] : undefined;
-            return edits && edits.filter ? { filter: edits.filter } : null;
+            if (!edits) return null;
+            
+            // Check if any meaningful edit exists
+            const hasAnyEdits =
+              !!edits.filter ||
+              !!edits.crop?.ratio ||
+              !!edits.rotate ||
+              !!edits.music ||
+              !!edits.audioMode ||
+              (edits.textOverlays?.length ?? 0) > 0 ||
+              typeof edits.contrast === 'number' ||
+              typeof edits.brightness === 'number';
+            
+            return hasAnyEdits ? edits : null;
           });
           
           await startBackgroundUpload({

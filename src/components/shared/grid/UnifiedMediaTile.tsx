@@ -9,6 +9,7 @@ import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -170,6 +171,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   // Get filter class for studio filters
   const filterClass = getFilterClass(item.filterId);
   
+  // Get crop/rotate/adjustments from studioEdits
+  const studioEdits = (item as any).studioEdits;
+  const cropClass = getCropWrapperClass(studioEdits?.crop);
+  const pixelLayerStyle = getPixelLayerStyle(studioEdits);
+  
   // Determine top-left override content (priority: milestone > multi-media)
   const hasMultiMedia = item.additionalMediaCount && item.additionalMediaCount > 0;
   
@@ -206,40 +212,46 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       )}
       onClick={handleClick}
     >
-      {/* Filtered pixel layer - wraps thumbnail and video */}
-      <div className={cn("absolute inset-0 w-full h-full", filterClass)}>
-        {/* Thumbnail - always visible as fallback */}
-        <img
-          src={thumbnailSrc}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="lazy"
-          draggable={false}
-        />
+      {/* Pixel layer with crop wrapper */}
+      <div className={cn("absolute inset-0", cropClass)}>
+        {/* Filtered + rotated pixel layer - wraps thumbnail and video */}
+        <div 
+          className={cn("w-full h-full", filterClass)}
+          style={pixelLayerStyle}
+        >
+          {/* Thumbnail - always visible as fallback */}
+          <img
+            src={thumbnailSrc}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            draggable={false}
+          />
 
-        {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
-        {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
-      {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
-        <HLSPlayer
-          ref={playerRef}
-          src={item.playbackUrl}
-          autoplay={isPlaying}
-          muted
-          loop
-          objectFit="cover"
-          externallyManaged
-          managedByMediaRuntime={true}
-          mediaId={item.postId}
-          onLoadedData={handleCanPlay}
-          className="absolute inset-0 h-full w-full"
-        />
-        )}
+          {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
+          {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
+        {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
+          <HLSPlayer
+            ref={playerRef}
+            src={item.playbackUrl}
+            autoplay={isPlaying}
+            muted
+            loop
+            objectFit="cover"
+            externallyManaged
+            managedByMediaRuntime={true}
+            mediaId={item.postId}
+            onLoadedData={handleCanPlay}
+            className="absolute inset-0 h-full w-full"
+          />
+          )}
+        </div>
       </div>
 
       {/* Text overlays from studioEdits - OUTSIDE filtered layer */}
-      {(item as any).studioEdits?.textOverlays?.length > 0 && (
+      {studioEdits?.textOverlays?.length > 0 && (
         <TextOverlayRenderer
-          textOverlays={(item as any).studioEdits.textOverlays}
+          textOverlays={studioEdits.textOverlays}
           isEditable={false}
         />
       )}

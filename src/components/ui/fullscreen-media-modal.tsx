@@ -17,6 +17,7 @@ import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { getFilterClass } from '@/utils/studioFilters';
+import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
@@ -113,6 +114,11 @@ const FullscreenMediaModal = ({
   // Get filter class for current media
   const currentFilterId = filterIds?.[currentIndex] || null;
   const filterClass = getFilterClass(currentFilterId);
+  
+  // Get crop/rotate/adjustments from current studioEdits
+  const currentEdits = studioEdits?.[currentIndex];
+  const cropClass = getCropWrapperClass(currentEdits?.crop);
+  const pixelLayerStyle = getPixelLayerStyle(currentEdits);
   
   // Detect if post has music from studioEdits - Option A enforcement
   const { postHasMusic, activeMusic } = useMemo(() => {
@@ -465,28 +471,36 @@ const FullscreenMediaModal = ({
         <div className="relative w-full h-full flex items-center justify-center">
           {mediaTypes[currentIndex] === 'image' ? (
             <div className="relative w-full h-full bg-media-loading">
-              <img
-                src={mediaUrls[currentIndex]}
-                alt={alt}
-                className={cn("w-full h-full object-contain", filterClass)}
-                draggable={false}
-                loading="eager"
-              />
+              <div className={cn("w-full h-full", cropClass)}>
+                <div className={cn("w-full h-full", filterClass)} style={pixelLayerStyle}>
+                  <img
+                    src={mediaUrls[currentIndex]}
+                    alt={alt}
+                    className="w-full h-full object-contain"
+                    draggable={false}
+                    loading="eager"
+                  />
+                </div>
+              </div>
             </div>
           ) : (
             <div className="relative w-full h-full bg-media-loading">
-              <HLSPlayer
-                key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
-                src={mediaUrls[currentIndex]}
-                className={cn("w-full h-full object-contain", filterClass)}
-                muted={postHasMusic ? true : isMuted}
-                loop={true}
-                autoplay={true}
-                showMuteButton={false}
-                showPlayButton={false}
-                mediaId={`modal-${fullscreenVideoId.current}-${currentIndex}`}
-                externallyManaged={false}
-              />
+              <div className={cn("w-full h-full", cropClass)}>
+                <div className={cn("w-full h-full", filterClass)} style={pixelLayerStyle}>
+                  <HLSPlayer
+                    key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
+                    src={mediaUrls[currentIndex]}
+                    className="w-full h-full object-contain"
+                    muted={postHasMusic ? true : isMuted}
+                    loop={true}
+                    autoplay={true}
+                    showMuteButton={false}
+                    showPlayButton={false}
+                    mediaId={`modal-${fullscreenVideoId.current}-${currentIndex}`}
+                    externallyManaged={false}
+                  />
+                </div>
+              </div>
             </div>
           )}
           
