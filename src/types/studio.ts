@@ -1,12 +1,25 @@
 export type FilterId = 'normal' | 'vivid' | 'bw' | 'dramatic';
 
+export type TextStyle = 
+  | 'modern_bold'
+  | 'classic_serif'
+  | 'signature'
+  | 'impact'
+  | 'outline'
+  | 'neon'
+  | 'glass'
+  | 'scoreboard'
+  // Legacy support
+  | 'modern'
+  | 'classic';
+
 export type TextOverlay = {
   id: string;
   text: string;
   x: number;        // 0..1 relative position
   y: number;        // 0..1 relative position
   scale: number;    // 0..1
-  style: 'modern' | 'classic' | 'signature';
+  style: TextStyle;
   color?: string;   // hex
 };
 

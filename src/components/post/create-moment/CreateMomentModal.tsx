@@ -552,6 +552,8 @@ export default function CreateMomentModal({
               onRemoveMedia={handleRemoveMedia}
               onReorder={handleReorder}
               getEdits={getEdits}
+              activeTool={activeTool}
+              onUpdateEdits={updateEdits}
             />
           ) : (
             <CreateMomentHero

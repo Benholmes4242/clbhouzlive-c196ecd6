@@ -1,10 +1,10 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
-import { StudioEdits } from "@/types/studio";
+import { StudioEdits, StudioTool, TextOverlay } from "@/types/studio";
 import MediaThumbnailStrip from "./MediaThumbnailStrip";
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
@@ -19,6 +19,9 @@ interface CreateMomentMediaStageProps {
   onRemoveMedia: (index: number) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   getEdits: (mediaId: string) => StudioEdits;
+  // Studio integration for editable text overlays
+  activeTool?: StudioTool;
+  onUpdateEdits?: (mediaId: string, patch: Partial<StudioEdits>) => void;
 }
 
 export default function CreateMomentMediaStage({
@@ -30,9 +33,12 @@ export default function CreateMomentMediaStage({
   onRemoveMedia,
   onReorder,
   getEdits,
+  activeTool,
+  onUpdateEdits,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
+  const stageContainerRef = useRef<HTMLDivElement>(null);
 
   // Check if any media has music attached (music applies to the whole post)
   const hasMusic = useMemo(() => {
@@ -60,11 +66,19 @@ export default function CreateMomentMediaStage({
     });
   };
 
+  // Handler for updating text overlays via drag
+  const handleTextOverlayChange = useCallback((overlays: TextOverlay[]) => {
+    if (!currentItem || !onUpdateEdits) return;
+    onUpdateEdits(currentItem.id, { textOverlays: overlays });
+  }, [onUpdateEdits]);
+
   if (media.length === 0) {
     return null;
   }
 
   const currentItem = media[activeIndex];
+  const isTextToolActive = activeTool === 'text';
+  const currentEdits = currentItem ? getEdits(currentItem.id) : undefined;
 
   return (
     <motion.div
@@ -77,7 +91,7 @@ export default function CreateMomentMediaStage({
       className="h-full w-full flex flex-col"
     >
       {/* Main carousel area */}
-      <div className="flex-1 relative">
+      <div ref={stageContainerRef} className="flex-1 relative">
         <MediaCarousel
           items={media.map((item) => {
             const edits = getEdits(item.id);
@@ -94,18 +108,20 @@ export default function CreateMomentMediaStage({
           onIndexChange={onIndexChange}
           onSetCover={onSetCover}
           coverIndex={coverIndex}
-          enableSwipe
+          enableSwipe={!isTextToolActive} // Disable swipe when dragging text
           loop={false}
           className="h-full w-full"
           forceVideoMuted={hasMusic}
           onMuteBlocked={handleMuteBlocked}
         />
 
-        {/* Text overlays for current media */}
+        {/* Text overlays for current media - editable when text tool is active */}
         {currentItem && (
           <TextOverlayRenderer
-            textOverlays={getEdits(currentItem.id)?.textOverlays ?? []}
-            isEditable={false}
+            textOverlays={currentEdits?.textOverlays ?? []}
+            isEditable={isTextToolActive}
+            onChange={isTextToolActive ? handleTextOverlayChange : undefined}
+            containerRef={stageContainerRef}
           />
         )}
 
