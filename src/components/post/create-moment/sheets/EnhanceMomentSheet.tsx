@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Wand2, Type, Film, ChevronRight, Award } from 'lucide-react';
 
@@ -54,6 +54,8 @@ interface EnhanceMomentSheetProps {
   onOpenStudio: () => void;
   onOpenBadges?: () => void;
   onOpenAiCaption?: () => void;
+  onOpenSmartCompilation?: () => void;
+  videoCount?: number;
 }
 
 /**
@@ -66,7 +68,20 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
   onOpenStudio,
   onOpenBadges,
   onOpenAiCaption,
+  onOpenSmartCompilation,
+  videoCount = 0,
 }) => {
+  // Filter options based on video count
+  const filteredOptions = useMemo(() => {
+    return ENHANCE_OPTIONS.filter(option => {
+      // Hide Smart Compilation if less than 2 videos
+      if (option.requiresMultipleVideos && videoCount < 2) {
+        return false;
+      }
+      return true;
+    });
+  }, [videoCount]);
+
   const handleOptionClick = (optionId: string) => {
     if (optionId === 'filters') {
       onClose();
@@ -77,6 +92,9 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
     } else if (optionId === 'ai-caption' && onOpenAiCaption) {
       onClose();
       onOpenAiCaption();
+    } else if (optionId === 'smart-compilation' && onOpenSmartCompilation) {
+      onClose();
+      onOpenSmartCompilation();
     }
     // Other options are coming soon - no action
   };
@@ -138,7 +156,7 @@ export const EnhanceMomentSheet: React.FC<EnhanceMomentSheetProps> = ({
 
           {/* Options */}
           <div className="px-4 pb-4 space-y-2">
-            {ENHANCE_OPTIONS.map(option => (
+            {filteredOptions.map(option => (
               <motion.button
                 key={option.id}
                 whileTap={{ scale: 0.98 }}

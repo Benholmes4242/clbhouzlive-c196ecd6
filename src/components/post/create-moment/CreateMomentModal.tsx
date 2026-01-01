@@ -20,7 +20,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet } from "./sheets";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet } from "./sheets";
 import { useDraftPersistence } from "./useDraftPersistence";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 
@@ -76,6 +76,7 @@ export default function CreateMomentModal({
   const [showEnhanceSheet, setShowEnhanceSheet] = useState(false);
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
   const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
+  const [showSmartCompilationSheet, setShowSmartCompilationSheet] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -128,6 +129,8 @@ export default function CreateMomentModal({
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
   const hasMedia = media.length > 0;
   const hasCategories = selectedCategories.length > 0;
+  // Count videos for Smart Compilation availability
+  const videoCount = useMemo(() => media.filter(m => m.type === 'video').length, [media]);
   // Soft-gated: Share button enabled if media exists - category check happens on tap
   const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
@@ -751,6 +754,11 @@ export default function CreateMomentModal({
           setShowEnhanceSheet(false);
           setShowAiCaptionSheet(true);
         }}
+        onOpenSmartCompilation={() => {
+          setShowEnhanceSheet(false);
+          setShowSmartCompilationSheet(true);
+        }}
+        videoCount={videoCount}
       />
 
       <MomentBadgesSheet
@@ -772,6 +780,19 @@ export default function CreateMomentModal({
         }}
         existingCaption={caption}
         prefilledCourseName={course?.name}
+      />
+
+      <SmartCompilationSheet
+        isOpen={showSmartCompilationSheet}
+        onClose={() => setShowSmartCompilationSheet(false)}
+        mediaItems={media}
+        existingMusic={hasMedia ? getEdits(media[0]?.id)?.music : null}
+        onCompilationComplete={(compiledMedia) => {
+          // Replace all media with the compiled video
+          onMediaChange?.([compiledMedia]);
+          setActiveIndex(0);
+          setCoverIndex(0);
+        }}
       />
     </div>
   );
