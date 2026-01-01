@@ -21,6 +21,7 @@ interface ExplorePost {
     name: string;
     country: string;
   };
+  badges?: string[];
 }
 
 export const useExploreContent = () => {
@@ -136,6 +137,7 @@ export const useExploreContent = () => {
             verified: false // Placeholder
           },
           golfCourse,
+          badges: post.badges || [],
           isFollowing: false // Placeholder
         };
       }).filter(Boolean) as ExplorePost[];

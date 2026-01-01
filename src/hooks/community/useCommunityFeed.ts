@@ -94,7 +94,7 @@ export function useCommunityFeed({
       let query = supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id,
+          id, content, created_at, user_id, badges,
           post_media (id, media_type, media_url, duration_seconds, width, height)
         `)
         .in('user_id', Array.from(communityIds));
@@ -200,6 +200,7 @@ export function useCommunityFeed({
             relationshipType: isFriend ? 'friend' : 'following',
             likeCount: likeMap.get(post.id) || 0,
             commentCount: commentMap.get(post.id) || 0,
+            badges: post.badges || [],
           };
         })
         .filter(Boolean) as CommunityContentItem[];

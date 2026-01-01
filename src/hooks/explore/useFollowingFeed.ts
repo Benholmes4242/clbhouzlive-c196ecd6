@@ -113,6 +113,7 @@ export function useFollowingFeed(pageSize = 12) {
           comments: Math.floor(Math.random() * 100) + 5,
           shares: Math.floor(Math.random() * 50) + 1,
           isFollowing: true,
+          badges: post.badges || [],
         };
       };
 
