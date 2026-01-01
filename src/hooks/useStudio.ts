@@ -11,11 +11,6 @@ export function useStudio() {
       ...prev,
       [mediaId]: { ...(prev[mediaId] ?? {}), ...patch }
     }));
-    console.log('[FILTER DEBUG 2] useStudio.updateEdits called:', {
-      mediaId,
-      patch,
-      timestamp: new Date().toISOString()
-    });
   }, []);
 
   const clearEdits = useCallback((mediaId: string) => {
