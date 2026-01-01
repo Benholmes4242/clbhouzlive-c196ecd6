@@ -166,30 +166,19 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            e.preventDefault();
             onMusicTap?.();
           }}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-          }}
-          onTouchEnd={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-          }}
           className={cn(
-            "flex items-center gap-2 text-left",
+            "flex items-center gap-2 w-full text-left",
             onMusicTap && "hover:opacity-80 transition-opacity"
           )}
         >
           <Music className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-          <span className="text-[12px] text-white/60 truncate max-w-[180px]">
+          <span className="text-[12px] text-white/60 truncate flex-1 min-w-0">
             {musicTrack.title}
             {musicTrack.artist && ` • ${musicTrack.artist}`}
           </span>
-          {/* Soundwave animation - directly after song text, only visible when music is playing */}
+          {/* Soundwave animation - only visible when music is playing (unmuted) */}
           {isMusicPlaying && <SoundwaveAnimation />}
         </button>
       )}
