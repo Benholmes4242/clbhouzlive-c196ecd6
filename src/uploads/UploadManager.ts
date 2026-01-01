@@ -33,6 +33,12 @@ class UploadManager {
       files: input.files,
       mediaItems: input.mediaItems,
       studioEditsByMediaId: input.studioEditsByMediaId,
+
+      // v2 fields
+      categories: input.categories,
+      visibility: input.visibility,
+      badges: input.badges,
+
       createdAt: new Date().toISOString(),
       status: 'queued',
       progress: {
