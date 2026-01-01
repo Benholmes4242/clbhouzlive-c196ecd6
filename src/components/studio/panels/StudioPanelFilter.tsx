@@ -28,8 +28,6 @@ const FILTER_OPTIONS: { id: FilterId; label: string }[] = [
 export default function StudioPanelFilter({ 
   edits, 
   updateEdits, 
-  onApply, 
-  onReset,
   previewUrl 
 }: StudioPanelFilterProps) {
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
@@ -43,18 +41,19 @@ export default function StudioPanelFilter({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Filter presets - horizontal scrollable */}
-      <div className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <label className="block text-body-sm font-medium text-zinc-700">Filter</label>
-          <span className="text-xs text-zinc-500">
-            Selected: <span className="font-medium text-zinc-700">{selectedLabel}</span>
+      {/* Filter presets - compact header + horizontal scroll */}
+      <div className="px-3 pt-2 pb-1">
+        {/* Compact header row */}
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-zinc-600">Filter</span>
+          <span className="text-[11px] text-zinc-400">
+            {selectedLabel}
           </span>
         </div>
         
-        {/* Horizontal scroll container */}
-        <div className="overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-          <div className="flex gap-3" style={{ minWidth: 'max-content' }}>
+        {/* Horizontal scroll container - tighter spacing */}
+        <div className="overflow-x-auto -mx-3 px-3 pb-1 scrollbar-hide">
+          <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
             {FILTER_OPTIONS.map(filter => {
               const isSelected = selectedFilter === filter.id;
               return (
@@ -62,10 +61,10 @@ export default function StudioPanelFilter({
                   key={filter.id}
                   onClick={() => handleSelectFilter(filter.id)}
                   className={cn(
-                    "flex-shrink-0 w-[72px] rounded-lg overflow-hidden transition-all",
+                    "flex-shrink-0 w-[64px] rounded-md overflow-hidden transition-all",
                     isSelected
-                      ? 'ring-2 ring-zinc-900 ring-offset-1 scale-[1.02]'
-                      : 'ring-1 ring-zinc-200 hover:ring-zinc-300'
+                      ? 'ring-[1.5px] ring-zinc-800 ring-offset-1'
+                      : 'ring-1 ring-zinc-200/80 hover:ring-zinc-300'
                   )}
                 >
                   {/* Preview tile with filter applied */}
@@ -88,24 +87,24 @@ export default function StudioPanelFilter({
                       />
                     )}
                     
-                    {/* Selected indicator */}
+                    {/* Selected indicator - subtle checkmark */}
                     {isSelected && (
-                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-zinc-900 flex items-center justify-center">
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <div className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-zinc-900/90 flex items-center justify-center">
+                        <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
                     )}
                   </div>
                   
-                  {/* Label */}
+                  {/* Label - compact */}
                   <div className={cn(
-                    "py-1.5 px-1 text-center",
-                    isSelected ? 'bg-zinc-900' : 'bg-white'
+                    "py-1 px-0.5 text-center",
+                    isSelected ? 'bg-zinc-800' : 'bg-white'
                   )}>
                     <span className={cn(
-                      "text-[11px] font-medium block truncate",
-                      isSelected ? 'text-white' : 'text-zinc-600'
+                      "text-[10px] font-medium block truncate",
+                      isSelected ? 'text-white' : 'text-zinc-500'
                     )}>
                       {filter.label}
                     </span>
@@ -115,25 +114,6 @@ export default function StudioPanelFilter({
             })}
           </div>
         </div>
-      </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Actions */}
-      <div className="p-4 border-t border-zinc-200 flex gap-3">
-        <button
-          onClick={onReset}
-          className="flex-1 py-2.5 rounded-sq-sm border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
-        >
-          Reset
-        </button>
-        <button
-          onClick={onApply}
-          className="flex-1 py-2.5 rounded-sq-sm bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
-        >
-          Apply
-        </button>
       </div>
     </div>
   );
