@@ -227,6 +227,7 @@ export default function CreateMomentModal({
       setSnapVisibility('public');
       setSelectedTags([]);
       setSelectedCategories([]);
+      setSelectedBadges([]);
       setVisibility('anyone');
       
       // Check for draft
