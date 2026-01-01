@@ -132,59 +132,52 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
   return (
     <div className="flex flex-col h-full">
-      {/* Music mutes original audio notice */}
+      {/* Compact mute notice + status row */}
       <div 
-        className="px-4 py-2 flex items-center gap-2"
-        style={{ 
-          background: 'var(--cm-surface-alt)',
-          borderBottom: '1px solid var(--cm-border-subtle)',
-        }}
+        className="px-3 py-1.5 flex items-center justify-between gap-2"
+        style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
       >
-        <VolumeX className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--cm-text-tertiary)' }} />
-        <p className="text-[11px]" style={{ color: 'var(--cm-text-secondary)' }}>
-          Adding a track will mute original video audio
-        </p>
-      </div>
-
-      {/* Music enabled indicator when track selected */}
-      {selectedTrack && (
-        <div 
-          className="px-4 py-2 flex items-center justify-between"
-          style={{ 
-            background: 'rgba(34, 197, 94, 0.1)',
-            borderBottom: '1px solid var(--cm-border-subtle)',
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-2 h-2 rounded-full animate-pulse"
-              style={{ background: '#22C55E' }}
-            />
-            <span className="text-[12px] font-medium" style={{ color: '#22C55E' }}>
-              Music enabled
-            </span>
-          </div>
+        <div className="flex items-center gap-1.5 min-w-0">
+          {selectedTrack ? (
+            <>
+              <div 
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ background: '#22C55E' }}
+              />
+              <span className="text-[11px] font-medium truncate" style={{ color: '#22C55E' }}>
+                {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
+              </span>
+            </>
+          ) : (
+            <>
+              <VolumeX className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--cm-text-tertiary)', opacity: 0.7 }} />
+              <span className="text-[10px]" style={{ color: 'var(--cm-text-tertiary)' }}>
+                Mutes original audio
+              </span>
+            </>
+          )}
+        </div>
+        {selectedTrack && (
           <button
             onClick={handleRemoveTrack}
-            className="text-[11px] px-2 py-1 rounded-md transition-colors"
+            className="text-[10px] px-1.5 py-0.5 rounded transition-colors flex-shrink-0"
             style={{ 
-              background: 'var(--cm-surface-alt)',
               color: 'var(--cm-text-secondary)',
             }}
           >
             Remove
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Search */}
+      {/* Search - tighter padding */}
       <div 
-        className="p-4"
+        className="px-3 py-2"
         style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
       >
         <div className="relative">
           <Search 
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" 
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5" 
             style={{ color: 'var(--cm-text-tertiary)' }}
           />
           <input
@@ -192,7 +185,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             placeholder="Search music..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none"
+            className="w-full pl-8 pr-3 py-1.5 rounded-lg text-sm focus:outline-none"
             style={{ 
               background: 'var(--cm-surface-alt)',
               border: '1px solid var(--cm-border-subtle)',
@@ -202,16 +195,16 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         </div>
       </div>
 
-      {/* Mood Tabs */}
+      {/* Mood Tabs - tighter */}
       <div 
-        className="flex gap-2 px-4 py-3 overflow-x-auto"
+        className="flex gap-1.5 px-3 py-2 overflow-x-auto"
         style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
       >
         {MUSIC_MOODS.map(mood => (
           <button
             key={mood.key}
             onClick={() => setActiveMood(mood.key)}
-            className="px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors"
+            className="px-2.5 py-1 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors"
             style={{
               background: activeMood === mood.key ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
               color: activeMood === mood.key ? 'white' : 'var(--cm-text-secondary)',
@@ -223,16 +216,16 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         ))}
       </div>
 
-      {/* Track list - scrollable with min-h-0 */}
+      {/* Track list - denser rows */}
       <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
         {filteredTracks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="flex flex-col items-center justify-center py-8 px-4">
             <Music2 
-              className="w-12 h-12 mb-3" 
+              className="w-10 h-10 mb-2" 
               style={{ color: 'var(--cm-text-tertiary)' }} 
             />
             <p 
-              className="text-sm text-center"
+              className="text-[12px] text-center"
               style={{ color: 'var(--cm-text-secondary)' }}
             >
               No tracks found
@@ -242,53 +235,53 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
           filteredTracks.map(track => (
             <div
               key={track.id}
-              className="px-4 py-3 flex items-center gap-3 transition-colors cursor-pointer"
+              className="px-3 py-2 flex items-center gap-2.5 transition-colors cursor-pointer"
               style={{ 
                 borderBottom: '1px solid var(--cm-border-subtle)',
                 background: selectedTrack === track.id ? 'var(--cm-surface-alt)' : 'transparent',
               }}
               onClick={() => handleSelectTrack(track)}
             >
-              {/* Preview button */}
+              {/* Preview button - smaller */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePreviewToggle(track);
                 }}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
                 style={{ 
                   background: previewingTrack === track.id ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
                 }}
               >
                 {previewingTrack === track.id ? (
-                  <Pause className="w-4 h-4 text-white" />
+                  <Pause className="w-3.5 h-3.5 text-white" />
                 ) : (
                   <Play 
-                    className="w-4 h-4 ml-0.5" 
+                    className="w-3.5 h-3.5 ml-0.5" 
                     style={{ color: 'var(--cm-text-primary)' }}
                   />
                 )}
               </button>
 
-              {/* Track info */}
+              {/* Track info - tighter */}
               <div className="flex-1 min-w-0">
                 <div 
-                  className="font-medium truncate"
+                  className="text-[13px] font-medium truncate leading-tight"
                   style={{ color: 'var(--cm-text-primary)' }}
                 >
                   {track.title}
                 </div>
                 <div 
-                  className="text-sm truncate"
+                  className="text-[11px] truncate leading-tight"
                   style={{ color: 'var(--cm-text-secondary)' }}
                 >
-                  {track.artist} • {track.mood}
+                  {track.artist}
                 </div>
               </div>
 
               {/* Duration */}
               <div 
-                className="text-sm flex-shrink-0"
+                className="text-[11px] flex-shrink-0"
                 style={{ color: 'var(--cm-text-tertiary)' }}
               >
                 {track.duration}
@@ -297,43 +290,13 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
               {/* Selected indicator */}
               {selectedTrack === track.id && (
                 <div 
-                  className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ background: 'var(--cm-surface-slate)' }}
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: '#22C55E' }}
                 />
               )}
             </div>
           ))
         )}
-      </div>
-
-
-      {/* Actions */}
-      <div 
-        className="p-4 flex gap-3"
-        style={{ borderTop: '1px solid var(--cm-border-subtle)' }}
-      >
-        <button
-          onClick={onReset}
-          className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
-          style={{ 
-            background: 'var(--cm-surface-alt)',
-            border: '1px solid var(--cm-border-subtle)',
-            color: 'var(--cm-text-primary)',
-          }}
-        >
-          Reset
-        </button>
-        <button
-          onClick={onApply}
-          disabled={!selectedTrack}
-          className="flex-1 py-2.5 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ 
-            background: 'var(--cm-surface-slate)',
-            color: 'white',
-          }}
-        >
-          Apply
-        </button>
       </div>
     </div>
   );

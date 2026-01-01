@@ -38,15 +38,7 @@ export default function CreateMomentCanvas({
   const [mentionQuery, setMentionQuery] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
 
-  // Auto-grow textarea - larger default, more breathing room
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto';
-      // Min 64px (3 lines), max 140px - more vertical space
-      textarea.style.height = `${Math.max(64, Math.min(textarea.scrollHeight, 140))}px`;
-    }
-  }, [caption]);
+  // Fixed height textarea - no auto-grow, internal scroll only
 
   // Handle caption input with mention detection
   const handleCaptionInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -133,8 +125,8 @@ export default function CreateMomentCanvas({
             border: '1px solid var(--cm-border-subtle)',
             boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)',
             color: 'var(--cm-text-primary)',
-            minHeight: '60px',
-            maxHeight: '140px',
+            height: '100px',
+            overflowY: 'auto',
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
             WebkitAppearance: 'none',
