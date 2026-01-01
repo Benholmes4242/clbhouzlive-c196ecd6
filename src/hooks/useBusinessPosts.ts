@@ -68,6 +68,7 @@ export function useBusinessPosts(businessId?: string) {
           is_pinned,
           pinned_until,
           pinned_at,
+          badges,
           post_media (
             id,
             media_url,

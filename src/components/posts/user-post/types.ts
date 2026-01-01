@@ -25,6 +25,7 @@ export interface UserPostData {
   actor_type?: 'personal' | 'business' | null;
   actor_id?: string | null;
   course_id?: string | null;
+  badges?: string[];
   user: {
     id: string;
     display_name: string | null;

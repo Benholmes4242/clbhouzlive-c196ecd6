@@ -485,6 +485,7 @@ export default function CreateMomentModal({
         studioEditsByMediaId,
         categories: selectedCategories,
         visibility,
+        badges: selectedBadges,
       });
       
       clearDraft();

@@ -159,6 +159,7 @@ async function processJob(jobId: string): Promise<void> {
       courseId: job.courseInfo?.id || null,
       categories: job.categories || [],
       visibility: job.visibility || 'anyone',
+      badges: job.badges || [],
     });
 
     const postId = postData.id;

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { useToast } from '@/hooks/use-toast';
+import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 
 interface UserPostMediaProps {
   media: PostMedia[];
@@ -18,6 +19,8 @@ interface UserPostMediaProps {
   shouldAutoplay: boolean;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   isClubhouse?: boolean;
+  /** Achievement badges to display on media */
+  badges?: string[];
 }
 
 export const UserPostMedia: React.FC<UserPostMediaProps> = ({
@@ -26,7 +29,8 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   rawCourseId,
   shouldAutoplay,
   onMediaClick,
-  isClubhouse = false
+  isClubhouse = false,
+  badges
 }) => {
   const { toast } = useToast();
 
@@ -87,7 +91,10 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     
     return (
       <div key={mediaItem.id} className="w-full aspect-square relative">
-        {/* Golf Course Badge overlay on each media item */}
+        {/* Achievement Badges overlay - top left */}
+        <AchievementBadgesOverlay badgeIds={badges} />
+        
+        {/* Golf Course Badge overlay on each media item - top right */}
         {courseToShow && (
           <div className="absolute top-2 right-2 z-10">
             <CoursePostBadge 

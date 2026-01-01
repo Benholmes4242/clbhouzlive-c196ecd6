@@ -71,6 +71,7 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
             rawCourseId={rawCourseId}
             shouldAutoplay={shouldAutoplay}
             onMediaClick={onMediaClick}
+            badges={post.badges}
           />
 
           <UserPostActions />
