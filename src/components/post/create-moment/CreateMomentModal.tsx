@@ -583,6 +583,7 @@ export default function CreateMomentModal({
               isPositioningText={isPositioningText}
               activeOverlayId={activeOverlayId}
               onSelectOverlay={setActiveOverlayId}
+              selectedBadges={selectedBadges}
             />
           ) : (
             <CreateMomentHero
