@@ -19,7 +19,6 @@ import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import CommentsModal from '@/components/posts/CommentsModal';
@@ -101,9 +100,9 @@ const VideoWithAutoplay: React.FC<{
     }
   }, [uid, getHlsUrl]);
 
-  // Use API values first, then fallbacks using centralized config
-  const hlsUrl = apiHlsUrl || (uid ? generateStreamHlsUrl(uid) : null);
-  const poster = apiPoster || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
+  // Use API values first, then fallbacks
+  const hlsUrl = apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
+  const poster = apiPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
   const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
 

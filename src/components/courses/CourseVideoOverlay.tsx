@@ -5,7 +5,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface VideoData {
   videoUrl: string;
@@ -41,7 +40,8 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
     if (firstVideo?.videoUrl) {
       const uid = uidFromNode({ media_url: firstVideo.videoUrl });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
         hasPreloadedFirst.current = true;
       }
     }

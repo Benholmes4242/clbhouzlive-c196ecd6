@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { edgePost } from '@/utils/callEdge';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl, CLOUDFLARE_STREAM_CONFIG } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useToast } from '@/hooks/use-toast';
 
 interface CloudflareStreamUploadResult {
@@ -119,9 +119,9 @@ export const useCloudflareStream = () => {
     return file.type.startsWith('video/');
   };
 
-  // Helper to get Cloudflare Stream embed URL (uses customer subdomain)
+  // Helper to get Cloudflare Stream embed URL
   const getEmbedUrl = (videoId: string): string => {
-    return `https://${CLOUDFLARE_STREAM_CONFIG.CUSTOMER_SUBDOMAIN}/${videoId}/iframe`;
+    return `https://iframe.videodelivery.net/${videoId}`;
   };
 
   // Helper to get direct playback URL (HLS)

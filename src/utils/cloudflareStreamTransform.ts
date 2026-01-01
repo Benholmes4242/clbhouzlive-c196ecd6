@@ -3,7 +3,6 @@
 // Now fetches actual URLs from Cloudflare API instead of constructing them
 
 import { getCloudflareStreamHLS, getCloudflareStreamPoster, batchFetchCloudflareStreamVideos } from './cloudflareStreamAPI';
-import { CLOUDFLARE_STREAM_CONFIG, generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
@@ -69,15 +68,15 @@ async function visit(node: any, videoDetails: Map<string, any>): Promise<any> {
       if (videoDetail && videoDetail.status.state === 'ready') {
         // Use API data if available and ready
         node.uid = uid;
-        node.hls_url = videoDetail.playback?.hls || generateStreamHlsUrl(uid);
-        node.poster = videoDetail.thumbnail || generateStreamThumbnailUrl(uid, { height: 600 });
+        node.hls_url = videoDetail.playback?.hls || `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        node.poster = videoDetail.thumbnail || `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
       } else {
-        // Fallback to constructed URLs using customer subdomain
+        // Fallback to constructed URLs
         node.uid = uid;
         node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
-                      generateStreamHlsUrl(uid);
+                      `https://videodelivery.net/${uid}/manifest/video.m3u8`;
         node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
-                     generateStreamThumbnailUrl(uid, { height: 600 });
+                     `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
       }
       
       // Remove any iframe/embed references - HLS only
@@ -140,11 +139,11 @@ export function transformCloudflareStreamDataSync(data: any): any {
       const uid = uidFromNode(node);
       if (uid) {
         node.uid = uid;
-        // ALWAYS use HLS manifest URLs via customer subdomain - NO iframes allowed
+        // ALWAYS use HLS manifest URLs - NO iframes allowed
         node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
-                      generateStreamHlsUrl(uid);
+                      `https://videodelivery.net/${uid}/manifest/video.m3u8`;
         node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
-                     generateStreamThumbnailUrl(uid, { height: 600 });
+                     `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
         
         // Remove any iframe/embed references - HLS only
         delete node.embed_url;
@@ -185,7 +184,7 @@ export function extractVideoId(url: string): string | null {
 
 // Helper to generate HLS manifest URL from video ID - NO iframe generation
 export function generateHlsUrl(videoId: string): string {
-  return generateStreamHlsUrl(videoId);
+  return `https://videodelivery.net/${videoId}/manifest/video.m3u8`;
 }
 
 // Helper to generate thumbnail URL from video ID
@@ -194,5 +193,6 @@ export function generateThumbnailUrl(videoId: string, options: {
   height?: number; 
   time?: number;
 } = {}): string {
-  return generateStreamThumbnailUrl(videoId, options);
+  const { width = 1280, height = 720, time = 1 } = options;
+  return `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
 }

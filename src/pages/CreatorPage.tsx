@@ -13,7 +13,6 @@ import { useMediaAutoplay } from '@/media';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,7 +88,8 @@ export const CreatorPage: React.FC = () => {
     if (firstVideo?.mediaUrl) {
       const uid = uidFromNode({ media_url: firstVideo.mediaUrl });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
         hasPreloadedFirst.current = true;
       }
     }

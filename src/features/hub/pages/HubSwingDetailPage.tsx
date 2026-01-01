@@ -9,7 +9,6 @@ import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
 import { useSwingConversation } from '@/features/echo/hooks/useSwingConversation';
 import { GlassVideo } from '@/components/media/GlassVideo';
 import '@/components/media/GlassVideo.css';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
@@ -36,7 +35,7 @@ export function HubSwingDetailPage() {
     // Check if it's a Cloudflare Stream URL and extract stream ID
     const streamIdMatch = swing.video_url.match(/\/([a-f0-9]{32})\//);
     const videoSrc = streamIdMatch 
-      ? generateStreamHlsUrl(streamIdMatch[1])
+      ? `https://videodelivery.net/${streamIdMatch[1]}/manifest/video.m3u8`
       : swing.video_url;
 
     // Extract thumbnail from analysis_results if available

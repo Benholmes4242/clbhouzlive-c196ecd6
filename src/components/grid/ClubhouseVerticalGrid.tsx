@@ -20,7 +20,6 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserTop100CourseIds } from '@/hooks/useUserTop100CourseIds';
@@ -82,8 +81,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   onFirstFrameReady?: () => void;
 }>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady }, ref) => {
   const uid = uidFromNode({ src });
-  const hlsUrl = uid ? generateStreamHlsUrl(uid) : null;
-  const poster = uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined;
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
+  const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
 
@@ -547,7 +546,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             const media = currentMedia;
             if (media.media_type === 'video') {
               const uid = uidFromNode({ src: media.media_url });
-              return uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined;
+              return uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
             }
             return media.media_url;
           })();
@@ -845,7 +844,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           postId={selectedPostId}
           videoThumbnail={
             filteredPosts[currentIndex].media?.[0]?.media_url
-              ? generateStreamThumbnailUrl(uidFromNode({ src: filteredPosts[currentIndex].media?.[0]?.media_url || '' }) || '', { height: 400 })
+              ? `https://videodelivery.net/${uidFromNode({ src: filteredPosts[currentIndex].media?.[0]?.media_url || '' })}/thumbnails/thumbnail.jpg?height=400`
               : undefined
           }
           creatorName={filteredPosts[currentIndex].user?.name}

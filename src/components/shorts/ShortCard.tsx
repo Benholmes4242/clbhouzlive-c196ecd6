@@ -4,7 +4,6 @@ import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import ShortsCardMeta from './ShortsCardMeta';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { Squircle } from '@/components/ui/squircle';
 import { Heart } from 'lucide-react';
 import TrendingBadge from '@/components/discover/TrendingBadge';
@@ -46,7 +45,7 @@ export default React.memo(function ShortCard({
   
   // Generate HLS URL and poster from Stream ID
   const uid = item.src ? uidFromNode({ src: item.src }) : null;
-  const hlsUrl = uid ? generateStreamHlsUrl(uid) : item.src;
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : item.src;
   const streamId = item.src ? getStreamIdFromUrl(item.src) : null;
   const posterUrl = item.thumbnailSrc ?? (streamId ? getStreamPoster(streamId, '0s', 720) : undefined);
   

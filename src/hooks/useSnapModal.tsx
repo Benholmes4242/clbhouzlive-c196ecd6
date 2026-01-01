@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useModalContext } from '@/contexts/ModalContext';
-import { normalizeFilesToMediaItems, revokeMediaItemUrls, generateVideoPoster } from '@/lib/mediaUtils';
+import { normalizeFilesToMediaItems, revokeMediaItemUrls } from '@/lib/mediaUtils';
 
 interface TaggableEntity {
   id: string;
@@ -26,7 +26,6 @@ export interface ComposerMediaItem {
   type: ComposerMediaType;
   file: File;
   previewUrl: string; // blob URL
-  thumbnailUrl?: string; // for videos: a generated poster image blob URL
   duration?: number;  // optional for video
 }
 
@@ -124,28 +123,15 @@ export const useSnapModal = () => {
       console.error('[composer] normalize failed:', error);
       // Fallback: open with minimal items so user isn't blocked
       try {
-        const minimal: ComposerMediaItem[] = await Promise.all(files.map(async (f, i) => {
+        const minimal: ComposerMediaItem[] = files.map((f, i) => {
           const url = URL.createObjectURL(f);
-          const isVideo = f.type.startsWith('video');
-          let thumbnailUrl = url;
-          
-          // Try to generate a thumbnail for videos
-          if (isVideo) {
-            try {
-              thumbnailUrl = await generateVideoPoster(f);
-            } catch {
-              thumbnailUrl = url; // fallback to video blob URL
-            }
-          }
-          
           return {
             id: `${Date.now()}-${i}`,
-            type: isVideo ? 'video' : 'image',
+            type: f.type.startsWith('video') ? 'video' : 'image',
             file: f,
             previewUrl: url,
-            thumbnailUrl,
-          } as ComposerMediaItem;
-        }));
+          };
+        });
         setMediaItems(minimal);
         if (minimal.length > 0) {
           setSelectedFile(minimal[0].file);

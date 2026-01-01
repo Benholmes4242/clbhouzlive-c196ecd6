@@ -1,6 +1,5 @@
 // Cloudflare Stream API integration for fetching HLS manifest URLs
 
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 interface CloudflareStreamVideo {
   uid: string;
   status: {
@@ -76,11 +75,11 @@ export async function getCloudflareStreamHLS(videoId: string): Promise<string | 
   const video = await fetchCloudflareStreamVideo(videoId);
   
   if (!video || video.status.state !== 'ready') {
-    // Fallback to constructed URL using customer subdomain if API fails or video not ready
-    return generateStreamHlsUrl(videoId);
+    // Fallback to constructed URL if API fails or video not ready
+    return `https://videodelivery.net/${videoId}/manifest/video.m3u8`;
   }
 
-  return video.playback?.hls || generateStreamHlsUrl(videoId);
+  return video.playback?.hls || `https://videodelivery.net/${videoId}/manifest/video.m3u8`;
 }
 
 /**
@@ -94,8 +93,9 @@ export async function getCloudflareStreamPoster(videoId: string, options: {
   const video = await fetchCloudflareStreamVideo(videoId);
   
   if (!video || video.status.state !== 'ready') {
-    // Fallback to constructed URL using customer subdomain if API fails
-    return generateStreamThumbnailUrl(videoId, options);
+    // Fallback to constructed URL if API fails
+    const { width = 1280, height = 720, time = 1 } = options;
+    return `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
   }
 
   // Use API thumbnail if available, otherwise construct one
@@ -103,7 +103,8 @@ export async function getCloudflareStreamPoster(videoId: string, options: {
     return video.thumbnail;
   }
 
-  return generateStreamThumbnailUrl(videoId, options);
+  const { width = 1280, height = 720, time = 1 } = options;
+  return `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
 }
 
 /**

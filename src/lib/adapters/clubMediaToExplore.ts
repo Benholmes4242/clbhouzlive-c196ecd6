@@ -1,7 +1,6 @@
 // Adapter to transform Club Media API response to ExploreContentItem format
 // This enables reuse of existing Explore components (MediaCard, MediaDisplay, etc.)
 
-import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 export interface ExploreContentItem {
   id: string;
   type: 'video' | 'image' | 'cta';
@@ -50,7 +49,7 @@ const extractStreamUidFromHls = (hls: string): string | null => {
 
 // Helper to generate Stream thumbnail URL
 const getStreamThumbnail = (uid: string): string => 
-  generateStreamThumbnailUrl(uid, { height: 600 });
+  `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
 
 // Transform Club Media item to ExploreContentItem format
 export const adaptClubMediaToExploreItem = (clubMediaItem: any): ExploreContentItem => {

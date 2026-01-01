@@ -13,7 +13,6 @@ import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 const VIDEO_WINDOW_RADIUS = 2;
 
@@ -117,7 +116,7 @@ export function useVerticalFeedLogic({
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        preloadHlsManifest(`https://videodelivery.net/${uid}/manifest/video.m3u8`);
       }
     }
   }, [posts]);
@@ -301,7 +300,7 @@ export function useVerticalFeedLogic({
       
       const uid = uidFromNode({ src });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        preloadHlsManifest(`https://videodelivery.net/${uid}/manifest/video.m3u8`);
       }
     }
   }, [currentIndex, posts]);

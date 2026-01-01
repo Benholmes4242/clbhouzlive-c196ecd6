@@ -9,7 +9,6 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityGridItem } from '@/components/profile/ActivityGrid';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 // Import ActivityPost type inline to avoid circular dependencies
 interface ActivityPostMedia {
@@ -67,7 +66,7 @@ function getOrientation(aspectRatio?: number): 'portrait' | 'landscape' | 'squar
  */
 function getHlsUrl(src: string): string | undefined {
   const uid = uidFromNode({ src });
-  return uid ? generateStreamHlsUrl(uid) : undefined;
+  return uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : undefined;
 }
 
 /**
@@ -77,7 +76,7 @@ function getThumbnailUrl(src: string, explicitThumbnail?: string): string {
   if (explicitThumbnail) return explicitThumbnail;
   const uid = uidFromNode({ src });
   return uid 
-    ? generateStreamThumbnailUrl(uid, { height: 600 })
+    ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` 
     : src;
 }
 
@@ -199,7 +198,7 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
 
   const isVideo = primaryMedia.media_type === 'video';
   const uid = isVideo ? uidFromNode({ src: primaryMedia.media_url }) : null;
-  const playbackUrl = uid ? generateStreamHlsUrl(uid) : primaryMedia.media_url;
+  const playbackUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : primaryMedia.media_url;
   
   const thumbnailUrl = isVideo
     ? (primaryMedia.poster_url || getThumbnailUrl(primaryMedia.media_url))

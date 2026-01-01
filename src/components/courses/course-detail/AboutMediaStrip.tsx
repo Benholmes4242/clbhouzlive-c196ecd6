@@ -6,7 +6,6 @@ import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExp
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { ChevronRight } from 'lucide-react';
-import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface LocalMediaItem {
   id: string;
@@ -61,7 +60,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   };
 
   const streamThumb = (uid: string) =>
-    generateStreamThumbnailUrl(uid);
+    `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`;
 
   // Build media objects for SquareCardMedia with proper image URLs
   const mediaTiles = (items ?? []).slice(0, maxItems).map((item) => {

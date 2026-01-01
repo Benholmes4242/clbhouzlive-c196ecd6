@@ -19,7 +19,6 @@ import { LazyMediaGridItem } from './LazyMediaGridItem';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -72,7 +71,8 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     if (firstVideo?.media_url) {
       const uid = uidFromNode({ media_url: firstVideo.media_url });
       if (uid) {
-        preloadHlsManifest(generateStreamHlsUrl(uid));
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
         hasPreloadedFirst.current = true;
       }
     }

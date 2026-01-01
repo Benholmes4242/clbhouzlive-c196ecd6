@@ -145,9 +145,9 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick
     };
   }, [short.id, sortIndex, registerMedia]);
 
-  // Build HLS URL from source - use original if already in correct format
-  const hlsUrl = short.src?.includes('/manifest/video.m3u8') 
-    ? short.src
+  // Build HLS URL from source
+  const hlsUrl = short.src?.includes('videodelivery.net') 
+    ? short.src.replace(/\/watch$/, '/manifest/video.m3u8')
     : short.src;
 
   return (

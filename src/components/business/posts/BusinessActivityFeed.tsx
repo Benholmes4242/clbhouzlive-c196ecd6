@@ -11,7 +11,6 @@ import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
@@ -109,7 +108,8 @@ export function BusinessActivityFeed({
       if (videoMedia?.media_url) {
         const uid = uidFromNode({ media_url: videoMedia.media_url });
         if (uid) {
-          preloadHlsManifest(generateStreamHlsUrl(uid));
+          const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+          preloadHlsManifest(hlsUrl);
           hasPreloadedFirst.current = true;
         }
       }

@@ -23,7 +23,6 @@ import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { getFilterClass } from '@/utils/studioFilters';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -140,7 +139,7 @@ export default function BusinessPostCard({
 
   // Get video HLS URL and poster
   const streamId = isVideo ? getStreamIdFromUrl(primaryMedia?.media_url || '') : null;
-  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : null;
+  const hlsUrl = streamId ? `https://videodelivery.net/${streamId}/manifest/video.m3u8` : null;
   const thumbnailUrl = isVideo
     ? primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600)
     : primaryMedia?.media_url;
