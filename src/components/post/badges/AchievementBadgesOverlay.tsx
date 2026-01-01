@@ -1,5 +1,7 @@
 import React from 'react';
 import { MOMENT_BADGES } from '@/components/post/create-moment/categoryDefinitions';
+import { getBadgeIcon } from './AchievementBadgeIcon';
+import { Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AchievementBadgesOverlayProps {
@@ -22,15 +24,22 @@ export const AchievementBadgesOverlay: React.FC<AchievementBadgesOverlayProps> =
 
   return (
     <div className={cn("absolute top-2 left-2 z-10 flex flex-col gap-1", className)}>
-      {badges.map((badge) => (
-        <div
-          key={badge!.id}
-          className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium shadow-sm"
-        >
-          <span>{badge!.emoji}</span>
-          <span>{badge!.label}</span>
-        </div>
-      ))}
+      {badges.map((badge) => {
+        const IconComponent = getBadgeIcon(badge!.id);
+        return (
+          <div
+            key={badge!.id}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium shadow-sm"
+          >
+            {IconComponent ? (
+              <IconComponent className="w-3.5 h-3.5" />
+            ) : (
+              <Award className="w-3.5 h-3.5" />
+            )}
+            <span>{badge!.label}</span>
+          </div>
+        );
+      })}
     </div>
   );
 };
