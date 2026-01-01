@@ -5,14 +5,12 @@ import { StudioEdits } from '@/types/studio';
 type StudioPanelEditProps = {
   edits: StudioEdits;
   updateEdits: (patch: Partial<StudioEdits>) => void;
-  onApply: () => void;
-  onReset: () => void;
   mediaType: 'image' | 'video';
 };
 
 const CROP_RATIOS = ['original', '1:1', '4:5', '16:9'] as const;
 
-export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, mediaType }: StudioPanelEditProps) {
+export default function StudioPanelEdit({ edits, updateEdits, mediaType }: StudioPanelEditProps) {
   const [cropRatio, setCropRatio] = useState<typeof CROP_RATIOS[number]>(
     edits?.crop?.ratio || 'original'
   );
@@ -31,16 +29,16 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {/* Crop ratios (images & videos) */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {/* Crop ratios */}
         <div>
-          <label className="block text-body-sm font-medium text-zinc-700 mb-3">Crop Ratio</label>
-          <div className="grid grid-cols-4 gap-2">
+          <label className="block text-xs font-medium text-zinc-600 mb-2">Crop Ratio</label>
+          <div className="grid grid-cols-4 gap-1.5">
             {CROP_RATIOS.map(ratio => (
               <button
                 key={ratio}
                 onClick={() => handleCropRatio(ratio)}
-                className={`py-2 px-3 rounded-lg border text-body-md font-medium transition-colors ${
+                className={`py-1.5 px-2 rounded-md border text-xs font-medium transition-colors ${
                   cropRatio === ratio
                     ? 'border-zinc-900 bg-zinc-900 text-white'
                     : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
@@ -52,36 +50,23 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
           </div>
         </div>
 
-        {/* Rotate (images & videos) */}
+        {/* Subtle divider */}
+        <div className="h-px bg-zinc-100" />
+
+        {/* Rotate - secondary utility */}
         <div>
-          <label className="block text-body-sm font-medium text-zinc-700 mb-3">Rotate</label>
+          <label className="block text-xs font-medium text-zinc-500 mb-1.5">Rotate</label>
           <button
             onClick={handleRotate}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 transition-colors text-zinc-600"
           >
-            <RotateCw className="w-5 h-5" />
-            <span className="text-sm font-medium">Rotate 90°</span>
+            <RotateCw className="w-4 h-4" />
+            <span className="text-xs font-medium">90°</span>
             {rotation > 0 && (
-              <span className="text-xs text-zinc-500">({rotation}°)</span>
+              <span className="text-[10px] text-zinc-400 ml-1">({rotation}°)</span>
             )}
           </button>
         </div>
-      </div>
-
-      {/* Actions */}
-      <div className="p-4 border-t border-zinc-200 flex gap-3">
-        <button
-          onClick={onReset}
-          className="flex-1 py-2.5 rounded-lg border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
-        >
-          Reset
-        </button>
-        <button
-          onClick={onApply}
-          className="flex-1 py-2.5 rounded-lg bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
-        >
-          Apply
-        </button>
       </div>
     </div>
   );

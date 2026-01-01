@@ -236,8 +236,6 @@ export default function StudioShelf({
                     <StudioPanelEdit
                       edits={edits}
                       updateEdits={updateEdits}
-                      onApply={handleApply}
-                      onReset={handleReset}
                       mediaType={activeMediaType}
                     />
                   </motion.div>
