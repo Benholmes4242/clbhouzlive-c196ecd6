@@ -29,6 +29,7 @@ export interface TaggedPost {
   is_pinned: boolean;
   pinned_until: string | null;
   pinned_at: string | null;
+  badges?: string[];
   post_media: Array<{
     id: string;
     media_url: string;

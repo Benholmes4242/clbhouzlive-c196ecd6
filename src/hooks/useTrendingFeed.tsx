@@ -53,6 +53,7 @@ export const useTrendingFeed = () => {
           created_at,
           user_id,
           actor_type,
+          badges,
           post_media!inner(id, media_type, media_url, filter_id, studio_edits)
         `)
         .in('user_id', allConnectedUserIds)
@@ -84,6 +85,7 @@ export const useTrendingFeed = () => {
           id: post.id,
           content: post.content,
           created_at: post.created_at,
+          badges: (post as any).badges || [],
           user: {
             id: post.user_id,
             display_name: userProfile?.display_name || null,

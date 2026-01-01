@@ -36,6 +36,7 @@ import { toast } from 'sonner';
 import TaggedText from '@/components/posts/TaggedText';
 import PlayedAtLine from '@/components/posts/PlayedAtLine';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -428,6 +429,9 @@ export default function BusinessPostCard({
                 isEditable={false}
               />
             )}
+
+            {/* Achievement Badges Overlay - Top Left */}
+            <AchievementBadgesOverlay badgeIds={post.badges} className="top-2 left-2" />
 
             {/* Multiple media indicator */}
             {hasMultipleMedia && (

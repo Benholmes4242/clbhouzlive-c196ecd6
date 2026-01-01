@@ -53,6 +53,7 @@ export function useUserMedia(userId: string | null, page = 0, viewerId?: string 
           id,
           created_at,
           user_id,
+          badges,
           post_media (
             id,
             media_type,
