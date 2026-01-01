@@ -41,19 +41,19 @@ export default function StudioPanelFilter({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Filter presets - compact header + horizontal scroll */}
-      <div className="px-3 pt-2 pb-1">
+      {/* Filter presets - header + 3-column grid */}
+      <div className="flex flex-col h-full">
         {/* Compact header row */}
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-zinc-600">Filter</span>
-          <span className="text-[11px] text-zinc-400">
-            {selectedLabel}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
+          <span className="text-xs font-medium text-zinc-600">Filters</span>
+          <span className="text-[11px] text-zinc-500">
+            Selected: {selectedLabel}
           </span>
         </div>
         
-        {/* Horizontal scroll container - tighter spacing */}
-        <div className="overflow-x-auto -mx-3 px-3 pb-1 scrollbar-hide">
-          <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
+        {/* 3-column grid with internal scroll */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          <div className="grid grid-cols-3 gap-3">
             {FILTER_OPTIONS.map(filter => {
               const isSelected = selectedFilter === filter.id;
               return (
@@ -61,9 +61,9 @@ export default function StudioPanelFilter({
                   key={filter.id}
                   onClick={() => handleSelectFilter(filter.id)}
                   className={cn(
-                    "flex-shrink-0 w-[64px] rounded-md overflow-hidden transition-all",
+                    "rounded-xl overflow-hidden transition-all duration-150",
                     isSelected
-                      ? 'ring-[1.5px] ring-zinc-800 ring-offset-1'
+                      ? 'ring-[1.5px] ring-zinc-500/50 ring-offset-2 ring-offset-white'
                       : 'ring-1 ring-zinc-200/80 hover:ring-zinc-300'
                   )}
                 >
@@ -89,8 +89,8 @@ export default function StudioPanelFilter({
                     
                     {/* Selected indicator - subtle checkmark */}
                     {isSelected && (
-                      <div className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-zinc-900/90 flex items-center justify-center">
-                        <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-zinc-700/90 flex items-center justify-center shadow-sm">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
@@ -99,12 +99,12 @@ export default function StudioPanelFilter({
                   
                   {/* Label - compact */}
                   <div className={cn(
-                    "py-1 px-0.5 text-center",
-                    isSelected ? 'bg-zinc-800' : 'bg-white'
+                    "py-1.5 px-1 text-center transition-colors duration-150",
+                    isSelected ? 'bg-zinc-700' : 'bg-white'
                   )}>
                     <span className={cn(
-                      "text-[10px] font-medium block truncate",
-                      isSelected ? 'text-white' : 'text-zinc-500'
+                      "text-[11px] font-medium block truncate",
+                      isSelected ? 'text-white' : 'text-zinc-600'
                     )}>
                       {filter.label}
                     </span>
