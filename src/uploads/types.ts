@@ -64,6 +64,7 @@ export interface UploadJob {
   // v2 fields
   categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
+  badges?: string[];
 
   files: File[];
   createdAt: string;
@@ -92,6 +93,7 @@ export interface UploadJobInput {
   // New v2 fields
   categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
+  badges?: string[];
 }
 
 // Serializable job for localStorage (no File objects)

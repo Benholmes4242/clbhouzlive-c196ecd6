@@ -15,6 +15,7 @@ import { MediaNavigationDots } from './overlays/MediaNavigationDots';
 import { MediaContainer } from './MediaContainer';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenPostNavigation } from '@/hooks/useFullscreenPostNavigation';
+import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 
 
 interface IndexFeedPostProps {
@@ -203,6 +204,9 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           golfCourse={golfCourse}
           source="index"
         />
+
+        {/* Achievement Badges overlay - top left below user info */}
+        <AchievementBadgesOverlay badgeIds={post.badges} className="top-14 left-2" />
 
         {/* Maximize Button for both Desktop and Mobile */}
         <div className="absolute top-3 right-3 z-20">

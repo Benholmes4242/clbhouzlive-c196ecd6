@@ -63,6 +63,7 @@ export const useRealPostsFetcher = () => {
           actor_id,
           course_id,
           categories,
+          badges,
           post_media!inner (
             id,
             media_type,

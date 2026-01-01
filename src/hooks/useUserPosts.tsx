@@ -24,6 +24,7 @@ interface UserPostData {
   id: string;
   content: string | null;
   created_at: string;
+  badges?: string[];
   user: {
     id: string;
     display_name: string | null;
@@ -57,7 +58,8 @@ export const useUserPosts = () => {
           content,
           created_at,
           user_id,
-          actor_type
+          actor_type,
+          badges
         `)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .or(visibilityFilter) // Apply visibility filter
@@ -119,6 +121,7 @@ export const useUserPosts = () => {
           id: post.id,
           content: post.content,
           created_at: post.created_at,
+          badges: (post as any).badges || [],
           user: {
             id: post.user_id,
             display_name: userProfile?.display_name || null,

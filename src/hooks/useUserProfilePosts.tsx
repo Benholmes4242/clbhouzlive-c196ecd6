@@ -23,6 +23,7 @@ interface UserPost {
   id: string;
   content: string | null;
   created_at: string;
+  badges?: string[];
   post_media: NormalizedMedia[];
 }
 
@@ -70,7 +71,8 @@ export const useUserProfilePosts = (userId: string | null) => {
           .select(`
             id,
             content,
-            created_at
+            created_at,
+            badges
           `)
           .eq('actor_type', 'personal')
           .eq('actor_id', userId)
@@ -135,6 +137,7 @@ export const useUserProfilePosts = (userId: string | null) => {
             id: post.id,
             content: post.content,
             created_at: post.created_at,
+            badges: (post as any).badges || [],
             post_media: medias
           };
         });
