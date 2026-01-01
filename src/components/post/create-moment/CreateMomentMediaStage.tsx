@@ -9,6 +9,7 @@ import MediaThumbnailStrip from "./MediaThumbnailStrip";
 import SoundtrackStrip from "@/components/studio/SoundtrackStrip";
 import TextOverlayRenderer from "@/components/studio/TextOverlayRenderer";
 import { useToast } from "@/hooks/use-toast";
+import { AchievementBadgesOverlay } from "@/components/post/badges/AchievementBadgesOverlay";
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
@@ -27,6 +28,8 @@ interface CreateMomentMediaStageProps {
   // Active overlay selection (synced with panel)
   activeOverlayId?: string | null;
   onSelectOverlay?: (id: string | null) => void;
+  // Achievement badges selected for this post
+  selectedBadges?: string[];
 }
 
 export default function CreateMomentMediaStage({
@@ -43,6 +46,7 @@ export default function CreateMomentMediaStage({
   isPositioningText = false,
   activeOverlayId,
   onSelectOverlay,
+  selectedBadges,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
@@ -167,6 +171,12 @@ export default function CreateMomentMediaStage({
         >
           {activeIndex + 1}/{media.length}
         </div>
+
+        {/* Achievement badges overlay - below media counter */}
+        <AchievementBadgesOverlay 
+          badgeIds={selectedBadges} 
+          className="top-10 left-2" 
+        />
 
         {/* Remove media button - top right - circle container */}
         <button
