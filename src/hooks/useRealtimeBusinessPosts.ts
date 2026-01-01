@@ -30,21 +30,35 @@ export function useRealtimeBusinessPosts(businessId?: string) {
       .subscribe();
 
     // Channel for post_media table changes - secondary safety net for media attachment
+    // When media is inserted, check if it belongs to a post from this business
     const mediaChannel = supabase
       .channel(`rt:business-post-media:${businessId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'post_media' },
-        (_payload) => {
-          // Debounce to avoid spamming invalidations for carousel posts
-          if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-          }
+        async (payload) => {
+          // Get the post_id from the inserted media
+          const postId = (payload.new as any)?.post_id;
+          if (!postId) return;
           
-          debounceTimerRef.current = setTimeout(() => {
-            console.log('[useRealtimeBusinessPosts] post_media INSERT detected, invalidating feed');
-            qc.invalidateQueries({ queryKey: postKeys.actorPosts('business', businessId) });
-          }, MEDIA_INVALIDATION_DEBOUNCE_MS);
+          // Check if this post belongs to this business (quick lookup)
+          const { data: post } = await supabase
+            .from('posts')
+            .select('actor_id, actor_type')
+            .eq('id', postId)
+            .single();
+          
+          if (post?.actor_type === 'business' && post?.actor_id === businessId) {
+            // Debounce to avoid spamming invalidations for carousel posts
+            if (debounceTimerRef.current) {
+              clearTimeout(debounceTimerRef.current);
+            }
+            
+            debounceTimerRef.current = setTimeout(() => {
+              console.log('[useRealtimeBusinessPosts] post_media INSERT detected for this business, invalidating feed');
+              qc.invalidateQueries({ queryKey: postKeys.actorPosts('business', businessId) });
+            }, MEDIA_INVALIDATION_DEBOUNCE_MS);
+          }
         }
       )
       .subscribe();
