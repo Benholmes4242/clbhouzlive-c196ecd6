@@ -111,6 +111,13 @@ export default function CreateMomentMediaStage({
           <MediaCarousel
             items={media.map((item) => {
               const edits = getEdits(item.id);
+              console.log('[FILTER DEBUG 3] CreateMomentMediaStage mapping item:', {
+                itemId: item.id,
+                edits,
+                hasFilter: !!edits?.filter,
+                filterValue: edits?.filter,
+                timestamp: new Date().toISOString()
+              });
               return {
                 id: item.id,
                 type: item.type,

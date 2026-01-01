@@ -43,6 +43,14 @@ export default function CarouselSlide({
   onMuteBlocked,
   studioEdits
 }: CarouselSlideProps) {
+  console.log('[FILTER DEBUG 4] CarouselSlide render:', {
+    itemId: item.id,
+    studioEdits,
+    hasFilter: !!studioEdits?.filter,
+    filterValue: studioEdits?.filter,
+    timestamp: new Date().toISOString()
+  });
+
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -52,6 +60,13 @@ export default function CarouselSlide({
   
   const showSkeleton = useCappedLoading(loaded, 600);
   const filterClass = getFilterClass(studioEdits?.filter);
+  
+  console.log('[FILTER DEBUG 5] CarouselSlide filterClass computed:', {
+    itemId: item.id,
+    inputFilter: studioEdits?.filter,
+    outputFilterClass: filterClass,
+    timestamp: new Date().toISOString()
+  });
   const cropClass = getCropWrapperClass(studioEdits?.crop);
   const pixelStyle = getPixelLayerStyle(studioEdits);
   
