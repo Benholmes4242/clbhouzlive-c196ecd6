@@ -14,7 +14,7 @@ export type MomentCategoryDef = {
 export type MomentBadgeDef = {
   id: string;
   label: string;
-  emoji: string;
+  category?: 'scoring' | 'shot' | 'performance' | 'experience';
   keywords?: string[];
 };
 
@@ -124,55 +124,102 @@ export function getDiscoverCategories(): MomentCategoryDef[] {
   return MOMENT_CATEGORIES.filter(c => c.discoverEnabled);
 }
 
-// Score badges - separate from categories
+// V1 Achievement Badges - 15 total
+// Organized by category for future grouping support
 export const MOMENT_BADGES: MomentBadgeDef[] = [
+  // Scoring (4)
+  {
+    id: 'break-100',
+    label: 'Breaking 100',
+    category: 'scoring',
+    keywords: ['broke 100', 'break 100', 'breaking 100', 'under 100', '99', '98', '97', '96', '95', '94', '93', '92', '91'],
+  },
+  {
+    id: 'break-90',
+    label: 'Breaking 90',
+    category: 'scoring',
+    keywords: ['broke 90', 'break 90', 'breaking 90', 'under 90', '89', '88', '87', '86', '85', '84', '83', '82', '81'],
+  },
+  {
+    id: 'break-80',
+    label: 'Breaking 80',
+    category: 'scoring',
+    keywords: ['broke 80', 'break 80', 'breaking 80', 'under 80', '79', '78', '77', '76', '75', '74', '73', '72'],
+  },
+  {
+    id: 'break-70',
+    label: 'Breaking 70',
+    category: 'scoring',
+    keywords: ['broke 70', 'break 70', 'breaking 70', 'under 70', '69', '68', '67', '66', '65'],
+  },
+  // Shot / Hole (4)
   {
     id: 'hio',
     label: 'Hole-in-One',
-    emoji: '🎯',
-    keywords: ['hole in one', 'hole-in-one', 'hio', 'aced'],
+    category: 'shot',
+    keywords: ['hole in one', 'hole-in-one', 'hio', 'aced', 'ace'],
   },
   {
     id: 'albatross',
     label: 'Albatross',
-    emoji: '🦅',
+    category: 'shot',
     keywords: ['albatross', 'double eagle', '-3'],
   },
   {
     id: 'eagle',
     label: 'Eagle',
-    emoji: '🦅',
+    category: 'shot',
     keywords: ['eagle', 'eagled', '-2'],
   },
   {
     id: 'birdie',
     label: 'Birdie',
-    emoji: '🐦',
+    category: 'shot',
     keywords: ['birdie', 'birdied', '-1'],
   },
+  // Performance (4)
   {
     id: 'pb',
     label: 'Personal Best',
-    emoji: '🏆',
+    category: 'performance',
     keywords: ['personal best', 'pb', 'new low', 'best score', 'best round', 'career low'],
   },
   {
-    id: 'break-80',
-    label: 'Breaking 80',
-    emoji: '7️⃣',
-    keywords: ['broke 80', 'break 80', 'breaking 80', 'under 80', '79', '78', '77', '76', '75', '74', '73', '72'],
+    id: 'best-front-9',
+    label: 'Best Front 9',
+    category: 'performance',
+    keywords: ['best front 9', 'front nine', 'best front nine', 'front 9 pb'],
   },
   {
-    id: 'break-90',
-    label: 'Breaking 90',
-    emoji: '8️⃣',
-    keywords: ['broke 90', 'break 90', 'breaking 90', 'under 90', '89', '88', '87', '86', '85', '84', '83', '82', '81'],
+    id: 'best-back-9',
+    label: 'Best Back 9',
+    category: 'performance',
+    keywords: ['best back 9', 'back nine', 'best back nine', 'back 9 pb'],
   },
   {
-    id: 'break-100',
-    label: 'Breaking 100',
-    emoji: '9️⃣',
-    keywords: ['broke 100', 'break 100', 'breaking 100', 'under 100', '99', '98', '97', '96', '95', '94', '93', '92', '91'],
+    id: 'longest-drive',
+    label: 'Longest Drive',
+    category: 'performance',
+    keywords: ['longest drive', 'bomb', 'bombed', 'crushed', 'smashed', 'distance'],
+  },
+  // Experience (3)
+  {
+    id: 'tournament',
+    label: 'Tournament Round',
+    category: 'experience',
+    keywords: ['tournament', 'competition', 'comp', 'medal', 'club championship'],
+  },
+  {
+    id: 'away-course',
+    label: 'Away Course',
+    category: 'experience',
+    keywords: ['away', 'visitor', 'guest', 'first time', 'new course', 'traveled'],
+  },
+  {
+    id: 'match-play',
+    label: 'Match Play Win',
+    category: 'experience',
+    keywords: ['match play', 'won match', 'beat', 'victory', '1 up', '2 up', '3 up'],
   },
 ];
 
