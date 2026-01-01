@@ -16,7 +16,7 @@ export function PostEventsBridge({ children }: PostEventsBridgeProps) {
   useEffect(() => {
     // Handle post:created events
     const offCreated = postEventBus.on('post:created', (evt) => {
-      // Invalidate actor-scoped feed
+      console.log('[PostEventsBridge] post:created', evt.actorType, evt.actorId);
 
       // Invalidate actor-scoped feed
       queryClient.invalidateQueries({
@@ -51,28 +51,10 @@ export function PostEventsBridge({ children }: PostEventsBridgeProps) {
       }
     });
 
-    // Handle post:updated events (e.g., after studio edits)
-    const offUpdated = postEventBus.on('post:updated', (evt) => {
-      // Invalidate actor-scoped feed
-      queryClient.invalidateQueries({
-        queryKey: postKeys.actorPosts(evt.actorType, evt.actorId),
-      });
-
-      // Invalidate trending/global feed
-      queryClient.invalidateQueries({
-        queryKey: postKeys.trending(),
-      });
-
-      // For personal posts, also invalidate the activity feed
-      if (evt.actorType === 'personal') {
-        queryClient.invalidateQueries({
-          queryKey: postKeys.activityPosts(evt.actorId),
-        });
-      }
-    });
-
     // Handle post:deleted events
     const offDeleted = postEventBus.on('post:deleted', (evt) => {
+      console.log('[PostEventsBridge] post:deleted', evt.actorType, evt.actorId);
+
       queryClient.invalidateQueries({
         queryKey: postKeys.actorPosts(evt.actorType, evt.actorId),
       });
@@ -94,7 +76,6 @@ export function PostEventsBridge({ children }: PostEventsBridgeProps) {
 
     return () => {
       offCreated();
-      offUpdated();
       offDeleted();
     };
   }, [queryClient]);

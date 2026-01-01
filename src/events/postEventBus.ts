@@ -1,11 +1,10 @@
 // Post event bus singleton
 
 import { SimpleEventBus } from './eventBus';
-import type { PostCreatedEvent, PostUpdatedEvent, PostDeletedEvent } from './postEvents';
+import type { PostCreatedEvent, PostDeletedEvent } from './postEvents';
 
 type PostEventMap = {
   'post:created': PostCreatedEvent;
-  'post:updated': PostUpdatedEvent;
   'post:deleted': PostDeletedEvent;
 };
 

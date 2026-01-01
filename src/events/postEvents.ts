@@ -11,13 +11,6 @@ export interface PostCreatedEvent {
   createdAt: string;      // ISO timestamp
 }
 
-export interface PostUpdatedEvent {
-  type: 'post:updated';
-  postId: string;
-  actorType: ActorType;
-  actorId: string;
-}
-
 export interface PostDeletedEvent {
   type: 'post:deleted';
   postId: string;
@@ -25,4 +18,4 @@ export interface PostDeletedEvent {
   actorId: string;
 }
 
-export type PostEvent = PostCreatedEvent | PostUpdatedEvent | PostDeletedEvent;
+export type PostEvent = PostCreatedEvent | PostDeletedEvent;
