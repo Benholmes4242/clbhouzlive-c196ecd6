@@ -24,72 +24,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
   const handlePostClick = (post: ActivityPost) => {
-    console.log('🔍 SocialActivity - Post clicked:', {
-      postId: post.id,
-      hasMedia: !!post.post_media?.length,
-      mediaUrl: post.post_media?.[0]?.media_url,
-      mediaType: post.post_media?.[0]?.media_type,
-      userId: post.user?.id,
-      currentUserId: userId
-    });
-
-    // Use canonical resolver, with content fallback for very old posts
-    const extractGolfCourseData = (post: ActivityPost) => {
-      // Try canonical resolver first (handles course_id + tags)
-      const resolved = resolveGolfCourse(post);
-      if (resolved) {
-        return {
-          id: resolved.id,
-          name: resolved.name || '',
-          country: resolved.country || '',
-          region: resolved.region || ''
-        };
-      }
-      
-      // Fallback: Try to extract from content (very old posts)
-      const courseFromContent = extractGolfCourseFromContent(post.content);
-      if (courseFromContent) {
-        return courseFromContent;
-      }
-      
-      return undefined;
-    };
-
-    // Transform ActivityPost to PostData format
-    const transformedPost = {
-      id: post.id,
-      content: post.content,
-      created_at: post.created_at,
-      user: post.user,
-      post_media: post.post_media || [],
-      post_tags: post.post_tags || [],
-      golfCourse: extractGolfCourseData(post)
-    };
-    
-    // Transform all posts
-    const transformedPosts = posts.map(p => ({
-      id: p.id,
-      content: p.content,
-      created_at: p.created_at,
-      user: p.user,
-      post_media: p.post_media || [],
-      post_tags: p.post_tags || [],
-      golfCourse: extractGolfCourseData(p)
-    }));
-    
-    // This function is now simplified - posts handle their own modals
-    console.log('🔍 SocialActivity - Setting selectedPost:', post);
     setSelectedPost(post);
   };
-
-  // Add logging for selectedPost changes
-  React.useEffect(() => {
-    console.log('🔍 SocialActivity - selectedPost changed:', {
-      hasSelectedPost: !!selectedPost,
-      selectedPostId: selectedPost?.id,
-      shouldRenderModal: !!selectedPost
-    });
-  }, [selectedPost]);
 
   const handlePostUpdated = () => {
     fetchUserPosts();

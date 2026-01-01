@@ -2,6 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } f
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { isCloudflareStreamUrl, uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface FeedVideoPlayerProps {
   src: string;
@@ -55,9 +56,9 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     }
   }, [uid, propHlsUrl, propPoster]);
 
-  // Use prop values first, then API values, then fallbacks
-  const hlsUrl = propHlsUrl || apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
-  const poster = propPoster || apiPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
+  // Use prop values first, then API values, then fallbacks using centralized config
+  const hlsUrl = propHlsUrl || apiHlsUrl || (uid ? generateStreamHlsUrl(uid) : null);
+  const poster = propPoster || apiPoster || (uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined);
 
   // PLAYBACK_AUTHORITY_ALLOWED: Exposes underlying HLSPlayer element for parent control via MediaRuntime
   useImperativeHandle(ref, () => {

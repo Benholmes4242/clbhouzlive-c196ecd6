@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2"
+import { generateStreamThumbnailUrl } from '../_shared/cloudflare-config.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -154,15 +155,15 @@ serve(async (req) => {
     }
 
 
-    // Helper to generate safe thumbnail URL
+    // Helper to generate safe thumbnail URL using shared config
     const getSafeThumbnailUrl = (mediaUrl: string, mediaType: string): string => {
       const isVideo = mediaType === 'video'
       
       if (isVideo) {
-        // For videos, extract UID and generate thumbnail URL
+        // For videos, extract UID and generate thumbnail URL from shared config
         const uid = extractStreamUidFromHls(mediaUrl)
         return uid 
-          ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`
+          ? generateStreamThumbnailUrl(uid)
           : mediaUrl // fallback to original if can't extract UID
       } else {
         // For images, use the R2 URL directly

@@ -12,6 +12,7 @@ import { useEffect, useRef } from 'react';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logHeroPreloadManifest } from '@/utils/discoverTimeline';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { ExploreContentItem } from '@/components/explore/types';
 
 const LANDSCAPE_THRESHOLD = 1.25;
@@ -77,7 +78,7 @@ export function useHeroPreload(content: ExploreContentItem[] | null): void {
     preloadStartedRef.current = true;
     
     // Start preloading manifest immediately
-    const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+    const hlsUrl = generateStreamHlsUrl(uid);
     
     console.log('[HeroPreload] Starting preload', {
       id: heroCandidate.id.slice(0, 8),

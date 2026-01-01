@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { normalizeError } from '../_shared/normalize-error.ts';
+import { generateStreamHlsUrl } from '../_shared/cloudflare-config.ts';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -81,8 +82,8 @@ serve(async (req) => {
             continue
           }
           
-          // Generate HLS manifest URL
-          const newHlsUrl = `https://videodelivery.net/${videoId}/manifest/video.m3u8`
+          // Generate HLS manifest URL using shared config
+          const newHlsUrl = generateStreamHlsUrl(videoId)
           
           // Update the database record
           const { error: updateError } = await supabase

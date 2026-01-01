@@ -19,6 +19,7 @@ import { useContinueWatching } from '@/hooks/useContinueWatching';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 export type VideoCategory = 'all' | 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
 
@@ -271,7 +272,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
     const uid = uidFromNode({ src: firstVideo.mediaUrl });
     if (uid) {
-      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      const hlsUrl = generateStreamHlsUrl(uid);
       if (import.meta.env.DEV) {
         console.log(`[${performance.now().toFixed(2)}ms] [VideosTab] LAYOUT_EFFECT_PRELOAD`, { 
           id: firstVideo.id.slice(0, 8) 

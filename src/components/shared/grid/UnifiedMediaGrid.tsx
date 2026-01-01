@@ -7,6 +7,7 @@ import { useMediaAutoplay } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logGridMount, logGridDataReady } from '@/utils/gridAuditTimeline';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useLazyTiles } from './useLazyTiles';
 
 // Debug logging for video lifecycle analysis
@@ -77,7 +78,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     if (videoUrl) {
       const uid = uidFromNode({ src: videoUrl });
       if (uid) {
-        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        const hlsUrl = generateStreamHlsUrl(uid);
         logGrid('LAYOUT_EFFECT_PRELOAD', { 
           id: firstVideo.id.slice(0, 8),
           hlsUrl: hlsUrl.slice(0, 50)

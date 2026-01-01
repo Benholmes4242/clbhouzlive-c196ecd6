@@ -6,6 +6,7 @@ import { OverlayCorners } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef, useMediaAutoplay, MediaRuntime } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import PostMeta from '@/components/posts/PostMeta';
 import {
   logHeroMount,
@@ -152,10 +153,9 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
 
     const uid = uidFromNode({ src: item.mediaUrl });
     if (uid) {
-      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
       logHero('LAYOUT_EFFECT_PRELOAD', { id: item.id.slice(0, 8) });
       logHeroPreloadManifest(item.id);
-      preloadHlsManifest(hlsUrl);
+      preloadHlsManifest(generateStreamHlsUrl(uid));
     }
   }, [item]);
 
