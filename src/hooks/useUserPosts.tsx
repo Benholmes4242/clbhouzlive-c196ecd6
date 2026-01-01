@@ -121,7 +121,7 @@ export const useUserPosts = () => {
           id: post.id,
           content: post.content,
           created_at: post.created_at,
-          badges: (post as any).badges || [],
+          badges: post.badges || [],
           user: {
             id: post.user_id,
             display_name: userProfile?.display_name || null,

@@ -137,7 +137,7 @@ export const useUserProfilePosts = (userId: string | null) => {
             id: post.id,
             content: post.content,
             created_at: post.created_at,
-            badges: (post as any).badges || [],
+            badges: post.badges || [],
             post_media: medias
           };
         });
