@@ -646,12 +646,13 @@ export default function CreateMomentModal({
             <button
               disabled={!hasMedia}
               onClick={handlePost}
-              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
               style={{
                 background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
                 border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
                 color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
-                boxShadow: hasMedia ? 'var(--cm-shadow-button)' : 'none',
+                boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
+                opacity: hasMedia ? 1 : 0.7,
               }}
             >
               Share

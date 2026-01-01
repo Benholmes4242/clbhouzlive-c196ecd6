@@ -39,13 +39,13 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      whileTap={{ scale: 0.92 }}
+      whileTap={{ scale: 0.98 }}
       animate={{ 
-        scale: shouldBounce ? [1, 1.06, 1] : 1,
+        scale: shouldBounce ? [1, 1.04, 1] : 1,
       }}
       transition={{ 
-        duration: 0.2,
-        scale: { duration: 0.25 }
+        duration: 0.15,
+        scale: { duration: 0.2 }
       }}
       onAnimationComplete={() => {
         if (shouldBounce) {
@@ -53,24 +53,25 @@ const ControlBarButton: React.FC<ControlBarButtonProps> = ({
         }
       }}
       className={cn(
-        "relative w-11 h-11 rounded-xl flex items-center justify-center transition-colors",
+        "relative w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-150",
         disabled && "opacity-40 cursor-not-allowed"
       )}
       style={{
         background: isActive ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
         border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
+        boxShadow: isActive ? '0 2px 6px rgba(0, 0, 0, 0.1)' : 'none',
       }}
       aria-label={ariaLabel}
     >
       <span style={{ color: isActive ? 'white' : 'var(--cm-icon-primary)' }}>
         {icon}
       </span>
-      {/* Active indicator dot - slate color, not orange */}
+      {/* Active indicator dot */}
       {isActive && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
+          className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
           style={{ 
             background: 'var(--cm-surface-slate)',
             border: '2px solid var(--cm-surface-card)',
@@ -151,10 +152,10 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-4">
         {/* Media picker */}
         <ControlBarButton
-          icon={<Image className="w-5 h-5" />}
+          icon={<Image className="w-[18px] h-[18px]" />}
           isActive={hasMedia}
           onClick={() => {
             dismissHint();
@@ -166,7 +167,7 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
 
         {/* Enhance */}
         <ControlBarButton
-          icon={<Sparkles className="w-5 h-5" />}
+          icon={<Sparkles className="w-[18px] h-[18px]" />}
           isActive={hasEnhanced}
           disabled={!hasMedia}
           onClick={() => {
@@ -178,7 +179,7 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
 
         {/* Categories */}
         <ControlBarButton
-          icon={<Tag className="w-5 h-5" />}
+          icon={<Tag className="w-[18px] h-[18px]" />}
           isActive={hasCategories}
           onClick={() => {
             dismissHint();
@@ -190,7 +191,7 @@ export const CreateMomentControlBar: React.FC<CreateMomentControlBarProps> = ({
 
         {/* Visibility */}
         <ControlBarButton
-          icon={<Eye className="w-5 h-5" />}
+          icon={<Eye className="w-[18px] h-[18px]" />}
           isActive={visibilityChanged}
           onClick={() => {
             dismissHint();

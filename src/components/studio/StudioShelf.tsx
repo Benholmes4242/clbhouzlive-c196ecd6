@@ -129,22 +129,30 @@ export default function StudioShelf({
             {/* Header - hide when collapsed */}
             {!isCollapsed && (
               <div 
-                className="flex items-center justify-between px-4 pb-3"
+                className="flex items-center justify-between px-4 pb-2"
                 style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
               >
-                <h3 
-                  className="text-lg font-semibold"
-                  style={{ color: 'var(--cm-text-primary)' }}
-                >
-                  Studio
-                </h3>
+                <div>
+                  <h3 
+                    className="text-base font-semibold"
+                    style={{ color: 'var(--cm-text-primary)' }}
+                  >
+                    Studio
+                  </h3>
+                  <p 
+                    className="text-[11px] mt-0.5"
+                    style={{ color: 'var(--cm-text-tertiary)' }}
+                  >
+                    Enhance your moment
+                  </p>
+                </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                   style={{ background: 'var(--cm-surface-alt)' }}
                   aria-label="Close Studio"
                 >
-                  <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                  <X className="w-3.5 h-3.5" style={{ color: 'var(--cm-icon-primary)' }} />
                 </button>
               </div>
             )}
@@ -243,13 +251,25 @@ export default function StudioShelf({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="text-center px-6 py-12">
-                      <div className="text-4xl mb-3">✨</div>
-                      <p className="font-medium" style={{ color: 'var(--cm-text-primary)' }}>
-                        Select a tool to get started
+                    <div className="text-center px-6 py-8">
+                      <motion.div 
+                        className="text-3xl mb-2"
+                        animate={{ 
+                          opacity: [0.7, 1, 0.7],
+                        }}
+                        transition={{ 
+                          duration: 2.5,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        ✨
+                      </motion.div>
+                      <p className="text-sm font-medium" style={{ color: 'var(--cm-text-primary)' }}>
+                        Choose a tool to enhance your moment
                       </p>
-                      <p className="text-sm mt-1" style={{ color: 'var(--cm-text-secondary)' }}>
-                        Add music, text, filters, or edit your media
+                      <p className="text-xs mt-1" style={{ color: 'var(--cm-text-tertiary)' }}>
+                        Add music, text, filters, or fine-tune your clip
                       </p>
                     </div>
                   </motion.div>
@@ -260,7 +280,7 @@ export default function StudioShelf({
             {/* Footer - hide when collapsed */}
             {!isCollapsed && (
               <div 
-                className="px-4 pt-3 flex gap-3"
+                className="px-4 pt-2.5 flex gap-2.5"
                 style={{ 
                   borderTop: '1px solid var(--cm-border-subtle)',
                   paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
@@ -269,11 +289,11 @@ export default function StudioShelf({
               >
                 <button
                   onClick={onClose}
-                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors"
                   style={{ 
                     background: 'var(--cm-surface-alt)',
                     border: '1px solid var(--cm-border-subtle)',
-                    color: 'var(--cm-text-primary)',
+                    color: 'var(--cm-text-secondary)',
                   }}
                 >
                   Cancel
@@ -282,10 +302,11 @@ export default function StudioShelf({
                   onClick={() => {
                     onClose();
                   }}
-                  className="flex-1 py-3 rounded-xl font-semibold transition-colors"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
                   style={{ 
                     background: 'var(--cm-surface-slate)',
                     color: 'white',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                   }}
                 >
                   Done

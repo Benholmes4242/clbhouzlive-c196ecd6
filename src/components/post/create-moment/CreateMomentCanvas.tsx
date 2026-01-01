@@ -98,24 +98,24 @@ export default function CreateMomentCanvas({
 
   return (
     <div 
-      className="flex flex-col px-4 gap-4"
+      className="flex flex-col px-4 gap-3"
       style={{
-        paddingTop: '12px',
-        paddingBottom: '12px',
+        paddingTop: '10px',
+        paddingBottom: '10px',
         touchAction: 'pan-y',
         background: 'var(--cm-surface-card)',
       }}
       data-ecm-scroll-container="true"
     >
-      {/* Posting As Selector */}
+      {/* Posting As Selector - Tighter rhythm */}
       {availableActors.length > 1 && (
         <div 
-          className="flex items-center justify-between py-1"
+          className="flex items-center justify-between py-0.5"
           style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
         >
           <div>
-            <span className="text-[14px] font-semibold" style={{ color: 'var(--cm-text-primary)' }}>Posting as</span>
-            <p className="text-[12px] mt-0.5" style={{ color: 'var(--cm-text-primary)', opacity: 0.7 }}>
+            <span className="text-[13px] font-semibold" style={{ color: 'var(--cm-text-primary)' }}>Posting as</span>
+            <p className="text-[11px] mt-0.5" style={{ color: 'var(--cm-text-primary)', opacity: 0.6 }}>
               This moment will appear on this profile
             </p>
           </div>
@@ -123,7 +123,7 @@ export default function CreateMomentCanvas({
         </div>
       )}
 
-      {/* Caption Input - Large, emotional core */}
+      {/* Caption Input - Large, emotional core with subtle inset feel */}
       <div className="flex flex-col relative">
         <textarea
           ref={textareaRef}
@@ -131,12 +131,14 @@ export default function CreateMomentCanvas({
           style={{
             background: 'var(--cm-surface-input)',
             border: '1px solid var(--cm-border-subtle)',
+            boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)',
             color: 'var(--cm-text-primary)',
-            minHeight: '64px',
+            minHeight: '60px',
             maxHeight: '140px',
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
-            WebkitAppearance: 'none'
+            WebkitAppearance: 'none',
+            ['--tw-placeholder-opacity' as string]: '0.65',
           }}
           placeholder="Add a caption..."
           value={caption}
