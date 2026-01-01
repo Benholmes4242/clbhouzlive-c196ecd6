@@ -294,12 +294,12 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                     onClick={() => setSelectedTone(tone.id)}
                     disabled={isLoading}
                     className={cn(
-                      "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all",
+                      "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-150",
                     )}
                     style={{
-                      background: selectedTone === tone.id ? 'var(--cm-surface-card)' : 'transparent',
-                      color: selectedTone === tone.id ? 'var(--cm-text-primary)' : 'var(--cm-text-tertiary)',
-                      boxShadow: selectedTone === tone.id ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      background: selectedTone === tone.id ? 'var(--cm-accent-subtle)' : 'transparent',
+                      color: selectedTone === tone.id ? 'var(--cm-accent)' : 'var(--cm-text-tertiary)',
+                      border: selectedTone === tone.id ? '1px solid var(--cm-accent-muted)' : '1px solid transparent',
                     }}
                   >
                     {tone.label}
@@ -502,16 +502,22 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                 }}
               />
 
-              {/* Minimal Toggles */}
+              {/* Minimal Toggles - Slate styled */}
               <div className="flex items-center gap-4 pt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={allowEmojis}
-                    onChange={(e) => setAllowEmojis(e.target.checked)}
-                    disabled={isLoading}
-                    className="w-3.5 h-3.5 rounded accent-[var(--cm-accent)]"
-                  />
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div 
+                    className={cn(
+                      "w-4 h-4 rounded flex items-center justify-center transition-all duration-150",
+                      allowEmojis ? "bg-[var(--cm-accent)]" : "bg-[var(--cm-surface-alt)] border border-[var(--cm-border)]"
+                    )}
+                    onClick={() => !isLoading && setAllowEmojis(!allowEmojis)}
+                  >
+                    {allowEmojis && (
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
                   <span 
                     className="text-xs"
                     style={{ color: 'var(--cm-text-tertiary)' }}
@@ -519,14 +525,20 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                     Emojis
                   </span>
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={shortMode}
-                    onChange={(e) => setShortMode(e.target.checked)}
-                    disabled={isLoading}
-                    className="w-3.5 h-3.5 rounded accent-[var(--cm-accent)]"
-                  />
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div 
+                    className={cn(
+                      "w-4 h-4 rounded flex items-center justify-center transition-all duration-150",
+                      shortMode ? "bg-[var(--cm-accent)]" : "bg-[var(--cm-surface-alt)] border border-[var(--cm-border)]"
+                    )}
+                    onClick={() => !isLoading && setShortMode(!shortMode)}
+                  >
+                    {shortMode && (
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
                   <span 
                     className="text-xs"
                     style={{ color: 'var(--cm-text-tertiary)' }}
@@ -537,14 +549,15 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
               </div>
             </div>
 
-            {/* Generate Button - Primary CTA */}
+            {/* Generate Button - Primary CTA (Slate to match Done) */}
             <button
               onClick={handleGenerate}
               disabled={isLoading}
-              className="w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all"
+              className="w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-150"
               style={{
-                background: isLoading ? 'var(--cm-surface-alt)' : 'var(--cm-accent)',
+                background: isLoading ? 'var(--cm-surface-alt)' : 'var(--cm-surface-slate)',
                 color: isLoading ? 'var(--cm-text-tertiary)' : 'white',
+                boxShadow: isLoading ? 'none' : 'var(--cm-shadow-button)',
               }}
             >
               {isLoading ? (
@@ -668,10 +681,11 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
               <button
                 onClick={handleAddToPost}
                 disabled={selectedCaptionIndex === null}
-                className="flex-1 py-2.5 rounded-xl font-medium transition-all"
+                className="flex-1 py-2.5 rounded-xl font-medium transition-all duration-150"
                 style={{
-                  background: selectedCaptionIndex !== null ? 'var(--cm-accent)' : 'var(--cm-surface-alt)',
+                  background: selectedCaptionIndex !== null ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
                   color: selectedCaptionIndex !== null ? 'white' : 'var(--cm-text-tertiary)',
+                  boxShadow: selectedCaptionIndex !== null ? 'var(--cm-shadow-button)' : 'none',
                 }}
               >
                 Add to Post
@@ -724,7 +738,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                       onClick={() => handleReplaceDecision('replace')}
                       className="flex-1 py-2.5 rounded-xl font-medium"
                       style={{
-                        background: 'var(--cm-accent)',
+                        background: 'var(--cm-surface-slate)',
                         color: 'white',
                       }}
                     >

@@ -34,9 +34,10 @@
   /* Backdrop */
   --cm-backdrop: rgba(31, 36, 40, 0.35);
   
-  /* Accent */
-  --cm-accent: #F7931E;
-  --cm-accent-subtle: rgba(247, 147, 30, 0.15);
+  /* Accent - Slate based (no orange) */
+  --cm-accent: #3A3F46;
+  --cm-accent-subtle: rgba(58, 63, 70, 0.10);
+  --cm-accent-muted: rgba(58, 63, 70, 0.50);
   
   /* Shadows */
   --cm-shadow-soft: 0 4px 24px rgba(31, 36, 40, 0.08);
