@@ -5,6 +5,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import MediaDisplay from '@/components/explore/MediaDisplay';
 import { QuickReactionButton } from './QuickReactionButton';
 import { usePostReactions } from '@/hooks/usePostReactions';
+import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 
 interface FullscreenPostFeedProps {
   content: ExploreContentItem[];
@@ -158,6 +159,8 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           muted={isMuted}
           studioEdits={currentPost.media?.[0]?.studio_edits}
         />
+        {/* Achievement Badges Overlay - Top Left */}
+        <AchievementBadgesOverlay badgeIds={currentPost.badges} className="top-14 left-4" />
       </div>
 
       {/* Navigation Arrows */}

@@ -64,6 +64,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
           created_at,
           user_id,
           course_id,
+          badges,
           post_media!inner (
             media_url,
             media_type,

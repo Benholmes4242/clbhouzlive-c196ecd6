@@ -5,7 +5,7 @@ async function prefetchUserBundle(userId: string) {
   // parallel fetches
   const profile = supabase.from('user_profiles').select('*').eq('id', userId).maybeSingle();
   const media = supabase.from('posts')
-    .select('id, created_at, post_media(id, media_url, media_type, width, height, duration_seconds)')
+    .select('id, created_at, badges, post_media(id, media_url, media_type, width, height, duration_seconds)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(20);
