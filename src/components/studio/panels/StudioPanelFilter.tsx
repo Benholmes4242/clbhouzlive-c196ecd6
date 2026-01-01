@@ -43,13 +43,37 @@ export default function StudioPanelFilter({
 
   return (
     <div className="flex flex-col h-full">
+      {/* Large live preview of current filter */}
+      <div className="px-4 pt-2 pb-3">
+        <div className="relative aspect-[4/3] max-h-[200px] rounded-xl overflow-hidden" style={{ background: 'var(--cm-surface-alt)' }}>
+          {previewUrl ? (
+            <div className={cn("w-full h-full", getFilterClass(selectedFilter))}>
+              <img 
+                src={previewUrl} 
+                alt="Filter preview"
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+            </div>
+          ) : (
+            <div 
+              className={cn(
+                "w-full h-full bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600",
+                getFilterClass(selectedFilter)
+              )}
+            />
+          )}
+          {/* Current filter label overlay */}
+          <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm">
+            <span className="text-xs font-medium text-white">{selectedLabel}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Filter presets - horizontal scrollable */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 pt-0 space-y-3">
         <div className="flex items-center justify-between">
-          <label className="block text-body-sm font-medium text-zinc-700">Filter</label>
-          <span className="text-xs text-zinc-500">
-            Selected: <span className="font-medium text-zinc-700">{selectedLabel}</span>
-          </span>
+          <label className="block text-body-sm font-medium" style={{ color: 'var(--cm-text-secondary)' }}>Choose a filter</label>
         </div>
         
         {/* Horizontal scroll container */}
@@ -64,12 +88,16 @@ export default function StudioPanelFilter({
                   className={cn(
                     "flex-shrink-0 w-[72px] rounded-lg overflow-hidden transition-all",
                     isSelected
-                      ? 'ring-2 ring-zinc-900 ring-offset-1 scale-[1.02]'
-                      : 'ring-1 ring-zinc-200 hover:ring-zinc-300'
+                      ? 'ring-2 ring-offset-1 scale-[1.02]'
+                      : 'ring-1 hover:ring-2'
                   )}
+                  style={{
+                    '--tw-ring-color': isSelected ? 'var(--cm-text-primary)' : 'var(--cm-border)',
+                    '--tw-ring-offset-color': 'var(--cm-surface-card)',
+                  } as React.CSSProperties}
                 >
                   {/* Preview tile with filter applied */}
-                  <div className="aspect-square relative overflow-hidden bg-zinc-100">
+                  <div className="aspect-square relative overflow-hidden" style={{ background: 'var(--cm-surface-alt)' }}>
                     {previewUrl ? (
                       <div className={cn("w-full h-full", getFilterClass(filter.id))}>
                         <img 
@@ -90,7 +118,10 @@ export default function StudioPanelFilter({
                     
                     {/* Selected indicator */}
                     {isSelected && (
-                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-zinc-900 flex items-center justify-center">
+                      <div 
+                        className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center"
+                        style={{ background: 'var(--cm-text-primary)' }}
+                      >
                         <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
@@ -99,14 +130,16 @@ export default function StudioPanelFilter({
                   </div>
                   
                   {/* Label */}
-                  <div className={cn(
-                    "py-1.5 px-1 text-center",
-                    isSelected ? 'bg-zinc-900' : 'bg-white'
-                  )}>
-                    <span className={cn(
-                      "text-[11px] font-medium block truncate",
-                      isSelected ? 'text-white' : 'text-zinc-600'
-                    )}>
+                  <div 
+                    className="py-1.5 px-1 text-center"
+                    style={{ 
+                      background: isSelected ? 'var(--cm-text-primary)' : 'var(--cm-surface-card)',
+                    }}
+                  >
+                    <span 
+                      className="text-[11px] font-medium block truncate"
+                      style={{ color: isSelected ? 'white' : 'var(--cm-text-secondary)' }}
+                    >
                       {filter.label}
                     </span>
                   </div>
@@ -121,16 +154,28 @@ export default function StudioPanelFilter({
       <div className="flex-1" />
 
       {/* Actions */}
-      <div className="p-4 border-t border-zinc-200 flex gap-3">
+      <div 
+        className="p-4 flex gap-3"
+        style={{ borderTop: '1px solid var(--cm-border-subtle)' }}
+      >
         <button
           onClick={onReset}
-          className="flex-1 py-2.5 rounded-sq-sm border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
+          className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
+          style={{ 
+            background: 'var(--cm-surface-alt)',
+            border: '1px solid var(--cm-border-subtle)',
+            color: 'var(--cm-text-primary)',
+          }}
         >
           Reset
         </button>
         <button
           onClick={onApply}
-          className="flex-1 py-2.5 rounded-sq-sm bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
+          className="flex-1 py-2.5 rounded-xl font-semibold transition-colors"
+          style={{ 
+            background: 'var(--cm-surface-slate)',
+            color: 'white',
+          }}
         >
           Apply
         </button>
