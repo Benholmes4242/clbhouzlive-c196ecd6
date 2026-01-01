@@ -42,7 +42,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
 
   const handleSubmit = async (data: any) => {
     // Derive files from mediaItems only (single source of truth)
-    const files = mediaItems.map(item => item.file);
+    const files = mediaItems.map(item => item.file).filter((f): f is File => !!f);
     
     // Strict validation: no media, no post (except achievements)
     if (files.length === 0 && !data.achievementId) {

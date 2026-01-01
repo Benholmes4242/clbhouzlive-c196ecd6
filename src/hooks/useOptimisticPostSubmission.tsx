@@ -12,7 +12,7 @@ interface PostSubmissionData {
   user: any;
   content: string;
   mediaFiles: File[];
-  mediaItems?: Array<{ id: string; file: File }>;
+  mediaItems?: Array<{ id: string; file?: File; compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number } }>;
   selectedTags: any[];
   courseInfo?: {
     id: string;

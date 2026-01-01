@@ -9,6 +9,7 @@ interface EnhanceOption {
   icon: React.ReactNode;
   isPremium?: boolean;
   comingSoon?: boolean;
+  requiresMultipleVideos?: boolean;
 }
 
 const ENHANCE_OPTIONS: EnhanceOption[] = [
@@ -35,7 +36,7 @@ const ENHANCE_OPTIONS: EnhanceOption[] = [
     label: 'Smart Compilation',
     description: 'Merge multiple clips into one video',
     icon: <Film className="w-5 h-5" />,
-    comingSoon: true,
+    requiresMultipleVideos: true,
   },
   {
     id: 'magic-enhance',

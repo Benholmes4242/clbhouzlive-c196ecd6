@@ -24,10 +24,17 @@ export type ComposerMediaType = "image" | "video";
 export interface ComposerMediaItem {
   id: string;
   type: ComposerMediaType;
-  file: File;
+  file?: File;  // Optional for compiled videos (server-generated)
   previewUrl: string; // blob URL
   thumbnailUrl?: string; // for videos: a generated poster image blob URL
   duration?: number;  // optional for video
+  // For server-compiled videos (Smart Compilation)
+  compiledVideo?: {
+    streamId: string;
+    playbackUrl: string;
+    posterUrl: string;
+    duration: number;
+  };
 }
 
 type SnapState = {
