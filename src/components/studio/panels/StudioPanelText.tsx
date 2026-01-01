@@ -126,6 +126,7 @@ export default function StudioPanelText({
   }, [textBoxes, updateEdits]);
 
   const selected = textBoxes.find(box => box.id === selectedBox);
+  const hasTextLayers = textBoxes.length > 0;
 
   // Compact view when positioning
   if (isPositioningText) {
@@ -150,117 +151,131 @@ export default function StudioPanelText({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Layers header */}
-      <div className="px-4 pt-3 pb-2 flex items-center gap-2">
-        <Layers className="w-4 h-4 text-zinc-500" />
-        <span className="text-sm font-medium text-zinc-700">Layers</span>
-        <span className="text-xs text-zinc-400 ml-auto">{textBoxes.length} text{textBoxes.length !== 1 ? 's' : ''}</span>
+      {/* Layers header - compact */}
+      <div className="px-3 pt-2 pb-1.5 flex items-center gap-2">
+        <Layers className="w-3.5 h-3.5 text-zinc-400" />
+        <span className="text-xs font-medium text-zinc-600">Layers</span>
+        <span className="text-[11px] text-zinc-400 ml-auto">{textBoxes.length}</span>
       </div>
       
-      {/* Text boxes list (Layers) */}
-      <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
-        {textBoxes.length === 0 ? (
-          <div className="text-center py-8 text-zinc-500">
-            <p className="text-sm">No text added yet</p>
-            <p className="text-xs mt-1">Tap + to add text to your media</p>
-          </div>
+      {/* Text boxes list (Layers) OR empty state CTA */}
+      <div className="flex-1 overflow-y-auto px-3 pb-2">
+        {!hasTextLayers ? (
+          /* Empty state: Single clear CTA */
+          <button
+            onClick={addTextBox}
+            className="w-full py-4 rounded-lg border border-dashed border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50 transition-colors flex flex-col items-center justify-center gap-1"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="text-sm font-medium">Add Text</span>
+          </button>
         ) : (
-          // Render in reverse order so newest appears at top
-          [...textBoxes].reverse().map((box, reverseIndex) => {
-            const isSelected = selectedBox === box.id;
-            const isTopLayer = reverseIndex === 0;
-            
-            return (
-              <div
-                key={box.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleSelectBox(box.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSelectBox(box.id);
-                  }
-                }}
-                className={cn(
-                  "w-full p-3 rounded-lg border text-left transition-colors cursor-pointer",
-                  isSelected
-                    ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
-                    : 'border-zinc-200 bg-white hover:bg-zinc-50'
-                )}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-zinc-900 truncate flex-1">{box.text}</span>
-                  <div className="flex items-center gap-2">
-                    {/* Bring to front button */}
-                    {!isTopLayer && isSelected && (
+          /* Layers list - compact rows */
+          <div className="space-y-1.5">
+            {[...textBoxes].reverse().map((box, reverseIndex) => {
+              const isSelected = selectedBox === box.id;
+              const isTopLayer = reverseIndex === 0;
+              
+              return (
+                <div
+                  key={box.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelectBox(box.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelectBox(box.id);
+                    }
+                  }}
+                  className={cn(
+                    "w-full px-2.5 py-2 rounded-lg border text-left transition-colors cursor-pointer",
+                    isSelected
+                      ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
+                      : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-zinc-900 truncate flex-1">{box.text}</span>
+                    <div className="flex items-center gap-1.5">
+                      {/* Bring to front button */}
+                      {!isTopLayer && isSelected && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            bringToFront(box.id);
+                          }}
+                          className="text-zinc-400 hover:text-zinc-600 p-0.5"
+                          title="Bring to front"
+                        >
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          bringToFront(box.id);
+                          removeBox(box.id);
                         }}
-                        className="text-zinc-400 hover:text-zinc-600 p-1"
-                        title="Bring to front"
+                        className="text-zinc-400 hover:text-red-500 text-[11px]"
                       >
-                        <ChevronUp className="w-4 h-4" />
+                        Remove
                       </button>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeBox(box.id);
-                      }}
-                      className="text-zinc-400 hover:text-red-500 text-xs"
-                    >
-                      Remove
-                    </button>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-zinc-400 mt-0.5">
+                    {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
                   </div>
                 </div>
-                <div className="text-xs text-zinc-500 mt-1">
-                  {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
-                  {box.rotation ? ` • ${Math.round(box.rotation)}°` : ''}
-                </div>
-              </div>
-            );
-          })
+              );
+            })}
+            
+            {/* Inline add button when layers exist */}
+            <button
+              onClick={addTextBox}
+              className="w-full py-2 rounded-lg border border-dashed border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50 transition-colors flex items-center justify-center gap-1.5 text-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="font-medium">Add</span>
+            </button>
+          </div>
         )}
       </div>
 
-      {/* Controls for selected box */}
+      {/* Controls for selected box - compact */}
       {selected && (
-        <div className="p-4 border-t border-zinc-200 bg-white space-y-4 max-h-[50vh] overflow-y-auto">
-          {/* Text input */}
+        <div className="px-3 py-2.5 border-t border-zinc-100 bg-white space-y-2.5 max-h-[45vh] overflow-y-auto">
+          {/* Text input - compact */}
           <div>
-            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Text</label>
             <input
               type="text"
               value={selected.text}
               onChange={(e) => updateBox(selected.id, { text: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:outline-none focus:border-[rgba(255,156,64,0.5)]"
+              placeholder="Enter text..."
+              className="w-full px-2.5 py-1.5 rounded-md border border-zinc-200 text-sm focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:ring-1 focus:ring-[rgba(255,156,64,0.2)]"
             />
           </div>
 
-          {/* Position on media button */}
+          {/* Position on media button - secondary style */}
           {onTogglePositionMode && (
             <button
               onClick={onTogglePositionMode}
-              className="w-full py-3 rounded-lg bg-zinc-100 hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 text-zinc-800 font-medium"
+              className="w-full py-2 rounded-md bg-zinc-50 hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1.5 text-zinc-600 text-xs font-medium"
             >
-              <Move className="w-5 h-5" />
+              <Move className="w-3.5 h-3.5" />
               Position on media
             </button>
           )}
 
-          {/* Style selector - horizontal scrolling chips */}
+          {/* Style selector - compact chips */}
           <div>
-            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Style</label>
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+            <label className="block text-[11px] font-medium text-zinc-500 mb-1.5">Style</label>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
               {STYLE_PRESETS.map(preset => (
                 <button
                   key={preset.id}
                   onClick={() => updateBox(selected.id, { style: preset.id })}
                   className={cn(
-                    "flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-lg border transition-all min-w-[60px]",
+                    "flex-shrink-0 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-md border transition-all min-w-[48px]",
                     selected.style === preset.id
                       ? 'border-zinc-900 bg-zinc-900 text-white'
                       : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
@@ -268,22 +283,22 @@ export default function StudioPanelText({
                 >
                   <span 
                     className={cn(
-                      "text-base leading-none",
+                      "text-sm leading-none",
                       PREVIEW_FONTS[preset.id],
                       selected.style === preset.id ? 'text-white' : 'text-zinc-900'
                     )}
                   >
                     {preset.preview}
                   </span>
-                  <span className="text-[10px] font-medium">{preset.label}</span>
+                  <span className="text-[9px] font-medium">{preset.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Scale slider */}
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Size</label>
+          {/* Size slider - compact */}
+          <div className="flex items-center gap-2">
+            <label className="text-[11px] font-medium text-zinc-500 w-8">Size</label>
             <input
               type="range"
               min="0.6"
@@ -291,23 +306,23 @@ export default function StudioPanelText({
               step="0.1"
               value={selected.scale}
               onChange={(e) => updateBox(selected.id, { scale: parseFloat(e.target.value) })}
-              className="w-full accent-zinc-900"
+              className="flex-1 accent-zinc-900 h-1"
             />
-            <div className="text-xs text-zinc-500 mt-1">{(selected.scale * 100).toFixed(0)}%</div>
+            <span className="text-[11px] text-zinc-500 w-8 text-right">{(selected.scale * 100).toFixed(0)}%</span>
           </div>
 
-          {/* Color picker */}
+          {/* Color picker - compact */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Color</label>
-            <div className="flex gap-2 flex-wrap">
+            <label className="block text-[11px] font-medium text-zinc-500 mb-1.5">Color</label>
+            <div className="flex gap-1.5 flex-wrap">
               {COLORS.map(color => (
                 <button
                   key={color}
                   onClick={() => updateBox(selected.id, { color })}
                   className={cn(
-                    "w-9 h-9 rounded-lg border-2 transition-all",
+                    "w-7 h-7 rounded-md border-2 transition-all",
                     selected.color === color
-                      ? 'border-zinc-900 scale-110 ring-2 ring-zinc-900/20'
+                      ? 'border-zinc-900 scale-105 ring-1 ring-zinc-900/20'
                       : 'border-zinc-200 hover:scale-105'
                   )}
                   style={{ backgroundColor: color }}
@@ -317,33 +332,6 @@ export default function StudioPanelText({
           </div>
         </div>
       )}
-
-      {/* Add button */}
-      <div className="p-4 border-t border-zinc-200">
-        <button
-          onClick={addTextBox}
-          className="w-full py-3 rounded-lg border-2 border-dashed border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50 transition-colors flex items-center justify-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          <span className="font-medium">Add Text</span>
-        </button>
-      </div>
-
-      {/* Actions */}
-      <div className="p-4 border-t border-zinc-200 flex gap-3">
-        <button
-          onClick={onReset}
-          className="flex-1 py-2.5 rounded-lg border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
-        >
-          Reset
-        </button>
-        <button
-          onClick={onApply}
-          className="flex-1 py-2.5 rounded-lg bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
-        >
-          Apply
-        </button>
-      </div>
     </div>
   );
 }
