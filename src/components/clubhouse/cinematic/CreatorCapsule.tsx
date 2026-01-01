@@ -14,6 +14,26 @@ import { ChevronUp, User, Music } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 
+/** Animated soundwave bars for music playback indicator */
+const SoundwaveAnimation: React.FC = () => (
+  <div className="flex items-center gap-0.5 h-3 ml-2 flex-shrink-0">
+    {[0, 1, 2].map((i) => (
+      <motion.div
+        key={i}
+        className="w-0.5 bg-white/60 rounded-full"
+        animate={{
+          height: ['3px', '12px', '6px', '10px', '3px'],
+        }}
+        transition={{
+          duration: 0.8,
+          repeat: Infinity,
+          delay: i * 0.15,
+        }}
+      />
+    ))}
+  </div>
+);
+
 interface GolfCourseInfo {
   id?: string | null;
   name?: string | null;
@@ -39,6 +59,8 @@ interface CreatorCapsuleProps {
   golfCourse?: GolfCourseInfo | null;
   /** Music track info - only shown when audioMode === 'music_only' */
   musicTrack?: MusicTrackInfo | null;
+  /** Whether music is currently playing (unmuted + has music) */
+  isMusicPlaying?: boolean;
   isFollowing?: boolean;
   isOwnPost?: boolean;
   isVisible: boolean;
@@ -53,6 +75,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   caption,
   golfCourse,
   musicTrack,
+  isMusicPlaying = false,
   isFollowing = false,
   isOwnPost = false,
   isVisible,
@@ -151,10 +174,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           )}
         >
           <Music className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-          <span className="text-[12px] text-white/60 truncate">
+          <span className="text-[12px] text-white/60 truncate flex-1 min-w-0">
             {musicTrack.title}
             {musicTrack.artist && ` • ${musicTrack.artist}`}
           </span>
+          {/* Soundwave animation - only visible when music is playing (unmuted) */}
+          {isMusicPlaying && <SoundwaveAnimation />}
         </button>
       )}
 
