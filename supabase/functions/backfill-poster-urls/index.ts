@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { normalizeError } from '../_shared/normalize-error.ts';
+import { generateStreamThumbnailUrl } from '../_shared/cloudflare-config.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,11 +10,11 @@ const corsHeaders = {
 function getStreamIdFromUrl(url: string): string | null {
   if (!url) return null;
   
-  // Match various Cloudflare Stream URL patterns
+  // Match various Cloudflare Stream URL patterns (detection only)
   const patterns = [
     /\/([a-f0-9]{32})\/manifest\/video\.m3u8/i,
     /\/([a-f0-9]{32})\/thumbnails\//i,
-    /videodelivery\.net\/([a-f0-9]{32})/i,
+    /videodelivery\.net\/([a-f0-9]{32})/i, // Detection only - for parsing legacy URLs
     /customer-[^.]+\.cloudflarestream\.com\/([a-f0-9]{32})/i
   ];
   
@@ -61,7 +62,8 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const posterUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?time=1s`;
+      // Use centralized URL generator - always uses customer subdomain
+      const posterUrl = generateStreamThumbnailUrl(streamId, { time: '1s' });
       
       const { error: updateError } = await supabaseClient
         .from('post_media')
@@ -99,7 +101,8 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const posterUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?time=1s`;
+      // Use centralized URL generator - always uses customer subdomain
+      const posterUrl = generateStreamThumbnailUrl(streamId, { time: '1s' });
       
       const { error: updateError } = await supabaseClient
         .from('course_review_media')
