@@ -30,6 +30,7 @@ import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 
 // Video ref management - keep only current + neighbors to prevent memory leaks
 const MAX_VIDEO_REFS = 20;
@@ -790,7 +791,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 </div>
               )}
 
-              {/* Media Content - Full viewport */}
+              {/* Achievement Badges - Top Left, below close button */}
+              <AchievementBadgesOverlay badgeIds={item.badges} className="top-14 left-6" />
               <div 
                 className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden"
               >

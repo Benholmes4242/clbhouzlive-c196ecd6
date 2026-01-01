@@ -189,6 +189,7 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
           user,
           business,
           categories: post.categories || [],
+          badges: post.badges || [],
           title: post.content || '',
           likes: 0, // De-emphasized per Phase 4
           comments: 0,

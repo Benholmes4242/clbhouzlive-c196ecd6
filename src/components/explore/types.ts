@@ -83,6 +83,7 @@ export interface ExploreContentItem {
   width?: number; // Encoded media width
   height?: number; // Encoded media height
   categories?: string[]; // Category IDs from Create Moment (e.g., 'funny', 'tips-coaching')
+  badges?: string[]; // Achievement badges (e.g., 'birdie', 'eagle', 'hio')
 }
 
 export interface CTAContentItem {
