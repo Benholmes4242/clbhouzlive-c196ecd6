@@ -57,9 +57,9 @@ export const useUserPosts = () => {
           content,
           created_at,
           user_id,
-          actor_type,
-          actor_id
+          actor_type
         `)
+        .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .or(visibilityFilter) // Apply visibility filter
         .order('created_at', { ascending: false })
         .limit(10); // Limit initial load for performance
