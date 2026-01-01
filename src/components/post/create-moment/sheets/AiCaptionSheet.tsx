@@ -1,0 +1,690 @@
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Sparkles, RefreshCw, Loader2, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+// Tone options (single-select)
+const TONE_OPTIONS = [
+  { id: 'classic', label: 'Classic' },
+  { id: 'funny', label: 'Funny' },
+  { id: 'hype', label: 'Hype' },
+  { id: 'minimal', label: 'Minimal' },
+  { id: 'story', label: 'Story' },
+] as const;
+
+// Moment type options (single-select)
+const MOMENT_TYPE_OPTIONS = [
+  { id: 'casual-round', label: 'Casual Round' },
+  { id: 'tournament', label: 'Tournament' },
+  { id: 'practice-range', label: 'Practice / Range' },
+  { id: 'new-course', label: 'New Course' },
+  { id: 'golf-trip', label: 'Golf Trip / Travel' },
+  { id: 'lesson-coaching', label: 'Lesson / Coaching' },
+  { id: 'matchplay-team', label: 'Matchplay / Team Day' },
+  { id: 'sunset-golden', label: 'Sunset / Golden Hour' },
+] as const;
+
+// Context token options (multi-select)
+const CONTEXT_TOKENS = [
+  // Score achievements
+  'Birdie', 'Eagle', 'Par', 'Bogey', 'Double',
+  // Personal achievements
+  'PB / Personal Best', 'Clutch Putt',
+  // Round context
+  'Back Nine', 'Front Nine',
+  // Stats
+  'Fairways Hit', 'Greens in Reg', 'Up & Down', 'Bunker Save',
+  // Shots
+  'Long Drive', 'Nearest the Pin',
+  // Gear
+  'New Clubs / New Driver',
+  // Social
+  'Playing Partners',
+  // Conditions
+  'Windy / Links Day', 'Fast Greens',
+] as const;
+
+type ToneId = typeof TONE_OPTIONS[number]['id'];
+type MomentTypeId = typeof MOMENT_TYPE_OPTIONS[number]['id'];
+
+interface GeneratedCaption {
+  text: string;
+  hashtags: string[];
+}
+
+interface AiCaptionSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onInsertCaption: (caption: string, mode: 'replace' | 'append') => void;
+  existingCaption: string;
+  prefilledCourseName?: string;
+}
+
+export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
+  isOpen,
+  onClose,
+  onInsertCaption,
+  existingCaption,
+  prefilledCourseName,
+}) => {
+  // Selection state
+  const [selectedTone, setSelectedTone] = useState<ToneId>('classic');
+  const [selectedMomentType, setSelectedMomentType] = useState<MomentTypeId>('casual-round');
+  const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
+  
+  // Optional inputs
+  const [courseName, setCourseName] = useState(prefilledCourseName || '');
+  const [scoreText, setScoreText] = useState('');
+  const [withText, setWithText] = useState('');
+  const [allowEmojis, setAllowEmojis] = useState(true);
+  const [shortMode, setShortMode] = useState(false);
+  
+  // Results state
+  const [captions, setCaptions] = useState<GeneratedCaption[]>([]);
+  const [selectedCaptionIndex, setSelectedCaptionIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showReplacePrompt, setShowReplacePrompt] = useState(false);
+
+  // Toggle token selection
+  const toggleToken = useCallback((token: string) => {
+    setSelectedTokens(prev => 
+      prev.includes(token) 
+        ? prev.filter(t => t !== token)
+        : [...prev, token]
+    );
+  }, []);
+
+  // Generate captions
+  const handleGenerate = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    setCaptions([]);
+    setSelectedCaptionIndex(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError('Please sign in to use AI Caption');
+        return;
+      }
+
+      const response = await supabase.functions.invoke('generate-caption', {
+        body: {
+          tone: selectedTone,
+          momentType: MOMENT_TYPE_OPTIONS.find(m => m.id === selectedMomentType)?.label || 'Casual Round',
+          tokens: selectedTokens,
+          courseName: courseName.trim() || undefined,
+          scoreText: scoreText.trim() || undefined,
+          withText: withText.trim() || undefined,
+          allowEmojis,
+          shortMode,
+        },
+      });
+
+      if (response.error) {
+        console.error('[AiCaptionSheet] Edge function error:', response.error);
+        setError('Couldn\'t generate captions. Try again.');
+        return;
+      }
+
+      const data = response.data;
+      
+      if (data.error === 'limit_reached') {
+        setError('Daily caption limit reached. Try again tomorrow.');
+        return;
+      }
+      
+      if (data.error) {
+        setError(data.message || 'Couldn\'t generate captions. Try again.');
+        return;
+      }
+
+      if (data.captions && Array.isArray(data.captions)) {
+        setCaptions(data.captions);
+      } else {
+        setError('Invalid response from AI. Try again.');
+      }
+    } catch (err) {
+      console.error('[AiCaptionSheet] Error:', err);
+      setError('Couldn\'t generate captions. Try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedTone, selectedMomentType, selectedTokens, courseName, scoreText, withText, allowEmojis, shortMode]);
+
+  // Handle adding caption to post
+  const handleAddToPost = useCallback(() => {
+    if (selectedCaptionIndex === null || !captions[selectedCaptionIndex]) return;
+    
+    const selectedCaption = captions[selectedCaptionIndex];
+    let fullCaption = selectedCaption.text;
+    
+    // Append hashtags if any
+    if (selectedCaption.hashtags && selectedCaption.hashtags.length > 0) {
+      fullCaption += '\n\n' + selectedCaption.hashtags.join(' ');
+    }
+
+    // Check if there's existing caption text
+    if (existingCaption.trim()) {
+      setShowReplacePrompt(true);
+    } else {
+      onInsertCaption(fullCaption, 'replace');
+      onClose();
+      toast.success('Caption added');
+    }
+  }, [selectedCaptionIndex, captions, existingCaption, onInsertCaption, onClose]);
+
+  // Handle replace/append decision
+  const handleReplaceDecision = useCallback((mode: 'replace' | 'append') => {
+    if (selectedCaptionIndex === null || !captions[selectedCaptionIndex]) return;
+    
+    const selectedCaption = captions[selectedCaptionIndex];
+    let fullCaption = selectedCaption.text;
+    
+    if (selectedCaption.hashtags && selectedCaption.hashtags.length > 0) {
+      fullCaption += '\n\n' + selectedCaption.hashtags.join(' ');
+    }
+
+    onInsertCaption(fullCaption, mode);
+    setShowReplacePrompt(false);
+    onClose();
+    toast.success(mode === 'replace' ? 'Caption replaced' : 'Caption added');
+  }, [selectedCaptionIndex, captions, onInsertCaption, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[10000]"
+        onClick={onClose}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/40" />
+        
+        {/* Sheet */}
+        <motion.div
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          className="absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col"
+          style={{ 
+            background: 'var(--cm-surface-card)',
+            paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+            <div 
+              className="w-10 h-1 rounded-full"
+              style={{ background: 'var(--cm-border)' }}
+            />
+          </div>
+
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pb-3 flex-shrink-0">
+            <div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" style={{ color: 'var(--cm-accent)' }} />
+                <h3 
+                  className="text-lg font-semibold"
+                  style={{ color: 'var(--cm-text-primary)' }}
+                >
+                  AI Caption
+                </h3>
+              </div>
+              <p 
+                className="text-xs mt-0.5"
+                style={{ color: 'var(--cm-text-tertiary)' }}
+              >
+                Generate a caption that matches your moment
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--cm-surface-alt)' }}
+            >
+              <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+            </button>
+          </div>
+
+          {/* Scrollable content */}
+          <div 
+            className="flex-1 overflow-y-auto px-4 space-y-4"
+            data-ecm-scroll-container="true"
+          >
+            {/* Tone Selection */}
+            <div>
+              <label 
+                className="text-xs font-medium mb-2 block"
+                style={{ color: 'var(--cm-text-secondary)' }}
+              >
+                Tone
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {TONE_OPTIONS.map(tone => (
+                  <button
+                    key={tone.id}
+                    onClick={() => setSelectedTone(tone.id)}
+                    disabled={isLoading}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                      selectedTone === tone.id
+                        ? "ring-2 ring-offset-1"
+                        : "opacity-70 hover:opacity-100"
+                    )}
+                    style={{
+                      background: selectedTone === tone.id 
+                        ? 'var(--cm-accent)' 
+                        : 'var(--cm-surface-alt)',
+                      color: selectedTone === tone.id 
+                        ? 'white' 
+                        : 'var(--cm-text-primary)',
+                      '--tw-ring-color': 'var(--cm-accent)',
+                    } as React.CSSProperties}
+                  >
+                    {tone.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Moment Type Selection */}
+            <div>
+              <label 
+                className="text-xs font-medium mb-2 block"
+                style={{ color: 'var(--cm-text-secondary)' }}
+              >
+                Moment Type
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {MOMENT_TYPE_OPTIONS.map(type => (
+                  <button
+                    key={type.id}
+                    onClick={() => setSelectedMomentType(type.id)}
+                    disabled={isLoading}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                      selectedMomentType === type.id
+                        ? "ring-2 ring-offset-1"
+                        : "opacity-70 hover:opacity-100"
+                    )}
+                    style={{
+                      background: selectedMomentType === type.id 
+                        ? 'var(--cm-accent)' 
+                        : 'var(--cm-surface-alt)',
+                      color: selectedMomentType === type.id 
+                        ? 'white' 
+                        : 'var(--cm-text-primary)',
+                      '--tw-ring-color': 'var(--cm-accent)',
+                    } as React.CSSProperties}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Context Tokens (multi-select) */}
+            <div>
+              <label 
+                className="text-xs font-medium mb-2 block"
+                style={{ color: 'var(--cm-text-secondary)' }}
+              >
+                Context (optional)
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {CONTEXT_TOKENS.map(token => (
+                  <button
+                    key={token}
+                    onClick={() => toggleToken(token)}
+                    disabled={isLoading}
+                    className={cn(
+                      "px-2.5 py-1 rounded-full text-xs font-medium transition-all",
+                      selectedTokens.includes(token)
+                        ? "ring-1"
+                        : "opacity-60 hover:opacity-100"
+                    )}
+                    style={{
+                      background: selectedTokens.includes(token) 
+                        ? 'var(--cm-accent-subtle)' 
+                        : 'var(--cm-surface-alt)',
+                      color: selectedTokens.includes(token) 
+                        ? 'var(--cm-accent)' 
+                        : 'var(--cm-text-secondary)',
+                      borderColor: selectedTokens.includes(token) 
+                        ? 'var(--cm-accent)' 
+                        : 'transparent',
+                    }}
+                  >
+                    {token}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Optional Inputs */}
+            <div className="space-y-3">
+              <div>
+                <label 
+                  className="text-xs font-medium mb-1 block"
+                  style={{ color: 'var(--cm-text-secondary)' }}
+                >
+                  Course (optional)
+                </label>
+                <input
+                  type="text"
+                  value={courseName}
+                  onChange={(e) => setCourseName(e.target.value)}
+                  disabled={isLoading}
+                  placeholder="e.g. St Andrews Old Course"
+                  className="w-full px-3 py-2 rounded-lg text-sm"
+                  style={{
+                    background: 'var(--cm-surface-alt)',
+                    border: '1px solid var(--cm-border-subtle)',
+                    color: 'var(--cm-text-primary)',
+                  }}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label 
+                    className="text-xs font-medium mb-1 block"
+                    style={{ color: 'var(--cm-text-secondary)' }}
+                  >
+                    Score (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={scoreText}
+                    onChange={(e) => setScoreText(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="e.g. 74 (+2)"
+                    className="w-full px-3 py-2 rounded-lg text-sm"
+                    style={{
+                      background: 'var(--cm-surface-alt)',
+                      border: '1px solid var(--cm-border-subtle)',
+                      color: 'var(--cm-text-primary)',
+                    }}
+                  />
+                </div>
+                <div>
+                  <label 
+                    className="text-xs font-medium mb-1 block"
+                    style={{ color: 'var(--cm-text-secondary)' }}
+                  >
+                    With (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={withText}
+                    onChange={(e) => setWithText(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="e.g. Sunday roll-up"
+                    className="w-full px-3 py-2 rounded-lg text-sm"
+                    style={{
+                      background: 'var(--cm-surface-alt)',
+                      border: '1px solid var(--cm-border-subtle)',
+                      color: 'var(--cm-text-primary)',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Toggles */}
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={allowEmojis}
+                    onChange={(e) => setAllowEmojis(e.target.checked)}
+                    disabled={isLoading}
+                    className="w-4 h-4 rounded accent-[var(--cm-accent)]"
+                  />
+                  <span 
+                    className="text-sm"
+                    style={{ color: 'var(--cm-text-secondary)' }}
+                  >
+                    Include emojis
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={shortMode}
+                    onChange={(e) => setShortMode(e.target.checked)}
+                    disabled={isLoading}
+                    className="w-4 h-4 rounded accent-[var(--cm-accent)]"
+                  />
+                  <span 
+                    className="text-sm"
+                    style={{ color: 'var(--cm-text-secondary)' }}
+                  >
+                    Short captions
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Generate Button */}
+            <button
+              onClick={handleGenerate}
+              disabled={isLoading}
+              className="w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all"
+              style={{
+                background: isLoading ? 'var(--cm-surface-alt)' : 'var(--cm-accent)',
+                color: isLoading ? 'var(--cm-text-tertiary)' : 'white',
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Generate captions
+                </>
+              )}
+            </button>
+
+            {/* Error State */}
+            {error && (
+              <div 
+                className="flex items-center gap-2 p-3 rounded-lg"
+                style={{ 
+                  background: 'var(--cm-surface-alt)',
+                  border: '1px solid var(--cm-border-subtle)',
+                }}
+              >
+                <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#ef4444' }} />
+                <p 
+                  className="text-sm"
+                  style={{ color: 'var(--cm-text-secondary)' }}
+                >
+                  {error}
+                </p>
+              </div>
+            )}
+
+            {/* Loading Skeleton */}
+            {isLoading && (
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => (
+                  <div 
+                    key={i}
+                    className="p-4 rounded-xl animate-pulse"
+                    style={{ background: 'var(--cm-surface-alt)' }}
+                  >
+                    <div 
+                      className="h-4 rounded w-3/4 mb-2"
+                      style={{ background: 'var(--cm-border)' }}
+                    />
+                    <div 
+                      className="h-4 rounded w-1/2"
+                      style={{ background: 'var(--cm-border)' }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Results */}
+            {captions.length > 0 && !isLoading && (
+              <div className="space-y-3 pb-2">
+                <label 
+                  className="text-xs font-medium block"
+                  style={{ color: 'var(--cm-text-secondary)' }}
+                >
+                  Select a caption
+                </label>
+                {captions.map((caption, index) => (
+                  <motion.button
+                    key={index}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelectedCaptionIndex(index)}
+                    className={cn(
+                      "w-full p-4 rounded-xl text-left transition-all",
+                      selectedCaptionIndex === index && "ring-2"
+                    )}
+                    style={{
+                      background: selectedCaptionIndex === index 
+                        ? 'var(--cm-accent-subtle)' 
+                        : 'var(--cm-surface-alt)',
+                      border: `1px solid ${selectedCaptionIndex === index ? 'var(--cm-accent)' : 'var(--cm-border-subtle)'}`,
+                      '--tw-ring-color': 'var(--cm-accent)',
+                    } as React.CSSProperties}
+                  >
+                    <p 
+                      className="text-sm leading-relaxed"
+                      style={{ color: 'var(--cm-text-primary)' }}
+                    >
+                      {caption.text}
+                    </p>
+                    {caption.hashtags && caption.hashtags.length > 0 && (
+                      <p 
+                        className="text-xs mt-2"
+                        style={{ color: 'var(--cm-text-tertiary)' }}
+                      >
+                        {caption.hashtags.join(' ')}
+                      </p>
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Actions */}
+          {captions.length > 0 && !isLoading && (
+            <div 
+              className="flex-shrink-0 p-4 flex gap-3"
+              style={{ borderTop: '1px solid var(--cm-border-subtle)' }}
+            >
+              <button
+                onClick={handleGenerate}
+                className="flex-1 py-2.5 rounded-xl font-medium flex items-center justify-center gap-2"
+                style={{
+                  background: 'var(--cm-surface-alt)',
+                  color: 'var(--cm-text-primary)',
+                  border: '1px solid var(--cm-border-subtle)',
+                }}
+              >
+                <RefreshCw className="w-4 h-4" />
+                Regenerate
+              </button>
+              <button
+                onClick={handleAddToPost}
+                disabled={selectedCaptionIndex === null}
+                className="flex-1 py-2.5 rounded-xl font-medium transition-all"
+                style={{
+                  background: selectedCaptionIndex !== null ? 'var(--cm-accent)' : 'var(--cm-surface-alt)',
+                  color: selectedCaptionIndex !== null ? 'white' : 'var(--cm-text-tertiary)',
+                }}
+              >
+                Add to Post Caption
+              </button>
+            </div>
+          )}
+
+          {/* Replace/Append Prompt */}
+          <AnimatePresence>
+            {showReplacePrompt && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center z-10"
+                style={{ background: 'rgba(0,0,0,0.5)' }}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="mx-4 p-5 rounded-2xl max-w-sm w-full"
+                  style={{ background: 'var(--cm-surface-card)' }}
+                >
+                  <h4 
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: 'var(--cm-text-primary)' }}
+                  >
+                    Replace existing caption?
+                  </h4>
+                  <p 
+                    className="text-sm mb-4"
+                    style={{ color: 'var(--cm-text-secondary)' }}
+                  >
+                    You already have a caption. Would you like to replace it or append the new one?
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleReplaceDecision('append')}
+                      className="flex-1 py-2.5 rounded-xl font-medium"
+                      style={{
+                        background: 'var(--cm-surface-alt)',
+                        color: 'var(--cm-text-primary)',
+                        border: '1px solid var(--cm-border-subtle)',
+                      }}
+                    >
+                      Append
+                    </button>
+                    <button
+                      onClick={() => handleReplaceDecision('replace')}
+                      className="flex-1 py-2.5 rounded-xl font-medium"
+                      style={{
+                        background: 'var(--cm-accent)',
+                        color: 'white',
+                      }}
+                    >
+                      Replace
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setShowReplacePrompt(false)}
+                    className="w-full mt-2 py-2 text-sm"
+                    style={{ color: 'var(--cm-text-tertiary)' }}
+                  >
+                    Cancel
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default AiCaptionSheet;
