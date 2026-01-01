@@ -705,24 +705,23 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       </div>
                     )}
                     
-                    {/* Music Player for posts with music_only audioMode */}
+                    {/* Music Player - audio only, no UI (soundwave moved to CreatorCapsule) */}
                     {postHasMusic && musicData && (
-                      <div className="absolute bottom-20 left-4 z-40 max-w-[200px]">
-                        <ClubhouseMusicPlayer
-                          music={{
-                            trackId: musicData.trackId,
-                            title: musicData.title,
-                            artist: musicData.artist,
-                            url: musicData.url,
-                            r2Key: musicData.r2Key,
-                            startAt: musicData.startAt,
-                            volume: musicData.volume,
-                          }}
-                          isActive={index === currentIndex}
-                          isGloballyMuted={isGloballyMuted}
-                          postId={item.id}
-                        />
-                      </div>
+                      <ClubhouseMusicPlayer
+                        music={{
+                          trackId: musicData.trackId,
+                          title: musicData.title,
+                          artist: musicData.artist,
+                          url: musicData.url,
+                          r2Key: musicData.r2Key,
+                          startAt: musicData.startAt,
+                          volume: musicData.volume,
+                        }}
+                        isActive={index === currentIndex}
+                        isGloballyMuted={isGloballyMuted}
+                        postId={item.id}
+                        hideUI
+                      />
                     )}
                     
                     {/* Text overlays from studio_edits */}
@@ -915,6 +914,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               title: currentMusicData.title,
               artist: currentMusicData.artist
             } : null}
+            isMusicPlaying={showMusicTrack && !isGloballyMuted}
             isFollowing={isFollowing === true}
             isOwnPost={filteredPosts[currentIndex].user?.id === user?.id}
             isVisible={true}

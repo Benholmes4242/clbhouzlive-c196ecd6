@@ -30,6 +30,8 @@ interface ClubhouseMusicPlayerProps {
   isActive: boolean;
   isGloballyMuted: boolean;
   postId: string;
+  /** If true, renders no UI (audio-only mode) */
+  hideUI?: boolean;
 }
 
 export function ClubhouseMusicPlayer({
@@ -37,6 +39,7 @@ export function ClubhouseMusicPlayer({
   isActive,
   isGloballyMuted,
   postId,
+  hideUI = false,
 }: ClubhouseMusicPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -126,7 +129,10 @@ export function ClubhouseMusicPlayer({
 
   if (hasError || !music.title) return null;
 
-  // Visual indicator when music is playing
+  // Hide UI if requested (audio-only mode - soundwave moved to CreatorCapsule)
+  if (hideUI) return null;
+
+  // Visual indicator when music is playing (legacy - kept for any non-Clubhouse usage)
   return (
     <AnimatePresence>
       {isActive && !isGloballyMuted && (
