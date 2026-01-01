@@ -108,8 +108,8 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
             </button>
           </div>
 
-          {/* Options */}
-          <div className="px-4 pb-4 space-y-2">
+          {/* Options - Tighter spacing */}
+          <div className="px-4 pb-4 space-y-1.5">
             {AUDIENCE_OPTIONS.map(option => {
               const isSelected = visibility === option.value;
               
@@ -118,7 +118,7 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                   key={option.value}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(option.value)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all"
+                  className="w-full flex items-center gap-3 p-2.5 rounded-xl transition-all"
                   style={{
                     background: isSelected 
                       ? 'var(--cm-surface-slate)' 
@@ -127,14 +127,14 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                       ? 'none' 
                       : '1px solid var(--cm-border-subtle)',
                     boxShadow: isSelected 
-                      ? '0 2px 8px rgba(0, 0, 0, 0.12)' 
+                      ? '0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.1)' 
                       : 'none',
                   }}
                 >
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    className="w-9 h-9 rounded-full flex items-center justify-center"
                     style={{ 
-                      background: isSelected ? 'rgba(255,255,255,0.15)' : 'var(--cm-surface-card)',
+                      background: isSelected ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-card)',
                       color: isSelected ? 'white' : 'var(--cm-icon-primary)',
                     }}
                   >
@@ -143,20 +143,24 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                   
                   <div className="flex-1 text-left">
                     <p 
-                      className="font-medium text-sm"
+                      className="font-medium text-[13px]"
                       style={{ color: isSelected ? 'white' : 'var(--cm-text-primary)' }}
                     >
                       {option.label}
                     </p>
                     <p 
-                      className="text-xs mt-0.5"
-                      style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--cm-text-tertiary)' }}
+                      className="text-[11px] mt-0.5"
+                      style={{ color: isSelected ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
                     >
                       {option.description}
                     </p>
                   </div>
                   
-                  {isSelected && <AnimatedCheck />}
+                  {isSelected && (
+                    <div className="opacity-100">
+                      <AnimatedCheck />
+                    </div>
+                  )}
                 </motion.button>
               );
             })}

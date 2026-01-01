@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Music, Type, Sparkles, Sliders } from 'lucide-react';
 import { StudioTool } from '@/types/studio';
 
@@ -9,21 +10,35 @@ type ToolButtonProps = {
 };
 
 const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
-  <button
+  <motion.button
     onClick={onClick}
-    className={`flex flex-col items-center justify-center gap-1.5 py-4 px-6 rounded-xl transition-all duration-200 ${
-      active 
-        ? 'bg-gradient-to-b from-[rgba(255,156,64,0.15)] to-[rgba(255,156,64,0.08)] border border-[rgba(255,156,64,0.4)] shadow-[0_2px_8px_rgba(255,156,64,0.15)]' 
-        : 'bg-white/60 border border-zinc-200 hover:bg-white/80 hover:border-zinc-300'
-    }`}
+    whileTap={{ scale: 0.97 }}
+    className="flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150"
+    style={{
+      background: active 
+        ? 'var(--cm-surface-slate)' 
+        : 'var(--cm-surface-alt)',
+      border: active 
+        ? 'none' 
+        : '1px solid var(--cm-border-subtle)',
+      boxShadow: active 
+        ? '0 2px 8px rgba(0, 0, 0, 0.12)' 
+        : 'none',
+    }}
   >
-    <div className={`${active ? 'text-[rgb(255,156,64)]' : 'text-zinc-600'}`}>
+    <div 
+      className="transition-colors"
+      style={{ color: active ? 'white' : 'var(--cm-icon-primary)' }}
+    >
       {icon}
     </div>
-    <span className={`text-sm font-medium ${active ? 'text-zinc-900' : 'text-zinc-600'}`}>
+    <span 
+      className="text-xs font-medium transition-colors"
+      style={{ color: active ? 'white' : 'var(--cm-text-secondary)' }}
+    >
       {label}
     </span>
-  </button>
+  </motion.button>
 );
 
 type StudioToolRailProps = {
@@ -33,27 +48,33 @@ type StudioToolRailProps = {
 
 export default function StudioToolRail({ activeTool, setActiveTool }: StudioToolRailProps) {
   return (
-    <div className="grid grid-cols-4 gap-3 px-4 py-3 bg-zinc-50/80 border-b border-zinc-200">
+    <div 
+      className="grid grid-cols-4 gap-2.5 px-4 py-2.5"
+      style={{ 
+        background: 'var(--cm-surface-card)',
+        borderBottom: '1px solid var(--cm-border-subtle)',
+      }}
+    >
       <ToolButton
-        icon={<Music className="w-6 h-6" />}
+        icon={<Music className="w-5 h-5" />}
         label="Music"
         active={activeTool === 'music'}
         onClick={() => setActiveTool('music')}
       />
       <ToolButton
-        icon={<Type className="w-6 h-6" />}
+        icon={<Type className="w-5 h-5" />}
         label="Text"
         active={activeTool === 'text'}
         onClick={() => setActiveTool('text')}
       />
       <ToolButton
-        icon={<Sparkles className="w-6 h-6" />}
+        icon={<Sparkles className="w-5 h-5" />}
         label="Filter"
         active={activeTool === 'filter'}
         onClick={() => setActiveTool('filter')}
       />
       <ToolButton
-        icon={<Sliders className="w-6 h-6" />}
+        icon={<Sliders className="w-5 h-5" />}
         label="Edit"
         active={activeTool === 'edit'}
         onClick={() => setActiveTool('edit')}

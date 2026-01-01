@@ -42,11 +42,11 @@ export default function CreateMomentHero({
       >
         {/* Hero card with actual scale transform on press */}
         <motion.div 
-          className="p-8 rounded-2xl flex flex-col items-center cursor-pointer"
+          className="px-6 py-6 rounded-3xl flex flex-col items-center cursor-pointer"
           style={{
-            width: '360px',
-            minWidth: '360px',
-            background: 'var(--cm-surface-card)',
+            width: '340px',
+            minWidth: '340px',
+            background: 'linear-gradient(180deg, var(--cm-surface-card) 0%, rgba(248, 250, 252, 0.95) 100%)',
             border: '1px dashed var(--cm-border)',
           }}
           animate={{ 
@@ -63,13 +63,13 @@ export default function CreateMomentHero({
           onMouseUp={handlePressEnd}
           onMouseLeave={handlePressEnd}
         >
-          <Camera className="w-12 h-12 mb-3" strokeWidth={1.5} style={{ color: 'var(--cm-icon-primary)' }} />
+          <Camera className="w-10 h-10 mb-2.5" strokeWidth={1.5} style={{ color: 'var(--cm-icon-primary)' }} />
           
-          <h2 className="text-[16px] font-medium leading-snug" style={{ color: 'var(--cm-text-primary)' }}>
+          <h2 className="text-[15px] font-medium leading-snug" style={{ color: 'var(--cm-text-primary)' }}>
             Capture the moment
           </h2>
           
-          <p className="text-sm mt-2 mb-6" style={{ color: 'var(--cm-text-secondary)' }}>
+          <p className="text-[13px] mt-1.5 mb-5" style={{ color: 'var(--cm-text-secondary)', opacity: 0.75 }}>
             From the tee, the green, or anywhere in between
           </p>
           
