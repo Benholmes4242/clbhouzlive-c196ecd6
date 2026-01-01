@@ -37,6 +37,10 @@ export default function StudioPanelFilter({
   const handleSelectFilter = (filterId: FilterId) => {
     setSelectedFilter(filterId);
     updateEdits({ filter: filterId });
+    console.log('[FILTER DEBUG 1] StudioPanelFilter.handleSelectFilter called:', {
+      filterId,
+      timestamp: new Date().toISOString()
+    });
   };
 
   const selectedLabel = FILTER_OPTIONS.find(f => f.id === selectedFilter)?.label || 'Pure';
