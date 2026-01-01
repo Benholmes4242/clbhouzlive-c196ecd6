@@ -169,7 +169,14 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             e.preventDefault();
             onMusicTap?.();
           }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+          }}
           onTouchEnd={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onPointerDown={(e) => {
             e.stopPropagation();
           }}
           className={cn(
