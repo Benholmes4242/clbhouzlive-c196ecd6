@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Lock, Sparkles, Coins } from 'lucide-react';
-import CompactHeader from '@/components/header/CompactHeader';
 import { PageRoot } from '@/components/layout/PageRoot';
 
 const rarityColors = {
@@ -70,10 +69,8 @@ export default function SeasonShop() {
     : shopItems?.filter(item => item.category === selectedCategory);
 
   return (
-    <PageRoot className="min-h-screen bg-background pb-24">
-      <CompactHeader />
-      
-      <div className="compact-header-offset">
+    <PageRoot className="min-h-screen bg-background pb-24 compact-header-offset">
+      <div>
         {/* Header */}
         <div className="px-4 py-6 bg-gradient-to-b from-primary/10 to-background">
           <div className="max-w-4xl mx-auto">

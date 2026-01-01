@@ -71,6 +71,7 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
+import GlobalHeader from '@/components/header/GlobalHeader';
 
 
 // Import wrapped components with explicit variants
@@ -632,7 +633,8 @@ const AppInner: React.FC = () => {
                                       <AchievementToastWrapper />
                                       <Suspense fallback={null}>
                                         <div className="app-depth">
-                                          {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                          {/* Global header for all pages except Clubhouse/Auth/Admin */}
+                                          <GlobalHeader />
                                           <AppRoutes />
                                         </div>
                                       </Suspense>

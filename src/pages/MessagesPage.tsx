@@ -7,7 +7,6 @@ import { ArrowLeft, Send, Search } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessages } from '@/hooks/useMessages';
 import { useConversation } from '@/hooks/useConversation';
-import CompactHeader from '@/components/header/CompactHeader';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -53,10 +52,8 @@ const MessagesPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-background">
-      <CompactHeader />
-      
-      <main className="px-4 md:container md:mx-auto md:px-0 py-6 compact-header-offset">
+    <PageRoot className="min-h-screen bg-background compact-header-offset">
+      <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <Button
