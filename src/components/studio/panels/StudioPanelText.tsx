@@ -170,8 +170,8 @@ export default function StudioPanelText({
             <span className="text-sm font-medium">Add Text</span>
           </button>
         ) : (
-          /* Layers list - compact rows */
-          <div className="space-y-1.5">
+          /* Layers list - ultra compact rows */
+          <div className="space-y-1">
             {[...textBoxes].reverse().map((box, reverseIndex) => {
               const isSelected = selectedBox === box.id;
               const isTopLayer = reverseIndex === 0;
@@ -189,26 +189,30 @@ export default function StudioPanelText({
                     }
                   }}
                   className={cn(
-                    "w-full px-2.5 py-2 rounded-lg border text-left transition-colors cursor-pointer",
+                    "w-full px-2 py-1.5 rounded-md border text-left transition-colors cursor-pointer",
                     isSelected
-                      ? 'border-[rgba(255,156,64,0.5)] bg-[rgba(255,156,64,0.05)]'
-                      : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                      ? 'border-[rgba(255,156,64,0.4)] bg-[rgba(255,156,64,0.04)]'
+                      : 'border-zinc-100 bg-white hover:bg-zinc-50'
                   )}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-zinc-900 truncate flex-1">{box.text}</span>
-                    <div className="flex items-center gap-1.5">
-                      {/* Bring to front button */}
+                  <div className="flex items-center justify-between gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <span className="text-[13px] font-medium text-zinc-800 truncate">{box.text}</span>
+                      <span className="text-[10px] text-zinc-400 opacity-70 flex-shrink-0">
+                        {STYLE_PRESETS.find(p => p.id === box.style)?.label} · {(box.scale * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
                       {!isTopLayer && isSelected && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             bringToFront(box.id);
                           }}
-                          className="text-zinc-400 hover:text-zinc-600 p-0.5"
+                          className="text-zinc-300 hover:text-zinc-500 p-0.5"
                           title="Bring to front"
                         >
-                          <ChevronUp className="w-3.5 h-3.5" />
+                          <ChevronUp className="w-3 h-3" />
                         </button>
                       )}
                       <button
@@ -216,26 +220,23 @@ export default function StudioPanelText({
                           e.stopPropagation();
                           removeBox(box.id);
                         }}
-                        className="text-zinc-400 hover:text-red-500 text-[11px]"
+                        className="text-zinc-300 hover:text-red-400 text-[10px] font-medium"
                       >
                         Remove
                       </button>
                     </div>
                   </div>
-                  <div className="text-[10px] text-zinc-400 mt-0.5">
-                    {STYLE_PRESETS.find(p => p.id === box.style)?.label || box.style} • {(box.scale * 100).toFixed(0)}%
-                  </div>
                 </div>
               );
             })}
             
-            {/* Inline add button when layers exist */}
+            {/* Inline add button - slim secondary style */}
             <button
               onClick={addTextBox}
-              className="w-full py-2 rounded-lg border border-dashed border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50 transition-colors flex items-center justify-center gap-1.5 text-xs"
+              className="w-full py-1.5 mt-0.5 rounded-md text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 transition-colors flex items-center justify-center gap-1 text-[11px]"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="font-medium">Add</span>
+              <Plus className="w-3 h-3" />
+              <span className="font-medium">Add another</span>
             </button>
           </div>
         )}
