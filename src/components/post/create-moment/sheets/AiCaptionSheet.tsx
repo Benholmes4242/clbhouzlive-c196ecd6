@@ -1,50 +1,46 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, RefreshCw, Loader2, AlertCircle } from 'lucide-react';
+import { X, Sparkles, RefreshCw, Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Tone options (single-select)
+// Simplified tone options (4 only, segmented control)
 const TONE_OPTIONS = [
   { id: 'classic', label: 'Classic' },
   { id: 'funny', label: 'Funny' },
-  { id: 'hype', label: 'Hype' },
   { id: 'minimal', label: 'Minimal' },
   { id: 'story', label: 'Story' },
 ] as const;
 
-// Moment type options (single-select)
+// Simplified moment types (6 core options)
 const MOMENT_TYPE_OPTIONS = [
-  { id: 'casual-round', label: 'Casual Round' },
-  { id: 'tournament', label: 'Tournament' },
-  { id: 'practice-range', label: 'Practice / Range' },
-  { id: 'new-course', label: 'New Course' },
-  { id: 'golf-trip', label: 'Golf Trip / Travel' },
-  { id: 'lesson-coaching', label: 'Lesson / Coaching' },
-  { id: 'matchplay-team', label: 'Matchplay / Team Day' },
-  { id: 'sunset-golden', label: 'Sunset / Golden Hour' },
+  { id: 'casual-round', label: 'Casual Round', icon: '⛳' },
+  { id: 'tournament', label: 'Tournament', icon: '🏆' },
+  { id: 'new-course', label: 'New Course', icon: '📍' },
+  { id: 'golf-trip', label: 'Golf Trip', icon: '✈️' },
+  { id: 'practice-range', label: 'Practice', icon: '🎯' },
+  { id: 'lesson-coaching', label: 'Lesson', icon: '📚' },
 ] as const;
 
-// Context token options (multi-select)
-const CONTEXT_TOKENS = [
-  // Score achievements
-  'Birdie', 'Eagle', 'Par', 'Bogey', 'Double',
-  // Personal achievements
-  'PB / Personal Best', 'Clutch Putt',
-  // Round context
-  'Back Nine', 'Front Nine',
-  // Stats
-  'Fairways Hit', 'Greens in Reg', 'Up & Down', 'Bunker Save',
-  // Shots
-  'Long Drive', 'Nearest the Pin',
-  // Gear
-  'New Clubs / New Driver',
-  // Social
-  'Playing Partners',
-  // Conditions
-  'Windy / Links Day', 'Fast Greens',
-] as const;
+// Grouped context options with selection limits
+const CONTEXT_GROUPS = {
+  performance: {
+    label: 'Performance',
+    maxSelect: 2,
+    options: ['Birdie', 'Eagle', 'Personal Best', 'Clutch Putt', 'Breaking 80', 'Breaking 90', 'Breaking 100'],
+  },
+  highlights: {
+    label: 'Round Highlights',
+    maxSelect: 3,
+    options: ['Front Nine', 'Back Nine', 'Long Drive', 'Nearest the Pin', 'Fairways Hit', 'Greens in Reg'],
+  },
+  conditions: {
+    label: 'Conditions',
+    maxSelect: 1,
+    options: ['Windy / Links Day', 'Sunset / Golden Hour', 'Fast Greens'],
+  },
+} as const;
 
 type ToneId = typeof TONE_OPTIONS[number]['id'];
 type MomentTypeId = typeof MOMENT_TYPE_OPTIONS[number]['id'];
@@ -72,7 +68,14 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
   // Selection state
   const [selectedTone, setSelectedTone] = useState<ToneId>('classic');
   const [selectedMomentType, setSelectedMomentType] = useState<MomentTypeId>('casual-round');
-  const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
+  const [selectedTokens, setSelectedTokens] = useState<Record<string, string[]>>({
+    performance: [],
+    highlights: [],
+    conditions: [],
+  });
+  
+  // Collapsible context section
+  const [contextExpanded, setContextExpanded] = useState(false);
   
   // Optional inputs
   const [courseName, setCourseName] = useState(prefilledCourseName || '');
@@ -88,14 +91,25 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [showReplacePrompt, setShowReplacePrompt] = useState(false);
 
-  // Toggle token selection
-  const toggleToken = useCallback((token: string) => {
-    setSelectedTokens(prev => 
-      prev.includes(token) 
-        ? prev.filter(t => t !== token)
-        : [...prev, token]
-    );
+  // Toggle token selection with group limits
+  const toggleToken = useCallback((group: string, token: string) => {
+    setSelectedTokens(prev => {
+      const currentGroup = prev[group] || [];
+      const maxSelect = CONTEXT_GROUPS[group as keyof typeof CONTEXT_GROUPS]?.maxSelect || 99;
+      
+      if (currentGroup.includes(token)) {
+        return { ...prev, [group]: currentGroup.filter(t => t !== token) };
+      } else if (currentGroup.length < maxSelect) {
+        return { ...prev, [group]: [...currentGroup, token] };
+      }
+      return prev;
+    });
   }, []);
+
+  // Get all selected tokens as flat array
+  const getAllSelectedTokens = useCallback(() => {
+    return Object.values(selectedTokens).flat();
+  }, [selectedTokens]);
 
   // Generate captions
   const handleGenerate = useCallback(async () => {
@@ -115,7 +129,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
         body: {
           tone: selectedTone,
           momentType: MOMENT_TYPE_OPTIONS.find(m => m.id === selectedMomentType)?.label || 'Casual Round',
-          tokens: selectedTokens,
+          tokens: getAllSelectedTokens(),
           courseName: courseName.trim() || undefined,
           scoreText: scoreText.trim() || undefined,
           withText: withText.trim() || undefined,
@@ -126,7 +140,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
 
       if (response.error) {
         console.error('[AiCaptionSheet] Edge function error:', response.error);
-        setError('Couldn\'t generate captions. Try again.');
+        setError("Couldn't generate captions. Try again.");
         return;
       }
 
@@ -138,7 +152,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
       }
       
       if (data.error) {
-        setError(data.message || 'Couldn\'t generate captions. Try again.');
+        setError(data.message || "Couldn't generate captions. Try again.");
         return;
       }
 
@@ -149,11 +163,11 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
       }
     } catch (err) {
       console.error('[AiCaptionSheet] Error:', err);
-      setError('Couldn\'t generate captions. Try again.');
+      setError("Couldn't generate captions. Try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [selectedTone, selectedMomentType, selectedTokens, courseName, scoreText, withText, allowEmojis, shortMode]);
+  }, [selectedTone, selectedMomentType, getAllSelectedTokens, courseName, scoreText, withText, allowEmojis, shortMode]);
 
   // Handle adding caption to post
   const handleAddToPost = useCallback(() => {
@@ -162,12 +176,10 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
     const selectedCaption = captions[selectedCaptionIndex];
     let fullCaption = selectedCaption.text;
     
-    // Append hashtags if any
     if (selectedCaption.hashtags && selectedCaption.hashtags.length > 0) {
       fullCaption += '\n\n' + selectedCaption.hashtags.join(' ');
     }
 
-    // Check if there's existing caption text
     if (existingCaption.trim()) {
       setShowReplacePrompt(true);
     } else {
@@ -195,6 +207,8 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
   }, [selectedCaptionIndex, captions, onInsertCaption, onClose]);
 
   if (!isOpen) return null;
+
+  const totalContextSelected = getAllSelectedTokens().length;
 
   return (
     <AnimatePresence>
@@ -245,7 +259,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                 className="text-xs mt-0.5"
                 style={{ color: 'var(--cm-text-tertiary)' }}
               >
-                Generate a caption that matches your moment
+                We'll suggest a few options for you
               </p>
             </div>
             <button
@@ -259,10 +273,10 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
 
           {/* Scrollable content */}
           <div 
-            className="flex-1 overflow-y-auto px-4 space-y-4"
+            className="flex-1 overflow-y-auto px-4 space-y-5 pb-4"
             data-ecm-scroll-container="true"
           >
-            {/* Tone Selection */}
+            {/* Tone Selection - Segmented Control */}
             <div>
               <label 
                 className="text-xs font-medium mb-2 block"
@@ -270,27 +284,23 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
               >
                 Tone
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div 
+                className="flex rounded-xl p-1"
+                style={{ background: 'var(--cm-surface-alt)' }}
+              >
                 {TONE_OPTIONS.map(tone => (
                   <button
                     key={tone.id}
                     onClick={() => setSelectedTone(tone.id)}
                     disabled={isLoading}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
-                      selectedTone === tone.id
-                        ? "ring-2 ring-offset-1"
-                        : "opacity-70 hover:opacity-100"
+                      "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all",
                     )}
                     style={{
-                      background: selectedTone === tone.id 
-                        ? 'var(--cm-accent)' 
-                        : 'var(--cm-surface-alt)',
-                      color: selectedTone === tone.id 
-                        ? 'white' 
-                        : 'var(--cm-text-primary)',
-                      '--tw-ring-color': 'var(--cm-accent)',
-                    } as React.CSSProperties}
+                      background: selectedTone === tone.id ? 'var(--cm-surface-card)' : 'transparent',
+                      color: selectedTone === tone.id ? 'var(--cm-text-primary)' : 'var(--cm-text-tertiary)',
+                      boxShadow: selectedTone === tone.id ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    }}
                   >
                     {tone.label}
                   </button>
@@ -298,7 +308,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
               </div>
             </div>
 
-            {/* Moment Type Selection */}
+            {/* Moment Type Selection - Grid */}
             <div>
               <label 
                 className="text-xs font-medium mb-2 block"
@@ -306,132 +316,169 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
               >
                 Moment Type
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {MOMENT_TYPE_OPTIONS.map(type => (
                   <button
                     key={type.id}
                     onClick={() => setSelectedMomentType(type.id)}
                     disabled={isLoading}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
-                      selectedMomentType === type.id
-                        ? "ring-2 ring-offset-1"
-                        : "opacity-70 hover:opacity-100"
+                      "py-2.5 px-2 rounded-xl text-center transition-all flex flex-col items-center gap-1",
                     )}
                     style={{
                       background: selectedMomentType === type.id 
-                        ? 'var(--cm-accent)' 
-                        : 'var(--cm-surface-alt)',
-                      color: selectedMomentType === type.id 
-                        ? 'white' 
-                        : 'var(--cm-text-primary)',
-                      '--tw-ring-color': 'var(--cm-accent)',
-                    } as React.CSSProperties}
-                  >
-                    {type.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Context Tokens (multi-select) */}
-            <div>
-              <label 
-                className="text-xs font-medium mb-2 block"
-                style={{ color: 'var(--cm-text-secondary)' }}
-              >
-                Context (optional)
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {CONTEXT_TOKENS.map(token => (
-                  <button
-                    key={token}
-                    onClick={() => toggleToken(token)}
-                    disabled={isLoading}
-                    className={cn(
-                      "px-2.5 py-1 rounded-full text-xs font-medium transition-all",
-                      selectedTokens.includes(token)
-                        ? "ring-1"
-                        : "opacity-60 hover:opacity-100"
-                    )}
-                    style={{
-                      background: selectedTokens.includes(token) 
                         ? 'var(--cm-accent-subtle)' 
                         : 'var(--cm-surface-alt)',
-                      color: selectedTokens.includes(token) 
+                      border: `1.5px solid ${selectedMomentType === type.id ? 'var(--cm-accent)' : 'transparent'}`,
+                      color: selectedMomentType === type.id 
                         ? 'var(--cm-accent)' 
-                        : 'var(--cm-text-secondary)',
-                      borderColor: selectedTokens.includes(token) 
-                        ? 'var(--cm-accent)' 
-                        : 'transparent',
+                        : 'var(--cm-text-primary)',
                     }}
                   >
-                    {token}
+                    <span className="text-base">{type.icon}</span>
+                    <span className="text-xs font-medium">{type.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Optional Inputs */}
-            <div className="space-y-3">
-              <div>
-                <label 
-                  className="text-xs font-medium mb-1 block"
+            {/* Collapsible Context Section */}
+            <div>
+              <button
+                onClick={() => setContextExpanded(!contextExpanded)}
+                disabled={isLoading}
+                className="w-full flex items-center justify-between py-2"
+              >
+                <span 
+                  className="text-xs font-medium flex items-center gap-2"
                   style={{ color: 'var(--cm-text-secondary)' }}
                 >
-                  Course (optional)
-                </label>
-                <input
-                  type="text"
-                  value={courseName}
-                  onChange={(e) => setCourseName(e.target.value)}
-                  disabled={isLoading}
-                  placeholder="e.g. St Andrews Old Course"
-                  className="w-full px-3 py-2 rounded-lg text-sm"
-                  style={{
-                    background: 'var(--cm-surface-alt)',
-                    border: '1px solid var(--cm-border-subtle)',
-                    color: 'var(--cm-text-primary)',
-                  }}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label 
-                    className="text-xs font-medium mb-1 block"
-                    style={{ color: 'var(--cm-text-secondary)' }}
+                  Add context
+                  <span 
+                    className="text-[10px] px-1.5 py-0.5 rounded-full"
+                    style={{ 
+                      background: 'var(--cm-surface-alt)',
+                      color: 'var(--cm-text-tertiary)',
+                    }}
                   >
-                    Score (optional)
-                  </label>
+                    optional
+                  </span>
+                  {totalContextSelected > 0 && (
+                    <span 
+                      className="text-[10px] px-1.5 py-0.5 rounded-full"
+                      style={{ 
+                        background: 'var(--cm-accent-subtle)',
+                        color: 'var(--cm-accent)',
+                      }}
+                    >
+                      {totalContextSelected} selected
+                    </span>
+                  )}
+                </span>
+                {contextExpanded ? (
+                  <ChevronUp className="w-4 h-4" style={{ color: 'var(--cm-text-tertiary)' }} />
+                ) : (
+                  <ChevronDown className="w-4 h-4" style={{ color: 'var(--cm-text-tertiary)' }} />
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {contextExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-4 pt-2">
+                      {Object.entries(CONTEXT_GROUPS).map(([groupKey, group]) => {
+                        const currentSelection = selectedTokens[groupKey] || [];
+                        const isMaxed = currentSelection.length >= group.maxSelect;
+                        
+                        return (
+                          <div key={groupKey}>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span 
+                                className="text-[11px] font-medium"
+                                style={{ color: 'var(--cm-text-tertiary)' }}
+                              >
+                                {group.label}
+                              </span>
+                              <span 
+                                className="text-[10px]"
+                                style={{ color: 'var(--cm-text-tertiary)' }}
+                              >
+                                {currentSelection.length}/{group.maxSelect}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {group.options.map(token => {
+                                const isSelected = currentSelection.includes(token);
+                                const isDisabled = isLoading || (!isSelected && isMaxed);
+                                
+                                return (
+                                  <button
+                                    key={token}
+                                    onClick={() => toggleToken(groupKey, token)}
+                                    disabled={isDisabled}
+                                    className={cn(
+                                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all",
+                                      isDisabled && !isSelected && "opacity-40"
+                                    )}
+                                    style={{
+                                      background: isSelected 
+                                        ? 'var(--cm-accent-subtle)' 
+                                        : 'var(--cm-surface-alt)',
+                                      color: isSelected 
+                                        ? 'var(--cm-accent)' 
+                                        : 'var(--cm-text-secondary)',
+                                      border: `1px solid ${isSelected ? 'var(--cm-accent)' : 'transparent'}`,
+                                    }}
+                                  >
+                                    {token}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Optional Inputs - Low Emphasis */}
+            <div 
+              className="space-y-2.5 pt-1"
+              style={{ opacity: 0.85 }}
+            >
+              <div className="grid grid-cols-3 gap-2">
+                <div className="col-span-2">
+                  <input
+                    type="text"
+                    value={courseName}
+                    onChange={(e) => setCourseName(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="Course name"
+                    className="w-full px-3 py-2 rounded-lg text-xs"
+                    style={{
+                      background: 'var(--cm-surface-alt)',
+                      border: '1px solid var(--cm-border-subtle)',
+                      color: 'var(--cm-text-primary)',
+                    }}
+                  />
+                </div>
+                <div>
                   <input
                     type="text"
                     value={scoreText}
                     onChange={(e) => setScoreText(e.target.value)}
                     disabled={isLoading}
-                    placeholder="e.g. 74 (+2)"
-                    className="w-full px-3 py-2 rounded-lg text-sm"
-                    style={{
-                      background: 'var(--cm-surface-alt)',
-                      border: '1px solid var(--cm-border-subtle)',
-                      color: 'var(--cm-text-primary)',
-                    }}
-                  />
-                </div>
-                <div>
-                  <label 
-                    className="text-xs font-medium mb-1 block"
-                    style={{ color: 'var(--cm-text-secondary)' }}
-                  >
-                    With (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={withText}
-                    onChange={(e) => setWithText(e.target.value)}
-                    disabled={isLoading}
-                    placeholder="e.g. Sunday roll-up"
-                    className="w-full px-3 py-2 rounded-lg text-sm"
+                    placeholder="Score"
+                    className="w-full px-3 py-2 rounded-lg text-xs"
                     style={{
                       background: 'var(--cm-surface-alt)',
                       border: '1px solid var(--cm-border-subtle)',
@@ -440,43 +487,57 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                   />
                 </div>
               </div>
+              
+              <input
+                type="text"
+                value={withText}
+                onChange={(e) => setWithText(e.target.value)}
+                disabled={isLoading}
+                placeholder="Playing with..."
+                className="w-full px-3 py-2 rounded-lg text-xs"
+                style={{
+                  background: 'var(--cm-surface-alt)',
+                  border: '1px solid var(--cm-border-subtle)',
+                  color: 'var(--cm-text-primary)',
+                }}
+              />
 
-              {/* Toggles */}
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
+              {/* Minimal Toggles */}
+              <div className="flex items-center gap-4 pt-1">
+                <label className="flex items-center gap-1.5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={allowEmojis}
                     onChange={(e) => setAllowEmojis(e.target.checked)}
                     disabled={isLoading}
-                    className="w-4 h-4 rounded accent-[var(--cm-accent)]"
+                    className="w-3.5 h-3.5 rounded accent-[var(--cm-accent)]"
                   />
                   <span 
-                    className="text-sm"
-                    style={{ color: 'var(--cm-text-secondary)' }}
+                    className="text-xs"
+                    style={{ color: 'var(--cm-text-tertiary)' }}
                   >
-                    Include emojis
+                    Emojis
                   </span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-1.5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={shortMode}
                     onChange={(e) => setShortMode(e.target.checked)}
                     disabled={isLoading}
-                    className="w-4 h-4 rounded accent-[var(--cm-accent)]"
+                    className="w-3.5 h-3.5 rounded accent-[var(--cm-accent)]"
                   />
                   <span 
-                    className="text-sm"
-                    style={{ color: 'var(--cm-text-secondary)' }}
+                    className="text-xs"
+                    style={{ color: 'var(--cm-text-tertiary)' }}
                   >
-                    Short captions
+                    Short
                   </span>
                 </label>
               </div>
             </div>
 
-            {/* Generate Button */}
+            {/* Generate Button - Primary CTA */}
             <button
               onClick={handleGenerate}
               disabled={isLoading}
@@ -613,7 +674,7 @@ export const AiCaptionSheet: React.FC<AiCaptionSheetProps> = ({
                   color: selectedCaptionIndex !== null ? 'white' : 'var(--cm-text-tertiary)',
                 }}
               >
-                Add to Post Caption
+                Add to Post
               </button>
             </div>
           )}
