@@ -122,3 +122,6 @@ verify_jwt = true
 
 [functions.generate-caption]
 verify_jwt = true
+
+[functions.smart-compilation]
+verify_jwt = true

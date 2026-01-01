@@ -134,14 +134,17 @@ async function processJob(jobId: string): Promise<void> {
     return;
   }
 
-  // CRITICAL: Fail fast if no files - don't create orphaned posts
-  if (!job.files || job.files.length === 0) {
-    console.error(`[uploadPipeline] Job ${jobId} has no files - aborting`);
+  // Check for compiled video (Smart Compilation - already uploaded to Stream)
+  const hasCompiledVideo = job.mediaItems?.some(m => m.compiledVideo);
+  
+  // CRITICAL: Fail fast if no files and no compiled video - don't create orphaned posts
+  if ((!job.files || job.files.length === 0) && !hasCompiledVideo) {
+    console.error(`[uploadPipeline] Job ${jobId} has no files or compiled video - aborting`);
     uploadManager.markFailed(jobId, 'No media files to upload');
     return;
   }
 
-  console.log(`[uploadPipeline] Processing job ${jobId} with ${job.files.length} files`);
+  console.log(`[uploadPipeline] Processing job ${jobId} with ${job.files.length} files, hasCompiledVideo: ${hasCompiledVideo}`);
 
   // Track uploaded stream UIDs for cleanup on failure
   const uploadedStreamUids: string[] = [];
@@ -167,16 +170,46 @@ async function processJob(jobId: string): Promise<void> {
 
     console.log(`[uploadPipeline] Created post ${postId} for job ${jobId}`);
 
-    // Phase B: Upload media files sequentially
-    const { uploadVideo } = await getCloudflareStream().then(m => ({
-      uploadVideo: async (file: File) => {
-        // Use the hook's upload function via a simple wrapper
-        const { uploadToCloudflareStream } = await import('@/utils/cloudflareStreamUpload');
-        return uploadToCloudflareStream(file);
+    // Handle compiled video specially (no file upload needed)
+    if (hasCompiledVideo) {
+      const compiledMedia = job.mediaItems?.find(m => m.compiledVideo);
+      if (compiledMedia?.compiledVideo) {
+        const { streamId, playbackUrl, posterUrl } = compiledMedia.compiledVideo;
+        
+        console.log(`[uploadPipeline] Using compiled video: ${streamId}`);
+        
+        // Create media record for compiled video
+        const { error: mediaError } = await supabase
+          .from('post_media')
+          .insert({
+            post_id: postId,
+            media_type: 'video',
+            media_url: playbackUrl,
+            display_order: 0,
+            stream_id: streamId,
+            poster_url: posterUrl,
+            studio_edits: { isCompilation: true },
+          });
+
+        if (mediaError) {
+          console.error(`[uploadPipeline] Compiled media record error:`, mediaError);
+          throw mediaError;
+        }
+
+        uploadManager.updateProgress(jobId, 1);
+        uploadedStreamUids.push(streamId);
       }
-    }));
-    
-    const { uploadToCloudflareR2 } = await getCloudflareR2();
+    } else {
+      // Phase B: Upload media files sequentially (normal flow)
+      const { uploadVideo } = await getCloudflareStream().then(m => ({
+        uploadVideo: async (file: File) => {
+          // Use the hook's upload function via a simple wrapper
+          const { uploadToCloudflareStream } = await import('@/utils/cloudflareStreamUpload');
+          return uploadToCloudflareStream(file);
+        }
+      }));
+      
+      const { uploadToCloudflareR2 } = await getCloudflareR2();
 
     for (let index = 0; index < job.files.length; index++) {
       const file = job.files[index];
@@ -265,6 +298,7 @@ async function processJob(jobId: string): Promise<void> {
         throw fileError;
       }
     }
+    } // End of else block for normal file upload flow
 
     // Finalizing phase
     uploadManager.updateStatus(jobId, 'finalizing', postId);
