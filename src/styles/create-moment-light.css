@@ -129,10 +129,9 @@
 
 .cm-grabber {
   width: 36px;
-  height: 5px;
-  background: white;
-  border-radius: 3px;
-  margin: 8px auto;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
   position: relative;
   z-index: 10;
 }

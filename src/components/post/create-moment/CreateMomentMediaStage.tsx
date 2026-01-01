@@ -158,11 +158,11 @@ export default function CreateMomentMediaStage({
           </div>
         )}
 
-        {/* Top scrim for badges */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent z-10" />
+        {/* Top scrim for badges - subtle */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent z-10" />
 
-        {/* Bottom scrim */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/30 to-transparent z-10" />
+        {/* Bottom scrim - subtle */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent z-10" />
 
         {/* Media counter - top left - matching bottom pill style */}
         <div 
