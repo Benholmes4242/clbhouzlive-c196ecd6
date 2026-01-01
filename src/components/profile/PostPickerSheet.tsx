@@ -41,6 +41,7 @@ export function PostPickerSheet({
           id,
           content,
           created_at,
+          badges,
           post_media (
             id,
             media_url,

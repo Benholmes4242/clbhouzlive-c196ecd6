@@ -59,6 +59,7 @@ export const useChannelsFeed = ({ subFilter = 'all' }: UseChannelsFeedProps = {}
           content,
           created_at,
           user_id,
+          badges,
           user_profiles!inner (
             id,
             display_name,

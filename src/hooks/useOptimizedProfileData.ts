@@ -65,7 +65,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
         supabase
           .from('posts')
           .select(`
-            id, content, created_at, user_id,
+            id, content, created_at, user_id, badges,
             post_media(id, media_type, media_url)
           `)
           .eq('user_id', userId)
