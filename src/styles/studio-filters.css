@@ -51,6 +51,7 @@
 }
 
 /* Base filter composition - applies the base filter directly */
+/* Use !important to override Tailwind's blur-0/blur-sm classes which also set filter */
 .clb-filter-normal,
 .clb-filter-vivid,
 .clb-filter-bw,
@@ -61,6 +62,6 @@
 .clb-filter-matte,
 .clb-filter-pop,
 .clb-filter-fade {
-  filter: var(--clb-base-filter, none);
+  filter: var(--clb-base-filter, none) !important;
   transition: filter 0.2s ease-out;
 }
