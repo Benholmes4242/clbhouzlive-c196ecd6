@@ -53,10 +53,10 @@ export const useTrendingFeed = () => {
           created_at,
           user_id,
           actor_type,
+          actor_id,
           post_media!inner(id, media_type, media_url, filter_id, studio_edits)
         `)
         .in('user_id', allConnectedUserIds)
-        .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .or(visibilityFilter) // Apply visibility filter
         .order('created_at', { ascending: false })
         .limit(6); // Optimized limit for performance
