@@ -236,6 +236,9 @@ class UploadManager {
         progress: job.progress,
         error: job.error,
         fileCount: job.files.length,
+        categories: job.categories,
+        visibility: job.visibility,
+        badges: job.badges,
       }));
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
@@ -276,6 +279,9 @@ class UploadManager {
           progress: s.progress,
           error: wasMidUpload ? 'Upload interrupted - page was refreshed' : s.error,
           files: [], // Files cannot be restored
+          categories: s.categories,
+          visibility: s.visibility,
+          badges: s.badges,
         };
 
         this.jobs.set(s.jobId, job);

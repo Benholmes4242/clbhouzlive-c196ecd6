@@ -78,6 +78,7 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
       content,
       created_at,
       user_id,
+      badges,
       post_media!inner(
         media_url,
         duration_seconds,

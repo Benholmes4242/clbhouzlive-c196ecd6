@@ -111,4 +111,8 @@ export interface SerializedUploadJob {
   error?: string;
   // Files cannot be serialized - job will be marked failed on restore
   fileCount: number;
+  // v2 fields
+  categories?: string[];
+  visibility?: 'anyone' | 'followers' | 'private';
+  badges?: string[];
 }

@@ -38,6 +38,7 @@ export const useExploreContent = () => {
           content,
           created_at,
           user_id,
+          badges,
           post_media!inner (
             id,
             media_type,

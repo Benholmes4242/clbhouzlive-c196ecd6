@@ -49,6 +49,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             content,
             created_at,
             course_id,
+            badges,
             post_media!inner (
               id,
               media_type,

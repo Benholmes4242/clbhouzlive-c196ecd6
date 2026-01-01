@@ -120,6 +120,7 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
           pinned_at,
           actor_type,
           actor_id,
+          badges,
           post_media (
             id,
             media_url,
