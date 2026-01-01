@@ -145,6 +145,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     
     // Filter ID
     filterId: primaryMedia.filter_id ?? (primaryMedia.studio_edits as any)?.filter ?? null,
+    
+    // Achievement badges
+    badges: post.badges,
   };
 }
 

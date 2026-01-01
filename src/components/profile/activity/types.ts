@@ -46,6 +46,7 @@ export interface ActivityPost {
   timeAgo: string;
   created_at: string;
   course_id?: string | null;
+  badges?: string[] | null;
   post_media: Array<{
     id: string;
     media_type: 'image' | 'video';

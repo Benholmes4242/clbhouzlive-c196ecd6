@@ -96,6 +96,9 @@ export interface UnifiedMediaItem {
   // Filter ID for studio filters
   filterId?: string | null;
   
+  // Achievement badges
+  badges?: string[] | null;
+  
   // Computed tile display (set by layout utils)
   tileDisplay?: TileDisplayInfo;
 }

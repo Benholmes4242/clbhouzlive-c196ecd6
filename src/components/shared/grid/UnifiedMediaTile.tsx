@@ -10,6 +10,7 @@ import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from 
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -247,6 +248,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           )}
         </div>
       </div>
+
+      {/* Achievement Badges overlay - top left */}
+      <AchievementBadgesOverlay badgeIds={item.badges} />
 
       {/* Text overlays from studioEdits - OUTSIDE filtered layer */}
       {studioEdits?.textOverlays?.length > 0 && (

@@ -33,6 +33,7 @@ function convertToGridPost(post: LocalActivityPost): ActivityPost {
     shares: post.shares,
     timeAgo: post.timeAgo,
     created_at: post.created_at,
+    badges: post.badges,
     post_media: post.post_media,
     post_tags: post.post_tags.map(tag => ({
       id: tag.id,
