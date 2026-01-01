@@ -11,7 +11,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
-import CompactHeader from '@/components/header/CompactHeader';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 
@@ -223,11 +222,9 @@ const ActivityPage: React.FC = () => {
   const isAllCaughtUp = hasNotifications && effectiveNewItems.length === 0;
 
   return (
-    <PageRoot className="pb-24">
-      <CompactHeader />
-
+    <PageRoot className="pb-24 compact-header-offset">
       {/* Header section with padding */}
-      <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
+      <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6">
         <section className="mb-4">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Activity

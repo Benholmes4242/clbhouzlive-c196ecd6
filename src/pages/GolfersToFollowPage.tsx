@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import CompactHeader from '@/components/header/CompactHeader';
 import { Search, ChevronLeft, Check, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
@@ -131,10 +130,8 @@ const GolfersToFollowPage = () => {
   const hasMore = page < totalPages;
 
   return (
-    <PageRoot className="bg-muted/40 pb-24">
-      <CompactHeader />
-
-      <div className="w-full compact-header-offset">
+    <PageRoot className="bg-muted/40 pb-24 compact-header-offset">
+      <div className="w-full">
         {/* Back CTA - top left, matching Notifications page */}
         <div className="px-4 pt-3">
           <button

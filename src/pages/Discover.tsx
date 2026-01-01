@@ -1,5 +1,4 @@
 import React, { useState, useMemo, lazy, Suspense, useEffect } from 'react';
-import CompactHeader from '@/components/header/CompactHeader';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -227,8 +226,7 @@ const Discover = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)]">
-      <CompactHeader />
+    <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)] compact-header-offset">
       <FadeInContent>
         <main className="pb-20 bg-[var(--bg-page)]">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
