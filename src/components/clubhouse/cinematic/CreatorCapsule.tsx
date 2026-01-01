@@ -174,12 +174,15 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           )}
         >
           <Music className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-          <span className="text-[12px] text-white/60 truncate flex-1 min-w-0">
-            {musicTrack.title}
-            {musicTrack.artist && ` • ${musicTrack.artist}`}
-          </span>
-          {/* Soundwave animation - only visible when music is playing (unmuted) */}
-          {isMusicPlaying && <SoundwaveAnimation />}
+          {/* Left-aligned group: text + soundwave together */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[12px] text-white/60 truncate">
+              {musicTrack.title}
+              {musicTrack.artist && ` • ${musicTrack.artist}`}
+            </span>
+            {/* Soundwave animation - sits immediately after song text */}
+            {isMusicPlaying && <SoundwaveAnimation />}
+          </div>
         </button>
       )}
 
