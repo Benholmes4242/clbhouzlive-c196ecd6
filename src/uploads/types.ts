@@ -58,7 +58,7 @@ export interface UploadJob {
     country: string;
   } | null;
   selectedTags?: any[];
-  mediaItems?: Array<{ id: string; file: File }>;
+  mediaItems?: Array<{ id: string; file?: File; compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number } }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   
   // v2 fields
@@ -88,7 +88,7 @@ export interface UploadJobInput {
   } | null;
   selectedTags?: any[];
   files: File[];
-  mediaItems?: Array<{ id: string; file: File }>;
+  mediaItems?: Array<{ id: string; file?: File; compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number } }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   // New v2 fields
   categories?: string[];
