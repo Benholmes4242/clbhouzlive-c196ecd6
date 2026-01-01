@@ -47,6 +47,15 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const hasPreloadedFirst = useRef(false);
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
+  
+  // Keep refs in sync with props to avoid stale closure in scroll handler
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+    isLoadingRef.current = isLoading;
+    logGrid('PROPS_SYNC', { hasMore, isLoading, itemCount: items.length });
+  }, [hasMore, isLoading, items.length]);
 
   // Log mount - with audit timeline
   useEffect(() => {
@@ -151,17 +160,39 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     });
   }, [flatItems.length, visibleIndices]);
 
-  // Infinite scroll handler
+  // Infinite scroll handler - uses refs to avoid stale closures
   useEffect(() => {
-    if (!config.infiniteScroll || !onLoadMore) return;
+    if (!config.infiniteScroll || !onLoadMore) {
+      logGrid('INFINITE_SCROLL_DISABLED', { infiniteScroll: config.infiniteScroll, hasOnLoadMore: !!onLoadMore });
+      return;
+    }
+
+    logGrid('INFINITE_SCROLL_SETUP', { hasMore: hasMoreRef.current, isLoading: isLoadingRef.current, itemCount: items.length });
 
     const handleScroll = () => {
-      if (!gridRef.current || !hasMore || loadingRef.current || isLoading) return;
-
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
       const scrollThreshold = scrollHeight - clientHeight - 800;
+      
+      // Use refs to get current values (avoids stale closure)
+      const currentHasMore = hasMoreRef.current;
+      const currentIsLoading = isLoadingRef.current;
+      
+      // Debug: log scroll state periodically
+      if (Math.random() < 0.05) { // Log 5% of scroll events to avoid spam
+        logGrid('SCROLL_CHECK', { 
+          scrollTop: Math.round(scrollTop), 
+          scrollThreshold: Math.round(scrollThreshold),
+          hasMore: currentHasMore,
+          loadingRef: loadingRef.current,
+          isLoading: currentIsLoading,
+          gridRefExists: !!gridRef.current
+        });
+      }
+
+      if (!gridRef.current || !currentHasMore || loadingRef.current || currentIsLoading) return;
 
       if (scrollTop > scrollThreshold) {
+        logGrid('LOAD_MORE_TRIGGERED', { scrollTop: Math.round(scrollTop), threshold: Math.round(scrollThreshold) });
         loadingRef.current = true;
         onLoadMore();
         setTimeout(() => {
@@ -172,7 +203,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [config.infiniteScroll, hasMore, isLoading, onLoadMore]);
+  }, [config.infiniteScroll, onLoadMore]); // Removed hasMore, isLoading - using refs instead
 
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
     onItemClick?.(item, index);
