@@ -198,7 +198,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               variant="ghost"
               size="icon"
               className={cn(
-                "h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
+                "h-8 w-8 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
                 useLightTheme
                   ? "text-slate-600 hover:text-slate-800 hover:bg-slate-900/5"
                   : isDimmed 
