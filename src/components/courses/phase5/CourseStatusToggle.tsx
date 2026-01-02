@@ -1,9 +1,9 @@
 /**
- * CourseStatusToggle - Personal status toggle (Played / Want to Play)
- * Phase 5: Calm, private-first design with toast confirmations
+ * CourseStatusToggle - Personal status toggle (Played / Want to Play / Wishlist)
+ * Phase 5: Calm, private-first design with mutually exclusive states
  */
 import React from 'react';
-import { Check, Bookmark, MapPin, Loader2 } from 'lucide-react';
+import { Check, Bookmark, Heart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus, CourseStatus } from '@/hooks/useCoursePersonalStatus';
@@ -25,7 +25,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { status, isLoading, setWantToPlay, setNextUp, isUpdating } = useCoursePersonalStatus(courseId);
+  const { status, isLoading, setWantToPlay, setWishlist, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) {
     return (
@@ -54,43 +54,49 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   }
 
   const handlePlayedClick = () => {
-    if (status.status === 'played') {
-      // Already played - go to edit rating
-      navigate(`/courses/${courseId}/rate`);
-    } else {
-      // Not played - go to rate
-      navigate(`/courses/${courseId}/rate`);
-    }
+    // Navigate to rate page
+    navigate(`/courses/${courseId}/rate`);
   };
 
   const handleWantToPlayClick = async () => {
+    if (status.status === 'played') return; // Disable if played
+    
     if (status.status === 'want_to_play') {
       await setWantToPlay(false);
       toast({
-        description: "Removed from your journey",
+        description: "Removed from Want to Play",
         duration: 2000,
       });
-    } else if (status.status !== 'played') {
+    } else {
       await setWantToPlay(true);
       toast({
-        description: "Added to your journey",
+        description: "Added to Want to Play",
         duration: 2000,
       });
     }
   };
 
-  const handleNextUpClick = async () => {
-    const wasNextUp = status.status === 'next_up';
-    await setNextUp(!wasNextUp);
-    toast({
-      description: wasNextUp ? "Removed from Next Up" : "Marked as Next Up",
-      duration: 2000,
-    });
+  const handleWishlistClick = async () => {
+    if (status.status === 'played') return; // Disable if played
+    
+    if (status.status === 'wishlist') {
+      await setWishlist(false);
+      toast({
+        description: "Removed from Wishlist",
+        duration: 2000,
+      });
+    } else {
+      await setWishlist(true);
+      toast({
+        description: "Added to Wishlist",
+        duration: 2000,
+      });
+    }
   };
 
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
-  const isNextUp = status.status === 'next_up';
+  const isWishlist = status.status === 'wishlist';
   const hasNoSelection = status.status === 'none';
 
   return (
@@ -103,7 +109,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
       )}
       
       {/* Status pills */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {/* Played status */}
         <button
           onClick={handlePlayedClick}
@@ -119,45 +125,52 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           {isPlayed ? 'Played' : 'Mark Played'}
         </button>
 
-        {/* Want to Play / Next Up */}
-        {!isPlayed && (
-          <button
-            onClick={handleWantToPlayClick}
-            disabled={isUpdating}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all",
-              isWantToPlay || isNextUp
-                ? "bg-amber-100 text-amber-800 border border-amber-200"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent"
-            )}
-          >
-            {isUpdating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Bookmark className={cn("h-4 w-4", (isWantToPlay || isNextUp) && "fill-amber-500")} />
-            )}
-            {isWantToPlay ? 'Want to Play' : isNextUp ? 'Next Up' : 'Want to Play'}
-          </button>
-        )}
+        {/* Want to Play - disabled if played */}
+        <button
+          onClick={handleWantToPlayClick}
+          disabled={isUpdating || isPlayed}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all",
+            isPlayed && "opacity-40 cursor-not-allowed",
+            isWantToPlay
+              ? "bg-amber-100 text-amber-800 border border-amber-200"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent"
+          )}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Bookmark className={cn("h-4 w-4", isWantToPlay && "fill-amber-500")} />
+          )}
+          {isWantToPlay ? '✓ Want to Play' : 'Want to Play'}
+        </button>
+
+        {/* Wishlist - disabled if played */}
+        <button
+          onClick={handleWishlistClick}
+          disabled={isUpdating || isPlayed}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all",
+            isPlayed && "opacity-40 cursor-not-allowed",
+            isWishlist
+              ? "bg-rose-100 text-rose-800 border border-rose-200"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent"
+          )}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Heart className={cn("h-4 w-4", isWishlist && "fill-rose-500")} />
+          )}
+          {isWishlist ? '✓ Wishlist' : 'Wishlist'}
+        </button>
       </div>
 
-      {/* Next Up option if Want to Play is selected - indented for hierarchy */}
-      {(isWantToPlay || isNextUp) && (
-        <div className="pl-2">
-          <button
-            onClick={handleNextUpClick}
-            disabled={isUpdating}
-            className={cn(
-              "flex items-center gap-2 text-sm transition-colors",
-              isNextUp
-                ? "text-amber-700 font-medium"
-                : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <MapPin className={cn("h-3.5 w-3.5", isNextUp && "fill-amber-500")} />
-            {isNextUp ? "Marked as Next Up" : "Mark as Next Up"}
-          </button>
-        </div>
+      {/* Wishlist privacy note */}
+      {isWishlist && (
+        <p className="text-xs text-slate-400">
+          Saved for later — visible only to you
+        </p>
       )}
     </div>
   );

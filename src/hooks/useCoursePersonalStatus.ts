@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
 
-export type CourseStatus = 'played' | 'want_to_play' | 'next_up' | 'none';
+export type CourseStatus = 'played' | 'want_to_play' | 'wishlist' | 'none';
 
 export interface CoursePersonalStatus {
   status: CourseStatus;
@@ -58,7 +58,7 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
         .maybeSingle();
 
       if (shortlist) {
-        const status = shortlist.list_key === 'next_up' ? 'next_up' : 'want_to_play';
+        const status = shortlist.list_key === 'wishlist' ? 'wishlist' : 'want_to_play';
         return {
           status,
           shortlistId: shortlist.id,
@@ -111,12 +111,12 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     },
   });
 
-  // Set as next up
-  const setNextUpMutation = useMutation({
-    mutationFn: async (nextUp: boolean) => {
+  // Set wishlist (private)
+  const setWishlistMutation = useMutation({
+    mutationFn: async (wishlist: boolean) => {
       if (!user?.id || !courseId) throw new Error('Not authenticated');
 
-      if (nextUp) {
+      if (wishlist) {
         // Remove any existing shortlist first
         await supabase
           .from('course_shortlists')
@@ -124,13 +124,13 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
           .eq('course_id', courseId)
           .eq('user_id', user.id);
 
-        // Add as next up
+        // Add as wishlist
         const { error } = await supabase
           .from('course_shortlists')
           .insert({
             user_id: user.id,
             course_id: courseId,
-            list_key: 'next_up',
+            list_key: 'wishlist',
           });
         if (error && error.code !== '23505') throw error;
       } else {
@@ -142,8 +142,8 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
         if (error) throw error;
       }
     },
-    onSuccess: (_, nextUp) => {
-      toast.success(nextUp ? 'Marked as Next Up' : 'Removed from Next Up');
+    onSuccess: (_, wishlist) => {
+      toast.success(wishlist ? 'Added to Wishlist' : 'Removed from Wishlist');
       queryClient.invalidateQueries({ queryKey: ['course-personal-status', courseId] });
     },
     onError: () => {
@@ -155,7 +155,7 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     status: query.data ?? { status: 'none' as const },
     isLoading: query.isLoading,
     setWantToPlay: (want: boolean) => setWantToPlayMutation.mutate(want),
-    setNextUp: (next: boolean) => setNextUpMutation.mutate(next),
-    isUpdating: setWantToPlayMutation.isPending || setNextUpMutation.isPending,
+    setWishlist: (wish: boolean) => setWishlistMutation.mutate(wish),
+    isUpdating: setWantToPlayMutation.isPending || setWishlistMutation.isPending,
   };
 }

@@ -1,17 +1,20 @@
 /**
  * MapCourseSheet - Bottom sheet for selected course on the Top 100 Map
  * Draggable between peek, half, and full states with course photo hero
+ * Includes journey actions: Mark Played, Want to Play, Wishlist
  */
 
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Star, Bookmark, ChevronUp, Flag } from 'lucide-react';
+import { Globe, Star, Bookmark, Heart, ChevronUp, Flag, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Top100MapCourse } from '@/hooks/useTop100MapCourses';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from 'sonner';
 
 interface MapCourseSheetProps {
   course: Top100MapCourse | null;
@@ -45,15 +48,100 @@ const useCourseImage = (courseId: string | undefined) => {
   });
 };
 
+// Hook for course shortlist status
+const useCourseShortlistStatus = (courseId: string | undefined, userId: string | undefined) => {
+  return useQuery({
+    queryKey: ['course-shortlist-status', courseId, userId],
+    queryFn: async () => {
+      if (!courseId || !userId) return null;
+      const { data } = await supabase
+        .from('course_shortlists')
+        .select('id, list_key')
+        .eq('course_id', courseId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!courseId && !!userId,
+    staleTime: 30_000,
+  });
+};
+
 export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   course,
   onClose,
   scope,
 }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user } = useSupabaseSession();
   const [sheetState, setSheetState] = useState<SheetState>('half');
   
   const { data: thumbnailImage } = useCourseImage(course?.id);
+  const { data: shortlistStatus } = useCourseShortlistStatus(course?.id, user?.id);
+
+  const isWantToPlay = shortlistStatus?.list_key === 'want_to_play';
+  const isWishlist = shortlistStatus?.list_key === 'wishlist';
+
+  // Mutation to toggle want to play
+  const toggleWantToPlayMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id || !course?.id) throw new Error('Not authenticated');
+      
+      if (isWantToPlay) {
+        await supabase.from('course_shortlists').delete()
+          .eq('course_id', course.id)
+          .eq('user_id', user.id);
+      } else {
+        // Remove any existing first
+        await supabase.from('course_shortlists').delete()
+          .eq('course_id', course.id)
+          .eq('user_id', user.id);
+        await supabase.from('course_shortlists').insert({
+          course_id: course.id,
+          user_id: user.id,
+          list_key: 'want_to_play',
+        });
+      }
+    },
+    onSuccess: () => {
+      toast.success(isWantToPlay ? 'Removed from Want to Play' : 'Added to Want to Play');
+      queryClient.invalidateQueries({ queryKey: ['course-shortlist-status', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['top100-map-courses'] });
+    },
+    onError: () => toast.error('Failed to update'),
+  });
+
+  // Mutation to toggle wishlist
+  const toggleWishlistMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id || !course?.id) throw new Error('Not authenticated');
+      
+      if (isWishlist) {
+        await supabase.from('course_shortlists').delete()
+          .eq('course_id', course.id)
+          .eq('user_id', user.id);
+      } else {
+        // Remove any existing first
+        await supabase.from('course_shortlists').delete()
+          .eq('course_id', course.id)
+          .eq('user_id', user.id);
+        await supabase.from('course_shortlists').insert({
+          course_id: course.id,
+          user_id: user.id,
+          list_key: 'wishlist',
+        });
+      }
+    },
+    onSuccess: () => {
+      toast.success(isWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
+      queryClient.invalidateQueries({ queryKey: ['course-shortlist-status', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['top100-map-courses'] });
+    },
+    onError: () => toast.error('Failed to update'),
+  });
+
+  const isUpdating = toggleWantToPlayMutation.isPending || toggleWishlistMutation.isPending;
 
   const handleDragEnd = useCallback(
     (_: any, info: PanInfo) => {
@@ -90,9 +178,20 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     return labels[scopeKey] || 'Global';
   };
 
+  const getStatusLabel = (): { text: string; className: string } => {
+    if (course?.user_has_rated) {
+      return { text: '✓ Played', className: 'bg-emerald-500/90 text-white' };
+    }
+    if (isWantToPlay) {
+      return { text: 'Want to Play', className: 'bg-[#F7931E]/90 text-white' };
+    }
+    return { text: 'Not Played', className: 'bg-white/90 text-slate-600 dark:bg-slate-800/90 dark:text-slate-300' };
+  };
+
   if (!course) return null;
 
   const showCtAs = sheetState === 'half' || sheetState === 'full';
+  const statusBadge = getStatusLabel();
 
   return (
     <AnimatePresence>
@@ -170,12 +269,10 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               <span
                 className={cn(
                   'inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm',
-                  course.user_has_rated
-                    ? 'bg-emerald-500/90 text-white'
-                    : 'bg-white/90 text-slate-600 dark:bg-slate-800/90 dark:text-slate-300'
+                  statusBadge.className
                 )}
               >
-                {course.user_has_rated ? '✓ Played' : 'Not Played'}
+                {statusBadge.text}
               </span>
             </div>
           </div>
@@ -211,42 +308,66 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                   Your rating: {course.user_rating.toFixed(1)}
                 </span>
               )}
-              
-              {/* Played status pill - compact version */}
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium',
-                  course.user_has_rated
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-                    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-                )}
-              >
-                {course.user_has_rated ? '✓ Played' : '○ Not played'}
-              </span>
             </div>
 
             {/* CTAs - only visible when half/full */}
             {showCtAs && (
-              <div className="flex gap-3 mt-5">
+              <div className="space-y-3 mt-5">
+                {/* Primary action */}
                 <Button
-                  className="flex-1"
+                  className="w-full"
                   onClick={() => navigate(`/courses/${course.id}`)}
                 >
                   View course
                 </Button>
                 
-                {!course.user_has_rated && (
-                  <Button
-                    variant="outline"
-                    className="flex-shrink-0"
-                    onClick={() => {
-                      // TODO: Add to wishlist functionality
-                      console.log('Add to wishlist:', course.id);
-                    }}
-                  >
-                    <Bookmark className="h-4 w-4 mr-1.5" />
-                    Wishlist
-                  </Button>
+                {/* Journey actions - only if not played */}
+                {!course.user_has_rated && user && (
+                  <div className="flex gap-2">
+                    {/* Mark as Played */}
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => navigate(`/courses/${course.id}/rate`)}
+                    >
+                      <Check className="h-4 w-4 mr-1.5" />
+                      Mark Played
+                    </Button>
+                    
+                    {/* Want to Play toggle */}
+                    <Button
+                      variant={isWantToPlay ? 'default' : 'outline'}
+                      size="icon"
+                      className={cn(
+                        isWantToPlay && 'bg-[#F7931E] hover:bg-[#F7931E]/90'
+                      )}
+                      onClick={() => toggleWantToPlayMutation.mutate()}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Bookmark className={cn('h-4 w-4', isWantToPlay && 'fill-current')} />
+                      )}
+                    </Button>
+                    
+                    {/* Wishlist toggle */}
+                    <Button
+                      variant={isWishlist ? 'default' : 'outline'}
+                      size="icon"
+                      className={cn(
+                        isWishlist && 'bg-rose-500 hover:bg-rose-500/90'
+                      )}
+                      onClick={() => toggleWishlistMutation.mutate()}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Heart className={cn('h-4 w-4', isWishlist && 'fill-current')} />
+                      )}
+                    </Button>
+                  </div>
                 )}
               </div>
             )}

@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type Top100MapScope = 'global' | 'gb-i' | 'usa' | 'europe';
 
+export type CourseJourneyStatus = 'played' | 'want_to_play' | 'none';
+
 export interface Top100MapCourse {
   id: string;
   name: string;
@@ -15,6 +17,7 @@ export interface Top100MapCourse {
   list_slug: Top100MapScope;
   user_has_rated: boolean;
   user_rating: number | null;
+  journey_status: CourseJourneyStatus;
 }
 
 export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
@@ -64,7 +67,10 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
 
       // 3) Get user's rated courses if userId provided
       let ratedCoursesMap = new Map<string, number>();
+      let wantToPlaySet = new Set<string>();
+      
       if (userId) {
+        // Fetch ratings
         const { data: ratings, error: ratingsError } = await supabase
           .from('course_ratings')
           .select('course_id, rating')
@@ -74,6 +80,19 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
         if (!ratingsError && ratings) {
           ratings.forEach((r: any) => {
             ratedCoursesMap.set(r.course_id, r.rating);
+          });
+        }
+
+        // Fetch want to play (shortlists with list_key = 'want_to_play')
+        const { data: shortlists, error: shortlistError } = await supabase
+          .from('course_shortlists')
+          .select('course_id, list_key')
+          .eq('user_id', userId)
+          .eq('list_key', 'want_to_play');
+
+        if (!shortlistError && shortlists) {
+          shortlists.forEach((s: any) => {
+            wantToPlaySet.add(s.course_id);
           });
         }
       }
@@ -95,6 +114,17 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
         // Keep the best (lowest) rank if duplicate
         if (!existingCourse || (existingCourse.rank || 9999) > currentRank) {
           const userRating = ratedCoursesMap.get(course.id);
+          const hasRated = ratedCoursesMap.has(course.id);
+          const wantsToPlay = wantToPlaySet.has(course.id);
+          
+          // Determine journey status
+          let journeyStatus: CourseJourneyStatus = 'none';
+          if (hasRated) {
+            journeyStatus = 'played';
+          } else if (wantsToPlay) {
+            journeyStatus = 'want_to_play';
+          }
+          
           coursesMap.set(course.id, {
             id: course.id,
             name: course.name,
@@ -105,8 +135,9 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
             longitude: course.longitude,
             rank: m.rank,
             list_slug: scope,
-            user_has_rated: ratedCoursesMap.has(course.id),
+            user_has_rated: hasRated,
             user_rating: userRating || null,
+            journey_status: journeyStatus,
           });
         }
       });
