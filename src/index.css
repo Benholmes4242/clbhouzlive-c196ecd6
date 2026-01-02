@@ -428,13 +428,13 @@ html.lightbox-open {
 
 /* Compact header content offset - use when CompactHeader is present */
 .compact-header-offset {
-  padding-top: calc(50px + var(--sat));
+  padding-top: calc(40px + var(--sat));
 }
 
 /* Discover needs the compact header offset WITHOUT adding safe-area again
    (CompactHeader already handles safe-area padding internally). */
 .compact-header-offset-no-safe {
-  padding-top: 50px;
+  padding-top: 40px;
 }
 
 /* ========================================
