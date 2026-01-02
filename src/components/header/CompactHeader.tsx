@@ -97,6 +97,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Hide brand (logo + wordmark) when dimmed on Clubhouse
   const hideBrand = isDimmed && isClubhouseRoute;
 
+  // Clubhouse uses 55px header, other pages use 40px
+  const headerHeight = isClubhouseRoute ? 55 : 40;
+  
   return (
     <>
       <header
@@ -104,7 +107,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         className={cn(
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
-          "fixed top-0 left-0 right-0 z-header h-[40px]",
+          "fixed top-0 left-0 right-0 z-header",
           
           className
         )}
@@ -114,13 +117,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           // Only Clubhouse gets safe-area padding (header bg extends into notch)
           paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : undefined,
-          height: isClubhouseRoute ? 'calc(40px + env(safe-area-inset-top))' : undefined,
+          height: isClubhouseRoute ? `calc(${headerHeight}px + env(safe-area-inset-top))` : `${headerHeight}px`,
           borderBottom: `1px solid ${getBorder()}`,
           boxShadow: isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
       >
-        <div className="mx-auto flex h-[40px] items-center justify-between px-3 sm:px-4 max-w-5xl">
+        <div 
+          className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
+          style={{ height: `${headerHeight}px` }}
+        >
           {/* Left: Logo icon (mobile) + wordmark (desktop) */}
           <button
             type="button"
@@ -132,14 +138,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="clbhouz"
               className={cn(
-                "h-8 w-8 object-contain transition-opacity duration-300",
+                "object-contain transition-opacity duration-300",
+                isClubhouseRoute ? "h-10 w-10" : "h-8 w-8",
                 hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />
             {/* Wordmark - desktop only */}
             <span 
               className={cn(
-                "hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300",
+                "hidden md:inline font-semibold tracking-tight transition-colors duration-300",
+                isClubhouseRoute ? "text-xl" : "text-lg",
                 useLightTheme ? "text-slate-800" : ""
               )}
               style={{ color: useLightTheme ? '#3A3F46' : hideBrand ? 'rgba(255, 255, 255, 0)' : isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
@@ -198,7 +206,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               variant="ghost"
               size="icon"
               className={cn(
-                "h-8 w-8 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
+                "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
+                isClubhouseRoute ? "h-10 w-10" : "h-8 w-8",
                 useLightTheme
                   ? "text-slate-600 hover:text-slate-800 hover:bg-slate-900/5"
                   : isDimmed 
@@ -209,7 +218,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               onClick={handleSearchClick}
               aria-label="Search"
             >
-              <Search className="h-5 w-5" />
+              <Search className={isClubhouseRoute ? "h-6 w-6" : "h-5 w-5"} />
             </Button>
             
             {/* Identity pill (mobile only, logged in users) */}
