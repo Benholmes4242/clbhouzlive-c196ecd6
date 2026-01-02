@@ -320,19 +320,19 @@ const GolfersToFollowPage = () => {
                             Following
                           </button>
                         ) : (
-                          <Button
-                            variant="gradient"
-                            size="sm"
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleFollowToggle(golfer.id, golfer.displayName, false);
                             }}
                             disabled={isActioning}
-                            className="px-4 py-2 text-sm h-8 flex-shrink-0"
+                            className={cn(
+                              followButtonClass,
+                              "border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
+                            )}
                           >
-                            <UserPlus className="w-3 h-3" />
-                            <span className="ml-1">Follow</span>
-                          </Button>
+                            Follow
+                          </button>
                         )}
 
                         {/* Add friend button - SECONDARY (always visible) */}

@@ -90,10 +90,11 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
 
       {/* Animated orange underline */}
       <div 
-        className="absolute bottom-0 h-0.5 bg-orange-500 transition-all duration-200 ease-out rounded-full"
+        className="absolute bottom-0 h-0.5 transition-all duration-200 ease-out rounded-full"
         style={{
           left: underlineStyle.left,
           width: underlineStyle.width,
+          backgroundColor: '#F79E1B',
         }}
       />
     </div>
