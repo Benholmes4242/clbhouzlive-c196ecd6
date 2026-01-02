@@ -362,7 +362,7 @@ const CourseExplorer = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > 0 && totalCount > EXPLORE_PAGE_SIZE;
 
   return (
-    <div className="w-full space-y-block pb-24">
+    <div className="w-full space-y-block pb-section">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
@@ -507,7 +507,7 @@ const CourseExplorer = () => {
 
           {/* Load more button */}
           {showLoadMoreButton && (
-            <div className="relative z-10 py-6 flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 pt-4">
               <Button
                 variant="outline"
                 size="sm"
