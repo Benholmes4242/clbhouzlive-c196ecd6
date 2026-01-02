@@ -2,7 +2,11 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseSearchFilters, SearchedCourse } from './useGolfCoursesSearch';
 
-const PAGE_SIZE = 25;
+/**
+ * Page size for infinite scroll fetching.
+ * Set to 100 to fetch complete Top 100 lists in a single request.
+ */
+const PAGE_SIZE = 100;
 
 // Extended type that includes rating
 export interface SearchedCourseWithRating extends SearchedCourse {

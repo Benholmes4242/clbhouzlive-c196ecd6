@@ -431,24 +431,30 @@ const Top100CoursesHubPanel = () => {
                     size="sm"
                     onClick={loadMore}
                     disabled={isLoadingMore}
-                    className="w-full max-w-xs gap-1.5"
+                    className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
                   >
-                    <ChevronDown className="h-4 w-4" />
-                    {isLoadingMore 
-                      ? 'Loading...' 
-                      : `Next ${Math.min(PAGE_SIZE, totalCount - displayedCourses.length)} courses`
-                    }
+                    {isLoadingMore ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                        Loading next courses…
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        Next {Math.min(PAGE_SIZE, totalCount - displayedCourses.length)} courses
+                      </>
+                    )}
                   </Button>
                   <p className="text-[11px] text-muted-foreground">
-                    Showing 1–{displayedCourses.length} of {totalCount} courses
+                    Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
                   </p>
                 </div>
               )}
 
               {/* End message */}
               {showEndMessage && (
-                <p className="text-center text-[11px] text-muted-foreground pt-2">
-                  You've reached the end • {totalCount} courses total
+                <p className="text-center text-[11px] text-muted-foreground pt-4">
+                  You've reached the end • {totalCount.toLocaleString()} courses total
                 </p>
               )}
             </>
