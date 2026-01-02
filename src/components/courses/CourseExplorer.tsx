@@ -500,48 +500,48 @@ const CourseExplorer = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Course list - using VirtualizedCourseList */}
-          <VirtualizedCourseList 
-            courses={displayedCourses}
-            onCourseClick={handleCourseClick}
-          />
+        <VirtualizedCourseList 
+          courses={displayedCourses}
+          onCourseClick={handleCourseClick}
+          footer={
+            <>
+              {/* Load more button */}
+              {showLoadMoreButton && (
+                <div className="flex flex-col items-center gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={loadMore}
+                    disabled={isLoadingMore}
+                    className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
+                  >
+                    {isLoadingMore ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                        Loading next courses…
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        Next {Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground">
+                    Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
+                  </p>
+                </div>
+              )}
 
-          {/* Load more button */}
-          {showLoadMoreButton && (
-            <div className="flex flex-col items-center gap-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={loadMore}
-                disabled={isLoadingMore}
-                className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
-              >
-                {isLoadingMore ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                    Loading next courses…
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-4 w-4" />
-                    Next {Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses
-                  </>
-                )}
-              </Button>
-              <p className="text-[11px] text-muted-foreground">
-                Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
-              </p>
-            </div>
-          )}
-
-          {/* End message */}
-          {showEndMessage && (
-            <p className="text-center text-[11px] text-muted-foreground pt-4">
-              You've reached the end • {totalCount.toLocaleString()} courses total
-            </p>
-          )}
-        </div>
+              {/* End message */}
+              {showEndMessage && (
+                <p className="text-center text-[11px] text-muted-foreground pt-4">
+                  You've reached the end • {totalCount.toLocaleString()} courses total
+                </p>
+              )}
+            </>
+          }
+        />
       )}
     </div>
   );
