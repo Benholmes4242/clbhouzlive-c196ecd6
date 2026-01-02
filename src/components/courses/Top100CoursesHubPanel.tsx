@@ -223,19 +223,19 @@ const Top100CoursesHubPanel = () => {
 
       {/* 2. Personal Progress Section */}
       {user && (
-        <section className="space-y-block">
+        <section className="space-y-3">
           {/* Progress Summary */}
-          <div className="text-center space-y-internal">
-            <p className="text-sm text-foreground">
-              You've rated <span className="font-semibold">{totalRated}</span> course{totalRated === 1 ? '' : 's'} across{' '}
-              <span className="font-semibold">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              You've rated <span className="font-medium text-foreground">{totalRated}</span> course{totalRated === 1 ? '' : 's'} across{' '}
+              <span className="font-medium text-foreground">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}
             </p>
             
-            {/* Progress bar - h-2, rounded-full, animated */}
+            {/* Progress bar - h-[5px], rounded-full, animated */}
             <div className="max-w-md mx-auto">
-              <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
+              <div className="h-[5px] w-full overflow-hidden rounded-full bg-slate-200/60">
                 <div
-                  className="h-2 rounded-full bg-amber-500 transition-all duration-300 ease-out"
+                  className="h-[5px] rounded-full bg-amber-500/90 transition-all duration-500 ease-out"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
@@ -246,13 +246,13 @@ const Top100CoursesHubPanel = () => {
           <button
             type="button"
             onClick={handleOpenTop100Club}
-            className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-4 text-left cursor-pointer hover:bg-muted/30 active:scale-[0.99] transition-all"
+            className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-3 text-left cursor-pointer hover:bg-muted/30 hover:shadow-md active:scale-[0.99] transition-all duration-150"
             aria-label="Open Top 100 Club"
             role="link"
           >
-            <div className="flex gap-4 items-stretch">
-              {/* Left: Badge tile */}
-              <div className="w-[150px] shrink-0">
+            <div className="flex gap-3 items-stretch">
+              {/* Left: Badge tile - reduced by ~10% */}
+              <div className="w-[135px] shrink-0">
                 {totalRated >= 5 ? (
                   <AchievementBadgeCard
                     tier={club.threshold?.toString() as AchievementTier || '5'}
@@ -275,16 +275,16 @@ const Top100CoursesHubPanel = () => {
                   <p className="font-semibold text-foreground truncate">
                     {totalRated >= 5 ? club.tierName : 'Start your journey'}
                   </p>
-                  <p className="text-sm text-muted-foreground truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {totalRated >= 5 ? 'Unlocked' : `Rate ${5 - totalRated} more Top 100 courses to unlock`}
                   </p>
                 </div>
 
                 {/* Row 2: CTA hint pinned bottom-right */}
-                <div className="flex justify-end mt-2">
+                <div className="flex justify-end mt-1.5">
                   <span className="group inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
                     Visit Top 100 Club
-                    <ChevronRight className="h-3.5 w-3.5 ml-[2px]" />
+                    <ChevronRight className="h-3.5 w-3.5 opacity-60 group-hover:opacity-90 transition-opacity" />
                   </span>
                 </div>
               </div>
@@ -349,7 +349,7 @@ const Top100CoursesHubPanel = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
-            className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base"
+            className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 focus-visible:outline-none"
           />
           {searchTerm && (
             <button
@@ -367,7 +367,7 @@ const Top100CoursesHubPanel = () => {
           {/* List selector */}
           <div className="flex-1">
             <Select value={selectedList} onValueChange={setSelectedList}>
-              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-sq-sm text-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-sq-sm text-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:ring-2 focus:ring-slate-200/60 focus:border-slate-300 focus:outline-none">
                 <SelectValue placeholder="Choose list" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
