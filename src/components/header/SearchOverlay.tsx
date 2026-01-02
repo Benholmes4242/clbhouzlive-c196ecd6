@@ -214,13 +214,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       )}>
         <div className="max-w-2xl mx-auto">
           <div className={cn(
-            "relative flex items-center gap-3 h-12 px-4 rounded-full border",
+            "relative flex items-center gap-2 h-8 px-3 rounded-full border",
             useLightTheme 
               ? "bg-white border-slate-200" 
               : "bg-white/8 border-white/10"
           )}>
             <Search className={cn(
-              "h-5 w-5 flex-shrink-0",
+              "h-4 w-4 flex-shrink-0",
               useLightTheme ? "text-slate-400" : "text-white/50"
             )} />
             <input
@@ -234,7 +234,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               onKeyDown={handleKeyDown}
               placeholder="Search players, courses..."
               className={cn(
-                "flex-1 bg-transparent border-none outline-none text-base",
+                "flex-1 bg-transparent border-none outline-none text-sm",
                 useLightTheme 
                   ? "text-slate-800 placeholder:text-slate-400" 
                   : "text-white placeholder:text-white/40"
@@ -245,13 +245,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
             <button
               onClick={handleClear}
               className={cn(
-                "flex-shrink-0 p-1.5 rounded-full transition-colors",
+                "flex-shrink-0 p-1 rounded-full transition-colors",
                 useLightTheme ? "hover:bg-slate-100" : "hover:bg-white/10"
               )}
               aria-label={query ? "Clear" : "Close"}
             >
               <X className={cn(
-                "h-5 w-5",
+                "h-4 w-4",
                 useLightTheme ? "text-slate-500" : "text-white/60"
               )} />
             </button>
