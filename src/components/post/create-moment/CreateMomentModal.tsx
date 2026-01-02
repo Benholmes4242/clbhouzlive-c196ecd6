@@ -321,20 +321,31 @@ export default function CreateMomentModal({
     }, ECM_EXIT_DURATION);
   }, [onClose, caption, course, saveDraft, activeActor, snapVisibility]);
 
-  // Touch handlers for swipe-to-dismiss
-  const isInsideScrollContainer = (target: EventTarget | null) => {
+  // Touch handlers for swipe-to-dismiss - HANDLE-ONLY
+  // Only allow dismiss from the grabber handle area, not from hero/thumbnails
+  const isHandleArea = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false;
-    return !!target.closest('[data-ecm-scroll-container="true"]');
+    return !!target.closest('[data-ecm-handle="true"]');
+  };
+
+  const shouldBlockDismiss = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false;
+    // Block if inside media stage, thumbnail strip, or any no-dismiss zone
+    return !!target.closest('[data-ecm-no-dismiss="true"]') || 
+           !!target.closest('[data-ecm-scroll-container="true"]');
   };
 
   const handleSheetTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    if (isExiting || isInsideScrollContainer(e.target)) return;
+    // Block all dismiss gestures when interacting with media (dragging thumbs, swiping hero)
+    if (isInteractingWithMedia) return;
+    // Only allow drag-to-dismiss from the handle area
+    if (isExiting || shouldBlockDismiss(e.target) || !isHandleArea(e.target)) return;
     setIsDragging(true);
     setDragStartY(e.touches[0].clientY);
   };
 
   const handleSheetTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    if (!isDragging || dragStartY == null || isExiting) return;
+    if (!isDragging || dragStartY == null || isExiting || isInteractingWithMedia) return;
     const deltaY = e.touches[0].clientY - dragStartY;
     if (deltaY <= 0) {
       setTranslateY(0);
@@ -609,13 +620,14 @@ export default function CreateMomentModal({
             background: 'var(--cm-surface-alt)',
           }}
         >
-          {/* Grabber bar - white, positioned at top */}
-          {!hasMedia && (
-            <div 
-              className="cm-grabber"
-              style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', left: '50%', transform: 'translateX(-50%)' }}
-            />
-          )}
+          {/* Grabber bar - swipe-to-dismiss handle area */}
+          <div 
+            data-ecm-handle="true"
+            className="absolute left-0 right-0 flex justify-center py-3 z-30"
+            style={{ top: 'env(safe-area-inset-top, 0px)' }}
+          >
+            <div className="cm-grabber" />
+          </div>
           {hasMedia ? (
             <CreateMomentMediaStage
               media={media}

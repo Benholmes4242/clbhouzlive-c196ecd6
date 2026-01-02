@@ -178,7 +178,7 @@ function ThumbContent({
         </button>
       )}
 
-      {/* Cover star button - bottom right (not during drag overlay) */}
+      {/* Cover star button - bottom right (not during drag overlay) - SLATE styling */}
       {!isDragOverlay && (
         <button
           onClick={(e) => {
@@ -188,7 +188,7 @@ function ThumbContent({
           className={`
             absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all
             ${isCover 
-              ? 'bg-amber-500 shadow-sm' 
+              ? 'bg-slate-600 shadow-sm' 
               : 'bg-black/50 hover:bg-black/70'
             }
           `}
