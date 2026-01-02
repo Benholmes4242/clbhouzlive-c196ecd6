@@ -212,7 +212,7 @@ export default function CreateMomentMediaStage({
 
         {/* Media counter - top left - matching bottom pill style */}
         <div 
-          className="absolute left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium text-white/90"
+          className="absolute left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium text-white"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
         >
           {activeIndex + 1}/{media.length}
@@ -231,7 +231,7 @@ export default function CreateMomentMediaStage({
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
           aria-label="Remove current media"
         >
-          <X className="w-3 h-3 text-white/90" />
+          <X className="w-3 h-3 text-white" />
         </button>
 
 
