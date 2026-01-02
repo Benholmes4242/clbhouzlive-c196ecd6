@@ -418,42 +418,42 @@ const Top100CoursesHubPanel = () => {
           </Button>
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Course list - using VirtualizedCourseList like Explore */}
-          <VirtualizedCourseList 
-            courses={displayedCourses}
-            onCourseClick={() => {}}
-          />
+        <VirtualizedCourseList 
+          courses={displayedCourses}
+          onCourseClick={() => {}}
+          footer={
+            <>
+              {/* Pagination - load more button */}
+              {showLoadMoreButton && (
+                <div className="flex flex-col items-center gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={loadMore}
+                    disabled={isLoadingMore}
+                    className="w-full max-w-xs gap-1.5"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                    {isLoadingMore 
+                      ? 'Loading...' 
+                      : `Next ${Math.min(PAGE_SIZE, totalCount - displayedCourses.length)} courses`
+                    }
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground">
+                    Showing 1–{displayedCourses.length} of {totalCount} courses
+                  </p>
+                </div>
+              )}
 
-          {/* Pagination - load more button */}
-          {showLoadMoreButton && (
-            <div className="flex flex-col items-center gap-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={loadMore}
-                disabled={isLoadingMore}
-                className="w-full max-w-xs gap-1.5"
-              >
-                <ChevronDown className="h-4 w-4" />
-                {isLoadingMore 
-                  ? 'Loading...' 
-                  : `Next ${Math.min(PAGE_SIZE, totalCount - displayedCourses.length)} courses`
-                }
-              </Button>
-              <p className="text-[11px] text-muted-foreground">
-                Showing 1–{displayedCourses.length} of {totalCount} courses
-              </p>
-            </div>
-          )}
-
-          {/* End message */}
-          {showEndMessage && (
-            <p className="text-center text-[11px] text-muted-foreground pt-2">
-              You've reached the end • {totalCount} courses total
-            </p>
-          )}
-        </div>
+              {/* End message */}
+              {showEndMessage && (
+                <p className="text-center text-[11px] text-muted-foreground pt-2">
+                  You've reached the end • {totalCount} courses total
+                </p>
+              )}
+            </>
+          }
+        />
       )}
     </div>
   );

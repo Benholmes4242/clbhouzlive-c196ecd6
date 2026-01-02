@@ -31,6 +31,7 @@ interface Course {
 interface VirtualizedCourseListProps {
   courses: Course[];
   onCourseClick?: () => void;
+  footer?: React.ReactNode;
 }
 
 // Card aspect ratio is 1.77/1 (6% taller than previous), so height = width / 1.77. With padding:
@@ -41,6 +42,7 @@ const BUFFER_SIZE = 3; // Number of items to render above/below viewport
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   courses,
   onCourseClick,
+  footer,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -181,6 +183,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             </div>
           ))}
         </div>
+        {footer && <div className="mt-6">{footer}</div>}
       </div>
     );
   }
@@ -208,6 +211,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             </div>
           ))}
         </div>
+        {footer && <div className="mt-6">{footer}</div>}
       </div>
     );
   }
@@ -215,36 +219,43 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   // For larger lists (>25), use virtualization
   const visibleCourses = courses.slice(visibleRange.start, visibleRange.end);
 
+  // Calculate the height for just the course grid, footer sits after
+  const gridHeight = totalHeight;
+
   return (
     <div 
       ref={containerRef}
       className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
-      style={{ height: totalHeight }}
     >
-      <div
-        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
-        style={{
-          transform: `translateY(${offsetY}px)`,
-        }}
-      >
-        {visibleCourses.map((course) => (
-          <div 
-            key={course.id} 
-            className="mb-4 sm:mb-0"
-            style={{ height: itemHeight }}
-          >
-            <UnifiedCourseCard 
-              course={fromGolfCourse(course)}
-              showRankBadges={true}
-              showRating={true}
-              onClick={() => {
-                onCourseClick?.();
-                navigate(`/courses/${course.id}`);
-              }}
-            />
-          </div>
-        ))}
+      {/* Virtualized grid with fixed height */}
+      <div style={{ height: gridHeight, position: 'relative' }}>
+        <div
+          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
+          style={{
+            transform: `translateY(${offsetY}px)`,
+          }}
+        >
+          {visibleCourses.map((course) => (
+            <div 
+              key={course.id} 
+              className="mb-4 sm:mb-0"
+              style={{ height: itemHeight }}
+            >
+              <UnifiedCourseCard 
+                course={fromGolfCourse(course)}
+                showRankBadges={true}
+                showRating={true}
+                onClick={() => {
+                  onCourseClick?.();
+                  navigate(`/courses/${course.id}`);
+                }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
+      {/* Footer (pagination) sits after the grid, always visible when scrolled to bottom */}
+      {footer && <div className="mt-6">{footer}</div>}
     </div>
   );
 };
