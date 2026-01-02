@@ -40,6 +40,7 @@ import Top100Pills from '@/components/courses/Top100Pills';
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
+const NewTab = lazy(() => import('@/components/discover/NewTab'));
 
 type MainKey = 'shorts' | 'new' | 'videos' | 'channels' | 'following';
 
@@ -255,9 +256,9 @@ const Discover = () => {
               {(key: MainKey) => {
                 if (key === 'new') {
                   return (
-                    <div className="md:container md:mx-auto md:px-0 p-4">
-                      {/* Empty placeholder for New tab */}
-                    </div>
+                    <Suspense fallback={null}>
+                      <NewTab onMediaClick={handleMediaClick} />
+                    </Suspense>
                   );
                 }
                 if (key === 'channels') {
