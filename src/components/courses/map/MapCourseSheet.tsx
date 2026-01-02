@@ -106,8 +106,16 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     },
     onSuccess: () => {
       toast.success(isWantToPlay ? 'Removed from Want to Play' : 'Added to Want to Play');
-      queryClient.invalidateQueries({ queryKey: ['course-shortlist-status', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['top100-map-courses'] });
+      // Use predicate to match all query variations
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-shortlist-status' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'top100-map-courses' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'user-journey-courses' 
+      });
     },
     onError: () => toast.error('Failed to update'),
   });
@@ -135,8 +143,16 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     },
     onSuccess: () => {
       toast.success(isWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
-      queryClient.invalidateQueries({ queryKey: ['course-shortlist-status', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['top100-map-courses'] });
+      // Use predicate to match all query variations
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-shortlist-status' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'top100-map-courses' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'user-journey-courses' 
+      });
     },
     onError: () => toast.error('Failed to update'),
   });
