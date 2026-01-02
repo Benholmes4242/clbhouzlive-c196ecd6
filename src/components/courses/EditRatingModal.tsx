@@ -94,6 +94,11 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-detailed', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
+      // Invalidate feed caches so cards update immediately
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
       
       toast({
         title: "Rating Updated!",
@@ -131,6 +136,12 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
+      // Invalidate feed caches so cards update immediately
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
       
       toast({
         title: "Rating Removed",

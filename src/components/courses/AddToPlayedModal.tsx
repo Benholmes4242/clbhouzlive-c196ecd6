@@ -92,6 +92,11 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['quest-courses'] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
+      // Invalidate feed caches so cards update immediately
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
       
       toast({
         title: "Rating submitted!",
