@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { 
   Users, 
   UserCheck, 
@@ -10,6 +11,7 @@ import {
   ClipboardCheck,
   Clock,
   Mail,
+  Database,
 } from "lucide-react";
 
 import { AdminOverviewHeader } from "@/components/admin/overview/AdminOverviewHeader";
@@ -17,6 +19,7 @@ import { MetricTile } from "@/components/admin/overview/MetricTile";
 import { ActionQueueCard } from "@/components/admin/overview/ActionQueueCard";
 import { RecentActivityList } from "@/components/admin/overview/RecentActivityList";
 import { QuickActionsGrid } from "@/components/admin/overview/QuickActionsGrid";
+import { Button } from "@/components/ui/button";
 import { track } from "@/lib/telemetry";
 
 type Metrics = {
@@ -32,6 +35,13 @@ type QueueCounts = {
   pendingVerifications: number | null;
   pendingInvites: number | null;
   expiringAdmins: number | null;
+};
+
+type BackfillResult = {
+  matched: number;
+  unmatched: number;
+  alreadySet: number;
+  unmatchedClubs: string[];
 };
 
 export function AdminOverviewPage() {
@@ -50,6 +60,81 @@ export function AdminOverviewPage() {
   });
   const [queuesLoading, setQueuesLoading] = useState(true);
   const [queuesError, setQueuesError] = useState<string | null>(null);
+
+  // Backfill state
+  const [backfillLoading, setBackfillLoading] = useState(false);
+  const [backfillResult, setBackfillResult] = useState<BackfillResult | null>(null);
+
+  const runBackfill = async (dryRun: boolean) => {
+    setBackfillLoading(true);
+    setBackfillResult(null);
+    
+    try {
+      const { data: usersToBackfill, error: usersError } = await supabase
+        .from('user_profiles')
+        .select('id, home_club, primary_club_id')
+        .not('home_club', 'is', null)
+        .neq('home_club', '');
+      
+      if (usersError) throw usersError;
+
+      const { data: clubs, error: clubsError } = await supabase
+        .from('golf_clubs')
+        .select('id, name');
+      
+      if (clubsError) throw clubsError;
+
+      const result: BackfillResult = {
+        matched: 0,
+        unmatched: 0,
+        alreadySet: 0,
+        unmatchedClubs: []
+      };
+
+      const updates: { id: string; clubId: string }[] = [];
+
+      for (const user of usersToBackfill || []) {
+        if (user.primary_club_id) {
+          result.alreadySet++;
+          continue;
+        }
+
+        const homeClubLower = user.home_club?.toLowerCase().trim();
+        const matchedClub = clubs?.find(c => 
+          c.name?.toLowerCase().trim() === homeClubLower
+        );
+
+        if (matchedClub) {
+          result.matched++;
+          updates.push({ id: user.id, clubId: matchedClub.id });
+        } else {
+          result.unmatched++;
+          if (user.home_club && !result.unmatchedClubs.includes(user.home_club)) {
+            result.unmatchedClubs.push(user.home_club);
+          }
+        }
+      }
+
+      if (!dryRun && updates.length > 0) {
+        for (const update of updates) {
+          await supabase
+            .from('user_profiles')
+            .update({ primary_club_id: update.clubId })
+            .eq('id', update.id);
+        }
+        toast.success(`Backfill complete! Updated ${updates.length} users.`);
+      } else if (dryRun) {
+        toast.info(`Dry run complete. Would update ${updates.length} users.`);
+      }
+
+      setBackfillResult(result);
+    } catch (error) {
+      console.error('Backfill error:', error);
+      toast.error('Backfill failed');
+    } finally {
+      setBackfillLoading(false);
+    }
+  };
 
   useEffect(() => {
     track("admin_overview_opened");
@@ -216,6 +301,51 @@ export function AdminOverviewPage() {
         {/* Quick Actions */}
         <section>
           <QuickActionsGrid />
+        </section>
+
+        {/* Home Club Backfill (Temporary) */}
+        <section className="rounded-lg border border-amber-500/50 bg-amber-500/5 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Database className="h-5 w-5 text-amber-600" />
+            <h3 className="font-medium">Home Club ID Backfill</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Match home_club text → golf_clubs → populate primary_club_id
+          </p>
+          <div className="flex gap-2 mb-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => runBackfill(true)}
+              disabled={backfillLoading}
+            >
+              {backfillLoading ? 'Running...' : 'Dry Run'}
+            </Button>
+            <Button 
+              size="sm"
+              onClick={() => runBackfill(false)}
+              disabled={backfillLoading}
+            >
+              Run Backfill
+            </Button>
+          </div>
+          {backfillResult && (
+            <div className="text-sm space-y-1">
+              <p className="text-green-600">✓ Matched: {backfillResult.matched}</p>
+              <p className="text-muted-foreground">○ Already set: {backfillResult.alreadySet}</p>
+              <p className="text-amber-600">✗ Unmatched: {backfillResult.unmatched}</p>
+              {backfillResult.unmatchedClubs.length > 0 && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-xs">Unmatched clubs ({backfillResult.unmatchedClubs.length})</summary>
+                  <ul className="list-disc list-inside text-xs text-muted-foreground mt-1 max-h-24 overflow-y-auto">
+                    {backfillResult.unmatchedClubs.map((club, i) => (
+                      <li key={i}>{club}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
         </section>
       </div>
     </div>
