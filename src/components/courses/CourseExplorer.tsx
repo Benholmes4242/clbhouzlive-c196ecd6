@@ -505,9 +505,9 @@ const CourseExplorer = () => {
             onCourseClick={handleCourseClick}
           />
 
-          {/* Load more button - matches leaderboard style */}
+          {/* Load more button */}
           {showLoadMoreButton && (
-            <div className="relative z-10 mt-6 mb-2 flex flex-col items-center gap-2">
+            <div className="relative z-10 py-6 flex flex-col items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
