@@ -432,8 +432,9 @@ html.lightbox-open {
 }
 
 /* Compact header content offset - use when CompactHeader is present */
+/* Uses !important to override the min-h-screen reset rule */
 .compact-header-offset {
-  padding-top: calc(40px + var(--sat));
+  padding-top: calc(40px + var(--sat)) !important;
 }
 
 /* Discover needs the compact header offset WITHOUT adding safe-area again
