@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useUserProfile } from './useUserProfile';
 import { useQuery } from '@tanstack/react-query';
+import { useDiscoveryExclusions } from './useDiscoveryExclusions';
 
 export type TabKey = 'suggested' | 'home_club' | 'verified';
 
@@ -20,6 +21,7 @@ interface GolferProfile {
   totalTop100Played: number;
   isVerified: boolean;
   friendStatus: 'none' | 'pending' | 'friends';
+  createdAt?: string;
 }
 
 // Helper to fetch Top 100 counts for a list of user IDs
@@ -79,44 +81,52 @@ async function fetchFriendStatuses(
 export function useGolfersDiscovery() {
   const { user } = useSupabaseSession();
   const { data: currentProfile } = useUserProfile(user?.id);
+  const { data: exclusions } = useDiscoveryExclusions(user?.id);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<TabKey>('suggested');
   const [page, setPage] = useState(1);
-  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+  
+  // Local optimistic state for follows (for immediate UI updates)
+  const [optimisticFollows, setOptimisticFollows] = useState<Map<string, boolean>>(new Map());
 
   // Reset page when tab changes
   useEffect(() => {
     setPage(1);
   }, [activeTab]);
 
-  // Fetch following status once
-  useEffect(() => {
-    const fetchFollowing = async () => {
-      if (!user) return;
+  // Compute effective following set (exclusions + optimistic updates)
+  const followingIds = useMemo(() => {
+    const baseFollowing = exclusions?.followingIds || new Set<string>();
+    const result = new Set(baseFollowing);
+    
+    // Apply optimistic updates
+    optimisticFollows.forEach((isFollowing, userId) => {
+      if (isFollowing) {
+        result.add(userId);
+      } else {
+        result.delete(userId);
+      }
+    });
+    
+    return result;
+  }, [exclusions?.followingIds, optimisticFollows]);
 
-      const { data: followingData } = await supabase
-        .from('user_follows')
-        .select('following_id')
-        .eq('follower_id', user.id);
-
-      const followingSet = new Set(followingData?.map(f => f.following_id) || []);
-      setFollowingIds(followingSet);
-    };
-
-    fetchFollowing();
-  }, [user]);
+  // Helper to determine if home club query is enabled
+  const viewerHomeClub = currentProfile?.home_club?.trim();
+  const viewerHomeClubId = currentProfile?.home_club_id;
+  const hasHomeClub = !!viewerHomeClubId || !!viewerHomeClub;
 
   // Global search query (searches within active tab context)
   const { data: searchResults, isLoading: searchLoading } = useQuery({
-    queryKey: ['search-golfers', searchQuery, activeTab, currentProfile?.home_club],
+    queryKey: ['search-golfers', searchQuery, activeTab, viewerHomeClub, viewerHomeClubId],
     enabled: searchQuery.trim().length > 0 && !!user,
     queryFn: async () => {
       const query = searchQuery.trim().toLowerCase();
       
       let baseQuery = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index, is_verified_golfer')
+        .select('id, display_name, username, profile_photo_url, home_club, home_club_id, eg_handicap_index, is_verified_golfer, created_at')
         .neq('id', user!.id)
         .is('deleted_at', null)
         .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`);
@@ -124,8 +134,10 @@ export function useGolfersDiscovery() {
       // Apply tab-specific filters to search
       switch (activeTab) {
         case 'home_club':
-          if (currentProfile?.home_club) {
-            baseQuery = baseQuery.ilike('home_club', currentProfile.home_club);
+          if (viewerHomeClubId) {
+            baseQuery = baseQuery.eq('home_club_id', viewerHomeClubId);
+          } else if (viewerHomeClub) {
+            baseQuery = baseQuery.eq('home_club', viewerHomeClub);
           }
           break;
         case 'verified':
@@ -133,7 +145,10 @@ export function useGolfersDiscovery() {
           break;
       }
 
-      const { data, error } = await baseQuery.limit(50);
+      // Add ordering for consistency
+      baseQuery = baseQuery.order('created_at', { ascending: false });
+
+      const { data, error } = await baseQuery.limit(100); // Fetch more to have enough after exclusions
 
       if (error) throw error;
 
@@ -149,31 +164,36 @@ export function useGolfersDiscovery() {
         username: profile.username,
         profileImage: profile.profile_photo_url || '',
         homeClub: profile.home_club,
+        homeClubId: profile.home_club_id,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
         totalTop100Played: top100Counts.get(profile.id) || 0,
         isVerified: profile.is_verified_golfer || false,
         friendStatus: friendStatuses.get(profile.id) || 'none',
+        createdAt: profile.created_at,
       }));
     },
   });
 
   // Paginated filtered query by tab
   const { data: filteredData, isLoading: filterLoading } = useQuery({
-    queryKey: ['golfers-filtered', activeTab, page, currentProfile?.home_club, user?.id],
-    enabled: searchQuery.trim().length === 0 && !!user,
+    queryKey: ['golfers-filtered', activeTab, page, viewerHomeClub, viewerHomeClubId, user?.id],
+    enabled: searchQuery.trim().length === 0 && !!user && (activeTab !== 'home_club' || hasHomeClub),
     queryFn: async () => {
       let query = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index, is_verified_golfer', { count: 'exact' })
+        .select('id, display_name, username, profile_photo_url, home_club, home_club_id, eg_handicap_index, is_verified_golfer, created_at', { count: 'exact' })
         .neq('id', user!.id)
         .is('deleted_at', null);
 
       // Apply tab-specific filters
       switch (activeTab) {
         case 'home_club':
-          if (currentProfile?.home_club) {
-            query = query.ilike('home_club', currentProfile.home_club);
+          // Use home_club_id if available, fallback to exact text match
+          if (viewerHomeClubId) {
+            query = query.eq('home_club_id', viewerHomeClubId);
+          } else if (viewerHomeClub) {
+            query = query.eq('home_club', viewerHomeClub);
           }
           break;
         case 'verified':
@@ -181,15 +201,16 @@ export function useGolfersDiscovery() {
           break;
         case 'suggested':
         default:
-          // Suggested: prioritize same home club, then verified
-          if (currentProfile?.home_club) {
-            // Order by home club match first (requires custom logic in results)
-          }
+          // Suggested shows all, ranking applied client-side
           break;
       }
 
-      const offset = (page - 1) * PAGE_SIZE;
-      const { data, error, count } = await query.range(offset, offset + PAGE_SIZE - 1);
+      // Apply consistent ordering
+      query = query.order('created_at', { ascending: false });
+
+      // Fetch more than needed to account for exclusions
+      const fetchLimit = PAGE_SIZE * 3;
+      const { data, error, count } = await query.limit(fetchLimit);
 
       if (error) throw error;
 
@@ -199,31 +220,20 @@ export function useGolfersDiscovery() {
         fetchFriendStatuses(user!.id, userIds)
       ]);
 
-      let profiles: GolferProfile[] = (data || []).map(profile => ({
+      const profiles: GolferProfile[] = (data || []).map(profile => ({
         id: profile.id,
         displayName: profile.display_name || profile.username || 'User',
         username: profile.username,
         profileImage: profile.profile_photo_url || '',
         homeClub: profile.home_club,
+        homeClubId: profile.home_club_id,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
         totalTop100Played: top100Counts.get(profile.id) || 0,
         isVerified: profile.is_verified_golfer || false,
         friendStatus: friendStatuses.get(profile.id) || 'none',
+        createdAt: profile.created_at,
       }));
-
-      // For suggested tab, sort by: same home club first, then verified
-      if (activeTab === 'suggested' && currentProfile?.home_club) {
-        profiles.sort((a, b) => {
-          const aClubMatch = a.homeClub?.toLowerCase() === currentProfile.home_club?.toLowerCase() ? 1 : 0;
-          const bClubMatch = b.homeClub?.toLowerCase() === currentProfile.home_club?.toLowerCase() ? 1 : 0;
-          if (aClubMatch !== bClubMatch) return bClubMatch - aClubMatch;
-          
-          const aVerified = a.isVerified ? 1 : 0;
-          const bVerified = b.isVerified ? 1 : 0;
-          return bVerified - aVerified;
-        });
-      }
 
       return {
         golfers: profiles,
@@ -232,29 +242,83 @@ export function useGolfersDiscovery() {
     },
   });
 
+  // Apply exclusions and sorting client-side
+  const processedGolfers = useMemo(() => {
+    const excludedIds = exclusions?.excludedIds || new Set<string>();
+    const isSearching = searchQuery.trim().length > 0;
+    const rawGolfers = isSearching ? searchResults || [] : filteredData?.golfers || [];
+    
+    // Filter out excluded users
+    let filtered = rawGolfers.filter(g => !excludedIds.has(g.id));
+    
+    // For suggested tab, apply ranking: same home club first, then verified, then by created_at
+    if (activeTab === 'suggested' && !isSearching) {
+      filtered.sort((a, b) => {
+        // 1. Same home club as viewer (using ID if available, else text)
+        const aClubMatch = viewerHomeClubId 
+          ? a.homeClubId === viewerHomeClubId
+          : viewerHomeClub 
+            ? a.homeClub?.toLowerCase() === viewerHomeClub.toLowerCase()
+            : false;
+        const bClubMatch = viewerHomeClubId
+          ? b.homeClubId === viewerHomeClubId
+          : viewerHomeClub
+            ? b.homeClub?.toLowerCase() === viewerHomeClub.toLowerCase()
+            : false;
+        
+        if (aClubMatch !== bClubMatch) return bClubMatch ? 1 : -1;
+        
+        // 2. Verified users next
+        if (a.isVerified !== b.isVerified) return b.isVerified ? 1 : -1;
+        
+        // 3. By created_at (newest first) for stability
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+    
+    // For verified and home_club tabs, ensure consistent ordering by created_at
+    if ((activeTab === 'verified' || activeTab === 'home_club') && !isSearching) {
+      filtered.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+    
+    return filtered;
+  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, activeTab, viewerHomeClub, viewerHomeClubId, searchQuery]);
+
+  // Paginate the processed results
+  const paginatedGolfers = useMemo(() => {
+    const isSearching = searchQuery.trim().length > 0;
+    if (isSearching) {
+      // For search, show up to 50 results
+      return processedGolfers.slice(0, 50);
+    }
+    // For tabs, paginate
+    return processedGolfers.slice(0, page * PAGE_SIZE);
+  }, [processedGolfers, page, searchQuery]);
+
   const updateFollowingStatus = (userId: string, isFollowing: boolean) => {
-    setFollowingIds((prev) => {
-      const next = new Set(prev);
-      if (isFollowing) {
-        next.add(userId);
-      } else {
-        next.delete(userId);
-      }
+    setOptimisticFollows(prev => {
+      const next = new Map(prev);
+      next.set(userId, isFollowing);
       return next;
     });
   };
 
   const isSearching = searchQuery.trim().length > 0;
-  const golfers = isSearching ? searchResults || [] : filteredData?.golfers || [];
-  const totalCount = isSearching ? searchResults?.length || 0 : filteredData?.totalCount || 0;
+  const totalCount = processedGolfers.length;
   const loading = isSearching ? searchLoading : filterLoading;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   // Check if user has no home club (for nudge display)
-  const hasNoHomeClub = !currentProfile?.home_club;
+  const hasNoHomeClub = !hasHomeClub;
 
   return {
-    golfers,
+    golfers: paginatedGolfers,
     loading,
     searchQuery,
     setSearchQuery,
