@@ -65,7 +65,7 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
     <div 
       ref={containerRef}
       className={cn(
-        "relative flex gap-1 overflow-x-auto scrollbar-hide",
+        "relative flex gap-4 overflow-x-auto scrollbar-hide",
         className
       )}
     >
@@ -77,10 +77,10 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
             ref={(el) => { tabsRef.current[index] = el; }}
             onClick={() => onChange(option.value)}
             className={cn(
-              "px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200",
+              "px-1 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200",
               isActive
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground/80"
+                ? "text-slate-900"
+                : "text-slate-500 hover:text-slate-700"
             )}
           >
             {option.label}
@@ -88,9 +88,9 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
         );
       })}
 
-      {/* Animated orange underline */}
+      {/* Animated orange underline - matches text width */}
       <div 
-        className="absolute bottom-0 h-0.5 transition-all duration-200 ease-out rounded-full"
+        className="absolute bottom-0 h-[2px] transition-all duration-200 ease-out rounded-full"
         style={{
           left: underlineStyle.left,
           width: underlineStyle.width,
