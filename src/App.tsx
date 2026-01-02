@@ -63,6 +63,7 @@ import { AchievementToastContainer } from '@/components/achievements/Achievement
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
+import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
 
 
 
@@ -565,8 +566,11 @@ const AppInner: React.FC = () => {
   // Continuously broadcast location when visibility is active
   useLocationBroadcast();
   
-  // Listen for Top 100 XP notifications
+// Listen for Top 100 XP notifications
   useTop100XpNotifications();
+  
+  // Real-time course ratings listener for instant card updates
+  useCourseRatingsRealtime();
   
   // Run chat history migration once on app init
   useEffect(() => {
