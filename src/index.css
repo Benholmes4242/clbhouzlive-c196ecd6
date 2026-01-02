@@ -755,7 +755,7 @@ html, body, #root {
   --echo-header-h: 64px;
   --echo-tabs-h: 48px;
   --echo-composer-h: 84px; /* includes padding/safe-area */
-  --echo-top: 56px; /* header height on mobile */
+  --echo-top: 40px; /* header height on mobile */
 
   /* Message bubble tokens - unified with style-tokens.css */
   --bubble-max: 92vw;
