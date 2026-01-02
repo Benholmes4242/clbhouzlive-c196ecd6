@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getTimeWindowISO, type Timeframe } from '@/lib/timeWindow';
 
 export type Top100Membership = {
   list_id: string;
@@ -23,6 +24,7 @@ export type FriendCourseHit = {
   played_at: string;
   rating?: number | null;
   thumbnail_url?: string | null;
+  community_rating?: number | null;
   top100_memberships: Top100Membership[];
 };
 
@@ -46,9 +48,9 @@ export type FriendsCoursesResult = {
   totalFriendsActive: number;
 };
 
-export function useFriendsCourses(userId?: string) {
+export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d') {
   return useQuery<FriendsCoursesResult>({
-    queryKey: ['friends-courses', userId],
+    queryKey: ['friends-courses', userId, timeframe],
     enabled: !!userId,
     queryFn: async () => {
       if (!userId) {
@@ -81,12 +83,11 @@ export function useFriendsCourses(userId?: string) {
         };
       }
 
-      // Get recent rounds for these friends (last 90 days)
-      const now = new Date();
-      const since = new Date();
-      since.setDate(now.getDate() - 90);
+      // Get time window based on selected timeframe (single source of truth)
+      const { startISO, endISO } = getTimeWindowISO(timeframe);
 
-      const { data: friendCourses, error: coursesError } = await supabase
+      // Build query for friends' courses
+      let query = supabase
         .from('user_courses' as any)
         .select(
           `
@@ -114,9 +115,15 @@ export function useFriendsCourses(userId?: string) {
         )
         .in('user_id', friendIds)
         .eq('played', true)
-        .gte('created_at', since.toISOString())
-        .lte('created_at', now.toISOString())
+        .lte('created_at', endISO)
         .order('created_at', { ascending: false });
+
+      // Apply start filter if not "all time"
+      if (startISO) {
+        query = query.gte('created_at', startISO);
+      }
+
+      const { data: friendCourses, error: coursesError } = await query;
 
       if (coursesError) throw coursesError;
 
@@ -164,6 +171,8 @@ export function useFriendsCourses(userId?: string) {
             short_label: m.top100_lists?.short_label || '',
             rank: m.rank,
           }));
+
+          const communityRating = ratingByCourseId.get(row.golf_courses?.id) ?? null;
           
           return {
             friend_id: row.user_id,
@@ -178,6 +187,7 @@ export function useFriendsCourses(userId?: string) {
             course_country: row.golf_courses?.country ?? null,
             course_sub_country: row.golf_courses?.sub_country ?? null,
             thumbnail_url: row.golf_courses?.thumbnail_image ?? null,
+            community_rating: communityRating,
             played_at: row.created_at,
             rating: row.rating ?? null,
             top100_memberships: memberships,
@@ -194,14 +204,13 @@ export function useFriendsCourses(userId?: string) {
 
         const existing = courseMap.get(key);
         if (!existing) {
-          const communityRating = ratingByCourseId.get(hit.course_id) ?? null;
           courseMap.set(key, {
             course_id: hit.course_id,
             course_name: hit.course_name,
             country: hit.course_country,
             sub_country: hit.course_sub_country,
             thumbnail_url: hit.thumbnail_url,
-            community_rating: communityRating,
+            community_rating: hit.community_rating ?? null,
             top100_memberships: hit.top100_memberships,
             friends: [hit],
             most_recent_play: hit.played_at,
@@ -238,8 +247,8 @@ export function useFriendsCourses(userId?: string) {
         totalFriendsActive: activeFriendIds.size,
       };
     },
-    staleTime: 30 * 60 * 1000,  // 30 min – friend courses are stable
-    gcTime:   60 * 60 * 1000,  // 60 min – keep for session
+    staleTime: 5 * 60 * 1000,  // 5 min – shorter since timeframe affects data
+    gcTime:   30 * 60 * 1000,  // 30 min – keep for session
     refetchOnWindowFocus: false,
   });
 }

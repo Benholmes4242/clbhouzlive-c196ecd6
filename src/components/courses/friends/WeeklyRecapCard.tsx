@@ -2,10 +2,13 @@ import React from 'react';
 import { Squircle } from '@/components/ui/squircle';
 import { Calendar, TrendingUp } from 'lucide-react';
 import type { FriendCourseHit, CourseWithFriends } from '@/hooks/useFriendsCourses';
+import type { Timeframe } from '@/lib/timeWindow';
+import { getTimeWindow } from '@/lib/timeWindow';
 
 interface WeeklyRecapCardProps {
   recent: FriendCourseHit[];
   courses: CourseWithFriends[];
+  timeframe: Timeframe;
   leaderboard: {
     friendId: string;
     friendName: string;
@@ -15,24 +18,19 @@ interface WeeklyRecapCardProps {
   }[];
 }
 
-const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, leaderboard }) => {
-  // Calculate monthly stats (last 30 days)
-  const now = new Date();
-  const monthAgo = new Date();
-  monthAgo.setDate(now.getDate() - 30);
+const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, timeframe, leaderboard }) => {
+  // Use the shared time window utility for consistent label
+  const { label: periodLabel } = getTimeWindow(timeframe);
 
-  const monthlyRounds = recent.filter(
-    (hit) => new Date(hit.played_at) >= monthAgo
-  );
+  // All stats are computed from the already-filtered `recent` prop
+  const totalRounds = recent.length;
 
-  const totalRoundsThisMonth = monthlyRounds.length;
+  // Unique courses played in this period
+  const uniqueCourses = new Set(recent.map((r) => r.course_id)).size;
 
-  // Unique courses played this month
-  const uniqueCoursesThisMonth = new Set(monthlyRounds.map((r) => r.course_id)).size;
-
-  // Most active friend this month
+  // Most active friend in this period
   const friendActivityMap = new Map<string, number>();
-  monthlyRounds.forEach((hit) => {
+  recent.forEach((hit) => {
     friendActivityMap.set(hit.friend_id, (friendActivityMap.get(hit.friend_id) || 0) + 1);
   });
 
@@ -41,7 +39,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
   friendActivityMap.forEach((count, friendId) => {
     if (count > maxRounds) {
       maxRounds = count;
-      const friend = monthlyRounds.find((r) => r.friend_id === friendId);
+      const friend = recent.find((r) => r.friend_id === friendId);
       if (friend) {
         mostActiveFriend = {
           name: friend.friend_profile.display_name || friend.friend_profile.username,
@@ -52,9 +50,9 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
     }
   });
 
-  // Top course this month (most plays)
+  // Top course this period (most plays)
   const coursePlayMap = new Map<string, { name: string; count: number }>();
-  monthlyRounds.forEach((hit) => {
+  recent.forEach((hit) => {
     const existing = coursePlayMap.get(hit.course_id);
     if (!existing) {
       coursePlayMap.set(hit.course_id, { name: hit.course_name, count: 1 });
@@ -72,8 +70,8 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
     }
   });
 
-  // Don't render if no monthly activity
-  if (totalRoundsThisMonth === 0) {
+  // Don't render if no activity in this period
+  if (totalRounds === 0) {
     return null;
   }
 
@@ -86,8 +84,8 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
             <Calendar className="w-3 h-3 text-emerald-600" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground">This month in your network</h3>
-            <p className="text-[11px] text-muted-foreground">Activity from the last 30 days</p>
+            <h3 className="text-sm font-semibold text-foreground">Activity in your network</h3>
+            <p className="text-[11px] text-muted-foreground">{periodLabel}</p>
           </div>
         </div>
       </div>
@@ -95,14 +93,14 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
       {/* Stats Row - Compact horizontal */}
       <div className="px-4 py-3 flex items-center justify-center gap-8 border-b border-border/40">
         <div className="text-center">
-          <p className="text-lg font-bold text-foreground">{totalRoundsThisMonth}</p>
+          <p className="text-lg font-bold text-foreground">{totalRounds}</p>
           <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/75">
             Rounds
           </p>
         </div>
         <div className="h-6 w-px bg-slate-200/60" />
         <div className="text-center">
-          <p className="text-lg font-bold text-foreground">{uniqueCoursesThisMonth}</p>
+          <p className="text-lg font-bold text-foreground">{uniqueCourses}</p>
           <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/75">
             Courses
           </p>
