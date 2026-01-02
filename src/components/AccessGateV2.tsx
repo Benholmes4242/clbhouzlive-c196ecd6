@@ -358,9 +358,9 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
       
       {/* Minimal access box */}
-      <section className="relative z-10 w-[280px] rounded-sq-md bg-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] px-6 py-5">
+      <section className="relative z-10 w-[308px] rounded-sq-md bg-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] px-7 py-5.5">
         {/* Single line of text */}
-        <p className="text-[15px] text-[#BFBFBF] text-center mb-4 font-normal">
+        <p className="text-[16.5px] text-[#BFBFBF] text-center mb-4.5 font-normal">
           Enter access code to continue
         </p>
 
@@ -369,13 +369,13 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
           <div 
             role="alert" 
             aria-live="polite"
-            className="text-destructive text-xs text-center mb-3"
+            className="text-destructive text-[13px] text-center mb-3.5"
           >
             {errorMessage}
           </div>
         )}
 
-        <form className="flex flex-col items-center gap-3" onSubmit={handleSubmit}>
+        <form className="flex flex-col items-center gap-3.5" onSubmit={handleSubmit}>
           <label htmlFor="gate-code" className="sr-only">
             Access code
           </label>
@@ -389,7 +389,7 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
             onChange={(e) => setAccessCode(e.target.value)}
             disabled={submitting}
             className="w-[80%] rounded-sq-sm bg-white text-foreground
-                     border border-slate-200 px-3 py-2.5 text-sm outline-none text-center
+                     border border-slate-200 px-3.5 py-2.75 text-[15.4px] outline-none text-center
                      focus:border-slate-600 focus:ring-2 focus:ring-slate-300/70 focus:ring-offset-1 
                      transition-all duration-150 disabled:opacity-60"
           />
@@ -397,7 +397,7 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
             type="submit"
             disabled={submitting}
             aria-label="Submit access code"
-            className="w-[80%] rounded-sq-sm bg-[#6E7A86] text-white py-2.5 font-medium text-sm
+            className="w-[80%] rounded-sq-sm bg-[#6E7A86] text-white py-2.75 font-medium text-[15.4px]
                      hover:bg-[#5F6B76] active:bg-[#566068] disabled:opacity-60 transition-colors"
           >
             {submitting ? "..." : "ENTER"}
@@ -406,7 +406,7 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
       </section>
 
       {/* Copyright below the box */}
-      <p className="relative z-10 mt-4 text-xs text-[#9CA3AF]">
+      <p className="relative z-10 mt-4.5 text-[13.2px] text-[#9CA3AF]">
         © 2025 clubhouz
       </p>
     </main>
