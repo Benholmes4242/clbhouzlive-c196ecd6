@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Star, X, Loader2 } from "lucide-react";
+import { Play, Star, X, Check, GripVertical } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
@@ -34,7 +34,6 @@ interface MediaThumbnailStripProps {
   onReorder: (fromIndex: number, toIndex: number) => void;
   getEdits: (mediaId: string) => StudioEdits;
   onDragStateChange?: (isDragging: boolean) => void;
-  uploadingMediaIds?: Set<string>;
 }
 
 interface SortableThumbProps {
@@ -42,7 +41,6 @@ interface SortableThumbProps {
   index: number;
   isActive: boolean;
   isCover: boolean;
-  isUploading: boolean;
   getEdits: (mediaId: string) => StudioEdits;
   onSelect: () => void;
   onSetCover: () => void;
@@ -56,7 +54,6 @@ function ThumbContent({
   index, 
   isActive, 
   isCover, 
-  isUploading,
   getEdits, 
   onSetCover, 
   onRemove,
@@ -117,11 +114,14 @@ function ThumbContent({
 
   return (
     <div className="relative w-14 h-14">
-      {/* Thumbnail container - no active border, just opacity change */}
+      {/* Selection indicator + thumbnail */}
       <div 
         className={`
           absolute inset-0 rounded-lg overflow-hidden transition-all duration-150
-          ${isActive ? '' : 'opacity-60 hover:opacity-100'}
+          ${isActive 
+            ? 'ring-2 ring-slate-600 ring-offset-1 ring-offset-background' 
+            : 'opacity-70 hover:opacity-100'
+          }
         `}
       >
         {/* Thumbnail image */}
@@ -150,41 +150,36 @@ function ThumbContent({
         )}
       </div>
 
-      {/* Upload spinner overlay */}
-      {isUploading && (
-        <div className="absolute inset-0 rounded-lg bg-black/40 flex items-center justify-center z-30">
-          <Loader2 className="w-5 h-5 text-white animate-spin" />
+      {/* Selection tick badge - top left */}
+      {isActive && (
+        <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-slate-600 shadow-sm flex items-center justify-center z-10">
+          <Check className="w-3 h-3 text-white" strokeWidth={3} />
         </div>
       )}
 
-      {/* Selection dot - top left, inside thumbnail (not during drag or upload) */}
-      {isActive && !isDragOverlay && !isUploading && (
-        <div className="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.4)] z-10" />
-      )}
-
-      {/* Video indicator - bottom left, inside thumbnail */}
-      {item.type === 'video' && !isUploading && (
+      {/* Video indicator - DARK GLASS */}
+      {item.type === 'video' && (
         <div className="absolute bottom-1 left-1 rounded bg-black/60 backdrop-blur-sm px-1 py-0.5 z-10">
           <Play className="w-2.5 h-2.5 text-white fill-white" />
         </div>
       )}
 
-      {/* Remove button - top right, inside thumbnail (not during drag or upload) */}
-      {!isDragOverlay && !isUploading && (
+      {/* Remove button - top right (not during drag overlay) */}
+      {!isDragOverlay && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
           }}
-          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 flex items-center justify-center z-20 transition-colors"
+          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-black/90 flex items-center justify-center z-20 transition-colors"
           aria-label="Remove media"
         >
           <X className="w-3 h-3 text-white" />
         </button>
       )}
 
-      {/* Cover star button - bottom right, inside thumbnail (not during drag or upload) */}
-      {!isDragOverlay && !isUploading && (
+      {/* Cover star button - bottom right (not during drag overlay) - SLATE styling */}
+      {!isDragOverlay && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -194,7 +189,7 @@ function ThumbContent({
             absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all
             ${isCover 
               ? 'bg-slate-600 shadow-sm' 
-              : 'bg-black/50 backdrop-blur-sm hover:bg-black/70'
+              : 'bg-black/50 hover:bg-black/70'
             }
           `}
           aria-label={isCover ? "Current cover" : "Set as cover"}
@@ -208,7 +203,7 @@ function ThumbContent({
   );
 }
 
-function SortableThumb({ item, index, isActive, isCover, isUploading, getEdits, onSelect, onSetCover, onRemove }: SortableThumbProps) {
+function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect, onSetCover, onRemove }: SortableThumbProps) {
   const {
     attributes,
     listeners,
@@ -225,28 +220,21 @@ function SortableThumb({ item, index, isActive, isCover, isUploading, getEdits, 
     opacity: isDragging ? 0.3 : 1,
   };
 
-  // Disable interactions while uploading
-  const handleClick = () => {
-    if (!isUploading) {
-      onSelect();
-    }
-  };
-
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
-      className={`relative flex-shrink-0 touch-none ${isUploading ? 'cursor-wait' : 'cursor-pointer'}`}
-      whileTap={isUploading ? undefined : { scale: 0.95 }}
-      onClick={handleClick}
-      {...(isUploading ? {} : { ...attributes, ...listeners })}
+      className="relative flex-shrink-0 cursor-pointer touch-none"
+      whileTap={{ scale: 0.95 }}
+      onClick={onSelect}
+      {...attributes}
+      {...listeners}
     >
       <ThumbContent
         item={item}
         index={index}
         isActive={isActive}
         isCover={isCover}
-        isUploading={isUploading}
         getEdits={getEdits}
         onSetCover={onSetCover}
         onRemove={onRemove}
@@ -265,7 +253,6 @@ export default function MediaThumbnailStrip({
   onReorder,
   getEdits,
   onDragStateChange,
-  uploadingMediaIds = new Set(),
 }: MediaThumbnailStripProps) {
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
 
@@ -312,71 +299,60 @@ export default function MediaThumbnailStrip({
 
   return (
     <div 
-      className="mx-3 mb-2 pt-2"
+      className="mx-3 mb-2 p-3 rounded-2xl bg-muted/50 border border-border/50"
       data-ecm-no-dismiss="true"
     >
-      {/* Thumbnail scroll container with edge fades */}
-      <div className="relative">
-        {/* Left fade gradient */}
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-background to-transparent z-10" />
-        
-        {/* Right fade gradient */}
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-background to-transparent z-10" />
-        
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-          modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+        modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+      >
+        <SortableContext
+          items={media.map(item => item.id)}
+          strategy={horizontalListSortingStrategy}
         >
-          <SortableContext
-            items={media.map(item => item.id)}
-            strategy={horizontalListSortingStrategy}
-          >
-            <div className="flex gap-2.5 overflow-x-auto scrollbar-hide px-3 py-1">
-              {media.map((item, index) => (
-                <SortableThumb
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  isActive={item.id === activeMediaId}
-                  isCover={item.id === coverMediaId}
-                  isUploading={uploadingMediaIds.has(item.id)}
-                  getEdits={getEdits}
-                  onSelect={() => onSelect(item.id)}
-                  onSetCover={() => onSetCover(item.id)}
-                  onRemove={() => onRemove(item.id)}
-                />
-              ))}
+          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
+            {media.map((item, index) => (
+              <SortableThumb
+                key={item.id}
+                item={item}
+                index={index}
+                isActive={item.id === activeMediaId}
+                isCover={item.id === coverMediaId}
+                getEdits={getEdits}
+                onSelect={() => onSelect(item.id)}
+                onSetCover={() => onSetCover(item.id)}
+                onRemove={() => onRemove(item.id)}
+              />
+            ))}
+          </div>
+        </SortableContext>
+        
+        {/* Drag overlay - follows finger */}
+        <DragOverlay adjustScale={false}>
+          {activeDragItem && (
+            <div className="scale-105 shadow-xl rounded-lg">
+              <ThumbContent
+                item={activeDragItem}
+                index={activeDragIndex}
+                isActive={activeDragItem.id === activeMediaId}
+                isCover={activeDragItem.id === coverMediaId}
+                getEdits={getEdits}
+                onSetCover={() => {}}
+                onRemove={() => {}}
+                isDragOverlay={true}
+              />
             </div>
-          </SortableContext>
-          
-          {/* Drag overlay - follows finger */}
-          <DragOverlay adjustScale={false}>
-            {activeDragItem && (
-              <div className="scale-105 shadow-xl rounded-lg">
-                <ThumbContent
-                  item={activeDragItem}
-                  index={activeDragIndex}
-                  isActive={activeDragItem.id === activeMediaId}
-                  isCover={activeDragItem.id === coverMediaId}
-                  isUploading={false}
-                  getEdits={getEdits}
-                  onSetCover={() => {}}
-                  onRemove={() => {}}
-                  isDragOverlay={true}
-                />
-              </div>
-            )}
-          </DragOverlay>
-        </DndContext>
-      </div>
+          )}
+        </DragOverlay>
+      </DndContext>
       
-      {/* Helper text - refined styling */}
-      <p className="text-xs text-slate-500 mt-2 text-center leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">
-        Drag to reorder · Tap ★ for cover
+      {/* Helper text - muted label */}
+      <p className="text-[11px] text-muted-foreground mt-2.5 text-center">
+        Hold and drag to reorder · Tap ★ to set cover
       </p>
     </div>
   );
