@@ -120,7 +120,7 @@ function ThumbContent({
           className="absolute -top-1 -right-1 w-3 h-3 rounded-full z-30"
           style={{ 
             background: 'var(--cm-surface-slate)',
-            border: '3px solid var(--cm-surface-card)',
+            border: '3px solid var(--cm-surface-alt)',
           }}
           aria-hidden="true"
         />
