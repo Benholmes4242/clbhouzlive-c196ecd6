@@ -183,14 +183,14 @@ export default function CarouselSlide({
           </div>
         )}
 
-        {/* Video badge in corner - DARK GLASS consistent */}
-        <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white">
+        {/* Video badge in corner - DARK GLASS consistent - z-20 to sit above parent gradient scrims */}
+        <div className="absolute bottom-2 right-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white">
           Video
         </div>
 
-        {/* Countdown timer - bottom left - DARK GLASS - shows remaining time when playing */}
+        {/* Countdown timer - bottom left - DARK GLASS - z-20 to sit above parent gradient scrims */}
         {loaded && duration > 0 && (
-          <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white">
+          <div className="absolute bottom-2 left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white">
             {isPlaying ? formatTime(remainingTime) : formatTime(duration)}
           </div>
         )}
