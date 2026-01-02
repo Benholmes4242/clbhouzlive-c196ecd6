@@ -317,7 +317,7 @@ const GolfersToFollowPage = () => {
                                 handleFollowToggle(golfer.id, golfer.displayName, true);
                               }}
                               disabled={isActioning}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-[#F79E1B] text-white gap-1"
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted text-foreground/80 gap-1"
                             >
                               <Check className="h-3 w-3" />
                               Following
@@ -329,7 +329,7 @@ const GolfersToFollowPage = () => {
                                 handleFollowToggle(golfer.id, golfer.displayName, false);
                               }}
                               disabled={isActioning}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-transparent text-[#F79E1B] hover:bg-[#F79E1B]/10"
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
                             >
                               Follow
                             </button>
