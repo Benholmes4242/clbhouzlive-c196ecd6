@@ -52,7 +52,7 @@ export function TourHubMainPage() {
       
       <TourHubTabs activeTab={activeTab} onTabChange={handleTabChange} className="mb-6" />
       
-      <div className="pb-24">
+      <div className="pb-[var(--page-bottom-padding)]">
         {renderTab()}
       </div>
     </TourHubShell>

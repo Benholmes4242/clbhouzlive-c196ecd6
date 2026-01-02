@@ -43,7 +43,7 @@ export default function GameDetailView() {
   const slotsFilledText = `${game.slots_total - game.slots_open}/${game.slots_total} filled`;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-[var(--page-bottom-padding)]">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">

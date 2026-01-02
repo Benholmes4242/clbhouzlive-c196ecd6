@@ -183,7 +183,7 @@ const BusinessInsightsPageV2 = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-[#05060a] pb-20">
+    <PageRoot className="min-h-screen bg-[#05060a] pb-[var(--page-bottom-padding)]">
       {/* Header - Dark theme */}
       <div className="sticky top-0 z-10 bg-[#05060a]/95 backdrop-blur-md border-b border-white/[0.04]">
         <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-4">

@@ -18,7 +18,7 @@ const FeedContent: React.FC<FeedContentProps> = ({
   onPostDeleted
 }) => {
   return (
-    <div className="index-feed space-y-6 pb-20">
+    <div className="index-feed space-y-6 pb-[var(--page-bottom-padding)]">
       {/* Show optimistic posts first */}
       {optimisticPosts.map((optimisticPost) => (
         <OptimisticPostCard 

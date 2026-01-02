@@ -210,7 +210,7 @@ const BusinessInsightsPage = () => {
   const businessSlug = businessFromQuery?.slug || businessFromQuery?.id;
 
   return (
-    <PageRoot className="min-h-screen bg-[hsl(var(--muted))] pb-24">
+    <PageRoot className="min-h-screen bg-[hsl(var(--muted))] pb-[var(--page-bottom-padding)]">
       <div className="max-w-6xl mx-auto py-section px-4 md:px-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-block mb-section">

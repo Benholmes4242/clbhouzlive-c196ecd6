@@ -66,7 +66,7 @@ const BusinessIntroPage: React.FC = () => {
       </header>
 
       {/* Content */}
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-24 pt-4">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-[var(--page-bottom-padding)] pt-4">
         
         {/* "Why this matters" strip - flat, subtle, no card */}
         <motion.section
