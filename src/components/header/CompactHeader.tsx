@@ -104,8 +104,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         className={cn(
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
-          "fixed top-0 left-0 right-0 z-header",
-          isClubhouseRoute ? "" : "h-14",
+          "fixed top-0 left-0 right-0 z-header h-[50px]",
+          
           className
         )}
         style={{
@@ -114,13 +114,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           // Only Clubhouse gets safe-area padding (header bg extends into notch)
           paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : undefined,
-          height: isClubhouseRoute ? 'calc(56px + env(safe-area-inset-top))' : undefined,
+          height: isClubhouseRoute ? 'calc(50px + env(safe-area-inset-top))' : undefined,
           borderBottom: `1px solid ${getBorder()}`,
           boxShadow: isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
       >
-        <div className="mx-auto flex h-14 items-center justify-between px-3 sm:px-4 max-w-5xl">
+        <div className="mx-auto flex h-[50px] items-center justify-between px-3 sm:px-4 max-w-5xl">
           {/* Left: Logo icon (mobile) + wordmark (desktop) */}
           <button
             type="button"
@@ -132,7 +132,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="clbhouz"
               className={cn(
-                "h-9 w-9 object-contain transition-opacity duration-300",
+                "h-8 w-8 object-contain transition-opacity duration-300",
                 hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />

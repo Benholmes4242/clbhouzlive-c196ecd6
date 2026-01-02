@@ -49,9 +49,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         ref={ref}
         onClick={onClick}
         className={cn(
-          "flex items-center gap-2 pl-1.5 pr-2.5 py-1",
+          "flex items-center gap-1.5 pl-1 pr-2 h-8",
           "rounded-sq-pill border transition-colors",
-          "max-w-[200px]",
+          "max-w-[180px]",
           useLightTheme 
             ? "bg-slate-100 border-slate-200/80 hover:bg-slate-200/80 active:bg-slate-200" 
             : "bg-white/5 border-white/10 hover:bg-white/10 active:bg-white/15"
@@ -60,7 +60,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">
           <SquircleAvatar
-            size={28}
+            size={24}
             src={activeActor.avatarUrl}
             alt={activeActor.name}
             fallback={getInitials(activeActor.name)}
