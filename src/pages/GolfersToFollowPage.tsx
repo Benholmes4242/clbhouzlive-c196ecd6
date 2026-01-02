@@ -130,10 +130,10 @@ const GolfersToFollowPage = () => {
   const hasMore = page < totalPages;
 
   return (
-    <PageRoot className="bg-muted/40 pb-24">
+    <PageRoot className="bg-muted/40 pb-6">
       <div className="w-full">
-        {/* Back CTA - flush test */}
-        <div className="px-4 pt-0">
+        {/* Back CTA - 24px below header */}
+        <div className="px-4 pt-6">
           <button
             type="button"
             onClick={handleBack}
@@ -352,7 +352,7 @@ const GolfersToFollowPage = () => {
 
             {/* Status text */}
             {!isSearching && totalCount > 0 && (
-              <p className="mt-sub text-center text-xs text-muted-foreground">
+              <p className="mt-sub pb-6 text-center text-xs text-muted-foreground">
                 Showing {showingCount} of {totalCount} golfers
               </p>
             )}
