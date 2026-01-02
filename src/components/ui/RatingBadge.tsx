@@ -18,9 +18,10 @@ interface RatingBadgeProps {
   className?: string;
 }
 
-// Premium muted gold for Outstanding
-const GOLD_BG_LIGHT = '#F5E6B8';
-const GOLD_BG_DARK = '#D4B85A';
+// Premium muted gold for Outstanding - matches RatingTierDistribution GOLD_COLOR
+const GOLD_COLOR = '#C9A94A';
+const GOLD_BG_LIGHT = '#D4C078'; // Lighter variant of GOLD_COLOR
+const GOLD_BG_DARK = GOLD_COLOR;
 
 // Neutral grey for all other tiers
 const NEUTRAL_BG_LIGHT = '#F1F5F9';
