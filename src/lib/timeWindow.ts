@@ -12,7 +12,7 @@ export interface TimeWindow {
  */
 export function getTimeWindow(timeframe: Timeframe, now = new Date()): TimeWindow {
   if (timeframe === 'all') {
-    return { start: null, end: now, label: 'All time' };
+    return { start: null, end: now, label: 'All time (recent)' };
   }
 
   const start = new Date(now);

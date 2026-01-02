@@ -264,7 +264,7 @@ const FriendsCoursesPanel: React.FC = () => {
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
               <SelectItem value="12m">Last 12 months</SelectItem>
-              <SelectItem value="all">All time</SelectItem>
+              <SelectItem value="all">All time (recent)</SelectItem>
             </SelectContent>
           </Select>
         </div>
