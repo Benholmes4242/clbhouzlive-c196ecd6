@@ -17,6 +17,7 @@ import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
+import TrendingInNetworkCard from './friends/TrendingInNetworkCard';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import CourseRankBadges from './CourseRankBadges';
@@ -340,8 +341,8 @@ const FriendsCoursesPanel: React.FC = () => {
     }
   }, [courses, courseFilter]);
 
-  // Hot courses: courses with 2+ friends, sorted by friends then recency
-  const hotCourses = useMemo(() => {
+  // Trending courses: courses with 2+ friends, sorted by friends then recency (for Trending module)
+  const trendingCourses = useMemo(() => {
     return courses
       .filter(course => course.total_friends_played >= 2)
       .sort((a, b) => {
@@ -353,14 +354,14 @@ const FriendsCoursesPanel: React.FC = () => {
           new Date(a.most_recent_play).getTime()
         );
       })
-      .slice(0, 2);
+      .slice(0, 3);
   }, [courses]);
 
   const regularCourses = useMemo(() => {
-    const hotIds = new Set(hotCourses.map(c => c.course_id));
+    const trendingIds = new Set(trendingCourses.map(c => c.course_id));
     const heroId = heroCourse?.course_id;
-    return courses.filter(c => !hotIds.has(c.course_id) && c.course_id !== heroId);
-  }, [courses, hotCourses, heroCourse]);
+    return courses.filter(c => !trendingIds.has(c.course_id) && c.course_id !== heroId);
+  }, [courses, trendingCourses, heroCourse]);
 
   // Paginate main courses list
   const paginatedCourses = useMemo(() => {
@@ -555,103 +556,20 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
 
-      {/* Hot in your network - 24px section gap */}
-      {hotCourses.length > 0 && (
+      {/* 🔥 Trending in your network - NEW Phase 2 module */}
+      {trendingCourses.length > 0 && (
         <div className="mt-6">
-          {/* Section header - 8px title gap, 16px to content */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-primary-accent" />
-              <h3 className="text-sm font-semibold">Hot in your network</h3>
-            </div>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-alt text-muted-foreground">
-              Courses multiple friends played recently
-            </span>
-          </div>
+          <TrendingInNetworkCard courses={trendingCourses} />
+        </div>
+      )}
 
-          {/* Full width breakout for cards - 16px card-to-card */}
-          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-            <div className="space-y-4">
-              {hotCourses.map((course) => (
-              <div key={course.course_id} className="overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-card border border-border/60"
-                onClick={() => navigate(`/courses/${course.course_id}`)}>
-                {/* Course Image - Taller */}
-                {course.thumbnail_url && (
-                  <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                    {/* Rank badges (top-left) */}
-                    {(() => {
-                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                      return (
-                        <CourseRankBadges
-                          globalRank={ranks.globalRank}
-                          regionalRank={ranks.regionalRank}
-                          usaRank={ranks.usaRank}
-                          country={course.country || ''}
-                          positioning="top-left"
-                        />
-                      );
-                    })()}
-                    
-                    <img
-                      src={course.thumbnail_url}
-                      alt={course.course_name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                    {/* Stronger bottom gradient */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-                  </div>
-                )}
-                
-                <div className="p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-semibold text-base">{course.course_name}</h3>
-                          <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
-                        </div>
-                        {/* Hot badge - subtle warm accent with thin border */}
-                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-amber-50/80 text-amber-700 border border-amber-200/80 whitespace-nowrap">
-                          Hot this month
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* Avatar stack - consistent 2-3 avatars + +N */}
-                    <div className="flex -space-x-2">
-                      {course.friends.slice(0, 3).map((friend, idx) => (
-                        <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
-                          <Squircle width={26} height={26}>
-                            <img 
-                              src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                              alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder.svg';
-                              }}
-                            />
-                          </Squircle>
-                        </div>
-                      ))}
-                      {course.friends.length > 3 && (
-                        <div className="relative flex items-center justify-center w-[26px] h-[26px] rounded-lg bg-slate-100 border border-slate-200 text-[10px] font-medium text-slate-600" style={{ zIndex: 6 }}>
-                          +{course.friends.length - 3}
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-xs text-slate-500">
-                      Played by <span className="font-medium text-foreground">{formatFriendsList(course.friends, 2)}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              ))}
-            </div>
-          </div>
+      {/* Section header for Recent in your network */}
+      {paginatedCourses.length > 0 && (
+        <div className="mt-8 mb-4">
+          <h3 className="text-base font-semibold text-foreground">Recent in your network</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Courses your friends have played recently
+          </p>
         </div>
       )}
 
@@ -784,13 +702,13 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Recent rounds timeline - 24px section gap */}
+      {/* Your friends' recent rounds - Section header + social typography */}
       {sortedRecent.length > 0 && (
-        <div className="mt-6">
-          {/* Section header - 8px title→subtitle, 16px to content */}
-          <div className="flex flex-col gap-2 mb-4">
+        <div className="mt-8">
+          {/* Section header */}
+          <div className="mb-4">
             <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-1">
               Rounds played in the last {timeframe === '7d' ? '7 days' : timeframe === '30d' ? '30 days' : timeframe === '90d' ? '90 days' : timeframe === '12m' ? '12 months' : 'all time'}
             </p>
           </div>
@@ -821,12 +739,14 @@ const FriendsCoursesPanel: React.FC = () => {
                     />
                   </Squircle>
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm block">
-                      <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
-                    </span>
-                    <span className="text-xs text-muted-foreground block">
+                    <p className="text-sm">
+                      <span className="font-semibold text-foreground">{hit.friend_profile.display_name || hit.friend_profile.username}</span>
+                      <span className="text-muted-foreground"> played </span>
+                      <span className="font-medium text-foreground">{hit.course_name}</span>
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">
                       {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
-                    </span>
+                    </p>
                   </div>
                 </div>
               ))}

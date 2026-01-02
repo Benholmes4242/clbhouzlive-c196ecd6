@@ -104,7 +104,7 @@ export function UnifiedPagination({
               onClick={handleNext}
               disabled={disabled}
             >
-              Next {pageSize} {itemLabel}
+              Load {Math.min(pageSize, total - endIndex)} more {itemLabel}
             </Button>
           )}
         </div>
