@@ -92,8 +92,8 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             </p>
           </div>
 
-          {/* Right side: Thumbnail + Rating */}
-          <div className="shrink-0 flex flex-col items-end gap-1.5">
+          {/* Right side: Thumbnail only */}
+          <div className="shrink-0">
             <Squircle width={56} height={56}>
               <img
                 src={thumbnailUrl || '/placeholder.svg'}
@@ -104,42 +104,46 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                 }}
               />
             </Squircle>
-            {communityRating && (
-              <div className="flex items-center gap-1">
-                <ClubhouseLogo size="xs" />
-                <span className="text-xs font-semibold text-foreground">{communityRating.toFixed(1)}</span>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Row 2: Avatar stack */}
-        <div className="flex -space-x-2 mt-3">
-          {sortedFriends.slice(0, 4).map((friend, idx) => (
-            <div
-              key={friend.friend_id}
-              className="relative"
-              style={{ zIndex: 10 - idx }}
-              onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
-            >
-              <Squircle width={32} height={32}>
-                <img
-                  src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
-                  alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-              </Squircle>
-            </div>
-          ))}
-          {friends.length > 4 && (
-            <div
-              className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600"
-              style={{ zIndex: 5 }}
-            >
-              +{friends.length - 4}
+        {/* Row 2: Avatar stack + Community rating (aligned with image) */}
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex -space-x-2">
+            {sortedFriends.slice(0, 4).map((friend, idx) => (
+              <div
+                key={friend.friend_id}
+                className="relative"
+                style={{ zIndex: 10 - idx }}
+                onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
+              >
+                <Squircle width={32} height={32}>
+                  <img
+                    src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
+                    alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </Squircle>
+              </div>
+            ))}
+            {friends.length > 4 && (
+              <div
+                className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600"
+                style={{ zIndex: 5 }}
+              >
+                +{friends.length - 4}
+              </div>
+            )}
+          </div>
+
+          {/* Community rating - aligned under image */}
+          {communityRating && (
+            <div className="flex items-center gap-1 w-14 justify-center">
+              <ClubhouseLogo size="xs" />
+              <span className="text-xs font-semibold text-foreground">{communityRating.toFixed(1)}</span>
             </div>
           )}
         </div>
