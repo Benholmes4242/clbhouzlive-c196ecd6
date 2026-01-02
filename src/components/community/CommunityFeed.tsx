@@ -215,7 +215,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // Empty state: User has no community (no friends/follows)
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
-      <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      <div className="min-h-screen pb-[var(--page-bottom-padding)] bg-[var(--bg-page)]">
         {/* Sticky Command Center */}
         <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
           <DiscoverCommandCenter
@@ -240,7 +240,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     const isFilteredEmpty = mediaFilter !== 'all';
     
     return (
-      <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      <div className="min-h-screen pb-[var(--page-bottom-padding)] bg-[var(--bg-page)]">
         {/* Sticky Command Center */}
         <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
           <DiscoverCommandCenter
@@ -275,7 +275,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   }
 
   return (
-    <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+    <div className="min-h-screen pb-[var(--page-bottom-padding)] bg-[var(--bg-page)]">
       {/* Sticky Command Center: Search + Sort + Pills + Subtitle */}
       <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
         <DiscoverCommandCenter

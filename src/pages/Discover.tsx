@@ -228,7 +228,7 @@ const Discover = () => {
   return (
     <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)] compact-header-offset">
       <FadeInContent>
-        <main className="pb-20 bg-[var(--bg-page)]">
+        <main className="pb-[var(--page-bottom-padding)] bg-[var(--bg-page)]">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
             <div className="px-1 bg-[var(--bg-page)]">
               <SegmentedControl 

@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const RateCoursePageSkeleton = () => {
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-[var(--page-bottom-padding)]">
         {/* Header with back button - Section A (light) */}
         <div className="relative h-[200px] bg-slate-50 animate-pulse">
           <div className="absolute top-4 left-4">

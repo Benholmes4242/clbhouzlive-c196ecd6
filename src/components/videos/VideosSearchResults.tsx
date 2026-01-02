@@ -43,7 +43,7 @@ export const VideosSearchResults: React.FC<VideosSearchResultsProps> = ({
   };
 
   return (
-    <div className={cn("min-h-screen pb-20", className)}>
+    <div className={cn("min-h-screen pb-[var(--page-bottom-padding)]", className)}>
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">

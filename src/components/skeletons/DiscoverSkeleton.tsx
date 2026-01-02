@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export const DiscoverSkeleton = () => {
   return (
-    <div className="min-h-screen page-with-header pb-20 bg-[var(--bg-page)]">
+    <div className="min-h-screen page-with-header pb-[var(--page-bottom-padding)] bg-[var(--bg-page)]">
       {/* Top tabs/segmented control */}
       <div className="px-4 pt-4">
         <div className="flex gap-2 mb-4">
