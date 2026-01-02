@@ -20,19 +20,8 @@ const ScrollToTopGlass = () => {
       
       const scrollTop = Math.max(rootScroll, mainScroll, pageScroll, windowScroll);
       
-      // Debug logging
-      if (scrollTop > 0) {
-        console.log('ScrollToTopGlass scroll detection:', {
-          rootScroll,
-          mainScroll,
-          pageScroll,
-          windowScroll,
-          maxScroll: scrollTop,
-          visible: scrollTop > 400
-        });
-      }
-      
-      setVisible(scrollTop > 400);
+      // Appear after ~1 screen height of scrolling
+      setVisible(scrollTop > 600);
     };
 
     // Initial check
@@ -68,33 +57,48 @@ const ScrollToTopGlass = () => {
     };
   }, []);
 
-  if (!visible) return null;
-
   return createPortal(
-    <button
-      type="button"
-      onClick={scrollToTop}
-      aria-label="Back to top"
-      className="
+    <div 
+      className={`
         fixed
         top-3
         left-1/2
         -translate-x-1/2
         z-[9999]
-        h-9
-        w-9
-        rounded-full
-        flex
-        items-center
-        justify-center
-        glass-dark-no-shadow
-        transition-transform
-        active:scale-95
-        opacity-70
-      "
+        pointer-events-none
+        transition-all
+        duration-300
+        ease-out
+        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}
+      `}
     >
-      <ChevronUp className="h-5 w-5 text-white" />
-    </button>,
+      <button
+        type="button"
+        onClick={scrollToTop}
+        aria-label="Back to top"
+        className="
+          pointer-events-auto
+          h-8
+          w-8
+          rounded-full
+          flex
+          items-center
+          justify-center
+          bg-slate-800/70
+          backdrop-blur-sm
+          border
+          border-white/10
+          opacity-60
+          hover:opacity-100
+          hover:scale-[1.03]
+          active:scale-95
+          transition-all
+          duration-150
+        "
+      >
+        <ChevronUp className="h-4 w-4 text-white" />
+      </button>
+    </div>,
     document.body
   );
 };
