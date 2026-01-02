@@ -97,12 +97,6 @@ export default function CreateMomentMediaStage({
     });
   };
 
-  // Handler for updating text overlays via drag
-  const handleTextOverlayChange = useCallback((overlays: TextOverlay[]) => {
-    if (!currentItem || !onUpdateEdits) return;
-    onUpdateEdits(currentItem.id, { textOverlays: overlays });
-  }, [onUpdateEdits]);
-
   // Handler for carousel index change (from swipe)
   const handleCarouselIndexChange = useCallback((index: number) => {
     const newMediaId = media[index]?.id;
@@ -138,6 +132,12 @@ export default function CreateMomentMediaStage({
   const isTextEditable = isTextToolActive && isPositioningText;
   const isDraggingText = isTextToolActive && isPositioningText;
   const currentEdits = currentItem ? getEdits(currentItem.id) : undefined;
+
+  // Handler for updating text overlays via drag - defined after currentItem
+  const handleTextOverlayChange = (overlays: TextOverlay[]) => {
+    if (!currentItem || !onUpdateEdits) return;
+    onUpdateEdits(currentItem.id, { textOverlays: overlays });
+  };
 
   return (
     <motion.div
