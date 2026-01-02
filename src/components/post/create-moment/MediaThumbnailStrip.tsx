@@ -312,36 +312,21 @@ export default function MediaThumbnailStrip({
           items={media.map(item => item.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {/* Scroll container with edge fades */}
-          <div className="relative">
-            {/* Left fade */}
-            <div 
-              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-background to-transparent z-10" 
-              aria-hidden="true"
-            />
-            
-            {/* Thumbnails row */}
-            <div className="flex gap-2.5 overflow-x-auto scrollbar-hide py-1 px-1">
-              {media.map((item, index) => (
-                <SortableThumb
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  isActive={item.id === activeMediaId}
-                  isCover={item.id === coverMediaId}
-                  getEdits={getEdits}
-                  onSelect={() => onSelect(item.id)}
-                  onSetCover={() => onSetCover(item.id)}
-                  onRemove={() => onRemove(item.id)}
-                />
-              ))}
-            </div>
-            
-            {/* Right fade */}
-            <div 
-              className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-background to-transparent z-10" 
-              aria-hidden="true"
-            />
+          {/* Thumbnails row */}
+          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide py-1 px-1">
+            {media.map((item, index) => (
+              <SortableThumb
+                key={item.id}
+                item={item}
+                index={index}
+                isActive={item.id === activeMediaId}
+                isCover={item.id === coverMediaId}
+                getEdits={getEdits}
+                onSelect={() => onSelect(item.id)}
+                onSetCover={() => onSetCover(item.id)}
+                onRemove={() => onRemove(item.id)}
+              />
+            ))}
           </div>
         </SortableContext>
         
