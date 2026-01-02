@@ -214,29 +214,29 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       </div>
 
       {/* Meta area - standardized padding */}
-      <div className={`${META_PADDING} bg-background space-y-0.5`}>
+      <div className={`${META_PADDING} bg-background`}>
         <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-1">
             {/* Course name */}
             <h3 className="text-sm font-semibold text-foreground truncate">
               {course.name}
             </h3>
 
-            {/* Location */}
+            {/* Location - increased spacing from title */}
             <p className="text-xs text-muted-foreground truncate">
               {course.locationText}
             </p>
 
             {/* Rating count / members */}
             {course.ratingCount && course.ratingCount > 0 && (
-              <p className="text-[11px] text-muted-foreground mt-0.5">
+              <p className="text-[11px] text-muted-foreground">
                 Rated by {course.ratingCount} member{course.ratingCount === 1 ? '' : 's'}
               </p>
             )}
 
             {/* Friends context */}
             {showFriendsContext && course.context?.friendsPlayedCount != null && (
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground">
                 {course.context.friendsPlayedCount > 0 ? (
                   <>Played by {course.context.friendsPlayedCount} friend{course.context.friendsPlayedCount === 1 ? '' : 's'}</>
                 ) : (
@@ -246,9 +246,11 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             )}
           </div>
 
-          {/* Community rating */}
+          {/* Community rating - fixed position */}
           {showRating && course.communityRating != null && (
-            <CourseCommunityRating rating={course.communityRating} />
+            <div className="flex-shrink-0 self-start">
+              <CourseCommunityRating rating={course.communityRating} />
+            </div>
           )}
         </div>
       </div>

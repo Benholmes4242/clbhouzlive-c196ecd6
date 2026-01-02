@@ -365,13 +365,18 @@ const CourseExplorer = () => {
     <div className="w-full space-y-block">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
         <Input
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--echo-orange)/0.12)] focus-visible:border-border/80 transition-all duration-150 text-base placeholder:text-[15px]"
         />
+        {isFetching && searchTerm && (
+          <div className="absolute right-10 top-1/2 -translate-y-1/2">
+            <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+          </div>
+        )}
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
@@ -390,7 +395,11 @@ const CourseExplorer = () => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 ${
+              selectedRegion !== PRIMARY_REGIONS.ALL 
+                ? 'border-[hsl(var(--echo-orange)/0.65)] border-[1.5px] text-foreground' 
+                : 'border-border/60'
+            }`}>
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                 <SelectValue placeholder="All Regions" />
@@ -413,7 +422,11 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow disabled:opacity-50 disabled:cursor-not-allowed">
+            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+              selectedSubregion !== 'all' 
+                ? 'border-[hsl(var(--echo-orange)/0.65)] border-[1.5px] text-foreground' 
+                : 'border-border/60'
+            }`}>
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
@@ -431,21 +444,21 @@ const CourseExplorer = () => {
       {/* Context row with sort */}
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2">
-          <p className="text-xs text-muted-foreground flex-1">
+          <p className="text-[11px] text-muted-foreground/85 flex-1">
             {hasSearch ? (
               <>
                 Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
                   ? 'worldwide'
-                  : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                  : <>in <span className="font-medium text-foreground/90">{getRegionLabel()}</span></>}
+                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground/90">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
               </>
             ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
               'Exploring all courses worldwide'
             ) : (
               <>
                 Exploring courses in{' '}
-                <span className="font-medium text-foreground">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                <span className="font-medium text-foreground/90">{getRegionLabel()}</span>
+                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground/90">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
               </>
             )}
           </p>
@@ -454,7 +467,7 @@ const CourseExplorer = () => {
             onChange={(v) => setSortOption(v as SortOption)}
             options={sortOptions}
             ariaLabel="Sort courses"
-            triggerClassName="h-9"
+            triggerClassName="h-9 text-[11px]"
           />
         </div>
       )}
@@ -500,13 +513,19 @@ const CourseExplorer = () => {
                 size="sm"
                 onClick={loadMore}
                 disabled={isLoadingMore}
-                className="w-full max-w-xs gap-1.5"
+                className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
               >
-                <ChevronDown className="h-4 w-4" />
-                {isLoadingMore 
-                  ? 'Loading...' 
-                  : `Next ${Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses`
-                }
+                {isLoadingMore ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                    Loading next courses…
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Next {Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses
+                  </>
+                )}
               </Button>
               <p className="text-[11px] text-muted-foreground">
                 Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
