@@ -9,7 +9,8 @@ import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
-import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
+import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, X } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { 
@@ -480,12 +481,20 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <p className="mb-4 text-xs font-semibold tracking-[0.08em] text-slate-500">
           Sort &amp; filter
         </p>
-        {/* Sort pills */}
-        <SegmentedTabs
-          options={sortOptions}
-          value={sortBy}
-          onChange={(value) => setSortBy(value as SortOption)}
-        />
+        {/* Sort tabs - underline style matching main tabs */}
+        <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)} className="w-full">
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
+            {sortOptions.map((option) => (
+              <TabsTrigger
+                key={option.value}
+                value={option.value}
+                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+              >
+                {option.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         
         {/* Rating filter chips (Upgrade B) - 12px below sort pills */}
         <div className="mt-3">
