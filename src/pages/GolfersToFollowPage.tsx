@@ -208,18 +208,25 @@ const GolfersToFollowPage = () => {
           </div>
         )}
 
-        {/* Search bar */}
+        {/* Search bar - disabled on home_club tab when no club set */}
         <div className="px-6 mt-4 mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search golfers by name or club"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-9 h-11 rounded-xl border-border/40 bg-white/35"
-            />
-          </div>
+          {activeTab === 'home_club' && hasNoHomeClub ? (
+            <div className="h-11 px-4 flex items-center rounded-xl border border-border/40 bg-muted/30">
+              <Search className="h-4 w-4 text-muted-foreground/50 mr-2" />
+              <span className="text-sm text-muted-foreground/60">Set your home club to search</span>
+            </div>
+          ) : (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search golfers by name or club"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="pl-9 h-11 rounded-xl border-border/40 bg-white/35"
+              />
+            </div>
+          )}
         </div>
 
         {/* Content */}
