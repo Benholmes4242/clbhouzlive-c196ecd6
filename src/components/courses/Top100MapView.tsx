@@ -60,12 +60,12 @@ const REGION_CONFIG: Record<
   },
 };
 
-// Marker colors
-const PLAYED_COLOR = '#F7931E';
+// Marker colors - Played = slate, Want to Play = orange outline, Not Played = muted
+const PLAYED_COLOR = '#0F172A'; // slate-900 (dark)
 const WANT_TO_PLAY_COLOR = '#F7931E'; // Orange stroke, hollow center
 const NOT_PLAYED_COLOR = '#94a3b8'; // Light grey (slate-400)
-const CLUSTER_COLOR_MIXED = '#334155';
-const CLUSTER_COLOR_PLAYED = '#F7931E';
+const CLUSTER_COLOR_MIXED = '#334155'; // slate-700
+const CLUSTER_COLOR_MOSTLY_PLAYED = '#0F172A'; // slate-900 (not orange)
 
 const Top100MapView: React.FC<Top100MapViewProps> = ({
   scope,
@@ -246,7 +246,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-color': [
             'case',
             ['>', ['/', ['get', 'played_count'], ['get', 'point_count']], 0.5],
-            CLUSTER_COLOR_PLAYED,
+            CLUSTER_COLOR_MOSTLY_PLAYED,
             CLUSTER_COLOR_MIXED,
           ],
           'circle-stroke-width': 2,
@@ -436,7 +436,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           {/* Legend row - aligned with same padding */}
           <div className="pointer-events-auto flex items-center gap-2.5 rounded-sq-sm bg-white/90 dark:bg-slate-900/90 px-2.5 py-1.5 text-[10px] text-slate-700 dark:text-slate-300 shadow-[0_2px_12px_rgba(0,0,0,0.1)] backdrop-blur-xl border border-white/40 dark:border-slate-700/50 w-fit">
             <div className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E] shadow-[0_0_4px_rgba(247,147,30,0.4)]" />
+              <span className="inline-block h-2 w-2 rounded-full bg-slate-900 dark:bg-slate-200" />
               <span>Played</span>
             </div>
             <div className="flex items-center gap-1">
@@ -508,11 +508,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200',
                     isActive
                       ? filter === 'played'
-                        ? 'bg-[#F7931E] text-white shadow-sm'
+                        ? 'bg-slate-900 dark:bg-slate-200 text-white dark:text-slate-900 shadow-sm'
                         : filter === 'want_to_play'
-                        ? 'bg-[#F7931E]/20 text-[#F7931E] border border-[#F7931E] shadow-sm'
+                        ? 'bg-[#F7931E]/15 text-[#F7931E] border border-[#F7931E] shadow-sm'
                         : filter === 'not_played'
-                        ? 'bg-slate-600 text-white shadow-sm'
+                        ? 'bg-slate-400 text-white shadow-sm'
                         : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white'
                   )}

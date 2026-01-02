@@ -274,10 +274,19 @@ const JourneyListPage: React.FC = () => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
+        
+        {/* Private wishlist notice */}
+        {activeTab === 'wishlist' && (
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100">
+            <p className="text-[11px] text-slate-500 text-center">
+              Saved for later — visible only to you
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 pb-24">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
