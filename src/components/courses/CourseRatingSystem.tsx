@@ -72,16 +72,26 @@ const CourseRatingSystem = ({
         await Promise.all(uploadPromises);
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
-      // Invalidate feed caches so cards update immediately
+      
+      // Force refetch community aggregates
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-rating-aggregates', courseId] 
+      });
+      
+      // Invalidate AND refetch feed caches so cards update immediately
       queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
+      
+      // Force refetch the infinite queries to show updated ratings
+      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       
       toast({
         title: "Rating Submitted! ✨",
