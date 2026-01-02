@@ -16,23 +16,23 @@ interface WeeklyRecapCardProps {
 }
 
 const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, leaderboard }) => {
-  // Calculate weekly stats (last 7 days)
+  // Calculate monthly stats (last 30 days)
   const now = new Date();
-  const weekAgo = new Date();
-  weekAgo.setDate(now.getDate() - 7);
+  const monthAgo = new Date();
+  monthAgo.setDate(now.getDate() - 30);
 
-  const weeklyRounds = recent.filter(
-    (hit) => new Date(hit.played_at) >= weekAgo
+  const monthlyRounds = recent.filter(
+    (hit) => new Date(hit.played_at) >= monthAgo
   );
 
-  const totalRoundsThisWeek = weeklyRounds.length;
+  const totalRoundsThisMonth = monthlyRounds.length;
 
-  // Unique courses played this week
-  const uniqueCoursesThisWeek = new Set(weeklyRounds.map((r) => r.course_id)).size;
+  // Unique courses played this month
+  const uniqueCoursesThisMonth = new Set(monthlyRounds.map((r) => r.course_id)).size;
 
-  // Most active friend this week
+  // Most active friend this month
   const friendActivityMap = new Map<string, number>();
-  weeklyRounds.forEach((hit) => {
+  monthlyRounds.forEach((hit) => {
     friendActivityMap.set(hit.friend_id, (friendActivityMap.get(hit.friend_id) || 0) + 1);
   });
 
@@ -41,7 +41,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
   friendActivityMap.forEach((count, friendId) => {
     if (count > maxRounds) {
       maxRounds = count;
-      const friend = weeklyRounds.find((r) => r.friend_id === friendId);
+      const friend = monthlyRounds.find((r) => r.friend_id === friendId);
       if (friend) {
         mostActiveFriend = {
           name: friend.friend_profile.display_name || friend.friend_profile.username,
@@ -52,9 +52,9 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
     }
   });
 
-  // Top course this week (most plays)
+  // Top course this month (most plays)
   const coursePlayMap = new Map<string, { name: string; count: number }>();
-  weeklyRounds.forEach((hit) => {
+  monthlyRounds.forEach((hit) => {
     const existing = coursePlayMap.get(hit.course_id);
     if (!existing) {
       coursePlayMap.set(hit.course_id, { name: hit.course_name, count: 1 });
@@ -72,8 +72,8 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
     }
   });
 
-  // Don't render if no weekly activity
-  if (totalRoundsThisWeek === 0) {
+  // Don't render if no monthly activity
+  if (totalRoundsThisMonth === 0) {
     return null;
   }
 
@@ -86,8 +86,8 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
             <Calendar className="w-3 h-3 text-emerald-600" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground">This week in your network</h3>
-            <p className="text-[11px] text-muted-foreground">Activity from the last 7 days</p>
+            <h3 className="text-sm font-semibold text-foreground">This month in your network</h3>
+            <p className="text-[11px] text-muted-foreground">Activity from the last 30 days</p>
           </div>
         </div>
       </div>
@@ -95,14 +95,14 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
       {/* Stats Row - Compact horizontal */}
       <div className="px-4 py-3 flex items-center justify-center gap-8 border-b border-border/40">
         <div className="text-center">
-          <p className="text-lg font-bold text-foreground">{totalRoundsThisWeek}</p>
+          <p className="text-lg font-bold text-foreground">{totalRoundsThisMonth}</p>
           <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/75">
             Rounds
           </p>
         </div>
         <div className="h-6 w-px bg-slate-200/60" />
         <div className="text-center">
-          <p className="text-lg font-bold text-foreground">{uniqueCoursesThisWeek}</p>
+          <p className="text-lg font-bold text-foreground">{uniqueCoursesThisMonth}</p>
           <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/75">
             Courses
           </p>

@@ -23,6 +23,7 @@ type FeedItem =
       thumbnailUrl: string | null;
       friends: FriendCourseHit[];
       mostRecentPlayedAt: string;
+      communityRating: number | null;
     };
 
 const PAGE_SIZE = 10;
@@ -85,6 +86,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
           thumbnailUrl: course.thumbnail_url || null,
           friends: course.friends,
           mostRecentPlayedAt: course.most_recent_play,
+          communityRating: course.community_rating ?? null,
         });
       } else {
         // Single activity
@@ -145,6 +147,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
                 thumbnailUrl={item.thumbnailUrl}
                 friends={item.friends}
                 mostRecentPlayedAt={item.mostRecentPlayedAt}
+                communityRating={item.communityRating}
                 index={idx}
               />
             );
