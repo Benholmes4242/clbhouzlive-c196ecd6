@@ -100,7 +100,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               lineHeight: '1.5',
             }}
           >
-            Everywhere you play. Everything you remember.
+            Everywhere you play. Every moment remembered.
           </p>
         </div>
         
