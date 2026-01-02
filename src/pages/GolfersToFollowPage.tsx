@@ -130,7 +130,7 @@ const GolfersToFollowPage = () => {
   const hasMore = page < totalPages;
 
   return (
-    <PageRoot className="bg-muted/40 pb-24 compact-header-offset">
+    <PageRoot className="bg-muted/40 pb-24 compact-header-offset-no-safe">
       <div className="w-full">
         {/* Back CTA - top left, matching Notifications page */}
         <div className="px-4 pt-6">
