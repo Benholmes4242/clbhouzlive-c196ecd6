@@ -250,7 +250,7 @@ const coursesAggregated = Array.from(courseIdToFriendsMap.values()).map(
 
     return {
       ...course,
-      average_rating: avg,
+      community_rating: avg,
     };
   }
 );
