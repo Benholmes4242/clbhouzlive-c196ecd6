@@ -8,7 +8,6 @@ import { Search, MapPin, X, ChevronDown } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'react-router-dom';
-import { FixedPaginationDock } from '@/components/ui/FixedPaginationDock';
 import {
   PRIMARY_REGIONS,
   PRIMARY_REGION_LABELS,
@@ -360,9 +359,10 @@ const CourseExplorer = () => {
   ];
 
   const showLoadMoreButton = displayedCourses.length > 0 && !hasReachedEnd && displayedCourses.length < totalCount;
+  const showEndMessage = hasReachedEnd && displayedCourses.length > 0 && totalCount > EXPLORE_PAGE_SIZE;
 
   return (
-    <div className="w-full space-y-block">
+    <div className="w-full space-y-block pb-24">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
@@ -504,24 +504,42 @@ const CourseExplorer = () => {
             courses={displayedCourses}
             onCourseClick={handleCourseClick}
           />
-        </div>
-      )}
 
-      {/* Fixed pagination dock */}
-      {displayedCourses.length > 0 && (
-        <FixedPaginationDock
-          page={0}
-          total={totalCount}
-          pageSize={EXPLORE_PAGE_SIZE}
-          hasNextPage={showLoadMoreButton}
-          onNext={loadMore}
-          isLoadingMore={isLoadingMore}
-          itemLabel="courses"
-          loadMoreStyle={true}
-          startIndex={1}
-          endIndex={displayedCourses.length}
-          nextButtonLabel={`Next ${Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses`}
-        />
+          {/* Load more button - matches leaderboard style */}
+          {showLoadMoreButton && (
+            <div className="relative z-10 mt-6 mb-2 flex flex-col items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadMore}
+                disabled={isLoadingMore}
+                className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
+              >
+                {isLoadingMore ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                    Loading next courses…
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Next {Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses
+                  </>
+                )}
+              </Button>
+              <p className="text-[11px] text-muted-foreground">
+                Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
+              </p>
+            </div>
+          )}
+
+          {/* End message */}
+          {showEndMessage && (
+            <p className="text-center text-[11px] text-muted-foreground pt-4">
+              You've reached the end • {totalCount.toLocaleString()} courses total
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

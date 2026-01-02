@@ -18,7 +18,7 @@ import {
   type Top100FilterChip,
 } from '@/components/top100/list';
 import { Top100HeroShell } from '@/components/top100/Top100HeroShell';
-import { FixedPaginationDock } from '@/components/ui/FixedPaginationDock';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -430,21 +430,41 @@ const Top100List = () => {
             </div>
           )}
         </section>
-      </main>
 
-      {/* Fixed Pagination Dock */}
-      {paginatedCourses.length > 0 && (
-        <FixedPaginationDock
-          page={page}
-          total={totalFiltered}
-          pageSize={PAGE_SIZE}
-          hasNextPage={hasNextPage}
-          onNext={handleNextPage}
-          onPrev={handlePrevPage}
-          itemLabel="courses"
-          scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
-        />
-      )}
+        {/* 7. Pagination with intent-driven copy */}
+        <div className="px-4 pb-[24px]">
+          <div className="flex items-center justify-between gap-4">
+            <button
+              onClick={handlePrevPage}
+              disabled={!hasPrevPage}
+              className={`px-4 py-2 text-sm font-medium rounded-sq-sm transition-colors ${
+                hasPrevPage 
+                  ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' 
+                  : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+              }`}
+            >
+              Previous 25
+            </button>
+            
+            <span className="text-xs text-slate-500">
+              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, totalFiltered)} of {totalFiltered}
+            </span>
+            
+            <button
+              onClick={handleNextPage}
+              disabled={!hasNextPage}
+              className={`px-4 py-2 text-sm font-medium rounded-sq-sm transition-colors ${
+                hasNextPage 
+                  ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                  : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+              }`}
+            >
+              Next 25
+            </button>
+          </div>
+        </div>
+
+      </main>
 
       {/* Course Detail Modal */}
       {selectedCourseId && (

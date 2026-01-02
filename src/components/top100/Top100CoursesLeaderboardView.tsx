@@ -12,7 +12,7 @@ import { Top100CourseMoversStrip } from './Top100CourseMoversStrip';
 import { getCourseTrophies } from './getCourseTrophies';
 import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
 import { fromLeaderboardCourse } from '@/lib/mappers/toCourseCardModel';
-import { FixedPaginationDock } from '@/components/ui/FixedPaginationDock';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 interface Top100CoursesLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -255,18 +255,16 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
         </div>
       )}
 
-      {/* Fixed Pagination Dock */}
-      {visibleCourses.length > 0 && (
-        <FixedPaginationDock
-          page={page}
-          total={visibleCourses.length}
-          pageSize={PAGE_SIZE}
-          hasNextPage={hasNext}
-          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-          onPrev={() => setPage((p) => Math.max(0, p - 1))}
-          itemLabel="courses"
-        />
-      )}
+      {/* Pagination */}
+      <UnifiedPagination
+        page={page}
+        total={visibleCourses.length}
+        pageSize={PAGE_SIZE}
+        hasNextPage={hasNext}
+        onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        onPrev={() => setPage((p) => Math.max(0, p - 1))}
+        itemLabel="courses"
+      />
     </div>
   );
 }

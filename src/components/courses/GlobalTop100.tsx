@@ -20,7 +20,7 @@ import {
 } from '@/constants/courseRegions';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
-import { FixedPaginationDock } from '@/components/ui/FixedPaginationDock';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 type Top100SortOption = 'official' | 'name_asc' | 'name_desc';
 
@@ -453,28 +453,24 @@ const GlobalTop100 = () => {
               ))}
             </div>
           </div>
+          
+          {/* Pagination Footer */}
+          <UnifiedPagination
+            page={page}
+            total={totalCount}
+            hasNextPage={hasNextPage}
+            onNext={() => {
+              if (hasMorePages && endIndex >= totalCount) {
+                fetchNextPage();
+              } else {
+                setPage((p) => p + 1);
+              }
+            }}
+            onPrev={() => setPage((p) => p - 1)}
+            disabled={isLoading || isFetchingNextPage}
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
+          />
         </div>
-      )}
-
-      {/* Fixed Pagination Dock */}
-      {paginatedCourses.length > 0 && (
-        <FixedPaginationDock
-          page={page}
-          total={totalCount}
-          pageSize={COURSES_PAGE_SIZE}
-          hasNextPage={hasNextPage}
-          onNext={() => {
-            if (hasMorePages && endIndex >= totalCount) {
-              fetchNextPage();
-            } else {
-              setPage((p) => p + 1);
-            }
-          }}
-          onPrev={() => setPage((p) => p - 1)}
-          disabled={isLoading || isFetchingNextPage}
-          scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
-          itemLabel="courses"
-        />
       )}
     </div>
   );
