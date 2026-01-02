@@ -16,6 +16,7 @@ import { Top100ProgressSummary } from '@/components/top100/Top100ProgressSummary
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { getProgressInsightsForLists } from '@/lib/utils/progressInsightCopy';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -188,13 +189,22 @@ const Top100Hub = () => {
                     Loading Top 100 lists...
                   </div>
                 ) : (
-                  listSummaries?.map((list) => (
-                    <Top100RegionCard
-                      key={list.id}
-                      list={list}
-                      onClick={() => navigate(`/top100/${list.slug}`)}
-                    />
-                  ))
+                  (() => {
+                    // Track used phrases to avoid duplicates in viewport
+                    const usedPhrases = new Set<string>();
+                    return listSummaries?.map((list) => {
+                      const card = (
+                        <Top100RegionCard
+                          key={list.id}
+                          list={list}
+                          onClick={() => navigate(`/top100/${list.slug}`)}
+                          userId={session?.user?.id}
+                          usedPhrases={usedPhrases}
+                        />
+                      );
+                      return card;
+                    });
+                  })()
                 )}
               </div>
 
