@@ -132,8 +132,8 @@ const GolfersToFollowPage = () => {
   return (
     <PageRoot className="bg-muted/40 pb-24 compact-header-offset">
       <div className="w-full">
-        {/* Back CTA - top left, 24px below header */}
-        <div className="px-4 pt-6">
+        {/* Back CTA - flush test */}
+        <div className="px-4 pt-0">
           <button
             type="button"
             onClick={handleBack}
