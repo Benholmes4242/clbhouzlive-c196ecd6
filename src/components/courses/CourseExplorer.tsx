@@ -362,7 +362,7 @@ const CourseExplorer = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > 0 && totalCount > EXPLORE_PAGE_SIZE;
 
   return (
-    <div className="w-full space-y-block pb-[180px]">
+    <div className="w-full space-y-block pb-[220px]">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
