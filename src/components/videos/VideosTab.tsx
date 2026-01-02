@@ -340,7 +340,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const BG_COLOR = '#f8fafc'; // slate-50
 
   return (
-    <div className={cn("min-h-screen pb-[var(--page-bottom-padding)]", className)} style={{ background: BG_COLOR }}>
+    <div className={cn("min-h-screen pb-20", className)} style={{ background: BG_COLOR }}>
       {/* Sticky Command Center: Search + Sort + Pills */}
       <div className="sticky top-0 z-30" style={{ background: BG_COLOR }}>
         <DiscoverCommandCenter

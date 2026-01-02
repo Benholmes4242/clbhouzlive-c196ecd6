@@ -173,7 +173,7 @@ export const CreatorPage: React.FC = () => {
   );
 
   return (
-    <PageRoot className="min-h-screen pb-[var(--page-bottom-padding)]" style={{ background: BG_COLOR }}>
+    <PageRoot className="min-h-screen pb-20" style={{ background: BG_COLOR }}>
       {/* Hero Section - matches ProfilePageV2 exactly */}
       <div className="relative">
         {/* Hero Image */}

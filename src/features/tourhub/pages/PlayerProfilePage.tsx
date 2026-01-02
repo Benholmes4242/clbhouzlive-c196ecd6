@@ -57,7 +57,7 @@ export function PlayerProfilePage() {
   
   return (
     <TourHubShell>
-      <div className="pt-6 pb-[var(--page-bottom-padding)]">
+      <div className="pt-6 pb-24">
         {/* Back Link */}
         <Link to="/tourhub?tab=players" className="text-primary hover:underline flex items-center gap-1 mb-6 text-sm">
           <ArrowLeft className="w-4 h-4" /> Back to Players

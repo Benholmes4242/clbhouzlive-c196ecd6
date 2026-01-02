@@ -2,7 +2,7 @@ import React from 'react';
 
 const EmptyFeedMessage = () => {
   return (
-    <div className="space-y-6 pb-[var(--page-bottom-padding)]">
+    <div className="space-y-6 pb-20">
       <div className="text-center py-12">
         <p className="text-muted-foreground text-lg">No posts from friends or followed accounts yet.</p>
         <p className="text-muted-foreground text-sm mt-2">

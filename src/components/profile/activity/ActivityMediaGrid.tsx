@@ -58,7 +58,7 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   }, [navigate]);
 
   return (
-    <div className="px-0 pb-[var(--page-bottom-padding)]">
+    <div className="px-0 pb-16">
       <UnifiedMediaGrid
         items={unifiedItems}
         config={PROFILE_GRID_CONFIG}

@@ -79,7 +79,7 @@ const ExploreRegionPage: React.FC = () => {
   const allCourses = courses.slice(0, 30);
 
   return (
-    <div className="min-h-screen bg-background pb-[var(--page-bottom-padding)]">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border/40">
         <div className="px-5 py-4 flex items-center gap-3">

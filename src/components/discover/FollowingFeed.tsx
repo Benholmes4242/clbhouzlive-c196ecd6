@@ -102,7 +102,7 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
   }
 
   return (
-    <div className="min-h-screen pb-[var(--page-bottom-padding)]" style={{ background: '#f8fafc' }}>
+    <div className="min-h-screen pb-20" style={{ background: '#f8fafc' }}>
       {/* Simple list layout - same as Videos page */}
       <div className="space-y-3 pt-4">
         {items.map((item, index) => (

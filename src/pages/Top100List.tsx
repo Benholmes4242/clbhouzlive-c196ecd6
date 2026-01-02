@@ -315,7 +315,7 @@ const Top100List = () => {
   if (isLoading) {
     return (
       <PageRoot className="min-h-screen bg-background">
-        <main className="pb-[var(--page-bottom-padding)]">
+        <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-4">
             <div className="h-[260px] bg-muted" />
             <div className="h-20 bg-muted rounded-2xl mx-4" />

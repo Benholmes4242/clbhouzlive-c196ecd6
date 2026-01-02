@@ -138,7 +138,7 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
   }
 
   return (
-    <div className={cn("pb-[var(--page-bottom-padding)]", className)}>
+    <div className={cn("pb-24", className)}>
       <UniversalMediaGrid
         items={unifiedItems}
         config={ACTIVITY_GRID_CONFIG}

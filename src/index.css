@@ -679,9 +679,6 @@ html, body, #root {
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 64px;
   
-  /* Standard page bottom padding: nav height + 24px gap */
-  --page-bottom-padding: 88px;
-  
   /* Top 100 Region Colors */
   --region-global: 31 159 155;      /* teal / blue-green */
   --region-gbi: 31 122 58;          /* deep green */

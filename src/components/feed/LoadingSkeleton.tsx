@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const LoadingSkeleton = () => {
   return (
-    <div className="space-y-6 pb-[var(--page-bottom-padding)]">
+    <div className="space-y-6 pb-20">
       {[1, 2].map((i) => (
         <div key={i} className="bg-surface-card border border-border p-4 space-y-4">
           {/* User header */}

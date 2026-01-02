@@ -182,7 +182,7 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-[var(--page-bottom-padding)]">
+          <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
             {/* Filter tabs */}
             <div className="mb-4 overflow-x-auto scrollbar-hide">
               <div className="inline-flex rounded-sq-pill bg-muted/70 border border-border/40 p-1 gap-0.5">
