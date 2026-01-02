@@ -145,7 +145,6 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
                 thumbnailUrl={item.thumbnailUrl}
                 friends={item.friends}
                 mostRecentPlayedAt={item.mostRecentPlayedAt}
-                onSave={onSave}
                 index={idx}
               />
             );
@@ -155,7 +154,6 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
               key={`single-${item.hit.friend_id}-${item.hit.course_id}-${item.hit.played_at}`}
               hit={item.hit}
               isTrending={trendingCourseIds.has(item.hit.course_id)}
-              onSave={onSave}
               index={idx}
             />
           );

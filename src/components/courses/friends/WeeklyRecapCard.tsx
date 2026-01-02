@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
 import { Calendar, TrendingUp } from 'lucide-react';
 import type { FriendCourseHit, CourseWithFriends } from '@/hooks/useFriendsCourses';
@@ -79,7 +78,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
   }
 
   return (
-    <Card className="bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div className="rounded-xl overflow-hidden bg-gradient-to-br from-primary/[0.04] to-primary/[0.02]">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border/40">
         <div className="flex items-center gap-2.5">
@@ -147,7 +146,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };
 

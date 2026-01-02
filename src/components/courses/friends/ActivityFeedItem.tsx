@@ -1,6 +1,6 @@
 import React from 'react';
 import { Squircle } from '@/components/ui/squircle';
-import { Bookmark, ExternalLink, Flame } from 'lucide-react';
+import { ExternalLink, Flame } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,14 +9,12 @@ import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
 interface ActivityFeedItemProps {
   hit: FriendCourseHit;
   isTrending?: boolean;
-  onSave?: (courseId: string) => void;
   index?: number;
 }
 
 const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
   hit,
   isTrending = false,
-  onSave,
   index = 0,
 }) => {
   const navigate = useNavigate();
@@ -30,11 +28,6 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
 
   const handleCourseClick = () => {
     navigate(`/courses/${hit.course_id}`);
-  };
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSave?.(hit.course_id);
   };
 
   return (
@@ -104,15 +97,8 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
         </div>
       </div>
 
-      {/* Actions */}
+      {/* Actions - only View course */}
       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/40">
-        <button
-          onClick={handleSave}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-        >
-          <Bookmark className="w-3.5 h-3.5" />
-          Save
-        </button>
         <button
           onClick={handleCourseClick}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"

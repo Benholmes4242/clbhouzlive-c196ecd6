@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Squircle } from '@/components/ui/squircle';
-import { Bookmark, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,7 +12,7 @@ interface ActivityClusterProps {
   thumbnailUrl: string | null;
   friends: FriendCourseHit[];
   mostRecentPlayedAt: string;
-  onSave?: (courseId: string) => void;
+  communityRating?: number | null;
   index?: number;
 }
 
@@ -22,7 +22,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
   thumbnailUrl,
   friends,
   mostRecentPlayedAt,
-  onSave,
+  communityRating,
   index = 0,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -64,11 +64,6 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
     navigate(`/user/${username}`);
   };
 
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSave?.(courseId);
-  };
-
   const toggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
@@ -83,53 +78,21 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
       onClick={handleCourseClick}
     >
       <div className="p-4">
+        {/* Row 1: Title + meta (left) | Thumbnail + rating (right) */}
         <div className="flex gap-3">
-          {/* Avatar Stack */}
-          <div className="shrink-0 flex -space-x-2">
-            {sortedFriends.slice(0, 4).map((friend, idx) => (
-              <div
-                key={friend.friend_id}
-                className="relative"
-                style={{ zIndex: 10 - idx }}
-                onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
-              >
-                <Squircle width={36} height={36}>
-                  <img
-                    src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
-                    alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                </Squircle>
-              </div>
-            ))}
-            {friends.length > 4 && (
-              <div
-                className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600"
-                style={{ zIndex: 5 }}
-              >
-                +{friends.length - 4}
-              </div>
-            )}
-          </div>
-
-          {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Headline - single line */}
-            <p className="text-sm font-semibold text-foreground truncate">
+            {/* Headline */}
+            <p className="text-sm font-semibold text-foreground">
               {friends.length} friends played {courseName}
             </p>
-
-            {/* Compact subline */}
+            {/* Subline */}
             <p className="text-xs text-slate-400 mt-0.5">
               Most recent: <span className="text-slate-500">{mostRecentName}</span> · {formatTimeCompact(mostRecentPlayedAt)} ago
             </p>
           </div>
 
-          {/* Course Thumbnail */}
-          <div className="shrink-0">
+          {/* Right side: Thumbnail + Rating */}
+          <div className="shrink-0 flex flex-col items-end gap-1.5">
             <Squircle width={56} height={56}>
               <img
                 src={thumbnailUrl || '/placeholder.svg'}
@@ -140,29 +103,57 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                 }}
               />
             </Squircle>
+            {communityRating && (
+              <div className="flex items-center gap-1">
+                <Star className="w-3 h-3 text-slate-400 fill-slate-400" />
+                <span className="text-xs font-medium text-slate-500">{communityRating.toFixed(1)}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Actions + Expand */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleSave}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+        {/* Row 2: Avatar stack */}
+        <div className="flex -space-x-2 mt-3">
+          {sortedFriends.slice(0, 4).map((friend, idx) => (
+            <div
+              key={friend.friend_id}
+              className="relative"
+              style={{ zIndex: 10 - idx }}
+              onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
             >
-              <Bookmark className="w-3.5 h-3.5" />
-              Save
-            </button>
-            <button
-              onClick={handleCourseClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+              <Squircle width={32} height={32}>
+                <img
+                  src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
+                  alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              </Squircle>
+            </div>
+          ))}
+          {friends.length > 4 && (
+            <div
+              className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600"
+              style={{ zIndex: 5 }}
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              View course
-            </button>
-          </div>
+              +{friends.length - 4}
+            </div>
+          )}
+        </div>
 
-          {friends.length > 2 && (
+        {/* Row 3: Actions */}
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
+          <button
+            onClick={handleCourseClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            View course
+          </button>
+
+          {friends.length > 1 && (
             <button
               onClick={toggleExpand}
               className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors"
@@ -178,7 +169,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
         </div>
       </div>
 
-      {/* Expanded Friend List */}
+      {/* Expanded Friend List with ratings */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
@@ -193,27 +184,34 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                 {sortedFriends.map((friend) => (
                   <div
                     key={`${friend.friend_id}-${friend.played_at}`}
-                    className="flex items-center gap-2 py-1"
+                    className="flex items-center justify-between py-1"
                     onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
                   >
-                    <Squircle width={28} height={28} className="shrink-0">
-                      <img
-                        src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
-                        alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                    </Squircle>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Squircle width={28} height={28} className="shrink-0">
+                        <img
+                          src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
+                          alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </Squircle>
                       <p className="text-sm font-medium text-foreground truncate">
                         {friend.friend_profile.display_name || friend.friend_profile.username}
                       </p>
                     </div>
-                    <p className="text-xs text-slate-400">
-                      {formatDistanceToNow(new Date(friend.played_at), { addSuffix: true })}
-                    </p>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {friend.rating ? (
+                        <>
+                          <Star className="w-3 h-3 text-slate-400 fill-slate-400" />
+                          <span className="text-sm font-medium text-foreground">{friend.rating.toFixed(1)}</span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
