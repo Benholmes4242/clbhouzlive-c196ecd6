@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Star, X, Check, GripVertical } from "lucide-react";
+import { Play, Star, X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
@@ -114,14 +114,11 @@ function ThumbContent({
 
   return (
     <div className="relative w-14 h-14">
-      {/* Selection indicator + thumbnail */}
+      {/* Thumbnail container - no active border */}
       <div 
         className={`
           absolute inset-0 rounded-lg overflow-hidden transition-all duration-150
-          ${isActive 
-            ? 'ring-2 ring-slate-600 ring-offset-1 ring-offset-background' 
-            : 'opacity-70 hover:opacity-100'
-          }
+          ${isActive ? '' : 'opacity-70 hover:opacity-100'}
         `}
       >
         {/* Thumbnail image */}
@@ -150,35 +147,36 @@ function ThumbContent({
         )}
       </div>
 
-      {/* Selection tick badge - top left */}
-      {isActive && (
-        <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-slate-600 shadow-sm flex items-center justify-center z-10">
-          <Check className="w-3 h-3 text-white" strokeWidth={3} />
-        </div>
+      {/* Selection dot - top left, inside thumbnail (hidden during drag) */}
+      {isActive && !isDragOverlay && (
+        <div 
+          className="absolute top-1 left-1 w-2 h-2 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.4)] z-10"
+          aria-hidden="true"
+        />
       )}
 
-      {/* Video indicator - DARK GLASS */}
+      {/* Video indicator - bottom left, inside thumbnail */}
       {item.type === 'video' && (
         <div className="absolute bottom-1 left-1 rounded bg-black/60 backdrop-blur-sm px-1 py-0.5 z-10">
           <Play className="w-2.5 h-2.5 text-white fill-white" />
         </div>
       )}
 
-      {/* Remove button - top right (not during drag overlay) */}
+      {/* Remove button - top right, inside thumbnail (not during drag overlay) */}
       {!isDragOverlay && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
           }}
-          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black/70 hover:bg-black/90 flex items-center justify-center z-20 transition-colors"
+          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 flex items-center justify-center z-20 transition-colors"
           aria-label="Remove media"
         >
           <X className="w-3 h-3 text-white" />
         </button>
       )}
 
-      {/* Cover star button - bottom right (not during drag overlay) - SLATE styling */}
+      {/* Cover star button - bottom right, inside thumbnail (not during drag overlay) */}
       {!isDragOverlay && (
         <button
           onClick={(e) => {
@@ -186,7 +184,7 @@ function ThumbContent({
             onSetCover();
           }}
           className={`
-            absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all
+            absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all backdrop-blur-sm
             ${isCover 
               ? 'bg-slate-600 shadow-sm' 
               : 'bg-black/50 hover:bg-black/70'
@@ -299,7 +297,7 @@ export default function MediaThumbnailStrip({
 
   return (
     <div 
-      className="mx-3 mb-2 p-3 rounded-2xl bg-muted/50 border border-border/50"
+      className="px-3 pt-3 pb-2"
       data-ecm-no-dismiss="true"
     >
       <DndContext
@@ -314,20 +312,36 @@ export default function MediaThumbnailStrip({
           items={media.map(item => item.id)}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
-            {media.map((item, index) => (
-              <SortableThumb
-                key={item.id}
-                item={item}
-                index={index}
-                isActive={item.id === activeMediaId}
-                isCover={item.id === coverMediaId}
-                getEdits={getEdits}
-                onSelect={() => onSelect(item.id)}
-                onSetCover={() => onSetCover(item.id)}
-                onRemove={() => onRemove(item.id)}
-              />
-            ))}
+          {/* Scroll container with edge fades */}
+          <div className="relative">
+            {/* Left fade */}
+            <div 
+              className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-background to-transparent z-10" 
+              aria-hidden="true"
+            />
+            
+            {/* Thumbnails row */}
+            <div className="flex gap-2.5 overflow-x-auto scrollbar-hide py-1 px-1">
+              {media.map((item, index) => (
+                <SortableThumb
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  isActive={item.id === activeMediaId}
+                  isCover={item.id === coverMediaId}
+                  getEdits={getEdits}
+                  onSelect={() => onSelect(item.id)}
+                  onSetCover={() => onSetCover(item.id)}
+                  onRemove={() => onRemove(item.id)}
+                />
+              ))}
+            </div>
+            
+            {/* Right fade */}
+            <div 
+              className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-background to-transparent z-10" 
+              aria-hidden="true"
+            />
           </div>
         </SortableContext>
         
@@ -350,9 +364,9 @@ export default function MediaThumbnailStrip({
         </DragOverlay>
       </DndContext>
       
-      {/* Helper text - muted label */}
-      <p className="text-[11px] text-muted-foreground mt-2.5 text-center">
-        Hold and drag to reorder · Tap ★ to set cover
+      {/* Helper text */}
+      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">
+        Drag to reorder · Tap ★ for cover
       </p>
     </div>
   );
