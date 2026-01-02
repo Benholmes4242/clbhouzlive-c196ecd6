@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Star, X } from "lucide-react";
+import { Play, Star, Trash2 } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
@@ -120,7 +120,7 @@ function ThumbContent({
           className="absolute -top-1 -right-1 w-3 h-3 rounded-full z-30"
           style={{ 
             background: 'var(--cm-surface-slate)',
-            border: '3px solid var(--cm-surface-card)',
+            border: '3px solid var(--cm-surface-elevated)',
           }}
           aria-hidden="true"
         />
@@ -167,7 +167,7 @@ function ThumbContent({
             onSetCover();
           }}
           className={`
-            absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all backdrop-blur-sm
+            absolute top-1 left-1 w-4 h-4 rounded-full flex items-center justify-center z-10 transition-all backdrop-blur-sm
             ${isCover 
               ? 'bg-slate-600 shadow-sm' 
               : 'bg-black/50 hover:bg-black/70'
@@ -176,15 +176,15 @@ function ThumbContent({
           aria-label={isCover ? "Current cover" : "Set as cover"}
         >
           <Star 
-            className={`w-3 h-3 ${isCover ? 'text-white fill-white' : 'text-white/80'}`} 
+            className={`w-2.5 h-2.5 ${isCover ? 'text-white fill-white' : 'text-white/80'}`} 
           />
         </button>
       )}
 
       {/* Video indicator - bottom left, inside thumbnail */}
       {item.type === 'video' && (
-        <div className="absolute bottom-1 left-1 rounded bg-black/60 backdrop-blur-sm px-1 py-0.5 z-10">
-          <Play className="w-2.5 h-2.5 text-white fill-white" />
+        <div className="absolute bottom-1 left-1 w-4 h-4 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center z-10">
+          <Play className="w-2 h-2 text-white fill-white" />
         </div>
       )}
 
@@ -195,10 +195,10 @@ function ThumbContent({
             e.stopPropagation();
             onRemove();
           }}
-          className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 flex items-center justify-center z-20 transition-colors"
+          className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
           aria-label="Remove media"
         >
-          <X className="w-3 h-3 text-white" />
+          <Trash2 className="w-2 h-2 text-white" />
         </button>
       )}
     </div>
