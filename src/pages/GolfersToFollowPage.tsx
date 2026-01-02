@@ -130,7 +130,7 @@ const GolfersToFollowPage = () => {
   const hasMore = page < totalPages;
 
   return (
-    <PageRoot className="bg-muted/40 pb-6">
+    <PageRoot className="bg-muted/40">
       <div className="w-full">
         {/* Back CTA - 24px below header */}
         <div className="px-4 pt-6">
