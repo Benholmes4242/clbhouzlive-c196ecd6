@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useUserProfile } from './useUserProfile';
 import { useQuery } from '@tanstack/react-query';
 
-export type FilterType = 'suggested' | 'club' | 'popular';
+export type TabKey = 'suggested' | 'home_club' | 'verified' | 'trending';
 
 const PAGE_SIZE = 15;
 
@@ -18,6 +18,8 @@ interface GolferProfile {
   handicap?: number | null;
   followersCount: number;
   totalTop100Played: number;
+  isVerified: boolean;
+  friendStatus: 'none' | 'pending' | 'friends';
 }
 
 // Helper to fetch Top 100 counts for a list of user IDs
@@ -41,14 +43,52 @@ async function fetchTop100Counts(userIds: string[]): Promise<Map<string, number>
   return countMap;
 }
 
+// Helper to fetch friend statuses for a list of user IDs
+async function fetchFriendStatuses(
+  currentUserId: string, 
+  userIds: string[]
+): Promise<Map<string, 'none' | 'pending' | 'friends'>> {
+  if (userIds.length === 0 || !currentUserId) return new Map();
+  
+  const { data, error } = await supabase
+    .from('user_friends')
+    .select('user_id, friend_id, status')
+    .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`)
+    .in('user_id', [...userIds, currentUserId])
+    .in('friend_id', [...userIds, currentUserId]);
+
+  if (error) {
+    console.warn('[useGolfersDiscovery] Failed to fetch friend statuses:', error);
+    return new Map();
+  }
+
+  const statusMap = new Map<string, 'none' | 'pending' | 'friends'>();
+  
+  for (const row of data || []) {
+    const otherId = row.user_id === currentUserId ? row.friend_id : row.user_id;
+    if (row.status === 'accepted') {
+      statusMap.set(otherId, 'friends');
+    } else if (row.status === 'pending') {
+      statusMap.set(otherId, 'pending');
+    }
+  }
+  
+  return statusMap;
+}
+
 export function useGolfersDiscovery() {
   const { user } = useSupabaseSession();
   const { data: currentProfile } = useUserProfile(user?.id);
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
+  const [activeTab, setActiveTab] = useState<TabKey>('suggested');
   const [page, setPage] = useState(1);
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+
+  // Reset page when tab changes
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab]);
 
   // Fetch following status once
   useEffect(() => {
@@ -67,24 +107,41 @@ export function useGolfersDiscovery() {
     fetchFollowing();
   }, [user]);
 
-  // Global search query (ignores filter)
+  // Global search query (searches within active tab context)
   const { data: searchResults, isLoading: searchLoading } = useQuery({
-    queryKey: ['search-golfers', searchQuery],
+    queryKey: ['search-golfers', searchQuery, activeTab, currentProfile?.home_club],
     enabled: searchQuery.trim().length > 0 && !!user,
     queryFn: async () => {
       const query = searchQuery.trim().toLowerCase();
-      const { data, error } = await supabase
+      
+      let baseQuery = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index, is_verified_golfer')
         .neq('id', user!.id)
         .is('deleted_at', null)
-        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`)
-        .limit(50);
+        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`);
+
+      // Apply tab-specific filters to search
+      switch (activeTab) {
+        case 'home_club':
+          if (currentProfile?.home_club) {
+            baseQuery = baseQuery.ilike('home_club', currentProfile.home_club);
+          }
+          break;
+        case 'verified':
+          baseQuery = baseQuery.eq('is_verified_golfer', true);
+          break;
+      }
+
+      const { data, error } = await baseQuery.limit(50);
 
       if (error) throw error;
 
       const userIds = (data || []).map(p => p.id);
-      const top100Counts = await fetchTop100Counts(userIds);
+      const [top100Counts, friendStatuses] = await Promise.all([
+        fetchTop100Counts(userIds),
+        fetchFriendStatuses(user!.id, userIds)
+      ]);
 
       return (data || []).map(profile => ({
         id: profile.id,
@@ -95,32 +152,43 @@ export function useGolfersDiscovery() {
         handicap: profile.eg_handicap_index,
         followersCount: 0,
         totalTop100Played: top100Counts.get(profile.id) || 0,
+        isVerified: profile.is_verified_golfer || false,
+        friendStatus: friendStatuses.get(profile.id) || 'none',
       }));
     },
   });
 
-  // Paginated filtered query
+  // Paginated filtered query by tab
   const { data: filteredData, isLoading: filterLoading } = useQuery({
-    queryKey: ['golfers-filtered', activeFilter, page, currentProfile?.home_club],
+    queryKey: ['golfers-filtered', activeTab, page, currentProfile?.home_club, user?.id],
     enabled: searchQuery.trim().length === 0 && !!user,
     queryFn: async () => {
       let query = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index', { count: 'exact' })
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index, is_verified_golfer', { count: 'exact' })
         .neq('id', user!.id)
         .is('deleted_at', null);
 
-      // Apply filter
-      switch (activeFilter) {
-        case 'club':
+      // Apply tab-specific filters
+      switch (activeTab) {
+        case 'home_club':
           if (currentProfile?.home_club) {
             query = query.ilike('home_club', currentProfile.home_club);
           }
           break;
-        case 'popular':
+        case 'verified':
+          query = query.eq('is_verified_golfer', true);
+          break;
+        case 'trending':
+          // For trending, order by recently updated (activity proxy)
+          query = query.order('updated_at', { ascending: false });
+          break;
         case 'suggested':
-          // For popular/suggested, we'll sort by follower count (would need a join or view in production)
-          // For now, just return all users
+        default:
+          // Suggested: prioritize same home club, then verified
+          if (currentProfile?.home_club) {
+            // Order by home club match first (requires custom logic in results)
+          }
           break;
       }
 
@@ -130,9 +198,12 @@ export function useGolfersDiscovery() {
       if (error) throw error;
 
       const userIds = (data || []).map(p => p.id);
-      const top100Counts = await fetchTop100Counts(userIds);
+      const [top100Counts, friendStatuses] = await Promise.all([
+        fetchTop100Counts(userIds),
+        fetchFriendStatuses(user!.id, userIds)
+      ]);
 
-      const profiles = (data || []).map(profile => ({
+      let profiles: GolferProfile[] = (data || []).map(profile => ({
         id: profile.id,
         displayName: profile.display_name || profile.username || 'User',
         username: profile.username,
@@ -141,7 +212,22 @@ export function useGolfersDiscovery() {
         handicap: profile.eg_handicap_index,
         followersCount: 0,
         totalTop100Played: top100Counts.get(profile.id) || 0,
+        isVerified: profile.is_verified_golfer || false,
+        friendStatus: friendStatuses.get(profile.id) || 'none',
       }));
+
+      // For suggested tab, sort by: same home club first, then verified
+      if (activeTab === 'suggested' && currentProfile?.home_club) {
+        profiles.sort((a, b) => {
+          const aClubMatch = a.homeClub?.toLowerCase() === currentProfile.home_club?.toLowerCase() ? 1 : 0;
+          const bClubMatch = b.homeClub?.toLowerCase() === currentProfile.home_club?.toLowerCase() ? 1 : 0;
+          if (aClubMatch !== bClubMatch) return bClubMatch - aClubMatch;
+          
+          const aVerified = a.isVerified ? 1 : 0;
+          const bVerified = b.isVerified ? 1 : 0;
+          return bVerified - aVerified;
+        });
+      }
 
       return {
         golfers: profiles,
@@ -168,13 +254,16 @@ export function useGolfersDiscovery() {
   const loading = isSearching ? searchLoading : filterLoading;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
+  // Check if user has no home club (for nudge display)
+  const hasNoHomeClub = !currentProfile?.home_club;
+
   return {
     golfers,
     loading,
     searchQuery,
     setSearchQuery,
-    activeFilter,
-    setActiveFilter,
+    activeTab,
+    setActiveTab,
     followingIds,
     updateFollowingStatus,
     page,
@@ -183,5 +272,12 @@ export function useGolfersDiscovery() {
     totalCount,
     pageSize: PAGE_SIZE,
     isSearching,
+    hasNoHomeClub,
+    // Keep legacy names for compatibility
+    activeFilter: activeTab,
+    setActiveFilter: setActiveTab as (filter: any) => void,
   };
 }
+
+// Keep legacy type export for compatibility
+export type FilterType = TabKey;
