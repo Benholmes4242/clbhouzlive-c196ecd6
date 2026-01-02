@@ -1,12 +1,12 @@
 /**
  * MapCourseSheet - Bottom sheet for selected course on the Top 100 Map
  * Draggable between peek, half, and full states with course photo hero
- * Includes journey actions: Mark Played, Want to Play, Wishlist
+ * Includes journey actions: Mark Played, Want to Play (Wishlist removed)
  */
 
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Star, Bookmark, Heart, ChevronUp, Flag, Check, Loader2 } from 'lucide-react';
+import { Globe, Star, Bookmark, ChevronUp, Flag, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -80,8 +80,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   const { data: thumbnailImage } = useCourseImage(course?.id);
   const { data: shortlistStatus } = useCourseShortlistStatus(course?.id, user?.id);
 
-  const isWantToPlay = shortlistStatus?.list_key === 'want_to_play';
-  const isWishlist = shortlistStatus?.list_key === 'wishlist';
+  // Treat both want_to_play and legacy wishlist as want_to_play
+  const isWantToPlay = shortlistStatus?.list_key === 'want_to_play' || shortlistStatus?.list_key === 'wishlist';
 
   // Mutation to toggle want to play
   const toggleWantToPlayMutation = useMutation({
@@ -116,48 +116,14 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
       queryClient.invalidateQueries({ 
         predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'user-journey-courses' 
       });
-    },
-    onError: () => toast.error('Failed to update'),
-  });
-
-  // Mutation to toggle wishlist
-  const toggleWishlistMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id || !course?.id) throw new Error('Not authenticated');
-      
-      if (isWishlist) {
-        await supabase.from('course_shortlists').delete()
-          .eq('course_id', course.id)
-          .eq('user_id', user.id);
-      } else {
-        // Remove any existing first
-        await supabase.from('course_shortlists').delete()
-          .eq('course_id', course.id)
-          .eq('user_id', user.id);
-        await supabase.from('course_shortlists').insert({
-          course_id: course.id,
-          user_id: user.id,
-          list_key: 'wishlist',
-        });
-      }
-    },
-    onSuccess: () => {
-      toast.success(isWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
-      // Use predicate to match all query variations
       queryClient.invalidateQueries({ 
-        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-shortlist-status' 
-      });
-      queryClient.invalidateQueries({ 
-        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'top100-map-courses' 
-      });
-      queryClient.invalidateQueries({ 
-        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'user-journey-courses' 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-personal-status' 
       });
     },
     onError: () => toast.error('Failed to update'),
   });
 
-  const isUpdating = toggleWantToPlayMutation.isPending || toggleWishlistMutation.isPending;
+  const isUpdating = toggleWantToPlayMutation.isPending;
 
   const handleDragEnd = useCallback(
     (_: any, info: PanInfo) => {
@@ -353,35 +319,19 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     {/* Want to Play toggle */}
                     <Button
                       variant={isWantToPlay ? 'default' : 'outline'}
-                      size="icon"
                       className={cn(
+                        "flex-1",
                         isWantToPlay && 'bg-[#F7931E] hover:bg-[#F7931E]/90'
                       )}
                       onClick={() => toggleWantToPlayMutation.mutate()}
                       disabled={isUpdating}
                     >
                       {isUpdating ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
                       ) : (
-                        <Bookmark className={cn('h-4 w-4', isWantToPlay && 'fill-current')} />
+                        <Bookmark className={cn('h-4 w-4 mr-1.5', isWantToPlay && 'fill-current')} />
                       )}
-                    </Button>
-                    
-                    {/* Wishlist toggle */}
-                    <Button
-                      variant={isWishlist ? 'default' : 'outline'}
-                      size="icon"
-                      className={cn(
-                        isWishlist && 'bg-rose-500 hover:bg-rose-500/90'
-                      )}
-                      onClick={() => toggleWishlistMutation.mutate()}
-                      disabled={isUpdating}
-                    >
-                      {isUpdating ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Heart className={cn('h-4 w-4', isWishlist && 'fill-current')} />
-                      )}
+                      {isWantToPlay ? 'Want to Play' : 'Want to Play'}
                     </Button>
                   </div>
                 )}

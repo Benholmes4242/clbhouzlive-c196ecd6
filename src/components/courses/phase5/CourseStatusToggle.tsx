@@ -1,13 +1,14 @@
 /**
- * CourseStatusToggle - Personal status toggle (Played / Want to Play / Wishlist)
- * Phase 5: Calm, private-first design with mutually exclusive states
+ * CourseStatusToggle - Personal status toggle (Played / Want to Play)
+ * Simplified: Wishlist removed, only Played and Want to Play remain
+ * Includes journey tooltip when no status is set
  */
 import React from 'react';
-import { Check, Bookmark, Heart, Loader2 } from 'lucide-react';
+import { Check, Bookmark, Loader2, Sparkles, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useCoursePersonalStatus, CourseStatus } from '@/hooks/useCoursePersonalStatus';
-import { useNavigate } from 'react-router-dom';
+import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,7 +26,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { status, isLoading, setWantToPlay, setWishlist, isUpdating } = useCoursePersonalStatus(courseId);
+  const { status, isLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) {
     return (
@@ -76,38 +77,12 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     }
   };
 
-  const handleWishlistClick = async () => {
-    if (status.status === 'played') return; // Disable if played
-    
-    if (status.status === 'wishlist') {
-      await setWishlist(false);
-      toast({
-        description: "Removed from Wishlist",
-        duration: 2000,
-      });
-    } else {
-      await setWishlist(true);
-      toast({
-        description: "Added to Wishlist",
-        duration: 2000,
-      });
-    }
-  };
-
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
-  const isWishlist = status.status === 'wishlist';
   const hasNoSelection = status.status === 'none';
 
   return (
     <div className={cn("space-y-3", className)}>
-      {/* Empty state nudge */}
-      {hasNoSelection && (
-        <p className="text-xs text-slate-400 mb-1">
-          Start tracking your journey
-        </p>
-      )}
-      
       {/* Status pills */}
       <div className="flex flex-wrap gap-2">
         {/* Played status */}
@@ -144,33 +119,23 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           )}
           {isWantToPlay ? '✓ Want to Play' : 'Want to Play'}
         </button>
-
-        {/* Wishlist - disabled if played */}
-        <button
-          onClick={handleWishlistClick}
-          disabled={isUpdating || isPlayed}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all",
-            isPlayed && "opacity-40 cursor-not-allowed",
-            isWishlist
-              ? "bg-rose-100 text-rose-800 border border-rose-200"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent"
-          )}
-        >
-          {isUpdating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Heart className={cn("h-4 w-4", isWishlist && "fill-rose-500")} />
-          )}
-          {isWishlist ? '✓ Wishlist' : 'Wishlist'}
-        </button>
       </div>
 
-      {/* Wishlist privacy note */}
-      {isWishlist && (
-        <p className="text-xs text-slate-400">
-          Saved for later — visible only to you
-        </p>
+      {/* Journey tooltip - only shown when no status is set */}
+      {hasNoSelection && (
+        <div className="flex items-start gap-2 text-xs text-slate-400">
+          <Sparkles className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+          <p>
+            Every course you mark becomes part of your journey — view them anytime on your{' '}
+            <Link to="/courses?tab=top100" className="text-slate-500 underline underline-offset-2 hover:text-slate-700">
+              map
+            </Link>{' '}
+            or{' '}
+            <Link to="/journey" className="text-slate-500 underline underline-offset-2 hover:text-slate-700">
+              journey page
+            </Link>.
+          </p>
+        </div>
       )}
     </div>
   );

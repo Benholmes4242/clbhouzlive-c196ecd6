@@ -1,10 +1,10 @@
 /**
  * PlanningSignals - Future-oriented, calm planning UI
- * Phase 5: Intention, not conversion
+ * Simplified: Only Want to Play (Wishlist removed)
  * Shows only when course is NOT played
  */
 import React from 'react';
-import { Compass, Bookmark, Heart } from 'lucide-react';
+import { Compass, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -21,7 +21,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
   className,
 }) => {
   const { user } = useSupabaseSession();
-  const { status, setWantToPlay, setWishlist, isUpdating } = useCoursePersonalStatus(courseId);
+  const { status, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) return null;
 
@@ -29,8 +29,6 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
   if (status.status === 'played') return null;
 
   const isWantToPlay = status.status === 'want_to_play';
-  const isWishlist = status.status === 'wishlist';
-  const hasIntent = isWantToPlay || isWishlist;
 
   return (
     <div className={cn("bg-slate-50 rounded-xl p-4 space-y-4", className)}>
@@ -40,9 +38,8 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
         <h4 className="text-sm font-medium text-slate-700">Planning</h4>
       </div>
 
-      {/* Action buttons */}
+      {/* Action button - Want to Play only */}
       <div className="space-y-2">
-        {/* Want to Play */}
         <button
           onClick={() => setWantToPlay(!isWantToPlay)}
           disabled={isUpdating}
@@ -71,43 +68,11 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
             <span className="text-xs text-amber-600">✓</span>
           )}
         </button>
-
-        {/* Wishlist (private) */}
-        <button
-          onClick={() => setWishlist(!isWishlist)}
-          disabled={isUpdating}
-          className={cn(
-            "w-full flex items-center justify-between px-4 py-3 rounded-lg text-left transition-all",
-            isWishlist
-              ? "bg-rose-50 border border-rose-200"
-              : "bg-white border border-slate-200 hover:border-slate-300"
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <Heart 
-              className={cn(
-                "h-4 w-4",
-                isWishlist ? "fill-rose-500 text-rose-500" : "text-slate-400"
-              )} 
-            />
-            <span className={cn(
-              "text-sm font-medium",
-              isWishlist ? "text-rose-800" : "text-slate-700"
-            )}>
-              {isWishlist ? 'On your Wishlist' : 'Add to Wishlist'}
-            </span>
-          </div>
-          {isWishlist && (
-            <span className="text-xs text-rose-600">✓</span>
-          )}
-        </button>
       </div>
 
       {/* Subtle helper text */}
       <p className="text-xs text-slate-400 text-center">
-        {isWishlist 
-          ? 'Saved for later — visible only to you' 
-          : 'Your planning is private'}
+        Only you can see your Want to Play list.
       </p>
     </div>
   );
