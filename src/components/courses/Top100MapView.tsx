@@ -11,7 +11,7 @@ import {
 import { RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
-import { MapCourseSheet, MapProgressOrb, MapInsightChip } from './map';
+import { MapCourseSheet, MapProgressOrb } from './map';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -450,20 +450,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Top overlay zone */}
+        {/* Top overlay zone - Legend as micro-pills */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-3">
-          {/* Insight chip (centered) - more spacing below */}
-          <div className="pointer-events-auto flex justify-center mb-3">
-            <MapInsightChip
-              courses={courses}
-              playedCount={ratedCount}
-              totalCount={officialTotal}
-              scope={scope}
-              ratedFilter={statusFilter === 'played' ? 'rated' : statusFilter === 'not_played' ? 'unrated' : 'all'}
-            />
-          </div>
-          
-          {/* Legend as micro-pills */}
           <div className="pointer-events-auto flex items-center gap-1.5 w-fit">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
               <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" />
