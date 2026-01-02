@@ -113,15 +113,15 @@ export function useGolfersDiscovery() {
   }, [exclusions?.followingIds, optimisticFollows]);
 
   // Helper to determine if home club query is enabled
-  // Use primary_club_id (canonical) instead of deprecated home_club_id
-  const viewerHomeClub = currentProfile?.home_club?.trim();
+  // Use primary_club_id ONLY (canonical) - no text fallback since accounts are wiped pre-launch
   const viewerPrimaryClubId = currentProfile?.primary_club_id;
-  const hasHomeClub = !!viewerPrimaryClubId || !!viewerHomeClub;
+  const hasHomeClub = !!viewerPrimaryClubId;
 
   // Global search query (searches within active tab context)
   const { data: searchResults, isLoading: searchLoading } = useQuery({
-    queryKey: ['search-golfers', searchQuery, activeTab, viewerHomeClub, viewerPrimaryClubId],
-    enabled: searchQuery.trim().length > 0 && !!user,
+    queryKey: ['search-golfers', searchQuery, activeTab, viewerPrimaryClubId],
+    // Home Club search only enabled if user has primary_club_id set
+    enabled: searchQuery.trim().length > 0 && !!user && (activeTab !== 'home_club' || !!viewerPrimaryClubId),
     queryFn: async () => {
       const query = searchQuery.trim().toLowerCase();
       
@@ -133,15 +133,11 @@ export function useGolfersDiscovery() {
         .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`);
 
       // Apply tab-specific filters to search
-      // Use primary_club_id (canonical) instead of deprecated home_club_id
+      // Use primary_club_id ONLY (canonical) - no text fallback
       switch (activeTab) {
         case 'home_club':
-          if (viewerPrimaryClubId) {
-            baseQuery = baseQuery.eq('primary_club_id', viewerPrimaryClubId);
-          } else if (viewerHomeClub) {
-            // Fallback to text match (for users without primary_club_id set)
-            baseQuery = baseQuery.eq('home_club', viewerHomeClub);
-          }
+          // Only filter by primary_club_id (guaranteed to exist due to enabled check)
+          baseQuery = baseQuery.eq('primary_club_id', viewerPrimaryClubId);
           break;
         case 'verified':
           baseQuery = baseQuery.eq('is_verified_golfer', true);
@@ -180,8 +176,9 @@ export function useGolfersDiscovery() {
 
   // Paginated filtered query by tab
   const { data: filteredData, isLoading: filterLoading } = useQuery({
-    queryKey: ['golfers-filtered', activeTab, page, viewerHomeClub, viewerPrimaryClubId, user?.id],
-    enabled: searchQuery.trim().length === 0 && !!user && (activeTab !== 'home_club' || hasHomeClub),
+    queryKey: ['golfers-filtered', activeTab, page, viewerPrimaryClubId, user?.id],
+    // Home Club tab only enabled if user has primary_club_id set
+    enabled: searchQuery.trim().length === 0 && !!user && (activeTab !== 'home_club' || !!viewerPrimaryClubId),
     queryFn: async () => {
       let query = supabase
         .from('user_profiles')
@@ -190,15 +187,11 @@ export function useGolfersDiscovery() {
         .is('deleted_at', null);
 
       // Apply tab-specific filters
-      // Use primary_club_id (canonical) instead of deprecated home_club_id
+      // Use primary_club_id ONLY (canonical) - no text fallback
       switch (activeTab) {
         case 'home_club':
-          if (viewerPrimaryClubId) {
-            query = query.eq('primary_club_id', viewerPrimaryClubId);
-          } else if (viewerHomeClub) {
-            // Fallback to text match (for users without primary_club_id set)
-            query = query.eq('home_club', viewerHomeClub);
-          }
+          // Only filter by primary_club_id (guaranteed to exist due to enabled check)
+          query = query.eq('primary_club_id', viewerPrimaryClubId);
           break;
         case 'verified':
           query = query.eq('is_verified_golfer', true);
@@ -258,17 +251,9 @@ export function useGolfersDiscovery() {
     // For suggested tab, apply ranking: same home club first, then verified, then by created_at
     if (activeTab === 'suggested' && !isSearching) {
       filtered.sort((a, b) => {
-        // 1. Same home club as viewer (using primary_club_id if available, else text)
-        const aClubMatch = viewerPrimaryClubId 
-          ? a.primaryClubId === viewerPrimaryClubId
-          : viewerHomeClub 
-            ? a.homeClub?.toLowerCase() === viewerHomeClub.toLowerCase()
-            : false;
-        const bClubMatch = viewerPrimaryClubId
-          ? b.primaryClubId === viewerPrimaryClubId
-          : viewerHomeClub
-            ? b.homeClub?.toLowerCase() === viewerHomeClub.toLowerCase()
-            : false;
+        // 1. Same home club as viewer (using primary_club_id ONLY)
+        const aClubMatch = viewerPrimaryClubId ? a.primaryClubId === viewerPrimaryClubId : false;
+        const bClubMatch = viewerPrimaryClubId ? b.primaryClubId === viewerPrimaryClubId : false;
         
         if (aClubMatch !== bClubMatch) return bClubMatch ? 1 : -1;
         
@@ -292,7 +277,7 @@ export function useGolfersDiscovery() {
     }
     
     return filtered;
-  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, activeTab, viewerHomeClub, viewerPrimaryClubId, searchQuery]);
+  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, activeTab, viewerPrimaryClubId, searchQuery]);
 
   // Paginate the processed results
   const paginatedGolfers = useMemo(() => {
