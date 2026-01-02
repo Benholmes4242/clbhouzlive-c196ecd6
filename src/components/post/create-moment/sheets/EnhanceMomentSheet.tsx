@@ -37,6 +37,7 @@ const ENHANCE_OPTIONS: EnhanceOption[] = [
     description: 'Merge multiple clips into one video',
     icon: <Film className="w-5 h-5" />,
     requiresMultipleVideos: true,
+    comingSoon: true,
   },
   {
     id: 'magic-enhance',
