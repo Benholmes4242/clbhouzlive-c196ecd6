@@ -260,9 +260,7 @@ export default function CreateMomentMediaStage({
         <MediaThumbnailStrip
           media={media}
           activeMediaId={activeMediaId}
-          coverMediaId={coverMediaId}
           onSelect={handleThumbnailSelect}
-          onSetCover={onSetCover}
           onRemove={onRemoveMedia}
           onReorder={onReorder}
           getEdits={getEdits}
