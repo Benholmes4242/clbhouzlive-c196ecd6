@@ -117,10 +117,10 @@ function ThumbContent({
       {/* Selection dot - outside top-right corner with indent (hidden during drag) */}
       {isActive && !isDragOverlay && (
         <div 
-          className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full z-30"
+          className="absolute -top-1 -right-1 w-3 h-3 rounded-full z-30"
           style={{ 
             background: 'var(--cm-surface-slate)',
-            border: '2px solid var(--cm-surface-card)',
+            border: '3px solid var(--cm-surface-card)',
           }}
           aria-hidden="true"
         />
