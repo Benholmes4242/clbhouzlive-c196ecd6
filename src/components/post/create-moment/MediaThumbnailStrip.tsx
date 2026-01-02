@@ -114,10 +114,14 @@ function ThumbContent({
 
   return (
     <div className="relative w-14 h-14">
-      {/* Selection dot - outside top-left corner (hidden during drag) - slate style */}
+      {/* Selection dot - outside top-right corner with indent (hidden during drag) */}
       {isActive && !isDragOverlay && (
         <div 
-          className="absolute -top-1 -left-1 w-1.5 h-1.5 rounded-full bg-slate-600 z-30"
+          className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full z-30"
+          style={{ 
+            background: 'var(--cm-surface-slate)',
+            border: '2px solid var(--cm-surface-card)',
+          }}
           aria-hidden="true"
         />
       )}
