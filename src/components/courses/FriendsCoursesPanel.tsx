@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
 import { toast } from 'sonner';
-import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
+import { type Timeframe } from '@/lib/timeWindow';
+
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
@@ -17,169 +17,40 @@ import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
-// Temporary: toggle to use high-activity mock data for Friends' Courses
-const USE_FRIENDS_COURSES_MOCK = false; // flip to false to use real data
-
-type Timeframe = '7d' | '30d' | '90d' | '12m' | 'all';
 type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
 
 const FriendsCoursesPanel: React.FC = () => {
-  // All hooks must be called before any conditional returns
   const { user } = useSupabaseSession();
-  const { data: realData, isLoading } = useFriendsCourses(user?.id);
-  
-  // When using mock, we still fetch real course data for photos/details
-  const mockCourseIds = useMemo(() => {
-    if (!USE_FRIENDS_COURSES_MOCK) return [];
-    return [...new Set(friendsCoursesMockData.recent.map(hit => hit.course_id))];
-  }, []);
-
-  const { data: realCoursesForMock, isLoading: loadingRealCourses } = useQuery({
-    queryKey: ['real-courses-for-friends-mock', mockCourseIds],
-    enabled: USE_FRIENDS_COURSES_MOCK && mockCourseIds.length > 0,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('golf_courses')
-        .select(`
-          id,
-          name,
-          country,
-          sub_country,
-          thumbnail_image,
-          course_top100_memberships (
-            list_id,
-            rank,
-            top100_lists!inner (
-              id,
-              slug,
-              short_label
-            )
-          )
-        `)
-        .in('id', mockCourseIds);
-      
-      if (error) throw error;
-
-      // Get community ratings for all courses
-      const { data: communityRatings } = await supabase
-        .from('course_rating_aggregates' as any)
-        .select('course_id, avg_overall_score')
-        .in('course_id', mockCourseIds);
-
-      const ratingByCourseId = new Map(
-        (communityRatings || []).map((r: any) => [r.course_id, r.avg_overall_score])
-      );
-      
-      return (data || []).reduce((map, course: any) => {
-        map.set(course.id, {
-          course_id: course.id,
-          course_name: course.name,
-          country: course.country,
-          sub_country: course.sub_country,
-          thumbnail_url: course.thumbnail_image,
-          community_rating: ratingByCourseId.get(course.id) ?? null,
-          top100_memberships: (course.course_top100_memberships || []).map((m: any) => ({
-            list_id: m.list_id,
-            list_slug: m.top100_lists?.slug || '',
-            short_label: m.top100_lists?.short_label || '',
-            rank: m.rank,
-          })),
-        });
-        return map;
-      }, new Map());
-    },
-    staleTime: 60_000,
-  });
-
-  // Merge mock friend data with real course data
-  const enrichedMockData = useMemo(() => {
-    if (!USE_FRIENDS_COURSES_MOCK || !realCoursesForMock) return null;
-    
-    const enrichedRecent = friendsCoursesMockData.recent.map(mockHit => {
-      const realCourse = realCoursesForMock.get(mockHit.course_id);
-      if (!realCourse) return mockHit;
-      
-      return {
-        ...mockHit,
-        course_name: realCourse.course_name,
-        course_country: realCourse.country,
-        course_sub_country: realCourse.sub_country,
-        thumbnail_url: realCourse.thumbnail_url,
-        community_rating: realCourse.community_rating,
-        top100_memberships: realCourse.top100_memberships,
-      };
-    });
-    
-    // Rebuild courses from enriched recent data
-    const courseMap = new Map<string, CourseWithFriends>();
-    for (const hit of enrichedRecent) {
-      if (!hit.course_id) continue;
-      const existing = courseMap.get(hit.course_id);
-      if (!existing) {
-        courseMap.set(hit.course_id, {
-          course_id: hit.course_id,
-          course_name: hit.course_name,
-          country: hit.course_country,
-          sub_country: hit.course_sub_country,
-          thumbnail_url: hit.thumbnail_url,
-          community_rating: hit.community_rating ?? null,
-          top100_memberships: hit.top100_memberships,
-          friends: [hit],
-          most_recent_play: hit.played_at,
-          total_friends_played: 1,
-        });
-      } else {
-        existing.friends.push(hit);
-        existing.total_friends_played = existing.friends.length;
-      }
-    }
-    
-    return {
-      courses: Array.from(courseMap.values()),
-      recent: enrichedRecent,
-      totalCourses: courseMap.size,
-      totalFriendsActive: friendsCoursesMockData.totalFriendsActive,
-    };
-  }, [realCoursesForMock]);
-
-  const sourceData = USE_FRIENDS_COURSES_MOCK ? enrichedMockData : realData;
-  const loading = USE_FRIENDS_COURSES_MOCK ? loadingRealCourses : isLoading;
-  
   const [timeframe, setTimeframe] = useState<Timeframe>('30d');
   const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
 
-  // Filter data by time range and course type
+  // Fetch data with timeframe passed to hook (server-side filtering)
+  const { data: sourceData, isLoading, isError, error } = useFriendsCourses(user?.id, timeframe);
+
+  // Error handling: log and toast once when error occurs
+  useEffect(() => {
+    if (isError && error) {
+      console.error('[FriendsCoursesPanel] Failed to load friends courses', {
+        userId: user?.id,
+        timeframe,
+        error,
+      });
+      toast.error("Couldn't load Friends' Courses. Please try again.");
+    }
+  }, [isError, error, user?.id, timeframe]);
+
+  // Filter data by course type only (time filtering now happens server-side)
   const filteredData = useMemo(() => {
     if (!sourceData) return null;
     
-    // Calculate time cutoff
-    let cutoff: Date | null = null;
-    if (timeframe !== 'all') {
-      cutoff = new Date();
-      if (timeframe === '7d') {
-        cutoff.setDate(cutoff.getDate() - 7);
-      } else if (timeframe === '30d') {
-        cutoff.setDate(cutoff.getDate() - 30);
-      } else if (timeframe === '90d') {
-        cutoff.setDate(cutoff.getDate() - 90);
-      } else if (timeframe === '12m') {
-        cutoff.setFullYear(cutoff.getFullYear() - 1);
-      }
-    }
-    
-    // Filter by time
-    const timeFilteredRecent = cutoff 
-      ? sourceData.recent.filter(hit => new Date(hit.played_at) >= cutoff)
-      : sourceData.recent;
-    
     // Filter by course type (Top 100 only or other filters)
     const courseTypeFilteredRecent = courseFilter === 'most_played'
-      ? timeFilteredRecent
+      ? sourceData.recent
       : courseFilter === 'highest_rated'
-      ? timeFilteredRecent.filter(hit => hit.rating != null)
+      ? sourceData.recent.filter(hit => hit.rating != null)
       : courseFilter === 'new'
-      ? timeFilteredRecent
-      : timeFilteredRecent;
+      ? sourceData.recent
+      : sourceData.recent;
     
     // Group into courses
     const courseMap = new Map<string, CourseWithFriends>();
@@ -223,7 +94,7 @@ const FriendsCoursesPanel: React.FC = () => {
       totalCourses: filteredCourses.length,
       totalFriendsActive: uniqueFriends.size,
     };
-  }, [sourceData, timeframe, courseFilter]);
+  }, [sourceData, courseFilter]);
 
   // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
@@ -346,20 +217,23 @@ const FriendsCoursesPanel: React.FC = () => {
     return new Set(trendingCourses.map(c => c.course_id));
   }, [trendingCourses]);
 
-
   // Handle save course action (want to play)
   const handleSaveCourse = (courseId: string) => {
     toast.success('Course saved to your list!');
     // TODO: Implement actual save to want_to_play list
   };
 
-
   // Now conditional returns - no more hooks after this point
   if (!user) return null;
 
-  // Show skeleton only while loading AND before we have any filtered data
-  if (loading && !filteredData) {
+  // Show skeleton only while loading AND before we have any data
+  if (isLoading && !filteredData) {
     return <FriendsCoursesSkeleton />;
+  }
+
+  // Error state: show empty component with error indication
+  if (isError) {
+    return <FriendsCoursesEmpty />;
   }
 
   // Empty state: no courses from friends in this time range
@@ -367,14 +241,13 @@ const FriendsCoursesPanel: React.FC = () => {
     return <FriendsCoursesEmpty />;
   }
 
-
   return (
     <div className="w-full pb-6">
-      {/* Page Header - Tighter spacing: 4px title→subtitle, 12px header→filters */}
+      {/* Page Header */}
       <div className="mb-3">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
-          <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
+          <h2 className="text-lg font-semibold tracking-tight">Your Network</h2>
+          <p className="text-sm text-muted-foreground">See where people you follow have been playing</p>
         </div>
       </div>
       
@@ -412,7 +285,7 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Friends Snapshot Card - 24px section gap */}
+      {/* Friends Snapshot Card */}
       <div className="mt-6">
         <FriendsSnapshotCard
           timeframe={timeframe}
@@ -424,7 +297,7 @@ const FriendsCoursesPanel: React.FC = () => {
         />
       </div>
 
-      {/* Hero Course Card - Most Popular - 24px section gap */}
+      {/* Hero Course Card - Most Popular */}
       {heroCourse && (
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-6">
           <FriendsHeroCourseCard 
@@ -434,7 +307,7 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Friends Activity Leaderboard - 24px section gap */}
+      {/* Friends Activity Leaderboard */}
       <div className="mt-6">
         <FriendsActivityCard 
           leaderboard={leaderboard}
@@ -442,27 +315,27 @@ const FriendsCoursesPanel: React.FC = () => {
         />
       </div>
 
-
-      {/* 🔥 Trending in your network - NEW Phase 2 module */}
+      {/* 🔥 Trending in your network */}
       {trendingCourses.length > 0 && (
         <div className="mt-6">
           <TrendingInNetworkCard courses={trendingCourses} />
         </div>
       )}
 
-      {/* Weekly Recap Card - "This week in your network" */}
+      {/* Weekly Recap Card - now uses timeframe for consistency */}
       <div className="mt-6">
         <WeeklyRecapCard
           recent={recent}
           courses={courses}
+          timeframe={timeframe}
           leaderboard={leaderboard}
         />
       </div>
 
-      {/* Unified Activity Feed - Phase 3 social feed first */}
+      {/* Unified Activity Feed */}
       <div className="mt-6">
         <div className="mb-3">
-          <h3 className="text-base font-semibold text-foreground">Friends activity</h3>
+          <h3 className="text-base font-semibold text-foreground">Network activity</h3>
         </div>
         <FriendsActivityFeed
           recent={recent}
