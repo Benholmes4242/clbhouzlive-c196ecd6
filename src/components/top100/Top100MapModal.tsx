@@ -26,6 +26,7 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
       <SheetContent 
         side="bottom" 
         className="h-full p-0 overflow-hidden"
+        hideCloseButton
       >
         <div className="h-full flex flex-col bg-background">
           {/* Page header */}
