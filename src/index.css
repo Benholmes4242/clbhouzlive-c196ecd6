@@ -110,6 +110,9 @@ html.lightbox-open {
   
   /* Echo brand orange - for accents */
   --echo-orange: 35 92% 57%;  /* #f89c2a in HSL */
+  
+  /* Tab underline orange - exact #f79e1b */
+  --tab-orange: 38 93% 54%;
   /* ========================================
      GLOBAL VERTICAL SPACING SYSTEM
      ======================================== */
