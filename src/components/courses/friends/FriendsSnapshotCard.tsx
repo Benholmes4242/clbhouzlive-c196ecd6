@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from '@/components/ui/card';
 
 interface FriendsSnapshotCardProps {
   timeframe: string;
@@ -7,7 +6,7 @@ interface FriendsSnapshotCardProps {
   totalRegions: number;
   averageRating: number | null;
   totalRounds: number;
-  userPlayedCount?: number; // How many of the friends' courses the user has also played
+  userPlayedCount?: number;
 }
 
 // Animated counter hook for premium count-up effect
@@ -68,7 +67,7 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
   };
 
   return (
-    <Card className="border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div className="rounded-xl overflow-hidden">
       {/* Stats Grid - 2×2 with dividers and premium hierarchy */}
       <div className="relative bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] px-4 py-5">
         <div className="grid grid-cols-2 gap-y-4">
@@ -118,21 +117,21 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
           </div>
         </div>
 
-        {/* Footer - Updated copy */}
+        {/* Footer */}
         <p className="mt-4 text-center text-xs text-slate-500">
           From your friends in {getTimeLabel()}
         </p>
-      </div>
 
-      {/* You vs Friends - inside card as footer row with divider */}
-      {totalCourses > 0 && (
-        <div className="border-t border-slate-200/60 px-4 py-3 bg-card">
-          <p className="text-sm text-center text-slate-600">
-            You've played <span className="font-bold text-foreground">{animatedUserPlayed}</span> of the <span className="font-bold text-foreground">{animatedCourses}</span> courses your friends played
-          </p>
-        </div>
-      )}
-    </Card>
+        {/* You vs Friends - inside as footer row with divider */}
+        {totalCourses > 0 && (
+          <div className="mt-4 pt-3 border-t border-slate-200/60">
+            <p className="text-sm text-center text-slate-600">
+              You've played <span className="font-bold text-foreground">{animatedUserPlayed}</span> of the <span className="font-bold text-foreground">{animatedCourses}</span> courses your friends played
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
