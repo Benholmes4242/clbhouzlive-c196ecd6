@@ -333,7 +333,13 @@ const PostPlayRatingModal = ({
       // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
       queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+      
+      // Force immediate refresh for any active feeds
+      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
       // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
       queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
@@ -467,7 +473,13 @@ const PostPlayRatingModal = ({
       // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
       queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+      
+      // Force immediate refresh for any active feeds
+      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
       // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
       queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
