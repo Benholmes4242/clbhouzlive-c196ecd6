@@ -61,7 +61,7 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
       case '30d': return 'the last 30 days';
       case '90d': return 'the last 90 days';
       case '12m': return 'the last 12 months';
-      case 'all': return 'all time';
+      case 'all': return 'all time (recent activity)';
       default: return timeframe;
     }
   };
