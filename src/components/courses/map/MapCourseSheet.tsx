@@ -331,7 +331,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                       ) : (
                         <Bookmark className={cn('h-4 w-4 mr-1.5', isWantToPlay && 'fill-current')} />
                       )}
-                      {isWantToPlay ? 'Want to Play' : 'Want to Play'}
+                      {isWantToPlay ? '✓ Want to Play' : 'Want to Play'}
                     </Button>
                   </div>
                 )}
