@@ -338,7 +338,7 @@ const GolfersToFollowPage = () => {
                           {/* Add friend button - SECONDARY */}
                           {friendStatus === 'friends' ? (
                             <span
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-50 text-emerald-600 gap-1 cursor-default"
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-500/10 text-emerald-600 gap-1 cursor-default"
                             >
                               <Check className="h-2.5 w-2.5" />
                               Friends
