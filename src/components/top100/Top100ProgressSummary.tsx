@@ -13,19 +13,21 @@ export function Top100ProgressSummary({ ratedCount, listCount }: Props) {
       : 0;
 
   return (
-    <section className="my-5 flex flex-col items-center text-center gap-2.5 px-4">
-      <p className="text-sm font-normal text-muted-foreground">
+    <section className="my-4 flex flex-col items-center text-center gap-2 px-4">
+      {/* Headline - clear hierarchy */}
+      <p className="text-sm font-medium text-foreground">
         You've rated {ratedCount} course{ratedCount === 1 ? '' : 's'} across {listCount} Top 100 list{listCount === 1 ? '' : 's'}
       </p>
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-        <span>{ratedCount} / {totalCoursesPossible} courses</span>
-        <span className="font-medium">{Math.round(progressPercent)}%</span>
-      </div>
+      {/* Secondary line - muted detail */}
+      <p className="text-xs text-muted-foreground">
+        {ratedCount} / {totalCoursesPossible} courses · {Math.round(progressPercent)}%
+      </p>
 
-      <div className="h-1.5 w-full max-w-[420px] overflow-hidden rounded-full bg-muted">
+      {/* Progress bar - thicker, more presence */}
+      <div className="h-2 w-full max-w-[400px] overflow-hidden rounded-full bg-muted/80">
         <div
-          className="h-full rounded-full bg-amber-500 transition-[width] duration-500 ease-out"
+          className="h-full rounded-full bg-[hsl(var(--tab-orange))] transition-[width] duration-500 ease-out"
           style={{ width: `${progressPercent}%` }}
         />
       </div>

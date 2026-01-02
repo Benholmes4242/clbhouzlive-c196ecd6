@@ -92,10 +92,12 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
           />
-          {/* Slightly stronger overlay for primary card */}
+          {/* Top gradient for title legibility */}
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 via-black/25 to-transparent" />
+          {/* Bottom gradient for content legibility - stronger */}
           <div className={cn(
-            "absolute inset-0 bg-gradient-to-t via-transparent to-transparent",
-            isPrimary ? "from-black/70" : "from-black/60"
+            "absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t via-black/40 to-transparent",
+            isPrimary ? "from-black/80" : "from-black/75"
           )} />
         </>
       ) : (
@@ -140,27 +142,27 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
           </div>
 
           {/* Bottom content for default variant */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-1.5 px-4 pb-4 pt-20">
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-1.5 px-4 pb-4">
             {/* Progress summary */}
-            <p className="text-[13px] text-white/90">
+            <p className="text-[13px] text-white font-medium">
               Rated <span className="font-semibold">{rated}</span> of {total} courses
             </p>
 
             {/* Progress bar + percentage */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-1.5 overflow-hidden rounded-full bg-white/25">
+            <div className="flex items-center gap-2.5">
+              <div className="flex-1 h-[5px] overflow-hidden rounded-full bg-white/30">
                 <div
                   className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
                   style={{ width: `${completion}%` }}
                 />
               </div>
-              <span className="text-xs font-medium text-white/80 tabular-nums min-w-[32px] text-right">
+              <span className="text-[11px] font-semibold text-white tabular-nums min-w-[28px] text-right">
                 {completion}%
               </span>
             </div>
 
             {/* Journey tone phrase - soft emotional reinforcement */}
-            <p className="text-[11px] text-white/50 mt-0.5">
+            <p className="text-[11px] text-white/60 mt-0.5">
               {journeyPhrase}
             </p>
 
