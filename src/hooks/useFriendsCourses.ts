@@ -116,7 +116,8 @@ export function useFriendsCourses(userId?: string, timeframe: Timeframe = '90d')
         .in('user_id', friendIds)
         .eq('played', true)
         .lte('created_at', endISO)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(1000); // Safety cap for "all time" queries
 
       // Apply start filter if not "all time"
       if (startISO) {
