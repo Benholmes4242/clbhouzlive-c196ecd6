@@ -10,7 +10,9 @@ export interface UserProfile {
   profile_photo_url: string | null;
   header_photo_url?: string | null;
   home_club: string | null;
-  home_club_id?: string | null;
+  // DEPRECATED: home_club_id is never written, use primary_club_id instead
+  // home_club_id?: string | null;
+  primary_club_id?: string | null; // Links to golf_clubs.id - canonical club identity
   eg_handicap_index: number | null;
   show_handicap?: boolean;
   bio?: string | null;
