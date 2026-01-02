@@ -142,7 +142,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           {/* Community rating - aligned under image */}
           {communityRating && (
             <div className="flex items-center gap-1 w-14 justify-center">
-              <ClubhouseLogo size="xs" />
+              <ClubhouseLogo className="h-4 w-4" />
               <span className="text-xs font-semibold text-foreground">{communityRating.toFixed(1)}</span>
             </div>
           )}
