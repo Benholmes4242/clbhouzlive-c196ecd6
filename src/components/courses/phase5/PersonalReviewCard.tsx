@@ -3,7 +3,7 @@
  * Phase 5: Memory-focused, not performative
  */
 import React, { useState } from 'react';
-import { Star, Edit3, Calendar } from 'lucide-react';
+import { Edit3, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
@@ -87,24 +87,12 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         </Button>
       </div>
 
-      {/* Overall rating */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Star
-              key={star}
-              className={cn(
-                "h-5 w-5",
-                star <= Math.round(rating.rating)
-                  ? "fill-amber-400 text-amber-400"
-                  : "text-slate-200"
-              )}
-            />
-          ))}
-        </div>
-        <span className="text-lg font-semibold text-slate-900">
+      {/* Overall rating - score only, no stars */}
+      <div className="flex items-center">
+        <span className="text-2xl font-bold text-slate-900">
           {rating.rating.toFixed(1)}
         </span>
+        <span className="text-sm text-slate-500 ml-1.5">/10</span>
       </div>
 
       {/* Sub-scores if available */}

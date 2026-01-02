@@ -156,8 +156,8 @@ html.lightbox-open {
   /* Tracks - visible grey for white backgrounds */
   --rating-bar-track: #D7DDE3;       /* slate-300 equivalent */
   
-  /* Neutral fill - dark slate for non-banded bars */
-  --rating-bar-fill-neutral: #1e293b; /* slate-800 */
+  /* Neutral fill - calm slate matching tier distribution bars */
+  --rating-bar-fill-neutral: #64748B; /* slate-500 - matches NEUTRAL_COLOR in RatingTierDistribution */
   
   /* Rating band colors - From CLBHOUZ_ACHIEVEMENT_PALETTE
      These must match src/lib/clbhouzAchievementPalette.ts */
