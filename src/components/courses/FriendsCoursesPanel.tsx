@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useNavigate } from 'react-router-dom';
+
 import { toast } from 'sonner';
 import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
@@ -15,7 +15,7 @@ import WeeklyRecapCard from './friends/WeeklyRecapCard';
 import FriendsActivityFeed from './friends/FriendsActivityFeed';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
-import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
+import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
 const USE_FRIENDS_COURSES_MOCK = true; // flip to false to use real data
@@ -26,7 +26,6 @@ type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
 const FriendsCoursesPanel: React.FC = () => {
   // All hooks must be called before any conditional returns
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
   
   // When using mock, we still fetch real course data for photos/details
@@ -148,9 +147,6 @@ const FriendsCoursesPanel: React.FC = () => {
   
   const [timeframe, setTimeframe] = useState<Timeframe>('30d');
   const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
-  const [page, setPage] = useState(1);
-  
-  const PAGE_SIZE = 5;
 
   // Filter data by time range and course type
   const filteredData = useMemo(() => {
@@ -350,10 +346,6 @@ const FriendsCoursesPanel: React.FC = () => {
     return new Set(trendingCourses.map(c => c.course_id));
   }, [trendingCourses]);
 
-  const regularCourses = useMemo(() => {
-    const heroId = heroCourse?.course_id;
-    return courses.filter(c => !trendingCourseIds.has(c.course_id) && c.course_id !== heroId);
-  }, [courses, trendingCourseIds, heroCourse]);
 
   // Handle save course action (want to play)
   const handleSaveCourse = (courseId: string) => {
@@ -361,73 +353,6 @@ const FriendsCoursesPanel: React.FC = () => {
     // TODO: Implement actual save to want_to_play list
   };
 
-  // Paginate main courses list (kept for hero card exclusion)
-  const paginatedCourses = useMemo(() => {
-    const startIndex = (page - 1) * PAGE_SIZE;
-    return regularCourses.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [regularCourses, page]);
-
-  // Reset page when filter changes
-  useEffect(() => {
-    setPage(1);
-  }, [timeframe, courseFilter]);
-
-  // Scroll to top of courses list
-  const scrollToCoursesList = () => {
-    if (!coursesListAnchorRef.current) return;
-
-    const rect = coursesListAnchorRef.current.getBoundingClientRect();
-    const absoluteTop = rect.top + window.scrollY;
-
-    // Offset so the anchor sits nicely under the sticky header/nav
-    const OFFSET = 80;
-
-    window.scrollTo({
-      top: absoluteTop - OFFSET,
-      behavior: 'smooth',
-    });
-  };
-
-  // Handle course pagination with scroll-to-top
-  const handleChangeCoursesPage = (direction: 'next' | 'prev') => {
-    setPage((prev) => {
-      const nextIndex = direction === 'next' ? prev + 1 : prev - 1;
-      return Math.max(1, nextIndex);
-    });
-
-    // Wait until the DOM updates, then scroll
-    requestAnimationFrame(scrollToCoursesList);
-  };
-
-  // Handle clicking a recent round to jump to its course card
-  const handleRecentRoundClick = (hit: FriendCourseHit) => {
-    const index = courseIndexById.get(hit.course_id);
-
-    if (index == null) {
-      // Fallback – if not in list, navigate to course detail
-      navigate(`/courses/${hit.course_id}`);
-      return;
-    }
-
-    const targetPage = Math.floor(index / PAGE_SIZE) + 1;
-    setPage(targetPage);
-
-    // Wait for DOM update, then scroll to and highlight the card
-    requestAnimationFrame(() => {
-      const cardEl = document.querySelector<HTMLElement>(
-        `[data-friends-course-card="${hit.course_id}"]`
-      );
-      if (cardEl) {
-        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        cardEl.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
-
-        // Remove highlight after a short delay
-        setTimeout(() => {
-          cardEl.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
-        }, 1400);
-      }
-    });
-  };
 
   // Now conditional returns - no more hooks after this point
   if (!user) return null;
@@ -442,11 +367,6 @@ const FriendsCoursesPanel: React.FC = () => {
     return <FriendsCoursesEmpty />;
   }
 
-  const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
-    const names = friends.slice(0, limit).map(f => f.friend_profile.display_name || f.friend_profile.username);
-    const remaining = friends.length - limit;
-    return remaining > 0 ? `${names.join(', ')} and ${remaining} other${remaining > 1 ? 's' : ''}` : names.join(', ');
-  };
 
   return (
     <div className="w-full pb-6">
