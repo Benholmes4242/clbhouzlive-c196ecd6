@@ -114,10 +114,18 @@ function ThumbContent({
 
   return (
     <div className="relative w-14 h-14">
-      {/* Thumbnail container - no active border */}
+      {/* Selection dot - outside top-left corner (hidden during drag) - slate style */}
+      {isActive && !isDragOverlay && (
+        <div 
+          className="absolute -top-1 -left-1 w-1.5 h-1.5 rounded-full bg-slate-600 z-30"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Thumbnail container - squircle design */}
       <div 
         className={`
-          absolute inset-0 rounded-lg overflow-hidden transition-all duration-150
+          absolute inset-0 rounded-[14px] overflow-hidden transition-all duration-150
           ${isActive ? '' : 'opacity-70 hover:opacity-100'}
         `}
       >
@@ -146,14 +154,6 @@ function ThumbContent({
           </>
         )}
       </div>
-
-      {/* Selection dot - top right, inside thumbnail (hidden during drag) - slate style */}
-      {isActive && !isDragOverlay && (
-        <div 
-          className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-slate-600 shadow-sm z-30"
-          aria-hidden="true"
-        />
-      )}
 
       {/* Cover star button - top left, inside thumbnail (not during drag overlay) */}
       {!isDragOverlay && (
