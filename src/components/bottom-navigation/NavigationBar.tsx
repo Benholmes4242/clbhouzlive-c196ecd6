@@ -37,10 +37,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             <Icon 
               className={cn(
                 "h-7 w-7 transition-colors duration-300",
+                "[stroke-width:1.5]", /* Consistent stroke weight across all icons */
                 isLightTheme
                   ? isActive 
-                    ? "text-slate-800" 
-                    : "text-slate-500"
+                    ? "text-slate-800 opacity-100" 
+                    : "text-slate-500 opacity-90"
                   : isActive 
                     ? "text-primary" 
                     : isDimmed 

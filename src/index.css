@@ -108,6 +108,8 @@ html.lightbox-open {
 
   --radius-tile: 18px;
   
+  /* Echo brand orange - for accents */
+  --echo-orange: 35 92% 57%;  /* #f89c2a in HSL */
   /* ========================================
      GLOBAL VERTICAL SPACING SYSTEM
      ======================================== */
