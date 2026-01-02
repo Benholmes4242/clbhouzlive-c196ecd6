@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Star, Trash2 } from "lucide-react";
+import { Play, Trash2 } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
@@ -27,9 +27,7 @@ import { restrictToHorizontalAxis, restrictToParentElement } from '@dnd-kit/modi
 interface MediaThumbnailStripProps {
   media: ComposerMediaItem[];
   activeMediaId: string | null;
-  coverMediaId: string | null;
   onSelect: (mediaId: string) => void;
-  onSetCover: (mediaId: string) => void;
   onRemove: (mediaId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   getEdits: (mediaId: string) => StudioEdits;
@@ -40,10 +38,9 @@ interface SortableThumbProps {
   item: ComposerMediaItem;
   index: number;
   isActive: boolean;
-  isCover: boolean;
+  isFirst: boolean;
   getEdits: (mediaId: string) => StudioEdits;
   onSelect: () => void;
-  onSetCover: () => void;
   onRemove: () => void;
   isDragOverlay?: boolean;
 }
@@ -53,9 +50,8 @@ function ThumbContent({
   item, 
   index, 
   isActive, 
-  isCover, 
+  isFirst, 
   getEdits, 
-  onSetCover, 
   onRemove,
   isDragOverlay = false 
 }: Omit<SortableThumbProps, 'onSelect'>) {
@@ -159,26 +155,17 @@ function ThumbContent({
         )}
       </div>
 
-      {/* Cover star button - top left, inside thumbnail (not during drag overlay) */}
-      {!isDragOverlay && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSetCover();
+      {/* Cover indicator - subtle pill on first item only */}
+      {isFirst && !isDragOverlay && (
+        <div 
+          className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-medium uppercase tracking-wide z-10 backdrop-blur-sm"
+          style={{ 
+            background: 'rgba(0,0,0,0.5)',
+            color: 'rgba(255,255,255,0.9)',
           }}
-          className={`
-            absolute top-1 left-1 w-4 h-4 rounded-full flex items-center justify-center z-10 transition-all backdrop-blur-sm
-            ${isCover 
-              ? 'bg-slate-600 shadow-sm' 
-              : 'bg-black/50 hover:bg-black/70'
-            }
-          `}
-          aria-label={isCover ? "Current cover" : "Set as cover"}
         >
-          <Star 
-            className={`w-2.5 h-2.5 ${isCover ? 'text-white fill-white' : 'text-white/80'}`} 
-          />
-        </button>
+          Cover
+        </div>
       )}
 
       {/* Video indicator - bottom left, inside thumbnail */}
@@ -205,7 +192,7 @@ function ThumbContent({
   );
 }
 
-function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect, onSetCover, onRemove }: SortableThumbProps) {
+function SortableThumb({ item, index, isActive, isFirst, getEdits, onSelect, onRemove }: SortableThumbProps) {
   const {
     attributes,
     listeners,
@@ -236,9 +223,8 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect, onS
         item={item}
         index={index}
         isActive={isActive}
-        isCover={isCover}
+        isFirst={isFirst}
         getEdits={getEdits}
-        onSetCover={onSetCover}
         onRemove={onRemove}
       />
     </motion.div>
@@ -248,9 +234,7 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect, onS
 export default function MediaThumbnailStrip({
   media,
   activeMediaId,
-  coverMediaId,
   onSelect,
-  onSetCover,
   onRemove,
   onReorder,
   getEdits,
@@ -324,10 +308,9 @@ export default function MediaThumbnailStrip({
                 item={item}
                 index={index}
                 isActive={item.id === activeMediaId}
-                isCover={item.id === coverMediaId}
+                isFirst={index === 0}
                 getEdits={getEdits}
                 onSelect={() => onSelect(item.id)}
-                onSetCover={() => onSetCover(item.id)}
                 onRemove={() => onRemove(item.id)}
               />
             ))}
@@ -342,9 +325,8 @@ export default function MediaThumbnailStrip({
                 item={activeDragItem}
                 index={activeDragIndex}
                 isActive={activeDragItem.id === activeMediaId}
-                isCover={activeDragItem.id === coverMediaId}
+                isFirst={activeDragIndex === 0}
                 getEdits={getEdits}
-                onSetCover={() => {}}
                 onRemove={() => {}}
                 isDragOverlay={true}
               />
@@ -355,7 +337,7 @@ export default function MediaThumbnailStrip({
       
       {/* Helper text */}
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">
-        Drag to reorder · Tap ★ for cover
+        Drag to reorder · First media will be your cover
       </p>
     </div>
   );

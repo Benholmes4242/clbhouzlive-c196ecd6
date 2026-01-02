@@ -44,7 +44,6 @@ const ENHANCE_OPTIONS: EnhanceOption[] = [
     label: 'Magic Enhance',
     description: 'Auto-enhance your photos',
     icon: <Wand2 className="w-5 h-5" />,
-    isPremium: true,
     comingSoon: true,
   },
 ];
