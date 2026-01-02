@@ -50,7 +50,7 @@ export function AppSelect<T extends string = string>({
           aria-label={ariaLabel}
           className={cn(
             'h-9 rounded-sq-sm border border-border/60 bg-background px-3 text-sm',
-            'focus:outline-none focus:ring-2 focus:ring-primary/20',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300',
             'shadow-[0_1px_2px_rgba(15,23,42,0.04)]',
             icon && 'pl-2',
             triggerClassName
