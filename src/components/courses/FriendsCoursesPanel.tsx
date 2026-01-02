@@ -15,7 +15,6 @@ import WeeklyRecapCard from './friends/WeeklyRecapCard';
 import FriendsActivityFeed from './friends/FriendsActivityFeed';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
@@ -473,9 +472,6 @@ const FriendsCoursesPanel: React.FC = () => {
           onSave={handleSaveCourse}
         />
       </div>
-
-      {/* Scroll to top button - matches Top 100 page */}
-      <ScrollToTopGlass />
     </div>
   );
 };
