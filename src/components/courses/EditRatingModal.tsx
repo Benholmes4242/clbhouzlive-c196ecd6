@@ -105,10 +105,12 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
       
-      // Force refetch the infinite queries to show updated ratings
+      // Force refetch the feed queries to show updated ratings
       await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
       toast({
         title: "Rating Updated!",
@@ -158,10 +160,12 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
       
-      // Force refetch the infinite queries to show updated ratings
+      // Force refetch the feed queries to show updated ratings
       await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
       toast({
         title: "Rating Removed",

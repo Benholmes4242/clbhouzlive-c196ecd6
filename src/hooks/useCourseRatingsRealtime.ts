@@ -24,12 +24,23 @@ export function useCourseRatingsRealtime() {
             queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
             queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
             queryClient.invalidateQueries({ queryKey: ['course-detail', courseId] });
+
+            // If those screens are currently open, refetch immediately
+            void queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', courseId], type: 'active' });
+            void queryClient.refetchQueries({ queryKey: ['course-rating-stats', courseId], type: 'active' });
+            void queryClient.refetchQueries({ queryKey: ['course-reviews-full', courseId], type: 'active' });
+            void queryClient.refetchQueries({ queryKey: ['course-detail', courseId], type: 'active' });
           }
           
           // Invalidate feed queries so cards update
           queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
           queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
           queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+
+          // Force-refresh any currently visible feeds (perf-tuning sets refetchOnMount=false)
+          void queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
+          void queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+          void queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
         }
       )
       .subscribe();

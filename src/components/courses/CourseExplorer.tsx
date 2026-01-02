@@ -143,6 +143,8 @@ const CourseExplorer = () => {
   // Fetch initial courses
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption, 0],
+    // PERF-TUNING OVERRIDE: ratings need to be fresh when returning to Explore
+    refetchOnMount: 'always',
     queryFn: async () => {
       if (!mountedRef.current) throw new Error('Component unmounted');
       
