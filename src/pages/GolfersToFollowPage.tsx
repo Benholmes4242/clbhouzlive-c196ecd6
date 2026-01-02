@@ -187,14 +187,22 @@ const GolfersToFollowPage = () => {
 
         {/* Home club nudge card when on home_club tab with no club set */}
         {activeTab === 'home_club' && hasNoHomeClub && (
-          <div className="mx-6 mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
-            <div className="flex items-start gap-2">
+          <div className="mx-6 mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+            <div className="flex items-start gap-3">
               <Info className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-amber-800">Set your home club</p>
-                <p className="text-xs text-amber-700 mt-0.5">
+                <p className="text-xs text-amber-700 mt-0.5 mb-3">
                   Add your home club to find golfers from your club.
                 </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs border-amber-300 bg-white hover:bg-amber-100 text-amber-800"
+                  onClick={() => navigate('/edit-profile?section=golf')}
+                >
+                  Set Home Club
+                </Button>
               </div>
             </div>
           </div>
