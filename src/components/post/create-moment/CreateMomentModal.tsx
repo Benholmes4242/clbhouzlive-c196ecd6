@@ -441,7 +441,33 @@ export default function CreateMomentModal({
       return;
     }
     
+    // Check if ANY media has music - music is post-level, applies to all media
+    // When music exists, all videos should have their original audio muted
+    const postLevelMusic = media.reduce<{
+      trackId: string;
+      title: string;
+      artist?: string;
+      url: string;
+      startAt?: number;
+      volume?: number;
+    } | null>((found, item) => {
+      if (found) return found;
+      const edits = getEdits?.(item.id);
+      if (edits?.music) {
+        return {
+          trackId: edits.music.trackId,
+          title: edits.music.title,
+          artist: edits.music.artist,
+          url: edits.music.url || '',
+          startAt: edits.music.startAt ?? 0,
+          volume: edits.music.volume ?? 0.8,
+        };
+      }
+      return null;
+    }, null);
+    
     // Build full studio edits including filter, music, audioMode, textOverlays, crop, and rotate
+    // When post has music, ALL media items get the same music and audioMode: 'music_only'
     const studioEditsByMediaId = media.reduce((acc, item) => {
       const edits = getEdits?.(item.id);
       const hasEdits = !!edits && (
@@ -453,23 +479,17 @@ export default function CreateMomentModal({
         !!edits.rotate
       );
       
-      if (hasEdits) {
+      // If post has music OR item has individual edits, include in payload
+      if (hasEdits || postLevelMusic) {
         acc[item.id] = {
-          ...(edits.filter && { filter: edits.filter }),
-          ...(edits.crop?.ratio && { crop: { ratio: edits.crop.ratio } }),
-          ...(edits.rotate && { rotate: edits.rotate }),
-          ...(edits.music && { 
-            music: {
-              trackId: edits.music.trackId,
-              title: edits.music.title,
-              artist: edits.music.artist,
-              url: edits.music.url || '',
-              startAt: edits.music.startAt ?? 0,
-              volume: edits.music.volume ?? 0.8,
-            }
-          }),
-          ...(edits.textOverlays?.length ? { textOverlays: edits.textOverlays } : {}),
-          audioMode: edits.music ? 'music_only' as const : (edits.audioMode ?? 'original' as const),
+          ...(edits?.filter && { filter: edits.filter }),
+          ...(edits?.crop?.ratio && { crop: { ratio: edits.crop.ratio } }),
+          ...(edits?.rotate && { rotate: edits.rotate }),
+          // Post-level music: apply same music to all media items
+          ...(postLevelMusic && { music: postLevelMusic }),
+          ...(edits?.textOverlays?.length ? { textOverlays: edits.textOverlays } : {}),
+          // When post has music, ALL media uses music_only (mutes original video audio)
+          audioMode: postLevelMusic ? 'music_only' as const : (edits?.audioMode ?? 'original' as const),
         };
       }
       return acc;
@@ -714,7 +734,18 @@ export default function CreateMomentModal({
         activeMediaPreviewUrl={media[activeIndex]?.previewUrl || null}
         activeMediaThumbnailUrl={media[activeIndex]?.thumbnailUrl || media[activeIndex]?.previewUrl || null}
         edits={getEdits(media[activeIndex]?.id || '')}
-        updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
+        updateEdits={(patch) => {
+          // Music is post-level: when music is added/changed, apply to ALL media items
+          // This ensures the music track plays for the entire post, not just one media item
+          if ('music' in patch) {
+            media.forEach(item => {
+              updateEdits(item.id, { music: patch.music });
+            });
+          } else {
+            // Other edits (filter, text, crop, etc.) remain per-media
+            updateEdits(media[activeIndex]?.id || '', patch);
+          }
+        }}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
         isPositioningText={isPositioningText}
         onTogglePositionMode={handleTogglePositionMode}
