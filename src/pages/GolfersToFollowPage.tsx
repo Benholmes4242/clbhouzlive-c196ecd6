@@ -310,53 +310,56 @@ const GolfersToFollowPage = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           {/* Follow/Following button - PRIMARY */}
-                          <Button
-                            variant={isFollowing ? "secondary" : "primary"}
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleFollowToggle(golfer.id, golfer.displayName, isFollowing);
-                            }}
-                            disabled={isActioning}
-                            className="h-8 text-xs"
-                          >
-                            {isFollowing && <Check className="h-3 w-3" />}
-                            {isFollowing ? 'Following' : 'Follow'}
-                          </Button>
+                          {isFollowing ? (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFollowToggle(golfer.id, golfer.displayName, true);
+                              }}
+                              disabled={isActioning}
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted text-foreground/80 gap-1"
+                            >
+                              <Check className="h-3 w-3" />
+                              Following
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFollowToggle(golfer.id, golfer.displayName, false);
+                              }}
+                              disabled={isActioning}
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
+                            >
+                              Follow
+                            </button>
+                          )}
 
                           {/* Add friend button - SECONDARY */}
                           {friendStatus === 'friends' ? (
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              disabled
-                              className="h-8 text-xs border-success/50 bg-success/10 text-success"
+                            <span
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-50 text-emerald-600 gap-1 cursor-default"
                             >
                               <Check className="h-2.5 w-2.5" />
                               Friends
-                            </Button>
+                            </span>
                           ) : friendStatus === 'pending' ? (
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              disabled
-                              className="h-8 text-xs"
+                            <span
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted/50 text-muted-foreground cursor-default"
                             >
                               Request sent
-                            </Button>
+                            </span>
                           ) : (
-                            <Button
-                              variant="secondary"
-                              size="sm"
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleFriendRequest(golfer.id, golfer.displayName, friendStatus);
                               }}
                               disabled={isActioning}
-                              className="h-8 text-xs"
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50"
                             >
                               Add friend
-                            </Button>
+                            </button>
                           )}
                         </div>
                       </div>
