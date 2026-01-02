@@ -74,7 +74,10 @@ const ScrollToTopGlass = () => {
     >
       <button
         type="button"
-        onClick={scrollToTop}
+        onClick={(e) => {
+          e.stopPropagation();
+          scrollToTop();
+        }}
         aria-label="Back to top"
         className="
           pointer-events-auto
@@ -90,11 +93,13 @@ const ScrollToTopGlass = () => {
           border-white/10
           opacity-60
           hover:opacity-100
-          hover:scale-[1.03]
+          hover:scale-105
           active:scale-95
           transition-all
           duration-150
+          touch-manipulation
         "
+        style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         <ChevronUp className="h-4 w-4 text-white" />
       </button>

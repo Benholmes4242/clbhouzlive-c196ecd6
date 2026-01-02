@@ -262,6 +262,28 @@ const FriendsCoursesPanel: React.FC = () => {
 
   const totalRounds = recent.length;
 
+  // Calculate how many of the friends' courses the user has also played (for "You vs Friends" nudge)
+  const { data: userPlayedCourseIds } = useQuery({
+    queryKey: ['user-played-course-ids', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_courses' as any)
+        .select('course_id')
+        .eq('user_id', user!.id)
+        .eq('played', true);
+      
+      if (error) throw error;
+      return new Set((data || []).map((r: any) => r.course_id));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const userPlayedCount = useMemo(() => {
+    if (!userPlayedCourseIds || courses.length === 0) return 0;
+    return courses.filter(c => userPlayedCourseIds.has(c.course_id)).length;
+  }, [courses, userPlayedCourseIds]);
+
   // Generate leaderboard data
   const leaderboard = useMemo(() => {
     const friendMap = new Map<string, {
@@ -460,9 +482,9 @@ const FriendsCoursesPanel: React.FC = () => {
 
   return (
     <div className="w-full pb-6">
-      {/* Page Header - 8px title→subtitle, 16px header→filters */}
-      <div className="mb-4">
-        <div className="flex flex-col gap-2">
+      {/* Page Header - Tighter spacing: 4px title→subtitle, 12px header→filters */}
+      <div className="mb-3">
+        <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
           <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
@@ -470,10 +492,10 @@ const FriendsCoursesPanel: React.FC = () => {
       
       {/* Filter Dropdowns */}
       <div className="flex items-center gap-3">
-        {/* Time Range Dropdown */}
+        {/* Time Range Dropdown - Primary visual emphasis */}
         <div className="flex-1">
           <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-slate-300 rounded-xl justify-between text-base font-medium focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
               <SelectValue placeholder="Select time range" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -486,10 +508,10 @@ const FriendsCoursesPanel: React.FC = () => {
           </Select>
         </div>
         
-        {/* Course Filter Dropdown */}
+        {/* Course Filter Dropdown - Secondary */}
         <div className="flex-1">
           <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
               <SelectValue placeholder="Select filter" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -502,14 +524,15 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Friends Snapshot Card - 24px section gap */}
-      <div className="mt-6">
+      {/* Friends Snapshot Card - 20px section gap */}
+      <div className="mt-5">
         <FriendsSnapshotCard
           timeframe={timeframe}
           totalCourses={totalCourses}
           totalRegions={totalRegions}
           averageRating={averageRating}
           totalRounds={totalRounds}
+          userPlayedCount={userPlayedCount}
         />
       </div>
 
@@ -590,32 +613,39 @@ const FriendsCoursesPanel: React.FC = () => {
                           <h3 className="font-semibold text-base">{course.course_name}</h3>
                           <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
                         </div>
-                        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+                        {/* Hot badge - subtle warm accent with thin border */}
+                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-amber-50/80 text-amber-700 border border-amber-200/80 whitespace-nowrap">
                           Hot this month
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="flex -space-x-2">
-                        {course.friends.slice(0, 3).map((friend, idx) => (
-                          <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
-                            <Squircle width={28} height={28}>
-                              <img 
-                                src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                                alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onError={(e) => {
-                                  e.currentTarget.src = '/placeholder.svg';
-                                }}
-                              />
-                            </Squircle>
-                          </div>
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground">Played by {formatFriendsList(course.friends, 2)}</span>
+                  <div className="flex items-center gap-2">
+                    {/* Avatar stack - consistent 2-3 avatars + +N */}
+                    <div className="flex -space-x-2">
+                      {course.friends.slice(0, 3).map((friend, idx) => (
+                        <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
+                          <Squircle width={26} height={26}>
+                            <img 
+                              src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                              alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder.svg';
+                              }}
+                            />
+                          </Squircle>
+                        </div>
+                      ))}
+                      {course.friends.length > 3 && (
+                        <div className="relative flex items-center justify-center w-[26px] h-[26px] rounded-lg bg-slate-100 border border-slate-200 text-[10px] font-medium text-slate-600" style={{ zIndex: 6 }}>
+                          +{course.friends.length - 3}
+                        </div>
+                      )}
                     </div>
+                    <span className="text-xs text-slate-500">
+                      Played by <span className="font-medium text-foreground">{formatFriendsList(course.friends, 2)}</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -699,29 +729,40 @@ const FriendsCoursesPanel: React.FC = () => {
                       {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
                     </p>
 
-                    {/* Bottom row: "Played by..." with avatar */}
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-xs text-muted-foreground">
+                    {/* Bottom row: Avatar stack + "Played by..." with slate timestamp */}
+                    <div className="flex items-center gap-2">
+                      {/* Avatar stack - consistent 2-3 avatars + +N */}
+                      <div className="flex -space-x-2">
+                        {course.friends.slice(0, 3).map((friend, idx) => (
+                          <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
+                            <Squircle width={26} height={26}>
+                              <img 
+                                src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                                alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
+                              />
+                            </Squircle>
+                          </div>
+                        ))}
+                        {course.friends.length > 3 && (
+                          <div className="relative flex items-center justify-center w-[26px] h-[26px] rounded-lg bg-slate-100 border border-slate-200 text-[10px] font-medium text-slate-600" style={{ zIndex: 6 }}>
+                            +{course.friends.length - 3}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500">
                         Played by{" "}
                         <span className="font-medium text-foreground">
                           {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
                         </span>
                         {course.total_friends_played > 1 && (
-                          <span> & {course.total_friends_played - 1} more</span>
+                          <span className="text-slate-500"> and {course.total_friends_played - 1} other{course.total_friends_played > 2 ? 's' : ''}</span>
                         )}
-                        {" "}· {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
+                        <span className="text-slate-400"> · {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}</span>
                       </p>
-
-                      <Squircle width={32} height={32} className="shrink-0">
-                        <img 
-                          src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                          alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={(e) => {
-                            e.currentTarget.src = '/placeholder.svg';
-                          }}
-                        />
-                      </Squircle>
                     </div>
                   </div>
                 </div>
