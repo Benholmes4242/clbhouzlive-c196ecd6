@@ -13,14 +13,11 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
-import { UnderlineTabs, UnderlineTabOption } from '@/components/ui/UnderlineTabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
-const TAB_OPTIONS: UnderlineTabOption[] = [
-  { value: 'suggested', label: 'Suggested' },
-  { value: 'home_club', label: 'Home Club' },
-  { value: 'verified', label: 'Verified' },
-];
+// Tab trigger class matching Courses page exactly
+const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]";
 
 const EMPTY_STATES: Record<TabKey, { title: string; description: string }> = {
   suggested: { title: 'No suggestions yet.', description: 'Try searching by name or club.' },
@@ -175,13 +172,21 @@ const GolfersToFollowPage = () => {
           </p>
         </div>
 
-        {/* Underline tabs - Courses style */}
-        <div className="px-6 border-b border-border/40">
-          <UnderlineTabs
-            options={TAB_OPTIONS}
-            value={activeTab}
-            onChange={(value) => setActiveTab(value as TabKey)}
-          />
+        {/* Tabs - matching Courses page styling exactly */}
+        <div className="px-6">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabKey)} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
+              <TabsTrigger value="suggested" className={tabTriggerClass}>
+                Suggested
+              </TabsTrigger>
+              <TabsTrigger value="home_club" className={tabTriggerClass}>
+                Home Club
+              </TabsTrigger>
+              <TabsTrigger value="verified" className={tabTriggerClass}>
+                Verified
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Home club nudge card when on home_club tab with no club set */}
