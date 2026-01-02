@@ -147,36 +147,15 @@ function ThumbContent({
         )}
       </div>
 
-      {/* Selection dot - top left, inside thumbnail (hidden during drag) */}
+      {/* Selection dot - top right, inside thumbnail (hidden during drag) - slate style */}
       {isActive && !isDragOverlay && (
         <div 
-          className="absolute top-1 left-1 w-2 h-2 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.4)] z-10"
+          className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-slate-600 shadow-sm z-30"
           aria-hidden="true"
         />
       )}
 
-      {/* Video indicator - bottom left, inside thumbnail */}
-      {item.type === 'video' && (
-        <div className="absolute bottom-1 left-1 rounded bg-black/60 backdrop-blur-sm px-1 py-0.5 z-10">
-          <Play className="w-2.5 h-2.5 text-white fill-white" />
-        </div>
-      )}
-
-      {/* Remove button - top right, inside thumbnail (not during drag overlay) */}
-      {!isDragOverlay && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 flex items-center justify-center z-20 transition-colors"
-          aria-label="Remove media"
-        >
-          <X className="w-3 h-3 text-white" />
-        </button>
-      )}
-
-      {/* Cover star button - bottom right, inside thumbnail (not during drag overlay) */}
+      {/* Cover star button - top left, inside thumbnail (not during drag overlay) */}
       {!isDragOverlay && (
         <button
           onClick={(e) => {
@@ -184,7 +163,7 @@ function ThumbContent({
             onSetCover();
           }}
           className={`
-            absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all backdrop-blur-sm
+            absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center z-10 transition-all backdrop-blur-sm
             ${isCover 
               ? 'bg-slate-600 shadow-sm' 
               : 'bg-black/50 hover:bg-black/70'
@@ -195,6 +174,27 @@ function ThumbContent({
           <Star 
             className={`w-3 h-3 ${isCover ? 'text-white fill-white' : 'text-white/80'}`} 
           />
+        </button>
+      )}
+
+      {/* Video indicator - bottom left, inside thumbnail */}
+      {item.type === 'video' && (
+        <div className="absolute bottom-1 left-1 rounded bg-black/60 backdrop-blur-sm px-1 py-0.5 z-10">
+          <Play className="w-2.5 h-2.5 text-white fill-white" />
+        </div>
+      )}
+
+      {/* Remove button - bottom right, inside thumbnail (not during drag overlay) */}
+      {!isDragOverlay && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 flex items-center justify-center z-20 transition-colors"
+          aria-label="Remove media"
+        >
+          <X className="w-3 h-3 text-white" />
         </button>
       )}
     </div>
