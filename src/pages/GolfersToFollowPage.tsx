@@ -130,7 +130,7 @@ const GolfersToFollowPage = () => {
   const hasMore = page < totalPages;
 
   return (
-    <PageRoot className="bg-muted/40 pb-24 compact-header-offset">
+    <PageRoot className="bg-muted/40 pb-24">
       <div className="w-full">
         {/* Back CTA - flush test */}
         <div className="px-4 pt-0">
