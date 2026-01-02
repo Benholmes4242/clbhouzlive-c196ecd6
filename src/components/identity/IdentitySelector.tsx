@@ -26,6 +26,12 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
 
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
+  // Truncate display name to prevent layout breaks
+  const truncateDisplayName = (name: string, maxLength = 18) => {
+    if (!name) return '';
+    return name.length > maxLength ? `${name.slice(0, maxLength)}…` : name;
+  };
+
   const renderAvatar = (actor: ActiveActor, size: 'sm' | 'md' = 'sm') => {
     // Use SDS squircle avatar - matches Clubhouse header PostingAsPill
     const sizePixels = size === 'sm' ? 24 : 32;
@@ -63,8 +69,8 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
   } : undefined;
 
   const textClasses = variant === 'dark'
-    ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-white leading-none`
-    : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px]`;
+    ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[140px] text-white leading-none whitespace-nowrap overflow-hidden text-ellipsis`
+    : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[140px] whitespace-nowrap overflow-hidden text-ellipsis`;
 
   const lightTextStyle = variant === 'light' ? {
     color: 'var(--cm-text-primary)',
@@ -84,7 +90,7 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
         <button className={triggerClasses} style={lightTriggerStyle}>
           {renderAvatar(activeActor)}
           <span className={textClasses} style={lightTextStyle}>
-            {activeActor.name}
+            {truncateDisplayName(activeActor.name, 18)}
           </span>
           <ChevronDown className={chevronClasses} style={lightChevronStyle} />
         </button>
