@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Squircle } from '@/components/ui/squircle';
-import { ExternalLink, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
@@ -105,8 +106,8 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             </Squircle>
             {communityRating && (
               <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-slate-400 fill-slate-400" />
-                <span className="text-xs font-medium text-slate-500">{communityRating.toFixed(1)}</span>
+                <ClubhouseLogo size="xs" />
+                <span className="text-xs font-semibold text-foreground">{communityRating.toFixed(1)}</span>
               </div>
             )}
           </div>
@@ -202,11 +203,11 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                         {friend.friend_profile.display_name || friend.friend_profile.username}
                       </p>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       {friend.rating ? (
                         <>
-                          <Star className="w-3 h-3 text-slate-400 fill-slate-400" />
-                          <span className="text-sm font-medium text-foreground">{friend.rating.toFixed(1)}</span>
+                          <ClubhouseLogo size="xs" />
+                          <span className="text-sm font-semibold text-foreground">{friend.rating.toFixed(1)}</span>
                         </>
                       ) : (
                         <span className="text-xs text-slate-400">—</span>
