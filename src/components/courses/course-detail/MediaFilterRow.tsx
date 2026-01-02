@@ -1,27 +1,7 @@
 import React from 'react';
-import { Settings2 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export type MediaFilterMode = 'most_recent' | 'photos' | 'videos' | 'friends' | 'mine';
-
-interface MediaFilterPillProps {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}
-
-const MediaFilterPill: React.FC<MediaFilterPillProps> = ({ label, active, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-      active
-        ? 'bg-slate-900 text-white shadow-sm'
-        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-    }`}
-  >
-    {label}
-  </button>
-);
 
 interface MediaFilterRowProps {
   filterMode: MediaFilterMode;
@@ -30,48 +10,47 @@ interface MediaFilterRowProps {
   hasUserMedia?: boolean;
 }
 
+// Exact same tab trigger class used in CourseTabs.tsx
+const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]";
+
 export const MediaFilterRow: React.FC<MediaFilterRowProps> = ({
   filterMode,
   onFilterChange,
   hasFriends = false,
   hasUserMedia = false,
 }) => {
+  // Calculate number of tabs for grid
+  let tabCount = 3; // most_recent, photos, videos
+  if (hasFriends) tabCount++;
+  if (hasUserMedia) tabCount++;
+
   return (
-    <div className="bg-slate-100 px-4 py-2">
-      <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
-        <Settings2 className="w-4 h-4 text-slate-500 flex-shrink-0" />
-        <div className="flex gap-3">
-          <MediaFilterPill
-            label="Most recent"
-            active={filterMode === 'most_recent'}
-            onClick={() => onFilterChange('most_recent')}
-          />
-          <MediaFilterPill
-            label="Photos"
-            active={filterMode === 'photos'}
-            onClick={() => onFilterChange('photos')}
-          />
-          <MediaFilterPill
-            label="Videos"
-            active={filterMode === 'videos'}
-            onClick={() => onFilterChange('videos')}
-          />
+    <div className="px-4 py-2 bg-slate-50 border-b border-slate-200/60">
+      <Tabs value={filterMode} onValueChange={(v) => onFilterChange(v as MediaFilterMode)} className="w-full">
+        <TabsList 
+          className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center"
+        >
+          <TabsTrigger value="most_recent" className={tabTriggerClass}>
+            Most recent
+          </TabsTrigger>
+          <TabsTrigger value="photos" className={tabTriggerClass}>
+            Photos
+          </TabsTrigger>
+          <TabsTrigger value="videos" className={tabTriggerClass}>
+            Videos
+          </TabsTrigger>
           {hasFriends && (
-            <MediaFilterPill
-              label="From friends"
-              active={filterMode === 'friends'}
-              onClick={() => onFilterChange('friends')}
-            />
+            <TabsTrigger value="friends" className={tabTriggerClass}>
+              From friends
+            </TabsTrigger>
           )}
           {hasUserMedia && (
-            <MediaFilterPill
-              label="From you"
-              active={filterMode === 'mine'}
-              onClick={() => onFilterChange('mine')}
-            />
+            <TabsTrigger value="mine" className={tabTriggerClass}>
+              From you
+            </TabsTrigger>
           )}
-        </div>
-      </div>
+        </TabsList>
+      </Tabs>
     </div>
   );
 };
