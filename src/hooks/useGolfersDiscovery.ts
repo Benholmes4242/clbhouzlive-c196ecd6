@@ -4,7 +4,7 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { useUserProfile } from './useUserProfile';
 import { useQuery } from '@tanstack/react-query';
 
-export type TabKey = 'suggested' | 'home_club' | 'verified' | 'trending';
+export type TabKey = 'suggested' | 'home_club' | 'verified';
 
 const PAGE_SIZE = 15;
 
@@ -178,10 +178,6 @@ export function useGolfersDiscovery() {
           break;
         case 'verified':
           query = query.eq('is_verified_golfer', true);
-          break;
-        case 'trending':
-          // For trending, order by recently updated (activity proxy)
-          query = query.order('updated_at', { ascending: false });
           break;
         case 'suggested':
         default:
