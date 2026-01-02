@@ -1,11 +1,11 @@
 /**
  * useUserJourneyCourses - Fetches all courses in user's journey
- * Returns played, want_to_play, and wishlist courses
+ * Returns played and want_to_play courses (wishlist removed)
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export type JourneyTab = 'played' | 'want_to_play' | 'wishlist';
+export type JourneyTab = 'played' | 'want_to_play';
 
 export interface JourneyCourse {
   id: string;
@@ -27,10 +27,9 @@ export function useUserJourneyCourses(userId: string | undefined) {
     queryFn: async (): Promise<{
       played: JourneyCourse[];
       want_to_play: JourneyCourse[];
-      wishlist: JourneyCourse[];
     }> => {
       if (!userId) {
-        return { played: [], want_to_play: [], wishlist: [] };
+        return { played: [], want_to_play: [] };
       }
 
       // Fetch ratings (played courses)
@@ -55,7 +54,7 @@ export function useUserJourneyCourses(userId: string | undefined) {
 
       if (ratingsError) throw ratingsError;
 
-      // Fetch shortlists (want_to_play and wishlist)
+      // Fetch shortlists (want_to_play only, but also include legacy wishlist and treat as want_to_play)
       const { data: shortlists, error: shortlistsError } = await supabase
         .from('course_shortlists')
         .select(`
@@ -72,7 +71,7 @@ export function useUserJourneyCourses(userId: string | undefined) {
           )
         `)
         .eq('user_id', userId)
-        .in('list_key', ['want_to_play', 'wishlist'])
+        .in('list_key', ['want_to_play', 'wishlist']) // Include legacy wishlist
         .order('created_at', { ascending: false });
 
       if (shortlistsError) throw shortlistsError;
@@ -127,16 +126,13 @@ export function useUserJourneyCourses(userId: string | undefined) {
           };
         });
 
-      // Transform shortlists to JourneyCourse
-      const want_to_play: JourneyCourse[] = [];
-      const wishlist: JourneyCourse[] = [];
-
-      (shortlists || [])
+      // Transform shortlists to JourneyCourse (all go to want_to_play now)
+      const want_to_play: JourneyCourse[] = (shortlists || [])
         .filter((s: any) => s.golf_courses)
-        .forEach((s: any) => {
+        .map((s: any) => {
           const course = s.golf_courses;
           const top100 = top100Map.get(course.id);
-          const journeyCourse: JourneyCourse = {
+          return {
             id: course.id,
             name: course.name,
             country: course.country,
@@ -145,18 +141,12 @@ export function useUserJourneyCourses(userId: string | undefined) {
             thumbnail_image: course.thumbnail_image,
             top100_rank: top100?.rank || null,
             top100_list: top100?.list || null,
-            journey_status: s.list_key as JourneyTab,
+            journey_status: 'want_to_play' as const,
             added_at: s.created_at,
           };
-
-          if (s.list_key === 'want_to_play') {
-            want_to_play.push(journeyCourse);
-          } else if (s.list_key === 'wishlist') {
-            wishlist.push(journeyCourse);
-          }
         });
 
-      return { played, want_to_play, wishlist };
+      return { played, want_to_play };
     },
     enabled: !!userId,
     staleTime: 60_000,

@@ -1,13 +1,14 @@
 /**
  * useCoursePersonalStatus - Hook for user's personal status on a course
- * Manages: Played (via ratings), Want to Play (via shortlist), Next Up (via shortlist)
+ * Manages: Played (via ratings), Want to Play (via shortlist)
+ * Simplified: Removed wishlist, only Played and Want to Play remain
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
 
-export type CourseStatus = 'played' | 'want_to_play' | 'wishlist' | 'none';
+export type CourseStatus = 'played' | 'want_to_play' | 'none';
 
 export interface CoursePersonalStatus {
   status: CourseStatus;
@@ -49,7 +50,7 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
         };
       }
 
-      // Check shortlist status
+      // Check shortlist status (want_to_play only now, treat legacy wishlist as want_to_play)
       const { data: shortlist } = await supabase
         .from('course_shortlists')
         .select('id, list_key, created_at')
@@ -58,9 +59,9 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
         .maybeSingle();
 
       if (shortlist) {
-        const status = shortlist.list_key === 'wishlist' ? 'wishlist' : 'want_to_play';
+        // Treat both 'want_to_play' and legacy 'wishlist' as want_to_play
         return {
-          status,
+          status: 'want_to_play',
           shortlistId: shortlist.id,
           createdAt: shortlist.created_at,
         };
@@ -104,47 +105,16 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     },
     onSuccess: (_, wantToPlay) => {
       toast.success(wantToPlay ? 'Added to Want to Play' : 'Removed from list');
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status', courseId] });
-    },
-    onError: () => {
-      toast.error('Failed to update');
-    },
-  });
-
-  // Set wishlist (private)
-  const setWishlistMutation = useMutation({
-    mutationFn: async (wishlist: boolean) => {
-      if (!user?.id || !courseId) throw new Error('Not authenticated');
-
-      if (wishlist) {
-        // Remove any existing shortlist first
-        await supabase
-          .from('course_shortlists')
-          .delete()
-          .eq('course_id', courseId)
-          .eq('user_id', user.id);
-
-        // Add as wishlist
-        const { error } = await supabase
-          .from('course_shortlists')
-          .insert({
-            user_id: user.id,
-            course_id: courseId,
-            list_key: 'wishlist',
-          });
-        if (error && error.code !== '23505') throw error;
-      } else {
-        const { error } = await supabase
-          .from('course_shortlists')
-          .delete()
-          .eq('course_id', courseId)
-          .eq('user_id', user.id);
-        if (error) throw error;
-      }
-    },
-    onSuccess: (_, wishlist) => {
-      toast.success(wishlist ? 'Added to Wishlist' : 'Removed from Wishlist');
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status', courseId] });
+      // Invalidate all related queries using predicate
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-personal-status' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'top100-map-courses' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'user-journey-courses' 
+      });
     },
     onError: () => {
       toast.error('Failed to update');
@@ -155,7 +125,6 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     status: query.data ?? { status: 'none' as const },
     isLoading: query.isLoading,
     setWantToPlay: (want: boolean) => setWantToPlayMutation.mutate(want),
-    setWishlist: (wish: boolean) => setWishlistMutation.mutate(wish),
-    isUpdating: setWantToPlayMutation.isPending || setWishlistMutation.isPending,
+    isUpdating: setWantToPlayMutation.isPending,
   };
 }

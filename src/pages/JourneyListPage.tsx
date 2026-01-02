@@ -1,10 +1,10 @@
 /**
  * JourneyListPage - Dedicated page for user's golf journey
- * Tabs: Played / Want to Play / Wishlist
+ * Tabs: Played / Want to Play (Wishlist removed)
  */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Check, Bookmark, Heart, Trash2, ArrowRight, Flag, Loader2 } from 'lucide-react';
+import { ChevronLeft, Check, Bookmark, Trash2, Flag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,6 @@ interface JourneyCourseCardProps {
   course: JourneyCourse;
   onRemove?: () => void;
   onMarkPlayed?: () => void;
-  onMoveToWantToPlay?: () => void;
   isRemoving?: boolean;
 }
 
@@ -33,7 +32,6 @@ const JourneyCourseCard: React.FC<JourneyCourseCardProps> = ({
   course,
   onRemove,
   onMarkPlayed,
-  onMoveToWantToPlay,
   isRemoving,
 }) => {
   const navigate = useNavigate();
@@ -109,17 +107,6 @@ const JourneyCourseCard: React.FC<JourneyCourseCardProps> = ({
             Played
           </Button>
         )}
-        {onMoveToWantToPlay && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-            onClick={onMoveToWantToPlay}
-          >
-            <ArrowRight className="h-3 w-3 mr-1" />
-            Want to Play
-          </Button>
-        )}
         {onRemove && (
           <Button
             variant="ghost"
@@ -160,35 +147,21 @@ const JourneyListPage: React.FC = () => {
     },
     onSuccess: () => {
       toast.success('Removed from list');
-      queryClient.invalidateQueries({ queryKey: ['user-journey-courses'] });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'user-journey-courses' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'course-personal-status' 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: q => Array.isArray(q.queryKey) && q.queryKey[0] === 'top100-map-courses' 
+      });
       setRemovingId(null);
     },
     onError: () => {
       toast.error('Failed to remove');
       setRemovingId(null);
     },
-  });
-
-  // Move to want_to_play mutation
-  const moveToWantToPlayMutation = useMutation({
-    mutationFn: async (courseId: string) => {
-      if (!user?.id) throw new Error('Not authenticated');
-      // Delete existing
-      await supabase.from('course_shortlists').delete()
-        .eq('course_id', courseId)
-        .eq('user_id', user.id);
-      // Insert as want_to_play
-      await supabase.from('course_shortlists').insert({
-        course_id: courseId,
-        user_id: user.id,
-        list_key: 'want_to_play',
-      });
-    },
-    onSuccess: () => {
-      toast.success('Moved to Want to Play');
-      queryClient.invalidateQueries({ queryKey: ['user-journey-courses'] });
-    },
-    onError: () => toast.error('Failed to move'),
   });
 
   const courses = journeyCourses?.[activeTab] || [];
@@ -198,9 +171,7 @@ const JourneyListPage: React.FC = () => {
       case 'played':
         return 'No courses played yet. Rate a course to add it here.';
       case 'want_to_play':
-        return 'No courses on your Want to Play list yet.';
-      case 'wishlist':
-        return 'Your wishlist is empty. Save courses for later.';
+        return 'Courses you want to play will appear here.';
     }
   };
 
@@ -210,8 +181,6 @@ const JourneyListPage: React.FC = () => {
         return <Check className="h-4 w-4" />;
       case 'want_to_play':
         return <Bookmark className="h-4 w-4" />;
-      case 'wishlist':
-        return <Heart className="h-4 w-4" />;
     }
   };
 
@@ -263,26 +232,8 @@ const JourneyListPage: React.FC = () => {
                 ) : null}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="wishlist" className={tabTriggerClass}>
-              <span className="flex items-center gap-1.5">
-                {getTabIcon('wishlist')}
-                Wishlist
-                {journeyCourses?.wishlist?.length ? (
-                  <span className="text-xs text-slate-400">({journeyCourses.wishlist.length})</span>
-                ) : null}
-              </span>
-            </TabsTrigger>
           </TabsList>
         </Tabs>
-        
-        {/* Private wishlist notice */}
-        {activeTab === 'wishlist' && (
-          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100">
-            <p className="text-[11px] text-slate-500 text-center">
-              Saved for later — visible only to you
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Content */}
@@ -315,11 +266,6 @@ const JourneyListPage: React.FC = () => {
               onMarkPlayed={
                 activeTab !== 'played'
                   ? () => navigate(`/courses/${course.id}/rate`)
-                  : undefined
-              }
-              onMoveToWantToPlay={
-                activeTab === 'wishlist'
-                  ? () => moveToWantToPlayMutation.mutate(course.id)
                   : undefined
               }
               isRemoving={removingId === course.id}

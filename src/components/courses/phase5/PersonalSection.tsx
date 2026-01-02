@@ -36,7 +36,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
 
   const isLoading = ratingLoading || statusLoading;
   const hasPlayed = status.status === 'played';
-  const hasIntent = status.status === 'want_to_play' || status.status === 'wishlist';
+  const hasIntent = status.status === 'want_to_play';
 
   if (isLoading) {
     return (
