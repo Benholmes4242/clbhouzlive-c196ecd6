@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, ChevronLeft, Check, UserPlus } from 'lucide-react';
+import { Search, ChevronLeft, Check, UserPlus, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
+import { useGolfersDiscovery, TabKey } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -13,18 +13,27 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
+import { UnderlineTabs, UnderlineTabOption } from '@/components/ui/UnderlineTabs';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
-const FILTER_TABS = [
-  { id: 'suggested' as const, label: 'Suggested' },
-  { id: 'club' as const, label: 'Home club' },
-  { id: 'popular' as const, label: 'Popular' },
+const TAB_OPTIONS: UnderlineTabOption[] = [
+  { value: 'suggested', label: 'Suggested' },
+  { value: 'home_club', label: 'Home Club' },
+  { value: 'verified', label: 'Verified' },
+  { value: 'trending', label: 'Trending' },
 ];
 
-const PAGE_SIZE = 10;
+const EMPTY_STATES: Record<TabKey, { title: string; description: string }> = {
+  suggested: { title: 'No suggestions yet', description: 'Try searching by name or club.' },
+  home_club: { title: 'No golfers from your club yet', description: 'Be the first to join!' },
+  verified: { title: 'No verified golfers yet', description: 'Check back soon.' },
+  trending: { title: 'Nothing trending yet', description: 'Check back soon.' },
+};
 
-// Shared base pill class for action buttons
-// Smaller action buttons (10-20% reduction: h-6 instead of h-7, px-2 instead of px-3, text-[11px])
-const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-2 h-6 text-[11px] font-semibold transition-colors";
+// Primary Follow button styles
+const followButtonClass = "inline-flex items-center justify-center rounded-sq-xs border h-7 px-3 text-xs font-semibold transition-colors disabled:opacity-60";
+// Secondary Add friend button styles (slightly smaller, lighter weight)
+const friendButtonClass = "inline-flex items-center justify-center rounded-sq-xs border h-6 px-2.5 text-[11px] font-medium transition-colors disabled:opacity-60";
 
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
@@ -38,16 +47,16 @@ const GolfersToFollowPage = () => {
     golfers,
     loading,
     setSearchQuery,
-    activeFilter,
-    setActiveFilter,
+    activeTab,
+    setActiveTab,
     followingIds,
     updateFollowingStatus,
     page,
     setPage,
     totalPages,
     totalCount,
-    pageSize,
     isSearching,
+    hasNoHomeClub,
   } = useGolfersDiscovery();
 
   const { user } = useSupabaseSession();
@@ -56,6 +65,7 @@ const GolfersToFollowPage = () => {
     currentUserId: user?.id || '' 
   });
   const [actioningUserId, setActioningUserId] = useState<string | null>(null);
+  const [friendRequestsSent, setFriendRequestsSent] = useState<Set<string>>(new Set());
 
   // Apply debounced search query
   useEffect(() => {
@@ -73,34 +83,46 @@ const GolfersToFollowPage = () => {
   const handleFollowToggle = async (userId: string, userName: string, isFollowing: boolean) => {
     setActioningUserId(userId);
     
+    // Optimistic update
+    updateFollowingStatus(userId, !isFollowing);
+    
     const success = isFollowing
       ? await unfollowUser(userId)
       : await followUser(userId);
 
-    if (success) {
-      updateFollowingStatus(userId, !isFollowing);
-      if (isFollowing) {
-        toast({ description: `You've unfollowed ${userName}` });
-      }
-    } else {
+    if (!success) {
+      // Revert on failure
+      updateFollowingStatus(userId, isFollowing);
       toast({
         description: isFollowing 
           ? 'Could not unfollow. Please try again.'
           : 'Could not follow. Please try again.',
         variant: 'destructive',
       });
+    } else if (isFollowing) {
+      toast({ description: `You've unfollowed ${userName}` });
     }
     
     setActioningUserId(null);
   };
 
-  const handleFriendRequest = async (userId: string, userName: string) => {
+  const handleFriendRequest = async (userId: string, userName: string, currentStatus: 'none' | 'pending' | 'friends') => {
+    if (currentStatus !== 'none') return;
+    
     setActioningUserId(userId);
+    
+    // Optimistic update
+    setFriendRequestsSent(prev => new Set(prev).add(userId));
+    
     const success = await sendFriendRequest(userId, undefined);
     
-    if (success) {
-      toast({ description: `Friend request sent to ${userName}` });
-    } else {
+    if (!success) {
+      // Revert on failure
+      setFriendRequestsSent(prev => {
+        const next = new Set(prev);
+        next.delete(userId);
+        return next;
+      });
       toast({
         description: 'Could not send request. Please try again.',
         variant: 'destructive',
@@ -115,11 +137,6 @@ const GolfersToFollowPage = () => {
     setSearchQuery('');
   };
 
-  const handleGoToPopular = () => {
-    setActiveFilter('popular');
-    setPage(1);
-  };
-
   const handleLoadNext = () => {
     if (page < totalPages) {
       setPage(page + 1);
@@ -128,6 +145,12 @@ const GolfersToFollowPage = () => {
 
   const showingCount = golfers.length;
   const hasMore = page < totalPages;
+
+  // Determine effective friend status (combining API data with optimistic updates)
+  const getEffectiveFriendStatus = (golfer: typeof golfers[0]) => {
+    if (friendRequestsSent.has(golfer.id)) return 'pending';
+    return golfer.friendStatus;
+  };
 
   return (
     <PageRoot className="bg-muted/40">
@@ -154,31 +177,32 @@ const GolfersToFollowPage = () => {
           </p>
         </div>
 
-        {/* Filter tabs - centered */}
-        <div className="flex justify-center px-6 mb-4">
-          <div className="inline-flex rounded-sq-pill bg-muted/50 p-1 gap-0.5">
-            {FILTER_TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveFilter(tab.id);
-                  setPage(1);
-                }}
-                className={cn(
-                  "px-3 py-1.5 text-sm rounded-sq-pill whitespace-nowrap transition-all duration-200",
-                  activeFilter === tab.id
-                    ? "bg-background text-foreground shadow-sm font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* Underline tabs - Courses style */}
+        <div className="px-6 border-b border-border/40">
+          <UnderlineTabs
+            options={TAB_OPTIONS}
+            value={activeTab}
+            onChange={(value) => setActiveTab(value as TabKey)}
+          />
         </div>
 
-        {/* Search bar - lighter treatment */}
-        <div className="px-6 mb-4">
+        {/* Home club nudge card when on home_club tab with no club set */}
+        {activeTab === 'home_club' && hasNoHomeClub && (
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
+            <div className="flex items-start gap-2">
+              <Info className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">Set your home club</p>
+                <p className="text-xs text-amber-700 mt-0.5">
+                  Add your home club to find golfers from your club.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Search bar */}
+        <div className="px-6 mt-4 mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -219,44 +243,27 @@ const GolfersToFollowPage = () => {
                   Clear search
                 </Button>
               </>
-            ) : activeFilter === 'suggested' ? (
-              // Suggested tab = empty
-              <>
-                <p className="text-sm font-medium text-foreground">No suggestions yet</p>
-                <p className="text-sm text-muted-foreground max-w-[280px]">
-                  Try Popular or search for a club.
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={handleGoToPopular}>
-                    Go to Popular
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => document.querySelector<HTMLInputElement>('input[type="search"]')?.focus()}
-                  >
-                    Search
-                  </Button>
-                </div>
-              </>
             ) : (
-              // Generic empty
+              // Tab-specific empty state
               <>
-                <p className="text-sm font-medium text-foreground">No golfers found</p>
+                <p className="text-sm font-medium text-foreground">
+                  {EMPTY_STATES[activeTab].title}
+                </p>
                 <p className="text-sm text-muted-foreground max-w-[280px]">
-                  Try another tab or search by name or club.
+                  {EMPTY_STATES[activeTab].description}
                 </p>
               </>
             )}
           </div>
         ) : (
           <>
-            {/* Flat list rows with colored buttons */}
+            {/* Golfer list rows */}
             <div className="divide-y divide-border/25">
               {golfers.map((golfer) => {
                 const isFollowing = followingIds.has(golfer.id);
                 const isActioning = actioningUserId === golfer.id;
-                const clubLine = golfer.homeClub || 'No home club set';
+                const clubLine = golfer.homeClub || 'Home club not set';
+                const friendStatus = getEffectiveFriendStatus(golfer);
 
                 return (
                   <button
@@ -264,72 +271,106 @@ const GolfersToFollowPage = () => {
                     onClick={() => navigate(`/users/${golfer.id}`)}
                     className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
                   >
-                    <div className="flex items-start gap-3">
-                      {/* Avatar */}
-                      <SquircleAvatar
-                        src={golfer.profileImage}
-                        alt={golfer.displayName}
-                        size={48}
-                        fallback={golfer.displayName?.charAt(0) || '?'}
-                        ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
-                      />
+                    <div className="flex items-center gap-3">
+                      {/* Avatar with verified badge overlay */}
+                      <div className="relative shrink-0">
+                        <SquircleAvatar
+                          src={golfer.profileImage}
+                          alt={golfer.displayName}
+                          size={52}
+                          fallback={golfer.displayName?.charAt(0) || '?'}
+                          ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
+                        />
+                        {golfer.isVerified && (
+                          <div className="absolute -top-0.5 -right-0.5">
+                            <VerifiedBadge size="sm" />
+                          </div>
+                        )}
+                      </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{golfer.displayName}</p>
-                        <p className="text-sm text-muted-foreground">{clubLine}</p>
-                        
-                        {/* Row with action buttons */}
-                        <div className="flex items-center justify-end mt-1.5">
-                          {/* Actions - smaller colored buttons */}
-                          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                            {/* Follow/Following button */}
-                            {isFollowing ? (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFollowToggle(golfer.id, golfer.displayName, true);
-                                }}
-                                disabled={isActioning}
-                                className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-0.5")}
-                              >
-                                <Check className="h-2.5 w-2.5" />
-                                Following
-                              </button>
-                            ) : (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFollowToggle(golfer.id, golfer.displayName, false);
-                                }}
-                                disabled={isActioning}
-                                className={cn(
-                                  basePillClass,
-                                  "border-orange-500 bg-orange-500/10 text-orange-600 hover:bg-orange-500/15",
-                                  "disabled:opacity-60"
-                                )}
-                              >
-                                {isActioning ? 'Following...' : 'Follow'}
-                              </button>
-                            )}
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {golfer.displayName}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {clubLine}
+                        </p>
+                      </div>
 
-                            {/* Add friend button - green styled */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFriendRequest(golfer.id, golfer.displayName);
-                              }}
-                              disabled={isActioning}
-                              className={cn(
-                                basePillClass,
-                                "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
-                                "disabled:opacity-60"
-                              )}
-                            >
-                              Add friend
-                            </button>
-                          </div>
-                        </div>
+                      {/* Action buttons - Follow primary, Add friend secondary */}
+                      <div 
+                        className="flex items-center gap-2 shrink-0" 
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {/* Follow/Following button - PRIMARY */}
+                        {isFollowing ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFollowToggle(golfer.id, golfer.displayName, true);
+                            }}
+                            disabled={isActioning}
+                            className={cn(
+                              followButtonClass, 
+                              "border-border bg-muted text-foreground/80 gap-1"
+                            )}
+                          >
+                            <Check className="h-3 w-3" />
+                            Following
+                          </button>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFollowToggle(golfer.id, golfer.displayName, false);
+                            }}
+                            disabled={isActioning}
+                            className={cn(
+                              followButtonClass,
+                              "border-orange-500 bg-orange-500 text-white hover:bg-orange-600"
+                            )}
+                          >
+                            Follow
+                          </button>
+                        )}
+
+                        {/* Add friend button - SECONDARY (always visible) */}
+                        {friendStatus === 'friends' ? (
+                          <span
+                            className={cn(
+                              friendButtonClass,
+                              "border-emerald-500/50 bg-emerald-50 text-emerald-600 gap-1 cursor-default"
+                            )}
+                          >
+                            <Check className="h-2.5 w-2.5" />
+                            Friends
+                          </span>
+                        ) : friendStatus === 'pending' ? (
+                          <span
+                            className={cn(
+                              friendButtonClass,
+                              "border-border bg-muted/50 text-muted-foreground cursor-default"
+                            )}
+                          >
+                            Request sent
+                          </span>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFriendRequest(golfer.id, golfer.displayName, friendStatus);
+                            }}
+                            disabled={isActioning}
+                            className={cn(
+                              friendButtonClass,
+                              "border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50"
+                            )}
+                          >
+                            <UserPlus className="h-3 w-3 mr-1" />
+                            Add friend
+                          </button>
+                        )}
                       </div>
                     </div>
                   </button>
