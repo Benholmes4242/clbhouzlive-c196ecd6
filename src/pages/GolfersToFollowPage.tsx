@@ -133,7 +133,7 @@ const GolfersToFollowPage = () => {
     <PageRoot className="bg-muted/40 pb-24 compact-header-offset">
       <div className="w-full">
         {/* Back CTA - top left, matching Notifications page */}
-        <div className="px-4 pt-3">
+        <div className="px-4 pt-6">
           <button
             type="button"
             onClick={handleBack}
