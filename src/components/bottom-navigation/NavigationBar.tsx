@@ -13,7 +13,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   const isLightTheme = variant === 'default';
   
   return (
-    <nav className="w-full h-12 flex items-center justify-around">
+    <nav className="w-full h-[53px] flex items-center justify-around">
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -36,7 +36,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
           >
             <Icon 
               className={cn(
-                "h-6 w-6 transition-colors duration-300",
+                "h-[26px] w-[26px] transition-colors duration-300",
                 "[stroke-width:1.5]", /* Consistent stroke weight across all icons */
                 isLightTheme
                   ? isActive 
@@ -53,7 +53,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             {/* Label */}
             <span 
               className={cn(
-                "text-[9px] leading-none transition-colors duration-300",
+                "text-[10px] leading-none transition-colors duration-300",
                 isLightTheme
                   ? isActive 
                     ? "text-slate-800" 
