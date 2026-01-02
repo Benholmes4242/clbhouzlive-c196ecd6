@@ -1,25 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import { Top100RankBadge } from './Top100RankBadge';
-
-// Journey tone phrases - soft, encouraging, non-technical
-const JOURNEY_PHRASES = [
-  'Building momentum',
-  'Your journey is underway',
-  'Progress in motion',
-  'Every course counts',
-  'Early progress',
-];
-
-function getJourneyPhrase(rated: number, total: number): string {
-  if (rated === 0) return 'Start your journey';
-  if (rated >= total) return 'Journey complete';
-  // Rotate phrases based on rated count for variety
-  return JOURNEY_PHRASES[rated % JOURNEY_PHRASES.length];
-}
+import { getProgressInsight } from '@/lib/utils/progressInsightCopy';
 
 type Top100RegionCardProps = {
   list: Top100ListSummary;
@@ -27,6 +12,8 @@ type Top100RegionCardProps = {
   showCta?: boolean;
   variant?: 'default' | 'hero';
   onBack?: () => void;
+  userId?: string;
+  usedPhrases?: Set<string>;
 };
 
 export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
@@ -35,6 +22,8 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   showCta = true,
   variant = 'default',
   onBack,
+  userId,
+  usedPhrases,
 }) => {
   const total = list.total_courses ?? 0;
   const rated = list.played_count ?? 0;
@@ -46,7 +35,16 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   // Check if this is the primary (Worldwide) journey
   const isPrimary = listSlug === 'global';
   
-  const journeyPhrase = useMemo(() => getJourneyPhrase(rated, total), [rated, total]);
+  // Get progress insight phrase using new milestone-aware copy system
+  const getJourneyPhrase = () => {
+    if (rated === 0) return 'Start your journey';
+    if (rated >= total) return 'Journey complete';
+    const phrase = getProgressInsight(completion, listSlug, userId, usedPhrases);
+    // Add to used phrases set to prevent duplicates across cards in viewport
+    usedPhrases?.add(phrase);
+    return phrase;
+  };
+  const journeyPhrase = getJourneyPhrase();
 
   // Map short labels to full display names
   const getDisplayLabel = (shortLabel: string, slug: string) => {
