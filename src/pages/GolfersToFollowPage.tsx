@@ -24,8 +24,8 @@ const TAB_OPTIONS: UnderlineTabOption[] = [
 
 const EMPTY_STATES: Record<TabKey, { title: string; description: string }> = {
   suggested: { title: 'No suggestions yet', description: 'Try searching by name or club.' },
-  home_club: { title: 'No golfers from your club yet', description: 'Be the first to join!' },
-  verified: { title: 'No verified golfers yet', description: 'Check back soon.' },
+  home_club: { title: "Your club's still warming up", description: "No golfers from your home club yet. Invite a few friends and you'll have a proper feed in no time." },
+  verified: { title: "We're new around here", description: "Our verified golfers are currently going through verification. Check back soon to see who's been approved." },
 };
 
 // Primary Follow button styles
