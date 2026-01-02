@@ -9,7 +9,8 @@ import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
-import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
+import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { MediaFilterMode } from './MediaFilterRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -321,24 +322,19 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <p className="mb-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
             Sort &amp; filter
           </p>
-          <div className="flex items-center gap-2">
-            <SegmentedTabs
-              options={filterOptions}
-              value={filterMode}
-              onChange={(value) => setFilterMode(value as MediaFilterMode)}
-              className="flex-1"
-            />
-            {/* Clear button - only when filter active */}
-            {isFilterActive && (
-              <button
-                type="button"
-                onClick={() => setFilterMode('most_recent')}
-                className="flex items-center gap-1 rounded-sq-md border border-border bg-card px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted active:scale-[0.97] transition-all"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+          <Tabs value={filterMode} onValueChange={(v) => setFilterMode(v as MediaFilterMode)} className="w-full">
+            <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
+              {filterOptions.map((option) => (
+                <TabsTrigger
+                  key={option.value}
+                  value={option.value}
+                  className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                >
+                  {option.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
       )}
 
