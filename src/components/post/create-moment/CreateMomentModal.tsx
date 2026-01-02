@@ -58,9 +58,10 @@ export default function CreateMomentModal({
   const [hasEntered, setHasEntered] = useState(() => prefersReduced());
   const [isExiting, setIsExiting] = useState(false);
   
-  // UI state
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [coverIndex, setCoverIndex] = useState(0);
+  // UI state - using IDs for stable references (not indices)
+  const [activeMediaId, setActiveMediaId] = useState<string | null>(null);
+  const [coverMediaId, setCoverMediaId] = useState<string | null>(null);
+  const [isInteractingWithMedia, setIsInteractingWithMedia] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
@@ -129,6 +130,14 @@ export default function CreateMomentModal({
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
   const hasMedia = media.length > 0;
   const hasCategories = selectedCategories.length > 0;
+  
+  // Derive activeIndex from activeMediaId
+  const activeIndex = useMemo(() => {
+    if (!activeMediaId) return 0;
+    const idx = media.findIndex(m => m.id === activeMediaId);
+    return idx >= 0 ? idx : 0;
+  }, [media, activeMediaId]);
+  
   // Count videos for Smart Compilation availability
   const videoCount = useMemo(() => media.filter(m => m.type === 'video').length, [media]);
   // Soft-gated: Share button enabled if media exists - category check happens on tap
@@ -136,6 +145,23 @@ export default function CreateMomentModal({
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
+  
+  // Initialize activeMediaId and coverMediaId when media changes
+  useEffect(() => {
+    if (media.length > 0) {
+      // If current active is not in media, reset to first
+      if (!activeMediaId || !media.some(m => m.id === activeMediaId)) {
+        setActiveMediaId(media[0].id);
+      }
+      // If cover is not in media, reset to first
+      if (!coverMediaId || !media.some(m => m.id === coverMediaId)) {
+        setCoverMediaId(media[0].id);
+      }
+    } else {
+      setActiveMediaId(null);
+      setCoverMediaId(null);
+    }
+  }, [media, activeMediaId, coverMediaId]);
 
   // Modal context sync
   useEffect(() => {
@@ -376,50 +402,49 @@ export default function CreateMomentModal({
     }, 10);
   };
 
-  // Remove media handler
-  const handleRemoveMedia = (index: number) => {
+  // Remove media handler - now using mediaId
+  const handleRemoveMedia = useCallback((mediaId: string) => {
     if (!onMediaChange || media.length === 0) return;
     
-    const newMedia = media.filter((_, idx) => idx !== index);
+    const indexToRemove = media.findIndex(m => m.id === mediaId);
+    if (indexToRemove === -1) return;
+    
+    const newMedia = media.filter(m => m.id !== mediaId);
     onMediaChange(newMedia);
     
-    if (activeIndex >= newMedia.length) {
-      setActiveIndex(Math.max(0, newMedia.length - 1));
+    // Also clear edits for removed media
+    clearEdits(mediaId);
+    
+    // If we removed the active media, select a nearby one
+    if (activeMediaId === mediaId && newMedia.length > 0) {
+      const newActiveIndex = Math.min(indexToRemove, newMedia.length - 1);
+      setActiveMediaId(newMedia[newActiveIndex].id);
     }
     
-    // Adjust cover index if needed
-    if (coverIndex >= newMedia.length) {
-      setCoverIndex(Math.max(0, newMedia.length - 1));
-    } else if (coverIndex > index) {
-      setCoverIndex(coverIndex - 1);
+    // If we removed the cover media, set cover to first remaining
+    if (coverMediaId === mediaId && newMedia.length > 0) {
+      setCoverMediaId(newMedia[0].id);
     }
-  };
+  }, [media, onMediaChange, activeMediaId, coverMediaId, clearEdits]);
 
-  // Reorder media handler
-  const handleReorder = (fromIndex: number, toIndex: number) => {
+  // Reorder media handler - IDs follow the media objects automatically
+  const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
     if (!onMediaChange) return;
     
     const reordered = arrayMove(media, fromIndex, toIndex);
     onMediaChange(reordered);
-    
-    // Update active index to follow the item
-    if (activeIndex === fromIndex) {
-      setActiveIndex(toIndex);
-    } else if (activeIndex > fromIndex && activeIndex <= toIndex) {
-      setActiveIndex(activeIndex - 1);
-    } else if (activeIndex < fromIndex && activeIndex >= toIndex) {
-      setActiveIndex(activeIndex + 1);
-    }
-    
-    // Update cover index to follow the item
-    if (coverIndex === fromIndex) {
-      setCoverIndex(toIndex);
-    } else if (coverIndex > fromIndex && coverIndex <= toIndex) {
-      setCoverIndex(coverIndex - 1);
-    } else if (coverIndex < fromIndex && coverIndex >= toIndex) {
-      setCoverIndex(coverIndex + 1);
-    }
-  };
+    // Note: activeMediaId and coverMediaId stay the same (they follow the media object)
+  }, [media, onMediaChange]);
+  
+  // Set cover handler
+  const handleSetCover = useCallback((mediaId: string) => {
+    setCoverMediaId(mediaId);
+  }, []);
+  
+  // Active media change handler
+  const handleActiveMediaChange = useCallback((mediaId: string) => {
+    setActiveMediaId(mediaId);
+  }, []);
 
   // Post handler - soft-gated flow (auto-open category sheet if missing)
   const handlePost = () => {
@@ -594,10 +619,10 @@ export default function CreateMomentModal({
           {hasMedia ? (
             <CreateMomentMediaStage
               media={media}
-              activeIndex={activeIndex}
-              coverIndex={coverIndex}
-              onIndexChange={setActiveIndex}
-              onSetCover={setCoverIndex}
+              activeMediaId={activeMediaId}
+              coverMediaId={coverMediaId}
+              onActiveMediaChange={handleActiveMediaChange}
+              onSetCover={handleSetCover}
               onRemoveMedia={handleRemoveMedia}
               onReorder={handleReorder}
               getEdits={getEdits}
@@ -607,6 +632,7 @@ export default function CreateMomentModal({
               activeOverlayId={activeOverlayId}
               onSelectOverlay={setActiveOverlayId}
               selectedBadges={selectedBadges}
+              onDragStateChange={setIsInteractingWithMedia}
             />
           ) : (
             <CreateMomentHero
@@ -822,8 +848,8 @@ export default function CreateMomentModal({
         onCompilationComplete={(compiledMedia) => {
           // Replace all media with the compiled video
           onMediaChange?.([compiledMedia]);
-          setActiveIndex(0);
-          setCoverIndex(0);
+          setActiveMediaId(compiledMedia.id);
+          setCoverMediaId(compiledMedia.id);
         }}
       />
     </div>

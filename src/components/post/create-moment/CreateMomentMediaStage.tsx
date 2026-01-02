@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback, useState } from "react";
+import { useMemo, useRef, useCallback, useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -13,11 +13,11 @@ import { AchievementBadgesOverlay } from "@/components/post/badges/AchievementBa
 
 interface CreateMomentMediaStageProps {
   media: ComposerMediaItem[];
-  activeIndex: number;
-  coverIndex: number;
-  onIndexChange: (index: number) => void;
-  onSetCover: (index: number) => void;
-  onRemoveMedia: (index: number) => void;
+  activeMediaId: string | null;
+  coverMediaId: string | null;
+  onActiveMediaChange: (mediaId: string) => void;
+  onSetCover: (mediaId: string) => void;
+  onRemoveMedia: (mediaId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   getEdits: (mediaId: string) => StudioEdits;
   // Studio integration for editable text overlays
@@ -30,13 +30,15 @@ interface CreateMomentMediaStageProps {
   onSelectOverlay?: (id: string | null) => void;
   // Achievement badges selected for this post
   selectedBadges?: string[];
+  // Callback when drag state changes (to block sheet dismiss)
+  onDragStateChange?: (isDragging: boolean) => void;
 }
 
 export default function CreateMomentMediaStage({
   media,
-  activeIndex,
-  coverIndex,
-  onIndexChange,
+  activeMediaId,
+  coverMediaId,
+  onActiveMediaChange,
   onSetCover,
   onRemoveMedia,
   onReorder,
@@ -47,12 +49,27 @@ export default function CreateMomentMediaStage({
   activeOverlayId,
   onSelectOverlay,
   selectedBadges,
+  onDragStateChange,
 }: CreateMomentMediaStageProps) {
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
   const stageContainerRef = useRef<HTMLDivElement>(null);
-  // Media container ref for text overlay drag calculations
   const mediaContainerRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<{ scrollToIndex: (index: number) => void } | null>(null);
+
+  // Derive activeIndex from activeMediaId
+  const activeIndex = useMemo(() => {
+    if (!activeMediaId) return 0;
+    const idx = media.findIndex(m => m.id === activeMediaId);
+    return idx >= 0 ? idx : 0;
+  }, [media, activeMediaId]);
+
+  // Derive coverIndex from coverMediaId
+  const coverIndex = useMemo(() => {
+    if (!coverMediaId) return 0;
+    const idx = media.findIndex(m => m.id === coverMediaId);
+    return idx >= 0 ? idx : 0;
+  }, [media, coverMediaId]);
 
   // Check if any media has music attached (music applies to the whole post)
   const hasMusic = useMemo(() => {
@@ -86,15 +103,39 @@ export default function CreateMomentMediaStage({
     onUpdateEdits(currentItem.id, { textOverlays: overlays });
   }, [onUpdateEdits]);
 
+  // Handler for carousel index change (from swipe)
+  const handleCarouselIndexChange = useCallback((index: number) => {
+    const newMediaId = media[index]?.id;
+    if (newMediaId && newMediaId !== activeMediaId) {
+      onActiveMediaChange(newMediaId);
+    }
+  }, [media, activeMediaId, onActiveMediaChange]);
+
+  // Handler for thumbnail tap - change active and scroll carousel
+  const handleThumbnailSelect = useCallback((mediaId: string) => {
+    onActiveMediaChange(mediaId);
+    // Scroll carousel to that index
+    const index = media.findIndex(m => m.id === mediaId);
+    if (index >= 0 && carouselRef.current) {
+      carouselRef.current.scrollToIndex(index);
+    }
+  }, [media, onActiveMediaChange]);
+
+  // Handler for navigation dots
+  const handleDotJump = useCallback((index: number) => {
+    const mediaId = media[index]?.id;
+    if (mediaId) {
+      onActiveMediaChange(mediaId);
+    }
+  }, [media, onActiveMediaChange]);
+
   if (media.length === 0) {
     return null;
   }
 
   const currentItem = media[activeIndex];
   const isTextToolActive = activeTool === 'text';
-  // Enable editing ONLY when in position mode (isPositioningText)
   const isTextEditable = isTextToolActive && isPositioningText;
-  // Disable swipe ONLY when actively positioning text (not just when text tool is open)
   const isDraggingText = isTextToolActive && isPositioningText;
   const currentEdits = currentItem ? getEdits(currentItem.id) : undefined;
 
@@ -107,12 +148,14 @@ export default function CreateMomentMediaStage({
         { delay: 0.1, duration: 0.3 }
       }
       className="h-full w-full flex flex-col"
+      data-ecm-no-dismiss="true"
     >
       {/* Main carousel area */}
-      <div ref={stageContainerRef} className="flex-1 relative">
+      <div ref={stageContainerRef} className="flex-1 relative" data-ecm-no-dismiss="true">
         {/* Media container wrapper for drag calculations */}
         <div ref={mediaContainerRef} className="relative h-full w-full">
           <MediaCarousel
+            ref={carouselRef}
             items={media.map((item) => {
               const edits = getEdits(item.id);
               return {
@@ -125,10 +168,13 @@ export default function CreateMomentMediaStage({
               };
             })}
             initialIndex={activeIndex}
-            onIndexChange={onIndexChange}
-            onSetCover={onSetCover}
+            onIndexChange={handleCarouselIndexChange}
+            onSetCover={(index) => {
+              const mediaId = media[index]?.id;
+              if (mediaId) onSetCover(mediaId);
+            }}
             coverIndex={coverIndex}
-            enableSwipe={!isDraggingText} // Only disable swipe when positioning
+            enableSwipe={!isDraggingText}
             loop={false}
             className="h-full w-full"
             forceVideoMuted={hasMusic}
@@ -180,7 +226,7 @@ export default function CreateMomentMediaStage({
 
         {/* Remove media button - top right - circle container */}
         <button
-          onClick={() => onRemoveMedia(activeIndex)}
+          onClick={() => onRemoveMedia(currentItem?.id || '')}
           className="absolute right-2 z-20 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
           aria-label="Remove current media"
@@ -203,7 +249,7 @@ export default function CreateMomentMediaStage({
         <MediaNavigationDots
           mediaCount={media.length}
           currentIndex={activeIndex}
-          onJump={onIndexChange}
+          onJump={handleDotJump}
           bottomOffset={8}
           className="z-20"
         />
@@ -213,11 +259,14 @@ export default function CreateMomentMediaStage({
       {media.length > 1 && (
         <MediaThumbnailStrip
           media={media}
-          activeIndex={activeIndex}
-          coverIndex={coverIndex}
-          onSelect={onIndexChange}
+          activeMediaId={activeMediaId}
+          coverMediaId={coverMediaId}
+          onSelect={handleThumbnailSelect}
+          onSetCover={onSetCover}
+          onRemove={onRemoveMedia}
           onReorder={onReorder}
           getEdits={getEdits}
+          onDragStateChange={onDragStateChange}
         />
       )}
     </motion.div>

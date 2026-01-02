@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CarouselSlide from './CarouselSlide';
 import { haptic } from '@/utils/haptics';
@@ -30,7 +30,11 @@ interface MediaCarouselProps {
   onMuteBlocked?: () => void;
 }
 
-const MediaCarousel = ({ 
+export interface MediaCarouselRef {
+  scrollToIndex: (index: number) => void;
+}
+
+const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({ 
   items, 
   initialIndex = 0, 
   onIndexChange,
@@ -41,12 +45,21 @@ const MediaCarousel = ({
   className = '',
   forceVideoMuted = false,
   onMuteBlocked
-}: MediaCarouselProps) => {
+}, ref) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Expose scrollToIndex to parent via ref
+  useImperativeHandle(ref, () => ({
+    scrollToIndex: (index: number) => {
+      if (index >= 0 && index < items.length) {
+        setActiveIndex(index);
+      }
+    }
+  }), [items.length]);
 
   const hasMultipleItems = items.length > 1;
 
@@ -270,6 +283,8 @@ const MediaCarousel = ({
       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10" />
     </div>
   );
-};
+});
+
+MediaCarousel.displayName = 'MediaCarousel';
 
 export default MediaCarousel;
