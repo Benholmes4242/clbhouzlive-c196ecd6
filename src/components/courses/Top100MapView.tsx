@@ -6,8 +6,8 @@ import {
   useTop100MapCourses,
   Top100MapScope,
   Top100MapCourse,
+  CourseJourneyStatus,
 } from '@/hooks/useTop100MapCourses';
-import { Button } from '@/components/ui/button';
 import { RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ import { MapCourseSheet, MapProgressOrb, MapInsightChip } from './map';
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
-type RatedFilter = 'all' | 'rated' | 'unrated';
+type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
 interface Top100MapViewProps {
   scope: Top100MapScope;
@@ -62,7 +62,8 @@ const REGION_CONFIG: Record<
 
 // Marker colors
 const PLAYED_COLOR = '#F7931E';
-const NOT_PLAYED_COLOR = '#64748b';
+const WANT_TO_PLAY_COLOR = '#F7931E'; // Orange stroke, hollow center
+const NOT_PLAYED_COLOR = '#94a3b8'; // Light grey (slate-400)
 const CLUSTER_COLOR_MIXED = '#334155';
 const CLUSTER_COLOR_PLAYED = '#F7931E';
 
@@ -78,7 +79,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
-  const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
 
   const {
@@ -88,21 +89,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   const regionConfig = REGION_CONFIG[scope];
 
-  // Filter courses by rated status
+  // Filter courses by status
   const filteredCourses = useMemo(() => {
-    if (ratedFilter === 'rated') return courses.filter((c) => c.user_has_rated);
-    if (ratedFilter === 'unrated') return courses.filter((c) => !c.user_has_rated);
+    if (statusFilter === 'played') return courses.filter((c) => c.journey_status === 'played');
+    if (statusFilter === 'want_to_play') return courses.filter((c) => c.journey_status === 'want_to_play');
+    if (statusFilter === 'not_played') return courses.filter((c) => c.journey_status === 'none');
     return courses;
-  }, [courses, ratedFilter]);
+  }, [courses, statusFilter]);
 
   // Official list size
   const officialTotal = REGION_TOTALS[scope] ?? courses.length;
-  const ratedCount = courses.filter((c) => c.user_has_rated).length;
+  const ratedCount = courses.filter((c) => c.journey_status === 'played').length;
+  const wantToPlayCount = courses.filter((c) => c.journey_status === 'want_to_play').length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
 
   // Count unique regions explored
   const regionsExplored = useMemo(() => {
-    const playedCourses = courses.filter((c) => c.user_has_rated);
+    const playedCourses = courses.filter((c) => c.journey_status === 'played');
     const countries = new Set(playedCourses.map((c) => c.country).filter(Boolean));
     return countries.size;
   }, [courses]);
@@ -111,7 +114,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   useEffect(() => {
     setHasInitialFit(false);
     setSelectedCourse(null);
-    setRatedFilter('all');
+    setStatusFilter('all');
   }, [scope]);
 
   // Initialise map
@@ -177,7 +180,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     setHasInitialFit(true);
   }, [courses, hasInitialFit, regionConfig, scope]);
 
-  // Clustering + layers with differentiated markers
+  // Clustering + layers with differentiated markers for 3 states
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -185,7 +188,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     const addClustering = () => {
       // Clean up existing layers
-      ['clusters', 'cluster-count', 'played-points', 'unplayed-points'].forEach((id) => {
+      ['clusters', 'cluster-count', 'played-points', 'want-to-play-points', 'not-played-points'].forEach((id) => {
         if (mapInstance.getLayer(id)) mapInstance.removeLayer(id);
       });
       if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
@@ -209,6 +212,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             rank: course.rank,
             user_has_rated: course.user_has_rated,
             user_rating: course.user_rating,
+            journey_status: course.journey_status,
           },
         })),
       };
@@ -220,7 +224,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         clusterMaxZoom: 7,
         clusterRadius: 45,
         clusterProperties: {
-          played_count: ['+', ['case', ['get', 'user_has_rated'], 1, 0]],
+          played_count: ['+', ['case', ['==', ['get', 'journey_status'], 'played'], 1, 0]],
         },
       });
 
@@ -266,26 +270,40 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // UNPLAYED points (render first, below played)
+      // NOT PLAYED points (render first, bottom layer) - muted grey
       mapInstance.addLayer({
-        id: 'unplayed-points',
+        id: 'not-played-points',
         type: 'circle',
         source: 'courses',
-        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'user_has_rated'], false]],
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'none']],
         paint: {
           'circle-radius': 5,
           'circle-color': 'transparent',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1.5,
           'circle-stroke-color': NOT_PLAYED_COLOR,
         },
       });
 
-      // PLAYED points (render on top, with glow effect)
+      // WANT TO PLAY points (middle layer) - outlined orange, hollow center
+      mapInstance.addLayer({
+        id: 'want-to-play-points',
+        type: 'circle',
+        source: 'courses',
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
+        paint: {
+          'circle-radius': 6,
+          'circle-color': 'transparent',
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': WANT_TO_PLAY_COLOR,
+        },
+      });
+
+      // PLAYED points (render on top, with glow effect) - filled orange
       mapInstance.addLayer({
         id: 'played-points',
         type: 'circle',
         source: 'courses',
-        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'user_has_rated'], true]],
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'played']],
         paint: {
           'circle-radius': 7,
           'circle-color': PLAYED_COLOR,
@@ -332,10 +350,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       };
 
       mapInstance.on('click', 'played-points', handlePointClick);
-      mapInstance.on('click', 'unplayed-points', handlePointClick);
+      mapInstance.on('click', 'want-to-play-points', handlePointClick);
+      mapInstance.on('click', 'not-played-points', handlePointClick);
 
       // Cursor styles
-      ['clusters', 'played-points', 'unplayed-points'].forEach((layer) => {
+      ['clusters', 'played-points', 'want-to-play-points', 'not-played-points'].forEach((layer) => {
         mapInstance.on('mouseenter', layer, () => {
           mapInstance.getCanvas().style.cursor = 'pointer';
         });
@@ -410,7 +429,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               playedCount={ratedCount}
               totalCount={officialTotal}
               scope={scope}
-              ratedFilter={ratedFilter}
+              ratedFilter={statusFilter === 'played' ? 'rated' : statusFilter === 'not_played' ? 'unrated' : 'all'}
             />
           </div>
           
@@ -421,7 +440,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <span>Played</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="inline-block h-1.5 w-1.5 rounded-full border-[1.5px] border-slate-400 bg-transparent" />
+              <span className="inline-block h-2 w-2 rounded-full border-2 border-[#F7931E] bg-transparent" />
+              <span>Want to Play</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="inline-block h-1.5 w-1.5 rounded-full border border-slate-400 bg-transparent" />
               <span>Not Played</span>
             </div>
           </div>
@@ -464,24 +487,31 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         />
       </div>
 
-      {/* Filters section - tighter, no label */}
-      <div className="flex-shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_8px_rgba(15,23,42,0.04)]">
-        <div className="px-4 py-3 space-y-2.5">
-          {/* Status filter - Mode toggle style, larger */}
-          <div className="flex items-center gap-1 p-1 rounded-sq-pill bg-slate-100/80 dark:bg-slate-800 w-fit">
-            {(['all', 'rated', 'unrated'] as RatedFilter[]).map((filter) => {
-              const isActive = ratedFilter === filter;
-              const labels = { all: 'All', rated: 'Played', unrated: 'Not Played' };
+      {/* Floating bottom control tray */}
+      <div className="flex-shrink-0 mx-4 mb-4">
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/60 p-3 space-y-2.5">
+          {/* Status filter row */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100/80 dark:bg-slate-800">
+            {(['all', 'played', 'want_to_play', 'not_played'] as StatusFilter[]).map((filter) => {
+              const isActive = statusFilter === filter;
+              const labels: Record<StatusFilter, string> = {
+                all: 'All',
+                played: 'Played',
+                want_to_play: 'Want to Play',
+                not_played: 'Not Played',
+              };
               return (
                 <button
                   key={filter}
-                  onClick={() => setRatedFilter(filter)}
+                  onClick={() => setStatusFilter(filter)}
                   className={cn(
-                    'px-4 py-2 rounded-sq-pill text-xs font-medium transition-all duration-200',
+                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200',
                     isActive
-                      ? filter === 'rated'
+                      ? filter === 'played'
                         ? 'bg-[#F7931E] text-white shadow-sm'
-                        : filter === 'unrated'
+                        : filter === 'want_to_play'
+                        ? 'bg-[#F7931E]/20 text-[#F7931E] border border-[#F7931E] shadow-sm'
+                        : filter === 'not_played'
                         ? 'bg-slate-600 text-white shadow-sm'
                         : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white'
@@ -493,7 +523,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             })}
           </div>
 
-          {/* Region chips - same height as status */}
+          {/* Region chips row */}
           <div className="flex items-center gap-1.5">
             {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
               const isActive = scope === regionScope;
@@ -503,7 +533,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   key={regionScope}
                   onClick={() => onScopeChange?.(regionScope)}
                   className={cn(
-                    'px-3 py-2 rounded-sq-pill text-xs font-medium border transition-all duration-200',
+                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-all duration-200',
                     isActive
                       ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
                       : 'bg-transparent border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
