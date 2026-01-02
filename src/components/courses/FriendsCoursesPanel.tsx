@@ -176,23 +176,23 @@ const FriendsCoursesPanel: React.FC = () => {
       });
   }, [recent]);
 
-  // Select hero course based on filter
+  // Select hero course based on filter (use spread to avoid mutating original array)
   const heroCourse = useMemo(() => {
     if (courses.length === 0) return null;
     
     switch (courseFilter) {
       case 'most_played':
-        return courses.sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
+        return [...courses].sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
       case 'highest_rated':
-        return courses
+        return [...courses]
           .filter(c => c.community_rating != null)
           .sort((a, b) => (b.community_rating || 0) - (a.community_rating || 0))[0] || courses[0];
       case 'new':
-        return courses.sort((a, b) => 
+        return [...courses].sort((a, b) => 
           new Date(b.most_recent_play).getTime() - new Date(a.most_recent_play).getTime()
         )[0];
       default:
-        return courses.sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
+        return [...courses].sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
     }
   }, [courses, courseFilter]);
 
