@@ -20,14 +20,12 @@ const TAB_OPTIONS: UnderlineTabOption[] = [
   { value: 'suggested', label: 'Suggested' },
   { value: 'home_club', label: 'Home Club' },
   { value: 'verified', label: 'Verified' },
-  { value: 'trending', label: 'Trending' },
 ];
 
 const EMPTY_STATES: Record<TabKey, { title: string; description: string }> = {
   suggested: { title: 'No suggestions yet', description: 'Try searching by name or club.' },
   home_club: { title: 'No golfers from your club yet', description: 'Be the first to join!' },
   verified: { title: 'No verified golfers yet', description: 'Check back soon.' },
-  trending: { title: 'Nothing trending yet', description: 'Check back soon.' },
 };
 
 // Primary Follow button styles
@@ -271,13 +269,13 @@ const GolfersToFollowPage = () => {
                     onClick={() => navigate(`/users/${golfer.id}`)}
                     className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
                   >
-                    <div className="flex gap-3">
+                    <div className="flex items-start gap-3">
                       {/* Avatar with verified badge overlay */}
                       <div className="relative shrink-0">
                         <SquircleAvatar
                           src={golfer.profileImage}
                           alt={golfer.displayName}
-                          size={52}
+                          size={56}
                           fallback={golfer.displayName?.charAt(0) || '?'}
                           ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
                         />
