@@ -25,10 +25,6 @@ const EMPTY_STATES: Record<TabKey, { title: string; description: string }> = {
   verified: { title: "We're new around here.", description: "Our verified golfers are currently going through verification. Check back soon to see who's been approved." },
 };
 
-// Primary Follow button styles
-const followButtonClass = "inline-flex items-center justify-center rounded-sq-xs border h-7 px-3 text-xs font-semibold transition-colors disabled:opacity-60";
-// Secondary Add friend button styles (slightly smaller, lighter weight)
-const friendButtonClass = "inline-flex items-center justify-center rounded-sq-xs border h-6 px-2.5 text-[11px] font-medium transition-colors disabled:opacity-60";
 
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
@@ -314,71 +310,53 @@ const GolfersToFollowPage = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           {/* Follow/Following button - PRIMARY */}
-                          {isFollowing ? (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFollowToggle(golfer.id, golfer.displayName, true);
-                              }}
-                              disabled={isActioning}
-                              className={cn(
-                                "h-8 px-3 text-xs font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap",
-                                "border-border bg-muted text-foreground/80 gap-1"
-                              )}
-                            >
-                              <Check className="h-3 w-3" />
-                              Following
-                            </button>
-                          ) : (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFollowToggle(golfer.id, golfer.displayName, false);
-                              }}
-                              disabled={isActioning}
-                              className={cn(
-                                "h-8 px-3 text-xs font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap",
-                                "border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
-                              )}
-                            >
-                              Follow
-                            </button>
-                          )}
+                          <Button
+                            variant={isFollowing ? "secondary" : "primary"}
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFollowToggle(golfer.id, golfer.displayName, isFollowing);
+                            }}
+                            disabled={isActioning}
+                            className="h-8 text-xs"
+                          >
+                            {isFollowing && <Check className="h-3 w-3" />}
+                            {isFollowing ? 'Following' : 'Follow'}
+                          </Button>
 
                           {/* Add friend button - SECONDARY */}
                           {friendStatus === 'friends' ? (
-                            <span
-                              className={cn(
-                                "h-8 px-3 text-xs font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap",
-                                "border-emerald-500/50 bg-emerald-50 text-emerald-600 gap-1 cursor-default"
-                              )}
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              disabled
+                              className="h-8 text-xs border-success/50 bg-success/10 text-success"
                             >
                               <Check className="h-2.5 w-2.5" />
                               Friends
-                            </span>
+                            </Button>
                           ) : friendStatus === 'pending' ? (
-                            <span
-                              className={cn(
-                                "h-8 px-3 text-xs font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap",
-                                "border-border bg-muted/50 text-muted-foreground cursor-default"
-                              )}
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              disabled
+                              className="h-8 text-xs"
                             >
                               Request sent
-                            </span>
+                            </Button>
                           ) : (
-                            <button
+                            <Button
+                              variant="secondary"
+                              size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleFriendRequest(golfer.id, golfer.displayName, friendStatus);
                               }}
                               disabled={isActioning}
-                              className={cn(
-                                "h-8 px-3 text-xs font-medium rounded-full border transition-colors flex items-center justify-center whitespace-nowrap",
-                                "border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50"
-                              )}
+                              className="h-8 text-xs"
                             >
                               Add friend
-                            </button>
+                            </Button>
                           )}
                         </div>
                       </div>
