@@ -320,24 +320,24 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
       >
         <div
           className={cn(
-            'flex items-center gap-1.5',
-            'px-2.5 py-1.5 rounded-sq-sm',
-            'bg-slate-900/90 dark:bg-white/95',
+            'flex items-center gap-2',
+            'px-3 py-1.5 rounded-full',
+            'bg-slate-900/95 dark:bg-white/95',
             'backdrop-blur-xl',
-            'shadow-[0_2px_12px_rgba(0,0,0,0.15)]',
+            'shadow-[0_2px_16px_rgba(0,0,0,0.2)]',
             'text-[11px] text-white dark:text-slate-900'
           )}
         >
-          <Sparkles className="h-3 w-3 text-amber-400 dark:text-amber-500 flex-shrink-0" />
+          <Sparkles className="h-3.5 w-3.5 text-amber-400 dark:text-amber-500 flex-shrink-0" />
           
-          <span className="leading-tight">{currentInsight.text}</span>
+          <span className="leading-tight font-medium">{currentInsight.text}</span>
           
           <button
             onClick={() => setIsDismissed(true)}
-            className="flex-shrink-0 p-0.5 -mr-0.5 text-white/50 dark:text-slate-400 hover:text-white dark:hover:text-slate-600 transition-colors"
+            className="flex-shrink-0 p-1 -mr-1 text-white/40 dark:text-slate-400 hover:text-white/80 dark:hover:text-slate-600 transition-colors rounded-full hover:bg-white/10 dark:hover:bg-slate-900/10"
             aria-label="Dismiss insight"
           >
-            <X className="h-3 w-3" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
       </motion.div>

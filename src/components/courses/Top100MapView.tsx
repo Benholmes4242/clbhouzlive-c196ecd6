@@ -139,10 +139,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       new mapboxgl.AttributionControl({ compact: true }),
       'bottom-left'
     );
-    mapInstance.addControl(
-      new mapboxgl.NavigationControl({ visualizePitch: false }),
-      'bottom-right'
-    );
+    // Custom zoom controls - don't add Mapbox default nav control
 
     return () => {
       if (mapRef.current) {
@@ -188,7 +185,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     const addClustering = () => {
       // Clean up existing layers
-      ['clusters', 'cluster-count', 'played-points', 'want-to-play-points', 'not-played-points'].forEach((id) => {
+      ['clusters', 'cluster-count', 'played-points', 'want-to-play-points', 'want-to-play-glow', 'not-played-points'].forEach((id) => {
         if (mapInstance.getLayer(id)) mapInstance.removeLayer(id);
       });
       if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
@@ -228,7 +225,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // Cluster circles - color based on played ratio
+      // Cluster circles - color based on played ratio, stronger border for depth
       mapInstance.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -238,10 +235,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-radius': [
             'step',
             ['get', 'point_count'],
-            16, 5,
-            20, 15,
-            24, 30,
-            28,
+            18, 5,
+            22, 15,
+            26, 30,
+            30,
           ],
           'circle-color': [
             'case',
@@ -249,8 +246,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             CLUSTER_COLOR_MOSTLY_PLAYED,
             CLUSTER_COLOR_MIXED,
           ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': 'rgba(255,255,255,0.3)',
+          'circle-stroke-width': 3,
+          'circle-stroke-color': 'rgba(255,255,255,0.5)',
+          'circle-blur': 0,
         },
       });
 
@@ -270,17 +268,30 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // NOT PLAYED points (render first, bottom layer) - muted grey
+      // NOT PLAYED points (render first, bottom layer) - muted grey, minimal
       mapInstance.addLayer({
         id: 'not-played-points',
         type: 'circle',
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'none']],
         paint: {
-          'circle-radius': 5,
-          'circle-color': 'transparent',
-          'circle-stroke-width': 1.5,
+          'circle-radius': 4,
+          'circle-color': 'rgba(255,255,255,0.6)',
+          'circle-stroke-width': 1,
           'circle-stroke-color': NOT_PLAYED_COLOR,
+        },
+      });
+
+      // WANT TO PLAY glow layer (subtle halo for visibility)
+      mapInstance.addLayer({
+        id: 'want-to-play-glow',
+        type: 'circle',
+        source: 'courses',
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
+        paint: {
+          'circle-radius': 12,
+          'circle-color': 'rgba(247, 147, 30, 0.15)',
+          'circle-blur': 0.8,
         },
       });
 
@@ -292,13 +303,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
         paint: {
           'circle-radius': 6,
-          'circle-color': 'transparent',
+          'circle-color': 'rgba(255,255,255,0.9)',
           'circle-stroke-width': 2.5,
           'circle-stroke-color': WANT_TO_PLAY_COLOR,
         },
       });
 
-      // PLAYED points (render on top, with glow effect) - filled orange
+      // PLAYED points (render on top) - filled dark with subtle depth
       mapInstance.addLayer({
         id: 'played-points',
         type: 'circle',
@@ -307,8 +318,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': 7,
           'circle-color': PLAYED_COLOR,
-          'circle-blur': 0.15,
-          'circle-stroke-width': 0,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': 'rgba(255,255,255,0.4)',
         },
       });
 
@@ -396,14 +407,33 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   return (
     <div className={cn('top100-map-shell', fullHeight ? 'h-full flex flex-col' : 'space-y-2')}>
-      {/* Header with dynamic stats - tighter spacing */}
-      <div className="flex-shrink-0 px-4 pt-3 pb-1">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
-          {regionConfig.label}
-        </h2>
+      {/* Premium header - compact with pill + progress bar */}
+      <div className="flex-shrink-0 px-4 pt-3 pb-2">
+        {/* Top row: Title + stats pill */}
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+            {regionConfig.label}
+          </h2>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-600 dark:text-slate-300">
+            <span className="text-slate-900 dark:text-white font-bold">{ratedCount}</span>
+            <span className="text-slate-400">/</span>
+            <span>{officialTotal}</span>
+            <span className="text-slate-400 ml-0.5">played</span>
+          </div>
+        </div>
+        
+        {/* Secondary line */}
         <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">
-          {ratedCount} played · {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
+          {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
         </p>
+        
+        {/* Progress strip */}
+        <div className="mt-2.5 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-500"
+            style={{ width: `${Math.min((ratedCount / officialTotal) * 100, 100)}%` }}
+          />
+        </div>
       </div>
 
       {/* Map container */}
@@ -420,10 +450,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Top overlay zone - consistent padding */}
+        {/* Top overlay zone */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-3">
-          {/* Insight chip (centered) */}
-          <div className="pointer-events-auto flex justify-center mb-2">
+          {/* Insight chip (centered) - more spacing below */}
+          <div className="pointer-events-auto flex justify-center mb-3">
             <MapInsightChip
               courses={courses}
               playedCount={ratedCount}
@@ -433,24 +463,24 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             />
           </div>
           
-          {/* Legend row - aligned with same padding */}
-          <div className="pointer-events-auto flex items-center gap-2.5 rounded-sq-sm bg-white/90 dark:bg-slate-900/90 px-2.5 py-1.5 text-[10px] text-slate-700 dark:text-slate-300 shadow-[0_2px_12px_rgba(0,0,0,0.1)] backdrop-blur-xl border border-white/40 dark:border-slate-700/50 w-fit">
-            <div className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-full bg-slate-900 dark:bg-slate-200" />
-              <span>Played</span>
+          {/* Legend as micro-pills */}
+          <div className="pointer-events-auto flex items-center gap-1.5 w-fit">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" />
+              <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Played</span>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-full border-2 border-[#F7931E] bg-transparent" />
-              <span>Want to Play</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.3)]" />
+              <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Want to Play</span>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="inline-block h-1.5 w-1.5 rounded-full border border-slate-400 bg-transparent" />
-              <span>Not Played</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
+              <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400 bg-transparent" />
+              <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Not Played</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom-right control stack: orb + reset */}
+        {/* Bottom-right control stack: orb + reset + zoom */}
         <div className="pointer-events-none absolute right-3 bottom-24 z-20 flex flex-col items-center gap-2">
           {/* Progress orb */}
           <div className="pointer-events-auto">
@@ -462,21 +492,47 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             />
           </div>
           
-          {/* Reset view button */}
-          <button
-            onClick={handleResetView}
-            className={cn(
-              'pointer-events-auto',
-              'flex items-center justify-center',
-              'w-8 h-8 rounded-sq-sm',
-              'bg-white/95 shadow-[0_2px_8px_rgba(0,0,0,0.1)] border border-slate-200/80',
-              'text-slate-500 hover:bg-slate-50 active:bg-slate-100',
-              'transition-colors duration-150'
-            )}
-            title="Reset view"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-          </button>
+          {/* Unified control buttons */}
+          <div className="pointer-events-auto flex flex-col gap-1.5">
+            {/* Zoom controls */}
+            <div className="flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-slate-200/60 dark:border-slate-700/50 overflow-hidden">
+              <button
+                onClick={() => mapRef.current?.zoomIn({ duration: 300 })}
+                className="flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-800"
+                title="Zoom in"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              <button
+                onClick={() => mapRef.current?.zoomOut({ duration: 300 })}
+                className="flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors"
+                title="Zoom out"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Reset view button */}
+            <button
+              onClick={handleResetView}
+              className={cn(
+                'flex items-center justify-center',
+                'w-9 h-9 rounded-lg',
+                'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
+                'shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-slate-200/60 dark:border-slate-700/50',
+                'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700',
+                'transition-colors duration-150'
+              )}
+              title="Reset view"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
 
         {/* Course bottom sheet */}
@@ -487,11 +543,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         />
       </div>
 
-      {/* Floating bottom control tray */}
-      <div className="flex-shrink-0 mx-4 mb-4">
-        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/60 p-3 space-y-2.5">
+      {/* Floating bottom control tray - premium glass */}
+      <div className="flex-shrink-0 mx-3 mb-3">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border border-white/60 dark:border-slate-700/40 p-2.5 space-y-2">
           {/* Status filter row */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100/80 dark:bg-slate-800">
+          <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100/70 dark:bg-slate-800/70">
             {(['all', 'played', 'want_to_play', 'not_played'] as StatusFilter[]).map((filter) => {
               const isActive = statusFilter === filter;
               const labels: Record<StatusFilter, string> = {
@@ -505,16 +561,16 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   key={filter}
                   onClick={() => setStatusFilter(filter)}
                   className={cn(
-                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200',
+                    'flex-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200',
                     isActive
                       ? filter === 'played'
-                        ? 'bg-slate-900 dark:bg-slate-200 text-white dark:text-slate-900 shadow-sm'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
                         : filter === 'want_to_play'
-                        ? 'bg-[#F7931E]/15 text-[#F7931E] border border-[#F7931E] shadow-sm'
+                        ? 'bg-[#F7931E] text-white shadow-sm'
                         : filter === 'not_played'
-                        ? 'bg-slate-400 text-white shadow-sm'
+                        ? 'bg-slate-500 dark:bg-slate-400 text-white dark:text-slate-900 shadow-sm'
                         : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-700/50'
                   )}
                 >
                   {labels[filter]}
@@ -524,7 +580,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
 
           {/* Region chips row */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
               const isActive = scope === regionScope;
               const labels = { global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' };
@@ -533,10 +589,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   key={regionScope}
                   onClick={() => onScopeChange?.(regionScope)}
                   className={cn(
-                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-all duration-200',
+                    'flex-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-all duration-200',
                     isActive
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
-                      : 'bg-transparent border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
+                      : 'bg-white/50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800'
                   )}
                 >
                   {labels[regionScope]}
