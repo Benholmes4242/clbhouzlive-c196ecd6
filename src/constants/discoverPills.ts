@@ -1,6 +1,5 @@
 export type MainPill =
   | "shorts"
-  | "new"
   | "videos"
   | "channels"
   | "following"

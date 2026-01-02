@@ -12,7 +12,6 @@ interface SegmentedControlProps {
 
 const tabs = [
   { id: 'shorts', label: 'Watch' },
-  { id: 'new', label: 'New' },
   { id: 'videos', label: 'Videos' },
   { id: 'channels', label: 'Explore' },
   { id: 'following', label: 'Community' }
