@@ -109,24 +109,24 @@ const Top100Hub = () => {
             </p>
           </div>
 
-          {/* Tabs: Courses | My Progress | Leaderboard */}
+          {/* Tabs: Courses | My Progress | Leaderboard - matches Golf Courses page exactly */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-block">
+            <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
               <TabsTrigger 
                 value="courses" 
-                className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
               >
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
               >
                 My Progress
               </TabsTrigger>
               <TabsTrigger 
                 value="leaderboard" 
-                className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
               >
                 Leaderboard
               </TabsTrigger>
@@ -148,20 +148,20 @@ const Top100Hub = () => {
                 );
               })()}
               
-              {/* View Mode Toggle - centered with balanced spacing */}
-              <div className="flex justify-center py-4">
-                <div className="inline-flex rounded-sq-sm bg-muted/60 border border-border/50 p-0.5">
+              {/* View Mode Toggle - polished segmented control */}
+              <div className="flex justify-center py-3">
+                <div className="inline-flex rounded-full bg-muted/50 p-[3px]">
                   <button
                     type="button"
                     onClick={handleListClick}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-sq-xs px-3.5 py-1.5 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200',
                       viewMode === 'list'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
                     )}
                   >
-                    <List className="h-4 w-4" />
+                    <List className="h-3.5 w-3.5" />
                     List
                   </button>
 
@@ -169,13 +169,13 @@ const Top100Hub = () => {
                     type="button"
                     onClick={handleMapClick}
                     className={cn(
-                      'inline-flex items-center gap-1.5 rounded-sq-xs px-3.5 py-1.5 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200',
                       viewMode === 'map'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
                     )}
                   >
-                    <MapIcon className="h-4 w-4" />
+                    <MapIcon className="h-3.5 w-3.5" />
                     Map
                   </button>
                 </div>
