@@ -41,7 +41,7 @@ const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'))
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
 
-type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
+type MainKey = 'shorts' | 'new' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -250,9 +250,16 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['shorts', 'videos', 'channels', 'following'] as const}
+              order={['shorts', 'new', 'videos', 'channels', 'following'] as const}
             >
               {(key: MainKey) => {
+                if (key === 'new') {
+                  return (
+                    <div className="md:container md:mx-auto md:px-0 p-4">
+                      {/* Empty placeholder for New tab */}
+                    </div>
+                  );
+                }
                 if (key === 'channels') {
                   return (
                     <Suspense fallback={null}>
