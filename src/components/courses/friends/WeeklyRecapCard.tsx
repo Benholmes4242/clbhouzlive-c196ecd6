@@ -79,12 +79,12 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
   }
 
   return (
-    <Card className="bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] border border-border/60 rounded-xl shadow-sm overflow-hidden">
+    <Card className="bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border/40">
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200/80">
-            <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-50/80 border border-emerald-200/60">
+            <Calendar className="w-3 h-3 text-emerald-600" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">This week in your network</h3>
@@ -93,34 +93,29 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="px-4 py-4 grid grid-cols-2 gap-4">
-        {/* Rounds logged */}
+      {/* Stats Row - Compact horizontal */}
+      <div className="px-4 py-3 flex items-center justify-center gap-8 border-b border-border/40">
         <div className="text-center">
-          <p className="text-xl font-bold text-foreground">{totalRoundsThisWeek}</p>
-          <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/75 mt-0.5">
-            Rounds logged
+          <p className="text-lg font-bold text-foreground">{totalRoundsThisWeek}</p>
+          <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/75">
+            Rounds
           </p>
         </div>
-
-        {/* Courses played */}
+        <div className="h-6 w-px bg-slate-200/60" />
         <div className="text-center">
-          <p className="text-xl font-bold text-foreground">{uniqueCoursesThisWeek}</p>
-          <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/75 mt-0.5">
-            Courses played
+          <p className="text-lg font-bold text-foreground">{uniqueCoursesThisWeek}</p>
+          <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/75">
+            Courses
           </p>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="mx-4 h-px bg-slate-200/60" />
-
-      {/* Bottom highlights */}
-      <div className="px-4 py-3 space-y-2">
+      {/* Bottom highlights - 2 compact rows */}
+      <div className="px-4 py-2.5 space-y-1.5">
         {/* Most active friend */}
         {mostActiveFriend && (
           <div className="flex items-center gap-2">
-            <Squircle width={24} height={24} className="shrink-0">
+            <Squircle width={20} height={20} className="shrink-0">
               <img
                 src={mostActiveFriend.avatarUrl || '/placeholder.svg'}
                 alt={mostActiveFriend.name}
@@ -133,7 +128,7 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
             <p className="text-xs text-slate-600">
               Most active:{' '}
               <span className="font-semibold text-foreground">{mostActiveFriend.name}</span>
-              <span className="text-slate-400"> ({mostActiveFriend.rounds} rounds)</span>
+              <span className="text-slate-400"> · {mostActiveFriend.rounds} rounds</span>
             </p>
           </div>
         )}
@@ -141,13 +136,13 @@ const WeeklyRecapCard: React.FC<WeeklyRecapCardProps> = ({ recent, courses, lead
         {/* Top course */}
         {topCourse && topCourse.friendCount >= 2 && (
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-50/80 border border-amber-200/60">
-              <TrendingUp className="w-3 h-3 text-amber-600" />
+            <div className="flex items-center justify-center w-5 h-5 rounded-md bg-amber-50/60 border border-amber-200/40">
+              <TrendingUp className="w-2.5 h-2.5 text-amber-600" />
             </div>
             <p className="text-xs text-slate-600">
               Top course:{' '}
               <span className="font-semibold text-foreground">{topCourse.name}</span>
-              <span className="text-slate-400"> (played by {topCourse.friendCount} friends)</span>
+              <span className="text-slate-400"> · played by {topCourse.friendCount}</span>
             </p>
           </div>
         )}

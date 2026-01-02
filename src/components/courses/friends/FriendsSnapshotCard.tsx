@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
 
 interface FriendsSnapshotCardProps {
   timeframe: string;
@@ -67,9 +68,9 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
   };
 
   return (
-    <section className="pt-2 pb-4">
+    <Card className="border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
       {/* Stats Grid - 2×2 with dividers and premium hierarchy */}
-      <div className="relative rounded-2xl bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] px-4 py-5">
+      <div className="relative bg-gradient-to-br from-primary/[0.04] to-primary/[0.02] px-4 py-5">
         <div className="grid grid-cols-2 gap-y-4">
           {/* Row 1 */}
           <div className="text-center relative">
@@ -123,15 +124,15 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
         </p>
       </div>
 
-      {/* You vs Friends - Strava-style nudge */}
+      {/* You vs Friends - inside card as footer row with divider */}
       {totalCourses > 0 && (
-        <div className="mt-3 text-center">
-          <p className="text-sm text-slate-600">
-            You've played <span className="font-bold text-foreground">{animatedUserPlayed}</span> of the <span className="font-bold text-foreground">{animatedCourses}</span> courses your friends played this month
+        <div className="border-t border-slate-200/60 px-4 py-3 bg-card">
+          <p className="text-sm text-center text-slate-600">
+            You've played <span className="font-bold text-foreground">{animatedUserPlayed}</span> of the <span className="font-bold text-foreground">{animatedCourses}</span> courses your friends played
           </p>
         </div>
       )}
-    </section>
+    </Card>
   );
 };
 

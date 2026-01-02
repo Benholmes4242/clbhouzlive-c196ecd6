@@ -21,7 +21,7 @@ const TrendingInNetworkCard: React.FC<TrendingInNetworkCardProps> = ({ courses }
   const trendingCourses = courses.slice(0, 3);
 
   return (
-    <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+    <Card className="bg-card border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border/60">
         <div className="flex items-center gap-2.5">
@@ -41,7 +41,7 @@ const TrendingInNetworkCard: React.FC<TrendingInNetworkCardProps> = ({ courses }
           <div
             key={course.course_id}
             onClick={() => navigate(`/courses/${course.course_id}`)}
-            className={`px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors cursor-pointer ${
+            className={`px-4 py-3.5 flex items-center gap-3 hover:bg-muted/30 transition-colors cursor-pointer ${
               index !== trendingCourses.length - 1 ? 'border-b border-border/40' : ''
             }`}
           >
@@ -59,17 +59,17 @@ const TrendingInNetworkCard: React.FC<TrendingInNetworkCardProps> = ({ courses }
 
             {/* Course info */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">{course.course_name}</p>
-              <p className="text-[11px] text-muted-foreground truncate">
+              <p className="text-sm font-medium text-foreground truncate">{course.course_name}</p>
+              <p className="text-xs text-slate-500 truncate">
                 {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Last played {formatDistanceToNow(new Date(course.most_recent_play), { addSuffix: true })}
               </p>
             </div>
 
-            {/* Friends count pill */}
-            <span className="shrink-0 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600">
+            {/* Friends count pill - neutral style */}
+            <span className="shrink-0 self-center inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
               {course.total_friends_played} friend{course.total_friends_played !== 1 ? 's' : ''}
             </span>
           </div>

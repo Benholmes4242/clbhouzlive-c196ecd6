@@ -23,11 +23,11 @@ const FeedFilterChips: React.FC<FeedFilterChipsProps> = ({ activeFilter, onFilte
           key={filter.key}
           onClick={() => onFilterChange(filter.key)}
           className={cn(
-            'shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200',
-            'border focus:outline-none focus:ring-1 focus:ring-slate-200/60',
+            'shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150',
+            'border focus:outline-none',
             activeFilter === filter.key
-              ? 'bg-foreground text-background border-foreground'
-              : 'bg-background text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'
+              ? 'bg-slate-900/5 text-slate-900 border-slate-300'
+              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700'
           )}
         >
           {filter.label}

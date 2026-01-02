@@ -19,15 +19,17 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
   const getHighlightLabel = () => {
     switch (filterType) {
       case 'most_played':
-        return 'Most popular course this month';
+        return 'Most played this month';
       case 'highest_rated':
         return 'Highest rated this period';
       case 'new':
         return 'Recently discovered';
       default:
-        return 'Most popular course this month';
+        return 'Most played this month';
     }
   };
+
+  const friendName = mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username;
 
   return (
     <div 
@@ -80,23 +82,27 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           </span>
         </div>
 
-        {/* Friend line with avatar */}
-        <div className="flex items-center justify-between gap-3 pt-0.5">
-          <p className="text-xs text-muted-foreground">
-            Played by{" "}
-            <span className="font-medium text-foreground">
-              {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-            </span>
-            {course.total_friends_played > 1 && (
-              <span> & {course.total_friends_played - 1} more</span>
-            )}
-            {" "}· {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
-          </p>
+        {/* Friend meta + avatar - vertically centered, 2-line meta block */}
+        <div className="flex items-center justify-between gap-3">
+          {/* 2-line meta text block */}
+          <div className="flex flex-col leading-snug">
+            <p className="text-sm text-muted-foreground">
+              Played by{" "}
+              <span className="font-medium text-foreground">{friendName}</span>
+              {course.total_friends_played > 1 && (
+                <span> & {course.total_friends_played - 1} more</span>
+              )}
+            </p>
+            <p className="text-xs text-slate-400">
+              {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
+            </p>
+          </div>
 
+          {/* Avatar squircle */}
           <Squircle width={36} height={36} className="shrink-0">
             <img 
               src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-              alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
+              alt={friendName}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
                 e.currentTarget.src = '/placeholder.svg';
