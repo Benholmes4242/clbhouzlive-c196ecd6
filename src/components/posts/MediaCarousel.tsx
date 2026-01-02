@@ -255,7 +255,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous media"
           >
-            <ChevronLeft className="w-3 h-3 text-white/90" />
+            <ChevronLeft className="w-3 h-3 text-white" />
           </button>
 
           <button
@@ -268,7 +268,7 @@ const MediaCarousel = forwardRef<MediaCarouselRef, MediaCarouselProps>(({
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next media"
           >
-            <ChevronRight className="w-3 h-3 text-white/90" />
+            <ChevronRight className="w-3 h-3 text-white" />
           </button>
         </>
       )}
