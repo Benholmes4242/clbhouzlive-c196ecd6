@@ -3,27 +3,18 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
-import { Card } from '@/components/ui/card';
-import { Squircle } from '@/components/ui/squircle';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { Users, MapPin, Flame, Video } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
 import TrendingInNetworkCard from './friends/TrendingInNetworkCard';
+import WeeklyRecapCard from './friends/WeeklyRecapCard';
+import FriendsActivityFeed from './friends/FriendsActivityFeed';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
-import CourseRankBadges from './CourseRankBadges';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
-import { extractRanksFromMemberships } from '@/utils/rankingUtils';
-import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
@@ -158,11 +149,8 @@ const FriendsCoursesPanel: React.FC = () => {
   const [timeframe, setTimeframe] = useState<Timeframe>('30d');
   const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
   const [page, setPage] = useState(1);
-  const [recentPage, setRecentPage] = useState(0);
-  const coursesListAnchorRef = useRef<HTMLDivElement | null>(null);
   
   const PAGE_SIZE = 5;
-  const RECENT_PAGE_SIZE = 8;
 
   // Filter data by time range and course type
   const filteredData = useMemo(() => {
@@ -357,53 +345,32 @@ const FriendsCoursesPanel: React.FC = () => {
       .slice(0, 3);
   }, [courses]);
 
-  const regularCourses = useMemo(() => {
-    const trendingIds = new Set(trendingCourses.map(c => c.course_id));
-    const heroId = heroCourse?.course_id;
-    return courses.filter(c => !trendingIds.has(c.course_id) && c.course_id !== heroId);
-  }, [courses, trendingCourses, heroCourse]);
+  // Create Set of trending course IDs for the feed
+  const trendingCourseIds = useMemo(() => {
+    return new Set(trendingCourses.map(c => c.course_id));
+  }, [trendingCourses]);
 
-  // Paginate main courses list
+  const regularCourses = useMemo(() => {
+    const heroId = heroCourse?.course_id;
+    return courses.filter(c => !trendingCourseIds.has(c.course_id) && c.course_id !== heroId);
+  }, [courses, trendingCourseIds, heroCourse]);
+
+  // Handle save course action (want to play)
+  const handleSaveCourse = (courseId: string) => {
+    toast.success('Course saved to your list!');
+    // TODO: Implement actual save to want_to_play list
+  };
+
+  // Paginate main courses list (kept for hero card exclusion)
   const paginatedCourses = useMemo(() => {
     const startIndex = (page - 1) * PAGE_SIZE;
     return regularCourses.slice(startIndex, startIndex + PAGE_SIZE);
   }, [regularCourses, page]);
 
-  const totalPages = Math.ceil(regularCourses.length / PAGE_SIZE);
-
   // Reset page when filter changes
   useEffect(() => {
     setPage(1);
-    setRecentPage(0);
   }, [timeframe, courseFilter]);
-
-  // Sort recent rounds by played_at descending (most recent first)
-  const sortedRecent = useMemo(() => {
-    return [...recent].sort(
-      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
-    );
-  }, [recent]);
-
-  // Paginate recent rounds
-  const totalRecent = sortedRecent.length;
-  const totalRecentPages = Math.ceil(totalRecent / RECENT_PAGE_SIZE);
-  const visibleRecent = useMemo(() => {
-    const startIdx = recentPage * RECENT_PAGE_SIZE;
-    return sortedRecent.slice(startIdx, startIdx + RECENT_PAGE_SIZE);
-  }, [sortedRecent, recentPage]);
-
-  // Build course index for jump-to-card functionality
-  const allFriendsCourses = heroCourse
-    ? [heroCourse, ...regularCourses]
-    : regularCourses;
-
-  const courseIndexById = useMemo(() => {
-    const map = new Map<string, number>();
-    allFriendsCourses.forEach((course, idx) => {
-      map.set(course.course_id, idx);
-    });
-    return map;
-  }, [allFriendsCourses]);
 
   // Scroll to top of courses list
   const scrollToCoursesList = () => {
@@ -563,208 +530,31 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Section header for Recent in your network */}
-      {paginatedCourses.length > 0 && (
-        <div className="mt-8 mb-4">
-          <h3 className="text-base font-semibold text-foreground">Recent in your network</h3>
+      {/* Weekly Recap Card - "This week in your network" */}
+      <div className="mt-6">
+        <WeeklyRecapCard
+          recent={recent}
+          courses={courses}
+          leaderboard={leaderboard}
+        />
+      </div>
+
+      {/* Unified Activity Feed - Phase 3 social feed first */}
+      <div className="mt-8">
+        <div className="mb-4">
+          <h3 className="text-base font-semibold text-foreground">Friends activity</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Courses your friends have played recently
+            See what your friends have been playing
           </p>
         </div>
-      )}
-
-      {/* Anchor for scrolling to start of course list */}
-      <div ref={coursesListAnchorRef} />
-
-      {/* Regular courses - Paginated list - 24px section gap, 16px card-to-card */}
-      {paginatedCourses.length > 0 && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-6">
-          <motion.div
-            key={page}
-            initial={{ x: 40, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -40, opacity: 0 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            className="space-y-4"
-          >
-            {paginatedCourses.map((course) => {
-              const mostRecentFriend = course.friends[0];
-              
-              return (
-                <div 
-                  key={course.course_id} 
-                  data-friends-course-card={course.course_id}
-                  className="relative overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-card border border-border/60 shadow-sm"
-                  onClick={() => navigate(`/courses/${course.course_id}`)}
-                >
-                  {/* Course Image - Taller, Full Width */}
-                  {course.thumbnail_url && (
-                    <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                      {/* Rank badges (top-left) */}
-                      {(() => {
-                        const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                        return (
-                          <CourseRankBadges
-                            globalRank={ranks.globalRank}
-                            regionalRank={ranks.regionalRank}
-                            usaRank={ranks.usaRank}
-                            country={course.country || ''}
-                            positioning="top-left"
-                          />
-                        );
-                      })()}
-                      
-                      <img
-                        src={course.thumbnail_url}
-                        alt={course.course_name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                      {/* Bottom gradient */}
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-                    </div>
-                  )}
-                  
-                  {/* Course Info - 12px internal stack */}
-                  <div className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="flex-1 min-w-0 pr-3 font-semibold text-base text-foreground truncate">
-                        {course.course_name}
-                      </h3>
-                      {/* Community rating - logo + text on white */}
-                      {typeof course.community_rating === 'number' && !Number.isNaN(course.community_rating) && (
-                        <div className="flex-shrink-0 flex items-center gap-1.5">
-                          <ClubhouseLogo className="h-5 w-5" />
-                          <span className="text-sm font-semibold text-foreground">
-                            {course.community_rating.toFixed(1)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
-                    </p>
-
-                    {/* Bottom row: Avatar stack + "Played by..." with slate timestamp */}
-                    <div className="flex items-center gap-2">
-                      {/* Avatar stack - consistent 2-3 avatars + +N */}
-                      <div className="flex -space-x-2">
-                        {course.friends.slice(0, 3).map((friend, idx) => (
-                          <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
-                            <Squircle width={26} height={26}>
-                              <img 
-                                src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                                alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onError={(e) => {
-                                  e.currentTarget.src = '/placeholder.svg';
-                                }}
-                              />
-                            </Squircle>
-                          </div>
-                        ))}
-                        {course.friends.length > 3 && (
-                          <div className="relative flex items-center justify-center w-[26px] h-[26px] rounded-lg bg-slate-100 border border-slate-200 text-[10px] font-medium text-slate-600" style={{ zIndex: 6 }}>
-                            +{course.friends.length - 3}
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-500">
-                        Played by{" "}
-                        <span className="font-medium text-foreground">
-                          {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-                        </span>
-                        {course.total_friends_played > 1 && (
-                          <span className="text-slate-500"> and {course.total_friends_played - 1} other{course.total_friends_played > 2 ? 's' : ''}</span>
-                        )}
-                        <span className="text-slate-400"> · {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </motion.div>
-
-          {/* Pagination Footer */}
-          <UnifiedPagination
-            page={page - 1}
-            total={regularCourses.length}
-            pageSize={PAGE_SIZE}
-            hasNextPage={page < totalPages}
-            onNext={() => handleChangeCoursesPage('next')}
-            onPrev={() => handleChangeCoursesPage('prev')}
-            itemLabel="courses"
-            scrollTargetRef={coursesListAnchorRef as React.RefObject<HTMLElement>}
-          />
-        </div>
-      )}
-
-      {/* Your friends' recent rounds - Section header + social typography */}
-      {sortedRecent.length > 0 && (
-        <div className="mt-8">
-          {/* Section header */}
-          <div className="mb-4">
-            <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Rounds played in the last {timeframe === '7d' ? '7 days' : timeframe === '30d' ? '30 days' : timeframe === '90d' ? '90 days' : timeframe === '12m' ? '12 months' : 'all time'}
-            </p>
-          </div>
-          
-          <motion.div
-            key={recentPage}
-            initial={{ y: 12, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-          >
-            <div className="space-y-0">
-              {visibleRecent.map((hit, idx) => (
-                <div 
-                  key={`${hit.friend_id}-${hit.course_id}-${idx}`}
-                  className={`flex items-center gap-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${
-                    idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
-                  }`}
-                  onClick={() => handleRecentRoundClick(hit)}
-                >
-                  <Squircle width={36} height={36} className="shrink-0">
-                    <img 
-                      src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                      alt={hit.friend_profile.display_name || hit.friend_profile.username}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                  </Squircle>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm">
-                      <span className="font-semibold text-foreground">{hit.friend_profile.display_name || hit.friend_profile.username}</span>
-                      <span className="text-muted-foreground"> played </span>
-                      <span className="font-medium text-foreground">{hit.course_name}</span>
-                    </p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Recent rounds pagination */}
-          <UnifiedPagination
-            page={recentPage}
-            total={sortedRecent.length}
-            pageSize={RECENT_PAGE_SIZE}
-            hasNextPage={recentPage < totalRecentPages - 1}
-            onNext={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
-            onPrev={() => setRecentPage((p) => Math.max(0, p - 1))}
-            itemLabel="rounds"
-          />
-        </div>
-      )}
+        <FriendsActivityFeed
+          recent={recent}
+          courses={courses}
+          trendingCourseIds={trendingCourseIds}
+          userPlayedCourseIds={userPlayedCourseIds}
+          onSave={handleSaveCourse}
+        />
+      </div>
     </div>
   );
 };
