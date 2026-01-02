@@ -416,7 +416,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             </p>
             <button
               type="button"
-              className="mt-4 w-full h-11 rounded-sq-sm inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition hover:bg-slate-50 active:scale-[0.98]"
+              className="mt-4 w-full h-11 rounded-full inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-slate-900 text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98]"
               onClick={handleRateClick}
             >
               Write the first review
