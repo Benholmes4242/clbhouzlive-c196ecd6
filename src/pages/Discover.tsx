@@ -40,9 +40,7 @@ import Top100Pills from '@/components/courses/Top100Pills';
 const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
-const NewTab = lazy(() => import('@/components/discover/NewTab'));
-
-type MainKey = 'shorts' | 'new' | 'videos' | 'channels' | 'following';
+type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -251,16 +249,9 @@ const Discover = () => {
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
               activeKey={main as MainKey}
-              order={['shorts', 'new', 'videos', 'channels', 'following'] as const}
+              order={['shorts', 'videos', 'channels', 'following'] as const}
             >
               {(key: MainKey) => {
-                if (key === 'new') {
-                  return (
-                    <Suspense fallback={null}>
-                      <NewTab onMediaClick={handleMediaClick} />
-                    </Suspense>
-                  );
-                }
                 if (key === 'channels') {
                   return (
                     <Suspense fallback={null}>
