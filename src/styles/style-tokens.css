@@ -7,8 +7,8 @@
   /* Header & Footer */
   --header-bg: rgba(15, 15, 15, 0.95);
   --header-border: rgba(255, 255, 255, 0.1);
-  --header-height: 56px;
-  --header-h: 56px;
+  --header-height: 40px;
+  --header-h: 40px;
   --footer-bg: var(--header-bg);
   
   /* Clubhouse cinematic dim tokens */
