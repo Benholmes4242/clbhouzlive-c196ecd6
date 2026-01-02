@@ -331,11 +331,14 @@ const EditProfilePage: React.FC = () => {
 
       if (error) throw error;
 
-      // Invalidate queries - including home clubs for visibility changes
+      // Invalidate queries - including discovery for home club changes
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
       await queryClient.invalidateQueries({ queryKey: ['home-clubs-map'] });
       await queryClient.invalidateQueries({ queryKey: ['user-home-clubs', user.id] });
+      // Invalidate discovery queries so Home Club tab updates immediately
+      await queryClient.invalidateQueries({ queryKey: ['golfers-filtered'] });
+      await queryClient.invalidateQueries({ queryKey: ['search-golfers'] });
 
       setSaveSuccess(true);
       
