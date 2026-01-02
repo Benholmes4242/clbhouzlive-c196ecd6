@@ -358,7 +358,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => navigate(`/courses/${courseId}/rate`)}
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-slate-800 active:scale-[0.98] transition-all shadow-sm"
+            className="inline-flex items-center gap-2 rounded-sq-pill border border-slate-300/70 bg-slate-100 text-slate-900 px-5 py-2.5 text-sm font-medium shadow-[0_6px_16px_rgba(15,23,42,0.15)] hover:bg-slate-50 active:scale-[0.98] transition-all"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

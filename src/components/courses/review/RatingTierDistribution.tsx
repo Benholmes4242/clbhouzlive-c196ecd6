@@ -38,14 +38,13 @@ const INACTIVE_COLOR = '#E2E8F0';
  * Displays Outstanding/Excellent/Very Good/Good/Fair bars with counts.
  * 
  * Design rules:
- * - All bars use neutral charcoal/slate color
- * - Only Outstanding tier gets gold highlight when it's the active tier
- * - No rainbow colors, no per-tier colors
+ * - Outstanding tier ALWAYS uses gold (regardless of count/dominance)
+ * - All other tiers use neutral charcoal/slate
+ * - Empty bars use light grey
  * - Clean, calm hierarchy: Gold = exceptional, neutral = everything else
  */
 export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   distribution,
-  activeTier,
 }) => {
   // Build distribution items
   const distributionItems = TIER_CONFIG.map(({ key, dataKey, label }) => ({
@@ -56,25 +55,18 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
 
-  // Find which tier has the highest count (implicit active tier if not provided)
-  const highestCountTier = distributionItems.reduce((prev, current) => 
-    current.count > prev.count ? current : prev
-  ).key;
-
-  const effectiveActiveTier = activeTier || (distributionItems.find(d => d.key === highestCountTier)?.count > 0 ? highestCountTier : null);
-
   return (
     <div className="space-y-2">
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
-        const isOutstandingAndActive = item.key === 'OUTSTANDING' && effectiveActiveTier === 'OUTSTANDING';
+        const isOutstanding = item.key === 'OUTSTANDING';
         const hasCount = item.count > 0;
         
         // Bar color logic:
-        // - Outstanding tier gets gold when it's the active tier
+        // - Outstanding tier ALWAYS gets gold (when it has any count)
         // - All other tiers with counts get neutral charcoal
         // - Empty bars get light grey
-        const barColor = isOutstandingAndActive 
+        const barColor = isOutstanding && hasCount
           ? GOLD_COLOR 
           : hasCount 
             ? NEUTRAL_COLOR 
