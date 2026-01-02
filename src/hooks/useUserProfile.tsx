@@ -11,6 +11,7 @@ export interface UserProfile {
   header_photo_url?: string | null;
   home_club: string | null;
   home_club_id?: string | null;
+  primary_club_id?: string | null; // golf_clubs.id - single source of truth for home club
   eg_handicap_index: number | null;
   show_handicap?: boolean;
   bio?: string | null;
