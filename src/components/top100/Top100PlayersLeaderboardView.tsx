@@ -14,7 +14,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
-import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+import { FixedPaginationDock } from '@/components/ui/FixedPaginationDock';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import {
   WeeklyHighlightsCarousel,
@@ -534,16 +534,18 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         </div>
       )}
 
-      {/* Pagination */}
-      <UnifiedPagination
-        page={page}
-        total={displayedEntries.length}
-        pageSize={PAGE_SIZE}
-        hasNextPage={hasNext}
-        onNext={handleNextPage}
-        onPrev={handlePrevPage}
-        itemLabel="players"
-      />
+      {/* Fixed Pagination Dock */}
+      {displayedEntries.length > 0 && (
+        <FixedPaginationDock
+          page={page}
+          total={displayedEntries.length}
+          pageSize={PAGE_SIZE}
+          hasNextPage={hasNext}
+          onNext={handleNextPage}
+          onPrev={handlePrevPage}
+          itemLabel="players"
+        />
+      )}
     </div>
   );
 }

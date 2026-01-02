@@ -22,7 +22,7 @@ import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import CourseRankBadges from './CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
-import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+import { FixedPaginationDock } from '@/components/ui/FixedPaginationDock';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
@@ -728,18 +728,6 @@ const FriendsCoursesPanel: React.FC = () => {
               );
             })}
           </motion.div>
-
-          {/* Pagination Footer */}
-          <UnifiedPagination
-            page={page - 1}
-            total={regularCourses.length}
-            pageSize={PAGE_SIZE}
-            hasNextPage={page < totalPages}
-            onNext={() => handleChangeCoursesPage('next')}
-            onPrev={() => handleChangeCoursesPage('prev')}
-            itemLabel="courses"
-            scrollTargetRef={coursesListAnchorRef as React.RefObject<HTMLElement>}
-          />
         </div>
       )}
 
@@ -791,18 +779,21 @@ const FriendsCoursesPanel: React.FC = () => {
               ))}
             </div>
           </motion.div>
-
-          {/* Recent rounds pagination */}
-          <UnifiedPagination
-            page={recentPage}
-            total={sortedRecent.length}
-            pageSize={RECENT_PAGE_SIZE}
-            hasNextPage={recentPage < totalRecentPages - 1}
-            onNext={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
-            onPrev={() => setRecentPage((p) => Math.max(0, p - 1))}
-            itemLabel="rounds"
-          />
         </div>
+      )}
+
+      {/* Fixed Pagination Dock - shows for either courses or recent rounds */}
+      {(regularCourses.length > PAGE_SIZE || sortedRecent.length > RECENT_PAGE_SIZE) && (
+        <FixedPaginationDock
+          page={page - 1}
+          total={regularCourses.length}
+          pageSize={PAGE_SIZE}
+          hasNextPage={page < totalPages}
+          onNext={() => handleChangeCoursesPage('next')}
+          onPrev={() => handleChangeCoursesPage('prev')}
+          itemLabel="courses"
+          scrollTargetRef={coursesListAnchorRef as React.RefObject<HTMLElement>}
+        />
       )}
     </div>
   );
