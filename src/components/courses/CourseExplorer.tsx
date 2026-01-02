@@ -362,7 +362,7 @@ const CourseExplorer = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > 0 && totalCount > EXPLORE_PAGE_SIZE;
 
   return (
-    <div className="w-full space-y-block">
+    <div className="w-full space-y-block pb-24">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
@@ -370,7 +370,7 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--echo-orange)/0.12)] focus-visible:border-border/80 transition-all duration-150 text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 transition-all duration-150 text-base placeholder:text-[15px]"
         />
         {isFetching && searchTerm && (
           <div className="absolute right-10 top-1/2 -translate-y-1/2">
@@ -395,9 +395,9 @@ const CourseExplorer = () => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 ${
+            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
               selectedRegion !== PRIMARY_REGIONS.ALL 
-                ? 'border-[hsl(var(--echo-orange)/0.65)] border-[1.5px] text-foreground' 
+                ? 'border-slate-300 text-foreground' 
                 : 'border-border/60'
             }`}>
               <div className="flex items-center">
@@ -422,9 +422,9 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
               selectedSubregion !== 'all' 
-                ? 'border-[hsl(var(--echo-orange)/0.65)] border-[1.5px] text-foreground' 
+                ? 'border-slate-300 text-foreground' 
                 : 'border-border/60'
             }`}>
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
@@ -507,7 +507,7 @@ const CourseExplorer = () => {
 
           {/* Load more button - matches leaderboard style */}
           {showLoadMoreButton && (
-            <div className="flex flex-col items-center gap-2 pt-4">
+            <div className="relative z-10 mt-6 mb-2 flex flex-col items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
