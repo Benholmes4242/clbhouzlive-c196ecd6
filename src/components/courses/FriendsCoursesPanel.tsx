@@ -412,8 +412,8 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Friends Snapshot Card - 20px section gap */}
-      <div className="mt-5">
+      {/* Friends Snapshot Card - 24px section gap */}
+      <div className="mt-6">
         <FriendsSnapshotCard
           timeframe={timeframe}
           totalCourses={totalCourses}
@@ -460,12 +460,9 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
       {/* Unified Activity Feed - Phase 3 social feed first */}
-      <div className="mt-8">
-        <div className="mb-4">
+      <div className="mt-6">
+        <div className="mb-3">
           <h3 className="text-base font-semibold text-foreground">Friends activity</h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            See what your friends have been playing
-          </p>
         </div>
         <FriendsActivityFeed
           recent={recent}

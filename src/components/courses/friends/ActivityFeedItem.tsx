@@ -42,7 +42,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="bg-card border border-border/60 rounded-xl p-4 hover:shadow-sm transition-shadow cursor-pointer"
+      className="bg-card/60 border border-border/50 rounded-xl p-3.5 hover:shadow-sm transition-shadow cursor-pointer"
       onClick={handleCourseClick}
     >
       <div className="flex gap-3">
@@ -80,8 +80,8 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
             {isTrending && (
               <>
                 <span className="mx-1.5">·</span>
-                <span className="inline-flex items-center gap-0.5 text-amber-600">
-                  <Flame className="w-3 h-3" />
+                <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                  <Flame className="w-2.5 h-2.5" />
                   Trending
                 </span>
               </>
@@ -108,14 +108,14 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/40">
         <button
           onClick={handleSave}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground bg-muted/40 hover:bg-muted hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
         >
           <Bookmark className="w-3.5 h-3.5" />
           Save
         </button>
         <button
           onClick={handleCourseClick}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground bg-muted/40 hover:bg-muted hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           View course

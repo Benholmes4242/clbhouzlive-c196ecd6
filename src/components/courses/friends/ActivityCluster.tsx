@@ -37,6 +37,24 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
   const mostRecentName =
     mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username;
 
+  // Format time compactly
+  const formatTimeCompact = (date: string) => {
+    const distance = formatDistanceToNow(new Date(date), { addSuffix: false });
+    return distance
+      .replace(' minutes', 'm')
+      .replace(' minute', 'm')
+      .replace(' hours', 'h')
+      .replace(' hour', 'h')
+      .replace(' days', 'd')
+      .replace(' day', 'd')
+      .replace(' weeks', 'w')
+      .replace(' week', 'w')
+      .replace(' months', 'mo')
+      .replace(' month', 'mo')
+      .replace('about ', '')
+      .replace('less than a', '<1');
+  };
+
   const handleCourseClick = () => {
     navigate(`/courses/${courseId}`);
   };
@@ -99,17 +117,14 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Headline */}
-            <p className="text-sm font-semibold text-foreground">
+            {/* Headline - single line */}
+            <p className="text-sm font-semibold text-foreground truncate">
               {friends.length} friends played {courseName}
             </p>
 
-            {/* Subline */}
+            {/* Compact subline */}
             <p className="text-xs text-slate-400 mt-0.5">
-              Most recent:{' '}
-              <span className="text-slate-500">{mostRecentName}</span>
-              <span className="mx-1">·</span>
-              {formatDistanceToNow(new Date(mostRecentPlayedAt), { addSuffix: true })}
+              Most recent: <span className="text-slate-500">{mostRecentName}</span> · {formatTimeCompact(mostRecentPlayedAt)} ago
             </p>
           </div>
 
@@ -133,14 +148,14 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleSave}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground bg-muted/40 hover:bg-muted hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
             >
               <Bookmark className="w-3.5 h-3.5" />
               Save
             </button>
             <button
               onClick={handleCourseClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground bg-muted/40 hover:bg-muted hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               View course
@@ -150,9 +165,9 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           {friends.length > 2 && (
             <button
               onClick={toggleExpand}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors"
             >
-              {isExpanded ? 'Hide' : `Show ${friends.length} friends`}
+              {isExpanded ? 'Hide' : 'Show friends'}
               {isExpanded ? (
                 <ChevronUp className="w-3.5 h-3.5" />
               ) : (
