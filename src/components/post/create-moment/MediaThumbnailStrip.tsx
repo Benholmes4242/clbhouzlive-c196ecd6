@@ -155,18 +155,6 @@ function ThumbContent({
         )}
       </div>
 
-      {/* Cover indicator - subtle pill on first item only */}
-      {isFirst && !isDragOverlay && (
-        <div 
-          className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-medium uppercase tracking-wide z-10 backdrop-blur-sm"
-          style={{ 
-            background: 'rgba(0,0,0,0.5)',
-            color: 'rgba(255,255,255,0.9)',
-          }}
-        >
-          Cover
-        </div>
-      )}
 
       {/* Video indicator - bottom left, inside thumbnail */}
       {item.type === 'video' && (
