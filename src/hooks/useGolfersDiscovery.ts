@@ -113,21 +113,20 @@ export function useGolfersDiscovery() {
   }, [exclusions?.followingIds, optimisticFollows]);
 
   // Helper to determine if home club query is enabled
-  // Use primary_club_id (golf_clubs.id) as the single source of truth
-  const viewerPrimaryClubId = currentProfile?.primary_club_id;
-  const viewerHomeClub = currentProfile?.home_club?.trim(); // Text fallback for ranking only
-  const hasHomeClub = !!viewerPrimaryClubId;
+  const viewerHomeClub = currentProfile?.home_club?.trim();
+  const viewerHomeClubId = currentProfile?.home_club_id;
+  const hasHomeClub = !!viewerHomeClubId || !!viewerHomeClub;
 
   // Global search query (searches within active tab context)
   const { data: searchResults, isLoading: searchLoading } = useQuery({
-    queryKey: ['search-golfers', searchQuery, activeTab, viewerPrimaryClubId],
+    queryKey: ['search-golfers', searchQuery, activeTab, viewerHomeClub, viewerHomeClubId],
     enabled: searchQuery.trim().length > 0 && !!user,
     queryFn: async () => {
       const query = searchQuery.trim().toLowerCase();
       
       let baseQuery = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at')
+        .select('id, display_name, username, profile_photo_url, home_club, home_club_id, eg_handicap_index, is_verified_golfer, created_at')
         .neq('id', user!.id)
         .is('deleted_at', null)
         .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`);
@@ -135,8 +134,10 @@ export function useGolfersDiscovery() {
       // Apply tab-specific filters to search
       switch (activeTab) {
         case 'home_club':
-          if (viewerPrimaryClubId) {
-            baseQuery = baseQuery.eq('primary_club_id', viewerPrimaryClubId);
+          if (viewerHomeClubId) {
+            baseQuery = baseQuery.eq('home_club_id', viewerHomeClubId);
+          } else if (viewerHomeClub) {
+            baseQuery = baseQuery.eq('home_club', viewerHomeClub);
           }
           break;
         case 'verified':
@@ -163,7 +164,7 @@ export function useGolfersDiscovery() {
         username: profile.username,
         profileImage: profile.profile_photo_url || '',
         homeClub: profile.home_club,
-        homeClubId: profile.primary_club_id,
+        homeClubId: profile.home_club_id,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
         totalTop100Played: top100Counts.get(profile.id) || 0,
@@ -176,21 +177,23 @@ export function useGolfersDiscovery() {
 
   // Paginated filtered query by tab
   const { data: filteredData, isLoading: filterLoading } = useQuery({
-    queryKey: ['golfers-filtered', activeTab, page, viewerPrimaryClubId, user?.id],
+    queryKey: ['golfers-filtered', activeTab, page, viewerHomeClub, viewerHomeClubId, user?.id],
     enabled: searchQuery.trim().length === 0 && !!user && (activeTab !== 'home_club' || hasHomeClub),
     queryFn: async () => {
       let query = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at', { count: 'exact' })
+        .select('id, display_name, username, profile_photo_url, home_club, home_club_id, eg_handicap_index, is_verified_golfer, created_at', { count: 'exact' })
         .neq('id', user!.id)
         .is('deleted_at', null);
 
       // Apply tab-specific filters
       switch (activeTab) {
         case 'home_club':
-          // Use primary_club_id (golf_clubs.id) as single source of truth
-          if (viewerPrimaryClubId) {
-            query = query.eq('primary_club_id', viewerPrimaryClubId);
+          // Use home_club_id if available, fallback to exact text match
+          if (viewerHomeClubId) {
+            query = query.eq('home_club_id', viewerHomeClubId);
+          } else if (viewerHomeClub) {
+            query = query.eq('home_club', viewerHomeClub);
           }
           break;
         case 'verified':
@@ -223,7 +226,7 @@ export function useGolfersDiscovery() {
         username: profile.username,
         profileImage: profile.profile_photo_url || '',
         homeClub: profile.home_club,
-        homeClubId: profile.primary_club_id,
+        homeClubId: profile.home_club_id,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
         totalTop100Played: top100Counts.get(profile.id) || 0,
@@ -251,14 +254,14 @@ export function useGolfersDiscovery() {
     // For suggested tab, apply ranking: same home club first, then verified, then by created_at
     if (activeTab === 'suggested' && !isSearching) {
       filtered.sort((a, b) => {
-        // 1. Same home club as viewer (using primary_club_id, text fallback for display)
-        const aClubMatch = viewerPrimaryClubId 
-          ? a.homeClubId === viewerPrimaryClubId
+        // 1. Same home club as viewer (using ID if available, else text)
+        const aClubMatch = viewerHomeClubId 
+          ? a.homeClubId === viewerHomeClubId
           : viewerHomeClub 
             ? a.homeClub?.toLowerCase() === viewerHomeClub.toLowerCase()
             : false;
-        const bClubMatch = viewerPrimaryClubId
-          ? b.homeClubId === viewerPrimaryClubId
+        const bClubMatch = viewerHomeClubId
+          ? b.homeClubId === viewerHomeClubId
           : viewerHomeClub
             ? b.homeClub?.toLowerCase() === viewerHomeClub.toLowerCase()
             : false;
@@ -285,7 +288,7 @@ export function useGolfersDiscovery() {
     }
     
     return filtered;
-  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, activeTab, viewerHomeClub, viewerPrimaryClubId, searchQuery]);
+  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, activeTab, viewerHomeClub, viewerHomeClubId, searchQuery]);
 
   // Paginate the processed results
   const paginatedGolfers = useMemo(() => {
