@@ -1092,7 +1092,7 @@ const PostPlayRatingModal = ({
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
-                              <div className="relative h-full w-full bg-slate-800">
+                              <div className="relative h-full w-full bg-slate-700">
                                 {preview && !preview.startsWith('blob:') ? (
                                   <img
                                     src={preview}
@@ -1102,16 +1102,16 @@ const PostPlayRatingModal = ({
                                 ) : (
                                   <video
                                     src={preview || undefined}
+                                    autoPlay
                                     muted
                                     playsInline
-                                    preload="metadata"
+                                    loop={false}
                                     className="h-full w-full object-cover"
-                                    onLoadedData={(e) => {
-                                      // Try to seek to first frame for iOS
+                                    onCanPlay={(e) => {
+                                      // Pause immediately after loading to show first frame on iOS
                                       const video = e.currentTarget;
-                                      if (video.readyState >= 2) {
-                                        video.currentTime = 0.1;
-                                      }
+                                      video.pause();
+                                      video.currentTime = 0.1;
                                     }}
                                   />
                                 )}
