@@ -53,6 +53,9 @@ interface Top100FilterSheetProps {
  * Top100FilterSheet - Bottom sheet for selecting list filter
  * Matches the Create Moment "Who can see this?" sheet style
  * Uses portal to escape stacking context from PageRoot transforms
+ * 
+ * Tested on mobile Safari - AnimatePresence wraps the conditional
+ * to ensure exit animations complete before unmount.
  */
 export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
   isOpen,
@@ -91,19 +94,19 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
         >
           {/* Backdrop */}
           <motion.div 
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
 
-          {/* Sheet */}
+          {/* Sheet - Dark mode */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="absolute bottom-0 left-0 right-0 rounded-t-2xl bg-white"
+            className="absolute bottom-0 left-0 right-0 rounded-t-2xl bg-card border-t border-border"
             style={{
               zIndex: Z.sheet,
               paddingBottom: 'env(safe-area-inset-bottom, 16px)',
@@ -112,21 +115,21 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-slate-200" />
+              <div className="w-10 h-1 rounded-full bg-muted" />
             </div>
 
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Filter courses</h3>
+              <h3 className="text-lg font-semibold text-foreground">Filter courses</h3>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors"
               >
-                <X className="w-4 h-4 text-slate-600" />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
 
-            {/* Options */}
+            {/* Options - Dark mode styling */}
             <div className="px-4 pb-4 space-y-1.5">
               {FILTER_OPTIONS.map((option) => {
                 const isSelected = activeFilter === option.value;
@@ -139,13 +142,13 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
                     onClick={() => handleSelect(option.value)}
                     className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all ${
                       isSelected
-                        ? 'bg-slate-800 shadow-md'
-                        : 'bg-slate-50 border border-slate-200/60 hover:bg-slate-100'
+                        ? 'bg-primary/20 border border-primary/40 shadow-md'
+                        : 'bg-muted/50 border border-border hover:bg-muted/80'
                     }`}
                   >
                     <div
                       className={`w-9 h-9 rounded-full flex items-center justify-center ${
-                        isSelected ? 'bg-white/15 text-white' : 'bg-white text-slate-600'
+                        isSelected ? 'bg-primary/20 text-primary' : 'bg-background text-muted-foreground'
                       }`}
                     >
                       {option.icon}
@@ -154,14 +157,14 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
                     <div className="flex-1 text-left">
                       <p
                         className={`font-medium text-[13px] ${
-                          isSelected ? 'text-white' : 'text-slate-800'
+                          isSelected ? 'text-foreground' : 'text-foreground/90'
                         }`}
                       >
                         {option.label}
                         {count !== undefined && count > 0 && (
                           <span
                             className={`ml-1.5 text-[11px] ${
-                              isSelected ? 'text-white/70' : 'text-slate-400'
+                              isSelected ? 'text-primary' : 'text-muted-foreground'
                             }`}
                           >
                             ({count})
@@ -170,7 +173,7 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
                       </p>
                       <p
                         className={`text-[11px] mt-0.5 ${
-                          isSelected ? 'text-white/75' : 'text-slate-500'
+                          isSelected ? 'text-muted-foreground' : 'text-muted-foreground/80'
                         }`}
                       >
                         {option.description}
