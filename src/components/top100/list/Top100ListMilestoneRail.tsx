@@ -317,12 +317,6 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
             </svg>
           )}
 
-          {/* Padlock icon for next up - inside squircle, top-right, offset from ring */}
-          {isNextUp && (
-            <div className="absolute z-20" style={{ top: 10, right: 10 }}>
-              <GiPadlock className="w-3 h-3 text-slate-500" />
-            </div>
-          )}
 
           {/* Center content */}
           <div className="relative w-full h-full flex items-center justify-center">
@@ -413,7 +407,8 @@ const GhostTile: React.FC<GhostTileProps> = ({ onClick }) => {
           background: 'rgba(255,255,255,0.6)',
         }}
       >
-        {/* Empty center - no number, no icon */}
+        {/* Padlock icon in center */}
+        <GiPadlock className="w-5 h-5 text-slate-400" />
       </div>
 
       {/* Copy below token */}
