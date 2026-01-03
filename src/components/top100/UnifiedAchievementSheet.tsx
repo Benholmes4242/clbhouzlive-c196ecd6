@@ -529,8 +529,8 @@ export function UnifiedAchievementSheet({
                 isUnlocked={isUnlocked}
               />
 
-              {/* 7. Primary CTA */}
-              <div className="space-y-3">
+              {/* 7. Primary CTA - 24px from bottom */}
+              <div className="pb-6">
                 <Button
                   onClick={primaryCtaAction}
                   className="w-full rounded-full font-medium text-white"
@@ -539,16 +539,6 @@ export function UnifiedAchievementSheet({
                   {primaryCtaLabel}
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
-
-                {/* 8. Secondary CTA (text button, low visual weight) */}
-                {(!isUnlocked || !isMilestone) && (
-                  <button
-                    onClick={secondaryCtaAction}
-                    className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-                  >
-                    {secondaryCtaLabel}
-                  </button>
-                )}
               </div>
             </div>
           </motion.div>
