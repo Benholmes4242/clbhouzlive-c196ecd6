@@ -34,6 +34,8 @@ interface UnifiedCourseCardProps {
   showPlayedStatus?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
+  hideLocation?: boolean;
+  loggedDate?: string | Date | null;
   contextTag?: string;
   onClick?: () => void;
   className?: string;
@@ -74,6 +76,8 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   showPlayedStatus = false,
   showFriendsContext = false,
   showLastPlayed = false,
+  hideLocation = false,
+  loggedDate,
   contextTag,
   onClick,
   className = '',
@@ -122,9 +126,11 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             <div className="font-semibold text-sm text-foreground truncate">
               {course.name}
             </div>
-            <div className="text-xs text-muted-foreground truncate">
-              {course.locationText}
-            </div>
+            {!hideLocation && (
+              <div className="text-xs text-muted-foreground truncate">
+                {course.locationText}
+              </div>
+            )}
             {showLastPlayed && course.context?.lastPlayedAt && (
               <div className="flex items-center gap-1 mt-1.5">
                 <Calendar className="w-3 h-3 text-muted-foreground" />
@@ -222,10 +228,19 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
               {course.name}
             </h3>
 
+            {/* Logged date pill - aligned with course name */}
+            {loggedDate && (
+              <div className="inline-block text-[9px] font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full">
+                Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
+              </div>
+            )}
+
             {/* Location - increased spacing from title */}
-            <p className="text-xs text-muted-foreground truncate">
-              {course.locationText}
-            </p>
+            {!hideLocation && (
+              <p className="text-xs text-muted-foreground truncate">
+                {course.locationText}
+              </p>
+            )}
 
             {/* Rating count / members */}
             {course.ratingCount && course.ratingCount > 0 && (
