@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { 
   getAllMilestonesWithState, 
   getListMilestoneState,
@@ -13,15 +13,21 @@ interface Top100ListMilestoneRailProps {
   onViewAll?: () => void;
 }
 
+// SVG ring dimensions
+const TOKEN_SIZE = 76;
+const RING_RADIUS = 32;
+const RING_CENTER = TOKEN_SIZE / 2;
+const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
 /**
- * Horizontal swipeable milestone rail for Top 100 list pages.
- * Frosted glass design with light/white tiles.
+ * Horizontal swipeable milestone rail with collectible token design.
+ * SVG progress rings with frosted glass backgrounds.
  * 
  * Visual states:
- * - NEXT UP: Frosted white + subtle brand halo + breathing glow
- * - UNLOCKED: Frosted white + glass check badge
- * - LOCKED: Frosted white, muted text, no heavy grey-out
- * - COMPLETED (100 tile only): Trophy with subtle gold accent
+ * - UNLOCKED: Solid brand accent ring + frosted glass
+ * - NEXT UP: Animated progress arc showing playedCount/nextMilestone
+ * - LOCKED: Thin neutral grey ring + muted text
+ * - COMPLETED (100 tile only): Trophy with subtle gold ring
  */
 export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = ({
   playedCount,
@@ -32,16 +38,14 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
   const nextUpRef = useRef<HTMLButtonElement>(null);
   const [milestones, setMilestones] = useState<ListMilestoneInfo[]>([]);
 
-  // Get milestone states
   useEffect(() => {
     setMilestones(getAllMilestonesWithState(playedCount));
   }, [playedCount]);
 
-  // Auto-scroll to next up milestone on mount using scrollIntoView
+  // Auto-scroll to next up milestone on mount
   useEffect(() => {
     if (!nextUpRef.current) return;
     
-    // Small delay to ensure layout is complete
     const timer = setTimeout(() => {
       nextUpRef.current?.scrollIntoView({
         behavior: 'smooth',
@@ -65,7 +69,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
 
   return (
     <section className="mt-4">
-      {/* Header: YOUR MILESTONES + See all → */}
+      {/* Header */}
       <div className="px-4 flex items-center justify-between mb-2.5">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
           Your Milestones
@@ -78,34 +82,33 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
         </button>
       </div>
 
-      {/* Horizontal scrolling rail with fade hint */}
+      {/* Horizontal scrolling rail */}
       <div className="relative">
         <div 
           ref={scrollRef}
-          className="flex gap-2.5 px-4 overflow-x-auto scrollbar-hide pb-1"
+          className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2"
           style={{ 
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch',
           }}
         >
           {milestones.map((milestone, index) => (
-            <MilestoneTile
+            <MilestoneToken
               key={milestone.threshold}
               ref={milestone.state === 'next_up' ? nextUpRef : undefined}
               milestone={milestone}
-              isFirst={index === 0}
-              isLast={index === milestones.length - 1}
+              playedCount={playedCount}
               isListComplete={isComplete}
               onClick={handleTileClick}
             />
           ))}
         </div>
         
-        {/* Right fade gradient to hint more content */}
+        {/* Right fade gradient */}
         <div 
-          className="absolute right-0 top-0 bottom-1 w-8 pointer-events-none"
+          className="absolute right-0 top-0 bottom-2 w-10 pointer-events-none"
           style={{
-            background: 'linear-gradient(to right, transparent, rgba(248,250,252,0.9))',
+            background: 'linear-gradient(to right, transparent, rgba(248,250,252,0.95))',
           }}
         />
       </div>
@@ -113,183 +116,196 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
   );
 };
 
-interface MilestoneTileProps {
+interface MilestoneTokenProps {
   milestone: ListMilestoneInfo;
-  isFirst: boolean;
-  isLast: boolean;
+  playedCount: number;
   isListComplete: boolean;
   onClick: () => void;
 }
 
-const MilestoneTile = React.forwardRef<HTMLButtonElement, MilestoneTileProps>(({
+const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(({
   milestone,
-  isFirst,
-  isLast,
+  playedCount,
   isListComplete,
   onClick,
 }, ref) => {
   const { threshold, state, toGo } = milestone;
 
-  // State-based styling
   const isNextUp = state === 'next_up';
   const isUnlocked = state === 'unlocked';
   const isLocked = state === 'locked';
   
-  // Only the 100 tile gets hero completion styling
   const isHundredTile = threshold === 100;
   const showCompletionHero = isListComplete && isHundredTile;
 
-  // Check for reduced motion preference
+  // Reduced motion check
   const prefersReducedMotion = typeof window !== 'undefined' 
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  // Frosted glass base styles
-  const baseGlassStyles: React.CSSProperties = {
-    background: 'rgba(255, 255, 255, 0.85)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
+  // Calculate progress for next up (arc percentage)
+  const getProgress = (): number => {
+    if (!isNextUp) return isUnlocked ? 1 : 0;
+    return Math.min(1, Math.max(0, playedCount / threshold));
   };
 
-  // State-specific border and shadow
-  const getBorderAndShadow = (): React.CSSProperties => {
+  const progress = getProgress();
+  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+
+  // Ring styling per state
+  const getRingConfig = () => {
     if (showCompletionHero) {
-      return {
-        border: '1px solid rgba(245, 158, 11, 0.25)',
-        boxShadow: '0 0 16px 2px rgba(245, 158, 11, 0.15), 0 2px 8px rgba(0,0,0,0.06)',
-      };
-    }
-    if (isNextUp) {
-      return {
-        border: '1px solid rgba(15, 23, 42, 0.14)',
-        boxShadow: '0 0 12px 2px hsl(var(--primary) / 0.12), 0 2px 8px rgba(0,0,0,0.06)',
-      };
+      return { stroke: 'rgb(180, 130, 50)', strokeWidth: 3, opacity: 1 };
     }
     if (isUnlocked) {
-      return {
-        border: '1px solid rgba(15, 23, 42, 0.08)',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-      };
+      return { stroke: 'hsl(var(--primary))', strokeWidth: 3, opacity: 1 };
     }
-    // Locked - slightly muted but not dead
-    return {
-      border: '1px solid rgba(15, 23, 42, 0.06)',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-    };
+    if (isNextUp) {
+      return { stroke: 'hsl(var(--primary))', strokeWidth: 4, opacity: 1 };
+    }
+    // Locked
+    return { stroke: 'rgb(203, 213, 225)', strokeWidth: 2, opacity: 0.7 };
   };
+
+  const ringConfig = getRingConfig();
 
   return (
     <motion.button
       ref={ref}
       whileTap={{ scale: 0.96 }}
       onClick={onClick}
-      className={`
-        relative flex-shrink-0 w-[88px] h-[80px] rounded-2xl p-2.5 
-        flex flex-col items-center justify-center gap-1
-        transition-all duration-200 cursor-pointer
-        ${isFirst ? 'ml-0' : ''} ${isLast ? 'mr-0' : ''}
-        ${isLocked ? 'opacity-70' : ''}
-      `}
+      className="relative flex-shrink-0 flex flex-col items-center justify-center cursor-pointer"
       style={{ 
+        width: TOKEN_SIZE,
+        height: TOKEN_SIZE + 20,
         scrollSnapAlign: 'start',
-        ...baseGlassStyles,
-        ...getBorderAndShadow(),
       }}
       aria-label={`Milestone ${threshold}: ${isUnlocked ? 'Complete' : isNextUp ? `${toGo} to go` : 'Locked'}`}
     >
-      {/* Breathing glow for next up - respects reduced motion */}
-      {isNextUp && !prefersReducedMotion && (
-        <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+      {/* Token container with SVG ring */}
+      <div 
+        className="relative flex items-center justify-center"
+        style={{ width: TOKEN_SIZE, height: TOKEN_SIZE }}
+      >
+        {/* Frosted glass background (squircle shape) */}
+        <div 
+          className="absolute inset-[6px] rounded-[18px]"
           style={{
-            background: 'radial-gradient(ellipse at center, hsl(var(--primary) / 0.08) 0%, transparent 70%)',
-          }}
-          animate={{
-            opacity: [0.4, 0.8, 0.4],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeInOut',
+            background: isLocked 
+              ? 'rgba(255, 255, 255, 0.75)' 
+              : 'rgba(255, 255, 255, 0.88)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            boxShadow: isNextUp 
+              ? '0 2px 12px rgba(0,0,0,0.06)' 
+              : '0 1px 6px rgba(0,0,0,0.04)',
           }}
         />
-      )}
 
-      {/* NEXT UP pill label */}
+        {/* Subtle halo for next up only */}
+        {isNextUp && !prefersReducedMotion && (
+          <motion.div
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at center, hsl(var(--primary) / 0.1) 0%, transparent 60%)',
+            }}
+            initial={{ opacity: 0.3 }}
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+
+        {/* SVG Ring */}
+        <svg 
+          width={TOKEN_SIZE} 
+          height={TOKEN_SIZE} 
+          className="absolute inset-0"
+          style={{ transform: 'rotate(-90deg)' }}
+        >
+          {/* Base ring (always visible for structure) */}
+          <circle
+            cx={RING_CENTER}
+            cy={RING_CENTER}
+            r={RING_RADIUS}
+            fill="none"
+            stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.06)'}
+            strokeWidth={isLocked ? 2 : 1}
+          />
+          
+          {/* Progress/solid ring */}
+          {(isUnlocked || isNextUp || showCompletionHero) && (
+            <motion.circle
+              cx={RING_CENTER}
+              cy={RING_CENTER}
+              r={RING_RADIUS}
+              fill="none"
+              stroke={ringConfig.stroke}
+              strokeWidth={ringConfig.strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE}
+              initial={isNextUp && !prefersReducedMotion ? { strokeDashoffset: CIRCUMFERENCE } : { strokeDashoffset }}
+              animate={{ strokeDashoffset }}
+              transition={
+                isNextUp && !prefersReducedMotion 
+                  ? { duration: 0.8, ease: 'easeOut', delay: 0.2 }
+                  : { duration: 0 }
+              }
+              style={{ opacity: ringConfig.opacity }}
+            />
+          )}
+        </svg>
+
+        {/* Center content */}
+        <div className="relative z-10 flex flex-col items-center justify-center">
+          {showCompletionHero ? (
+            <Trophy className="w-6 h-6" style={{ color: 'rgb(180, 130, 50)' }} />
+          ) : (
+            <span className={`text-xl font-bold ${
+              isNextUp 
+                ? 'text-slate-800' 
+                : isUnlocked 
+                  ? 'text-slate-700' 
+                  : 'text-slate-400'
+            }`}>
+              {threshold}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Subtext below token */}
+      <span className={`text-[10px] font-medium mt-1 ${
+        showCompletionHero
+          ? 'text-amber-700/80'
+          : isNextUp 
+            ? 'text-slate-600' 
+            : isUnlocked 
+              ? 'text-slate-500' 
+              : 'text-slate-400'
+      }`}>
+        {isNextUp && toGo !== undefined 
+          ? `${toGo} to go`
+          : isUnlocked || showCompletionHero
+            ? 'Complete'
+            : ''
+        }
+      </span>
+
+      {/* NEXT UP label pill */}
       {isNextUp && (
         <span 
-          className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+          className="absolute -top-0.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
           style={{
-            background: 'hsl(var(--primary) / 0.12)',
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid rgba(15, 23, 42, 0.1)',
             color: 'hsl(var(--primary))',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
           }}
         >
           Next Up
         </span>
       )}
-      
-      {/* Completed hero label */}
-      {showCompletionHero && (
-        <span 
-          className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-          style={{
-            background: 'rgba(245, 158, 11, 0.12)',
-            color: 'rgb(180, 120, 20)',
-          }}
-        >
-          Complete
-        </span>
-      )}
-
-      {/* Main number or trophy */}
-      <div className="relative">
-        {showCompletionHero ? (
-          <Trophy className="w-6 h-6" style={{ color: 'rgb(180, 120, 20)' }} />
-        ) : (
-          <span className={`text-xl font-bold ${
-            isNextUp 
-              ? 'text-slate-800' 
-              : isUnlocked 
-                ? 'text-slate-700' 
-                : 'text-slate-400'
-          }`}>
-            {threshold}
-          </span>
-        )}
-        
-        {/* Glass check badge for unlocked (non-100) */}
-        {isUnlocked && !showCompletionHero && (
-          <div 
-            className="absolute -top-1 -right-2.5 w-4 h-4 rounded-full flex items-center justify-center"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(15, 23, 42, 0.1)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-            }}
-          >
-            <Check className="w-2.5 h-2.5 text-slate-500" strokeWidth={3} />
-          </div>
-        )}
-      </div>
-
-      {/* Subtext */}
-      <span className={`text-[10px] font-medium ${
-        showCompletionHero
-          ? 'text-amber-700/80'
-          : isNextUp 
-            ? 'text-slate-500' 
-            : isUnlocked 
-              ? 'text-slate-400' 
-              : 'text-slate-300'
-      }`}>
-        {isNextUp && toGo !== undefined 
-          ? `${toGo} to go` 
-          : isUnlocked || showCompletionHero
-            ? `${threshold} Complete`
-            : ''
-        }
-      </span>
     </motion.button>
   );
 });
 
-MilestoneTile.displayName = 'MilestoneTile';
+MilestoneToken.displayName = 'MilestoneToken';
