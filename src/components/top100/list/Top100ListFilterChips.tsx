@@ -28,8 +28,8 @@ const FILTER_OPTIONS: { value: Top100FilterChip; label: string }[] = [
 ];
 
 const SORT_OPTIONS: { value: Top100SortMode; label: string; requiresReviewData?: boolean }[] = [
-  { value: 'rating_high', label: 'Rating: High to Low' },
-  { value: 'rating_low', label: 'Rating: Low to High' },
+  { value: 'rating_high', label: 'High to Low' },
+  { value: 'rating_low', label: 'Low to High' },
   { value: 'most_rated', label: 'Most Rated', requiresReviewData: true },
   { value: 'az', label: 'A to Z' },
   { value: 'za', label: 'Z to A' },
