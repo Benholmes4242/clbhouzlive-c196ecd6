@@ -88,14 +88,14 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   onClick={() => onFilterChange(option.value)}
                   className={`cursor-pointer ${
                     isActive 
-                      ? 'bg-slate-100 text-slate-900 font-medium' 
+                      ? 'bg-[var(--surface-slate)] text-white font-medium' 
                       : 'text-slate-700'
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     {option.label}
                     {counts[option.value] !== undefined && counts[option.value]! > 0 && (
-                      <span className="text-slate-400 text-xs">({counts[option.value]})</span>
+                      <span className={isActive ? 'text-white/70' : 'text-slate-400'}> ({counts[option.value]})</span>
                     )}
                   </span>
                 </DropdownMenuItem>
@@ -133,7 +133,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                     isDisabled
                       ? 'text-slate-400 opacity-50 cursor-not-allowed'
                       : isActive 
-                        ? 'bg-slate-100 text-slate-900 font-medium cursor-pointer' 
+                        ? 'bg-[var(--surface-slate)] text-white font-medium cursor-pointer' 
                         : 'text-slate-700 cursor-pointer'
                   }`}
                   disabled={isDisabled}
