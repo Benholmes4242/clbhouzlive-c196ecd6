@@ -714,11 +714,11 @@ html, body, #root {
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 64px;
   
-  /* Top 100 Region Colors */
-  --region-global: 31 159 155;      /* teal / blue-green */
-  --region-gbi: 31 122 58;          /* deep green */
-  --region-usa: 197 68 59;          /* warm red */
-  --region-europe: 101 84 192;      /* violet / indigo */
+  /* Top 100 Region Colors - Premium identity per list */
+  --region-global: 180 140 70;      /* soft gold / champagne - prestige, pinnacle */
+  --region-gbi: 35 90 50;           /* deep racing green - tradition, heritage */
+  --region-usa: 140 45 50;          /* deep burgundy red - bold, competitive */
+  --region-europe: 55 90 150;       /* rich blue - continental, refined */
   
   /* Create Moment composer tokens - compact to fit on one screen */
   --composer-height: 380px;
