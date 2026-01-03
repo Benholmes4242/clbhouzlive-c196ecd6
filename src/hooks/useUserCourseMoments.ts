@@ -32,6 +32,7 @@ export function useUserCourseMoments(courseId: string | undefined) {
           id,
           media_url,
           media_type,
+          poster_url,
           created_at,
           review:course_ratings!inner(user_id, review)
         `)
@@ -49,7 +50,7 @@ export function useUserCourseMoments(courseId: string | undefined) {
       // Get media for those ratings
       const { data: courseMedia } = await supabase
         .from('course_review_media')
-        .select('id, media_url, media_type, created_at, review_id')
+        .select('id, media_url, media_type, poster_url, created_at, review_id')
         .in('review_id', Array.from(ratingIds));
 
       courseMedia?.forEach(media => {

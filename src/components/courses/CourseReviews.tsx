@@ -68,7 +68,7 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
       // Get review media for each rating
       const { data: mediaData, error: mediaError } = await supabase
         .from('course_review_media')
-        .select('id, review_id, media_url, media_type, file_name')
+        .select('id, review_id, media_url, media_type, file_name, poster_url')
         .in('review_id', ratingsData.map(r => r.id));
 
       if (mediaError) throw mediaError;
