@@ -18,6 +18,7 @@ import {
   generateJourneyInsights,
   type Top100FilterChip,
 } from '@/components/top100/list';
+import type { Top100SortMode } from '@/components/top100/list/Top100ListFilterChips';
 import { Top100HeroShell } from '@/components/top100/Top100HeroShell';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
@@ -49,6 +50,7 @@ const Top100List = () => {
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
+  const [sortMode, setSortMode] = useState<Top100SortMode>('rank');
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
   const [isFilterSticky, setIsFilterSticky] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -132,23 +134,36 @@ const Top100List = () => {
 
       const courseIds = (data || []).map((item: any) => item.golf_courses.id);
       
+      // Fetch ratings aggregates
       const { data: ratingsData } = await supabase
         .from('course_rating_aggregates')
-        .select('course_id, avg_overall_score')
+        .select('course_id, avg_overall_score, rating_count')
         .in('course_id', courseIds);
 
       const ratingsMap = new Map(
-        (ratingsData || []).map((r: any) => [r.course_id, r.avg_overall_score])
+        (ratingsData || []).map((r: any) => [r.course_id, { 
+          avgRating: r.avg_overall_score, 
+          reviewCount: r.rating_count || 0 
+        }])
       );
 
-      return (data || []).map((item: any) => ({
-        ...item.golf_courses,
-        rank: item.rank,
-        communityRating: ratingsMap.get(item.golf_courses.id) || null,
-      }));
+      return (data || []).map((item: any) => {
+        const ratingInfo = ratingsMap.get(item.golf_courses.id);
+        return {
+          ...item.golf_courses,
+          rank: item.rank,
+          communityRating: ratingInfo?.avgRating || null,
+          reviewCount: ratingInfo?.reviewCount || 0,
+        };
+      });
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  // Check if we have review data
+  const hasReviewData = useMemo(() => {
+    return courses?.some((c) => c.reviewCount > 0) ?? false;
+  }, [courses]);
 
   // Fetch friends progress on this list
   const { data: friendsProgress = [] } = useFriendsTop100Progress(user?.id, currentList?.id);
@@ -211,10 +226,10 @@ const Top100List = () => {
 
 
 
-  // Reset displayed count when filter changes
+  // Reset displayed count when filter or sort changes
   useEffect(() => {
     setDisplayedCount(PAGE_SIZE);
-  }, [filterChip]);
+  }, [filterChip, sortMode]);
 
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
@@ -222,31 +237,58 @@ const Top100List = () => {
 
     let filtered = [...courses];
 
-    // Apply filter based on chip
+    // Step 1: Apply filter based on chip
     if (filterChip === 'unplayed') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     } else if (filterChip === 'played') {
       filtered = filtered.filter((c) => playedCourseIds.has(c.id));
     }
+    // 'official' and 'community' don't filter, only affect default sort meaning
 
-    // Apply sort
+    // Step 2: Apply sort
     filtered.sort((a, b) => {
-      switch (filterChip) {
-        case 'official':
+      switch (sortMode) {
+        case 'rank':
+          // Rank meaning depends on filter
+          if (filterChip === 'community') {
+            // Sort by community rating descending
+            return (b.communityRating || 0) - (a.communityRating || 0);
+          }
+          // Official, Played, Unplayed → use official rank
           return a.rank - b.rank;
-        case 'community':
-          return (b.communityRating || 0) - (a.communityRating || 0);
-        case 'played':
+
+        case 'az':
+          return a.name.localeCompare(b.name);
+
+        case 'za':
+          return b.name.localeCompare(a.name);
+
+        case 'most_reviewed':
+          // Primary: review count desc, Tie-breaker: rank asc
+          if (b.reviewCount !== a.reviewCount) {
+            return b.reviewCount - a.reviewCount;
+          }
           return a.rank - b.rank;
-        case 'unplayed':
+
+        case 'highest_rated':
+          // Primary: avg rating desc, Tie-breaker: review count desc, then rank
+          const ratingA = a.communityRating || 0;
+          const ratingB = b.communityRating || 0;
+          if (ratingB !== ratingA) {
+            return ratingB - ratingA;
+          }
+          if (b.reviewCount !== a.reviewCount) {
+            return b.reviewCount - a.reviewCount;
+          }
           return a.rank - b.rank;
+
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [courses, filterChip, playedCourseIds]);
+  }, [courses, filterChip, sortMode, playedCourseIds]);
 
   // Load-more calculations (Explore pattern: accumulate items)
   const totalFiltered = filteredAndSortedCourses.length;
@@ -358,8 +400,11 @@ const Top100List = () => {
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={setFilterChip}
+            activeSort={sortMode}
+            onSortChange={setSortMode}
             counts={{ played: filterPlayedCount, unplayed: unplayedCount }}
             isSticky={isFilterSticky}
+            hasReviewData={hasReviewData}
           />
           
           {/* Scroll-to-top arrow positioned below sticky filters - matching ScrollToTopGlass style */}
