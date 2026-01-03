@@ -129,7 +129,7 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
               </button>
             </div>
 
-            {/* Options - Dark mode styling */}
+            {/* Options - Matches MomentAudienceSheet styling */}
             <div className="px-4 pb-4 space-y-1.5">
               {FILTER_OPTIONS.map((option) => {
                 const isSelected = activeFilter === option.value;
@@ -140,41 +140,47 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
                     key={option.value}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleSelect(option.value)}
-                    className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all ${
-                      isSelected
-                        ? 'bg-primary/20 border border-primary/40 shadow-md'
-                        : 'bg-muted/50 border border-border hover:bg-muted/80'
-                    }`}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-xl transition-all"
+                    style={{
+                      background: isSelected 
+                        ? 'var(--cm-surface-slate)' 
+                        : 'var(--cm-surface-alt)',
+                      border: isSelected 
+                        ? 'none' 
+                        : '1px solid var(--cm-border-subtle)',
+                      boxShadow: isSelected 
+                        ? '0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.1)' 
+                        : 'none',
+                    }}
                   >
                     <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center ${
-                        isSelected ? 'bg-primary/20 text-primary' : 'bg-background text-muted-foreground'
-                      }`}
+                      className="w-9 h-9 rounded-full flex items-center justify-center"
+                      style={{ 
+                        background: isSelected ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-card)',
+                        color: isSelected ? 'white' : 'var(--cm-icon-primary)',
+                      }}
                     >
                       {option.icon}
                     </div>
 
                     <div className="flex-1 text-left">
                       <p
-                        className={`font-medium text-[13px] ${
-                          isSelected ? 'text-foreground' : 'text-foreground/90'
-                        }`}
+                        className="font-medium text-[13px]"
+                        style={{ color: isSelected ? 'white' : 'var(--cm-text-primary)' }}
                       >
                         {option.label}
                         {count !== undefined && count > 0 && (
                           <span
-                            className={`ml-1.5 text-[11px] ${
-                              isSelected ? 'text-primary' : 'text-muted-foreground'
-                            }`}
+                            className="ml-1.5 text-[11px]"
+                            style={{ color: isSelected ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
                           >
                             ({count})
                           </span>
                         )}
                       </p>
                       <p
-                        className={`text-[11px] mt-0.5 ${
-                          isSelected ? 'text-muted-foreground' : 'text-muted-foreground/80'
-                        }`}
+                        className="text-[11px] mt-0.5"
+                        style={{ color: isSelected ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
                       >
                         {option.description}
                       </p>
