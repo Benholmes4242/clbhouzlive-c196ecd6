@@ -12,7 +12,7 @@ export const getMediaType = (file: File): 'image' | 'video' | 'unknown' => {
   
   // Fallback to extension (iOS often returns empty MIME for videos)
   const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'];
-  const videoExts = ['mp4', 'mov', 'webm', 'm4v', '3gp', 'avi'];
+  const videoExts = ['mp4', 'mov', 'webm', 'm4v', '3gp'];
   
   if (imageExts.includes(ext)) return 'image';
   if (videoExts.includes(ext)) return 'video';
