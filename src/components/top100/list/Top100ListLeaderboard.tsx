@@ -136,7 +136,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
         )}
       </div>
 
-      <div className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory pb-1 scrollbar-none mt-2.5 pl-4">
+      <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none mt-2.5 pl-4">
         {sortedFriends.slice(0, 10).map((friend, index) => {
           // Calculate relative position
           const diff = friend.playedOnList - currentUserPlayed;
@@ -161,7 +161,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`
-                flex-shrink-0 w-[68px] snap-start p-1.5 rounded-xl bg-white border transition-all text-center
+                flex-shrink-0 w-[68px] p-1.5 rounded-xl bg-white border transition-all text-center
                 ${isCurrentUser ? 'border-amber-400 ring-2 ring-amber-400/20' : ''}
                 ${isClosestCompetitor && !isCurrentUser ? 'border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.25)]' : ''}
                 ${!isCurrentUser && !isClosestCompetitor ? 'border-slate-100' : ''}
