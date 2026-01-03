@@ -238,27 +238,62 @@ const PostPlayRatingModal = ({
       // Upload media files if any
       if (mediaFiles.length > 0) {
         const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+        const { edgePost } = await import('@/utils/callEdge');
+        const { generateStreamThumbnailUrl, generateStreamHlsUrl } = await import('@/config/cloudflareStream');
+        
         const uploadPromises = mediaFiles.map(async (file) => {
-          const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+          const isVideo = isVideoFile(file);
           
-          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
-          
-          if (!uploadResult.success) {
-            throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+          if (isVideo) {
+            // Videos go to Cloudflare Stream
+            console.log('[Review Media] Uploading video to Cloudflare Stream:', file.name);
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const streamResult = await edgePost('cloudflare-stream-upload', formData);
+            
+            if (!streamResult?.success || !streamResult?.videoId) {
+              throw new Error(streamResult?.error || `Failed to upload video ${file.name}`);
+            }
+            
+            console.log('[Review Media] Stream upload success:', streamResult.videoId);
+            
+            // Save video record with stream_id and poster_url
+            const { error: mediaError } = await supabase
+              .from('course_review_media')
+              .insert({
+                review_id: ratingId,
+                media_url: generateStreamHlsUrl(streamResult.videoId),
+                media_type: 'video',
+                stream_id: streamResult.videoId,
+                poster_url: generateStreamThumbnailUrl(streamResult.videoId),
+                file_name: file.name,
+                file_size: file.size
+              });
+
+            if (mediaError) throw mediaError;
+          } else {
+            // Images go to R2
+            const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+            const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
+            
+            if (!uploadResult.success) {
+              throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+            }
+
+            // Save image record to database
+            const { error: mediaError } = await supabase
+              .from('course_review_media')
+              .insert({
+                review_id: ratingId,
+                media_url: uploadResult.publicUrl,
+                media_type: 'image',
+                file_name: file.name,
+                file_size: file.size
+              });
+
+            if (mediaError) throw mediaError;
           }
-
-          // Save media record to database
-          const { error: mediaError } = await supabase
-            .from('course_review_media')
-            .insert({
-              review_id: ratingId,
-              media_url: uploadResult.publicUrl,
-              media_type: isVideoFile(file) ? 'video' : 'image',
-              file_name: file.name,
-              file_size: file.size
-            });
-
-          if (mediaError) throw mediaError;
         });
 
         await Promise.all(uploadPromises);
@@ -1092,28 +1127,18 @@ const PostPlayRatingModal = ({
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
-                              <div className="relative h-full w-full bg-slate-700">
+                              <div className="relative h-full w-full bg-slate-800">
+                                {/* Show thumbnail if generated, otherwise show placeholder */}
                                 {preview && !preview.startsWith('blob:') ? (
                                   <img
                                     src={preview}
-                                    alt=""
+                                    alt="Video thumbnail"
                                     className="h-full w-full object-cover"
                                   />
                                 ) : (
-                                  <video
-                                    src={preview || undefined}
-                                    autoPlay
-                                    muted
-                                    playsInline
-                                    loop={false}
-                                    className="h-full w-full object-cover"
-                                    onCanPlay={(e) => {
-                                      // Pause immediately after loading to show first frame on iOS
-                                      const video = e.currentTarget;
-                                      video.pause();
-                                      video.currentTime = 0.1;
-                                    }}
-                                  />
+                                  <div className="h-full w-full flex items-center justify-center bg-slate-700">
+                                    <span className="text-xs text-slate-400 text-center px-2">Video added</span>
+                                  </div>
                                 )}
                                 {/* Centered play icon overlay */}
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

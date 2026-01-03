@@ -27,10 +27,10 @@ export const ReviewMediaStrip: React.FC<ReviewMediaStripProps> = ({ media, onMed
         >
           {item.media_type === 'video' ? (
             <>
-              <video
-                src={item.media_url}
+              <img
+                src={item.poster_url || item.media_url}
+                alt="Video thumbnail"
                 className="w-full h-full object-cover"
-                preload="metadata"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
