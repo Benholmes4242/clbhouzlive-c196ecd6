@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import CompactHeader from './CompactHeader';
 import { useModalContext } from '@/contexts/ModalContext';
+import { isGlobalHeaderExcluded } from './globalHeaderRules';
 
 /**
  * GlobalHeader - Renders CompactHeader on all pages except:
@@ -14,38 +15,13 @@ import { useModalContext } from '@/contexts/ModalContext';
 const GlobalHeader: React.FC = () => {
   const location = useLocation();
   const { shouldHideHeader } = useModalContext();
-  
+
   const pathname = location.pathname;
-  
-  // Routes that should NOT show the global header
-  const excludedRoutes = [
-    '/', // Clubhouse home
-    '/clubhouse',
-    '/auth',
-    '/auth/callback',
-    '/auth/verified',
-    '/signup',
-    '/onboarding',
-    '/create-moment',
-  ];
-  
-  // Check if current path starts with excluded prefixes
-  const excludedPrefixes = [
-    '/admin',
-    '/hub', // Hub has its own overlay handling
-  ];
-  
-  // Check exact matches
-  const isExcludedExact = excludedRoutes.some(route => pathname === route);
-  
-  // Check prefix matches
-  const isExcludedPrefix = excludedPrefixes.some(prefix => pathname.startsWith(prefix));
-  
-  // Hide header for full-screen modals
-  if (shouldHideHeader || isExcludedExact || isExcludedPrefix) {
+
+  if (shouldHideHeader || isGlobalHeaderExcluded(pathname)) {
     return null;
   }
-  
+
   return <CompactHeader />;
 };
 
