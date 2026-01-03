@@ -13,6 +13,7 @@ import {
   Top100ListAchievementsPair,
   Top100ListFilterChips,
   Top100ListCourseCard,
+  Top100ListProgressCard,
   JourneyInsightCard,
   generateJourneyInsights,
   type Top100FilterChip,
@@ -347,9 +348,20 @@ const Top100List = () => {
           />
         )}
 
-        {/* 3. Social Leaderboard - mt-4 from progress hero */}
+        {/* 2. Progress Card with next milestone + motivational copy */}
         {session && (
-          <div className="mt-4">
+          <Top100ListProgressCard
+            playedCount={playedCount}
+            totalCount={totalCount}
+            listSlug={slug || 'global'}
+            listDisplayName={listDisplayName}
+            userId={user?.id}
+          />
+        )}
+
+        {/* 3. Social Leaderboard */}
+        {session && (
+          <div className="mt-6">
             <Top100ListLeaderboard
               friends={friendsSummary}
               totalInList={totalCount}
@@ -359,9 +371,9 @@ const Top100List = () => {
           </div>
         )}
 
-        {/* 4. Achievements Pair - mt-4 from leaderboard */}
+        {/* 4. Milestones - horizontal strip */}
         {session && (
-          <div className="mt-4">
+          <div className="mt-6">
             <Top100ListAchievementsPair
               primary={listMilestones.primary}
               upcoming={listMilestones.upcoming}
@@ -372,14 +384,33 @@ const Top100List = () => {
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
 
-        {/* 5. Filter Chips (sticky) - mt-4 from achievements */}
-        <div ref={filterRef} className={`mt-4 ${isFilterSticky ? 'sticky top-14 z-10' : ''}`}>
+        {/* 5. Filter Chips (sticky) - with scroll-to-top inside when sticky */}
+        <div 
+          ref={filterRef} 
+          className={`mt-6 ${isFilterSticky ? 'sticky top-14 z-10' : ''}`}
+        >
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={setFilterChip}
             counts={{ unplayed: unplayedCount }}
             isSticky={isFilterSticky}
           />
+          
+          {/* Scroll-to-top arrow positioned below sticky filters */}
+          {isFilterSticky && (
+            <div className="flex justify-center py-2 bg-gradient-to-b from-white/95 to-transparent">
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                aria-label="Back to top"
+                className="h-7 w-7 rounded-full flex items-center justify-center bg-slate-100 border border-slate-200 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-all"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 6. Course List with Journey Insights */}
@@ -431,37 +462,18 @@ const Top100List = () => {
           )}
         </section>
 
-        {/* 7. Pagination with intent-driven copy */}
-        <div className="px-4 pb-[24px]">
-          <div className="flex items-center justify-between gap-4">
-            <button
-              onClick={handlePrevPage}
-              disabled={!hasPrevPage}
-              className={`px-4 py-2 text-sm font-medium rounded-sq-sm transition-colors ${
-                hasPrevPage 
-                  ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' 
-                  : 'bg-slate-50 text-slate-300 cursor-not-allowed'
-              }`}
-            >
-              Previous 25
-            </button>
-            
-            <span className="text-xs text-slate-500">
-              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, totalFiltered)} of {totalFiltered}
-            </span>
-            
-            <button
-              onClick={handleNextPage}
-              disabled={!hasNextPage}
-              className={`px-4 py-2 text-sm font-medium rounded-sq-sm transition-colors ${
-                hasNextPage 
-                  ? 'bg-slate-900 text-white hover:bg-slate-800' 
-                  : 'bg-slate-50 text-slate-300 cursor-not-allowed'
-              }`}
-            >
-              Next 25
-            </button>
-          </div>
+        {/* 7. Pagination - using UnifiedPagination to match Explore/Top100 exactly */}
+        <div className="px-4 pb-6">
+          <UnifiedPagination
+            page={page}
+            total={totalFiltered}
+            pageSize={PAGE_SIZE}
+            hasNextPage={hasNextPage}
+            onNext={handleNextPage}
+            onPrev={handlePrevPage}
+            itemLabel="courses"
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
+          />
         </div>
 
       </main>
@@ -475,8 +487,8 @@ const Top100List = () => {
         />
       )}
 
-      {/* Scroll to top button */}
-      <ScrollToTopGlass />
+      {/* Global scroll to top button - only show when filters are not sticky */}
+      {!isFilterSticky && <ScrollToTopGlass />}
     </PageRoot>
   );
 };
