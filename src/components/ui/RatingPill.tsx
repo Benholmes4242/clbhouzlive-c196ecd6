@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getRatingTheme, type RatingTier } from '@/lib/globalAchievementMilestoneSystem';
 
@@ -16,6 +16,7 @@ interface RatingPillProps {
  * Unified Rating Pill Component
  * 
  * Uses slate styling for Fair→Excellent, gold only for Outstanding.
+ * Phase 3A: Includes smooth tier change transitions.
  * 
  * @example
  * <RatingPill score={8.5} />
@@ -38,20 +39,45 @@ export function RatingPill({ score, tier, label, className }: RatingPillProps) {
   
   // Determine if Outstanding (gold) or standard (slate)
   const isOutstanding = theme.key === 'OUTSTANDING';
+  
+  // Phase 3A: Track tier changes for transition animation
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [displayedLabel, setDisplayedLabel] = useState(displayLabel);
+  const prevTierRef = useRef(theme.key);
+  
+  useEffect(() => {
+    // Only animate if tier actually changed (not just decimal value)
+    if (prevTierRef.current !== theme.key) {
+      setIsTransitioning(true);
+      
+      // After fade out, update label and fade in
+      const timer = setTimeout(() => {
+        setDisplayedLabel(displayLabel);
+        setIsTransitioning(false);
+      }, 120);
+      
+      prevTierRef.current = theme.key;
+      return () => clearTimeout(timer);
+    } else {
+      // No tier change - update immediately
+      setDisplayedLabel(displayLabel);
+    }
+  }, [theme.key, displayLabel]);
 
   return (
     <span
       className={cn(
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
-        'border transition-colors',
+        'border rating-label-transition',
         isOutstanding 
           ? 'bg-[#C9A94A]/15 border-[#C9A94A]/40 text-[#8B7635]'
           : 'bg-slate-100 border-slate-200 text-slate-600',
         className
       )}
+      data-transitioning={isTransitioning}
     >
-      {displayLabel.toUpperCase()}
+      {displayedLabel.toUpperCase()}
     </span>
   );
 }
