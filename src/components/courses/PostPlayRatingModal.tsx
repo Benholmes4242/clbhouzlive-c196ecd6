@@ -15,6 +15,7 @@ import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { generateVideoThumbnail } from '@/utils/videoThumbnail';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingPill } from '@/components/ui/RatingPill';
+import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
@@ -252,7 +253,7 @@ const PostPlayRatingModal = ({
             .insert({
               review_id: ratingId,
               media_url: uploadResult.publicUrl,
-              media_type: file.type.startsWith('video/') ? 'video' : 'image',
+              media_type: isVideoFile(file) ? 'video' : 'image',
               file_name: file.name,
               file_size: file.size
             });
@@ -717,7 +718,7 @@ const PostPlayRatingModal = ({
     
     for (const file of filesToAdd) {
       try {
-        if (file.type.startsWith('video/')) {
+        if (isVideoFile(file)) {
           const thumbnail = await generateVideoThumbnail(file);
           if (thumbnail) {
             newPreviews.set(file, thumbnail);
@@ -1032,7 +1033,7 @@ const PostPlayRatingModal = ({
                   <div className="w-full">
                     <div className="grid grid-cols-3 gap-3">
                       {selectedMedia.map((file, index) => {
-                        const isVideo = file.type.startsWith('video/');
+                        const isVideo = isVideoFile(file);
                         const preview = mediaPreviews.get(file) || '';
                         
                         console.log('[Media Audit] CHECKPOINT C - Thumbnail render:', {

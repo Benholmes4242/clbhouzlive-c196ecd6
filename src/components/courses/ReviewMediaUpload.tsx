@@ -9,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { getMediaType } from '@/utils/getMediaType';
 
 interface ReviewMediaUploadProps {
   onMediaSelected: (files: File[]) => void;
@@ -35,10 +36,10 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
     
     // No file size limits - users can upload files of any size
 
-    // Check file types
-    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp', 'video/mp4', 'video/quicktime', 'video/mov'];
-    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+    // Check file types - use extension fallback for iOS empty MIME
+    const invalidFiles = files.filter(file => getMediaType(file) === 'unknown');
     if (invalidFiles.length > 0) {
+      console.warn('[ReviewMediaUpload] Invalid files rejected:', invalidFiles.map(f => ({ name: f.name, type: f.type })));
       toast({
         title: "Invalid file type",
         description: "Only JPG, PNG, MP4, and MOV files are supported.",
@@ -125,7 +126,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
   ];
 
   const getMediaPreview = (file: File) => {
-    const isVideo = file.type.startsWith('video/');
+    const isVideo = getMediaType(file) === 'video';
     const url = URL.createObjectURL(file);
     
     return (
