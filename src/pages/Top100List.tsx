@@ -73,6 +73,14 @@ const Top100List = () => {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
   const [sortMode, setSortMode] = useState<Top100SortMode>('rating_high');
+
+  // When switching to Played/Unplayed, force sort to rating_high
+  const handleFilterChange = (newFilter: Top100FilterChip) => {
+    setFilterChip(newFilter);
+    if (newFilter === 'played' || newFilter === 'unplayed') {
+      setSortMode('rating_high');
+    }
+  };
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
   const [isFilterSticky, setIsFilterSticky] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -275,12 +283,11 @@ const Top100List = () => {
 
       switch (sortMode) {
         case 'rating_high':
-          // If Show = Community Rating OR Played/Unplayed: sort by communityRating DESC
-          // If Show = Official Rank: fallback to officialRank ASC (no official rating metric)
-          if (filterChip === 'official') {
+          // If Show = Official Rating OR Played/Unplayed: sort by officialRank ASC (1→100, best first)
+          if (filterChip === 'official' || filterChip === 'played' || filterChip === 'unplayed') {
             return officialRankA - officialRankB;
           }
-          // Community, Played, Unplayed → use communityRating
+          // Community → use communityRating DESC
           const ratingHighA = a.communityRating ?? 0;
           const ratingHighB = b.communityRating ?? 0;
           if (ratingHighB !== ratingHighA) {
@@ -290,11 +297,11 @@ const Top100List = () => {
           return officialRankA - officialRankB;
 
         case 'rating_low':
-          // If Show = Official Rank: fallback to officialRank ASC
+          // If Show = Official Rating: sort by officialRank DESC (100→1, worst first)
           if (filterChip === 'official') {
-            return officialRankA - officialRankB;
+            return officialRankB - officialRankA;
           }
-          // Community, Played, Unplayed → communityRating ASC
+          // Community → communityRating ASC
           const ratingLowA = a.communityRating ?? 0;
           const ratingLowB = b.communityRating ?? 0;
           if (ratingLowA !== ratingLowB) {
@@ -438,7 +445,7 @@ const Top100List = () => {
         >
           <Top100ListFilterChips
             activeFilter={filterChip}
-            onFilterChange={setFilterChip}
+            onFilterChange={handleFilterChange}
             activeSort={sortMode}
             onSortChange={setSortMode}
             counts={{ played: filterPlayedCount, unplayed: unplayedCount }}

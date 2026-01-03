@@ -21,7 +21,7 @@ interface Top100ListFilterChipsProps {
 }
 
 const FILTER_OPTIONS: { value: Top100FilterChip; label: string }[] = [
-  { value: 'official', label: 'Official Rank' },
+  { value: 'official', label: 'Official Rating' },
   { value: 'community', label: 'Community Rating' },
   { value: 'played', label: 'Played' },
   { value: 'unplayed', label: 'Unplayed' },
@@ -48,8 +48,11 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   isSticky = false,
   hasReviewData = false,
 }) => {
-  const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official Rank';
+  const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official Rating';
   const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Rating: High to Low';
+
+  // When Played/Unplayed is active, only rating_high is enabled
+  const isPlayedOrUnplayed = activeFilter === 'played' || activeFilter === 'unplayed';
 
   // Filter sort options based on available data
   const availableSortOptions = SORT_OPTIONS.filter(
@@ -115,15 +118,25 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
           <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
             {availableSortOptions.map((option) => {
               const isActive = activeSort === option.value;
+              // When Played/Unplayed: only rating_high is enabled
+              const isDisabled = isPlayedOrUnplayed && option.value !== 'rating_high';
+              
               return (
                 <DropdownMenuItem
                   key={option.value}
-                  onClick={() => onSortChange(option.value)}
-                  className={`cursor-pointer ${
-                    isActive 
-                      ? 'bg-slate-100 text-slate-900 font-medium' 
-                      : 'text-slate-700'
+                  onClick={() => {
+                    if (!isDisabled) {
+                      onSortChange(option.value);
+                    }
+                  }}
+                  className={`${
+                    isDisabled
+                      ? 'text-slate-400 opacity-50 cursor-not-allowed'
+                      : isActive 
+                        ? 'bg-slate-100 text-slate-900 font-medium cursor-pointer' 
+                        : 'text-slate-700 cursor-pointer'
                   }`}
+                  disabled={isDisabled}
                 >
                   {option.label}
                 </DropdownMenuItem>
