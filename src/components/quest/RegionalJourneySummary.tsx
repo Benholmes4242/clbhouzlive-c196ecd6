@@ -6,6 +6,8 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
+import { cn } from '@/lib/utils';
 
 export interface RegionProgress {
   id: string;
@@ -26,6 +28,9 @@ const RegionRow: React.FC<{
 }> = ({ region, onClick }) => {
   const progressPercent = region.total > 0 ? (region.played / region.total) * 100 : 0;
   const isComplete = region.played >= region.total && region.total > 0;
+  
+  // Get region-specific theme colors from the Top 100 page system
+  const theme = getRegionTheme(region.id as Top100ListSlug);
 
   return (
     <button
@@ -72,19 +77,14 @@ const RegionRow: React.FC<{
         </div>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar - uses region-specific colors from Top 100 theme system */}
       <div
         className="h-1.5 rounded-full overflow-hidden"
         style={{ background: 'var(--quest-track)' }}
       >
         <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{
-            width: `${progressPercent}%`,
-            background: isComplete
-              ? 'var(--quest-accent-gold)'
-              : 'var(--quest-accent-green)',
-          }}
+          className={cn("h-full rounded-full transition-all duration-500", theme.barClass)}
+          style={{ width: `${progressPercent}%` }}
         />
       </div>
     </button>
