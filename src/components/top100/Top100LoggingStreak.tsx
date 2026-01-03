@@ -75,7 +75,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
             className={cn(
               'w-10 h-10 rounded-full flex items-center justify-center',
               currentStreak > 0
-                ? 'bg-orange-500/15 text-orange-500'
+                ? 'bg-orange-500/12 text-orange-500'  // Slightly less saturated bg (item 4)
                 : 'bg-muted text-muted-foreground'
             )}
           >
@@ -131,11 +131,11 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
             <div key={idx} className="flex flex-col items-center gap-1 flex-1">
               <div
                 className={cn(
-                  'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium',
+                  'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
                   hasLog
-                    ? 'bg-orange-500/20 text-orange-600'
+                    ? 'bg-orange-500/20 text-orange-600 shadow-[0_0_6px_rgba(249,115,22,0.25)]'  // Glow for streak months (item 4)
                     : isCurrent
-                    ? 'bg-muted border border-dashed border-muted-foreground/40 text-muted-foreground'
+                    ? 'bg-muted border-2 border-dashed border-muted-foreground/50 text-muted-foreground'  // Thicker current ring (item 4)
                     : 'bg-muted/50 text-muted-foreground/60'
                 )}
               >

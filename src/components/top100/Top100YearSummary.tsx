@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar, Globe2, PlusCircle, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { YearSummary } from '@/lib/top100ProgressSelectors';
 
 interface Top100YearSummaryProps {
@@ -27,11 +28,17 @@ function StatItem({
   const showDelta = delta !== undefined && delta !== null && delta !== 0;
   const deltaPrefix = delta && delta > 0 ? '+' : '';
   
+  // Use accent color for avg rating (item 2)
+  const isAvgRating = label === 'Avg rating';
+  
   return (
     <div className="text-center flex flex-col items-center gap-1">
-      {/* Subtle icon above label (A4) */}
-      <Icon className="w-3.5 h-3.5 text-muted-foreground/50" />
-      <p className="text-sm font-semibold text-foreground leading-tight">
+      {/* Slightly increased icon opacity (item 2) */}
+      <Icon className="w-3.5 h-3.5 text-muted-foreground/70" />
+      <p className={cn(
+        "text-sm font-semibold leading-tight",
+        isAvgRating ? "text-orange-500" : "text-foreground"
+      )}>
         {value}
       </p>
       <p className="text-[11px] font-medium text-muted-foreground">

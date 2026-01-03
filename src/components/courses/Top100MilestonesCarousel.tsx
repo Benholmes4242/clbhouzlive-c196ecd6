@@ -150,17 +150,17 @@ export function Top100MilestonesCarousel({
                     onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
                   />
 
-                  {/* Labels */}
+                  {/* Labels - locked tiles have better clarity (item 5) */}
                   <div className="mt-2 text-center">
                     <p className={cn(
                       "text-[11px] font-medium whitespace-nowrap",
-                      isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground"
+                      isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground/80"
                     )}>
                       {milestone.tierName}
                     </p>
                     <p className={cn(
                       "text-[10px] leading-[1.2] py-0.5",
-                      isUnlocked ? "text-emerald-500" : "text-muted-foreground"
+                      isUnlocked ? "text-emerald-500" : "text-foreground/60"
                     )}>
                       {isUnlocked ? 'Unlocked' : `${remaining} away`}
                     </p>
@@ -172,9 +172,9 @@ export function Top100MilestonesCarousel({
         </CarouselContent>
       </Carousel>
 
-      {/* Progress line (C3) */}
+      {/* Progress line (C3) - bumped height 1-2px (item 5) */}
       <div className="mx-2.5 mt-4">
-        <div className="h-1 rounded-full bg-muted overflow-hidden">
+        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ 

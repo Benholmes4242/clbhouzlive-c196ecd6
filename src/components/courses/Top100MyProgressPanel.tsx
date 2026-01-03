@@ -244,7 +244,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
         return (
           <div className="flex justify-center mb-4 mt-2">
-            <button
+              <button
               type="button"
               onClick={() => {
                 const asMilestone: Top100Milestone = {
@@ -256,10 +256,10 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                 setSelectedMilestone(asMilestone);
                 setIsDetailSheetOpen(true);
               }}
-              className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-muted/50 transition-colors"
+              className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-muted/50 active:scale-[0.98] transition-all"
             >
+              {/* Tightened copy (item 6) */}
               <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
-                Next achievement:{' '}
                 <span className="font-semibold">
                   {data.next_milestone.remaining} more to{' '}
                 </span>
@@ -316,7 +316,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* 5.2 Closest Badge - Merged module (E1) */}
-      <div className="mb-6">
+      <div className="mb-4">
         <Top100ClosestBadgeCard 
           totalTop100Played={data.totalTop100Played} 
           onOpenDetail={handleClosestBadgeDetail}
@@ -327,8 +327,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION 6: RECENT ACTIVITY (MEMORY LAYER)
           ============================================ */}
       
-      {/* 6.1 Recent Top 100 Rounds - Swipe Carousel (F1-F3) */}
-      <div className="-mx-4 sm:mx-0">
+      {/* 6.1 Recent Top 100 Rounds - Swipe Carousel (F1-F3) - tighter spacing (item 10) */}
+      <div className="-mx-4 sm:mx-0 mb-3">
         <Top100RecentRoundsCarousel
           rounds={data.recent_rounds}
           isOwnProfile={isOwnProfile}
