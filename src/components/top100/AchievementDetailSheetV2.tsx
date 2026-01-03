@@ -131,10 +131,10 @@ export function AchievementDetailSheetV2({
 
           {/* Sheet - sit above bottom nav by offsetting by its height */}
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             drag="y"
             dragControls={dragControls}
             dragListener={false}
