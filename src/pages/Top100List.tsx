@@ -200,10 +200,10 @@ const Top100List = () => {
     }));
   }, [friendsProgress]);
 
-  // Build list-specific milestones (not global achievements)
-  // List milestones: 25 / 50 / 75 / 100 complete for each list
+  // Build list-specific milestones using standardized thresholds
+  // Milestones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] - same for all lists
   const listMilestones = useMemo(() => {
-    const listMilestoneThresholds = [25, 50, 75, 100];
+    const listMilestoneThresholds = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
     const listShortName = currentList?.short_label || listDisplayName.replace('Great Britain & Ireland', 'GB&I');
     
     // Find current milestone (highest achieved)
