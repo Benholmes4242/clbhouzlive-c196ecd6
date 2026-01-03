@@ -171,7 +171,8 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
     width: TOKEN_SIZE,
     height: TOKEN_HEIGHT,
     borderRadius: SQUIRCLE_RADIUS,
-    border: `${ringThickness}px solid ${ringBorderColor}`,
+    // Next up tokens have no grey track - only the progress arc
+    border: isNextUp ? 'none' : `${ringThickness}px solid ${ringBorderColor}`,
     boxSizing: 'border-box',
     overflow: 'hidden',
     background: 'transparent',
