@@ -77,11 +77,26 @@ const MILESTONE_LOCKED_COLOR = '#A89F91'; // Warm stone
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-function getMilestoneColor(threshold: number): string {
+// Success green used for all unlocked achievements
+const SUCCESS_COLOR = '#10b981';
+
+function getMilestoneColor(threshold: number, isUnlocked: boolean): string {
+  // Unlocked always uses success green
+  if (isUnlocked) return SUCCESS_COLOR;
+  
+  // In progress / locked uses tier colour (never greyed out - keeps aspiration high)
   if (MILESTONE_PALETTE_MAP[threshold]) {
     return CLBHOUZ_ACHIEVEMENT_PALETTE[MILESTONE_PALETTE_MAP[threshold]];
   }
   return MILESTONE_LOCKED_COLOR;
+}
+
+function getRegionColor(listSlug: Top100ListSlug, isUnlocked: boolean): string {
+  // Unlocked always uses success green
+  if (isUnlocked) return SUCCESS_COLOR;
+  
+  // In progress / locked uses region colour
+  return REGION_COLORS[listSlug];
 }
 
 function getMilestoneName(threshold: number): string {
@@ -249,7 +264,7 @@ function StatusPill({ isUnlocked, remaining, color }: StatusPillProps) {
 interface ProgressModuleProps {
   played: number;
   total: number;
-  color: string;
+  color: string; // Unified accent color (already accounts for unlock state)
   isUnlocked: boolean;
 }
 
@@ -264,7 +279,7 @@ function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProp
         <span className="text-sm font-medium text-muted-foreground">Progress</span>
         <span 
           className="text-sm font-bold"
-          style={{ color: isUnlocked ? '#10b981' : color }}
+          style={{ color }}
         >
           {played} / {total}
         </span>
@@ -277,9 +292,7 @@ function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProp
           animate={{ width: `${progressPercent}%` }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="h-full rounded-full"
-          style={{
-            backgroundColor: isUnlocked ? '#10b981' : color,
-          }}
+          style={{ backgroundColor: color }}
         />
       </div>
 
@@ -395,7 +408,9 @@ export function UnifiedAchievementSheet({
     const { threshold, totalPlayed } = data as MilestoneData;
     title = getMilestoneName(threshold);
     purposeSentence = `Awarded for playing ${threshold} Top 100 courses worldwide`;
-    color = totalPlayed >= threshold ? getMilestoneColor(threshold) : MILESTONE_LOCKED_COLOR;
+    
+    // Unified colour: success green when unlocked, tier colour when in progress
+    color = getMilestoneColor(threshold, isUnlocked);
     
     primaryCtaLabel = isUnlocked ? 'View all achievements' : 'View unplayed Top 100 courses';
     primaryCtaAction = isUnlocked 
@@ -409,9 +424,11 @@ export function UnifiedAchievementSheet({
     const theme = getRegionTheme(listSlug);
     title = theme.primaryLabel;
     purposeSentence = `Complete the ${theme.shortName} Top 100 to earn this badge`;
-    color = REGION_COLORS[listSlug];
     
+    // Unified colour: success green when unlocked, region colour when in progress
     const isComplete = p >= t && t > 0;
+    color = getRegionColor(listSlug, isComplete);
+    
     primaryCtaLabel = `View ${theme.shortName} list`;
     primaryCtaAction = () => { navigate(`/top100/${listSlug}`); onClose(); };
     secondaryCtaLabel = isComplete ? 'View all achievements' : 'View unplayed courses';
@@ -534,7 +551,7 @@ export function UnifiedAchievementSheet({
                 <Button
                   onClick={primaryCtaAction}
                   className="w-full rounded-full font-medium text-white"
-                  style={{ backgroundColor: isUnlocked ? '#10b981' : color }}
+                  style={{ backgroundColor: color }}
                 >
                   {primaryCtaLabel}
                   <ChevronRight className="w-4 h-4 ml-1" />
