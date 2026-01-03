@@ -149,7 +149,7 @@ export function AchievementDetailSheetV2({
               "shadow-2xl"
             )}
             style={{
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
+              paddingBottom: 'env(safe-area-inset-bottom)',
             }}
           >
             {/* Drag handle */}
@@ -170,7 +170,7 @@ export function AchievementDetailSheetV2({
             </button>
 
             {/* Content - nudged slightly upward for visual balance */}
-            <div className="px-6 pb-6 pt-1">
+            <div className="px-6 pb-6 pt-1" style={{ paddingBottom: '24px' }}>
               {/* Hero Medal - gamified "level" feel */}
               <div className="flex justify-center mb-5">
                 <div className="relative">
