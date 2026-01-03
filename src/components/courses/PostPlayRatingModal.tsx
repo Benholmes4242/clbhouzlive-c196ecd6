@@ -23,6 +23,15 @@ const MAX_REVIEW_MEDIA_ITEMS = 6;
 // Generate stable file key for tracking uploads (consistent across references)
 const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
 
+// Existing media item from database
+interface ExistingMedia {
+  id: string;
+  media_url: string;
+  media_type: string;
+  poster_url: string | null;
+  stream_id: string | null;
+}
+
 interface Course {
   id: string;
   name: string;
@@ -75,6 +84,9 @@ const PostPlayRatingModal = ({
   const [mediaPreviews, setMediaPreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey
   const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set()); // keyed by fileKey
   const mediaPreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
+  
+  // Existing media from database (edit mode)
+  const [existingMediaItems, setExistingMediaItems] = useState<ExistingMedia[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
   const [conditionScore, setConditionScore] = useState<number | null>(null);
@@ -143,6 +155,19 @@ const PostPlayRatingModal = ({
       setConditionTouched(existingRating.condition_score != null);
       setClubhouseTouched(existingRating.clubhouse_score != null);
       setFacilitiesTouched(existingRating.facilities_score != null);
+      
+      // Fetch existing media for this review
+      const fetchExistingMedia = async () => {
+        const { data: mediaData, error } = await supabase
+          .from('course_review_media')
+          .select('id, media_url, media_type, poster_url, stream_id')
+          .eq('review_id', existingRating.id);
+        
+        if (!error && mediaData) {
+          setExistingMediaItems(mediaData);
+        }
+      };
+      fetchExistingMedia();
     }
   }, [existingRating, isEditMode]);
 
@@ -655,10 +680,13 @@ const PostPlayRatingModal = ({
     }
     // Clean up media previews
     mediaPreviews.forEach((url) => {
-      URL.revokeObjectURL(url);
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
     });
     setSelectedMedia([]);
     setMediaPreviews(new Map());
+    setExistingMediaItems([]);
     setShowConfirmation(false);
     setIsSubmitting(false);
   };
@@ -780,11 +808,18 @@ const PostPlayRatingModal = ({
       })
     );
 
-    // Respect 6-item maximum
-    const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - selectedMedia.length;
+    // Respect 6-item maximum (existing media + new files)
+    const totalExisting = existingMediaItems.length + selectedMedia.length;
+    const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - totalExisting;
     const filesToAdd = files.slice(0, Math.max(0, remainingSlots));
 
     if (filesToAdd.length === 0) {
+      if (remainingSlots <= 0) {
+        toast({
+          title: `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`,
+          description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
+        });
+      }
       return;
     }
 
@@ -1111,9 +1146,71 @@ const PostPlayRatingModal = ({
             {/* Media Upload Section - Section D (dark) */}
             <section className="px-6 pt-6 pb-3 bg-slate-100">
               <div className="py-8 flex flex-col items-center justify-center gap-4">
-                {selectedMedia.length > 0 && (
+                {/* Total media count = existing + new */}
+                {(existingMediaItems.length > 0 || selectedMedia.length > 0) && (
                   <div className="w-full">
                     <div className="grid grid-cols-3 gap-3">
+                      {/* Existing media items from database */}
+                      {existingMediaItems.map((item) => {
+                        const isVideo = item.media_type === 'video';
+                        
+                        return (
+                          <div key={item.id} className="relative w-full aspect-square overflow-hidden rounded-md">
+                            {isVideo ? (
+                              // Video with Stream poster
+                              <div className="relative h-full w-full">
+                                {item.poster_url ? (
+                                  <img
+                                    src={item.poster_url}
+                                    alt="Video thumbnail"
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-full w-full bg-slate-700" />
+                                )}
+                                {/* Play icon overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm">
+                                    <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <img
+                                src={item.media_url}
+                                alt=""
+                                className="h-full w-full object-cover"
+                              />
+                            )}
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                // Delete from database
+                                const { error } = await supabase
+                                  .from('course_review_media')
+                                  .delete()
+                                  .eq('id', item.id);
+                                
+                                if (!error) {
+                                  setExistingMediaItems(prev => prev.filter(m => m.id !== item.id));
+                                } else {
+                                  toast({
+                                    title: "Error",
+                                    description: "Failed to remove media",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                              className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
+                              aria-label="Remove media"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      
+                      {/* Newly selected files */}
                       {selectedMedia.map((file, index) => {
                         const isVideo = isVideoFile(file);
                         const fileKey = getFileKey(file);
@@ -1127,7 +1224,7 @@ const PostPlayRatingModal = ({
                         const isUploading = uploadingFiles.has(fileKey);
                         
                         return (
-                          <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
+                          <div key={`new-${index}`} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
                               // Pre-upload placeholder tile for videos
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
@@ -1173,7 +1270,7 @@ const PostPlayRatingModal = ({
                   </div>
                 )}
                 
-                {selectedMedia.length === 0 && (
+                {existingMediaItems.length === 0 && selectedMedia.length === 0 && (
                   <div className="text-center">
                     <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                       Media upload (optional)
@@ -1220,10 +1317,12 @@ const PostPlayRatingModal = ({
                     input.click();
                   }}
                   variant="outline"
-                  disabled={selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS}
+                  disabled={(existingMediaItems.length + selectedMedia.length) >= MAX_REVIEW_MEDIA_ITEMS}
                   className="w-44 mt-6 h-11 rounded-xl border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS ? `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added` : 'Add Media'}
+                  {(existingMediaItems.length + selectedMedia.length) >= MAX_REVIEW_MEDIA_ITEMS 
+                    ? `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added` 
+                    : 'Add Media'}
                 </Button>
               </div>
             </section>
