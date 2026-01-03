@@ -12,7 +12,7 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
-import { generateVideoThumbnail } from '@/utils/videoThumbnail';
+// Video thumbnails handled by Cloudflare Stream poster_url after upload
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
@@ -764,47 +764,12 @@ const PostPlayRatingModal = ({
     // iOS Safari can hang on seek/canvas extraction for some MOV/HEVC clips.
     setSelectedMedia((prev) => [...prev, ...filesToAdd]);
 
+    // Generate previews for images only - videos use placeholder tiles until Stream upload completes
     for (const file of filesToAdd) {
       const inferred = getMediaType(file);
 
-      // Always give the UI *something* to render immediately
-      if (inferred === 'video') {
-        const blobUrl = URL.createObjectURL(file);
-        setMediaPreviews((prev) => {
-          const next = new Map(prev);
-          next.set(file, blobUrl);
-          return next;
-        });
-
-        // Best-effort thumbnail (non-blocking) with timeout
-        const THUMBNAIL_TIMEOUT_MS = 4500;
-        Promise.race([
-          generateVideoThumbnail(file),
-          new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('thumbnail_timeout')), THUMBNAIL_TIMEOUT_MS)
-          ),
-        ])
-          .then((thumbnail) => {
-            if (!thumbnail) return;
-            setMediaPreviews((prev) => {
-              const next = new Map(prev);
-              const previous = next.get(file);
-              if (previous && previous.startsWith('blob:')) {
-                URL.revokeObjectURL(previous);
-              }
-              next.set(file, thumbnail);
-              return next;
-            });
-          })
-          .catch((error) => {
-            console.warn('[Media Audit] Video thumbnail unavailable (using blob preview)', {
-              name: file.name,
-              type: file.type,
-              inferred,
-              error: (error as any)?.message ?? String(error),
-            });
-          });
-      } else {
+      if (inferred === 'image') {
+        // Images get a blob preview
         const previewUrl = URL.createObjectURL(file);
         setMediaPreviews((prev) => {
           const next = new Map(prev);
@@ -812,6 +777,7 @@ const PostPlayRatingModal = ({
           return next;
         });
       }
+      // Videos: no preview set - UI will show placeholder tile
     }
 
     console.log('[Media Audit] CHECKPOINT B - Queued media + previews:', {
@@ -1114,38 +1080,24 @@ const PostPlayRatingModal = ({
                         const isVideo = isVideoFile(file);
                         const preview = mediaPreviews.get(file) || '';
                         
-                        console.log('[Media Audit] CHECKPOINT C - Thumbnail render:', {
-                          index,
-                          fileName: file.name,
-                          fileType: file.type,
-                          isVideo,
-                          previewUrl: preview,
-                          previewExists: !!preview,
-                          previewLength: preview?.length || 0
-                        });
+                        // Get filename for display (truncate if too long)
+                        const displayName = file.name.length > 12 
+                          ? file.name.slice(0, 10) + '…' 
+                          : file.name;
                         
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
-                              <div className="relative h-full w-full bg-slate-800">
-                                {/* Show thumbnail if generated, otherwise show placeholder */}
-                                {preview && !preview.startsWith('blob:') ? (
-                                  <img
-                                    src={preview}
-                                    alt="Video thumbnail"
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="h-full w-full flex items-center justify-center bg-slate-700">
-                                    <span className="text-xs text-slate-400 text-center px-2">Video added</span>
-                                  </div>
-                                )}
-                                {/* Centered play icon overlay */}
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
-                                    <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
-                                  </div>
+                              // Pre-upload placeholder tile for videos
+                              <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
+                                {/* Play icon */}
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm mb-2">
+                                  <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
                                 </div>
+                                {/* Filename */}
+                                <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
+                                  {displayName}
+                                </span>
                               </div>
                             ) : (
                               <img
