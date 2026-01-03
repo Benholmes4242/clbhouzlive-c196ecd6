@@ -3,23 +3,31 @@
  * 
  * Provides emotionally consistent, milestone-aware phrases for Top 100 progress bars.
  * Uses deterministic rotation (not random) to avoid visual chaos.
+ * 
+ * Bands:
+ * - 0–9%: early-stage phrases
+ * - 10–24%: momentum phrases  
+ * - 25–49%: commitment phrases
+ * - 50–74%: achievement phrases
+ * - 75%+: single legendary phrase
+ * 
+ * Milestone rules:
+ * - At exactly 10%, 25%, 50%: show milestone-specific phrase
+ * - At 75%+: always show legendary phrase
  */
 
-// Phrase buckets by progress tier
+// Phrase buckets by progress band
 const EARLY_PHRASES = ['Journey begins', 'First steps', 'On the board'];
 const MOMENTUM_PHRASES = ['Momentum building', 'Finding rhythm', 'Progress underway', 'Gaining ground'];
-const ESTABLISHED_PHRASES = ['Taking shape', 'Well underway', 'Serious progress', 'Confidence growing'];
-const STRONG_PHRASES = ['Halfway mastery', 'Deep into it', 'Commitment showing', 'Impressive pace'];
+const COMMITMENT_PHRASES = ['Taking shape', 'Well underway', 'Serious progress', 'Confidence growing'];
+const ACHIEVEMENT_PHRASES = ['Halfway mastery', 'Deep into it', 'Commitment showing', 'Impressive pace'];
 const LEGENDARY_PHRASE = 'Legendary territory';
 
-// Region progress modifiers - smaller regions feel rewarding sooner
-const REGION_MODIFIERS: Record<string, number> = {
-  'global': 1.0,
-  'worldwide': 1.0,
-  'gb-ireland': 1.15,
-  'gbi': 1.15,
-  'usa': 1.1,
-  'europe': 1.2,
+// Milestone-specific phrases (shown only at exact thresholds)
+const MILESTONE_PHRASES: Record<number, string> = {
+  10: 'First milestone',
+  25: 'Quarter complete',
+  50: 'Halfway there',
 };
 
 /**
@@ -36,34 +44,46 @@ function hashString(str: string): number {
 }
 
 /**
- * Get the region modifier for progress weighting
+ * Get week number for persistence (phrases persist within a week)
  */
-function getRegionModifier(listSlug: string): number {
-  const normalizedSlug = listSlug.toLowerCase().replace(/[_\s]/g, '-');
-  
-  for (const [key, modifier] of Object.entries(REGION_MODIFIERS)) {
-    if (normalizedSlug.includes(key)) {
-      return modifier;
-    }
-  }
-  
-  return 1.0; // Default modifier
+function getCurrentWeek(): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = now.getTime() - start.getTime();
+  const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  return Math.floor(diff / oneWeek);
 }
 
 /**
  * Check if progress is at an exact milestone (10%, 25%, 50%)
+ * Returns the milestone value if at one, otherwise null
  */
-function isExactMilestone(progress: number): boolean {
-  // Allow small tolerance for floating point
+function getExactMilestone(progress: number): number | null {
   const milestones = [10, 25, 50];
-  return milestones.some(m => Math.abs(progress - m) < 0.5);
+  for (const m of milestones) {
+    // Allow small tolerance for floating point (within 0.5%)
+    if (Math.abs(progress - m) < 0.5) {
+      return m;
+    }
+  }
+  return null;
+}
+
+/**
+ * Get phrase pool based on progress band
+ */
+function getPhrasePool(progress: number): string[] {
+  if (progress >= 50) return ACHIEVEMENT_PHRASES;
+  if (progress >= 25) return COMMITMENT_PHRASES;
+  if (progress >= 10) return MOMENTUM_PHRASES;
+  return EARLY_PHRASES;
 }
 
 /**
  * Get progress insight phrase for a Top 100 list card
  * 
  * @param rawProgress - Raw progress percentage (0-100)
- * @param listSlug - Unique identifier for the list (e.g., 'global', 'usa', 'gbi')
+ * @param listSlug - Unique identifier for the list (e.g., 'global', 'usa', 'gb-i')
  * @param userId - Optional user ID for deterministic rotation
  * @param usedPhrases - Set of phrases already used in viewport (to avoid duplicates)
  */
@@ -73,40 +93,29 @@ export function getProgressInsight(
   userId?: string,
   usedPhrases?: Set<string>
 ): string {
-  // Apply region modifier for adjusted progress feel
-  const regionModifier = getRegionModifier(listSlug);
-  const adjustedProgress = Math.min(rawProgress * regionModifier, 100);
-  
-  // Legendary territory - single phrase, never rotated
-  if (adjustedProgress >= 75) {
+  // Legendary territory - single phrase at 75%+, never rotated
+  if (rawProgress >= 75) {
     return LEGENDARY_PHRASE;
   }
   
-  // Select phrase pool based on adjusted progress
-  let pool: string[];
-  if (adjustedProgress >= 50) {
-    pool = STRONG_PHRASES;
-  } else if (adjustedProgress >= 25) {
-    pool = ESTABLISHED_PHRASES;
-  } else if (adjustedProgress >= 10) {
-    pool = MOMENTUM_PHRASES;
-  } else {
-    pool = EARLY_PHRASES;
+  // Check for exact milestone
+  const exactMilestone = getExactMilestone(rawProgress);
+  if (exactMilestone !== null && MILESTONE_PHRASES[exactMilestone]) {
+    return MILESTONE_PHRASES[exactMilestone];
   }
   
-  // At exact milestone, show first phrase in tier
-  if (isExactMilestone(rawProgress)) {
-    const phrase = pool[0];
-    return usedPhrases?.has(phrase) ? getAlternateFromPool(pool, phrase, usedPhrases) : phrase;
-  }
+  // Get appropriate phrase pool based on progress band
+  const pool = getPhrasePool(rawProgress);
   
-  // Deterministic rotation based on userId + listSlug
-  const seed = `${userId || 'anonymous'}-${listSlug}`;
+  // Deterministic rotation based on userId + listSlug + current week
+  // This ensures phrase persists for a period but varies between lists
+  const week = getCurrentWeek();
+  const seed = `${userId || 'anonymous'}-${listSlug}-${week}`;
   const rotationIndex = hashString(seed) % pool.length;
   
   let selectedPhrase = pool[rotationIndex];
   
-  // Avoid duplicate phrases in viewport
+  // Avoid duplicate phrases in viewport if usedPhrases provided
   if (usedPhrases?.has(selectedPhrase)) {
     selectedPhrase = getAlternateFromPool(pool, selectedPhrase, usedPhrases);
   }
