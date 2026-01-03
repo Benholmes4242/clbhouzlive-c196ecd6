@@ -1,5 +1,3 @@
-import React from 'react';
-
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // UNIFIED MILESTONE SYSTEM FOR TOP 100 LISTS
 // Single source of truth for all list milestone logic
@@ -76,10 +74,11 @@ export function getListMilestoneState(playedCount: number): ListProgressState {
 }
 
 /**
- * Get all milestones with their states for the milestone rail
+ * Get all milestones with their states for the milestone rail.
+ * Returns the full list of 11 milestones - rail shows all and scrolls horizontally.
  */
 export function getAllMilestonesWithState(playedCount: number): ListMilestoneInfo[] {
-  const { lastCompletedMilestone, nextMilestone, toGo } = getListMilestoneState(playedCount);
+  const { nextMilestone, toGo } = getListMilestoneState(playedCount);
 
   return LIST_MILESTONE_THRESHOLDS.map((threshold) => {
     let state: MilestoneState;
@@ -95,7 +94,7 @@ export function getAllMilestonesWithState(playedCount: number): ListMilestoneInf
       coursesToGo = toGo;
     } else {
       state = 'locked';
-      label = 'Locked';
+      label = ''; // Clean - no "Locked" text
     }
 
     return {
@@ -105,31 +104,4 @@ export function getAllMilestonesWithState(playedCount: number): ListMilestoneInf
       toGo: coursesToGo,
     };
   });
-}
-
-/**
- * Get a "smart window" of milestones to display in the rail.
- * Shows: last completed, next up, and next 2 future milestones.
- * Falls back to first 4 if no progress yet.
- */
-export function getVisibleMilestones(playedCount: number): ListMilestoneInfo[] {
-  const allMilestones = getAllMilestonesWithState(playedCount);
-  
-  // For completed users, show last 4 milestones
-  if (playedCount >= 100) {
-    return allMilestones.slice(-4);
-  }
-
-  const nextUpIndex = allMilestones.findIndex((m) => m.state === 'next_up');
-  
-  // If no progress, show first 4
-  if (nextUpIndex === -1) {
-    return allMilestones.slice(0, 4);
-  }
-
-  // Show: 1 before next up (if exists), next up, and 2 after
-  const startIndex = Math.max(0, nextUpIndex - 1);
-  const endIndex = Math.min(allMilestones.length, nextUpIndex + 3);
-  
-  return allMilestones.slice(startIndex, endIndex);
 }
