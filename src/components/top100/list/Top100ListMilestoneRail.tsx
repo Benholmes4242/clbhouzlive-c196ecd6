@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
@@ -25,43 +25,21 @@ interface Top100ListMilestoneRailProps {
 const TOKEN_SIZE = 78; // width
 const TOKEN_HEIGHT = TOKEN_SIZE * 1.05; // SquircleAvatar uses aspectRatio: 1 / 1.05 (allows sub-pixel height)
 const TOKEN_LABEL_HEIGHT = 22;
-const SQUIRCLE_RADIUS = '34%';
+const SQUIRCLE_RADIUS = '34%'; // SDS squircle border-radius
+const SQUIRCLE_RADIUS_PERCENT = 0.34; // Numeric version for SVG calculations
 const RING_TRACK_COLOR = 'rgba(15,23,42,0.12)';
 
 /**
- * Generate superellipse path points for squircle shape
- * Returns array of {x, y} points and total path length
+ * Calculate the perimeter of a rounded rectangle (squircle with border-radius)
+ * This matches CSS border-radius: 34% exactly
  */
-function generateSquirclePath(w: number, h: number, inset: number = 0, n = 5, steps = 120) {
-  const a = (w - inset * 2) / 2;
-  const b = (h - inset * 2) / 2;
-  const cx = w / 2;
-  const cy = h / 2;
-  const m = 2 / n;
-  const points: { x: number; y: number }[] = [];
-  
-  for (let i = 0; i < steps; i++) {
-    const t = (i / steps) * Math.PI * 2;
-    const ct = Math.cos(t);
-    const st = Math.sin(t);
-    const x = cx + Math.sign(ct) * a * Math.pow(Math.abs(ct), m);
-    const y = cy + Math.sign(st) * b * Math.pow(Math.abs(st), m);
-    points.push({ x, y });
-  }
-  
-  // Calculate total path length
-  let totalLength = 0;
-  for (let i = 0; i < points.length; i++) {
-    const next = points[(i + 1) % points.length];
-    const dx = next.x - points[i].x;
-    const dy = next.y - points[i].y;
-    totalLength += Math.sqrt(dx * dx + dy * dy);
-  }
-  
-  // Generate SVG path string
-  const pathD = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')} Z`;
-  
-  return { pathD, totalLength, points };
+function calculateRoundedRectPerimeter(w: number, h: number, rx: number, ry: number): number {
+  // Perimeter = 2 * (straight edges) + elliptical corners
+  const straightWidth = w - 2 * rx;
+  const straightHeight = h - 2 * ry;
+  // Approximate ellipse quarter arc: π/2 * sqrt((rx² + ry²) / 2) per corner
+  const cornerArc = (Math.PI / 2) * Math.sqrt((rx * rx + ry * ry) / 2);
+  return 2 * straightWidth + 2 * straightHeight + 4 * cornerArc;
 }
 
 /**
@@ -234,14 +212,14 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       ? `Milestone achieved — ${threshold} courses played.`
       : `Unlocks at ${threshold} courses played.`;
 
-  // SVG squircle path for NEXT UP ring
-  const svgWidth = TOKEN_SIZE;
-  const svgHeight = TOKEN_HEIGHT;
+  // SVG dimensions for NEXT UP ring - uses rect with rx/ry to match CSS border-radius: 34%
   const strokeWidth = 4;
-  const { pathD, totalLength } = useMemo(() => 
-    generateSquirclePath(svgWidth, svgHeight, strokeWidth / 2), 
-    [svgWidth, svgHeight, strokeWidth]
-  );
+  const inset = strokeWidth / 2;
+  const rectWidth = TOKEN_SIZE - strokeWidth;
+  const rectHeight = TOKEN_HEIGHT - strokeWidth;
+  const rx = rectWidth * SQUIRCLE_RADIUS_PERCENT;
+  const ry = rectHeight * SQUIRCLE_RADIUS_PERCENT;
+  const perimeter = calculateRoundedRectPerimeter(rectWidth, rectHeight, rx, ry);
 
   const tokenButton = (
     <motion.button
@@ -273,45 +251,54 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
 
         {/* Ring container */}
         <div className="relative z-10" style={ringContainerStyle}>
-          {/* NEXT UP: SVG squircle ring with track + progress arc on same path */}
+          {/* NEXT UP: SVG squircle ring with track + progress arc using rect rx/ry to match SDS */}
           {isNextUp && (
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none"
-              viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+              viewBox={`0 0 ${TOKEN_SIZE} ${TOKEN_HEIGHT}`}
               fill="none"
             >
-              {/* Track path (grey, full squircle) */}
-              <path
-                d={pathD}
+              {/* Track rect (grey, full squircle) */}
+              <rect
+                x={inset}
+                y={inset}
+                width={rectWidth}
+                height={rectHeight}
+                rx={rx}
+                ry={ry}
                 stroke={RING_TRACK_COLOR}
                 strokeWidth={strokeWidth}
                 fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
               />
               {/* Progress arc (same geometry, overlays track) */}
               {prefersReducedMotion ? (
-                <path
-                  d={pathD}
+                <rect
+                  x={inset}
+                  y={inset}
+                  width={rectWidth}
+                  height={rectHeight}
+                  rx={rx}
+                  ry={ry}
                   stroke={theme.ringColor}
                   strokeWidth={strokeWidth}
                   fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeDasharray={`${progress * totalLength} ${totalLength}`}
-                  strokeDashoffset={totalLength * 0.25}
+                  strokeDasharray={`${progress * perimeter} ${perimeter}`}
+                  strokeDashoffset={perimeter * 0.25}
                 />
               ) : (
-                <motion.path
-                  d={pathD}
+                <motion.rect
+                  x={inset}
+                  y={inset}
+                  width={rectWidth}
+                  height={rectHeight}
+                  rx={rx}
+                  ry={ry}
                   stroke={theme.ringColor}
                   strokeWidth={strokeWidth}
                   fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeDashoffset={totalLength * 0.25}
-                  initial={{ strokeDasharray: `0 ${totalLength}` }}
-                  animate={{ strokeDasharray: `${progress * totalLength} ${totalLength}` }}
+                  strokeDashoffset={perimeter * 0.25}
+                  initial={{ strokeDasharray: `0 ${perimeter}` }}
+                  animate={{ strokeDasharray: `${progress * perimeter} ${perimeter}` }}
                   transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
                 />
               )}
