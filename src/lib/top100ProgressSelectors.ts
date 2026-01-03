@@ -10,26 +10,25 @@ export type YearSummary = {
   avgRating: number | null;
 };
 
-export function buildYearSummary(rounds: Top100RecentRound[]): YearSummary | null {
-  if (!rounds.length) return null;
+/**
+ * Build year summary from year-scoped rounds (already filtered by calendar year in the hook)
+ * @param yearRounds - Rounds already filtered to the current calendar year
+ * @param year - The year to display (for labeling)
+ */
+export function buildYearSummary(yearRounds: Top100RecentRound[], year?: number): YearSummary | null {
+  const displayYear = year ?? new Date().getFullYear();
 
-  const currentYear = new Date().getFullYear();
-
-  const yearRounds = rounds.filter(r => {
-    const d = new Date(r.played_at);
-    return d.getFullYear() === currentYear;
-  });
-
-  if (!yearRounds.length) return null;
-
+  // Count unique courses played this year
   const uniqueCourses = new Set(yearRounds.map(r => r.course_id));
+  
+  // Calculate average rating from rounds that have a rating
   const ratedRounds = yearRounds.filter(r => r.rating != null);
   const avgRating = ratedRounds.length > 0
     ? ratedRounds.reduce((sum, r) => sum + (r.rating ?? 0), 0) / ratedRounds.length
     : null;
 
   return {
-    year: currentYear,
+    year: displayYear,
     newCourses: uniqueCourses.size,
     avgRating: avgRating !== null ? Number(avgRating.toFixed(1)) : null,
   };
@@ -96,10 +95,8 @@ export type ShareMoment = {
 export function pickShareMoment(rounds: Top100RecentRound[]): ShareMoment | null {
   if (!rounds.length) return null;
 
-  // Pick the most recent round
-  const latest = [...rounds].sort(
-    (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
-  )[0];
+  // Pick the most recent round (already sorted by played_at DESC)
+  const latest = rounds[0];
 
   return {
     courseId: latest.course_id,
@@ -109,4 +106,17 @@ export function pickShareMoment(rounds: Top100RecentRound[]): ShareMoment | null
     rating: latest.rating,
     listSlugs: latest.list_slugs,
   };
+}
+
+/**
+ * Count regions with activity in the given rounds
+ */
+export function countYearRegions(yearRounds: Top100RecentRound[]): number {
+  const regions = new Set<string>();
+  for (const round of yearRounds) {
+    for (const slug of round.list_slugs) {
+      regions.add(slug);
+    }
+  }
+  return regions.size;
 }
