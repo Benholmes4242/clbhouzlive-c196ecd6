@@ -2,7 +2,7 @@
  * Top100ListCompletionSheet - Region-aware completion detail sheet
  * 
  * Opened from Top 100 List Completions row cards.
- * Uses region-specific accent colours from the global theme system.
+ * Uses region-specific accent colours matching Your Journey by Region section.
  */
 
 import React, { useEffect } from 'react';
@@ -14,7 +14,6 @@ import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 type RegionSlug = 'global' | 'gb-i' | 'usa' | 'europe';
 
@@ -26,12 +25,42 @@ interface Top100ListCompletionSheetProps {
   total: number;
 }
 
-// Region display names
-const REGION_NAMES: Record<RegionSlug, string> = {
-  global: 'World Top 100',
-  'gb-i': 'GB&I Top 100',
-  usa: 'USA Top 100',
-  europe: 'Europe Top 100',
+// Region config - matches Your Journey by Region section exactly
+const REGION_CONFIG: Record<RegionSlug, { 
+  name: string; 
+  shortLabel: string;
+  bgClass: string; 
+  fillClass: string; 
+  accent: string;
+}> = {
+  global: {
+    name: 'World Top 100',
+    shortLabel: 'World',
+    bgClass: 'bg-amber-500/10',
+    fillClass: 'bg-amber-500/60',
+    accent: '#f59e0b', // amber-500
+  },
+  'gb-i': {
+    name: 'GB&I Top 100',
+    shortLabel: 'GB&I',
+    bgClass: 'bg-blue-500/10',
+    fillClass: 'bg-blue-500/60',
+    accent: '#3b82f6', // blue-500
+  },
+  usa: {
+    name: 'USA Top 100',
+    shortLabel: 'USA',
+    bgClass: 'bg-red-500/10',
+    fillClass: 'bg-red-500/60',
+    accent: '#ef4444', // red-500
+  },
+  europe: {
+    name: 'Europe Top 100',
+    shortLabel: 'Europe',
+    bgClass: 'bg-emerald-500/10',
+    fillClass: 'bg-emerald-500/60',
+    accent: '#10b981', // emerald-500
+  },
 };
 
 function getRegionIcon(slug: RegionSlug) {
@@ -72,9 +101,7 @@ export function Top100ListCompletionSheet({
 
   if (!listSlug) return null;
 
-  // Get theme from global system
-  const theme = getRegionTheme(listSlug);
-  const regionName = REGION_NAMES[listSlug];
+  const regionConfig = REGION_CONFIG[listSlug];
   const remaining = Math.max(0, total - played);
   const progressPercent = total > 0 ? (played / total) * 100 : 0;
   const isComplete = remaining === 0 && total > 0;
@@ -149,18 +176,18 @@ export function Top100ListCompletionSheet({
               <div className="flex items-center gap-3 mb-6">
                 {/* Region icon container - tinted with region colour */}
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${theme.bgLight}, ${theme.bgDark})`,
-                    color: theme.accent,
-                  }}
+                  className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
+                    regionConfig.bgClass
+                  )}
+                  style={{ color: regionConfig.accent }}
                 >
                   {getRegionIcon(listSlug)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-bold text-foreground truncate">
-                    {regionName}
+                    {regionConfig.name}
                   </h2>
                   <p className="text-sm text-muted-foreground">
                     Completion progress
@@ -171,7 +198,7 @@ export function Top100ListCompletionSheet({
               {/* Progress card */}
               <div
                 className="rounded-xl border p-4 mb-5 bg-card/50"
-                style={{ borderColor: `${theme.bgDark}40` }}
+                style={{ borderColor: `${regionConfig.accent}25` }}
               >
                 {/* Big progress numbers */}
                 <div className="flex justify-between items-baseline mb-3">
@@ -200,18 +227,15 @@ export function Top100ListCompletionSheet({
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 0.6, ease: 'easeOut' }}
-                    className="h-full rounded-full"
-                    style={{
-                      backgroundColor: isComplete ? '#10b981' : theme.bgDark,
-                    }}
+                    className={cn("h-full rounded-full", isComplete ? "bg-emerald-500" : regionConfig.fillClass)}
                   />
                 </div>
 
                 {/* Microcopy */}
                 <p className="text-xs text-muted-foreground text-center">
-                {isComplete
+                  {isComplete
                     ? 'Completion badge earned.'
-                    : `Finish the list to earn the ${theme.shortLabel} completion badge.`}
+                    : `Finish the list to earn the ${regionConfig.shortLabel} completion badge.`}
                 </p>
               </div>
 
@@ -219,13 +243,10 @@ export function Top100ListCompletionSheet({
               <div className="space-y-3">
                 <Button
                   onClick={handleViewList}
-                  className="w-full rounded-full font-medium"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${theme.bgLight}, ${theme.bgDark})`,
-                    color: theme.accent,
-                  }}
+                  className={cn("w-full rounded-full font-medium text-white", regionConfig.bgClass.replace('/10', ''))}
+                  style={{ backgroundColor: regionConfig.accent }}
                 >
-                  View {theme.shortLabel} list
+                  View {regionConfig.shortLabel} list
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
 
