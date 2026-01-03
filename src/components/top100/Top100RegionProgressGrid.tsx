@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe2, Map, ChevronRight } from 'lucide-react';
+import { Map, ChevronRight } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
+import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
 import { RegionDrilldownSheet } from './RegionDrilldownSheet';
@@ -72,7 +73,7 @@ function getRegionIcon(slug: string) {
   switch (slug) {
     case 'global-top-100':
     case 'global':
-      return <Globe2 className={iconClass} />;
+      return <GiWorld className={iconClass} />;
     case 'gb-i-top-100':
     case 'gb-i':
       return <FaLandmarkDome className={iconClass} />;
@@ -81,7 +82,7 @@ function getRegionIcon(slug: string) {
       return <FaFlagUsa className={iconClass} />;
     case 'europe-top-100':
     case 'europe':
-      return <Map className={iconClass} />;
+      return <GiEuropeanFlag className={iconClass} />;
     default:
       return <Map className={iconClass} />;
   }
