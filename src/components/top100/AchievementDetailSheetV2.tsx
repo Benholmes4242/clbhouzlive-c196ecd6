@@ -17,10 +17,11 @@
  * - Proper z-layer + footer-safe sheet behaviour
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, X, ChevronRight, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { CLUB_STEPS, type Top100ClubMeta } from '@/lib/top100Club';
 import { MILESTONE_THEMES, type MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
@@ -79,6 +80,17 @@ export function AchievementDetailSheetV2({
   context,
 }: AchievementDetailSheetV2Props) {
   const navigate = useNavigate();
+  const dragControls = useDragControls();
+
+  // Prevent the underlying page from scrolling while the sheet is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen]);
 
   if (!threshold) return null;
 
@@ -103,7 +115,7 @@ export function AchievementDetailSheetV2({
     onClose();
   };
 
-  return (
+  const content = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -113,7 +125,8 @@ export function AchievementDetailSheetV2({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-[120]"
+            onTouchMove={(e) => e.preventDefault()}
+            className="fixed inset-0 bg-black/50 z-[120] touch-none"
           />
 
           {/* Sheet - sit above bottom nav by offsetting by its height */}
@@ -123,6 +136,8 @@ export function AchievementDetailSheetV2({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             drag="y"
+            dragControls={dragControls}
+            dragListener={false}
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={(_, info) => {
@@ -139,7 +154,10 @@ export function AchievementDetailSheetV2({
             }}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-2">
+            <div
+              className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
+              onPointerDown={(e) => dragControls.start(e)}
+            >
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
             </div>
 
@@ -293,4 +311,7 @@ export function AchievementDetailSheetV2({
       )}
     </AnimatePresence>
   );
+
+  if (typeof window === 'undefined') return null;
+  return createPortal(content, document.body);
 }
