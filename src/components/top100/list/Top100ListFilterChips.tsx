@@ -4,12 +4,16 @@ import { Top100FilterSheet } from './Top100FilterSheet';
 import { motion } from 'framer-motion';
 
 export type Top100FilterChip = 'official' | 'community' | 'played' | 'unplayed';
+export type Top100SortMode = 'rank' | 'az' | 'za' | 'most_reviewed' | 'highest_rated';
 
 interface Top100ListFilterChipsProps {
   activeFilter: Top100FilterChip;
   onFilterChange: (filter: Top100FilterChip) => void;
+  activeSort: Top100SortMode;
+  onSortChange: (sort: Top100SortMode) => void;
   counts?: Partial<Record<Top100FilterChip, number>>;
   isSticky?: boolean;
+  hasReviewData?: boolean;
 }
 
 const FILTER_LABELS: Record<Top100FilterChip, string> = {
@@ -19,6 +23,14 @@ const FILTER_LABELS: Record<Top100FilterChip, string> = {
   unplayed: 'Unplayed',
 };
 
+const SORT_LABELS: Record<Top100SortMode, string> = {
+  rank: 'Rank',
+  az: 'A–Z',
+  za: 'Z–A',
+  most_reviewed: 'Most reviewed',
+  highest_rated: 'Highest rated',
+};
+
 /**
  * Premium frosted glass filter control with inner chip display.
  * Opens a bottom sheet selector on tap.
@@ -26,12 +38,16 @@ const FILTER_LABELS: Record<Top100FilterChip, string> = {
 export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeFilter,
   onFilterChange,
+  activeSort,
+  onSortChange,
   counts = {},
   isSticky = false,
+  hasReviewData = false,
 }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   
-  const currentLabel = FILTER_LABELS[activeFilter];
+  const currentFilterLabel = FILTER_LABELS[activeFilter];
+  const currentSortLabel = SORT_LABELS[activeSort];
   const count = counts[activeFilter];
 
   return (
@@ -69,7 +85,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
             Filter
           </span>
           
-          {/* Active value chip */}
+          {/* Active filter chip */}
           <span 
             className="text-[12px] font-medium px-2 py-0.5 rounded-md"
             style={{
@@ -77,10 +93,21 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
               color: 'rgb(51, 65, 85)',
             }}
           >
-            {currentLabel}
+            {currentFilterLabel}
             {count !== undefined && count > 0 && (
               <span className="text-slate-400 ml-1">({count})</span>
             )}
+          </span>
+
+          {/* Active sort chip */}
+          <span 
+            className="text-[12px] font-medium px-2 py-0.5 rounded-md"
+            style={{
+              background: 'rgba(15, 23, 42, 0.06)',
+              color: 'rgb(51, 65, 85)',
+            }}
+          >
+            Sort: {currentSortLabel}
           </span>
           
           {/* Chevron */}
@@ -93,7 +120,10 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         onClose={() => setIsSheetOpen(false)}
         activeFilter={activeFilter}
         onFilterChange={onFilterChange}
+        activeSort={activeSort}
+        onSortChange={onSortChange}
         counts={counts}
+        hasReviewData={hasReviewData}
       />
     </>
   );

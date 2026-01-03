@@ -7,7 +7,7 @@ export { Top100ListAchievementsRow } from './Top100ListAchievementsRow';
 export { Top100ListAchievementsPair } from './Top100ListAchievementsPair';
 export { Top100ListMilestoneRail } from './Top100ListMilestoneRail';
 export { Top100ListFilters, type SortMode, type FilterMode } from './Top100ListFilters';
-export { Top100ListFilterChips, type Top100FilterChip } from './Top100ListFilterChips';
+export { Top100ListFilterChips, type Top100FilterChip, type Top100SortMode } from './Top100ListFilterChips';
 export { Top100ListCourseCard } from './Top100ListCourseCard';
 export { Top100ListProgressHero } from './Top100ListProgressHero';
 export { Top100ListProgressCard } from './Top100ListProgressCard';
