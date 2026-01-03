@@ -219,12 +219,13 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
 
         {/* Ring container - matches SquircleAvatar geometry */}
         <div className="relative z-10" style={ringContainerStyle}>
-          {/* NEXT UP progress arc overlay (only paints the ring area) */}
+          {/* NEXT UP progress arc overlay - uses negative inset to cover the border track */}
           {isNextUp && (
             prefersReducedMotion ? (
               <div
-                className="absolute inset-0 pointer-events-none"
+                className="absolute pointer-events-none"
                 style={{
+                  inset: -ringThickness,
                   borderRadius: SQUIRCLE_RADIUS,
                   padding: ringThickness,
                   boxSizing: 'border-box',
@@ -236,11 +237,12 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
               />
             ) : (
               <motion.div
-                className="absolute inset-0 pointer-events-none"
+                className="absolute pointer-events-none"
                 initial={{ ['--p' as any]: 0 }}
                 animate={{ ['--p' as any]: progress }}
                 transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
                 style={{
+                  inset: -ringThickness,
                   borderRadius: SQUIRCLE_RADIUS,
                   padding: ringThickness,
                   boxSizing: 'border-box',
