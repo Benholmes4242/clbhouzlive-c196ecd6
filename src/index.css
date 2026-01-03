@@ -3179,6 +3179,126 @@ html[data-immersive="true"] .app-shell--topSpacer {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Rating Slider Styles (Primary & Breakdown)
+   
+   Design: Clbhouz-quality sliders with slate (Fair→Excellent) or gold (Outstanding)
+   Usage: Applied via className on Radix Slider in PostPlayRatingModal
+   Tier switching: data-tier="outstanding" triggers gold styling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Shared slider track styling */
+.rating-slider-primary [data-radix-slider-track],
+.rating-slider-breakdown [data-radix-slider-track] {
+  background-color: hsl(215 20% 90%); /* Light slate track */
+  height: 6px;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary slider - slightly thicker track */
+.rating-slider-primary [data-radix-slider-track] {
+  height: 8px;
+}
+
+/* Filled range - Slate (neutral: Fair → Excellent) */
+.rating-slider-primary [data-radix-slider-range],
+.rating-slider-breakdown [data-radix-slider-range] {
+  background-color: hsl(215 16% 47%); /* Slate-500 */
+  border-radius: 999px;
+  transition: background-color 0.2s ease-out;
+}
+
+/* Thumb styling - Slate (neutral) */
+.rating-slider-primary [data-radix-slider-thumb],
+.rating-slider-breakdown [data-radix-slider-thumb] {
+  background-color: hsl(215 25% 27%); /* Slate-700 */
+  border: 2px solid hsl(215 25% 27%);
+  border-radius: 50%;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: 
+    background-color 0.2s ease-out,
+    border-color 0.2s ease-out,
+    box-shadow 0.15s ease-out,
+    transform 0.1s ease-out;
+  cursor: grab;
+}
+
+/* Primary slider - larger thumb */
+.rating-slider-primary [data-radix-slider-thumb] {
+  width: 20px;
+  height: 20px;
+}
+
+/* Breakdown slider - smaller thumb */
+.rating-slider-breakdown [data-radix-slider-thumb] {
+  width: 16px;
+  height: 16px;
+}
+
+/* Thumb hover state */
+.rating-slider-primary [data-radix-slider-thumb]:hover,
+.rating-slider-breakdown [data-radix-slider-thumb]:hover {
+  background-color: hsl(215 25% 22%); /* Slate-800 */
+  border-color: hsl(215 25% 22%);
+  box-shadow: 
+    0 3px 8px rgba(0, 0, 0, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+/* Thumb active/drag state */
+.rating-slider-primary [data-radix-slider-thumb]:active,
+.rating-slider-breakdown [data-radix-slider-thumb]:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+/* Thumb focus state */
+.rating-slider-primary [data-radix-slider-thumb]:focus,
+.rating-slider-breakdown [data-radix-slider-thumb]:focus {
+  outline: none;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    0 0 0 3px hsla(215, 16%, 47%, 0.25); /* Slate focus ring */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Outstanding Tier - Gold Styling (9.0+)
+   Triggered by data-tier="outstanding" attribute on Slider root
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Outstanding: Gold filled range */
+.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-range],
+.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-range] {
+  background-color: #C9A94A; /* Gold - matches Reviews tab */
+}
+
+/* Outstanding: Gold thumb */
+.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb],
+.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb] {
+  background-color: #C9A94A;
+  border-color: #C9A94A;
+}
+
+/* Outstanding: Gold thumb hover */
+.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:hover,
+.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:hover {
+  background-color: #B8992F; /* Darker gold on hover */
+  border-color: #B8992F;
+}
+
+/* Outstanding: Gold focus ring */
+.rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:focus,
+.rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:focus {
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    0 0 0 3px rgba(201, 169, 74, 0.3); /* Gold focus ring */
+}
+
 /* Add to Played Button Styles */
 .add-to-played-btn {
   transition: all 0.2s ease-in-out;

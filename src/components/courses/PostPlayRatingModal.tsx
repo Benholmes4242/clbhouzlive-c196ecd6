@@ -889,6 +889,7 @@ const PostPlayRatingModal = ({
                   max={10}
                   step={0.1}
                   className="w-full rating-slider-primary"
+                  data-tier={getScoreTier(selectedRating || 5).tier === 'outstanding' ? 'outstanding' : undefined}
                 />
               </div>
 
@@ -980,6 +981,7 @@ const PostPlayRatingModal = ({
                       max={10}
                       step={0.1}
                       className="w-full rating-slider-breakdown"
+                      data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
                     />
                   </div>
                 </div>
