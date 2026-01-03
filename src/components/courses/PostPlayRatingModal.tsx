@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trophy, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle } from 'lucide-react';
+import { Star, Check, Trophy, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
@@ -12,16 +12,13 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
-// Video thumbnails handled by Cloudflare Stream poster_url after upload
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
+import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
 
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
-
-// Generate stable file key for tracking uploads (consistent across references)
-const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
 
 // Existing media item from database
 interface ExistingMedia {
@@ -77,15 +74,43 @@ const PostPlayRatingModal = ({
     message: "Your rating is still being submitted.",
   });
   
+  // Upload session ID - stable for the life of this modal instance
+  const uploadSessionIdRef = useRef(crypto.randomUUID());
+  const uploadSessionId = uploadSessionIdRef.current;
+  
+  // Current user ID for upload ownership
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  // Fetch current user on mount
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id || null);
+    });
+  }, []);
+  
+  // Upload-on-select video handling hook
+  const {
+    videoDrafts,
+    uploadVideo,
+    removeVideo,
+    attachToReview,
+    cleanupPending,
+    reset: resetVideoDrafts,
+  } = useReviewVideoUpload({
+    uploadSessionId,
+    userId: currentUserId,
+    onError: (msg) => toast({ title: 'Video Upload Error', description: msg, variant: 'destructive' }),
+  });
+  
   // Store last payload for retry
   const lastPayloadRef = useRef<any>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
-  const [mediaPreviews, setMediaPreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey (images + video thumbnails)
-  const [videoObjectUrls, setVideoObjectUrls] = useState<Map<string, string>>(new Map()); // keyed by fileKey (video blob URLs for pre-upload preview)
-  const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set()); // keyed by fileKey
-  const mediaPreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
-  const videoObjectUrlsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
+  
+  // Selected IMAGES only (videos handled separately via videoDrafts)
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey
+  const imagePreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
+  
   // Existing media from database (edit mode)
   const [existingMediaItems, setExistingMediaItems] = useState<ExistingMedia[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
@@ -112,6 +137,9 @@ const PostPlayRatingModal = ({
   // Phase 3A: Track Outstanding entry for breakdown sliders
   const [breakdownOutstandingEntry, setBreakdownOutstandingEntry] = useState<Record<string, boolean>>({});
   const prevBreakdownTiersRef = useRef<Record<string, string>>({});
+  
+  // Total media count (existing + new images + video drafts)
+  const totalMediaCount = existingMediaItems.length + selectedImages.length + videoDrafts.length;
 
   // Use passed existingRating or fetch internally as fallback
   const { data: existingRatingFetched } = useQuery({
@@ -174,14 +202,13 @@ const PostPlayRatingModal = ({
 
   // Keep ref in sync with state for cleanup
   useEffect(() => {
-    mediaPreviewsRef.current = mediaPreviews;
-  }, [mediaPreviews]);
+    imagePreviewsRef.current = imagePreviews;
+  }, [imagePreviews]);
 
   // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
-      mediaPreviewsRef.current.forEach((url) => {
-        // Only revoke blob: URLs, not Stream poster URLs
+      imagePreviewsRef.current.forEach((url) => {
         if (url.startsWith('blob:')) {
           URL.revokeObjectURL(url);
         }
@@ -226,7 +253,7 @@ const PostPlayRatingModal = ({
     mutationFn: async ({ 
       rating, 
       reviewText, 
-      mediaFiles,
+      imageFiles,
       design,
       condition,
       clubhouse,
@@ -234,7 +261,7 @@ const PostPlayRatingModal = ({
     }: { 
       rating: number; 
       reviewText: string; 
-      mediaFiles: File[];
+      imageFiles: File[];
       design: number | null;
       condition: number | null;
       clubhouse: number | null;
@@ -283,85 +310,53 @@ const PostPlayRatingModal = ({
         ratingId = newRating.id;
       }
 
-      // Upload media files if any
-      if (mediaFiles.length > 0) {
-        // Mark all files as uploading using stable file keys
-        const fileKeys = mediaFiles.map(getFileKey);
-        setUploadingFiles(new Set(fileKeys));
-        
+      // Upload IMAGE files only - videos are already uploaded via upload-on-select
+      if (imageFiles.length > 0) {
         const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-        const { edgePost } = await import('@/utils/callEdge');
-        const { generateStreamThumbnailUrl, generateStreamHlsUrl } = await import('@/config/cloudflareStream');
         
-        const uploadPromises = mediaFiles.map(async (file) => {
-          const fileKey = getFileKey(file);
-          const isVideo = isVideoFile(file);
+        const uploadPromises = imageFiles.map(async (file) => {
+          // Images go to R2
+          const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
           
-          try {
-            if (isVideo) {
-              // Videos go to Cloudflare Stream
-              console.log('[Review Media] Uploading video to Cloudflare Stream:', file.name);
-              const formData = new FormData();
-              formData.append('file', file);
-              
-              const streamResult = await edgePost('cloudflare-stream-upload', formData);
-              
-              if (!streamResult?.success || !streamResult?.videoId) {
-                throw new Error(streamResult?.error || `Failed to upload video ${file.name}`);
-              }
-              
-              console.log('[Review Media] Stream upload success:', streamResult.videoId);
-              
-              // Save video record with stream_id and poster_url
-              const { error: mediaError } = await supabase
-                .from('course_review_media')
-                .insert({
-                  review_id: ratingId,
-                  media_url: generateStreamHlsUrl(streamResult.videoId),
-                  media_type: 'video',
-                  stream_id: streamResult.videoId,
-                  poster_url: generateStreamThumbnailUrl(streamResult.videoId),
-                  file_name: file.name,
-                  file_size: file.size
-                });
-
-              if (mediaError) throw mediaError;
-            } else {
-              // Images go to R2
-              const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
-              const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
-              
-              if (!uploadResult.success) {
-                throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
-              }
-
-              // Save image record to database
-              const { error: mediaError } = await supabase
-                .from('course_review_media')
-                .insert({
-                  review_id: ratingId,
-                  media_url: uploadResult.publicUrl,
-                  media_type: 'image',
-                  file_name: file.name,
-                  file_size: file.size
-                });
-
-              if (mediaError) throw mediaError;
-            }
-          } finally {
-            // Clear this file from uploading state (per-file, not batch)
-            setUploadingFiles(prev => {
-              const next = new Set(prev);
-              next.delete(fileKey);
-              return next;
-            });
+          if (!uploadResult.success) {
+            throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
           }
+
+          // Save image record to database
+          const { error: mediaError } = await supabase
+            .from('course_review_media')
+            .insert({
+              review_id: ratingId,
+              media_url: uploadResult.publicUrl,
+              media_type: 'image',
+              file_name: file.name,
+              file_size: file.size,
+              status: 'attached',
+              owner_user_id: userResponse.user.id,
+            });
+
+          if (mediaError) throw mediaError;
         });
 
         await Promise.all(uploadPromises);
       }
+      
+      // Return the ratingId so we can attach videos in onSuccess
+      return ratingId;
     },
-    onSuccess: async (result, variables) => {
+    onSuccess: async (ratingId: string, variables) => {
+      // Attach pending videos to the review
+      if (videoDrafts.filter(d => d.status === 'ready').length > 0) {
+        try {
+          const { attached } = await attachToReview(ratingId);
+          console.log('[Rating] Attached', attached, 'videos to review:', ratingId);
+        } catch (attachError) {
+          console.error('[Rating] Failed to attach videos:', attachError);
+          // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
+        }
+      }
+      
       // Get userId for proper query invalidation
       const { data: userResponse } = await supabase.auth.getUser();
       const userId = userResponse?.user?.id;
@@ -371,6 +366,7 @@ const PostPlayRatingModal = ({
       console.log('[Rating Mutation onSuccess]', {
         courseId: course?.id,
         isNewReview,
+        ratingId,
         payload: {
           rating: variables.rating,
           reviewText: variables.reviewText,
@@ -679,64 +675,22 @@ const PostPlayRatingModal = ({
       setClubhouseTouched(false);
       setFacilitiesTouched(false);
     }
-    // Clean up media previews
-    mediaPreviews.forEach((url) => {
+    // Clean up image previews
+    imagePreviews.forEach((url) => {
       if (url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
       }
     });
-    setSelectedMedia([]);
-    setMediaPreviews(new Map());
+    setSelectedImages([]);
+    setImagePreviews(new Map());
+    resetVideoDrafts();
     setExistingMediaItems([]);
     setShowConfirmation(false);
     setIsSubmitting(false);
   };
-
-  // Generate video thumbnail
-  const generateVideoThumbnail = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement('video');
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      
-      video.preload = 'metadata';
-      video.muted = true;
-      video.playsInline = true;
-      
-      video.onloadeddata = () => {
-        // Seek to 1 second or 10% of duration, whichever is smaller
-        const seekTime = Math.min(1, video.duration * 0.1);
-        video.currentTime = seekTime;
-      };
-      
-      video.onseeked = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context?.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const thumbnailUrl = URL.createObjectURL(blob);
-            resolve(thumbnailUrl);
-          } else {
-            reject(new Error('Failed to generate thumbnail'));
-          }
-          
-          // Clean up
-          URL.revokeObjectURL(video.src);
-        }, 'image/jpeg', 0.8);
-      };
-      
-      video.onerror = () => {
-        reject(new Error('Failed to load video'));
-        URL.revokeObjectURL(video.src);
-      };
-      
-      video.src = URL.createObjectURL(file);
-    });
-  };
-
-  const handleClose = () => {
+  const handleClose = async () => {
+    // Cleanup pending video uploads when modal is closed without submitting
+    await cleanupPending();
     onClose();
     resetForm();
   };
@@ -764,7 +718,7 @@ const PostPlayRatingModal = ({
     const payload = {
       rating: normalize(selectedRating) || 5,
       reviewText: review.trim(),
-      mediaFiles: selectedMedia,
+      imageFiles: selectedImages,
       design: designTouched ? normalize(designScore) : null,
       condition: conditionTouched ? normalize(conditionScore) : null,
       clubhouse: clubhouseTouched ? normalize(clubhouseScore) : null,
@@ -779,6 +733,7 @@ const PostPlayRatingModal = ({
       clubhouse: typeof payload.clubhouse,
       facilities: typeof payload.facilities
     });
+    console.log('[Rating Submission] Video drafts to attach:', videoDrafts.filter(d => d.status === 'ready').length);
     
     // Store payload for retry
     lastPayloadRef.current = payload;
@@ -793,7 +748,7 @@ const PostPlayRatingModal = ({
     submitRatingMutation.mutate(lastPayloadRef.current);
   };
 
-  const handleMediaSelected = (files: File[]) => {
+  const handleMediaSelected = async (files: File[]) => {
     console.log('[Media Audit] CHECKPOINT A - Picked items:', files);
     console.log(
       '[Media Audit] CHECKPOINT A1 - Picked details:',
@@ -809,9 +764,8 @@ const PostPlayRatingModal = ({
       })
     );
 
-    // Respect 6-item maximum (existing media + new files)
-    const totalExisting = existingMediaItems.length + selectedMedia.length;
-    const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - totalExisting;
+    // Respect 6-item maximum (existing media + images + video drafts)
+    const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - totalMediaCount;
     const filesToAdd = files.slice(0, Math.max(0, remainingSlots));
 
     if (filesToAdd.length === 0) {
@@ -832,45 +786,59 @@ const PostPlayRatingModal = ({
       });
     }
 
-    // IMPORTANT (mobile): never block state insertion on thumbnail generation.
-    // iOS Safari can hang on seek/canvas extraction for some MOV/HEVC clips.
-    setSelectedMedia((prev) => [...prev, ...filesToAdd]);
-
-    // Generate previews for images only - videos use placeholder tiles until Stream upload completes
+    // Split into images vs videos
+    const imageFiles: File[] = [];
+    const videoFiles: File[] = [];
+    
     for (const file of filesToAdd) {
       const inferred = getMediaType(file);
+      if (inferred === 'video') {
+        videoFiles.push(file);
+      } else {
+        imageFiles.push(file);
+      }
+    }
 
-      if (inferred === 'image') {
-        // Images get a blob preview
+    // Add images to state with blob previews
+    if (imageFiles.length > 0) {
+      setSelectedImages((prev) => [...prev, ...imageFiles]);
+      
+      for (const file of imageFiles) {
         const previewUrl = URL.createObjectURL(file);
         const fileKey = getFileKey(file);
-        setMediaPreviews((prev) => {
+        setImagePreviews((prev) => {
           const next = new Map(prev);
           next.set(fileKey, previewUrl);
           return next;
         });
       }
-      // Videos: no preview set - UI will show placeholder tile
     }
 
-    console.log('[Media Audit] CHECKPOINT B - Queued media + previews:', {
-      addedCount: filesToAdd.length,
-      totalCountAfterAdd: selectedMedia.length + filesToAdd.length,
+    // Upload videos to Stream immediately (upload-on-select)
+    for (const file of videoFiles) {
+      console.log('[Review Media] Starting upload-on-select for:', file.name);
+      uploadVideo(file);
+    }
+
+    console.log('[Media Audit] CHECKPOINT B - Queued media:', {
+      imagesAdded: imageFiles.length,
+      videosStarted: videoFiles.length,
+      totalCount: totalMediaCount + filesToAdd.length,
     });
   };
 
-  const handleRemoveMedia = (index: number) => {
-    const fileToRemove = selectedMedia[index];
+  const handleRemoveImage = (index: number) => {
+    const fileToRemove = selectedImages[index];
     const fileKey = getFileKey(fileToRemove);
-    const previewUrl = mediaPreviews.get(fileKey);
+    const previewUrl = imagePreviews.get(fileKey);
     
-    // Revoke the object URL to free memory (only blob: URLs)
+    // Revoke the object URL to free memory
     if (previewUrl && previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(previewUrl);
     }
     
-    setSelectedMedia(prev => prev.filter((_, i) => i !== index));
-    setMediaPreviews(prev => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => {
       const newMap = new Map(prev);
       newMap.delete(fileKey);
       return newMap;
@@ -1147,8 +1115,8 @@ const PostPlayRatingModal = ({
             {/* Media Upload Section - Section D (dark) */}
             <section className="px-6 pt-6 pb-3 bg-slate-100">
               <div className="py-8 flex flex-col items-center justify-center gap-4">
-                {/* Total media count = existing + new */}
-                {(existingMediaItems.length > 0 || selectedMedia.length > 0) && (
+                {/* Total media count = existing + images + video drafts */}
+                {totalMediaCount > 0 && (
                   <div className="w-full">
                     <div className="grid grid-cols-3 gap-3">
                       {/* Existing media items from database */}
@@ -1211,56 +1179,85 @@ const PostPlayRatingModal = ({
                         );
                       })}
                       
-                      {/* Newly selected files */}
-                      {selectedMedia.map((file, index) => {
-                        const isVideo = isVideoFile(file);
+                      {/* Newly selected IMAGES */}
+                      {selectedImages.map((file, index) => {
                         const fileKey = getFileKey(file);
-                        const preview = mediaPreviews.get(fileKey) || '';
-                        
-                        // Get filename for display (truncate if too long)
-                        const displayName = file.name.length > 12 
-                          ? file.name.slice(0, 10) + '…' 
-                          : file.name;
-                        
-                        const isUploading = uploadingFiles.has(fileKey);
+                        const preview = imagePreviews.get(fileKey) || '';
                         
                         return (
-                          <div key={`new-${index}`} className="relative w-full aspect-square overflow-hidden rounded-md">
-                            {isVideo ? (
-                              // Pre-upload placeholder tile for videos
+                          <div key={`img-${index}`} className="relative w-full aspect-square overflow-hidden rounded-md">
+                            <img
+                              src={preview}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
+                              aria-label="Remove image"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      
+                      {/* Video drafts (upload-on-select) */}
+                      {videoDrafts.map((draft) => {
+                        const displayName = draft.fileName.length > 12 
+                          ? draft.fileName.slice(0, 10) + '…' 
+                          : draft.fileName;
+                        
+                        return (
+                          <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden rounded-md">
+                            {draft.status === 'uploading' ? (
+                              // Uploading state with spinner
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                {isUploading ? (
-                                  // Uploading state with spinner
-                                  <>
-                                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2" />
-                                    <span className="text-xs text-slate-300 text-center px-2">
-                                      Uploading…
-                                    </span>
-                                  </>
-                                ) : (
-                                  // Pre-upload state with play icon
-                                  <>
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm mb-2">
-                                      <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
-                                    </div>
-                                    <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
-                                      {displayName}
-                                    </span>
-                                  </>
-                                )}
+                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2" />
+                                <span className="text-xs text-slate-300 text-center px-2">
+                                  Uploading…
+                                </span>
+                              </div>
+                            ) : draft.status === 'ready' && draft.posterUrl ? (
+                              // Ready with Stream poster thumbnail
+                              <div className="relative h-full w-full">
+                                <img
+                                  src={draft.posterUrl}
+                                  alt="Video thumbnail"
+                                  className="h-full w-full object-cover"
+                                />
+                                {/* Play icon overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm">
+                                    <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
+                                  </div>
+                                </div>
+                              </div>
+                            ) : draft.status === 'failed' ? (
+                              // Failed state with retry
+                              <div className="relative h-full w-full bg-red-900/30 flex flex-col items-center justify-center">
+                                <AlertCircle className="w-6 h-6 text-red-400 mb-2" />
+                                <span className="text-xs text-red-300 text-center px-2">
+                                  Failed
+                                </span>
                               </div>
                             ) : (
-                              <img
-                                src={preview}
-                                alt=""
-                                className="h-full w-full object-cover"
-                              />
+                              // Fallback placeholder
+                              <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm mb-2">
+                                  <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
+                                </div>
+                                <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
+                                  {displayName}
+                                </span>
+                              </div>
                             )}
                             <button
                               type="button"
-                              onClick={() => handleRemoveMedia(index)}
+                              onClick={() => removeVideo(draft.fileKey)}
                               className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
-                              aria-label="Remove media"
+                              aria-label="Remove video"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -1271,7 +1268,7 @@ const PostPlayRatingModal = ({
                   </div>
                 )}
                 
-                {existingMediaItems.length === 0 && selectedMedia.length === 0 && (
+                {totalMediaCount === 0 && (
                   <div className="text-center">
                     <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                       Media upload (optional)
@@ -1318,10 +1315,10 @@ const PostPlayRatingModal = ({
                     input.click();
                   }}
                   variant="outline"
-                  disabled={(existingMediaItems.length + selectedMedia.length) >= MAX_REVIEW_MEDIA_ITEMS}
+                  disabled={totalMediaCount >= MAX_REVIEW_MEDIA_ITEMS}
                   className="w-44 mt-6 h-11 rounded-xl border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {(existingMediaItems.length + selectedMedia.length) >= MAX_REVIEW_MEDIA_ITEMS 
+                  {totalMediaCount >= MAX_REVIEW_MEDIA_ITEMS 
                     ? `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added` 
                     : 'Add Media'}
                 </Button>

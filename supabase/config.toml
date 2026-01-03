@@ -125,3 +125,9 @@ verify_jwt = true
 
 [functions.smart-compilation]
 verify_jwt = true
+
+[functions.cleanup-review-videos]
+verify_jwt = false
+
+[functions.delete-review-video]
+verify_jwt = true
