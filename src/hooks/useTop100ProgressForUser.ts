@@ -5,6 +5,25 @@ import { applyMyJourneyDebug } from '@/lib/top100DebugHelpers';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import type { Top100TierId } from '@/lib/top100Club';
 
+/**
+ * ============================================================================
+ * DATE FIELD USAGE (Canonical Reference)
+ * ============================================================================
+ * 
+ * played_at = COALESCE(review_date, created_at)
+ *   Used for ALL user-facing features:
+ *   - Year Summary tiles (courses/regions/new/avg rating)
+ *   - Year Progress chart (monthly buckets)
+ *   - 3-month logging streak
+ *   - Recent Top 100 Rounds ordering
+ * 
+ * edited_at = updated_at
+ *   Used for: NOTHING user-facing (admin/debug only)
+ *   Editing a rating should NEVER affect progress, recents, or stats.
+ * 
+ * ============================================================================
+ */
+
 export type Top100ListProgress = {
   listId: string;
   listSlug: string;
@@ -20,7 +39,8 @@ export type Top100RecentRound = {
   country: string | null;
   sub_country: string | null;
   list_slugs: string[];
-  played_at: string;  // Canonical: COALESCE(review_date, created_at)
+  played_at: string;      // Canonical: COALESCE(review_date, created_at) - used for all ordering/filtering
+  first_activity_at?: string; // created_at - for stable tie-breaking
   rating: number | null;
   image_url?: string | null;
   global_rank: number | null;
@@ -42,9 +62,9 @@ export type Top100ProgressResponse = {
   totalTop100Played: number;
   regions_count: number;
   lists: Top100ListProgress[];
-  recent_rounds: Top100RecentRound[];        // Ordered by played_at DESC, limit 25
-  year_rounds: Top100RecentRound[];          // NEW: All rounds for current calendar year
-  all_rounds_for_streak: Top100RecentRound[]; // NEW: Last 18 months for streak calculation
+  recent_rounds: Top100RecentRound[];        // Ordered by played_at DESC, first_activity_at DESC, course_id ASC - limit 25
+  year_rounds: Top100RecentRound[];          // All rounds for current calendar year (uses played_at)
+  all_rounds_for_streak: Top100RecentRound[]; // Last 18 months for streak (uses played_at)
   next_milestone: Top100NextMilestone | null;
   club_label?: string | null;
   club_tier_name?: string | null;
@@ -152,12 +172,16 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         });
       }
 
-      // === FETCH RECENT ROUNDS (limit 25, ordered by played_at DESC) ===
+      // === FETCH RECENT ROUNDS ===
+      // Order: played_at DESC, first_activity_at DESC, course_id ASC (stable tie-breaker)
+      // Limit 25 after filtering to Top 100 courses
       const { data: recentActivity, error: recentError } = await supabase
         .from('user_course_activity' as any)
-        .select('course_id, played_at, rating_value')
+        .select('course_id, played_at, first_activity_at, rating_value')
         .eq('user_id', userId)
         .order('played_at', { ascending: false, nullsFirst: false })
+        .order('first_activity_at', { ascending: false, nullsFirst: false })
+        .order('course_id', { ascending: true })
         .limit(100); // Get more to filter to Top 100 only
 
       if (recentError) throw recentError;
@@ -174,11 +198,13 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       const { data: yearActivity, error: yearError } = await supabase
         .from('user_course_activity' as any)
-        .select('course_id, played_at, rating_value')
+        .select('course_id, played_at, first_activity_at, rating_value')
         .eq('user_id', userId)
         .gte('played_at', yearStart)
         .lt('played_at', yearEnd)
-        .order('played_at', { ascending: false, nullsFirst: false });
+        .order('played_at', { ascending: false, nullsFirst: false })
+        .order('first_activity_at', { ascending: false, nullsFirst: false })
+        .order('course_id', { ascending: true });
 
       if (yearError) throw yearError;
 
@@ -193,10 +219,12 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       const { data: streakActivity, error: streakError } = await supabase
         .from('user_course_activity' as any)
-        .select('course_id, played_at, rating_value')
+        .select('course_id, played_at, first_activity_at, rating_value')
         .eq('user_id', userId)
         .gte('played_at', streakStart)
-        .order('played_at', { ascending: false, nullsFirst: false });
+        .order('played_at', { ascending: false, nullsFirst: false })
+        .order('first_activity_at', { ascending: false, nullsFirst: false })
+        .order('course_id', { ascending: true });
 
       if (streakError) throw streakError;
 
@@ -243,6 +271,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
           sub_country: course.sub_country,
           list_slugs: courseListSlugs,
           played_at: activity.played_at || new Date().toISOString(),
+          first_activity_at: activity.first_activity_at,
           rating: activity.rating_value,
           image_url: course.thumbnail_image ?? null,
           global_rank: globalMembership?.rank ?? null,
