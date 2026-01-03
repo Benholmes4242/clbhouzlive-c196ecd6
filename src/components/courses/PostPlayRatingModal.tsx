@@ -17,6 +17,9 @@ import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
 
+// Track if modal is being unmounted
+let isUnmounting = false;
+
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
 
@@ -96,11 +99,28 @@ const PostPlayRatingModal = ({
     attachToReview,
     cleanupPending,
     reset: resetVideoDrafts,
+    resetCleanupFlag,
+    retryPoster,
   } = useReviewVideoUpload({
     uploadSessionId,
     userId: currentUserId,
     onError: (msg) => toast({ title: 'Video Upload Error', description: msg, variant: 'destructive' }),
   });
+  
+  // Fix #6: Cleanup pending videos on unmount (best-effort)
+  useEffect(() => {
+    isUnmounting = false;
+    // Reset cleanup flag when modal opens with new session
+    resetCleanupFlag();
+    
+    return () => {
+      isUnmounting = true;
+      // Best-effort cleanup on unmount - async but won't block unmount
+      cleanupPending().catch(err => {
+        console.error('[Rating] Unmount cleanup error (non-blocking):', err);
+      });
+    };
+  }, [uploadSessionId]); // Only re-run if session changes
   
   // Store last payload for retry
   const lastPayloadRef = useRef<any>(null);
@@ -1220,12 +1240,18 @@ const PostPlayRatingModal = ({
                                 </span>
                               </div>
                             ) : draft.status === 'ready' && draft.posterUrl ? (
-                              // Ready with Stream poster thumbnail
+                              // Ready with Stream poster thumbnail (Fix #7: onError retry)
                               <div className="relative h-full w-full">
                                 <img
                                   src={draft.posterUrl}
                                   alt="Video thumbnail"
                                   className="h-full w-full object-cover"
+                                  onError={() => {
+                                    // Retry poster load with cache-buster if it fails
+                                    if ((draft.posterRetryCount || 0) < 3) {
+                                      setTimeout(() => retryPoster(draft.fileKey), 1000);
+                                    }
+                                  }}
                                 />
                                 {/* Play icon overlay */}
                                 <div className="absolute inset-0 flex items-center justify-center">
