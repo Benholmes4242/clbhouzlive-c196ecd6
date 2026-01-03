@@ -141,30 +141,30 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
           </SheetHeader>
 
           {selectedMonth?.count === 0 ? (
-            /* Empty state - centered, calm, with subtle CTA */
-            <div className="flex flex-col items-center justify-center py-8 px-4 text-center min-h-[180px]">
+            /* Empty state - nudged upward for better balance, calm CTA */
+            <div className="flex flex-col items-center justify-center py-6 pb-10 px-4 text-center min-h-[180px] -mt-4">
               <p className="text-sm text-muted-foreground mb-1">
                 No Top 100 courses logged this month.
               </p>
               <p className="text-xs text-muted-foreground/70 mb-6">
-                Log a round to keep your progress moving.
+                Log a round to keep the momentum going.
               </p>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleLogRound}
-                className="text-sm"
+                className="text-sm border-border/80 rounded-lg"
               >
                 Log a Top 100 round
               </Button>
             </div>
           ) : (
-            /* Courses list - each row tappable */
+            /* Courses list - each row tappable with clear feedback */
             <div className="overflow-y-auto max-h-[40vh]">
-              <p className="text-sm text-muted-foreground mb-3">
-                {selectedMonth?.count} course{selectedMonth?.count !== 1 ? 's' : ''} logged
+              <p className="text-xs text-muted-foreground mb-3">
+                {selectedMonth?.count} Top 100 round{selectedMonth?.count !== 1 ? 's' : ''} logged
               </p>
-              <div className="space-y-0.5">
+              <div className="divide-y divide-border/30">
                 {selectedMonth?.courses.map((course, idx) => (
                   <button
                     key={`${course.id}-${idx}`}
@@ -172,18 +172,18 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                     onClick={() => handleCourseClick(course.id)}
                     className={cn(
                       'w-full flex items-center justify-between py-3 px-2 -mx-2 rounded-lg',
-                      'text-left transition-colors cursor-pointer',
-                      'hover:bg-muted/50 active:bg-muted/70'
+                      'text-left transition-all duration-100 cursor-pointer',
+                      'hover:bg-muted/50 active:bg-muted/80 active:scale-[0.995]'
                     )}
                   >
                     <span className="text-sm font-medium text-foreground truncate pr-3 flex-1">
                       {course.name}
                     </span>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 flex-shrink-0 mr-0.5">
                       <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {format(new Date(course.playedAt), 'd MMM')}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
                     </div>
                   </button>
                 ))}
