@@ -12,7 +12,6 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
-import { generateVideoThumbnail } from '@/utils/videoThumbnail';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
@@ -238,27 +237,55 @@ const PostPlayRatingModal = ({
       // Upload media files if any
       if (mediaFiles.length > 0) {
         const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+        const { uploadToCloudflareStream } = await import('@/utils/cloudflareStreamUpload');
+        
         const uploadPromises = mediaFiles.map(async (file) => {
-          const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+          const isVideo = isVideoFile(file);
           
-          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
-          
-          if (!uploadResult.success) {
-            throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+          if (isVideo) {
+            // Videos go to Cloudflare Stream for proper HLS playback and poster generation
+            const streamResult = await uploadToCloudflareStream(file);
+            
+            if (!streamResult.success) {
+              throw new Error(streamResult.error || `Failed to upload video ${file.name}`);
+            }
+            
+            // Save media record with Stream URL and poster
+            const { error: mediaError } = await supabase
+              .from('course_review_media')
+              .insert({
+                review_id: ratingId,
+                media_url: streamResult.videoUrl,
+                media_type: 'video',
+                file_name: file.name,
+                file_size: file.size,
+                stream_id: streamResult.streamId,
+                poster_url: streamResult.posterUrl
+              });
+            
+            if (mediaError) throw mediaError;
+          } else {
+            // Images go to R2
+            const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+            const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
+            
+            if (!uploadResult.success) {
+              throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+            }
+
+            // Save media record to database
+            const { error: mediaError } = await supabase
+              .from('course_review_media')
+              .insert({
+                review_id: ratingId,
+                media_url: uploadResult.publicUrl,
+                media_type: 'image',
+                file_name: file.name,
+                file_size: file.size
+              });
+
+            if (mediaError) throw mediaError;
           }
-
-          // Save media record to database
-          const { error: mediaError } = await supabase
-            .from('course_review_media')
-            .insert({
-              review_id: ratingId,
-              media_url: uploadResult.publicUrl,
-              media_type: isVideoFile(file) ? 'video' : 'image',
-              file_name: file.name,
-              file_size: file.size
-            });
-
-          if (mediaError) throw mediaError;
         });
 
         await Promise.all(uploadPromises);
@@ -725,51 +752,23 @@ const PostPlayRatingModal = ({
       });
     }
 
-    // IMPORTANT (mobile): never block state insertion on thumbnail generation.
-    // iOS Safari can hang on seek/canvas extraction for some MOV/HEVC clips.
+    // Add files to state immediately
     setSelectedMedia((prev) => [...prev, ...filesToAdd]);
 
     for (const file of filesToAdd) {
       const inferred = getMediaType(file);
 
-      // Always give the UI *something* to render immediately
       if (inferred === 'video') {
-        const blobUrl = URL.createObjectURL(file);
+        // For videos: use placeholder immediately - NO client-side thumbnail generation
+        // Stream poster will be available after upload completes
         setMediaPreviews((prev) => {
           const next = new Map(prev);
-          next.set(file, blobUrl);
+          // Use 'pending' marker to show placeholder
+          next.set(file, 'pending');
           return next;
         });
-
-        // Best-effort thumbnail (non-blocking) with timeout
-        const THUMBNAIL_TIMEOUT_MS = 4500;
-        Promise.race([
-          generateVideoThumbnail(file),
-          new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('thumbnail_timeout')), THUMBNAIL_TIMEOUT_MS)
-          ),
-        ])
-          .then((thumbnail) => {
-            if (!thumbnail) return;
-            setMediaPreviews((prev) => {
-              const next = new Map(prev);
-              const previous = next.get(file);
-              if (previous && previous.startsWith('blob:')) {
-                URL.revokeObjectURL(previous);
-              }
-              next.set(file, thumbnail);
-              return next;
-            });
-          })
-          .catch((error) => {
-            console.warn('[Media Audit] Video thumbnail unavailable (using blob preview)', {
-              name: file.name,
-              type: file.type,
-              inferred,
-              error: (error as any)?.message ?? String(error),
-            });
-          });
       } else {
+        // For images: use blob URL for instant preview
         const previewUrl = URL.createObjectURL(file);
         setMediaPreviews((prev) => {
           const next = new Map(prev);
@@ -1092,28 +1091,21 @@ const PostPlayRatingModal = ({
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
-                              <div className="relative h-full w-full bg-slate-700">
-                                {preview && !preview.startsWith('blob:') ? (
+                              <div className="relative h-full w-full bg-gradient-to-br from-slate-700 to-slate-800">
+                                {/* Video: Always use <img> for poster, never <video> in grid */}
+                                {preview && preview !== 'pending' && !preview.startsWith('blob:') ? (
                                   <img
                                     src={preview}
                                     alt=""
                                     className="h-full w-full object-cover"
                                   />
                                 ) : (
-                                  <video
-                                    src={preview || undefined}
-                                    autoPlay
-                                    muted
-                                    playsInline
-                                    loop={false}
-                                    className="h-full w-full object-cover"
-                                    onCanPlay={(e) => {
-                                      // Pause immediately after loading to show first frame on iOS
-                                      const video = e.currentTarget;
-                                      video.pause();
-                                      video.currentTime = 0.1;
-                                    }}
-                                  />
+                                  /* Branded placeholder while video is pending upload */
+                                  <div className="h-full w-full flex items-center justify-center">
+                                    <div className="text-center text-slate-400">
+                                      <div className="text-xs font-medium">Video</div>
+                                    </div>
+                                  </div>
                                 )}
                                 {/* Centered play icon overlay */}
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
