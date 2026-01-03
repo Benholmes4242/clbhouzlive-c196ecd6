@@ -76,18 +76,40 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
     input.type = 'file';
     input.accept = accept;
     input.multiple = true;
+
+    // iOS reliability: ensure input is in the DOM when clicked
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    input.style.top = '-9999px';
+
     if (capture) {
       input.setAttribute('capture', 'environment');
     }
+
+    const cleanup = () => {
+      try {
+        input.value = '';
+      } catch {
+        // no-op
+      }
+      input.remove();
+    };
+
     input.onchange = (e) => {
       const target = e.target as HTMLInputElement;
-      if (target.files) {
-        const files = Array.from(target.files);
-        if (validateFiles(files)) {
-          onMediaSelected(files);
-        }
+      const files = Array.from(target.files || []);
+      console.log('[ReviewMediaUpload] input.onchange fired:', {
+        count: files.length,
+        files: files.map((f) => ({ name: f.name, size: f.size, type: f.type, inferred: getMediaType(f) })),
+      });
+
+      if (files.length > 0 && validateFiles(files)) {
+        onMediaSelected(files);
       }
+      cleanup();
     };
+
+    document.body.appendChild(input);
     input.click();
     setShowPicker(false);
   };
@@ -158,7 +180,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
     return (
       <button
         type="button"
-        onClick={() => handleFileSelection('image/jpeg,image/png,image/heic,image/webp,video/mp4,video/quicktime,video/mov')}
+        onClick={() => handleFileSelection('image/*,video/*')}
         className="mt-2 text-xs font-medium text-slate-500 underline underline-offset-2"
       >
         Add more photos or videos

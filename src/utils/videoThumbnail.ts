@@ -12,46 +12,82 @@ export const generateVideoThumbnail = (videoFile: File, timeOffset: number = 1):
       return;
     }
 
-    video.onloadedmetadata = () => {
-      // Set canvas dimensions to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+    let settled = false;
+    const objectURL = URL.createObjectURL(videoFile);
 
-      // Seek to the specified time offset (or 1 second)
-      video.currentTime = Math.min(timeOffset, video.duration);
+    const cleanup = () => {
+      try {
+        video.pause();
+      } catch {
+        // no-op
+      }
+      video.removeAttribute('src');
+      try {
+        video.load();
+      } catch {
+        // no-op
+      }
+      URL.revokeObjectURL(objectURL);
     };
 
-    video.onseeked = () => {
+    const settle = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      cleanup();
+      fn();
+    };
+
+    const captureFrame = () => {
       try {
-        // Draw the video frame to canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Convert canvas to data URL
+        // Guard against 0x0 dimensions
+        const w = Math.max(1, video.videoWidth || 1);
+        const h = Math.max(1, video.videoHeight || 1);
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(video, 0, 0, w, h);
         const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
-        
-        // Clean up
-        video.removeAttribute('src');
-        video.load();
-        
-        resolve(thumbnail);
+        settle(() => resolve(thumbnail));
       } catch (error) {
-        reject(error);
+        settle(() => reject(error));
       }
     };
 
-    video.onerror = () => {
-      reject(new Error('Failed to load video'));
+    const timeoutId = window.setTimeout(() => {
+      // Safari/iOS can hang before firing seeked/canplay for some codecs.
+      settle(() => reject(new Error('thumbnail_timeout')));
+    }, 5000);
+
+    video.muted = true;
+    (video as any).playsInline = true;
+    video.preload = 'metadata';
+
+    video.onloadedmetadata = () => {
+      // Seek to the specified time offset (fallback to near-start)
+      try {
+        const safeTime = Math.max(0, Math.min(timeOffset, Math.max(0, video.duration - 0.1)));
+        video.currentTime = Number.isFinite(safeTime) ? safeTime : 0;
+      } catch {
+        // If seeking isn't allowed, just capture earliest available frame
+        // (loadeddata/canplay will fire next)
+      }
     };
 
-    // Create object URL for the video file
-    const objectURL = URL.createObjectURL(videoFile);
+    video.onseeked = () => {
+      captureFrame();
+    };
+
+    // Fallback path if seeked doesn't fire but a frame is available
+    video.onloadeddata = () => {
+      if (!settled) captureFrame();
+    };
+
+    video.onerror = () => {
+      settle(() => reject(new Error('Failed to load video')));
+    };
+
     video.src = objectURL;
     video.load();
-
-    // Clean up object URL after processing
-    video.onload = () => {
-      URL.revokeObjectURL(objectURL);
-    };
   });
 };
 
