@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
@@ -109,7 +108,7 @@ export function Top100RecentRoundsCarousel({
         {rounds.length > 3 && (
           <button
             type="button"
-            onClick={() => navigate('/profile?tab=courses')}
+            onClick={() => navigate('/profile?tab=courses#all-courses-played')}
             className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             View all rounds →
@@ -129,19 +128,13 @@ export function Top100RecentRoundsCarousel({
         <CarouselContent className="-ml-2 px-2.5">
           {rounds.slice(0, 10).map((round, index) => (
             <CarouselItem key={`${round.course_id}-${round.played_at}`} className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]">
-              <div className="relative">
-                <UnifiedCourseCard
-                  course={fromTop100Round(round)}
-                  showRankBadges={true}
-                  showRating={true}
-                />
-                {/* Date logged overlay - smaller text + more padding (item 9) */}
-                {round.played_at && (
-                  <div className="absolute bottom-2 left-2 text-[9px] font-medium text-white/80 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    Logged: {format(new Date(round.played_at), 'd MMM yyyy')}
-                  </div>
-                )}
-              </div>
+              <UnifiedCourseCard
+                course={fromTop100Round(round)}
+                showRankBadges={true}
+                showRating={true}
+                hideLocation={true}
+                loggedDate={round.played_at}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>

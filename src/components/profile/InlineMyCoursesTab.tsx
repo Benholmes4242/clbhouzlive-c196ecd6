@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import HandicapCard from './HandicapCard';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import ProfileModalRouter from './ProfileModalRouter';
@@ -21,6 +22,22 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
   onRegionClick,
   onEGConnect
 }) => {
+  const location = useLocation();
+
+  // Handle deep link scroll to all-courses-played section
+  useEffect(() => {
+    if (location.hash === '#all-courses-played') {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        const element = document.getElementById('all-courses-played');
+        if (element) {
+          element.scrollIntoView({ behavior: 'instant', block: 'start' });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
+
   // Determine the display name for the header
   const getDisplayName = () => {
     if (isOwnProfile) {
@@ -53,8 +70,8 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
         </h2>
       </div>
 
-      {/* My Courses Content - embedded inline */}
-      <div className="mt-6">
+      {/* My Courses Content - embedded inline with anchor for deep linking */}
+      <div id="all-courses-played" className="mt-6 scroll-mt-4">
         <UserCoursesContent username={username} />
       </div>
 
