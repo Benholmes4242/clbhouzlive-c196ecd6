@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy } from 'lucide-react';
+import { Trophy, Lock } from 'lucide-react';
 import { 
   getAllMilestonesWithState, 
   getListMilestoneState,
@@ -69,6 +69,14 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
     setMilestones(getAllMilestonesWithState(playedCount));
   }, [playedCount]);
 
+  // Filter milestones: only unlocked + next_up (hide all locked beyond next_up)
+  const visibleMilestones = useMemo(() => {
+    return milestones.filter(m => m.state === 'unlocked' || m.state === 'next_up');
+  }, [milestones]);
+
+  // Show ghost tile only if not complete
+  const showGhostTile = playedCount < 100;
+
   // Auto-scroll to next up milestone on mount
   useEffect(() => {
     if (!nextUpRef.current) return;
@@ -117,7 +125,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <TooltipProvider delayDuration={200}>
-            {milestones.map((milestone) => (
+            {visibleMilestones.map((milestone) => (
               <MilestoneToken
                 key={milestone.threshold}
                 ref={milestone.state === 'next_up' ? nextUpRef : undefined}
@@ -128,6 +136,10 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
                 onClick={handleTileClick}
               />
             ))}
+            {/* Ghost tile - only show if not complete */}
+            {showGhostTile && (
+              <GhostTile onClick={handleTileClick} />
+            )}
           </TooltipProvider>
         </div>
         
@@ -162,7 +174,6 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
 
   const isNextUp = state === 'next_up';
   const isUnlocked = state === 'unlocked';
-  const isLocked = state === 'locked';
   
   const isHundredTile = threshold === 100;
   const showCompletionHero = isListComplete && isHundredTile;
@@ -305,6 +316,13 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
             </svg>
           )}
 
+          {/* Padlock icon for next up - top right */}
+          {isNextUp && (
+            <div className="absolute top-1 right-1 z-20">
+              <Lock className="w-3 h-3 text-slate-400" strokeWidth={2} />
+            </div>
+          )}
+
           {/* Center content */}
           <div className="relative w-full h-full flex items-center justify-center">
             {showCompletionHero ? (
@@ -313,9 +331,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
               <span className={`text-xl font-bold ${
                 isNextUp 
                   ? 'text-slate-800' 
-                  : isUnlocked 
-                    ? 'text-slate-700' 
-                    : 'text-slate-400'
+                  : 'text-slate-700'
               }`}>
                 {threshold}
               </span>
@@ -363,3 +379,51 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
 });
 
 MilestoneToken.displayName = 'MilestoneToken';
+
+/**
+ * Ghost tile - appears at end of rail when playedCount < 100
+ * Signals "more ahead" without revealing future milestones
+ */
+interface GhostTileProps {
+  onClick: () => void;
+}
+
+const GhostTile: React.FC<GhostTileProps> = ({ onClick }) => {
+  return (
+    <motion.button
+      whileTap={{ scale: 0.96 }}
+      onClick={onClick}
+      className="relative flex-shrink-0 flex flex-col items-center justify-center cursor-pointer"
+      style={{ 
+        width: TOKEN_SIZE,
+        height: TOKEN_HEIGHT + TOKEN_LABEL_HEIGHT,
+      }}
+      aria-label="More milestones ahead"
+    >
+      {/* Token container */}
+      <div 
+        className="relative flex items-center justify-center"
+        style={{ 
+          width: TOKEN_SIZE, 
+          height: TOKEN_HEIGHT,
+          borderRadius: SQUIRCLE_RADIUS,
+          border: `2px solid ${RING_TRACK_COLOR}`,
+          boxSizing: 'border-box',
+          background: 'rgba(255,255,255,0.6)',
+        }}
+      >
+        {/* Empty center - no number, no icon */}
+      </div>
+
+      {/* Copy below token */}
+      <div className="flex flex-col items-center mt-1">
+        <span className="text-[10px] font-medium text-slate-500">
+          More ahead
+        </span>
+        <span className="text-[9px] text-slate-400">
+          Keep going
+        </span>
+      </div>
+    </motion.button>
+  );
+};
