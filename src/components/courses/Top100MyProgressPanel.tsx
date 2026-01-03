@@ -17,6 +17,8 @@ import {
   Top100RegionProgressSkeleton,
   Top100RecentRoundsSkeleton,
   Top100ClosestBadgeSkeleton,
+  Top100TimelineSkeleton,
+  Top100StreakSkeleton,
 } from '@/components/top100/Top100ProgressSkeletons';
 import type { Top100ListId } from '@/config/top100ListMilestones';
 import type { Top100Milestone } from '@/config/top100Milestones';
@@ -27,6 +29,8 @@ import { Top100RegionProgressGrid } from '@/components/top100/Top100RegionProgre
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 import { buildYearSummary } from '@/lib/top100ProgressSelectors';
+import { Top100ProgressTimeline } from '@/components/top100/Top100ProgressTimeline';
+import { Top100LoggingStreak } from '@/components/top100/Top100LoggingStreak';
 
 // Tier colors for next milestone chip - derived from global MILESTONE_THEMES
 const TIER_COLORS: Record<string, string> = {
@@ -107,6 +111,12 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       <div className="w-full max-w-full pb-8">
         <Top100ProgressHeroSkeleton />
         <Top100YearSummarySkeleton />
+        <div className="mb-4">
+          <Top100TimelineSkeleton />
+        </div>
+        <div className="mb-6">
+          <Top100StreakSkeleton />
+        </div>
         <Top100MilestonesCarouselSkeleton />
         <div className="mt-6">
           <Top100RegionProgressSkeleton />
@@ -196,6 +206,26 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
       {/* 1.2 Supporting Stats Row with icons (A4) */}
       <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
+
+      {/* ============================================
+          SECTION 1.5: PROGRESS TIMELINE & STREAK (H, I)
+          ============================================ */}
+      
+      {/* H) Progress Timeline - 12 month view */}
+      <div className="mb-4">
+        <Top100ProgressTimeline
+          rounds={data.recent_rounds}
+          onViewAll={() => navigate('/rounds?filter=top100')}
+        />
+      </div>
+
+      {/* I) Logging Streak Module */}
+      <div className="mb-6">
+        <Top100LoggingStreak
+          rounds={data.recent_rounds}
+          onLogRound={() => navigate('/courses?action=log')}
+        />
+      </div>
 
       {/* ============================================
           SECTION 2: ACHIEVEMENTS (CELEBRATION LAYER)
