@@ -20,6 +20,9 @@ import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
 
+// Generate stable file key for tracking uploads (consistent across references)
+const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
+
 interface Course {
   id: string;
   name: string;
@@ -69,8 +72,9 @@ const PostPlayRatingModal = ({
   const lastPayloadRef = useRef<any>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
-  const [mediaPreviews, setMediaPreviews] = useState<Map<File, string>>(new Map());
-  const [uploadingFiles, setUploadingFiles] = useState<Set<File>>(new Set());
+  const [mediaPreviews, setMediaPreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey
+  const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set()); // keyed by fileKey
+  const mediaPreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
   const [conditionScore, setConditionScore] = useState<number | null>(null);
@@ -142,11 +146,19 @@ const PostPlayRatingModal = ({
     }
   }, [existingRating, isEditMode]);
 
+  // Keep ref in sync with state for cleanup
+  useEffect(() => {
+    mediaPreviewsRef.current = mediaPreviews;
+  }, [mediaPreviews]);
+
   // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
-      mediaPreviews.forEach((url) => {
-        URL.revokeObjectURL(url);
+      mediaPreviewsRef.current.forEach((url) => {
+        // Only revoke blob: URLs, not Stream poster URLs
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
       });
     };
   }, []);
@@ -247,72 +259,80 @@ const PostPlayRatingModal = ({
 
       // Upload media files if any
       if (mediaFiles.length > 0) {
-        // Mark all files as uploading
-        setUploadingFiles(new Set(mediaFiles));
+        // Mark all files as uploading using stable file keys
+        const fileKeys = mediaFiles.map(getFileKey);
+        setUploadingFiles(new Set(fileKeys));
         
         const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
         const { edgePost } = await import('@/utils/callEdge');
         const { generateStreamThumbnailUrl, generateStreamHlsUrl } = await import('@/config/cloudflareStream');
         
         const uploadPromises = mediaFiles.map(async (file) => {
+          const fileKey = getFileKey(file);
           const isVideo = isVideoFile(file);
           
-          if (isVideo) {
-            // Videos go to Cloudflare Stream
-            console.log('[Review Media] Uploading video to Cloudflare Stream:', file.name);
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            const streamResult = await edgePost('cloudflare-stream-upload', formData);
-            
-            if (!streamResult?.success || !streamResult?.videoId) {
-              throw new Error(streamResult?.error || `Failed to upload video ${file.name}`);
+          try {
+            if (isVideo) {
+              // Videos go to Cloudflare Stream
+              console.log('[Review Media] Uploading video to Cloudflare Stream:', file.name);
+              const formData = new FormData();
+              formData.append('file', file);
+              
+              const streamResult = await edgePost('cloudflare-stream-upload', formData);
+              
+              if (!streamResult?.success || !streamResult?.videoId) {
+                throw new Error(streamResult?.error || `Failed to upload video ${file.name}`);
+              }
+              
+              console.log('[Review Media] Stream upload success:', streamResult.videoId);
+              
+              // Save video record with stream_id and poster_url
+              const { error: mediaError } = await supabase
+                .from('course_review_media')
+                .insert({
+                  review_id: ratingId,
+                  media_url: generateStreamHlsUrl(streamResult.videoId),
+                  media_type: 'video',
+                  stream_id: streamResult.videoId,
+                  poster_url: generateStreamThumbnailUrl(streamResult.videoId),
+                  file_name: file.name,
+                  file_size: file.size
+                });
+
+              if (mediaError) throw mediaError;
+            } else {
+              // Images go to R2
+              const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+              const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
+              
+              if (!uploadResult.success) {
+                throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+              }
+
+              // Save image record to database
+              const { error: mediaError } = await supabase
+                .from('course_review_media')
+                .insert({
+                  review_id: ratingId,
+                  media_url: uploadResult.publicUrl,
+                  media_type: 'image',
+                  file_name: file.name,
+                  file_size: file.size
+                });
+
+              if (mediaError) throw mediaError;
             }
-            
-            console.log('[Review Media] Stream upload success:', streamResult.videoId);
-            
-            // Save video record with stream_id and poster_url
-            const { error: mediaError } = await supabase
-              .from('course_review_media')
-              .insert({
-                review_id: ratingId,
-                media_url: generateStreamHlsUrl(streamResult.videoId),
-                media_type: 'video',
-                stream_id: streamResult.videoId,
-                poster_url: generateStreamThumbnailUrl(streamResult.videoId),
-                file_name: file.name,
-                file_size: file.size
-              });
-
-            if (mediaError) throw mediaError;
-          } else {
-            // Images go to R2
-            const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
-            const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
-            
-            if (!uploadResult.success) {
-              throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
-            }
-
-            // Save image record to database
-            const { error: mediaError } = await supabase
-              .from('course_review_media')
-              .insert({
-                review_id: ratingId,
-                media_url: uploadResult.publicUrl,
-                media_type: 'image',
-                file_name: file.name,
-                file_size: file.size
-              });
-
-            if (mediaError) throw mediaError;
+          } finally {
+            // Clear this file from uploading state (per-file, not batch)
+            setUploadingFiles(prev => {
+              const next = new Set(prev);
+              next.delete(fileKey);
+              return next;
+            });
           }
         });
 
         await Promise.all(uploadPromises);
-        
-        // Clear uploading state
-        setUploadingFiles(new Set());
       }
     },
     onSuccess: async (result, variables) => {
@@ -787,9 +807,10 @@ const PostPlayRatingModal = ({
       if (inferred === 'image') {
         // Images get a blob preview
         const previewUrl = URL.createObjectURL(file);
+        const fileKey = getFileKey(file);
         setMediaPreviews((prev) => {
           const next = new Map(prev);
-          next.set(file, previewUrl);
+          next.set(fileKey, previewUrl);
           return next;
         });
       }
@@ -804,17 +825,18 @@ const PostPlayRatingModal = ({
 
   const handleRemoveMedia = (index: number) => {
     const fileToRemove = selectedMedia[index];
-    const previewUrl = mediaPreviews.get(fileToRemove);
+    const fileKey = getFileKey(fileToRemove);
+    const previewUrl = mediaPreviews.get(fileKey);
     
-    // Revoke the object URL to free memory
-    if (previewUrl) {
+    // Revoke the object URL to free memory (only blob: URLs)
+    if (previewUrl && previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(previewUrl);
     }
     
     setSelectedMedia(prev => prev.filter((_, i) => i !== index));
     setMediaPreviews(prev => {
       const newMap = new Map(prev);
-      newMap.delete(fileToRemove);
+      newMap.delete(fileKey);
       return newMap;
     });
   };
@@ -1094,14 +1116,15 @@ const PostPlayRatingModal = ({
                     <div className="grid grid-cols-3 gap-3">
                       {selectedMedia.map((file, index) => {
                         const isVideo = isVideoFile(file);
-                        const preview = mediaPreviews.get(file) || '';
+                        const fileKey = getFileKey(file);
+                        const preview = mediaPreviews.get(fileKey) || '';
                         
                         // Get filename for display (truncate if too long)
                         const displayName = file.name.length > 12 
                           ? file.name.slice(0, 10) + '…' 
                           : file.name;
                         
-                        const isUploading = uploadingFiles.has(file);
+                        const isUploading = uploadingFiles.has(fileKey);
                         
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
