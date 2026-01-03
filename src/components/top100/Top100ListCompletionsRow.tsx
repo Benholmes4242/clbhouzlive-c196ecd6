@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import type { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
@@ -21,23 +20,13 @@ const COMPLETION_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'] as const;
 
 interface Top100ListCompletionsRowProps {
   lists: Top100ListProgress[];
-  onOpenList?: (slug: string) => void;
+  onCardClick: (slug: string, played: number, total: number) => void;
 }
 
 export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> = ({
   lists,
-  onOpenList,
+  onCardClick,
 }) => {
-  const navigate = useNavigate();
-
-  const handleClick = (slug: string) => {
-    if (onOpenList) {
-      onOpenList(slug);
-    } else {
-      navigate(`/top100/${slug}`);
-    }
-  };
-
   // Order the lists according to COMPLETION_LIST_SLUGS
   const ordered = COMPLETION_LIST_SLUGS.map(slug =>
     lists.find(l => l.listSlug === slug) ?? null
@@ -61,7 +50,7 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
             <button
               key={slug}
               type="button"
-              onClick={() => handleClick(slug)}
+              onClick={() => onCardClick(slug, played, total)}
               className="text-left"
             >
               <AchievementBadgeCard
