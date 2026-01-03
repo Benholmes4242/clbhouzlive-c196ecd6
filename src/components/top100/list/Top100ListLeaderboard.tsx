@@ -136,7 +136,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
         )}
       </div>
 
-      <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 scrollbar-none mt-2.5 px-4">
+      <div className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory pb-1 scrollbar-none mt-2.5 pl-4">
         {sortedFriends.slice(0, 10).map((friend, index) => {
           // Calculate relative position
           const diff = friend.playedOnList - currentUserPlayed;
@@ -219,6 +219,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
             </motion.button>
           );
         })}
+        {/* End spacer to match right padding */}
+        <div className="flex-shrink-0 w-2" aria-hidden="true" />
       </div>
     </section>
   );
