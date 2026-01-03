@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 
 interface Course {
   id: string;
@@ -74,7 +75,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
             .insert({
               review_id: ratingData.id,
               media_url: uploadResult.publicUrl,
-              media_type: file.type.startsWith('video/') ? 'video' : 'image',
+              media_type: isVideoFile(file) ? 'video' : 'image',
               file_name: file.name,
               file_size: file.size,
             });
@@ -139,9 +140,8 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const validFiles = files.filter(file => {
-      const isImage = file.type.startsWith('image/');
-      const isVideo = file.type.startsWith('video/');
-      return (isImage || isVideo);
+      const mediaType = getMediaType(file);
+      return mediaType === 'image' || mediaType === 'video';
     });
     
     setUploadedFiles(prev => [...prev, ...validFiles].slice(0, 5));

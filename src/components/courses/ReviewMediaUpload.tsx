@@ -42,7 +42,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
       console.warn('[ReviewMediaUpload] Invalid files rejected:', invalidFiles.map(f => ({ name: f.name, type: f.type })));
       toast({
         title: "Invalid file type",
-        description: "Only JPG, PNG, MP4, and MOV files are supported.",
+        description: "Photos (JPG/PNG/HEIC) and videos (MP4/MOV) are supported.",
         variant: "destructive",
       });
       return false;
