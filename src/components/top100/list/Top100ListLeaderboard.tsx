@@ -62,13 +62,11 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   // Contextual empty states based on friend/list conditions (only if not mocking)
   if (leaderboardFriends.length === 0) {
     return (
-      <section className="mt-4">
-        <div className="px-4">
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-            Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
-          </h2>
-        </div>
-        <div className="mt-3 mx-4 px-4 py-5 rounded-sq-lg bg-slate-50 border border-slate-100 text-center">
+      <section className="mt-4 px-4">
+        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+          Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
+        </h2>
+        <div className="mt-3 text-center">
           <p className="text-sm font-semibold text-slate-800">
             No friends here yet
           </p>
@@ -77,7 +75,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           </p>
           <Button
             onClick={() => navigate('/golferstofollow')}
-            className="w-full max-w-[280px] h-12 rounded-xl"
+            className="w-full max-w-[280px] h-12 rounded-xl mt-4"
           >
             Find golfers to follow
           </Button>
@@ -90,13 +88,11 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   const allFriendsHaveZero = friends.every(f => f.playedOnList === 0);
   if (allFriendsHaveZero && currentUserPlayed === 0) {
     return (
-      <section className="mt-4">
-        <div className="px-4">
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-            Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
-          </h2>
-        </div>
-        <div className="mt-3 mx-4 px-4 py-5 rounded-sq-lg bg-slate-50 border border-slate-100 text-center">
+      <section className="mt-4 px-4">
+        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+          Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
+        </h2>
+        <div className="mt-3 text-center">
           <p className="text-sm font-semibold text-slate-800">
             Be the first
           </p>
@@ -105,7 +101,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           </p>
           <Button
             onClick={() => navigate('/courses')}
-            className="w-full max-w-[280px] h-12 rounded-xl"
+            className="w-full max-w-[280px] h-12 rounded-xl mt-4"
           >
             Explore courses
           </Button>
