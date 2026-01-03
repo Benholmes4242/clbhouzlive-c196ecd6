@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy, Lock } from 'lucide-react';
+import { Trophy, LockKeyhole } from 'lucide-react';
 import { 
   getAllMilestonesWithState, 
   getListMilestoneState,
@@ -316,10 +316,10 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
             </svg>
           )}
 
-          {/* Padlock icon for next up - top right */}
+          {/* Padlock icon for next up - inside squircle, top-right, offset from ring */}
           {isNextUp && (
-            <div className="absolute top-1 right-1 z-20">
-              <Lock className="w-3 h-3 text-slate-400" strokeWidth={2} />
+            <div className="absolute z-20" style={{ top: 10, right: 10 }}>
+              <LockKeyhole className="w-3 h-3 text-slate-500" strokeWidth={2.5} fill="currentColor" />
             </div>
           )}
 
