@@ -3,16 +3,26 @@
  * Scrolls all possible scroll containers to top with smooth animation
  */
 export const scrollToTop = () => {
-  // Scroll window
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  
-  // Also scroll #root container if it's the scroll parent
-  const scrollContainer = document.getElementById('root');
-  if (scrollContainer) {
-    scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+  // Scroll window (in case a page is using document scrolling)
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+  // Scroll common app containers (most pages scroll #root)
+  const rootContainer = document.getElementById('root');
+  const mainElement = document.querySelector('main') as HTMLElement | null;
+  const pageContainer = document.querySelector('.page-with-header') as HTMLElement | null;
+  const pageRoot = document.querySelector('.page-root') as HTMLElement | null;
+
+  const targets = [rootContainer, mainElement, pageContainer, pageRoot].filter(Boolean) as HTMLElement[];
+
+  for (const el of targets) {
+    el.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }
-  
-  // Scroll document elements for mobile compatibility
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
+
+  // Mobile compatibility / hard reset (some browsers ignore smooth on overflow containers)
+  requestAnimationFrame(() => {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    for (const el of targets) el.scrollTop = 0;
+  });
 };
+
