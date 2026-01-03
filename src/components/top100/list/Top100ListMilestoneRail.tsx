@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
@@ -21,43 +21,12 @@ interface Top100ListMilestoneRailProps {
   onViewAll?: () => void;
 }
 
-// Token dimensions - SDS global squircle shape
-const TOKEN_SIZE = 78;
-const SQUIRCLE_INSET = 8;
-const SQUIRCLE_SIZE = TOKEN_SIZE - (SQUIRCLE_INSET * 2); // 62px inner squircle
-
-/**
- * Generate superellipse path (Lamé curve) for iOS-style continuous corners
- * Matches the global SDS squircle shape (n=5)
- */
-function superellipsePath(w: number, h: number, n = 5, steps = 160): string {
-  const a = w / 2;
-  const b = h / 2;
-  const m = 2 / n;
-  const pts: [number, number][] = [];
-  
-  for (let i = 0; i < steps; i++) {
-    const t = (i / steps) * Math.PI * 2;
-    const ct = Math.cos(t);
-    const st = Math.sin(t);
-    const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m);
-    const y = Math.sign(st) * b * Math.pow(Math.abs(st), m);
-    pts.push([x + a, y + b]);
-  }
-  
-  return `M ${pts.map(p => p.join(",")).join(" L ")} Z`;
-}
-
-/**
- * Calculate the approximate perimeter of a superellipse for stroke-dasharray
- */
-function superellipsePerimeter(w: number, h: number, n = 5): number {
-  // Approximation using Ramanujan-like formula adapted for superellipse
-  const a = w / 2;
-  const b = h / 2;
-  // For n=5 superellipse, perimeter is roughly 3.7 * (a + b)
-  return 3.7 * (a + b);
-}
+// Token dimensions - SDS global squircle shape (matches SquircleAvatar)
+const TOKEN_SIZE = 78; // width
+const TOKEN_HEIGHT = TOKEN_SIZE * 1.05; // SquircleAvatar uses aspectRatio: 1 / 1.05 (allows sub-pixel height)
+const TOKEN_LABEL_HEIGHT = 22;
+const SQUIRCLE_RADIUS = '34%';
+const RING_TRACK_COLOR = 'var(--journey-rail-base)';
 
 /**
  * Horizontal swipeable milestone rail with collectible token design.
@@ -188,42 +157,25 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   const prefersReducedMotion = typeof window !== 'undefined' 
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  // Generate superellipse path for the ring (centered in TOKEN_SIZE)
-  const squirclePath = useMemo(() => {
-    // Create path for inner squircle, offset by SQUIRCLE_INSET
-    const path = superellipsePath(SQUIRCLE_SIZE, SQUIRCLE_SIZE);
-    // Translate path to be centered
-    return path;
-  }, []);
-
-  // Calculate perimeter for stroke animation
-  const squirclePerimeter = useMemo(() => superellipsePerimeter(SQUIRCLE_SIZE, SQUIRCLE_SIZE), []);
-
-  // Calculate progress for next up (arc percentage)
+  // Calculate progress for next up (0..1)
   const getProgress = (): number => {
-    if (!isNextUp) return isUnlocked ? 1 : 0;
+    if (!isNextUp) return isUnlocked || showCompletionHero ? 1 : 0;
     return Math.min(1, Math.max(0, playedCount / threshold));
   };
 
   const progress = getProgress();
-  const strokeDashoffset = squirclePerimeter * (1 - progress);
+  const ringThickness = showCompletionHero ? 4 : isNextUp ? 4 : isUnlocked ? 3 : 2;
+  const ringBorderColor = (isUnlocked || showCompletionHero) ? theme.ringColor : RING_TRACK_COLOR;
 
-  // Ring styling per state - using regional color for unlocked/next up
-  const getRingConfig = () => {
-    if (showCompletionHero) {
-      return { stroke: 'rgb(180, 130, 50)', strokeWidth: 3.5, opacity: 1 };
-    }
-    if (isUnlocked) {
-      return { stroke: theme.ringColor, strokeWidth: 3, opacity: 1 };
-    }
-    if (isNextUp) {
-      return { stroke: theme.ringColor, strokeWidth: 4, opacity: 1 };
-    }
-    // Locked - neutral grey, thin
-    return { stroke: 'rgb(203, 213, 225)', strokeWidth: 2, opacity: 0.6 };
+  const ringContainerStyle: React.CSSProperties = {
+    width: TOKEN_SIZE,
+    height: TOKEN_HEIGHT,
+    borderRadius: SQUIRCLE_RADIUS,
+    border: `${ringThickness}px solid ${ringBorderColor}`,
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+    background: 'transparent',
   };
-
-  const ringConfig = getRingConfig();
 
   // Aspirational copy for next up
   const aspirationalCopy = isNextUp && toGo !== undefined 
@@ -245,79 +197,78 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       className="relative flex-shrink-0 flex flex-col items-center justify-center cursor-pointer"
       style={{ 
         width: TOKEN_SIZE,
-        height: TOKEN_SIZE + 22,
+        height: TOKEN_HEIGHT + TOKEN_LABEL_HEIGHT,
       }}
       aria-label={`Milestone ${threshold}: ${isUnlocked ? 'Complete' : isNextUp ? aspirationalCopy : 'Locked'}`}
     >
-      {/* Token container with SVG ring */}
+      {/* Token container */}
       <div 
         className="relative flex items-center justify-center"
-        style={{ width: TOKEN_SIZE, height: TOKEN_SIZE }}
+        style={{ width: TOKEN_SIZE, height: TOKEN_HEIGHT }}
       >
         {/* Subtle halo for next up only - uses regional color */}
-
         {isNextUp && !prefersReducedMotion && (
           <motion.div
-            className="absolute inset-0 rounded-[18px] pointer-events-none"
-            style={{ background: theme.haloGradient }}
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: theme.haloGradient, borderRadius: SQUIRCLE_RADIUS }}
             initial={{ opacity: 0.3 }}
             animate={{ opacity: [0.3, 0.55, 0.3] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
 
-        {/* SVG Squircle Ring - using superellipse path for SDS global squircle */}
-        <svg 
-          width={TOKEN_SIZE} 
-          height={TOKEN_SIZE} 
-          className="absolute inset-0"
-        >
-          <g transform={`translate(${SQUIRCLE_INSET}, ${SQUIRCLE_INSET})`}>
-            {/* Base squircle ring (structure) */}
-            <path
-              d={squirclePath}
-              fill="none"
-              stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.05)'}
-              strokeWidth={isLocked ? 2 : 1}
-            />
-            
-            {/* Progress/solid squircle ring - uses regional color */}
-            {(isUnlocked || isNextUp || showCompletionHero) && (
-              <motion.path
-                d={squirclePath}
-                fill="none"
-                stroke={ringConfig.stroke}
-                strokeWidth={ringConfig.strokeWidth}
-                strokeLinecap="round"
-                strokeDasharray={squirclePerimeter}
-                initial={isNextUp && !prefersReducedMotion ? { strokeDashoffset: squirclePerimeter } : { strokeDashoffset }}
-                animate={{ strokeDashoffset }}
-                transition={
-                  isNextUp && !prefersReducedMotion 
-                    ? { duration: 0.8, ease: 'easeOut', delay: 0.2 }
-                    : { duration: 0 }
-                }
-                style={{ opacity: ringConfig.opacity }}
+        {/* Ring container - matches SquircleAvatar geometry */}
+        <div className="relative z-10" style={ringContainerStyle}>
+          {/* NEXT UP progress arc overlay (only paints the ring area) */}
+          {isNextUp && (
+            prefersReducedMotion ? (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  borderRadius: SQUIRCLE_RADIUS,
+                  padding: ringThickness,
+                  boxSizing: 'border-box',
+                  background: `conic-gradient(from -90deg, ${theme.ringColor} 0 calc(${progress} * 1turn), transparent 0)`,
+                  WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+                  ['WebkitMaskComposite' as any]: 'xor',
+                  maskComposite: 'exclude',
+                } as any}
               />
-            )}
-          </g>
-        </svg>
-
-        {/* Center content */}
-        <div className="relative z-10 flex flex-col items-center justify-center">
-          {showCompletionHero ? (
-            <Trophy className="w-6 h-6" style={{ color: 'rgb(180, 130, 50)' }} />
-          ) : (
-            <span className={`text-xl font-bold ${
-              isNextUp 
-                ? 'text-slate-800' 
-                : isUnlocked 
-                  ? 'text-slate-700' 
-                  : 'text-slate-400'
-            }`}>
-              {threshold}
-            </span>
+            ) : (
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                initial={{ ['--p' as any]: 0 }}
+                animate={{ ['--p' as any]: progress }}
+                transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
+                style={{
+                  borderRadius: SQUIRCLE_RADIUS,
+                  padding: ringThickness,
+                  boxSizing: 'border-box',
+                  background: `conic-gradient(from -90deg, ${theme.ringColor} 0 calc(var(--p) * 1turn), transparent 0)`,
+                  WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+                  ['WebkitMaskComposite' as any]: 'xor',
+                  maskComposite: 'exclude',
+                } as any}
+              />
+            )
           )}
+
+          {/* Center content */}
+          <div className="relative w-full h-full flex items-center justify-center">
+            {showCompletionHero ? (
+              <Trophy className="w-6 h-6" style={{ color: theme.ringColor }} />
+            ) : (
+              <span className={`text-xl font-bold ${
+                isNextUp 
+                  ? 'text-slate-800' 
+                  : isUnlocked 
+                    ? 'text-slate-700' 
+                    : 'text-slate-400'
+              }`}>
+                {threshold}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
