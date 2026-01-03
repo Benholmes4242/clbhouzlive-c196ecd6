@@ -41,7 +41,7 @@ const TIER_LABELS: Record<string, string> = {
   'GBI': 'GB&I',
   'EU': 'EUROPE',
   'USA': 'USA',
-  'WORLD': 'WORLD',
+  'WORLD': 'WORLDWIDE',
 };
 
 // Club name mapping
@@ -117,22 +117,23 @@ function getTierAccentColor(tier: string): string {
 }
 
 /**
- * Get the appropriate icon for a tier - regional icons or Trophy for milestones
+ * Get the background icon for regional tiers (replaces emblem line art)
  */
-function getTierIcon(tier: string, color: string): React.ReactNode {
-  const iconClass = "w-3.5 h-3.5 relative z-10";
+function getRegionalBackgroundIcon(tier: string, accentColor: string): React.ReactNode | null {
+  const iconClass = "w-20 h-20";
+  const style = { color: accentColor, opacity: 0.08 };
   
   switch (tier) {
     case 'WORLD':
-      return <GiWorld className={iconClass} style={{ color }} />;
+      return <GiWorld className={iconClass} style={style} />;
     case 'GBI':
-      return <FaLandmarkDome className={iconClass} style={{ color }} />;
+      return <FaLandmarkDome className={iconClass} style={style} />;
     case 'USA':
-      return <FaFlagUsa className={iconClass} style={{ color }} />;
+      return <FaFlagUsa className={iconClass} style={style} />;
     case 'EU':
-      return <GiEuropeanFlag className={iconClass} style={{ color }} />;
+      return <GiEuropeanFlag className={iconClass} style={style} />;
     default:
-      return <Trophy className={iconClass} style={{ color }} />;
+      return null;
   }
 }
 
@@ -294,7 +295,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       />
 
       {/* Background emblem watermark - tier-colored at ~6% opacity */}
-      {emblemSrc && (
+      {/* For regional cards, use icons instead of emblem line art */}
+      {isRegional ? (
+        <div 
+          className="pointer-events-none select-none absolute inset-y-0 right-0 flex items-center justify-end pr-2 transition-transform duration-300"
+          style={{ transform: `translateX(${isHovered ? -2 : 0}px)` }}
+        >
+          {getRegionalBackgroundIcon(tier, accentColor)}
+        </div>
+      ) : emblemSrc && (
         <img
           src={emblemSrc}
           alt=""
@@ -373,7 +382,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
               }}
             />
             
-            {getTierIcon(tier, accentColor)}
+            <Trophy 
+              className="w-3.5 h-3.5 relative z-10"
+              style={{ color: accentColor }} 
+            />
           </div>
         </div>
         
