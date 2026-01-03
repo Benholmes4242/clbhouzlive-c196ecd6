@@ -288,6 +288,10 @@ const Top100List = () => {
       const officialRankA = getOfficialRankForSlug(a, slug) ?? Number.MAX_SAFE_INTEGER;
       const officialRankB = getOfficialRankForSlug(b, slug) ?? Number.MAX_SAFE_INTEGER;
 
+      // Helper: check if course has a community rating
+      const hasRatingA = a.communityRating != null;
+      const hasRatingB = b.communityRating != null;
+
       switch (sortMode) {
         case 'rating_high':
           // If Show = Official Rating OR Played/Unplayed: sort by officialRank ASC (1→100, best first)
@@ -295,10 +299,17 @@ const Top100List = () => {
             if (officialRankA !== officialRankB) return officialRankA - officialRankB;
             return tieBreak(a, b);
           }
-          // Community → use communityRating DESC
-          const ratingHighA = a.communityRating ?? 0;
-          const ratingHighB = b.communityRating ?? 0;
-          if (ratingHighB !== ratingHighA) return ratingHighB - ratingHighA;
+          // Community → rated first, then unrated
+          // Separate rated vs unrated: rated courses come first
+          if (hasRatingA && !hasRatingB) return -1;
+          if (!hasRatingA && hasRatingB) return 1;
+          // Both rated: sort by communityRating DESC
+          if (hasRatingA && hasRatingB) {
+            if (a.communityRating !== b.communityRating) return b.communityRating! - a.communityRating!;
+            if (officialRankA !== officialRankB) return officialRankA - officialRankB;
+            return tieBreak(a, b);
+          }
+          // Both unrated: sort by officialRank ASC, then tie-break
           if (officialRankA !== officialRankB) return officialRankA - officialRankB;
           return tieBreak(a, b);
 
@@ -308,10 +319,16 @@ const Top100List = () => {
             if (officialRankA !== officialRankB) return officialRankB - officialRankA;
             return tieBreak(a, b);
           }
-          // Community → communityRating ASC
-          const ratingLowA = a.communityRating ?? 0;
-          const ratingLowB = b.communityRating ?? 0;
-          if (ratingLowA !== ratingLowB) return ratingLowA - ratingLowB;
+          // Community → rated first, then unrated
+          if (hasRatingA && !hasRatingB) return -1;
+          if (!hasRatingA && hasRatingB) return 1;
+          // Both rated: sort by communityRating ASC
+          if (hasRatingA && hasRatingB) {
+            if (a.communityRating !== b.communityRating) return a.communityRating! - b.communityRating!;
+            if (officialRankA !== officialRankB) return officialRankA - officialRankB;
+            return tieBreak(a, b);
+          }
+          // Both unrated: sort by officialRank ASC, then tie-break
           if (officialRankA !== officialRankB) return officialRankA - officialRankB;
           return tieBreak(a, b);
 
