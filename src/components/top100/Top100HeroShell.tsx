@@ -104,14 +104,14 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </div>
         </div>
 
-        {/* FULL-BLEED PROGRESS SLAB - simplified overlay density */}
+        {/* FULL-BLEED PROGRESS SLAB - refined padding and contrast */}
         {showProgress && (
           <div 
-            className="w-full px-4 py-4"
+            className="w-full px-4 py-3"
             style={{ background: '#2f3a4a' }}
           >
-            {/* Top row: X / total (primary) + % complete (secondary) */}
-            <div className="flex items-center justify-between gap-4">
+            {/* Top row: X / total (primary) + % complete (secondary) - baseline aligned */}
+            <div className="flex items-baseline justify-between gap-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -124,19 +124,19 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 <span className="text-white/60 text-lg ml-0.5">/{totalCount}</span>
               </motion.div>
 
-              <div className="text-right text-white">
-                <div className="text-lg font-semibold">
+              <div className="flex items-baseline gap-1.5 text-white">
+                <span className="text-lg font-semibold">
                   {Math.round(percent)}%
-                </div>
-                <div className="text-[11px] text-white/60">
+                </span>
+                <span className="text-[11px] text-white/60">
                   complete
-                </div>
+                </span>
               </div>
             </div>
 
-            {/* Progress bar */}
-            <div className="mt-3">
-              <div className="h-2 w-full bg-white/15 rounded-full overflow-hidden">
+            {/* Progress bar - darkened track for better contrast */}
+            <div className="mt-2.5">
+              <div className="h-2 w-full bg-black/25 rounded-full overflow-hidden">
                 <motion.div
                   className="h-2 bg-amber-400 rounded-full"
                   initial={{ width: 0 }}

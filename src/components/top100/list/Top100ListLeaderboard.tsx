@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
@@ -121,22 +122,22 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
           </h2>
-          <p className="text-[13px] text-slate-500 mt-1">
+          <p className="text-xs text-slate-400 mt-0.5">
             See how you stack up against friends.
           </p>
         </div>
         {friends.length > 8 && (
           <button
             onClick={onViewAll}
-            className="text-[12px] font-medium text-slate-700 hover:text-slate-900 transition-colors"
+            className="text-[11px] font-medium text-slate-500 hover:text-slate-700 transition-colors"
           >
             View all
           </button>
         )}
       </div>
 
-      <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none mt-3 px-4">
-        {sortedFriends.slice(0, 10).map((friend) => {
+      <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 scrollbar-none mt-2.5 px-4">
+        {sortedFriends.slice(0, 10).map((friend, index) => {
           // Calculate relative position
           const diff = friend.playedOnList - currentUserPlayed;
           const isAhead = diff > 0;
@@ -148,42 +149,50 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
             .filter(f => f.playedOnList !== currentUserPlayed)
             .sort((a, b) => Math.abs(a.playedOnList - currentUserPlayed) - Math.abs(b.playedOnList - currentUserPlayed))[0]?.id === friend.id;
 
+          // Highlight current user (first position) with ring
+          const isCurrentUser = index === 0;
+
           return (
-            <button
+            <motion.button
               key={friend.id}
               type="button"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`
-                flex-shrink-0 w-[72px] snap-start p-2 rounded-sq-md bg-white border transition-all text-center
-                ${isClosestCompetitor ? 'border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' : 'border-slate-100'}
+                flex-shrink-0 w-[68px] snap-start p-1.5 rounded-xl bg-white border transition-all text-center
+                ${isCurrentUser ? 'border-amber-400 ring-2 ring-amber-400/20' : ''}
+                ${isClosestCompetitor && !isCurrentUser ? 'border-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.25)]' : ''}
+                ${!isCurrentUser && !isClosestCompetitor ? 'border-slate-100' : ''}
               `}
             >
               {/* Avatar with progress ring */}
-              <div className="relative mx-auto mb-1.5">
+              <div className="relative mx-auto mb-1">
                 <SquircleAvatar
-                  size={40}
+                  size={36}
                   src={friend.avatarUrl}
                   alt={friend.name}
                   fallback={friend.name[0]?.toUpperCase() || '?'}
                   ringColor={friend.totalTop100Played ? getRingColorForTotalPlayed(friend.totalTop100Played) : null}
                 />
-                {/* Mini progress ring indicator */}
+                {/* Mini progress badge - slightly smaller and darker */}
                 <div 
-                  className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white"
+                  className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-slate-800 flex items-center justify-center text-[7px] font-bold text-white"
                   title={`${friend.playedOnList}/${totalInList} played`}
                 >
                   {friend.playedOnList}
                 </div>
               </div>
 
-              {/* Name - centered, truncated, fixed width */}
-              <div className="text-xs font-medium text-slate-900 truncate w-[72px] text-center px-1">
+              {/* Name - centered, truncated */}
+              <div className="text-[10px] font-medium text-slate-900 truncate px-0.5">
                 {friend.name.split(' ')[0]}
               </div>
 
-              {/* Relative position indicator */}
+              {/* Relative position indicator - smaller */}
               <div className={`
-                mt-1 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-sq-pill px-1.5 py-0.5
+                mt-0.5 flex items-center justify-center gap-0.5 text-[8px] font-medium rounded-full px-1 py-0.5
                 ${isAhead ? 'bg-emerald-50 text-emerald-600' : ''}
                 ${isBehind ? 'bg-slate-50 text-slate-500' : ''}
                 ${isSame ? 'bg-amber-50 text-amber-600' : ''}
@@ -207,7 +216,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
                   </>
                 )}
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
