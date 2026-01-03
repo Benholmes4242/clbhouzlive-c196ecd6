@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Trophy } from 'lucide-react';
+import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
+import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { 
   getTierPalette, 
@@ -112,6 +114,26 @@ function getTierAccentColor(tier: string): string {
     'WORLD': '#7A8FC0',
   };
   return regionalColors[tier] || '#94a3b8';
+}
+
+/**
+ * Get the appropriate icon for a tier - regional icons or Trophy for milestones
+ */
+function getTierIcon(tier: string, color: string): React.ReactNode {
+  const iconClass = "w-3.5 h-3.5 relative z-10";
+  
+  switch (tier) {
+    case 'WORLD':
+      return <GiWorld className={iconClass} style={{ color }} />;
+    case 'GBI':
+      return <FaLandmarkDome className={iconClass} style={{ color }} />;
+    case 'USA':
+      return <FaFlagUsa className={iconClass} style={{ color }} />;
+    case 'EU':
+      return <GiEuropeanFlag className={iconClass} style={{ color }} />;
+    default:
+      return <Trophy className={iconClass} style={{ color }} />;
+  }
 }
 
 /**
@@ -351,10 +373,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
               }}
             />
             
-            <Trophy 
-              className="w-3.5 h-3.5 relative z-10"
-              style={{ color: accentColor }} 
-            />
+            {getTierIcon(tier, accentColor)}
           </div>
         </div>
         
