@@ -1,4 +1,12 @@
-
+/**
+ * LEGACY COMPONENT
+ * 
+ * This modal uses native <input type="range"> sliders with hard-coded orange (#F5A623).
+ * It should be migrated to Radix Slider with the rating-slider-primary/breakdown
+ * classes and slate/gold styling in a future phase.
+ * 
+ * Still actively used by CourseReviews.tsx for editing existing ratings.
+ */
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';

@@ -699,7 +699,7 @@ const PostPlayRatingModal = ({
     // Show toast if user tried to add more than allowed
     if (files.length > remainingSlots && remainingSlots > 0) {
       toast({
-        title: "Media limit reached",
+        title: `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added`,
         description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
       });
     }
