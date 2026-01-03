@@ -2,7 +2,7 @@
  * Top100ListCompletionSheet - Region-aware completion detail sheet
  * 
  * Opened from Top 100 List Completions row cards.
- * Uses region-specific accent colours (World gold, GB&I green, USA red, Europe teal).
+ * Uses region-specific accent colours from the global theme system.
  */
 
 import React, { useEffect } from 'react';
@@ -14,6 +14,7 @@ import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 type RegionSlug = 'global' | 'gb-i' | 'usa' | 'europe';
 
@@ -25,28 +26,12 @@ interface Top100ListCompletionSheetProps {
   total: number;
 }
 
-// Region colour config - matches region page accents
-const REGION_COLORS: Record<RegionSlug, { accent: string; accentMuted: string; name: string }> = {
-  global: {
-    accent: '#f59e0b', // Amber/Gold
-    accentMuted: 'rgba(245, 158, 11, 0.6)',
-    name: 'World Top 100',
-  },
-  'gb-i': {
-    accent: '#22c55e', // Green
-    accentMuted: 'rgba(34, 197, 94, 0.6)',
-    name: 'GB&I Top 100',
-  },
-  usa: {
-    accent: '#ef4444', // Red
-    accentMuted: 'rgba(239, 68, 68, 0.6)',
-    name: 'USA Top 100',
-  },
-  europe: {
-    accent: '#14b8a6', // Teal
-    accentMuted: 'rgba(20, 184, 166, 0.6)',
-    name: 'Europe Top 100',
-  },
+// Region display names
+const REGION_NAMES: Record<RegionSlug, string> = {
+  global: 'World Top 100',
+  'gb-i': 'GB&I Top 100',
+  usa: 'USA Top 100',
+  europe: 'Europe Top 100',
 };
 
 function getRegionIcon(slug: RegionSlug) {
@@ -87,7 +72,9 @@ export function Top100ListCompletionSheet({
 
   if (!listSlug) return null;
 
-  const regionConfig = REGION_COLORS[listSlug];
+  // Get theme from global system
+  const theme = getRegionTheme(listSlug);
+  const regionName = REGION_NAMES[listSlug];
   const remaining = Math.max(0, total - played);
   const progressPercent = total > 0 ? (played / total) * 100 : 0;
   const isComplete = remaining === 0 && total > 0;
@@ -164,8 +151,8 @@ export function Top100ListCompletionSheet({
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{
-                    backgroundColor: `${regionConfig.accent}15`,
-                    color: regionConfig.accent,
+                    background: `linear-gradient(135deg, ${theme.bgLight}, ${theme.bgDark})`,
+                    color: theme.accent,
                   }}
                 >
                   {getRegionIcon(listSlug)}
@@ -173,7 +160,7 @@ export function Top100ListCompletionSheet({
 
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-bold text-foreground truncate">
-                    {regionConfig.name}
+                    {regionName}
                   </h2>
                   <p className="text-sm text-muted-foreground">
                     Completion progress
@@ -184,7 +171,7 @@ export function Top100ListCompletionSheet({
               {/* Progress card */}
               <div
                 className="rounded-xl border p-4 mb-5 bg-card/50"
-                style={{ borderColor: `${regionConfig.accent}25` }}
+                style={{ borderColor: `${theme.bgDark}40` }}
               >
                 {/* Big progress numbers */}
                 <div className="flex justify-between items-baseline mb-3">
@@ -215,16 +202,16 @@ export function Top100ListCompletionSheet({
                     transition={{ duration: 0.6, ease: 'easeOut' }}
                     className="h-full rounded-full"
                     style={{
-                      backgroundColor: isComplete ? '#10b981' : regionConfig.accentMuted,
+                      backgroundColor: isComplete ? '#10b981' : theme.bgDark,
                     }}
                   />
                 </div>
 
                 {/* Microcopy */}
                 <p className="text-xs text-muted-foreground text-center">
-                  {isComplete
+                {isComplete
                     ? 'Completion badge earned.'
-                    : `Finish the list to earn the ${regionConfig.name.replace(' Top 100', '')} completion badge.`}
+                    : `Finish the list to earn the ${theme.shortLabel} completion badge.`}
                 </p>
               </div>
 
@@ -233,9 +220,12 @@ export function Top100ListCompletionSheet({
                 <Button
                   onClick={handleViewList}
                   className="w-full rounded-full font-medium"
-                  style={{ backgroundColor: regionConfig.accent }}
+                  style={{ 
+                    background: `linear-gradient(135deg, ${theme.bgLight}, ${theme.bgDark})`,
+                    color: theme.accent,
+                  }}
                 >
-                  View {regionConfig.name.replace(' Top 100', '')} list
+                  View {theme.shortLabel} list
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
 
