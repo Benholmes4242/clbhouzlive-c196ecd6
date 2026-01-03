@@ -2,6 +2,8 @@
  * TTL cleanup for orphaned review videos
  * Deletes pending videos older than 24 hours that were never attached to a review
  * Should be run on a schedule (e.g., hourly)
+ * 
+ * Fix #4: Protected with a secret header instead of embedded JWT
  */
 
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
@@ -17,6 +19,18 @@ serve(async (req) => {
   }
 
   try {
+    // Fix #4: Verify cleanup secret header
+    const cleanupSecret = Deno.env.get("CLEANUP_SECRET");
+    const providedSecret = req.headers.get("x-cleanup-secret");
+    
+    if (cleanupSecret && providedSecret !== cleanupSecret) {
+      console.log("❌ Invalid or missing cleanup secret");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Use service role for cleanup operations
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -30,12 +44,13 @@ serve(async (req) => {
 
     console.log(`🧹 Cleaning up pending review videos older than ${CLEANUP_AGE_HOURS}h (before ${cutoffIso})`);
 
-    // Find orphaned pending videos
+    // Find orphaned pending videos (review_id is NULL and old)
     const { data: orphanedVideos, error: fetchError } = await supabase
       .from("course_review_media")
       .select("id, stream_id")
       .eq("media_type", "video")
       .eq("status", "pending")
+      .is("review_id", null)
       .lt("created_at", cutoffIso);
 
     if (fetchError) {

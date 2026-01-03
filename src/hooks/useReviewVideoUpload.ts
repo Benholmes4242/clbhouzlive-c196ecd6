@@ -2,13 +2,18 @@
  * Hook for upload-on-select review video handling
  * Videos are uploaded to Cloudflare Stream immediately on selection
  * and tracked with 'pending' status until review is submitted
+ * 
+ * Fixes applied:
+ * - #1: review_id is now nullable (no fake UUID)
+ * - #2: Standardized on delete-review-video endpoint
+ * - #5: Removed unused AbortController machinery
+ * - #7: Added poster retry/cache-buster logic
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { edgePost } from '@/utils/callEdge';
 import { generateStreamThumbnailUrl, generateStreamHlsUrl } from '@/config/cloudflareStream';
-import { isVideoFile, getMediaType } from '@/utils/getMediaType';
 
 export interface ReviewVideoDraft {
   fileKey: string;
@@ -19,6 +24,7 @@ export interface ReviewVideoDraft {
   posterUrl: string | null;
   dbRowId: string | null; // course_review_media row id
   error?: string;
+  posterRetryCount?: number; // Track poster retry attempts
 }
 
 interface UseReviewVideoUploadOptions {
@@ -36,11 +42,13 @@ export function useReviewVideoUpload({
   onError,
 }: UseReviewVideoUploadOptions) {
   const [videoDrafts, setVideoDrafts] = useState<ReviewVideoDraft[]>([]);
-  const abortControllerRef = useRef<Map<string, AbortController>>(new Map());
+  
+  // Track if cleanup has been called (to prevent double cleanup)
+  const cleanupCalledRef = useRef(false);
 
   /**
    * Upload a video file to Cloudflare Stream immediately
-   * Creates a pending DB row once upload completes
+   * Creates a pending DB row once upload completes (with NULL review_id)
    */
   const uploadVideo = useCallback(async (file: File): Promise<ReviewVideoDraft | null> => {
     if (!userId) {
@@ -59,6 +67,7 @@ export function useReviewVideoUpload({
       streamId: null,
       posterUrl: null,
       dbRowId: null,
+      posterRetryCount: 0,
     };
 
     setVideoDrafts(prev => [...prev, draft]);
@@ -97,11 +106,11 @@ export function useReviewVideoUpload({
       const posterUrl = generateStreamThumbnailUrl(streamId);
       const hlsUrl = generateStreamHlsUrl(streamId);
 
-      // Step 4: Create pending DB row
+      // Step 4: Create pending DB row with NULL review_id (Fix #1)
       const { data: dbRow, error: dbError } = await supabase
         .from('course_review_media')
         .insert({
-          review_id: '00000000-0000-0000-0000-000000000000', // placeholder - will be updated on submit
+          review_id: null, // NULL for pending - will be updated on submit
           media_url: hlsUrl,
           media_type: 'video',
           stream_id: streamId,
@@ -111,7 +120,7 @@ export function useReviewVideoUpload({
           status: 'pending',
           upload_session_id: uploadSessionId,
           owner_user_id: userId,
-        } as any) // Type assertion since types aren't regenerated yet
+        } as any)
         .select('id')
         .single();
 
@@ -127,6 +136,7 @@ export function useReviewVideoUpload({
         streamId,
         posterUrl,
         dbRowId: dbRow?.id || null,
+        posterRetryCount: 0,
       };
 
       setVideoDrafts(prev => 
@@ -155,6 +165,22 @@ export function useReviewVideoUpload({
   }, [uploadSessionId, userId, onError]);
 
   /**
+   * Retry poster URL with cache-buster if the poster fails to load (Fix #7)
+   */
+  const retryPoster = useCallback((fileKey: string) => {
+    setVideoDrafts(prev => prev.map(d => {
+      if (d.fileKey === fileKey && d.streamId && (d.posterRetryCount || 0) < 3) {
+        const retryCount = (d.posterRetryCount || 0) + 1;
+        // Add cache-buster query param
+        const newPosterUrl = `${generateStreamThumbnailUrl(d.streamId)}?t=${Date.now()}`;
+        console.log('[ReviewVideoUpload] Retrying poster load:', d.streamId, 'attempt:', retryCount);
+        return { ...d, posterUrl: newPosterUrl, posterRetryCount: retryCount };
+      }
+      return d;
+    }));
+  }, []);
+
+  /**
    * Remove a video draft and clean up the pending DB row / Stream asset
    */
   const removeVideo = useCallback(async (fileKey: string) => {
@@ -166,21 +192,13 @@ export function useReviewVideoUpload({
     // Remove from local state immediately
     setVideoDrafts(prev => prev.filter(d => d.fileKey !== fileKey));
 
-    // Cleanup DB row and Stream asset if upload completed
-    if (draft.streamId && draft.dbRowId) {
+    // Cleanup via edge function (Fix #2: standardized on delete-review-video)
+    if (draft.streamId) {
       try {
-        // Delete DB row first
-        await supabase
-          .from('course_review_media')
-          .delete()
-          .eq('id', draft.dbRowId);
-
-        // Then delete Stream asset via dedicated edge function
         await edgePost('delete-review-video', { 
           streamId: draft.streamId, 
-          dbRowId: draft.dbRowId 
+          dbRowId: draft.dbRowId || undefined,
         });
-        
         console.log('[ReviewVideoUpload] Cleaned up stream asset:', draft.streamId);
       } catch (error) {
         console.error('[ReviewVideoUpload] Cleanup error:', error);
@@ -223,31 +241,37 @@ export function useReviewVideoUpload({
 
   /**
    * Cleanup all pending uploads (on modal close/cancel)
+   * Fix #6: This is called from handleClose and useEffect cleanup
    */
   const cleanupPending = useCallback(async () => {
+    // Prevent double cleanup
+    if (cleanupCalledRef.current) {
+      console.log('[ReviewVideoUpload] Cleanup already called, skipping');
+      return;
+    }
+    cleanupCalledRef.current = true;
+
     const pendingVideos = videoDrafts.filter(d => d.status === 'ready' || d.status === 'uploading');
     
+    if (pendingVideos.length === 0) {
+      console.log('[ReviewVideoUpload] No pending videos to clean up');
+      return;
+    }
+
     console.log('[ReviewVideoUpload] Cleaning up', pendingVideos.length, 'pending videos');
 
-    // Cancel any in-progress uploads
-    abortControllerRef.current.forEach(controller => controller.abort());
-    abortControllerRef.current.clear();
-
-    // Cleanup completed uploads
+    // Cleanup completed uploads via edge function (Fix #2)
     for (const draft of pendingVideos) {
-      if (draft.streamId && draft.dbRowId) {
+      if (draft.streamId) {
         try {
-          await supabase
-            .from('course_review_media')
-            .delete()
-            .eq('id', draft.dbRowId);
-
           await edgePost('delete-review-video', { 
             streamId: draft.streamId, 
-            dbRowId: draft.dbRowId 
+            dbRowId: draft.dbRowId || undefined,
           });
+          console.log('[ReviewVideoUpload] Cleaned up:', draft.streamId);
         } catch (error) {
           console.error('[ReviewVideoUpload] Cleanup error for', draft.streamId, error);
+          // Non-blocking - TTL cleanup will catch orphans
         }
       }
     }
@@ -259,7 +283,15 @@ export function useReviewVideoUpload({
    * Reset state (without cleanup - for use after successful submit)
    */
   const reset = useCallback(() => {
+    cleanupCalledRef.current = false;
     setVideoDrafts([]);
+  }, []);
+
+  /**
+   * Reset cleanup flag when modal reopens (new session)
+   */
+  const resetCleanupFlag = useCallback(() => {
+    cleanupCalledRef.current = false;
   }, []);
 
   return {
@@ -269,5 +301,7 @@ export function useReviewVideoUpload({
     attachToReview,
     cleanupPending,
     reset,
+    resetCleanupFlag,
+    retryPoster,
   };
 }

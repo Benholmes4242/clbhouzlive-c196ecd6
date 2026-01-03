@@ -2039,7 +2039,7 @@ export type Database = {
           media_url: string
           owner_user_id: string | null
           poster_url: string | null
-          review_id: string
+          review_id: string | null
           status: string
           stream_id: string | null
           upload_session_id: string | null
@@ -2053,7 +2053,7 @@ export type Database = {
           media_url: string
           owner_user_id?: string | null
           poster_url?: string | null
-          review_id: string
+          review_id?: string | null
           status?: string
           stream_id?: string | null
           upload_session_id?: string | null
@@ -2067,7 +2067,7 @@ export type Database = {
           media_url?: string
           owner_user_id?: string | null
           poster_url?: string | null
-          review_id?: string
+          review_id?: string | null
           status?: string
           stream_id?: string | null
           upload_session_id?: string | null
