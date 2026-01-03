@@ -70,6 +70,7 @@ const PostPlayRatingModal = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<Map<File, string>>(new Map());
+  const [uploadingFiles, setUploadingFiles] = useState<Set<File>>(new Set());
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
   const [conditionScore, setConditionScore] = useState<number | null>(null);
@@ -140,6 +141,15 @@ const PostPlayRatingModal = ({
       setFacilitiesTouched(existingRating.facilities_score != null);
     }
   }, [existingRating, isEditMode]);
+
+  // Cleanup blob URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      mediaPreviews.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
 
   // Track modal open for analytics
   useEffect(() => {
@@ -237,6 +247,9 @@ const PostPlayRatingModal = ({
 
       // Upload media files if any
       if (mediaFiles.length > 0) {
+        // Mark all files as uploading
+        setUploadingFiles(new Set(mediaFiles));
+        
         const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
         const { edgePost } = await import('@/utils/callEdge');
         const { generateStreamThumbnailUrl, generateStreamHlsUrl } = await import('@/config/cloudflareStream');
@@ -297,6 +310,9 @@ const PostPlayRatingModal = ({
         });
 
         await Promise.all(uploadPromises);
+        
+        // Clear uploading state
+        setUploadingFiles(new Set());
       }
     },
     onSuccess: async (result, variables) => {
@@ -1085,19 +1101,32 @@ const PostPlayRatingModal = ({
                           ? file.name.slice(0, 10) + '…' 
                           : file.name;
                         
+                        const isUploading = uploadingFiles.has(file);
+                        
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
                               // Pre-upload placeholder tile for videos
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                {/* Play icon */}
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm mb-2">
-                                  <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
-                                </div>
-                                {/* Filename */}
-                                <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
-                                  {displayName}
-                                </span>
+                                {isUploading ? (
+                                  // Uploading state with spinner
+                                  <>
+                                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2" />
+                                    <span className="text-xs text-slate-300 text-center px-2">
+                                      Uploading…
+                                    </span>
+                                  </>
+                                ) : (
+                                  // Pre-upload state with play icon
+                                  <>
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm mb-2">
+                                      <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
+                                    </div>
+                                    <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
+                                      {displayName}
+                                    </span>
+                                  </>
+                                )}
                               </div>
                             ) : (
                               <img
