@@ -67,15 +67,15 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
           : 'bg-slate-50 border-b border-slate-200/60'
       }`}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         {/* Show dropdown (Filter) */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
+              className="flex items-center justify-between w-44 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
             >
               <span>{currentFilterLabel}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
@@ -107,10 +107,10 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
+              className="flex items-center justify-between w-44 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
             >
               <span>{currentSortLabel}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
