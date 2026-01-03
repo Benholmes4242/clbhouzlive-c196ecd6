@@ -5,6 +5,7 @@ export { Top100ListLeaderboard } from './Top100ListLeaderboard';
 export { Top100ListAchievements } from './Top100ListAchievements';
 export { Top100ListAchievementsRow } from './Top100ListAchievementsRow';
 export { Top100ListAchievementsPair } from './Top100ListAchievementsPair';
+export { Top100ListMilestoneRail } from './Top100ListMilestoneRail';
 export { Top100ListFilters, type SortMode, type FilterMode } from './Top100ListFilters';
 export { Top100ListFilterChips, type Top100FilterChip } from './Top100ListFilterChips';
 export { Top100ListCourseCard } from './Top100ListCourseCard';

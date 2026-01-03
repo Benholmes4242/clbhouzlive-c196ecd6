@@ -1,5 +1,5 @@
 import React from 'react';
-import { getProgressInsight } from '@/lib/utils/progressInsightCopy';
+import { getListMilestoneState } from '@/lib/listMilestoneSystem';
 
 interface Top100ListProgressCardProps {
   playedCount: number;
@@ -11,21 +11,21 @@ interface Top100ListProgressCardProps {
 
 /**
  * Progress card shown below hero with next milestone info and motivational copy.
- * Displays: "Next milestone: 25" + "X courses to go" + rotating insight phrase
+ * Uses unified milestone system: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+ * 
+ * Displays:
+ * - Next milestone: {nextMilestone}
+ * - {toGo} courses to go
+ * - Status copy (right side)
  */
 export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   playedCount,
-  totalCount,
   listSlug,
   listDisplayName,
-  userId,
 }) => {
-  // Calculate milestone info
-  const milestoneThresholds = [25, 50, 75, 100];
-  const nextMilestone = milestoneThresholds.find(t => t > playedCount) || 100;
-  const coursesToGo = nextMilestone - playedCount;
-  const isComplete = playedCount >= 100;
-  
+  // Use unified milestone system
+  const { nextMilestone, toGo, isComplete, statusCopy } = getListMilestoneState(playedCount);
+
   // Get region prefix for milestone naming
   const getRegionPrefix = () => {
     switch (listSlug) {
@@ -36,10 +36,6 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
       default: return listDisplayName;
     }
   };
-  
-  // Get progress insight phrase
-  const percent = totalCount > 0 ? (playedCount / totalCount) * 100 : 0;
-  const insightPhrase = getProgressInsight(percent, listSlug, userId);
 
   if (isComplete) {
     return (
@@ -47,11 +43,14 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900">
-              {getRegionPrefix()} – 100 Complete ✓
+              Completed
+            </p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              100 of 100 played
             </p>
           </div>
           <p className="text-xs font-medium text-amber-700 italic whitespace-nowrap">
-            {insightPhrase}
+            {statusCopy}
           </p>
         </div>
       </div>
@@ -66,11 +65,11 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
             Next milestone: {nextMilestone}
           </p>
           <p className="text-xs text-slate-500 mt-0.5">
-            {coursesToGo} course{coursesToGo !== 1 ? 's' : ''} to go
+            {toGo} course{toGo !== 1 ? 's' : ''} to go
           </p>
         </div>
         <p className="text-xs font-medium text-slate-500 italic whitespace-nowrap">
-          {insightPhrase}
+          {statusCopy}
         </p>
       </div>
     </div>

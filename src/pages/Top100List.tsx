@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import {
   Top100ListLeaderboard,
-  Top100ListAchievementsPair,
+  Top100ListMilestoneRail,
   Top100ListFilterChips,
   Top100ListCourseCard,
   Top100ListProgressCard,
@@ -200,37 +200,6 @@ const Top100List = () => {
     }));
   }, [friendsProgress]);
 
-  // Build list-specific milestones using standardized thresholds
-  // Milestones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] - same for all lists
-  const listMilestones = useMemo(() => {
-    const listMilestoneThresholds = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    const listShortName = currentList?.short_label || listDisplayName.replace('Great Britain & Ireland', 'GB&I');
-    
-    // Find current milestone (highest achieved)
-    const achievedMilestones = listMilestoneThresholds.filter(t => playedCount >= t);
-    const currentThreshold = achievedMilestones[achievedMilestones.length - 1];
-    const nextThreshold = listMilestoneThresholds.find(t => t > playedCount);
-    
-    const primary = currentThreshold ? {
-      id: `${slug}-${currentThreshold}`,
-      title: currentThreshold === 50 ? `${listShortName} – Halfway` : `${listShortName} – ${currentThreshold} Complete`,
-      current: playedCount,
-      target: currentThreshold,
-      isComplete: true,
-      percentOfPlayers: currentThreshold >= 50 ? 8 : currentThreshold >= 25 ? 18 : 35,
-    } : null;
-
-    const upcoming = nextThreshold ? {
-      id: `${slug}-${nextThreshold}`,
-      title: nextThreshold === 50 ? `${listShortName} – Halfway` : `${listShortName} – ${nextThreshold} Complete`,
-      current: playedCount,
-      target: nextThreshold,
-      isComplete: false,
-    } : null;
-
-    return { primary, upcoming };
-  }, [playedCount, slug, currentList?.short_label, listDisplayName]);
-
   // Generate journey insights
   const journeyInsights = useMemo(() => {
     if (!courses) return [];
@@ -367,13 +336,10 @@ const Top100List = () => {
           </div>
         )}
 
-        {/* 4. Milestones - horizontal strip */}
+        {/* 4. Milestones - horizontal rail */}
         {session && (
           <div className="mt-6">
-            <Top100ListAchievementsPair
-              primary={listMilestones.primary}
-              upcoming={listMilestones.upcoming}
-            />
+            <Top100ListMilestoneRail playedCount={playedCount} />
           </div>
         )}
 
