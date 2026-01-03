@@ -107,16 +107,16 @@ export function AchievementDetailSheetV2({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop - z-[60] to sit above content but below sheet */}
+          {/* Backdrop - must sit above bottom nav (nav is z-100) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-[60]"
+            className="fixed inset-0 bg-black/50 z-[120]"
           />
 
-          {/* Sheet - z-[70] to sit above everything including footer */}
+          {/* Sheet - must sit above bottom nav */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -129,13 +129,12 @@ export function AchievementDetailSheetV2({
               if (info.offset.y > 100) onClose();
             }}
             className={cn(
-              "fixed left-0 right-0 z-[70]",
+              "fixed bottom-0 left-0 right-0 z-[130]",
               "bg-background rounded-t-3xl max-h-[85vh] overflow-hidden",
               "shadow-2xl"
             )}
             style={{
-              bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom))',
-              paddingBottom: '16px',
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
             }}
           >
             {/* Drag handle */}
