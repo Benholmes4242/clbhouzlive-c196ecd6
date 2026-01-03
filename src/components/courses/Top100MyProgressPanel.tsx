@@ -44,6 +44,9 @@ const TIER_COLORS: Record<string, string> = {
   grandslam: MILESTONE_THEMES[400].bgDark,
 };
 
+// Stable empty array constant - module level to avoid new reference each render
+const EMPTY_ROUNDS: any[] = [];
+
 interface Top100MyProgressPanelProps {
   userId?: string | null;
 }
@@ -104,8 +107,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     return Math.min(100, Math.round((progress / range) * 100));
   }, [data?.next_milestone, data?.totalTop100Played]);
 
-  // Stable empty array to avoid new reference each render during loading
-  const EMPTY_ROUNDS: typeof data.year_rounds = [];
   const yearRounds = data?.year_rounds ?? EMPTY_ROUNDS;
 
   // Derive year summary from year-scoped data (not recent_rounds)
