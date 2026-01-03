@@ -14,6 +14,7 @@ interface CourseData {
   played: boolean;
   rankingBadges?: Array<{ id: string; label: string }>;
   communityRating?: number | null;
+  reviewCount?: number;
   globalRank?: number | null;
   regionalRank?: number | null;
   usaRank?: number | null;
