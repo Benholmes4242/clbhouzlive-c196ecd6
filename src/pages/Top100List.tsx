@@ -19,10 +19,13 @@ import {
   type Top100FilterChip,
 } from '@/components/top100/list';
 import { Top100HeroShell } from '@/components/top100/Top100HeroShell';
-import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
+
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
   'gb-i': 'Great Britain & Ireland',
@@ -30,7 +33,7 @@ const REGION_DISPLAY_NAMES: Record<string, string> = {
   europe: 'Continental Europe',
 };
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = EXPLORE_PAGE_SIZE; // Match Explore page (10 courses)
 const INSIGHT_INTERVAL = 10; // Insert insight card every N courses
 
 const Top100List = () => {
@@ -45,8 +48,9 @@ const Top100List = () => {
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
-  const [page, setPage] = useState(0);
+  const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
   const [isFilterSticky, setIsFilterSticky] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const listTopRef = useRef<HTMLDivElement | null>(null);
   const filterRef = useRef<HTMLDivElement | null>(null);
@@ -56,13 +60,13 @@ const Top100List = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [slug]);
 
-  // Restore page + scroll from sessionStorage on mount
+  // Restore displayedCount + scroll from sessionStorage on mount
   useEffect(() => {
-    const savedPage = sessionStorage.getItem('top100:list:page');
+    const savedCount = sessionStorage.getItem('top100:list:displayedCount');
     const savedScrollY = sessionStorage.getItem('top100:list:scrollY');
 
-    if (savedPage) {
-      setPage(Number(savedPage));
+    if (savedCount) {
+      setDisplayedCount(Number(savedCount));
     }
     if (savedScrollY) {
       requestAnimationFrame(() => {
@@ -74,7 +78,7 @@ const Top100List = () => {
       });
     }
 
-    sessionStorage.removeItem('top100:list:page');
+    sessionStorage.removeItem('top100:list:displayedCount');
     sessionStorage.removeItem('top100:list:scrollY');
   }, []);
 
@@ -237,9 +241,9 @@ const Top100List = () => {
 
 
 
-  // Reset page when filter changes
+  // Reset displayed count when filter changes
   useEffect(() => {
-    setPage(0);
+    setDisplayedCount(PAGE_SIZE);
   }, [filterChip]);
 
   // Filter and sort courses
@@ -273,45 +277,34 @@ const Top100List = () => {
     return filtered;
   }, [courses, filterChip, playedCourseIds]);
 
-  // Pagination calculations
+  // Load-more calculations (Explore pattern: accumulate items)
   const totalFiltered = filteredAndSortedCourses.length;
-  const hasNextPage = (page + 1) * PAGE_SIZE < totalFiltered;
-  const hasPrevPage = page > 0;
+  const hasMoreCourses = displayedCount < totalFiltered;
+  const remainingCount = Math.min(PAGE_SIZE, totalFiltered - displayedCount);
 
-  // Paginated courses for current page
-  const paginatedCourses = useMemo(() => {
-    return filteredAndSortedCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  }, [filteredAndSortedCourses, page]);
+  // Displayed courses (load-more pattern: show 1 to displayedCount)
+  const displayedCourses = useMemo(() => {
+    return filteredAndSortedCourses.slice(0, displayedCount);
+  }, [filteredAndSortedCourses, displayedCount]);
 
-  // Scroll to list top after pagination
-  const scrollToListTop = useCallback(() => {
-    if (listTopRef.current) {
-      window.scrollTo({
-        top: listTopRef.current.offsetTop - 16,
-        left: 0,
-        behavior: 'auto',
-      });
-    }
-  }, []);
+  // Load more function (matches Explore pattern)
+  const loadMore = useCallback(() => {
+    if (!hasMoreCourses || isLoadingMore) return;
+    
+    setIsLoadingMore(true);
+    // Simulate brief loading state for UX consistency
+    setTimeout(() => {
+      setDisplayedCount((prev) => Math.min(prev + PAGE_SIZE, totalFiltered));
+      setIsLoadingMore(false);
+    }, 150);
+  }, [hasMoreCourses, isLoadingMore, totalFiltered]);
 
-  const handlePrevPage = useCallback(() => {
-    if (!hasPrevPage) return;
-    setPage((p) => p - 1);
-    scrollToListTop();
-  }, [hasPrevPage, scrollToListTop]);
-
-  const handleNextPage = useCallback(() => {
-    if (!hasNextPage) return;
-    setPage((p) => p + 1);
-    scrollToListTop();
-  }, [hasNextPage, scrollToListTop]);
-
-  // Save page + scroll before navigating to course detail
+  // Save displayedCount + scroll before navigating to course detail
   const handleOpenCourse = useCallback((courseId: string) => {
-    sessionStorage.setItem('top100:list:page', String(page));
+    sessionStorage.setItem('top100:list:displayedCount', String(displayedCount));
     sessionStorage.setItem('top100:list:scrollY', String(window.scrollY));
     navigate(`/courses/${courseId}`);
-  }, [page, navigate]);
+  }, [displayedCount, navigate]);
 
   if (isLoading) {
     return (
@@ -416,16 +409,15 @@ const Top100List = () => {
 
         {/* 6. Course List with Journey Insights */}
         <section className="mt-4 pb-6 space-y-3">
-          {paginatedCourses.map((course, index) => {
+          {displayedCourses.map((course, index) => {
             // Insert insight card every N courses
-            const absoluteIndex = page * PAGE_SIZE + index;
             const shouldInsertInsight = 
-              absoluteIndex > 0 && 
-              absoluteIndex % INSIGHT_INTERVAL === 0 && 
-              journeyInsights[Math.floor(absoluteIndex / INSIGHT_INTERVAL) - 1];
+              index > 0 && 
+              index % INSIGHT_INTERVAL === 0 && 
+              journeyInsights[Math.floor(index / INSIGHT_INTERVAL) - 1];
             
             const insightText = shouldInsertInsight 
-              ? journeyInsights[Math.floor(absoluteIndex / INSIGHT_INTERVAL) - 1] 
+              ? journeyInsights[Math.floor(index / INSIGHT_INTERVAL) - 1] 
               : null;
 
             return (
@@ -454,7 +446,7 @@ const Top100List = () => {
             );
           })}
 
-          {paginatedCourses.length === 0 && (
+          {displayedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
               <p className="text-muted-foreground text-lg">
                 No courses match your current filter
@@ -463,19 +455,40 @@ const Top100List = () => {
           )}
         </section>
 
-        {/* 7. Pagination - using UnifiedPagination to match Explore/Top100 exactly */}
-        <div className="px-4 pb-6">
-          <UnifiedPagination
-            page={page}
-            total={totalFiltered}
-            pageSize={PAGE_SIZE}
-            hasNextPage={hasNextPage}
-            onNext={handleNextPage}
-            onPrev={handlePrevPage}
-            itemLabel="courses"
-            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
-          />
-        </div>
+        {/* 7. Pagination - Load More button matching Explore page exactly */}
+        {hasMoreCourses && (
+          <div className="flex flex-col items-center gap-2 pt-4 px-4 pb-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadMore}
+              disabled={isLoadingMore}
+              className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
+            >
+              {isLoadingMore ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                  Loading next courses…
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-4 w-4" />
+                  Next {remainingCount} courses
+                </>
+              )}
+            </Button>
+            <p className="text-[11px] text-muted-foreground">
+              Showing 1–{displayedCourses.length} of {totalFiltered.toLocaleString()} courses
+            </p>
+          </div>
+        )}
+
+        {/* End message when all courses shown */}
+        {!hasMoreCourses && displayedCourses.length > PAGE_SIZE && (
+          <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
+            You've reached the end • {totalFiltered.toLocaleString()} courses total
+          </p>
+        )}
 
       </main>
 
