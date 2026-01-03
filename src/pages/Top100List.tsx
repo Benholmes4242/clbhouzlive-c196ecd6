@@ -336,10 +336,10 @@ const Top100List = () => {
           </div>
         )}
 
-        {/* 4. Milestones - horizontal rail */}
+        {/* 4. Milestones - horizontal rail with regional theming */}
         {session && (
           <div className="mt-6">
-            <Top100ListMilestoneRail playedCount={playedCount} />
+            <Top100ListMilestoneRail playedCount={playedCount} listSlug={slug} />
           </div>
         )}
 

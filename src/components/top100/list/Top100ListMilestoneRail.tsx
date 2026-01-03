@@ -7,36 +7,48 @@ import {
   getListMilestoneState,
   type ListMilestoneInfo,
 } from '@/lib/listMilestoneSystem';
+import { getRegionTheme, getAspirationalCopy, getMilestoneTooltip } from '@/lib/regionTheme';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface Top100ListMilestoneRailProps {
   playedCount: number;
+  listSlug?: string;
   onViewAll?: () => void;
 }
 
-// SVG ring dimensions
-const TOKEN_SIZE = 76;
-const RING_RADIUS = 32;
+// SVG ring dimensions for squircle tokens
+const TOKEN_SIZE = 78;
+const RING_RADIUS = 33;
 const RING_CENTER = TOKEN_SIZE / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 /**
  * Horizontal swipeable milestone rail with collectible token design.
- * SVG progress rings with frosted glass backgrounds.
+ * Regional color theming - each list has its own accent color.
  * 
  * Visual states:
- * - UNLOCKED: Solid brand accent ring + frosted glass
- * - NEXT UP: Animated progress arc showing playedCount/nextMilestone
- * - LOCKED: Thin neutral grey ring + muted text
- * - COMPLETED (100 tile only): Trophy with subtle gold ring
+ * - UNLOCKED: Solid regional accent ring
+ * - NEXT UP: Animated progress arc in regional color + aspirational copy
+ * - LOCKED: Thin neutral grey ring
+ * - COMPLETED (100 tile only): Trophy with gold accent
  */
 export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = ({
   playedCount,
+  listSlug = 'global',
   onViewAll,
 }) => {
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const nextUpRef = useRef<HTMLButtonElement>(null);
   const [milestones, setMilestones] = useState<ListMilestoneInfo[]>([]);
+
+  // Get regional theme
+  const theme = getRegionTheme(listSlug);
 
   useEffect(() => {
     setMilestones(getAllMilestonesWithState(playedCount));
@@ -92,16 +104,19 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          {milestones.map((milestone, index) => (
-            <MilestoneToken
-              key={milestone.threshold}
-              ref={milestone.state === 'next_up' ? nextUpRef : undefined}
-              milestone={milestone}
-              playedCount={playedCount}
-              isListComplete={isComplete}
-              onClick={handleTileClick}
-            />
-          ))}
+          <TooltipProvider delayDuration={200}>
+            {milestones.map((milestone) => (
+              <MilestoneToken
+                key={milestone.threshold}
+                ref={milestone.state === 'next_up' ? nextUpRef : undefined}
+                milestone={milestone}
+                playedCount={playedCount}
+                isListComplete={isComplete}
+                theme={theme}
+                onClick={handleTileClick}
+              />
+            ))}
+          </TooltipProvider>
         </div>
         
         {/* Right fade gradient */}
@@ -120,6 +135,7 @@ interface MilestoneTokenProps {
   milestone: ListMilestoneInfo;
   playedCount: number;
   isListComplete: boolean;
+  theme: ReturnType<typeof getRegionTheme>;
   onClick: () => void;
 }
 
@@ -127,6 +143,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   milestone,
   playedCount,
   isListComplete,
+  theme,
   onClick,
 }, ref) => {
   const { threshold, state, toGo } = milestone;
@@ -151,24 +168,36 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   const progress = getProgress();
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
-  // Ring styling per state
+  // Ring styling per state - using regional color for unlocked/next up
   const getRingConfig = () => {
     if (showCompletionHero) {
-      return { stroke: 'rgb(180, 130, 50)', strokeWidth: 3, opacity: 1 };
+      return { stroke: 'rgb(180, 130, 50)', strokeWidth: 3.5, opacity: 1 };
     }
     if (isUnlocked) {
-      return { stroke: 'hsl(var(--primary))', strokeWidth: 3, opacity: 1 };
+      return { stroke: theme.ringColor, strokeWidth: 3, opacity: 1 };
     }
     if (isNextUp) {
-      return { stroke: 'hsl(var(--primary))', strokeWidth: 4, opacity: 1 };
+      return { stroke: theme.ringColor, strokeWidth: 4, opacity: 1 };
     }
-    // Locked
-    return { stroke: 'rgb(203, 213, 225)', strokeWidth: 2, opacity: 0.7 };
+    // Locked - neutral grey, thin
+    return { stroke: 'rgb(203, 213, 225)', strokeWidth: 2, opacity: 0.6 };
   };
 
   const ringConfig = getRingConfig();
 
-  return (
+  // Aspirational copy for next up
+  const aspirationalCopy = isNextUp && toGo !== undefined 
+    ? getAspirationalCopy(toGo, threshold) 
+    : null;
+
+  // Tooltip for detailed progress
+  const tooltipText = isNextUp && toGo !== undefined
+    ? getMilestoneTooltip(playedCount, toGo, threshold)
+    : isUnlocked
+      ? `Milestone achieved — ${threshold} courses played.`
+      : `Unlocks at ${threshold} courses played.`;
+
+  const tokenButton = (
     <motion.button
       ref={ref}
       whileTap={{ scale: 0.96 }}
@@ -176,10 +205,10 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       className="relative flex-shrink-0 flex flex-col items-center justify-center cursor-pointer"
       style={{ 
         width: TOKEN_SIZE,
-        height: TOKEN_SIZE + 20,
+        height: TOKEN_SIZE + 22,
         scrollSnapAlign: 'start',
       }}
-      aria-label={`Milestone ${threshold}: ${isUnlocked ? 'Complete' : isNextUp ? `${toGo} to go` : 'Locked'}`}
+      aria-label={`Milestone ${threshold}: ${isUnlocked ? 'Complete' : isNextUp ? aspirationalCopy : 'Locked'}`}
     >
       {/* Token container with SVG ring */}
       <div 
@@ -188,10 +217,10 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       >
         {/* Frosted glass background (squircle shape) */}
         <div 
-          className="absolute inset-[6px] rounded-[18px]"
+          className="absolute inset-[7px] rounded-[16px]"
           style={{
             background: isLocked 
-              ? 'rgba(255, 255, 255, 0.75)' 
+              ? 'rgba(255, 255, 255, 0.7)' 
               : 'rgba(255, 255, 255, 0.88)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
@@ -201,15 +230,13 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
           }}
         />
 
-        {/* Subtle halo for next up only */}
+        {/* Subtle halo for next up only - uses regional color */}
         {isNextUp && !prefersReducedMotion && (
           <motion.div
             className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at center, hsl(var(--primary) / 0.1) 0%, transparent 60%)',
-            }}
+            style={{ background: theme.haloGradient }}
             initial={{ opacity: 0.3 }}
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            animate={{ opacity: [0.3, 0.55, 0.3] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
@@ -221,17 +248,17 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
           className="absolute inset-0"
           style={{ transform: 'rotate(-90deg)' }}
         >
-          {/* Base ring (always visible for structure) */}
+          {/* Base ring (structure) */}
           <circle
             cx={RING_CENTER}
             cy={RING_CENTER}
             r={RING_RADIUS}
             fill="none"
-            stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.06)'}
+            stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.05)'}
             strokeWidth={isLocked ? 2 : 1}
           />
           
-          {/* Progress/solid ring */}
+          {/* Progress/solid ring - uses regional color */}
           {(isUnlocked || isNextUp || showCompletionHero) && (
             <motion.circle
               cx={RING_CENTER}
@@ -272,7 +299,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         </div>
       </div>
 
-      {/* Subtext below token */}
+      {/* Subtext below token - aspirational copy for next up */}
       <span className={`text-[10px] font-medium mt-1 ${
         showCompletionHero
           ? 'text-amber-700/80'
@@ -282,22 +309,22 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
               ? 'text-slate-500' 
               : 'text-slate-400'
       }`}>
-        {isNextUp && toGo !== undefined 
-          ? `${toGo} to go`
+        {isNextUp && aspirationalCopy
+          ? aspirationalCopy
           : isUnlocked || showCompletionHero
             ? 'Complete'
             : ''
         }
       </span>
 
-      {/* NEXT UP label pill */}
+      {/* NEXT UP label pill - uses regional text color */}
       {isNextUp && (
         <span 
           className="absolute -top-0.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
-            border: '1px solid rgba(15, 23, 42, 0.1)',
-            color: 'hsl(var(--primary))',
+            border: `1px solid ${theme.ringColor}`,
+            color: theme.ringColor,
             boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
           }}
         >
@@ -305,6 +332,22 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         </span>
       )}
     </motion.button>
+  );
+
+  // Wrap with tooltip for detailed progress info
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {tokenButton}
+      </TooltipTrigger>
+      <TooltipContent 
+        side="bottom" 
+        className="max-w-[200px] text-center text-xs"
+        sideOffset={4}
+      >
+        {tooltipText}
+      </TooltipContent>
+    </Tooltip>
   );
 });
 

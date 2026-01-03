@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getTop100Club } from '@/lib/top100Club';
+import { getRegionTheme } from '@/lib/regionTheme';
 
 interface Top100ListProgressHeroProps {
   playedCount: number;
@@ -12,17 +13,20 @@ interface Top100ListProgressHeroProps {
 
 /**
  * Premium hero progress module for Top 100 list pages.
- * Shows large numeric progress, animated bar, and milestone info.
+ * Uses regional color theming for progress bar.
  */
 export const Top100ListProgressHero: React.FC<Top100ListProgressHeroProps> = ({
   playedCount,
   totalCount,
   listName,
-  listSlug,
+  listSlug = 'global',
 }) => {
   const [animatedProgress, setAnimatedProgress] = useState(0);
   
   const percent = totalCount > 0 ? (playedCount / totalCount) * 100 : 0;
+  
+  // Get regional theme for colored progress bar
+  const theme = getRegionTheme(listSlug);
   
   // Get current and next milestone
   const currentClub = getTop100Club(playedCount);
@@ -41,7 +45,7 @@ export const Top100ListProgressHero: React.FC<Top100ListProgressHeroProps> = ({
 
   return (
     <div className="px-4 pt-6 pb-4">
-      {/* Single unified journey state container - no boxed background */}
+      {/* Single unified journey state container */}
       <div className="p-4 flex gap-4 items-stretch">
         {/* Left: Large numeric tile */}
         <div className="w-[100px] shrink-0 flex flex-col items-center justify-center bg-slate-900 rounded-sq-md p-3">
@@ -56,7 +60,7 @@ export const Top100ListProgressHero: React.FC<Top100ListProgressHeroProps> = ({
           <span className="text-sm text-white/60 font-medium">/ {totalCount}</span>
         </div>
 
-        {/* Right column: controlled flex layout */}
+        {/* Right column */}
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           {/* Row 1: Title/Sub + Status pill */}
           <div className="flex items-start justify-between gap-2">
@@ -71,24 +75,23 @@ export const Top100ListProgressHero: React.FC<Top100ListProgressHeroProps> = ({
               )}
             </div>
             
-            {/* Status pill - shrink-0 */}
-            <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 rounded-sq-pill">
-              <Trophy className="w-3.5 h-3.5 text-amber-600" />
-              <span className="text-xs font-semibold text-amber-700">
+            {/* Status pill - neutral, not colored */}
+            <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-sq-pill">
+              <Trophy className="w-3.5 h-3.5 text-slate-600" />
+              <span className="text-xs font-semibold text-slate-700">
                 {Math.round(percent)}%
               </span>
             </div>
           </div>
 
-          {/* Progress bar */}
+          {/* Progress bar - uses regional color */}
           <div className="mt-3">
             <div className="h-2 rounded-full bg-muted/60 overflow-hidden">
               <motion.div
-                className="h-2 rounded-full bg-amber-500"
+                className={`h-2 rounded-full ${theme.barClass}`}
                 initial={{ width: 0 }}
                 animate={{ width: `${animatedProgress}%` }}
                 transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-                style={{ transition: 'all 300ms ease-out' }}
               />
             </div>
             <p className="text-[11px] text-muted-foreground mt-1.5">

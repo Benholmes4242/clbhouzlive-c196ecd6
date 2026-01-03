@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Top100RankBadge } from './Top100RankBadge';
+import { getRegionTheme } from '@/lib/regionTheme';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 interface Top100HeroShellProps {
@@ -15,8 +16,7 @@ interface Top100HeroShellProps {
 
 /**
  * Top100HeroShell - Unified hero image + full-bleed attached progress slab
- * No floating card look - hero and progress are visually connected edge-to-edge.
- * Simplified to show only: X/total, %, and progress bar.
+ * Uses regional color theming for progress bar.
  */
 export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   list,
@@ -30,6 +30,9 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   const hero = list.hero_course;
   const topRank = hero?.rank_in_list ?? null;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
+  
+  // Get regional theme for progress bar color
+  const theme = getRegionTheme(listSlug);
   
   // Progress calculation
   const percent = totalCount > 0 ? (playedCount / totalCount) * 100 : 0;
@@ -104,7 +107,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </div>
         </div>
 
-        {/* FULL-BLEED PROGRESS SLAB - lighter blue-grey with gradient blend */}
+        {/* FULL-BLEED PROGRESS SLAB - uses regional color for bar */}
         {showProgress && (
           <div 
             className="w-full px-4 py-3"
@@ -112,7 +115,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               background: 'linear-gradient(to bottom, #4a5568 0%, #64748b 50%, #94a3b8 100%)',
             }}
           >
-            {/* Top row: X / total (primary) + % complete (secondary) - baseline aligned */}
+            {/* Top row: X / total (primary) + % complete (secondary) */}
             <div className="flex items-baseline justify-between gap-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -136,11 +139,12 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               </div>
             </div>
 
-            {/* Progress bar - slightly lighter track for softer look */}
+            {/* Progress bar - uses regional accent color */}
             <div className="mt-2.5">
               <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-2 bg-amber-400 rounded-full shadow-sm"
+                  className="h-2 rounded-full shadow-sm"
+                  style={{ backgroundColor: theme.ringColor }}
                   initial={{ width: 0 }}
                   animate={{ width: `${animatedProgress}%` }}
                   transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
