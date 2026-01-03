@@ -19,8 +19,8 @@ interface Top100ListAchievementsPairProps {
   onShareAchievement?: (id: string) => void;
 }
 
-// Milestone thresholds for Top 100 lists
-const MILESTONE_THRESHOLDS = [20, 25, 50, 75, 100];
+// Milestone thresholds for Top 100 lists - standardized across all lists
+const MILESTONE_THRESHOLDS = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 /**
  * Helper to get current and next milestones from played count

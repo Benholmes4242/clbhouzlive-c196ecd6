@@ -104,11 +104,13 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </div>
         </div>
 
-        {/* FULL-BLEED PROGRESS SLAB - refined padding and contrast */}
+        {/* FULL-BLEED PROGRESS SLAB - lighter blue-grey with gradient blend */}
         {showProgress && (
           <div 
             className="w-full px-4 py-3"
-            style={{ background: '#2f3a4a' }}
+            style={{ 
+              background: 'linear-gradient(to bottom, #4a5568 0%, #64748b 50%, #94a3b8 100%)',
+            }}
           >
             {/* Top row: X / total (primary) + % complete (secondary) - baseline aligned */}
             <div className="flex items-baseline justify-between gap-4">
@@ -118,27 +120,27 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
                 className="text-white"
               >
-                <span className="text-3xl font-semibold leading-none">
+                <span className="text-3xl font-semibold leading-none drop-shadow-sm">
                   {playedCount}
                 </span>
-                <span className="text-white/60 text-lg ml-0.5">/{totalCount}</span>
+                <span className="text-white/70 text-lg ml-0.5">/{totalCount}</span>
               </motion.div>
 
               <div className="flex items-baseline gap-1.5 text-white">
-                <span className="text-lg font-semibold">
+                <span className="text-lg font-semibold drop-shadow-sm">
                   {Math.round(percent)}%
                 </span>
-                <span className="text-[11px] text-white/60">
+                <span className="text-[11px] text-white/70">
                   complete
                 </span>
               </div>
             </div>
 
-            {/* Progress bar - darkened track for better contrast */}
+            {/* Progress bar - slightly lighter track for softer look */}
             <div className="mt-2.5">
-              <div className="h-2 w-full bg-black/25 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-2 bg-amber-400 rounded-full"
+                  className="h-2 bg-amber-400 rounded-full shadow-sm"
                   initial={{ width: 0 }}
                   animate={{ width: `${animatedProgress}%` }}
                   transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
