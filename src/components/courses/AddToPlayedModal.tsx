@@ -1,6 +1,12 @@
 /**
+ * LEGACY COMPONENT
+ * 
  * AddToPlayedModal - RATINGS-ONLY: Renamed to "Rate Course" modal
  * No longer writes to user_top100_courses - rating IS the played status
+ * 
+ * Uses native <input type="range"> slider with hard-coded orange (#F5A623).
+ * Should be migrated to Radix Slider with rating-slider-primary class
+ * and slate/gold styling in a future phase.
  */
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
