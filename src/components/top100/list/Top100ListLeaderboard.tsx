@@ -4,6 +4,9 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
+// Dev-only mock flag - disable after UI polish
+const MOCK_TOP100_LEADERBOARD = import.meta.env.VITE_MOCK_TOP100_LEADERBOARD === 'true';
+
 interface FriendLeaderboardEntry {
   id: string;
   name: string;
@@ -12,6 +15,20 @@ interface FriendLeaderboardEntry {
   playedOnList: number;
   totalTop100Played?: number;
 }
+
+// Mock data for dev testing - 10 golfers with realistic variety
+const MOCK_LEADERBOARD_DATA: FriendLeaderboardEntry[] = [
+  { id: 'mock-1', name: 'James Wilson', username: 'jameswilson', avatarUrl: 'https://i.pravatar.cc/150?u=james', playedOnList: 42, totalTop100Played: 89 },
+  { id: 'mock-2', name: 'Sarah Chen', username: 'sarahchen', avatarUrl: 'https://i.pravatar.cc/150?u=sarah', playedOnList: 31, totalTop100Played: 65 },
+  { id: 'mock-3', name: 'Michael O\'Brien', username: 'mikeobrien', avatarUrl: null, playedOnList: 24, totalTop100Played: 48 },
+  { id: 'mock-4', name: 'Emma Thompson', username: 'emmathompson', avatarUrl: 'https://i.pravatar.cc/150?u=emma', playedOnList: 19, totalTop100Played: 37 },
+  { id: 'mock-5', name: 'David Park', username: 'davidpark', avatarUrl: 'https://i.pravatar.cc/150?u=david', playedOnList: 15, totalTop100Played: 28 },
+  { id: 'mock-6', name: 'Rachel Adams', username: 'racheladams', avatarUrl: null, playedOnList: 11, totalTop100Played: 22 },
+  { id: 'mock-7', name: 'Tom Hughes', username: 'tomhughes', avatarUrl: 'https://i.pravatar.cc/150?u=tom', playedOnList: 8, totalTop100Played: 15 },
+  { id: 'mock-8', name: 'Lisa Martinez', username: 'lisamartinez', avatarUrl: 'https://i.pravatar.cc/150?u=lisa', playedOnList: 6, totalTop100Played: 12 },
+  { id: 'mock-9', name: 'Chris Taylor', username: 'christaylor', avatarUrl: null, playedOnList: 3, totalTop100Played: 6 },
+  { id: 'mock-10', name: 'Anna Schmidt', username: 'annaschmidt', avatarUrl: 'https://i.pravatar.cc/150?u=anna', playedOnList: 1, totalTop100Played: 2 },
+];
 
 interface Top100ListLeaderboardProps {
   friends: FriendLeaderboardEntry[];
@@ -33,11 +50,15 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Sort friends by played count descending
-  const sortedFriends = [...friends].sort((a, b) => b.playedOnList - a.playedOnList);
+  // Use mock data if flag is enabled and real data is empty
+  const showMock = MOCK_TOP100_LEADERBOARD && friends.length === 0;
+  const leaderboardFriends = showMock ? MOCK_LEADERBOARD_DATA : friends;
 
-  // Contextual empty states based on friend/list conditions
-  if (friends.length === 0) {
+  // Sort friends by played count descending
+  const sortedFriends = [...leaderboardFriends].sort((a, b) => b.playedOnList - a.playedOnList);
+
+  // Contextual empty states based on friend/list conditions (only if not mocking)
+  if (leaderboardFriends.length === 0) {
     return (
       <section className="mt-4">
         <div className="px-4">
