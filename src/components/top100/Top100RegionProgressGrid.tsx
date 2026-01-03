@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Map, ChevronRight } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
-import { RegionDrilldownSheet } from './RegionDrilldownSheet';
 
 interface Top100RegionProgressGridProps {
   lists: Top100ListProgress[];
@@ -110,22 +109,13 @@ export function Top100RegionProgressGrid({
   displayName: userDisplayName,
 }: Top100RegionProgressGridProps) {
   const navigate = useNavigate();
-  const [selectedList, setSelectedList] = useState<Top100ListProgress | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const label = isOwnProfile
     ? 'YOUR JOURNEY BY REGION'
     : `${userDisplayName?.toUpperCase() ?? 'THEIR'} JOURNEY BY REGION`;
 
-  const handleListClick = (list: Top100ListProgress) => {
-    setSelectedList(list);
-    setIsSheetOpen(true);
-  };
-
-  const handleViewCourses = (filter: 'played' | 'unplayed') => {
-    if (selectedList) {
-      navigate(`/top100/${selectedList.listSlug}?filter=${filter}`);
-    }
+  const handleCardClick = (slug: string) => {
+    navigate(`/top100/${slug}`);
   };
 
   return (
@@ -148,7 +138,7 @@ export function Top100RegionProgressGrid({
               <button
                 key={list.listSlug}
                 type="button"
-                onClick={() => handleListClick(list)}
+                onClick={() => handleCardClick(list.listSlug)}
                 className="w-full rounded-sq-sm border border-border/40 bg-card/60 px-3 py-2.5 text-left hover:bg-muted/30 transition-all duration-200 flex items-center justify-between gap-3 group"
               >
                 {/* Left side: region-tinted icon container + names */}
@@ -198,14 +188,6 @@ export function Top100RegionProgressGrid({
           })}
         </div>
       </section>
-
-      {/* Region Drilldown Sheet (D4) */}
-      <RegionDrilldownSheet
-        list={selectedList}
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        onViewCourses={handleViewCourses}
-      />
     </>
   );
 }
