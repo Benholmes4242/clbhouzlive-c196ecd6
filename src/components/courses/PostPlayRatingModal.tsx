@@ -693,18 +693,30 @@ const PostPlayRatingModal = ({
     submitRatingMutation.mutate(lastPayloadRef.current);
   };
 
-  const handleMediaSelected = async (files: File[]) => {
+  const handleMediaSelected = (files: File[]) => {
     console.log('[Media Audit] CHECKPOINT A - Picked items:', files);
-    console.log('[Media Audit] CHECKPOINT A - First picked item:', files[0]);
-    
+    console.log(
+      '[Media Audit] CHECKPOINT A1 - Picked details:',
+      files.map((f) => {
+        const ext = f.name.split('.').pop()?.toLowerCase() || '';
+        return {
+          name: f.name,
+          size: f.size,
+          type: f.type,
+          ext,
+          inferred: getMediaType(f),
+        };
+      })
+    );
+
     // Respect 6-item maximum
     const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - selectedMedia.length;
     const filesToAdd = files.slice(0, Math.max(0, remainingSlots));
-    
+
     if (filesToAdd.length === 0) {
       return;
     }
-    
+
     // Show toast if user tried to add more than allowed
     if (files.length > remainingSlots && remainingSlots > 0) {
       toast({
@@ -712,33 +724,64 @@ const PostPlayRatingModal = ({
         description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
       });
     }
-    
-    // Generate ALL previews first, before updating state
-    const newPreviews = new Map(mediaPreviews);
-    
+
+    // IMPORTANT (mobile): never block state insertion on thumbnail generation.
+    // iOS Safari can hang on seek/canvas extraction for some MOV/HEVC clips.
+    setSelectedMedia((prev) => [...prev, ...filesToAdd]);
+
     for (const file of filesToAdd) {
-      try {
-        if (isVideoFile(file)) {
-          const thumbnail = await generateVideoThumbnail(file);
-          if (thumbnail) {
-            newPreviews.set(file, thumbnail);
-          }
-        } else {
-          const previewUrl = URL.createObjectURL(file);
-          newPreviews.set(file, previewUrl);
-        }
-      } catch (error) {
-        console.error('[Media] Failed to generate preview for file', file.name, error);
+      const inferred = getMediaType(file);
+
+      // Always give the UI *something* to render immediately
+      if (inferred === 'video') {
+        const blobUrl = URL.createObjectURL(file);
+        setMediaPreviews((prev) => {
+          const next = new Map(prev);
+          next.set(file, blobUrl);
+          return next;
+        });
+
+        // Best-effort thumbnail (non-blocking) with timeout
+        const THUMBNAIL_TIMEOUT_MS = 4500;
+        Promise.race([
+          generateVideoThumbnail(file),
+          new Promise<string>((_, reject) =>
+            setTimeout(() => reject(new Error('thumbnail_timeout')), THUMBNAIL_TIMEOUT_MS)
+          ),
+        ])
+          .then((thumbnail) => {
+            if (!thumbnail) return;
+            setMediaPreviews((prev) => {
+              const next = new Map(prev);
+              const previous = next.get(file);
+              if (previous && previous.startsWith('blob:')) {
+                URL.revokeObjectURL(previous);
+              }
+              next.set(file, thumbnail);
+              return next;
+            });
+          })
+          .catch((error) => {
+            console.warn('[Media Audit] Video thumbnail unavailable (using blob preview)', {
+              name: file.name,
+              type: file.type,
+              inferred,
+              error: (error as any)?.message ?? String(error),
+            });
+          });
+      } else {
+        const previewUrl = URL.createObjectURL(file);
+        setMediaPreviews((prev) => {
+          const next = new Map(prev);
+          next.set(file, previewUrl);
+          return next;
+        });
       }
     }
-    
-    // Only after ALL previews are ready, update both states together
-    setSelectedMedia(prev => [...prev, ...filesToAdd]);
-    setMediaPreviews(newPreviews);
-    
-    console.log('[Media Audit] CHECKPOINT B - State media after add:', {
-      count: selectedMedia.length + filesToAdd.length,
-      previewMapSize: newPreviews.size,
+
+    console.log('[Media Audit] CHECKPOINT B - Queued media + previews:', {
+      addedCount: filesToAdd.length,
+      totalCountAfterAdd: selectedMedia.length + filesToAdd.length,
     });
   };
 
@@ -1050,11 +1093,23 @@ const PostPlayRatingModal = ({
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
                               <div className="relative h-full w-full">
-                                <img
-                                  src={preview}
-                                  alt=""
-                                  className="h-full w-full object-cover"
-                                />
+                                {!preview ? (
+                                  <div className="h-full w-full bg-slate-200" />
+                                ) : preview.startsWith('blob:') ? (
+                                  <video
+                                    src={preview}
+                                    muted
+                                    playsInline
+                                    preload="metadata"
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <img
+                                    src={preview}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                  />
+                                )}
                                 <div className="absolute bottom-2 right-2 pointer-events-none">
                                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
                                     <div className="h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white" style={{ marginLeft: '1px' }} />
@@ -1101,13 +1156,32 @@ const PostPlayRatingModal = ({
                     input.type = 'file';
                     input.accept = 'image/*,video/*';
                     input.multiple = true;
+                    input.style.position = 'fixed';
+                    input.style.left = '-9999px';
+                    input.style.top = '-9999px';
+
+                    const cleanup = () => {
+                      try {
+                        input.value = '';
+                      } catch {
+                        // no-op
+                      }
+                      input.remove();
+                    };
+
                     input.onchange = (e) => {
                       const target = e.target as HTMLInputElement;
-                      if (target.files) {
-                        const files = Array.from(target.files);
-                        handleMediaSelected(files);
+                      const picked = Array.from(target.files || []);
+                      console.log('[Media Audit] CHECKPOINT A0 - input.onchange fired:', {
+                        count: picked.length,
+                      });
+                      if (picked.length > 0) {
+                        handleMediaSelected(picked);
                       }
+                      cleanup();
                     };
+
+                    document.body.appendChild(input);
                     input.click();
                   }}
                   variant="outline"
