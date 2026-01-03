@@ -91,10 +91,11 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 type="button"
                 onClick={() => setSelectedMonth(month)}
                 className={cn(
-                  'flex-1 rounded-t transition-all hover:opacity-80',
+                  'flex-1 rounded-t transition-all cursor-pointer',
+                  'hover:opacity-80 active:scale-95',
                   isActive
                     ? 'bg-primary/80 hover:bg-primary'
-                    : 'bg-muted/40 hover:bg-muted/60'
+                    : 'bg-muted/60 hover:bg-muted/80'  // Darker inactive months (item 3)
                 )}
                 style={{ height: `${heightPercent}%` }}
                 aria-label={`${month.label}: ${month.count} courses`}

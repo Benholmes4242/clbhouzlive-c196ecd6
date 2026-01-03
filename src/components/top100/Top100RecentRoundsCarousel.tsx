@@ -135,9 +135,9 @@ export function Top100RecentRoundsCarousel({
                   showRankBadges={true}
                   showRating={true}
                 />
-                {/* Date logged overlay (F2) */}
+                {/* Date logged overlay - smaller text + more padding (item 9) */}
                 {round.played_at && (
-                  <div className="absolute bottom-2 left-2 text-[10px] font-medium text-white/80 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                  <div className="absolute bottom-2 left-2 text-[9px] font-medium text-white/80 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
                     Logged: {format(new Date(round.played_at), 'd MMM yyyy')}
                   </div>
                 )}
@@ -163,7 +163,7 @@ export function Top100RecentRoundsCarousel({
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            {/* Dot indicators */}
+            {/* Dot indicators - wider dots (item 9) */}
             <div className="flex gap-1.5">
               {Array.from({ length: Math.min(count, 5) }).map((_, idx) => (
                 <div
@@ -171,8 +171,8 @@ export function Top100RecentRoundsCarousel({
                   className={cn(
                     'h-1.5 rounded-full transition-all',
                     idx === current
-                      ? 'w-4 bg-foreground/60'
-                      : 'w-1.5 bg-foreground/20'
+                      ? 'w-5 bg-foreground/60'
+                      : 'w-2 bg-foreground/20'
                   )}
                 />
               ))}

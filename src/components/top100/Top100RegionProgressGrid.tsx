@@ -113,8 +113,8 @@ export function Top100RegionProgressGrid({
 
                 {/* Right side: percentage above bar (D2) + increased contrast bar (D3) */}
                 <div className="flex flex-col items-end gap-1 flex-shrink-0 min-w-[100px]">
-                  {/* Percentage directly above progress bar (D2) */}
-                  <span className="text-[10px] text-muted-foreground font-medium">
+                  {/* Percentage - slightly smaller (item 7) */}
+                  <span className="text-[9px] text-muted-foreground font-medium">
                     {remainingPercent}% remaining
                   </span>
 
@@ -127,8 +127,8 @@ export function Top100RegionProgressGrid({
                   </div>
                 </div>
 
-                {/* Chevron hint for drilldown (D4) */}
-                <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors flex-shrink-0" />
+                {/* Chevron hint - lighter to feel like affordance (item 7) */}
+                <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors flex-shrink-0" />
               </button>
             );
           })}

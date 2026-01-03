@@ -122,7 +122,7 @@ function HeroWithMilestoneRow({
           />
         </div>
 
-        {/* Achievement badge card on the right */}
+        {/* Achievement badge card on the right - removed secondary Unlocked line per polish (1) */}
         <div
           style={{
             width: 'min(42vw, 260px)',
@@ -137,8 +137,6 @@ function HeroWithMilestoneRow({
             unlocked={true}
             totalTop100Played={totalTop100Played}
           />
-          {/* Premium glass "Unlocked" pill (B1) */}
-          <UnlockedPill />
         </div>
       </div>
     </motion.div>

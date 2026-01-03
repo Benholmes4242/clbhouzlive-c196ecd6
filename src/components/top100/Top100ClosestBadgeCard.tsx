@@ -112,8 +112,8 @@ export function Top100ClosestBadgeCard({
               </span>
             </p>
 
-            {/* Progress bar */}
-            <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+            {/* Progress bar - increased contrast bg (item 8) */}
+            <div className="mt-3 h-2 rounded-full bg-border/80 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ 
@@ -123,14 +123,14 @@ export function Top100ClosestBadgeCard({
               />
             </div>
 
-            {/* CTA */}
+            {/* CTA - underline on hover (item 8) */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenDetail?.(closest);
               }}
-              className="mt-3 text-xs font-medium hover:underline"
+              className="mt-3 text-xs font-medium underline-offset-2 hover:underline"
               style={{ color: accentColor }}
             >
               See requirements →
