@@ -104,13 +104,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     return Math.min(100, Math.round((progress / range) * 100));
   }, [data?.next_milestone, data?.totalTop100Played]);
 
+  // Stable empty array to avoid new reference each render during loading
+  const EMPTY_ROUNDS: typeof data.year_rounds = [];
+  const yearRounds = data?.year_rounds ?? EMPTY_ROUNDS;
+
   // Derive year summary from year-scoped data (not recent_rounds)
   // MUST be called before any early returns to satisfy React hooks rules
-  const yearSummary = useMemo(() => buildYearSummary(data?.year_rounds ?? []), [data?.year_rounds]);
+  const yearSummary = useMemo(() => buildYearSummary(yearRounds), [yearRounds]);
   
   // Count regions active this year (for Year Summary)
   // MUST be called before any early returns to satisfy React hooks rules
-  const yearRounds = data?.year_rounds ?? [];
   const yearRegionsCount = useMemo(() => {
     const regions = new Set<string>();
     for (const round of yearRounds) {
