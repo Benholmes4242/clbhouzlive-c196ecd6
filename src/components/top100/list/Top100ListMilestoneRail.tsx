@@ -81,9 +81,9 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
   const { isComplete } = getListMilestoneState(playedCount);
 
   return (
-    <section className="mt-4">
-      {/* Header */}
-      <div className="px-4 flex items-center justify-between mb-2.5">
+    <section>
+      {/* Header - Spacing: Header → token rail = 12px (S) */}
+      <div className="px-4 flex items-center justify-between mb-3">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
           Your Milestones
         </h2>
@@ -290,20 +290,6 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         }
       </span>
 
-      {/* NEXT UP label pill - uses regional text color */}
-      {isNextUp && (
-        <span 
-          className="absolute -top-0.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-          style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            border: `1px solid ${theme.ringColor}`,
-            color: theme.ringColor,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-          }}
-        >
-          Next Up
-        </span>
-      )}
     </motion.button>
   );
 

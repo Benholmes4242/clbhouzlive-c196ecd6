@@ -314,6 +314,7 @@ const Top100List = () => {
         )}
 
         {/* 2. Progress Card with next milestone + motivational copy */}
+        {/* Spacing: Progress bar → Next milestone = 16px (M) */}
         {session && (
           <Top100ListProgressCard
             playedCount={playedCount}
@@ -325,6 +326,7 @@ const Top100List = () => {
         )}
 
         {/* 3. Social Leaderboard */}
+        {/* Spacing: Next milestone → Leaderboard = 24px (L) */}
         {session && (
           <div className="mt-6">
             <Top100ListLeaderboard
@@ -337,8 +339,9 @@ const Top100List = () => {
         )}
 
         {/* 4. Milestones - horizontal rail with regional theming */}
+        {/* Spacing: Leaderboard → Milestones = 32px (XL) */}
         {session && (
-          <div className="mt-6">
+          <div className="mt-8">
             <Top100ListMilestoneRail playedCount={playedCount} listSlug={slug} />
           </div>
         )}
@@ -347,9 +350,10 @@ const Top100List = () => {
         <div ref={listTopRef} />
 
         {/* 5. Filter Chips (sticky) - with scroll-to-top inside when sticky */}
+        {/* Spacing: Token rail → Filter = 16px (M) */}
         <div 
           ref={filterRef} 
-          className={`mt-6 ${isFilterSticky ? 'sticky top-0 z-10' : ''}`}
+          className={`mt-4 ${isFilterSticky ? 'sticky top-0 z-10' : ''}`}
         >
           <Top100ListFilterChips
             activeFilter={filterChip}
@@ -377,6 +381,8 @@ const Top100List = () => {
         </div>
 
         {/* 6. Course List with Journey Insights */}
+        {/* Spacing: Filter → Divider = 24px (L), Divider → List = 16px (M) */}
+        {/* Combined: Filter → List = 16px (M) since no explicit divider component */}
         <section className="mt-4 pb-6 space-y-3">
           {displayedCourses.map((course, index) => {
             // Insert insight card every N courses
