@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { Calendar, ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,8 @@ interface Round {
 }
 
 interface Top100ProgressTimelineProps {
-  rounds: Round[];
+  rounds: Round[];           // Year-scoped rounds (already filtered to the selected year)
+  year?: number;             // The year being displayed (defaults to current year)
   onViewAll?: () => void;
 }
 
@@ -28,18 +29,20 @@ interface MonthData {
 
 export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
   rounds,
+  year,
   onViewAll,
 }) => {
   const navigate = useNavigate();
   const [selectedMonth, setSelectedMonth] = useState<MonthData | null>(null);
 
-  // Build last 12 months data
+  const displayYear = year ?? new Date().getFullYear();
+
+  // Build all 12 months for the selected year
   const monthsData = useMemo(() => {
-    const now = new Date();
     const months: MonthData[] = [];
 
-    for (let i = 11; i >= 0; i--) {
-      const monthDate = subMonths(now, i);
+    for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      const monthDate = new Date(displayYear, monthIndex, 1);
       const monthStart = startOfMonth(monthDate);
       const monthEnd = endOfMonth(monthDate);
 
@@ -64,7 +67,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
     }
 
     return months;
-  }, [rounds]);
+  }, [rounds, displayYear]);
 
   const maxCount = Math.max(...monthsData.map((m) => m.count), 1);
   const totalThisYear = monthsData.reduce((sum, m) => sum + m.count, 0);
@@ -83,11 +86,11 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
     <>
       {/* Section rendered directly on page background - no card */}
       <section className="px-2.5">
-        {/* Header */}
+        {/* Header - dynamic year label */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold text-foreground">2026 Progress</h3>
+            <h3 className="text-sm font-semibold text-foreground">{displayYear} Progress</h3>
           </div>
           <span className="text-xs text-muted-foreground">
             {totalThisYear} course{totalThisYear !== 1 ? 's' : ''} logged

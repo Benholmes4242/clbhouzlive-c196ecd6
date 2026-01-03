@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -176,8 +176,19 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
   }
 
-  // Derive year summary
-  const yearSummary = buildYearSummary(data.recent_rounds);
+  // Derive year summary from year-scoped data (not recent_rounds)
+  const yearSummary = buildYearSummary(data.year_rounds ?? []);
+  
+  // Count regions active this year (for Year Summary)
+  const yearRegionsCount = useMemo(() => {
+    const regions = new Set<string>();
+    for (const round of (data.year_rounds ?? [])) {
+      for (const slug of round.list_slugs) {
+        regions.add(slug);
+      }
+    }
+    return regions.size;
+  }, [data.year_rounds]);
 
   // Build completed lists stats
   const statsByList: Partial<Record<Top100ListId, { playedCount: number; totalCount: number }>> = {};
@@ -211,27 +222,28 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-      {/* 1.2 Supporting Stats Row with icons (A4) */}
+      {/* 1.2 Supporting Stats Row with icons (A4) - use year-scoped regions count */}
       <div className="mb-5">
-        <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
+        <Top100YearSummary summary={yearSummary} regionsCount={yearRegionsCount} />
       </div>
 
       {/* ============================================
           SECTION 1.5: PROGRESS TIMELINE & STREAK (H, I)
           ============================================ */}
       
-      {/* H) Progress Timeline - 12 month view */}
+      {/* H) Progress Timeline - year-scoped data */}
       <div className="mb-5">
         <Top100ProgressTimeline
-          rounds={data.recent_rounds}
+          rounds={data.year_rounds ?? []}
+          year={new Date().getFullYear()}
           onViewAll={() => navigate('/rounds?filter=top100')}
         />
       </div>
 
-      {/* I) Logging Streak Module */}
+      {/* I) Logging Streak Module - uses all_rounds_for_streak (last 18 months) */}
       <div className="mb-5">
         <Top100LoggingStreak
-          rounds={data.recent_rounds}
+          rounds={data.all_rounds_for_streak ?? data.recent_rounds}
           onLogRound={() => navigate('/courses?action=log')}
         />
       </div>

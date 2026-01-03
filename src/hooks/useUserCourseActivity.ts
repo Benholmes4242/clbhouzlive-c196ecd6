@@ -5,7 +5,8 @@ export interface UserCourseActivity {
   user_id: string;
   course_id: string;
   first_activity_at?: string;
-  last_activity_at?: string;
+  played_at?: string;  // Canonical "when played" timestamp: COALESCE(review_date, created_at)
+  edited_at?: string;  // When the rating was last edited (for admin/debug only)
   rating_value?: number;
   has_review: boolean;
   has_rating: boolean;
@@ -23,12 +24,12 @@ export function useUserCourseActivity(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return [];
 
-      // Fetch user's course activity
+      // Fetch user's course activity - now using played_at (canonical timestamp)
       const { data: activityData, error: activityError } = await supabase
         .from('user_course_activity' as any)
-        .select('user_id, course_id, first_activity_at, last_activity_at, rating_value, has_review, has_rating, has_played')
+        .select('user_id, course_id, first_activity_at, played_at, edited_at, rating_value, has_review, has_rating, has_played')
         .eq('user_id', userId)
-        .order('last_activity_at', { ascending: false, nullsFirst: false });
+        .order('played_at', { ascending: false, nullsFirst: false });
 
       if (activityError) throw activityError;
 
@@ -48,14 +49,15 @@ export function useUserCourseActivity(userId: string | undefined) {
         user_id: a.user_id,
         course_id: a.course_id,
         first_activity_at: a.first_activity_at,
-        last_activity_at: a.last_activity_at,
+        played_at: a.played_at,
+        edited_at: a.edited_at,
         rating_value: a.rating_value,
         has_review: a.has_review,
         has_rating: a.has_rating,
         has_played: a.has_played,
-        // Compatibility aliases
+        // Compatibility aliases - now use played_at as canonical
         first_played_at: a.first_activity_at,
-        last_played_at: a.last_activity_at,
+        last_played_at: a.played_at,
         is_top100: top100Set.has(a.course_id),
       })) as UserCourseActivity[];
     },

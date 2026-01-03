@@ -20,7 +20,7 @@ export type Top100RecentRound = {
   country: string | null;
   sub_country: string | null;
   list_slugs: string[];
-  played_at: string;
+  played_at: string;  // Canonical: COALESCE(review_date, created_at)
   rating: number | null;
   image_url?: string | null;
   global_rank: number | null;
@@ -39,13 +39,15 @@ export type Top100NextMilestone = {
 export type Top100ProgressResponse = {
   total_played_top100: number;
   total_top100_rated?: number;
-  totalTop100Played: number; // NEW: canonical field
+  totalTop100Played: number;
   regions_count: number;
   lists: Top100ListProgress[];
-  recent_rounds: Top100RecentRound[];
+  recent_rounds: Top100RecentRound[];        // Ordered by played_at DESC, limit 25
+  year_rounds: Top100RecentRound[];          // NEW: All rounds for current calendar year
+  all_rounds_for_streak: Top100RecentRound[]; // NEW: Last 18 months for streak calculation
   next_milestone: Top100NextMilestone | null;
   club_label?: string | null;
-  club_tier_name?: string | null; // NEW: user-facing tier name
+  club_tier_name?: string | null;
   club_ring?: Top100TierId;
 };
 
@@ -63,6 +65,8 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
           regions_count: 0,
           lists: [],
           recent_rounds: [],
+          year_rounds: [],
+          all_rounds_for_streak: [],
           next_milestone: null,
           club_label: null,
           club_tier_name: null,
@@ -81,7 +85,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       // Fetch user's course activity
       const { data: userActivity, error: activityError } = await supabase
-        .from('user_course_activity')
+        .from('user_course_activity' as any)
         .select('course_id')
         .eq('user_id', userId);
 
@@ -148,63 +152,117 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         });
       }
 
-      // Fetch recent rounds - get all activity then filter to Top 100 courses
+      // === FETCH RECENT ROUNDS (limit 25, ordered by played_at DESC) ===
       const { data: recentActivity, error: recentError } = await supabase
         .from('user_course_activity' as any)
-        .select('course_id, last_activity_at, rating_value')
+        .select('course_id, played_at, rating_value')
         .eq('user_id', userId)
-        .order('last_activity_at', { ascending: false, nullsFirst: false })
-        .limit(50); // Get more to filter
+        .order('played_at', { ascending: false, nullsFirst: false })
+        .limit(100); // Get more to filter to Top 100 only
 
       if (recentError) throw recentError;
 
-      // Filter to only Top 100 courses (those that are in playedTop100Courses set)
+      // Filter to only Top 100 courses, limit 25
       const recentTop100Activity = (recentActivity || [])
         .filter((a: any) => playedTop100Courses.has(a.course_id))
-        .slice(0, 10);
+        .slice(0, 25);
 
-      // Fetch course details separately
-      const recentCourseIds = recentTop100Activity.map((a: any) => a.course_id);
-      const { data: recentCourses, error: coursesError } = await supabase
+      // === FETCH YEAR-SCOPED DATA (for timeline/year summary) ===
+      const currentYear = new Date().getFullYear();
+      const yearStart = `${currentYear}-01-01T00:00:00.000Z`;
+      const yearEnd = `${currentYear + 1}-01-01T00:00:00.000Z`;
+
+      const { data: yearActivity, error: yearError } = await supabase
+        .from('user_course_activity' as any)
+        .select('course_id, played_at, rating_value')
+        .eq('user_id', userId)
+        .gte('played_at', yearStart)
+        .lt('played_at', yearEnd)
+        .order('played_at', { ascending: false, nullsFirst: false });
+
+      if (yearError) throw yearError;
+
+      // Filter to Top 100 only for year rounds
+      const yearTop100Activity = (yearActivity || [])
+        .filter((a: any) => playedTop100Courses.has(a.course_id));
+
+      // === FETCH STREAK DATA (last 18 months) ===
+      const eighteenMonthsAgo = new Date();
+      eighteenMonthsAgo.setMonth(eighteenMonthsAgo.getMonth() - 18);
+      const streakStart = eighteenMonthsAgo.toISOString();
+
+      const { data: streakActivity, error: streakError } = await supabase
+        .from('user_course_activity' as any)
+        .select('course_id, played_at, rating_value')
+        .eq('user_id', userId)
+        .gte('played_at', streakStart)
+        .order('played_at', { ascending: false, nullsFirst: false });
+
+      if (streakError) throw streakError;
+
+      // Filter to Top 100 only for streak
+      const streakTop100Activity = (streakActivity || [])
+        .filter((a: any) => playedTop100Courses.has(a.course_id));
+
+      // === FETCH COURSE DETAILS ===
+      // Collect all unique course IDs we need details for
+      const allCourseIds = new Set([
+        ...recentTop100Activity.map((a: any) => a.course_id),
+        ...yearTop100Activity.map((a: any) => a.course_id),
+        ...streakTop100Activity.map((a: any) => a.course_id),
+      ]);
+
+      const { data: allCourses, error: coursesError } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, thumbnail_image')
-        .in('id', recentCourseIds);
+        .in('id', Array.from(allCourseIds));
 
       if (coursesError) throw coursesError;
 
-      const courseMap = new Map((recentCourses || []).map(c => [c.id, c]));
+      const courseMap = new Map((allCourses || []).map(c => [c.id, c]));
 
-      // Build recent rounds with all list memberships and real ranks
-      const recentRounds: Top100RecentRound[] = [];
-      for (const activity of recentTop100Activity as any[]) {
+      // Helper to build round objects
+      const buildRound = (activity: any): Top100RecentRound | null => {
         const course = courseMap.get(activity.course_id);
-        if (!course) continue;
+        if (!course) return null;
         
         const courseMemberships = (memberships || [])
           .filter((m: any) => m.course_id === activity.course_id);
         
         const courseListSlugs = courseMemberships.map((m: any) => m.top100_lists.slug);
         
-        // Extract real ranks from memberships
         const globalMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'global');
         const gbMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'gb-i');
         const usaMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'usa');
         const europeMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'europe');
 
-        recentRounds.push({
+        return {
           course_id: activity.course_id,
           course_name: course.name,
           country: course.country,
           sub_country: course.sub_country,
           list_slugs: courseListSlugs,
-          played_at: activity.last_activity_at || new Date().toISOString(),
+          played_at: activity.played_at || new Date().toISOString(),
           rating: activity.rating_value,
           image_url: course.thumbnail_image ?? null,
           global_rank: globalMembership?.rank ?? null,
           regional_rank: gbMembership?.rank ?? europeMembership?.rank ?? null,
           usa_rank: usaMembership?.rank ?? null,
-        });
-      }
+        };
+      };
+
+      // Build all round arrays
+      const recentRounds = recentTop100Activity
+        .map(buildRound)
+        .filter((r): r is Top100RecentRound => r !== null);
+
+      const yearRounds = yearTop100Activity
+        .map(buildRound)
+        .filter((r): r is Top100RecentRound => r !== null);
+
+      const allRoundsForStreak = streakTop100Activity
+        .map(buildRound)
+        .filter((r): r is Top100RecentRound => r !== null);
 
       // Normalize to canonical field
       const totalTop100Played = playedTop100Courses.size;
@@ -220,6 +278,8 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         regions_count: regionsWithProgress.size,
         lists: listProgress,
         recent_rounds: recentRounds,
+        year_rounds: yearRounds,
+        all_rounds_for_streak: allRoundsForStreak,
         next_milestone: nextClub
           ? {
               threshold: nextClub.threshold,

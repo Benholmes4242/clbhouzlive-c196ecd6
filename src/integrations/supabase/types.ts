@@ -8088,31 +8088,34 @@ export type Database = {
       user_course_activity: {
         Row: {
           course_id: string | null
+          edited_at: string | null
           first_activity_at: string | null
           has_played: boolean | null
           has_rating: boolean | null
           has_review: boolean | null
-          last_activity_at: string | null
+          played_at: string | null
           rating_value: number | null
           user_id: string | null
         }
         Insert: {
           course_id?: string | null
+          edited_at?: string | null
           first_activity_at?: string | null
           has_played?: never
           has_rating?: never
           has_review?: never
-          last_activity_at?: string | null
+          played_at?: never
           rating_value?: number | null
           user_id?: string | null
         }
         Update: {
           course_id?: string | null
+          edited_at?: string | null
           first_activity_at?: string | null
           has_played?: never
           has_rating?: never
           has_review?: never
-          last_activity_at?: string | null
+          played_at?: never
           rating_value?: number | null
           user_id?: string | null
         }
