@@ -76,7 +76,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
 
   const handleLogRound = () => {
     setSelectedMonth(null);
-    navigate('/courses?action=log');
+    navigate('/top100?tab=courses');
   };
 
   return (
