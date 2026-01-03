@@ -1,13 +1,4 @@
-/**
- * LEGACY COMPONENT
- * 
- * This modal uses native <input type="range"> sliders with hard-coded orange (#F5A623).
- * It should be migrated to Radix Slider with the rating-slider-primary/breakdown
- * classes and slate/gold styling in a future phase.
- * 
- * Still actively used by CourseReviews.tsx for editing existing ratings.
- */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -17,9 +8,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface EditRatingModalProps {
   courseId: string;
@@ -266,14 +259,14 @@ const EditRatingModal = ({
             </div>
 
             <div className="space-y-1.5">
-              <input
-                type="range"
+              <Slider
                 min={0.5}
                 max={10}
                 step={0.5}
-                value={displayRating}
-                onChange={(e) => setRating(parseFloat(e.target.value))}
-                className="w-full accent-slate-800 focus:outline-none"
+                value={[displayRating]}
+                onValueChange={(values) => setRating(values[0])}
+                className="w-full rating-slider-primary"
+                data-tier={rating !== null && getScoreTier(rating).tier === 'outstanding' ? 'outstanding' : undefined}
               />
 
               {/* tick labels */}
@@ -289,7 +282,12 @@ const EditRatingModal = ({
 
             {/* selected pill */}
             <div className="mt-2 flex justify-center">
-              <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-3 py-1 text-xs">
+              <span className={cn(
+                "inline-flex items-center rounded-full px-3 py-1 text-xs",
+                rating !== null && getScoreTier(rating).tier === 'outstanding'
+                  ? "bg-[#C9A94A] text-white"
+                  : "bg-slate-900 text-white"
+              )}>
                 {rating !== null ? `Selected: ${rating.toFixed(1)} / 10` : 'No rating selected yet'}
               </span>
             </div>
@@ -345,14 +343,14 @@ const EditRatingModal = ({
                     </span>
                   </div>
 
-                  <input
-                    type="range"
+                  <Slider
                     min={0.5}
                     max={10}
                     step={0.5}
-                    value={displayValue}
-                    onChange={(e) => setScore(parseFloat(e.target.value))}
-                    className="w-full accent-slate-800"
+                    value={[displayValue]}
+                    onValueChange={(values) => setScore(values[0])}
+                    className="w-full rating-slider-breakdown"
+                    data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
                   />
 
                   <div className="flex justify-between text-[11px] text-muted-foreground">

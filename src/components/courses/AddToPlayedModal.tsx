@@ -1,24 +1,21 @@
 /**
- * LEGACY COMPONENT
- * 
- * AddToPlayedModal - RATINGS-ONLY: Renamed to "Rate Course" modal
+ * AddToPlayedModal - RATINGS-ONLY: "Rate Course" modal
  * No longer writes to user_top100_courses - rating IS the played status
- * 
- * Uses native <input type="range"> slider with hard-coded orange (#F5A623).
- * Should be migrated to Radix Slider with rating-slider-primary class
- * and slate/gold styling in a future phase.
+ * Uses Radix Slider with rating-slider-primary class and slate/gold styling.
  */
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface Course {
   id: string;
@@ -166,34 +163,20 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
           <div className="space-y-3">
             <Label className="text-base font-medium">Rating</Label>
             <div className="space-y-2">
-              <div className="relative flex w-full touch-none select-none items-center">
-                <div className="relative h-2 w-full grow overflow-hidden rounded-full" style={{ backgroundColor: '#FFE8D1' }}>
-                  <div 
-                    className="absolute h-full rounded-full transition-all" 
-                    style={{ 
-                      backgroundColor: '#F5A623',
-                      width: `${(rating[0] / 10) * 100}%`
-                    }}
-                  />
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  value={rating[0]}
-                  onChange={(e) => setRating([parseFloat(e.target.value)])}
-                  className="absolute w-full h-2 opacity-0 cursor-pointer"
-                />
-                <div 
-                  className="absolute block h-5 w-5 rounded-full border-2 bg-background transition-colors"
-                  style={{ 
-                    borderColor: '#F5A623',
-                    left: `calc(${(rating[0] / 10) * 100}% - 10px)`
-                  }}
-                />
-              </div>
-              <div className="text-center text-2xl font-bold" style={{ color: '#F5A623' }}>
+              <Slider
+                min={0.5}
+                max={10}
+                step={0.5}
+                value={rating}
+                onValueChange={setRating}
+                className="w-full rating-slider-primary"
+                data-tier={getScoreTier(rating[0]).tier === 'outstanding' ? 'outstanding' : undefined}
+              />
+              <div className={`text-center text-2xl font-bold ${
+                getScoreTier(rating[0]).tier === 'outstanding' 
+                  ? 'text-[#C9A94A]' 
+                  : 'text-slate-800'
+              }`}>
                 {rating[0]}
               </div>
             </div>
