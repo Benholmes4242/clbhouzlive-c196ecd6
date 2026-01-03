@@ -276,8 +276,15 @@ const Top100List = () => {
     // 'official' and 'community' don't filter, only affect sort context
 
     // Step 2: Apply sort using slug→rank mapping
+    // Helper for deterministic tie-breakers: name A→Z, then id
+    const tieBreak = (a: typeof filtered[0], b: typeof filtered[0]): number => {
+      const nameCompare = a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      if (nameCompare !== 0) return nameCompare;
+      return a.id.localeCompare(b.id);
+    };
+
     filtered.sort((a, b) => {
-      // Compute official rank for each course based on slug
+      // Compute official rank for each course based on slug (null → bottom)
       const officialRankA = getOfficialRankForSlug(a, slug) ?? Number.MAX_SAFE_INTEGER;
       const officialRankB = getOfficialRankForSlug(b, slug) ?? Number.MAX_SAFE_INTEGER;
 
@@ -285,48 +292,47 @@ const Top100List = () => {
         case 'rating_high':
           // If Show = Official Rating OR Played/Unplayed: sort by officialRank ASC (1→100, best first)
           if (filterChip === 'official' || filterChip === 'played' || filterChip === 'unplayed') {
-            return officialRankA - officialRankB;
+            if (officialRankA !== officialRankB) return officialRankA - officialRankB;
+            return tieBreak(a, b);
           }
           // Community → use communityRating DESC
           const ratingHighA = a.communityRating ?? 0;
           const ratingHighB = b.communityRating ?? 0;
-          if (ratingHighB !== ratingHighA) {
-            return ratingHighB - ratingHighA;
-          }
-          // Tie-breaker: officialRank ASC
-          return officialRankA - officialRankB;
+          if (ratingHighB !== ratingHighA) return ratingHighB - ratingHighA;
+          if (officialRankA !== officialRankB) return officialRankA - officialRankB;
+          return tieBreak(a, b);
 
         case 'rating_low':
           // If Show = Official Rating: sort by officialRank DESC (100→1, worst first)
           if (filterChip === 'official') {
-            return officialRankB - officialRankA;
+            if (officialRankA !== officialRankB) return officialRankB - officialRankA;
+            return tieBreak(a, b);
           }
           // Community → communityRating ASC
           const ratingLowA = a.communityRating ?? 0;
           const ratingLowB = b.communityRating ?? 0;
-          if (ratingLowA !== ratingLowB) {
-            return ratingLowA - ratingLowB;
-          }
-          // Tie-breaker: officialRank ASC
-          return officialRankA - officialRankB;
+          if (ratingLowA !== ratingLowB) return ratingLowA - ratingLowB;
+          if (officialRankA !== officialRankB) return officialRankA - officialRankB;
+          return tieBreak(a, b);
 
         case 'most_rated':
-          // Sort by reviewCount DESC, tie-breaker: communityRating DESC, then officialRank ASC
-          if (b.reviewCount !== a.reviewCount) {
-            return b.reviewCount - a.reviewCount;
-          }
+          // Sort by reviewCount DESC, tie-breaker: communityRating DESC, then officialRank ASC, then name/id
+          if (b.reviewCount !== a.reviewCount) return b.reviewCount - a.reviewCount;
           const mrRatingA = a.communityRating ?? 0;
           const mrRatingB = b.communityRating ?? 0;
-          if (mrRatingB !== mrRatingA) {
-            return mrRatingB - mrRatingA;
-          }
-          return officialRankA - officialRankB;
+          if (mrRatingB !== mrRatingA) return mrRatingB - mrRatingA;
+          if (officialRankA !== officialRankB) return officialRankA - officialRankB;
+          return tieBreak(a, b);
 
         case 'az':
-          return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+          const azCompare = a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+          if (azCompare !== 0) return azCompare;
+          return a.id.localeCompare(b.id);
 
         case 'za':
-          return b.name.toLowerCase().localeCompare(a.name.toLowerCase());
+          const zaCompare = b.name.toLowerCase().localeCompare(a.name.toLowerCase());
+          if (zaCompare !== 0) return zaCompare;
+          return b.id.localeCompare(a.id);
 
         default:
           return 0;
