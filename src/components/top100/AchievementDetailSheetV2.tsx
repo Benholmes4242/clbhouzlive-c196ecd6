@@ -129,12 +129,13 @@ export function AchievementDetailSheetV2({
               if (info.offset.y > 100) onClose();
             }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[70]",
+              "fixed left-0 right-0 z-[70]",
               "bg-background rounded-t-3xl max-h-[85vh] overflow-hidden",
               "shadow-2xl"
             )}
             style={{
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
+              bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom))',
+              paddingBottom: '16px',
             }}
           >
             {/* Drag handle */}
