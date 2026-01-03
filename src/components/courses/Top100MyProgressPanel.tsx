@@ -10,6 +10,7 @@ import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompleti
 import { Top100ClosestBadgeCard } from '@/components/top100/Top100ClosestBadgeCard';
 import { Top100RecentRoundsCarousel } from '@/components/top100/Top100RecentRoundsCarousel';
 import { AchievementDetailSheetV2 } from '@/components/top100/AchievementDetailSheetV2';
+import { Top100ListCompletionSheet } from '@/components/top100/Top100ListCompletionSheet';
 import {
   Top100ProgressHeroSkeleton,
   Top100YearSummarySkeleton,
@@ -63,6 +64,14 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const [selectedThreshold, setSelectedThreshold] = useState<number | null>(null);
   const [isAchievementSheetOpen, setIsAchievementSheetOpen] = useState(false);
 
+  // Completion sheet state
+  const [completionSheetData, setCompletionSheetData] = useState<{
+    slug: 'global' | 'gb-i' | 'usa' | 'europe';
+    played: number;
+    total: number;
+  } | null>(null);
+  const [isCompletionSheetOpen, setIsCompletionSheetOpen] = useState(false);
+
   // Unified sheet opener - single entry point for all triggers
   const openAchievementSheet = useCallback((threshold: number) => {
     setSelectedThreshold(threshold);
@@ -71,6 +80,20 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   const closeAchievementSheet = useCallback(() => {
     setIsAchievementSheetOpen(false);
+  }, []);
+
+  // Completion sheet handlers
+  const openCompletionSheet = useCallback((slug: string, played: number, total: number) => {
+    setCompletionSheetData({
+      slug: slug as 'global' | 'gb-i' | 'usa' | 'europe',
+      played,
+      total,
+    });
+    setIsCompletionSheetOpen(true);
+  }, []);
+
+  const closeCompletionSheet = useCallback(() => {
+    setIsCompletionSheetOpen(false);
   }, []);
 
   // Milestone tracking - keeping ref update for future use
@@ -298,7 +321,10 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       
       {/* 5.1 Top 100 List Completions */}
       <div className="mb-4">
-        <Top100ListCompletionsRow lists={data.lists} />
+        <Top100ListCompletionsRow 
+          lists={data.lists} 
+          onCardClick={openCompletionSheet}
+        />
       </div>
 
       {/* 5.2 Closest Badge - Merged module (E1) */}
@@ -328,6 +354,15 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         onClose={closeAchievementSheet}
         threshold={selectedThreshold}
         totalTop100Played={data.totalTop100Played}
+      />
+
+      {/* Completion Sheet - region list completions */}
+      <Top100ListCompletionSheet
+        isOpen={isCompletionSheetOpen}
+        onClose={closeCompletionSheet}
+        listSlug={completionSheetData?.slug ?? null}
+        played={completionSheetData?.played ?? 0}
+        total={completionSheetData?.total ?? 100}
       />
 
       {/* Scroll to top FAB */}
