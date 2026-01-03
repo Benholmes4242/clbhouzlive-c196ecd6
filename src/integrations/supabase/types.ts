@@ -2037,9 +2037,12 @@ export type Database = {
           id: string
           media_type: string
           media_url: string
+          owner_user_id: string | null
           poster_url: string | null
           review_id: string
+          status: string
           stream_id: string | null
+          upload_session_id: string | null
         }
         Insert: {
           created_at?: string
@@ -2048,9 +2051,12 @@ export type Database = {
           id?: string
           media_type: string
           media_url: string
+          owner_user_id?: string | null
           poster_url?: string | null
           review_id: string
+          status?: string
           stream_id?: string | null
+          upload_session_id?: string | null
         }
         Update: {
           created_at?: string
@@ -2059,9 +2065,12 @@ export type Database = {
           id?: string
           media_type?: string
           media_url?: string
+          owner_user_id?: string | null
           poster_url?: string | null
           review_id?: string
+          status?: string
           stream_id?: string | null
+          upload_session_id?: string | null
         }
         Relationships: [
           {
