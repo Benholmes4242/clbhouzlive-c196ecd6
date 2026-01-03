@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
-import { Top100FilterSheet } from './Top100FilterSheet';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { ChevronDown, Check } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export type Top100FilterChip = 'official' | 'community' | 'played' | 'unplayed';
 export type Top100SortMode = 'rank' | 'az' | 'za' | 'most_reviewed' | 'highest_rated';
@@ -16,24 +20,24 @@ interface Top100ListFilterChipsProps {
   hasReviewData?: boolean;
 }
 
-const FILTER_LABELS: Record<Top100FilterChip, string> = {
-  official: 'Official',
-  community: 'Community',
-  played: 'Played',
-  unplayed: 'Unplayed',
-};
+const FILTER_OPTIONS: { value: Top100FilterChip; label: string }[] = [
+  { value: 'official', label: 'Official' },
+  { value: 'community', label: 'Community' },
+  { value: 'played', label: 'Played' },
+  { value: 'unplayed', label: 'Unplayed' },
+];
 
-const SORT_LABELS: Record<Top100SortMode, string> = {
-  rank: 'Rank',
-  az: 'A–Z',
-  za: 'Z–A',
-  most_reviewed: 'Most reviewed',
-  highest_rated: 'Highest rated',
-};
+const SORT_OPTIONS: { value: Top100SortMode; label: string; requiresReviewData?: boolean }[] = [
+  { value: 'rank', label: 'Rank' },
+  { value: 'az', label: 'A–Z' },
+  { value: 'za', label: 'Z–A' },
+  { value: 'most_reviewed', label: 'Most reviewed', requiresReviewData: true },
+  { value: 'highest_rated', label: 'Highest rated', requiresReviewData: true },
+];
 
 /**
- * Premium frosted glass filter control with inner chip display.
- * Opens a bottom sheet selector on tap.
+ * Two inline slate dropdowns for filter (Show) and sort (Sort by).
+ * Replaces the previous bottom sheet approach.
  */
 export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeFilter,
@@ -44,87 +48,85 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   isSticky = false,
   hasReviewData = false,
 }) => {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  
-  const currentFilterLabel = FILTER_LABELS[activeFilter];
-  const currentSortLabel = SORT_LABELS[activeSort];
-  const count = counts[activeFilter];
+  const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official';
+  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Rank';
+
+  // Filter sort options based on available data
+  const availableSortOptions = SORT_OPTIONS.filter(
+    opt => !opt.requiresReviewData || hasReviewData
+  );
 
   return (
-    <>
-      <div 
-        className={`px-4 py-3 transition-all ${
-          isSticky 
-            ? 'bg-slate-50/95 backdrop-blur-md border-b border-slate-200/60 shadow-sm' 
-            : 'bg-slate-50 border-b border-slate-200/60'
-        }`}
-      >
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setIsSheetOpen(true)}
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all"
-          style={{
-            background: isSheetOpen 
-              ? 'rgba(255, 255, 255, 0.95)' 
-              : 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            border: isSheetOpen 
-              ? '1px solid rgba(15, 23, 42, 0.15)' 
-              : '1px solid rgba(15, 23, 42, 0.08)',
-            boxShadow: isSheetOpen 
-              ? '0 0 8px 1px hsl(var(--primary) / 0.1), 0 2px 8px rgba(0,0,0,0.06)'
-              : '0 2px 6px rgba(0,0,0,0.04)',
-          }}
-        >
-          {/* Filter icon */}
-          <SlidersHorizontal className="w-4 h-4 text-slate-500" />
-          
-          {/* Label */}
-          <span className="text-sm font-semibold text-slate-700">
-            Filter
-          </span>
-          
-          {/* Active filter chip */}
-          <span 
-            className="text-[12px] font-medium px-2 py-0.5 rounded-md"
-            style={{
-              background: 'rgba(15, 23, 42, 0.06)',
-              color: 'rgb(51, 65, 85)',
-            }}
-          >
-            {currentFilterLabel}
-            {count !== undefined && count > 0 && (
-              <span className="text-slate-400 ml-1">({count})</span>
-            )}
-          </span>
+    <div 
+      className={`px-4 py-3 transition-all ${
+        isSticky 
+          ? 'bg-slate-50/95 backdrop-blur-md border-b border-slate-200/60 shadow-sm' 
+          : 'bg-slate-50 border-b border-slate-200/60'
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        {/* Show dropdown (Filter) */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
+            >
+              <span className="text-slate-500 text-xs">Show:</span>
+              <span>{currentFilterLabel}</span>
+              {counts[activeFilter] !== undefined && counts[activeFilter]! > 0 && (
+                <span className="text-slate-400 text-xs">({counts[activeFilter]})</span>
+              )}
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-[160px] bg-white">
+            {FILTER_OPTIONS.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => onFilterChange(option.value)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  {option.label}
+                  {counts[option.value] !== undefined && counts[option.value]! > 0 && (
+                    <span className="text-slate-400 text-xs">({counts[option.value]})</span>
+                  )}
+                </span>
+                {activeFilter === option.value && (
+                  <Check className="w-4 h-4 text-slate-600" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-          {/* Active sort chip */}
-          <span 
-            className="text-[12px] font-medium px-2 py-0.5 rounded-md"
-            style={{
-              background: 'rgba(15, 23, 42, 0.06)',
-              color: 'rgb(51, 65, 85)',
-            }}
-          >
-            Sort: {currentSortLabel}
-          </span>
-          
-          {/* Chevron */}
-          <ChevronDown className="w-4 h-4 text-slate-400 ml-auto" />
-        </motion.button>
+        {/* Sort by dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
+            >
+              <span className="text-slate-500 text-xs">Sort:</span>
+              <span>{currentSortLabel}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-[160px] bg-white">
+            {availableSortOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => onSortChange(option.value)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <span>{option.label}</span>
+                {activeSort === option.value && (
+                  <Check className="w-4 h-4 text-slate-600" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-
-      <Top100FilterSheet
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        activeFilter={activeFilter}
-        onFilterChange={onFilterChange}
-        activeSort={activeSort}
-        onSortChange={onSortChange}
-        counts={counts}
-        hasReviewData={hasReviewData}
-      />
-    </>
+    </div>
   );
 };
