@@ -36,30 +36,57 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   // Sort friends by played count descending
   const sortedFriends = [...friends].sort((a, b) => b.playedOnList - a.playedOnList);
 
+  // Contextual empty states based on friend/list conditions
   if (friends.length === 0) {
     return (
-      <section className="mt-6">
+      <section className="mt-4">
         <div className="px-4">
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
           </h2>
-          <p className="text-[13px] text-slate-500 mt-1">
-            See how your friends are progressing.
-          </p>
         </div>
-        <div className="mt-3 mx-4 px-4 py-4 rounded-sq-lg bg-slate-50 border border-slate-100">
-          <p className="text-sm font-semibold text-slate-700">
-            No friends on this list yet
+        <div className="mt-3 mx-4 px-4 py-5 rounded-sq-lg bg-slate-50 border border-slate-100 text-center">
+          <p className="text-sm font-semibold text-slate-800">
+            No friends here yet
           </p>
-          <p className="mt-1 text-sm text-slate-500">
-            Follow other golfers to see how they're progressing.
+          <p className="mt-1.5 text-sm text-slate-500 max-w-[240px] mx-auto">
+            Follow golfers to compare progress on this Top 100.
           </p>
           <button
             type="button"
-            className="mt-3 inline-flex items-center justify-center rounded-sq-sm bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+            className="mt-4 inline-flex items-center justify-center rounded-sq-sm bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
             onClick={() => navigate('/golferstofollow')}
           >
             Find golfers to follow
+          </button>
+        </div>
+      </section>
+    );
+  }
+  
+  // Check if all friends have 0 progress - contextual "be the first" state
+  const allFriendsHaveZero = friends.every(f => f.playedOnList === 0);
+  if (allFriendsHaveZero && currentUserPlayed === 0) {
+    return (
+      <section className="mt-4">
+        <div className="px-4">
+          <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+            Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
+          </h2>
+        </div>
+        <div className="mt-3 mx-4 px-4 py-5 rounded-sq-lg bg-slate-50 border border-slate-100 text-center">
+          <p className="text-sm font-semibold text-slate-800">
+            Be the first
+          </p>
+          <p className="mt-1.5 text-sm text-slate-500 max-w-[240px] mx-auto">
+            Start rating courses to set the pace for your friends.
+          </p>
+          <button
+            type="button"
+            className="mt-4 inline-flex items-center justify-center rounded-sq-sm bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+            onClick={() => navigate('/courses')}
+          >
+            Explore courses
           </button>
         </div>
       </section>

@@ -9,5 +9,6 @@ export { Top100ListFilters, type SortMode, type FilterMode } from './Top100ListF
 export { Top100ListFilterChips, type Top100FilterChip } from './Top100ListFilterChips';
 export { Top100ListCourseCard } from './Top100ListCourseCard';
 export { Top100ListProgressHero } from './Top100ListProgressHero';
+export { Top100ListProgressCard } from './Top100ListProgressCard';
 export { JourneyInsightCard, generateJourneyInsights } from './JourneyInsightCard';
 export { FloatingJourneyButton } from './FloatingJourneyButton';

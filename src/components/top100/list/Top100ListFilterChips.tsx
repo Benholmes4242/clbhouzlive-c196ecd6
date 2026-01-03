@@ -57,12 +57,24 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
       className={`py-3 transition-all ${
         isSticky 
           ? 'bg-gradient-to-b from-white via-white to-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm' 
-          : ''
+          : 'bg-background'
       }`}
     >
+      {/* Section label above filters */}
+      {!isSticky && (
+        <div className="px-4 mb-2">
+          <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+            Browse the list
+          </h3>
+        </div>
+      )}
+      
       <div className="flex gap-2 overflow-x-auto pb-1 px-4 scrollbar-hide">
         {chips.map((chip) => {
           const isActive = activeFilter === chip.key;
+          // Official Order is default and should appear filled
+          const isDefault = chip.key === 'official';
+          
           return (
             <motion.button
               key={chip.key}

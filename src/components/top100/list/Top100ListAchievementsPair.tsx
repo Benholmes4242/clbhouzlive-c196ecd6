@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Lock, Share2 } from 'lucide-react';
+import { Trophy, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AchievementData {
@@ -34,7 +34,7 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
   if (!primary && !upcoming) return null;
 
   return (
-    <section className="mt-6">
+    <section className="mt-4">
       <div className="px-4 flex items-center justify-between mb-3">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
           Milestones
@@ -47,28 +47,68 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
         </button>
       </div>
 
-      <div className="px-4 flex gap-3">
-        {/* Primary Achievement (Unlocked) - reduced saturation */}
-        {primary && (
+      {/* Horizontal achievement strip - more compact, achievement-like */}
+      <div className="px-4 flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+        {/* Next milestone (primary focus) - stronger prominence */}
+        {upcoming && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex-1 relative overflow-hidden rounded-sq-md bg-gradient-to-br from-amber-50/80 to-amber-100/40 border border-amber-200/50 p-4"
+            className="flex-shrink-0 min-w-[200px] relative overflow-hidden rounded-sq-md bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 p-3.5 shadow-lg"
+          >
+            {/* Subtle glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none" />
+            
+            <div className="relative">
+              <div className="flex items-center gap-2.5 mb-2">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md ring-2 ring-amber-400/30">
+                  <Trophy className="w-4 h-4 text-white drop-shadow-sm" />
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-amber-400 font-semibold">Next milestone</div>
+                  <div className="text-sm font-semibold text-white">{upcoming.title}</div>
+                </div>
+              </div>
+
+              <div className="text-xs text-slate-400 mb-2">
+                {upcoming.target - upcoming.current} courses to go
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(upcoming.current / upcoming.target) * 100}%` }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Primary Achievement (Unlocked) - secondary visual weight */}
+        {primary && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="flex-shrink-0 min-w-[180px] relative overflow-hidden rounded-sq-md bg-gradient-to-br from-amber-50/80 to-amber-100/40 border border-amber-200/50 p-3.5"
           >
             <div className="relative">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2.5 mb-1.5">
                 <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
                   <Trophy className="w-4 h-4 text-white drop-shadow-sm" />
                 </div>
                 <div>
+                  <div className="text-[10px] text-emerald-600 font-semibold uppercase tracking-wide">Unlocked</div>
                   <div className="text-sm font-semibold text-slate-900">{primary.title}</div>
-                  <div className="text-[10px] text-emerald-600 font-medium">Unlocked</div>
                 </div>
               </div>
 
               {primary.percentOfPlayers && (
-                <div className="text-xs text-slate-600 mb-3">
+                <div className="text-[11px] text-slate-600">
                   Top {primary.percentOfPlayers}% of players
                 </div>
               )}
@@ -77,7 +117,7 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
               {onShareAchievement && (
                 <button
                   onClick={() => onShareAchievement(primary.id)}
-                  className="flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                  className="mt-2 flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-slate-700 transition-colors"
                 >
                   <Share2 className="w-3 h-3" />
                   Share
@@ -85,33 +125,6 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
               )}
             </div>
           </motion.div>
-        )}
-
-        {/* Upcoming Achievement (Locked) */}
-        {upcoming && (
-          <div className="flex-1 rounded-sq-md bg-slate-50 border border-slate-100 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
-                <Lock className="w-4 h-4 text-slate-400" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-slate-700">{upcoming.title}</div>
-                <div className="text-[10px] text-slate-400 font-medium">Locked</div>
-              </div>
-            </div>
-
-            <div className="text-xs text-slate-500">
-              {upcoming.target - upcoming.current} courses to go
-            </div>
-
-            {/* Progress bar */}
-            <div className="mt-2 h-1.5 rounded-full bg-slate-200 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-slate-400 transition-all duration-300"
-                style={{ width: `${(upcoming.current / upcoming.target) * 100}%` }}
-              />
-            </div>
-          </div>
         )}
       </div>
     </section>
