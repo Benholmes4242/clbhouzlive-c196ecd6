@@ -15,13 +15,13 @@ interface Top100ListMilestoneRailProps {
 
 /**
  * Horizontal swipeable milestone rail for Top 100 list pages.
- * Shows all milestones with NEXT UP, UNLOCKED, and LOCKED states.
+ * Frosted glass design with light/white tiles.
  * 
- * Visual states (dark-mode only):
- * - NEXT UP: Strongest glow + subtle pulse animation
- * - UNLOCKED: Moderate glow, static, check icon
- * - LOCKED: No glow, reduced opacity
- * - COMPLETED (100 tile only): Trophy with gold glow
+ * Visual states:
+ * - NEXT UP: Frosted white + subtle brand halo + breathing glow
+ * - UNLOCKED: Frosted white + glass check badge
+ * - LOCKED: Frosted white, muted text, no heavy grey-out
+ * - COMPLETED (100 tile only): Trophy with subtle gold accent
  */
 export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = ({
   playedCount,
@@ -67,37 +67,47 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
     <section className="mt-4">
       {/* Header: YOUR MILESTONES + See all → */}
       <div className="px-4 flex items-center justify-between mb-2.5">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
           Your Milestones
         </h2>
         <button
           onClick={handleTileClick}
-          className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
         >
           See all →
         </button>
       </div>
 
-      {/* Horizontal scrolling rail */}
-      <div 
-        ref={scrollRef}
-        className="flex gap-2.5 px-4 overflow-x-auto scrollbar-hide pb-1"
-        style={{ 
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        {milestones.map((milestone, index) => (
-          <MilestoneTile
-            key={milestone.threshold}
-            ref={milestone.state === 'next_up' ? nextUpRef : undefined}
-            milestone={milestone}
-            isFirst={index === 0}
-            isLast={index === milestones.length - 1}
-            isListComplete={isComplete}
-            onClick={handleTileClick}
-          />
-        ))}
+      {/* Horizontal scrolling rail with fade hint */}
+      <div className="relative">
+        <div 
+          ref={scrollRef}
+          className="flex gap-2.5 px-4 overflow-x-auto scrollbar-hide pb-1"
+          style={{ 
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {milestones.map((milestone, index) => (
+            <MilestoneTile
+              key={milestone.threshold}
+              ref={milestone.state === 'next_up' ? nextUpRef : undefined}
+              milestone={milestone}
+              isFirst={index === 0}
+              isLast={index === milestones.length - 1}
+              isListComplete={isComplete}
+              onClick={handleTileClick}
+            />
+          ))}
+        </div>
+        
+        {/* Right fade gradient to hint more content */}
+        <div 
+          className="absolute right-0 top-0 bottom-1 w-8 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to right, transparent, rgba(248,250,252,0.9))',
+          }}
+        />
       </div>
     </section>
   );
@@ -133,53 +143,68 @@ const MilestoneTile = React.forwardRef<HTMLButtonElement, MilestoneTileProps>(({
   const prefersReducedMotion = typeof window !== 'undefined' 
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  // Dark-mode container classes
-  const containerClasses = `
-    relative flex-shrink-0 w-[88px] h-[80px] rounded-2xl p-2.5 
-    flex flex-col items-center justify-center gap-1
-    transition-all duration-200 cursor-pointer
-    ${isFirst ? 'ml-0' : ''} ${isLast ? 'mr-0' : ''}
-    ${showCompletionHero 
-      ? 'bg-gradient-to-br from-amber-900/40 to-amber-950/60 border border-amber-500/30' 
-      : isNextUp 
-        ? 'bg-gradient-to-br from-slate-700/80 to-slate-800/90 border border-primary/40' 
-        : isUnlocked 
-          ? 'bg-gradient-to-br from-slate-700/50 to-slate-800/60 border border-slate-600/40' 
-          : 'bg-slate-800/40 border border-slate-700/30 opacity-50'
-    }
-  `;
+  // Frosted glass base styles
+  const baseGlassStyles: React.CSSProperties = {
+    background: 'rgba(255, 255, 255, 0.85)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+  };
 
-  // Glow effect - dark mode friendly
-  const glowStyles = showCompletionHero ? {
-    boxShadow: '0 0 20px 3px rgba(245, 158, 11, 0.25), 0 4px 12px rgba(0, 0, 0, 0.3)',
-  } : isNextUp ? {
-    boxShadow: '0 0 20px 4px hsl(var(--primary) / 0.3), 0 4px 12px rgba(0, 0, 0, 0.25)',
-  } : isUnlocked ? {
-    boxShadow: '0 0 10px 2px rgba(148, 163, 184, 0.1)',
-  } : {};
+  // State-specific border and shadow
+  const getBorderAndShadow = (): React.CSSProperties => {
+    if (showCompletionHero) {
+      return {
+        border: '1px solid rgba(245, 158, 11, 0.25)',
+        boxShadow: '0 0 16px 2px rgba(245, 158, 11, 0.15), 0 2px 8px rgba(0,0,0,0.06)',
+      };
+    }
+    if (isNextUp) {
+      return {
+        border: '1px solid rgba(15, 23, 42, 0.14)',
+        boxShadow: '0 0 12px 2px hsl(var(--primary) / 0.12), 0 2px 8px rgba(0,0,0,0.06)',
+      };
+    }
+    if (isUnlocked) {
+      return {
+        border: '1px solid rgba(15, 23, 42, 0.08)',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+      };
+    }
+    // Locked - slightly muted but not dead
+    return {
+      border: '1px solid rgba(15, 23, 42, 0.06)',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+    };
+  };
 
   return (
     <motion.button
       ref={ref}
       whileTap={{ scale: 0.96 }}
       onClick={onClick}
-      className={containerClasses}
+      className={`
+        relative flex-shrink-0 w-[88px] h-[80px] rounded-2xl p-2.5 
+        flex flex-col items-center justify-center gap-1
+        transition-all duration-200 cursor-pointer
+        ${isFirst ? 'ml-0' : ''} ${isLast ? 'mr-0' : ''}
+        ${isLocked ? 'opacity-70' : ''}
+      `}
       style={{ 
         scrollSnapAlign: 'start',
-        ...glowStyles,
+        ...baseGlassStyles,
+        ...getBorderAndShadow(),
       }}
       aria-label={`Milestone ${threshold}: ${isUnlocked ? 'Complete' : isNextUp ? `${toGo} to go` : 'Locked'}`}
     >
-      {/* Pulse animation for next up - respects reduced motion */}
+      {/* Breathing glow for next up - respects reduced motion */}
       {isNextUp && !prefersReducedMotion && (
         <motion.div
-          className="absolute inset-0 rounded-2xl"
+          className="absolute inset-0 rounded-2xl pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, hsl(var(--primary) / 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at center, hsl(var(--primary) / 0.08) 0%, transparent 70%)',
           }}
           animate={{
-            opacity: [0.3, 0.6, 0.3],
-            scale: [1, 1.02, 1],
+            opacity: [0.4, 0.8, 0.4],
           }}
           transition={{
             duration: 3,
@@ -189,16 +214,28 @@ const MilestoneTile = React.forwardRef<HTMLButtonElement, MilestoneTileProps>(({
         />
       )}
 
-      {/* State label - only show on next up tile */}
+      {/* NEXT UP pill label */}
       {isNextUp && (
-        <span className="text-[9px] font-semibold uppercase tracking-wider text-primary">
+        <span 
+          className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+          style={{
+            background: 'hsl(var(--primary) / 0.12)',
+            color: 'hsl(var(--primary))',
+          }}
+        >
           Next Up
         </span>
       )}
       
-      {/* Show label for completed hero */}
+      {/* Completed hero label */}
       {showCompletionHero && (
-        <span className="text-[9px] font-semibold uppercase tracking-wider text-amber-400">
+        <span 
+          className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+          style={{
+            background: 'rgba(245, 158, 11, 0.12)',
+            color: 'rgb(180, 120, 20)',
+          }}
+        >
           Complete
         </span>
       )}
@@ -206,36 +243,43 @@ const MilestoneTile = React.forwardRef<HTMLButtonElement, MilestoneTileProps>(({
       {/* Main number or trophy */}
       <div className="relative">
         {showCompletionHero ? (
-          <Trophy className="w-6 h-6 text-amber-400" />
+          <Trophy className="w-6 h-6" style={{ color: 'rgb(180, 120, 20)' }} />
         ) : (
           <span className={`text-xl font-bold ${
             isNextUp 
-              ? 'text-foreground' 
+              ? 'text-slate-800' 
               : isUnlocked 
-                ? 'text-foreground/90' 
-                : 'text-muted-foreground/60'
+                ? 'text-slate-700' 
+                : 'text-slate-400'
           }`}>
             {threshold}
           </span>
         )}
         
-        {/* Check icon for unlocked (non-100) */}
+        {/* Glass check badge for unlocked (non-100) */}
         {isUnlocked && !showCompletionHero && (
-          <div className="absolute -top-0.5 -right-2 w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center">
-            <Check className="w-2 h-2 text-primary-foreground" strokeWidth={3} />
+          <div 
+            className="absolute -top-1 -right-2.5 w-4 h-4 rounded-full flex items-center justify-center"
+            style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid rgba(15, 23, 42, 0.1)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+            }}
+          >
+            <Check className="w-2.5 h-2.5 text-slate-500" strokeWidth={3} />
           </div>
         )}
       </div>
 
-      {/* Subtext - streamlined */}
+      {/* Subtext */}
       <span className={`text-[10px] font-medium ${
         showCompletionHero
-          ? 'text-amber-400/80'
+          ? 'text-amber-700/80'
           : isNextUp 
-            ? 'text-muted-foreground' 
+            ? 'text-slate-500' 
             : isUnlocked 
-              ? 'text-muted-foreground/80' 
-              : 'text-muted-foreground/40'
+              ? 'text-slate-400' 
+              : 'text-slate-300'
       }`}>
         {isNextUp && toGo !== undefined 
           ? `${toGo} to go` 
