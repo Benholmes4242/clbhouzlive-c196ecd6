@@ -47,6 +47,56 @@ export function Top100YearSummarySkeleton() {
   );
 }
 
+export function Top100TimelineSkeleton() {
+  return (
+    <div className="animate-pulse bg-card border border-border/60 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-muted rounded" />
+          <div className="h-4 w-24 bg-muted rounded" />
+        </div>
+        <div className="h-3 w-20 bg-muted rounded" />
+      </div>
+      <div className="flex items-end gap-1 h-16">
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="flex-1 bg-muted rounded-t"
+            style={{ height: `${Math.random() * 60 + 20}%` }}
+          />
+        ))}
+      </div>
+      <div className="flex gap-1 mt-1.5">
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="flex-1 h-2 bg-muted rounded" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function Top100StreakSkeleton() {
+  return (
+    <div className="animate-pulse bg-card border border-border/60 rounded-xl p-4">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-muted" />
+        <div className="flex-1 space-y-1.5">
+          <div className="h-4 w-28 bg-muted rounded" />
+          <div className="h-3 w-40 bg-muted rounded" />
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-border/40">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex flex-col items-center gap-1 flex-1">
+            <div className="w-6 h-6 rounded-full bg-muted" />
+            <div className="h-2 w-6 bg-muted rounded" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Top100MilestonesCarouselSkeleton() {
   return (
     <div className="mt-6 animate-pulse">
