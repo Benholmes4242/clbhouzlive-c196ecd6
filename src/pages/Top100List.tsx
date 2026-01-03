@@ -25,6 +25,7 @@ import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
+import { scrollToTop } from '@/utils/scrollToTop';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
@@ -394,7 +395,7 @@ const Top100List = () => {
             <div className="flex justify-center py-2">
               <button
                 type="button"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                onClick={scrollToTop}
                 aria-label="Back to top"
                 className="h-8 w-8 rounded-full flex items-center justify-center bg-slate-800/70 backdrop-blur-sm border border-white/10 opacity-60 hover:opacity-100 hover:scale-105 active:scale-95 transition-all duration-150 touch-manipulation"
                 style={{ WebkitTapHighlightColor: 'transparent' }}
