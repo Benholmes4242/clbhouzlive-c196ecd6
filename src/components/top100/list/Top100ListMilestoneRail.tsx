@@ -21,11 +21,13 @@ interface Top100ListMilestoneRailProps {
   onViewAll?: () => void;
 }
 
-// SVG ring dimensions for squircle tokens
+// Token dimensions - squircle shape
 const TOKEN_SIZE = 78;
-const RING_RADIUS = 33;
-const RING_CENTER = TOKEN_SIZE / 2;
-const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+const SQUIRCLE_INSET = 8;
+const SQUIRCLE_SIZE = TOKEN_SIZE - (SQUIRCLE_INSET * 2);
+const SQUIRCLE_RADIUS = 16; // Corner radius for squircle
+// Perimeter approximation for rounded rect (for stroke dash)
+const SQUIRCLE_PERIMETER = (SQUIRCLE_SIZE * 2 + SQUIRCLE_SIZE * 2) - (8 * SQUIRCLE_RADIUS) + (2 * Math.PI * SQUIRCLE_RADIUS);
 
 /**
  * Horizontal swipeable milestone rail with collectible token design.
@@ -99,10 +101,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
         <div 
           ref={scrollRef}
           className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2"
-          style={{ 
-            scrollSnapType: 'x mandatory',
-            WebkitOverflowScrolling: 'touch',
-          }}
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <TooltipProvider delayDuration={200}>
             {milestones.map((milestone) => (
@@ -166,7 +165,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   };
 
   const progress = getProgress();
-  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+  const strokeDashoffset = SQUIRCLE_PERIMETER * (1 - progress);
 
   // Ring styling per state - using regional color for unlocked/next up
   const getRingConfig = () => {
@@ -206,7 +205,6 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       style={{ 
         width: TOKEN_SIZE,
         height: TOKEN_SIZE + 22,
-        scrollSnapAlign: 'start',
       }}
       aria-label={`Milestone ${threshold}: ${isUnlocked ? 'Complete' : isNextUp ? aspirationalCopy : 'Locked'}`}
     >
@@ -215,25 +213,11 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
         className="relative flex items-center justify-center"
         style={{ width: TOKEN_SIZE, height: TOKEN_SIZE }}
       >
-        {/* Frosted glass background (squircle shape) */}
-        <div 
-          className="absolute inset-[7px] rounded-[16px]"
-          style={{
-            background: isLocked 
-              ? 'rgba(255, 255, 255, 0.7)' 
-              : 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            boxShadow: isNextUp 
-              ? '0 2px 12px rgba(0,0,0,0.06)' 
-              : '0 1px 6px rgba(0,0,0,0.04)',
-          }}
-        />
-
         {/* Subtle halo for next up only - uses regional color */}
+
         {isNextUp && !prefersReducedMotion && (
           <motion.div
-            className="absolute inset-0 rounded-full pointer-events-none"
+            className="absolute inset-0 rounded-[18px] pointer-events-none"
             style={{ background: theme.haloGradient }}
             initial={{ opacity: 0.3 }}
             animate={{ opacity: [0.3, 0.55, 0.3] }}
@@ -241,35 +225,40 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
           />
         )}
 
-        {/* SVG Ring */}
+        {/* SVG Squircle Ring */}
         <svg 
           width={TOKEN_SIZE} 
           height={TOKEN_SIZE} 
           className="absolute inset-0"
-          style={{ transform: 'rotate(-90deg)' }}
         >
-          {/* Base ring (structure) */}
-          <circle
-            cx={RING_CENTER}
-            cy={RING_CENTER}
-            r={RING_RADIUS}
+          {/* Base squircle ring (structure) */}
+          <rect
+            x={SQUIRCLE_INSET}
+            y={SQUIRCLE_INSET}
+            width={SQUIRCLE_SIZE}
+            height={SQUIRCLE_SIZE}
+            rx={SQUIRCLE_RADIUS}
+            ry={SQUIRCLE_RADIUS}
             fill="none"
             stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.05)'}
             strokeWidth={isLocked ? 2 : 1}
           />
           
-          {/* Progress/solid ring - uses regional color */}
+          {/* Progress/solid squircle ring - uses regional color */}
           {(isUnlocked || isNextUp || showCompletionHero) && (
-            <motion.circle
-              cx={RING_CENTER}
-              cy={RING_CENTER}
-              r={RING_RADIUS}
+            <motion.rect
+              x={SQUIRCLE_INSET}
+              y={SQUIRCLE_INSET}
+              width={SQUIRCLE_SIZE}
+              height={SQUIRCLE_SIZE}
+              rx={SQUIRCLE_RADIUS}
+              ry={SQUIRCLE_RADIUS}
               fill="none"
               stroke={ringConfig.stroke}
               strokeWidth={ringConfig.strokeWidth}
               strokeLinecap="round"
-              strokeDasharray={CIRCUMFERENCE}
-              initial={isNextUp && !prefersReducedMotion ? { strokeDashoffset: CIRCUMFERENCE } : { strokeDashoffset }}
+              strokeDasharray={SQUIRCLE_PERIMETER}
+              initial={isNextUp && !prefersReducedMotion ? { strokeDashoffset: SQUIRCLE_PERIMETER } : { strokeDashoffset }}
               animate={{ strokeDashoffset }}
               transition={
                 isNextUp && !prefersReducedMotion 
