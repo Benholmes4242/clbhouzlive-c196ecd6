@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { CLUB_STEPS, Top100ClubMeta } from '@/lib/top100Club';
 import { AchievementBadgeSquircle, type SquircleTier } from '@/components/achievements/AchievementBadgeSquircle';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel';
+import { cn } from '@/lib/utils';
 
 // Show all tiers from 5 through 400 in order
 const MILESTONES: Top100ClubMeta[] = CLUB_STEPS;
@@ -66,10 +73,12 @@ interface Top100MilestonesCarouselProps {
 /**
  * Top100MilestonesCarousel - Milestone Achievements (All Lists) section
  * 
- * Features:
- * - Unified AchievementBadgeSquircle components (collector/rarity polish)
- * - Journey rail runs BEHIND squircles, contained within bounds
- * - Current target milestone emphasized with border + halo
+ * Now uses Embla snap carousel (C1) with:
+ * - Horizontal swipe on mobile
+ * - Snap-to-card alignment
+ * - Slight "peek" of next card
+ * - Dot indicators
+ * - Milestone states: unlocked (subtle glow), next (strong glow), locked (readable)
  */
 export function Top100MilestonesCarousel({
   totalPlayed,
@@ -81,9 +90,26 @@ export function Top100MilestonesCarousel({
   // Find next milestone index for current target state
   const nextIndex = MILESTONES.findIndex(m => totalPlayed < m.threshold);
 
-  // Calculate rail positioning - contained within first/last squircle centers
-  // Squircle width is 56px (h-14 w-14), container min-width is 72px
-  const containerHalfWidth = 36; // half of 72px container
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+    setCount(api.scrollSnapList().length);
+  }, [api]);
+
+  React.useEffect(() => {
+    if (!api) return;
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+    api.on('select', onSelect);
+    return () => { api.off('select', onSelect); };
+  }, [api, onSelect]);
+
+  // Calculate rail positioning
+  const containerHalfWidth = 36;
 
   return (
     <section className="space-y-2 mt-6">
@@ -94,73 +120,88 @@ export function Top100MilestonesCarousel({
         Milestone achievements (all lists)
       </p>
 
-      {/* Outer scroller */}
-      <div className="overflow-x-auto pb-1 -mx-1 px-1">
-        {/* Inner column that scrolls together */}
-        <div className="inline-flex flex-col min-w-full">
-          {/* Container for rail + squircles - rail runs BEHIND */}
-          <div className="relative">
-            {/* Progress rail - centered behind squircles, contained within bounds */}
-            {/* Rail sits at visual centerline of squircles (56px / 2 = 28px) */}
-            <div 
-              className="absolute h-[4px] rounded-full pointer-events-none"
-              style={{
-                // Vertically center at squircle midpoint
-                top: '28px',
-                transform: 'translateY(-50%)',
-                // Horizontal containment: center of first to center of last
-                left: `${containerHalfWidth}px`,
-                right: `${containerHalfWidth}px`,
-                background: 'var(--journey-rail-base, rgba(31, 36, 40, 0.06))',
-              }}
-            >
-              {/* Fill portion - visible glow with tier color */}
-              <div 
-                className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
-                style={{
-                  width: `${progressPct}%`,
-                  background: `linear-gradient(90deg, ${targetColor}70, ${targetColor}90)`,
-                  boxShadow: `0 0 12px ${targetColor}50, 0 0 4px ${targetColor}40`,
-                }}
-              />
-            </div>
+      {/* Snap carousel (C1) */}
+      <Carousel
+        setApi={setApi}
+        opts={{
+          align: 'start',
+          loop: false,
+          skipSnaps: false,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-2 px-2.5">
+          {MILESTONES.map((milestone, index) => {
+            const isUnlocked = totalPlayed >= milestone.threshold;
+            const isNext = !isUnlocked && index === nextIndex;
+            const remaining = Math.max(0, milestone.threshold - totalPlayed);
 
-            {/* Row of squircle badges - sits above rail (z-10) */}
-            <div className="flex gap-4 relative z-10">
-              {MILESTONES.map((milestone, index) => {
-                const isUnlocked = totalPlayed >= milestone.threshold;
-                const isNext = !isUnlocked && index === nextIndex;
-                const remaining = Math.max(0, milestone.threshold - totalPlayed);
+            return (
+              <CarouselItem 
+                key={milestone.tierId} 
+                className="pl-2 basis-auto"
+              >
+                <div className="flex flex-col items-center min-w-[80px] gap-1">
+                  {/* Milestone squircle with states (C2) */}
+                  <AchievementBadgeSquircle
+                    tier={String(milestone.threshold) as SquircleTier}
+                    unlocked={isUnlocked}
+                    isCurrentTarget={isNext}
+                    onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
+                  />
 
-                return (
-                  <div
-                    key={milestone.tierId}
-                    className="flex flex-col items-center min-w-[72px] gap-1"
-                  >
-                    {/* Unified AchievementBadgeSquircle with current target state */}
-                    <AchievementBadgeSquircle
-                      tier={String(milestone.threshold) as SquircleTier}
-                      unlocked={isUnlocked}
-                      isCurrentTarget={isNext}
-                      onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
-                    />
-
-                    {/* Labels - consistent two lines */}
-                    <div className="mt-2 text-center">
-                      <p className="text-[11px] font-medium text-foreground whitespace-nowrap">
-                        {milestone.tierName}
-                      </p>
-                      <p className="text-[10px] leading-[1.2] text-muted-foreground py-0.5">
-                        {isUnlocked ? 'Unlocked' : `${remaining} away`}
-                      </p>
-                    </div>
+                  {/* Labels */}
+                  <div className="mt-2 text-center">
+                    <p className={cn(
+                      "text-[11px] font-medium whitespace-nowrap",
+                      isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      {milestone.tierName}
+                    </p>
+                    <p className={cn(
+                      "text-[10px] leading-[1.2] py-0.5",
+                      isUnlocked ? "text-emerald-500" : "text-muted-foreground"
+                    )}>
+                      {isUnlocked ? 'Unlocked' : `${remaining} away`}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                </div>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+      </Carousel>
+
+      {/* Progress line (C3) */}
+      <div className="mx-2.5 mt-4">
+        <div className="h-1 rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ 
+              width: `${progressPct}%`, 
+              backgroundColor: targetColor,
+              boxShadow: `0 0 8px ${targetColor}50`,
+            }}
+          />
         </div>
       </div>
+
+      {/* Dot indicators (optional) */}
+      {count > 4 && (
+        <div className="flex justify-center gap-1 mt-2">
+          {Array.from({ length: Math.min(count, 8) }).map((_, idx) => (
+            <div
+              key={idx}
+              className={cn(
+                'h-1 rounded-full transition-all',
+                idx === current
+                  ? 'w-3 bg-foreground/50'
+                  : 'w-1 bg-foreground/15'
+              )}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

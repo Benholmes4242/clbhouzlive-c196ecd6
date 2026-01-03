@@ -1,20 +1,29 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
 import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
-import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
-import { Top100CompletedListsRow } from '@/components/top100/Top100CompletedListsRow';
 import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
+import { Top100ClosestBadgeCard } from '@/components/top100/Top100ClosestBadgeCard';
+import { Top100RecentRoundsCarousel } from '@/components/top100/Top100RecentRoundsCarousel';
+import { AchievementDetailSheet } from '@/components/top100/AchievementDetailSheet';
+import {
+  Top100ProgressHeroSkeleton,
+  Top100YearSummarySkeleton,
+  Top100MilestonesCarouselSkeleton,
+  Top100RegionProgressSkeleton,
+  Top100RecentRoundsSkeleton,
+  Top100ClosestBadgeSkeleton,
+} from '@/components/top100/Top100ProgressSkeletons';
 import type { Top100ListId } from '@/config/top100ListMilestones';
+import type { Top100Milestone } from '@/config/top100Milestones';
 import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
-import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
+import { Top100RegionProgressGrid } from '@/components/top100/Top100RegionProgressGrid';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 import { buildYearSummary } from '@/lib/top100ProgressSelectors';
@@ -46,7 +55,28 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const isOwnProfile = !userId || userId === session?.user?.id;
   const prevTotalRef = useRef<number | null>(null);
 
-  // Milestone tracking - keeping ref update for future use, toast disabled
+  // Achievement detail sheet state (C5)
+  const [selectedMilestone, setSelectedMilestone] = useState<Top100Milestone | null>(null);
+  const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
+
+  const handleMilestoneClick = useCallback((milestone: any) => {
+    // Convert to Top100Milestone format
+    const asMilestone: Top100Milestone = {
+      id: milestone.tierId,
+      threshold: milestone.threshold,
+      label: milestone.tierName,
+      ringColor: '',
+    };
+    setSelectedMilestone(asMilestone);
+    setIsDetailSheetOpen(true);
+  }, []);
+
+  const handleClosestBadgeDetail = useCallback((milestone: Top100Milestone) => {
+    setSelectedMilestone(milestone);
+    setIsDetailSheetOpen(true);
+  }, []);
+
+  // Milestone tracking - keeping ref update for future use
   useEffect(() => {
     if (!data || !isOwnProfile) return;
     prevTotalRef.current = data.totalTop100Played;
@@ -71,16 +101,22 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     );
   }
 
+  // Skeleton loading state (G2)
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-40 bg-muted rounded-xl" />
-        <div className="h-16 bg-muted rounded-xl" />
-        <div className="grid grid-cols-2 gap-4">
-          <div className="h-24 bg-muted rounded-xl" />
-          <div className="h-24 bg-muted rounded-xl" />
+      <div className="w-full max-w-full pb-8">
+        <Top100ProgressHeroSkeleton />
+        <Top100YearSummarySkeleton />
+        <Top100MilestonesCarouselSkeleton />
+        <div className="mt-6">
+          <Top100RegionProgressSkeleton />
         </div>
-        <div className="h-64 bg-muted rounded-xl" />
+        <div className="mt-6">
+          <Top100ClosestBadgeSkeleton />
+        </div>
+        <div className="mt-6">
+          <Top100RecentRoundsSkeleton />
+        </div>
       </div>
     );
   }
@@ -104,7 +140,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const myCount = data?.totalTop100Played ?? 0;
   const friends = friendsSnapshot?.friends ?? [];
 
-  // Filter to only friends who have played at least 1 Top 100 course, sort by total_top100_played DESC
+  // Filter to only friends who have played at least 1 Top 100 course
   const topFriends = friends
     .filter(f => (f.total_top100_played ?? 0) > 0)
     .sort((a, b) => (b.total_top100_played ?? 0) - (a.total_top100_played ?? 0))
@@ -142,10 +178,9 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     <div className="w-full max-w-full pb-8">
       {/* ============================================
           SECTION 1: PAGE HEADER & HERO CONTEXT
-          "Who you are now"
           ============================================ */}
       
-      {/* 1.1 Hero: User Identity & Total Progress */}
+      {/* 1.1 Hero: User Identity & Total Progress (A2, A3) */}
       <div className="pt-4 pb-6">
         <Top100ProgressHero
           displayName={displayName}
@@ -159,32 +194,40 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-      {/* 1.2 Supporting Stats Row - lighter visual weight */}
-      <div className="mb-6">
-        <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
-      </div>
+      {/* 1.2 Supporting Stats Row with icons (A4) */}
+      <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
 
       {/* ============================================
           SECTION 2: ACHIEVEMENTS (CELEBRATION LAYER)
-          "What you've achieved"
           ============================================ */}
       
-      {/* 2.1 Unlocked Milestone Card */}
+      {/* 2.1 Milestone Achievements - Snap Carousel (C1, C2, C3) */}
       <div className="mb-4">
-        <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
+        <Top100MilestonesCarousel 
+          totalPlayed={data.totalTop100Played} 
+          onMilestoneClick={handleMilestoneClick}
+        />
       </div>
 
-      {/* ============================================
-          SECTION 3: NEXT ACHIEVEMENT PROGRESS
-          "What's next"
-          ============================================ */}
-      
-      {/* 3.1 Progress-to-next-achievement bar - reduced vertical padding, aligned with tiles */}
+      {/* 2.2 Next achievement line - interactive (C4) */}
       {data?.next_milestone && (() => {
         const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
         return (
           <div className="flex justify-center mb-4 mt-2">
-            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const asMilestone: Top100Milestone = {
+                  id: data.next_milestone!.tierId as any,
+                  threshold: data.next_milestone!.threshold,
+                  label: data.next_milestone!.tierName,
+                  ringColor: nextTierColor,
+                };
+                setSelectedMilestone(asMilestone);
+                setIsDetailSheetOpen(true);
+              }}
+              className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-muted/50 transition-colors"
+            >
               <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
                 Next achievement:{' '}
                 <span className="font-semibold">
@@ -201,17 +244,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                   style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
                 />
               </div>
-            </div>
+            </button>
           </div>
         );
       })()}
 
       {/* ============================================
-          SECTION 4: SOCIAL CONTEXT (SECONDARY)
-          "How you compare socially"
+          SECTION 3: SOCIAL CONTEXT (SECONDARY)
           ============================================ */}
       
-      {/* 4.1 Friends Chasing the Top 100 - reduced contrast, expanded by default */}
+      {/* 3.1 Friends Chasing the Top 100 */}
       {isOwnProfile && topFriends.length > 0 && (
         <div className="mb-6 opacity-95">
           <Top100FriendsActivityCard
@@ -223,11 +265,9 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       )}
 
       {/* ============================================
-          SECTION 5: JOURNEY BY REGION
-          "Where your journey has taken you"
+          SECTION 4: JOURNEY BY REGION (D1-D4)
           ============================================ */}
       
-      {/* 5.1 Regional Progress Cards - calmer progress bars */}
       <div className="mb-6">
         <Top100RegionProgressGrid
           lists={data.lists}
@@ -238,37 +278,44 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* ============================================
-          SECTION 6: COMPLETIONS & NEAR COMPLETIONS
-          "What you're close to finishing"
+          SECTION 5: COMPLETIONS & CLOSEST BADGE (E1, E2)
           ============================================ */}
       
-      {/* 6.1 Top 100 List Completions */}
+      {/* 5.1 Top 100 List Completions */}
       <div className="mb-4">
         <Top100ListCompletionsRow lists={data.lists} />
       </div>
 
-      {/* 6.2 Completed Lists Row - show when any list is fully completed */}
-      <div className="mb-4">
-        <Top100CompletedListsRow statsByList={statsByList} />
-      </div>
-
-      {/* 6.3 Badges You're Close To - single badge, clear distance */}
+      {/* 5.2 Closest Badge - Merged module (E1) */}
       <div className="mb-6">
-        <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
+        <Top100ClosestBadgeCard 
+          totalTop100Played={data.totalTop100Played} 
+          onOpenDetail={handleClosestBadgeDetail}
+        />
       </div>
 
       {/* ============================================
-          SECTION 7: RECENT ACTIVITY (MEMORY LAYER)
-          "What you've done recently"
+          SECTION 6: RECENT ACTIVITY (MEMORY LAYER)
           ============================================ */}
       
-      {/* 7.1 Recent Top 100 Rounds - reflection, not action */}
+      {/* 6.1 Recent Top 100 Rounds - Swipe Carousel (F1-F3) */}
       <div className="-mx-4 sm:mx-0">
-        <Top100RecentRoundsFeed
+        <Top100RecentRoundsCarousel
           rounds={data.recent_rounds}
           isOwnProfile={isOwnProfile}
+          onAddRound={() => navigate('/courses?action=log')}
         />
       </div>
+
+      {/* Achievement Detail Sheet (C5) */}
+      <AchievementDetailSheet
+        milestone={selectedMilestone}
+        totalTop100Played={data.totalTop100Played}
+        isOpen={isDetailSheetOpen}
+        onClose={() => setIsDetailSheetOpen(false)}
+        onViewCourses={() => navigate('/top100/global?filter=unplayed')}
+        onViewAllMilestones={() => navigate('/achievements')}
+      />
 
       {/* Scroll to top FAB */}
       <ScrollToTopGlass />
