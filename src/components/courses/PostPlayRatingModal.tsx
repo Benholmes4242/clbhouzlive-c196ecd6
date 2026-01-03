@@ -889,7 +889,7 @@ const PostPlayRatingModal = ({
                   max={10}
                   step={0.1}
                   className="w-full rating-slider-primary"
-                  data-tier={getScoreTier(selectedRating || 5).tier === 'outstanding' ? 'outstanding' : undefined}
+                  data-tier={getScoreTier(selectedRating ?? 0.5).tier === 'outstanding' ? 'outstanding' : undefined}
                 />
               </div>
 
@@ -1033,10 +1033,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveMedia(index)}
-                              className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
+                              className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
                               aria-label="Remove media"
                             >
-                              <span className="text-xl leading-none text-white">✕</span>
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         );
@@ -1076,7 +1076,7 @@ const PostPlayRatingModal = ({
                   disabled={selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS}
                   className="w-44 mt-6 h-11 rounded-xl border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS ? 'Media limit reached' : 'Add Media'}
+                  {selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS ? `${MAX_REVIEW_MEDIA_ITEMS} of ${MAX_REVIEW_MEDIA_ITEMS} added` : 'Add Media'}
                 </Button>
               </div>
             </section>

@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, Upload, ImageIcon, Camera, FolderOpen } from 'lucide-react';
+import { ImagePlus, Trash2, Upload, ImageIcon, Camera, FolderOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Sheet,
@@ -144,9 +144,10 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
         )}
         <button
           onClick={() => onRemoveMedia(selectedMedia.indexOf(file))}
-          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+          className="absolute bottom-1 right-1 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
+          aria-label="Remove media"
         >
-          <X className="w-3 h-3" />
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     );
