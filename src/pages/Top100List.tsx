@@ -256,6 +256,8 @@ const Top100List = () => {
     // Apply filter based on chip
     if (filterChip === 'unplayed') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
+    } else if (filterChip === 'played') {
+      filtered = filtered.filter((c) => playedCourseIds.has(c.id));
     }
 
     // Apply sort
@@ -263,10 +265,9 @@ const Top100List = () => {
       switch (filterChip) {
         case 'official':
           return a.rank - b.rank;
-        case 'highest-rated':
+        case 'community':
           return (b.communityRating || 0) - (a.communityRating || 0);
-        case 'most-played':
-          // Would need play count data - for now keep official order
+        case 'played':
           return a.rank - b.rank;
         case 'unplayed':
           return a.rank - b.rank;
@@ -324,7 +325,8 @@ const Top100List = () => {
     );
   }
 
-  // Calculate unplayed count for filter chip
+  // Calculate played/unplayed counts for filter chips
+  const filterPlayedCount = courses?.filter(c => playedCourseIds.has(c.id)).length || 0;
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
   return (
@@ -386,7 +388,7 @@ const Top100List = () => {
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={setFilterChip}
-            counts={{ unplayed: unplayedCount }}
+            counts={{ played: filterPlayedCount, unplayed: unplayedCount }}
             isSticky={isFilterSticky}
           />
           

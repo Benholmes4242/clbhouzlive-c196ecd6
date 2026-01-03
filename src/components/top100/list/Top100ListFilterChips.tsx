@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export type Top100FilterChip = 'official' | 'highest-rated' | 'most-played' | 'unplayed';
+export type Top100FilterChip = 'official' | 'community' | 'played' | 'unplayed';
 
 interface Top100ListFilterChipsProps {
   activeFilter: Top100FilterChip;
@@ -40,11 +40,16 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
           <TabsTrigger value="official" className={tabTriggerClass}>
             Official
           </TabsTrigger>
-          <TabsTrigger value="highest-rated" className={tabTriggerClass}>
-            Top Rated
+          <TabsTrigger value="community" className={tabTriggerClass}>
+            Community
           </TabsTrigger>
-          <TabsTrigger value="most-played" className={tabTriggerClass}>
-            Popular
+          <TabsTrigger value="played" className={tabTriggerClass}>
+            Played
+            {counts.played !== undefined && counts.played > 0 && (
+              <span className="ml-1 text-[10px] text-muted-foreground">
+                ({counts.played})
+              </span>
+            )}
           </TabsTrigger>
           <TabsTrigger value="unplayed" className={tabTriggerClass}>
             Unplayed
