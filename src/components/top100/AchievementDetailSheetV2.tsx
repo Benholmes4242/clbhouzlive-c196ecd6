@@ -144,12 +144,11 @@ export function AchievementDetailSheetV2({
               if (info.offset.y > 100) onClose();
             }}
             className={cn(
-              "fixed left-0 right-0 z-[130]",
+              "fixed bottom-0 left-0 right-0 z-[130]",
               "bg-background rounded-t-3xl max-h-[85vh] overflow-hidden",
               "shadow-2xl"
             )}
             style={{
-              bottom: 'var(--bottom-nav-height, 64px)',
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
             }}
           >
