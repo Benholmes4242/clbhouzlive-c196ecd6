@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@ta
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
-import { ScrollRestoration } from '@/components/ScrollRestoration';
+// ScrollRestoration removed - we always want pages to open at top, no scroll preservation
 import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
 import AccessGateV2 from "@/components/AccessGateV2";
@@ -626,7 +626,6 @@ const AppInner: React.FC = () => {
                       <HubProvider>
                         <ActiveActorProvider>
                           <ScrollToTop />
-                          <ScrollRestoration />
                           <MediaSystemProvider>
                             <GlobalAudioProvider>
                               {/* RETIRED: VideoManagerProvider + VideoPlaybackManagerProvider removed */}
