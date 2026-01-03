@@ -67,19 +67,20 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
   const currentMonth = format(new Date(), 'MMMM');
 
   return (
-    <div className="bg-card border border-border/60 rounded-xl p-4">
+    // Inline section on page background - no card
+    <section className="px-2.5">
       <div className="flex items-center justify-between">
         {/* Streak display */}
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center',
+              'w-9 h-9 rounded-full flex items-center justify-center',
               currentStreak > 0
-                ? 'bg-orange-500/12 text-orange-500'  // Slightly less saturated bg (item 4)
+                ? 'bg-orange-500/12 text-orange-500'
                 : 'bg-muted text-muted-foreground'
             )}
           >
-            <Flame className="h-5 w-5" />
+            <Flame className="h-4.5 w-4.5" />
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">
@@ -116,7 +117,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
       </div>
 
       {/* Visual month indicators (last 6 months) */}
-      <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-border/40">
+      <div className="flex items-center gap-1.5 mt-3">
         {Array.from({ length: 6 }).map((_, idx) => {
           const monthDate = subMonths(new Date(), 5 - idx);
           const monthStart = startOfMonth(monthDate);
@@ -148,6 +149,6 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           );
         })}
       </div>
-    </div>
+    </section>
   );
 };

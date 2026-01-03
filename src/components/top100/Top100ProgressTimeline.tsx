@@ -81,7 +81,8 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
 
   return (
     <>
-      <div className="bg-card border border-border/60 rounded-xl p-4">
+      {/* Section rendered directly on page background - no card */}
+      <section className="px-2.5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -129,7 +130,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
             </span>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Month detail sheet */}
       <Sheet open={!!selectedMonth} onOpenChange={(open) => !open && setSelectedMonth(null)}>
