@@ -205,14 +205,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* 1.2 Supporting Stats Row with icons (A4) */}
-      <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
+      <div className="mb-5">
+        <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
+      </div>
 
       {/* ============================================
           SECTION 1.5: PROGRESS TIMELINE & STREAK (H, I)
           ============================================ */}
       
       {/* H) Progress Timeline - 12 month view */}
-      <div className="mb-4">
+      <div className="mb-5">
         <Top100ProgressTimeline
           rounds={data.recent_rounds}
           onViewAll={() => navigate('/rounds?filter=top100')}
@@ -220,7 +222,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* I) Logging Streak Module */}
-      <div className="mb-6">
+      <div className="mb-5">
         <Top100LoggingStreak
           rounds={data.recent_rounds}
           onLogRound={() => navigate('/courses?action=log')}
