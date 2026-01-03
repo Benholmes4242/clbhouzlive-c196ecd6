@@ -60,17 +60,18 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   const sortedFriends = [...leaderboardFriends].sort((a, b) => b.playedOnList - a.playedOnList);
 
   // Contextual empty states based on friend/list conditions (only if not mocking)
+  // Spacing: Header → copy = 12px (S), Copy → CTA = 16px (M), Button bottom → next = 24px (L)
   if (leaderboardFriends.length === 0) {
     return (
-      <section className="mt-4 px-4">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+      <section className="px-4">
+        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
-        <div className="mt-3 text-center">
+        <div className="text-center">
           <p className="text-sm font-semibold text-slate-800">
             No friends here yet
           </p>
-          <p className="mt-1.5 text-sm text-slate-500 max-w-[240px] mx-auto">
+          <p className="mt-3 text-sm text-slate-500 max-w-[240px] mx-auto">
             Follow golfers to compare progress on this Top 100.
           </p>
           <Button
@@ -88,15 +89,15 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   const allFriendsHaveZero = friends.every(f => f.playedOnList === 0);
   if (allFriendsHaveZero && currentUserPlayed === 0) {
     return (
-      <section className="mt-4 px-4">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+      <section className="px-4">
+        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
-        <div className="mt-3 text-center">
+        <div className="text-center">
           <p className="text-sm font-semibold text-slate-800">
             Be the first
           </p>
-          <p className="mt-1.5 text-sm text-slate-500 max-w-[240px] mx-auto">
+          <p className="mt-3 text-sm text-slate-500 max-w-[240px] mx-auto">
             Start rating courses to set the pace for your friends.
           </p>
           <Button
@@ -111,8 +112,9 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   }
 
   return (
-    <section className="mt-4">
-      <div className="px-4 flex items-start justify-between">
+    <section>
+      {/* Header - Spacing: Header → content = 12px (S) */}
+      <div className="px-4 flex items-start justify-between mb-3">
         <div>
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
@@ -131,7 +133,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
         )}
       </div>
 
-      <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none mt-2.5 pl-4">
+      <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none pl-4">
         {sortedFriends.slice(0, 10).map((friend, index) => {
           // Calculate relative position
           const diff = friend.playedOnList - currentUserPlayed;
