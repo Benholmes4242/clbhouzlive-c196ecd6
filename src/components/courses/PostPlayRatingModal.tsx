@@ -81,10 +81,11 @@ const PostPlayRatingModal = ({
   const lastPayloadRef = useRef<any>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
-  const [mediaPreviews, setMediaPreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey
+  const [mediaPreviews, setMediaPreviews] = useState<Map<string, string>>(new Map()); // keyed by fileKey (images + video thumbnails)
+  const [videoObjectUrls, setVideoObjectUrls] = useState<Map<string, string>>(new Map()); // keyed by fileKey (video blob URLs for pre-upload preview)
   const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set()); // keyed by fileKey
   const mediaPreviewsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
-  
+  const videoObjectUrlsRef = useRef<Map<string, string>>(new Map()); // ref for cleanup
   // Existing media from database (edit mode)
   const [existingMediaItems, setExistingMediaItems] = useState<ExistingMedia[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
