@@ -104,6 +104,24 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     return Math.min(100, Math.round((progress / range) * 100));
   }, [data?.next_milestone, data?.totalTop100Played]);
 
+  // Derive year summary from year-scoped data (not recent_rounds)
+  // MUST be called before any early returns to satisfy React hooks rules
+  const yearSummary = useMemo(() => buildYearSummary(data?.year_rounds ?? []), [data?.year_rounds]);
+  
+  // Count regions active this year (for Year Summary)
+  // MUST be called before any early returns to satisfy React hooks rules
+  const yearRegionsCount = useMemo(() => {
+    const regions = new Set<string>();
+    for (const round of (data?.year_rounds ?? [])) {
+      for (const slug of round.list_slugs) {
+        regions.add(slug);
+      }
+    }
+    return regions.size;
+  }, [data?.year_rounds]);
+
+  // ===== EARLY RETURNS AFTER ALL HOOKS =====
+  
   if (!effectiveUserId) {
     return (
       <div className="text-center py-12">
@@ -176,19 +194,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
   }
 
-  // Derive year summary from year-scoped data (not recent_rounds)
-  const yearSummary = buildYearSummary(data.year_rounds ?? []);
-  
-  // Count regions active this year (for Year Summary)
-  const yearRegionsCount = useMemo(() => {
-    const regions = new Set<string>();
-    for (const round of (data.year_rounds ?? [])) {
-      for (const slug of round.list_slugs) {
-        regions.add(slug);
-      }
-    }
-    return regions.size;
-  }, [data.year_rounds]);
+  // yearSummary and yearRegionsCount are now computed before early returns (lines ~108-122)
 
   // Build completed lists stats
   const statsByList: Partial<Record<Top100ListId, { playedCount: number; totalCount: number }>> = {};
