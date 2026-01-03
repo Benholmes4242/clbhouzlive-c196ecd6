@@ -110,15 +110,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   
   // Count regions active this year (for Year Summary)
   // MUST be called before any early returns to satisfy React hooks rules
+  const yearRounds = data?.year_rounds ?? [];
   const yearRegionsCount = useMemo(() => {
     const regions = new Set<string>();
-    for (const round of (data?.year_rounds ?? [])) {
-      for (const slug of round.list_slugs) {
+    for (const round of yearRounds) {
+      for (const slug of round.list_slugs ?? []) {
         regions.add(slug);
       }
     }
     return regions.size;
-  }, [data?.year_rounds]);
+  }, [yearRounds]);
 
   // ===== EARLY RETURNS AFTER ALL HOOKS =====
   
