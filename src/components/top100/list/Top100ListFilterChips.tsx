@@ -74,7 +74,6 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
             <button
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
             >
-              <span className="text-slate-500 text-xs">Show:</span>
               <span>{currentFilterLabel}</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
             </button>
@@ -110,7 +109,6 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
             <button
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
             >
-              <span className="text-slate-500 text-xs">Sort:</span>
               <span>{currentSortLabel}</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
             </button>
