@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useTop100ProgressForUser, type Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
@@ -45,7 +45,7 @@ const TIER_COLORS: Record<string, string> = {
 };
 
 // Stable empty array constant - module level to avoid new reference each render
-const EMPTY_ROUNDS: any[] = [];
+const EMPTY_ROUNDS: Top100RecentRound[] = [];
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
