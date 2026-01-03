@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
 import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
@@ -7,6 +8,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
+import { Check } from 'lucide-react';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;
@@ -54,6 +56,16 @@ function CenteredHeroAvatar({
   );
 }
 
+// Premium glass pill for unlocked status (B1)
+function UnlockedPill() {
+  return (
+    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+      <Check className="w-3 h-3 text-emerald-400" />
+      <span className="text-[10px] font-medium text-white/80 tracking-wide">Unlocked</span>
+    </div>
+  );
+}
+
 // Hero row with avatar left, achievement badge card right
 function HeroWithMilestoneRow({ 
   avatarUrl, 
@@ -85,7 +97,6 @@ function HeroWithMilestoneRow({
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       {/* Direct flex row on page background - no container clipping */}
-      {/* Increased gap +8-12px for visual distinction between avatar and card */}
       <div
         className="flex items-center justify-between"
         style={{
@@ -117,6 +128,7 @@ function HeroWithMilestoneRow({
             width: 'min(42vw, 260px)',
             minWidth: '140px',
           }}
+          className="flex flex-col items-center gap-2"
         >
           <AchievementBadgeCard
             tier={achievementTier}
@@ -125,6 +137,8 @@ function HeroWithMilestoneRow({
             unlocked={true}
             totalTop100Played={totalTop100Played}
           />
+          {/* Premium glass "Unlocked" pill (B1) */}
+          <UnlockedPill />
         </div>
       </div>
     </motion.div>
@@ -150,8 +164,9 @@ export function Top100ProgressHero({
   // Map threshold to AchievementTier
   const achievementTier = club.threshold?.toString() as AchievementTier || '5';
   
+  // Human-friendly date format: "1 Feb 2026" (A3)
   const formattedDate = lastRoundAt
-    ? new Date(lastRoundAt).toLocaleDateString()
+    ? format(new Date(lastRoundAt), 'd MMM yyyy')
     : null;
 
   // Calculate nudge if we have list progress data
@@ -192,16 +207,23 @@ export function Top100ProgressHero({
         />
       )}
 
-      {/* Primary summary line */}
-      <p className="text-center text-lg font-semibold text-foreground">
-        {isOwnProfile ? "You've" : `${displayName} has`} played{' '}
-        <span className="font-bold">{totalTop100Played} Top 100 course{totalTop100Played === 1 ? '' : 's'}</span>
+      {/* Primary summary line - DOMINANT number (A2) */}
+      <p className="text-center text-foreground px-4">
+        <span className="text-base font-medium">
+          {isOwnProfile ? "You've played " : `${displayName} has played `}
+        </span>
+        <span className="text-3xl font-bold text-foreground">
+          {totalTop100Played}
+        </span>
+        <span className="text-base font-medium">
+          {' '}Top 100 course{totalTop100Played === 1 ? '' : 's'}
+        </span>
       </p>
 
-      {/* Secondary summary line */}
+      {/* Secondary summary line - human-friendly date (A3) */}
       {formattedDate && (
         <p className="text-sm text-muted-foreground">
-          Last Top 100 round: {formattedDate}
+          Last logged: {formattedDate}
         </p>
       )}
 
