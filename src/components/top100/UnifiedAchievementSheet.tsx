@@ -12,9 +12,11 @@
  * 6. Progress module
  * 7. Primary CTA
  * 8. Secondary CTA
+ * 
+ * Animation triggers ONLY on locked → unlocked transition (single-fire)
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, X, ChevronRight, Check } from 'lucide-react';
@@ -26,6 +28,9 @@ import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhou
 import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAchievementUnlock } from '@/hooks/useAchievementUnlock';
+import { AchievementConfetti, getConfettiTheme } from './AchievementConfetti';
+import { haptic } from '@/utils/haptics';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -100,15 +105,21 @@ interface IconDiscProps {
   regionSlug?: Top100ListSlug;
   color: string;
   isUnlocked: boolean;
+  isAnimating: boolean;
+  animationPhase: number; // 0-5 for animation stages
 }
 
-function IconDisc({ type, regionSlug, color, isUnlocked }: IconDiscProps) {
-  const iconClass = isUnlocked ? 'w-8 h-8' : 'w-8 h-8';
-  const iconColor = isUnlocked ? color : `${color}80`; // Muted version for locked
+function IconDisc({ type, regionSlug, color, isUnlocked, isAnimating, animationPhase }: IconDiscProps) {
+  const iconClass = 'w-8 h-8';
+  
+  // During animation: start muted, transition to filled
+  const showFilled = isUnlocked && (!isAnimating || animationPhase >= 2);
+  const iconColor = showFilled ? color : `${color}80`;
+  const strokeWidth = showFilled ? 2.5 : 1.5;
   
   const getIcon = () => {
     if (type === 'milestone') {
-      return <Trophy className={iconClass} style={{ color: iconColor }} strokeWidth={isUnlocked ? 2.5 : 1.5} />;
+      return <Trophy className={iconClass} style={{ color: iconColor }} strokeWidth={strokeWidth} />;
     }
     
     // Regional icons
@@ -126,17 +137,62 @@ function IconDisc({ type, regionSlug, color, isUnlocked }: IconDiscProps) {
     }
   };
 
+  // Animation: scale from 0.96 → 1 at phase 1
+  const scaleValue = isAnimating && animationPhase < 1 ? 0.96 : 1;
+  const opacityValue = isAnimating && animationPhase < 1 ? 0.7 : 1;
+
   return (
-    <div className="flex justify-center mb-5">
-      <div 
+    <div className="flex justify-center mb-5 relative">
+      {/* Ring stroke animation - draws clockwise at phase 3 */}
+      {isAnimating && animationPhase >= 3 && (
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.1 }}
+        >
+          <svg width="80" height="80" className="absolute">
+            <motion.circle
+              cx="40"
+              cy="40"
+              r="38"
+              fill="none"
+              stroke={color}
+              strokeWidth="2"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              style={{
+                transform: 'rotate(-90deg)',
+                transformOrigin: 'center',
+              }}
+            />
+          </svg>
+        </motion.div>
+      )}
+      
+      <motion.div 
         className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
         style={{
           background: 'rgba(255, 255, 255, 0.85)',
           boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.06), inset 0 -1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08)',
         }}
+        animate={{
+          scale: scaleValue,
+          opacity: opacityValue,
+        }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
       >
-        {getIcon()}
-      </div>
+        <motion.div
+          animate={{
+            scale: isAnimating && animationPhase === 2 ? [1, 1.1, 1] : 1,
+          }}
+          transition={{ duration: 0.15 }}
+        >
+          {getIcon()}
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
@@ -249,6 +305,69 @@ export function UnifiedAchievementSheet({
 }: UnifiedAchievementSheetProps) {
   const navigate = useNavigate();
   const dragControls = useDragControls();
+  
+  // Animation state
+  const [animationPhase, setAnimationPhase] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Derive values early for unlock detection
+  const isMilestone = data?.type === 'milestone';
+  const identifier = isMilestone 
+    ? (data as MilestoneData)?.threshold 
+    : (data as RegionalData)?.listSlug;
+  
+  const played = isMilestone 
+    ? (data as MilestoneData)?.totalPlayed ?? 0
+    : (data as RegionalData)?.played ?? 0;
+  const total = isMilestone 
+    ? (data as MilestoneData)?.threshold ?? 0
+    : (data as RegionalData)?.total ?? 0;
+  const isUnlocked = played >= total && total > 0;
+  
+  // Single-fire unlock detection
+  const unlockState = useAchievementUnlock(
+    isMilestone ? 'milestone' : 'regional',
+    identifier ?? 0,
+    isUnlocked,
+    isOpen
+  );
+  
+  const isAnimating = unlockState.shouldAnimate && !unlockState.hasAnimated;
+
+  // Run animation sequence when unlock detected
+  useEffect(() => {
+    if (!isAnimating) {
+      setAnimationPhase(0);
+      setShowConfetti(false);
+      return;
+    }
+    
+    // Animation timeline: ≈900ms total
+    // Phase 0: 0ms - Sheet opens, icon muted
+    // Phase 1: 120ms - Icon disc scales 0.96 → 1, opacity increases
+    // Phase 2: 240ms - Icon switches to filled, color animates in
+    // Phase 3: 320ms - Ring stroke animates clockwise
+    // Phase 4: 420ms - Status pill transition
+    // Phase 5: 520ms - Progress bar snaps to 100%
+    // Phase 6: 600-900ms - Confetti + haptic
+    
+    const timers: NodeJS.Timeout[] = [];
+    
+    timers.push(setTimeout(() => setAnimationPhase(1), 120));
+    timers.push(setTimeout(() => setAnimationPhase(2), 240));
+    timers.push(setTimeout(() => setAnimationPhase(3), 320));
+    timers.push(setTimeout(() => setAnimationPhase(4), 420));
+    timers.push(setTimeout(() => setAnimationPhase(5), 520));
+    timers.push(setTimeout(() => {
+      setShowConfetti(true);
+      haptic('medium'); // Success haptic at icon fill moment
+      unlockState.markAnimated();
+    }, 600));
+    
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [isAnimating, unlockState]);
 
   // Prevent underlying page scroll
   useEffect(() => {
@@ -263,12 +382,8 @@ export function UnifiedAchievementSheet({
   if (!data) return null;
 
   // Derive all display values based on type
-  const isMilestone = data.type === 'milestone';
-  
   let title: string;
   let purposeSentence: string;
-  let played: number;
-  let total: number;
   let color: string;
   let regionSlug: Top100ListSlug | undefined;
   let primaryCtaLabel: string;
@@ -280,11 +395,8 @@ export function UnifiedAchievementSheet({
     const { threshold, totalPlayed } = data as MilestoneData;
     title = getMilestoneName(threshold);
     purposeSentence = `Awarded for playing ${threshold} Top 100 courses worldwide`;
-    played = totalPlayed;
-    total = threshold;
     color = totalPlayed >= threshold ? getMilestoneColor(threshold) : MILESTONE_LOCKED_COLOR;
     
-    const isUnlocked = totalPlayed >= threshold;
     primaryCtaLabel = isUnlocked ? 'View all achievements' : 'View unplayed Top 100 courses';
     primaryCtaAction = isUnlocked 
       ? () => { navigate('/achievements'); onClose(); }
@@ -297,8 +409,6 @@ export function UnifiedAchievementSheet({
     const theme = getRegionTheme(listSlug);
     title = theme.primaryLabel;
     purposeSentence = `Complete the ${theme.shortName} Top 100 to earn this badge`;
-    played = p;
-    total = t;
     color = REGION_COLORS[listSlug];
     
     const isComplete = p >= t && t > 0;
@@ -310,13 +420,20 @@ export function UnifiedAchievementSheet({
       : () => { navigate(`/top100/${listSlug}?filter=unplayed`); onClose(); };
   }
 
-  const isUnlocked = played >= total && total > 0;
   const remaining = Math.max(0, total - played);
+  const confettiTheme = getConfettiTheme(isMilestone ? 'milestone' : 'regional', regionSlug);
 
   const content = (
     <AnimatePresence>
       {isOpen && (
         <>
+          {/* Confetti overlay */}
+          <AchievementConfetti 
+            isActive={showConfetti} 
+            theme={confettiTheme}
+            onComplete={() => setShowConfetti(false)}
+          />
+          
           {/* Backdrop - consistent dim level */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -375,6 +492,8 @@ export function UnifiedAchievementSheet({
                 regionSlug={regionSlug}
                 color={color}
                 isUnlocked={isUnlocked}
+                isAnimating={isAnimating}
+                animationPhase={animationPhase}
               />
 
               {/* 3. Title */}
@@ -387,12 +506,20 @@ export function UnifiedAchievementSheet({
                 {purposeSentence}
               </p>
 
-              {/* 5. Status pill */}
-              <StatusPill 
-                isUnlocked={isUnlocked}
-                remaining={remaining}
-                color={color}
-              />
+              {/* 5. Status pill - animate at phase 4 */}
+              <motion.div
+                animate={isAnimating && animationPhase >= 4 ? {
+                  opacity: [0.5, 1],
+                  scale: [0.95, 1],
+                } : {}}
+                transition={{ duration: 0.15 }}
+              >
+                <StatusPill 
+                  isUnlocked={isUnlocked}
+                  remaining={remaining}
+                  color={color}
+                />
+              </motion.div>
 
               {/* 6. Progress module */}
               <ProgressModule
