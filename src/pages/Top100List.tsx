@@ -19,6 +19,28 @@ import {
   type Top100FilterChip,
 } from '@/components/top100/list';
 import type { Top100SortMode } from '@/components/top100/list/Top100ListFilterChips';
+
+/**
+ * Canonical slug → rank field mapping (LOCKED).
+ * Returns the official rank value for a course based on the list slug.
+ */
+const getOfficialRankForSlug = (
+  course: { global_rank?: number | null; regional_rank?: number | null; usa_rank?: number | null },
+  slug: string | undefined
+): number | null => {
+  switch (slug) {
+    case 'global':
+      return course.global_rank ?? null;
+    case 'usa':
+      return course.usa_rank ?? null;
+    case 'gb-i':
+    case 'europe':
+      // Country filtering already handled upstream in list query
+      return course.regional_rank ?? null;
+    default:
+      return course.global_rank ?? null;
+  }
+};
 import { Top100HeroShell } from '@/components/top100/Top100HeroShell';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
@@ -50,7 +72,7 @@ const Top100List = () => {
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
-  const [sortMode, setSortMode] = useState<Top100SortMode>('rank');
+  const [sortMode, setSortMode] = useState<Top100SortMode>('rating_high');
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
   const [isFilterSticky, setIsFilterSticky] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -237,50 +259,67 @@ const Top100List = () => {
 
     let filtered = [...courses];
 
-    // Step 1: Apply filter based on chip
+    // Step 1: Apply played/unplayed subset filter first
     if (filterChip === 'unplayed') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     } else if (filterChip === 'played') {
       filtered = filtered.filter((c) => playedCourseIds.has(c.id));
     }
-    // 'official' and 'community' don't filter, only affect default sort meaning
+    // 'official' and 'community' don't filter, only affect sort context
 
-    // Step 2: Apply sort
+    // Step 2: Apply sort using slug→rank mapping
     filtered.sort((a, b) => {
+      // Compute official rank for each course based on slug
+      const officialRankA = getOfficialRankForSlug(a, slug) ?? Number.MAX_SAFE_INTEGER;
+      const officialRankB = getOfficialRankForSlug(b, slug) ?? Number.MAX_SAFE_INTEGER;
+
       switch (sortMode) {
-        case 'rank':
-          // Rank meaning depends on filter
-          if (filterChip === 'community') {
-            // Sort by community rating descending
-            return (b.communityRating || 0) - (a.communityRating || 0);
+        case 'rating_high':
+          // If Show = Community Rating OR Played/Unplayed: sort by communityRating DESC
+          // If Show = Official Rank: fallback to officialRank ASC (no official rating metric)
+          if (filterChip === 'official') {
+            return officialRankA - officialRankB;
           }
-          // Official, Played, Unplayed → use official rank
-          return a.rank - b.rank;
+          // Community, Played, Unplayed → use communityRating
+          const ratingHighA = a.communityRating ?? 0;
+          const ratingHighB = b.communityRating ?? 0;
+          if (ratingHighB !== ratingHighA) {
+            return ratingHighB - ratingHighA;
+          }
+          // Tie-breaker: officialRank ASC
+          return officialRankA - officialRankB;
+
+        case 'rating_low':
+          // If Show = Official Rank: fallback to officialRank ASC
+          if (filterChip === 'official') {
+            return officialRankA - officialRankB;
+          }
+          // Community, Played, Unplayed → communityRating ASC
+          const ratingLowA = a.communityRating ?? 0;
+          const ratingLowB = b.communityRating ?? 0;
+          if (ratingLowA !== ratingLowB) {
+            return ratingLowA - ratingLowB;
+          }
+          // Tie-breaker: officialRank ASC
+          return officialRankA - officialRankB;
+
+        case 'most_rated':
+          // Sort by reviewCount DESC, tie-breaker: communityRating DESC, then officialRank ASC
+          if (b.reviewCount !== a.reviewCount) {
+            return b.reviewCount - a.reviewCount;
+          }
+          const mrRatingA = a.communityRating ?? 0;
+          const mrRatingB = b.communityRating ?? 0;
+          if (mrRatingB !== mrRatingA) {
+            return mrRatingB - mrRatingA;
+          }
+          return officialRankA - officialRankB;
 
         case 'az':
-          return a.name.localeCompare(b.name);
+          return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
 
         case 'za':
-          return b.name.localeCompare(a.name);
-
-        case 'most_reviewed':
-          // Primary: review count desc, Tie-breaker: rank asc
-          if (b.reviewCount !== a.reviewCount) {
-            return b.reviewCount - a.reviewCount;
-          }
-          return a.rank - b.rank;
-
-        case 'highest_rated':
-          // Primary: avg rating desc, Tie-breaker: review count desc, then rank
-          const ratingA = a.communityRating || 0;
-          const ratingB = b.communityRating || 0;
-          if (ratingB !== ratingA) {
-            return ratingB - ratingA;
-          }
-          if (b.reviewCount !== a.reviewCount) {
-            return b.reviewCount - a.reviewCount;
-          }
-          return a.rank - b.rank;
+          return b.name.toLowerCase().localeCompare(a.name.toLowerCase());
 
         default:
           return 0;
@@ -288,7 +327,7 @@ const Top100List = () => {
     });
 
     return filtered;
-  }, [courses, filterChip, sortMode, playedCourseIds]);
+  }, [courses, filterChip, sortMode, playedCourseIds, slug]);
 
   // Load-more calculations (Explore pattern: accumulate items)
   const totalFiltered = filteredAndSortedCourses.length;
@@ -456,6 +495,7 @@ const Top100List = () => {
                     subCountry: course.sub_country,
                     played: playedCourseIds.has(course.id),
                     communityRating: course.communityRating,
+                    reviewCount: course.reviewCount,
                     globalRank: course.global_rank,
                     regionalRank: course.regional_rank,
                     usaRank: course.usa_rank,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export type Top100FilterChip = 'official' | 'community' | 'played' | 'unplayed';
-export type Top100SortMode = 'rank' | 'az' | 'za' | 'most_reviewed' | 'highest_rated';
+export type Top100SortMode = 'rating_high' | 'rating_low' | 'most_rated' | 'az' | 'za';
 
 interface Top100ListFilterChipsProps {
   activeFilter: Top100FilterChip;
@@ -21,23 +21,23 @@ interface Top100ListFilterChipsProps {
 }
 
 const FILTER_OPTIONS: { value: Top100FilterChip; label: string }[] = [
-  { value: 'official', label: 'Official' },
-  { value: 'community', label: 'Community' },
+  { value: 'official', label: 'Official Rank' },
+  { value: 'community', label: 'Community Rating' },
   { value: 'played', label: 'Played' },
   { value: 'unplayed', label: 'Unplayed' },
 ];
 
 const SORT_OPTIONS: { value: Top100SortMode; label: string; requiresReviewData?: boolean }[] = [
-  { value: 'rank', label: 'Rank' },
-  { value: 'az', label: 'A–Z' },
-  { value: 'za', label: 'Z–A' },
-  { value: 'most_reviewed', label: 'Most reviewed', requiresReviewData: true },
-  { value: 'highest_rated', label: 'Highest rated', requiresReviewData: true },
+  { value: 'rating_high', label: 'Rating: High to Low' },
+  { value: 'rating_low', label: 'Rating: Low to High' },
+  { value: 'most_rated', label: 'Most Rated', requiresReviewData: true },
+  { value: 'az', label: 'A to Z' },
+  { value: 'za', label: 'Z to A' },
 ];
 
 /**
- * Two inline slate dropdowns for filter (Show) and sort (Sort by).
- * Replaces the previous bottom sheet approach.
+ * Two inline Explore-style dropdowns for filter (Show) and sort (Sort).
+ * Active option uses slate highlight background (no checkmarks).
  */
 export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeFilter,
@@ -48,8 +48,8 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   isSticky = false,
   hasReviewData = false,
 }) => {
-  const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official';
-  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Rank';
+  const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official Rank';
+  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Rating: High to Low';
 
   // Filter sort options based on available data
   const availableSortOptions = SORT_OPTIONS.filter(
@@ -73,34 +73,35 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
             >
               <span className="text-slate-500 text-xs">Show:</span>
               <span>{currentFilterLabel}</span>
-              {counts[activeFilter] !== undefined && counts[activeFilter]! > 0 && (
-                <span className="text-slate-400 text-xs">({counts[activeFilter]})</span>
-              )}
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[160px] bg-white">
-            {FILTER_OPTIONS.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => onFilterChange(option.value)}
-                className="flex items-center justify-between cursor-pointer"
-              >
-                <span className="flex items-center gap-2">
-                  {option.label}
-                  {counts[option.value] !== undefined && counts[option.value]! > 0 && (
-                    <span className="text-slate-400 text-xs">({counts[option.value]})</span>
-                  )}
-                </span>
-                {activeFilter === option.value && (
-                  <Check className="w-4 h-4 text-slate-600" />
-                )}
-              </DropdownMenuItem>
-            ))}
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
+            {FILTER_OPTIONS.map((option) => {
+              const isActive = activeFilter === option.value;
+              return (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onFilterChange(option.value)}
+                  className={`cursor-pointer ${
+                    isActive 
+                      ? 'bg-slate-100 text-slate-900 font-medium' 
+                      : 'text-slate-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {option.label}
+                    {counts[option.value] !== undefined && counts[option.value]! > 0 && (
+                      <span className="text-slate-400 text-xs">({counts[option.value]})</span>
+                    )}
+                  </span>
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Sort by dropdown */}
+        {/* Sort dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -111,19 +112,23 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[160px] bg-white">
-            {availableSortOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => onSortChange(option.value)}
-                className="flex items-center justify-between cursor-pointer"
-              >
-                <span>{option.label}</span>
-                {activeSort === option.value && (
-                  <Check className="w-4 h-4 text-slate-600" />
-                )}
-              </DropdownMenuItem>
-            ))}
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
+            {availableSortOptions.map((option) => {
+              const isActive = activeSort === option.value;
+              return (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onSortChange(option.value)}
+                  className={`cursor-pointer ${
+                    isActive 
+                      ? 'bg-slate-100 text-slate-900 font-medium' 
+                      : 'text-slate-700'
+                  }`}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
