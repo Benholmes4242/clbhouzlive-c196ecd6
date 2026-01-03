@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ListOrdered, Users, CheckCircle2, Circle } from 'lucide-react';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
+import { Z } from '@/config/zIndex';
 import type { Top100FilterChip } from './Top100ListFilterChips';
-
 interface FilterOption {
   value: Top100FilterChip;
   label: string;
@@ -72,7 +72,8 @@ export const Top100FilterSheet: React.FC<Top100FilterSheetProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[10000]"
+        className="fixed inset-0"
+        style={{ zIndex: Z.sheetBackdrop }}
         onClick={onClose}
       >
         {/* Backdrop */}
