@@ -85,33 +85,37 @@ export function UnifiedPagination({
     : 'justify-between';
 
   return (
-    <div className="flex flex-col items-center gap-2 mt-4 mb-6">
+    <div className="flex flex-col items-center gap-2 pt-4">
       {/* Pagination Buttons */}
       {(hasPrevPage || hasNextPage) && (
         <div className={`flex items-center gap-3 w-full ${layoutClass}`}>
           {hasPrevPage && (
             <Button
-              variant="secondary"
+              variant="outline"
+              size="sm"
               onClick={handlePrev}
               disabled={disabled}
+              className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
             >
               Previous {pageSize} {itemLabel}
             </Button>
           )}
           {hasNextPage && (
             <Button
-              variant="secondary"
+              variant="outline"
+              size="sm"
               onClick={handleNext}
               disabled={disabled}
+              className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
             >
-              Load {Math.min(pageSize, total - endIndex)} more {itemLabel}
+              Next {Math.min(pageSize, total - endIndex)} {itemLabel}
             </Button>
           )}
         </div>
       )}
       
-      {/* Status Text - 8px gap from buttons */}
-      <p className="text-xs text-muted-foreground">
+      {/* Status Text - matches Explore page exactly */}
+      <p className="text-[11px] text-muted-foreground">
         {usePageFormat ? (
           <>Page {currentPage} of {totalPages}</>
         ) : (

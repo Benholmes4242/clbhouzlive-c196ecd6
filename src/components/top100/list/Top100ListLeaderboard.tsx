@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // Dev-only mock flag - disable after UI polish
 const MOCK_TOP100_LEADERBOARD = import.meta.env.VITE_MOCK_TOP100_LEADERBOARD === 'true';
@@ -74,13 +75,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <p className="mt-1.5 text-sm text-slate-500 max-w-[240px] mx-auto">
             Follow golfers to compare progress on this Top 100.
           </p>
-          <button
-            type="button"
-            className="mt-4 inline-flex items-center justify-center rounded-sq-sm bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+          <Button
             onClick={() => navigate('/golferstofollow')}
+            className="w-full max-w-[280px] h-12 rounded-xl"
           >
             Find golfers to follow
-          </button>
+          </Button>
         </div>
       </section>
     );
@@ -103,13 +103,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <p className="mt-1.5 text-sm text-slate-500 max-w-[240px] mx-auto">
             Start rating courses to set the pace for your friends.
           </p>
-          <button
-            type="button"
-            className="mt-4 inline-flex items-center justify-center rounded-sq-sm bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+          <Button
             onClick={() => navigate('/courses')}
+            className="w-full max-w-[280px] h-12 rounded-xl"
           >
             Explore courses
-          </button>
+          </Button>
         </div>
       </section>
     );

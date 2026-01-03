@@ -83,7 +83,7 @@ const Top100List = () => {
     const handleScroll = () => {
       if (filterRef.current) {
         const rect = filterRef.current.getBoundingClientRect();
-        setIsFilterSticky(rect.top <= 56);
+        setIsFilterSticky(rect.top <= 0);
       }
     };
 
@@ -387,7 +387,7 @@ const Top100List = () => {
         {/* 5. Filter Chips (sticky) - with scroll-to-top inside when sticky */}
         <div 
           ref={filterRef} 
-          className={`mt-6 ${isFilterSticky ? 'sticky top-14 z-10' : ''}`}
+          className={`mt-6 ${isFilterSticky ? 'sticky top-0 z-10' : ''}`}
         >
           <Top100ListFilterChips
             activeFilter={filterChip}
@@ -396,16 +396,17 @@ const Top100List = () => {
             isSticky={isFilterSticky}
           />
           
-          {/* Scroll-to-top arrow positioned below sticky filters */}
+          {/* Scroll-to-top arrow positioned below sticky filters - matching ScrollToTopGlass style */}
           {isFilterSticky && (
-            <div className="flex justify-center py-2 bg-gradient-to-b from-white/95 to-transparent">
+            <div className="flex justify-center py-2">
               <button
                 type="button"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 aria-label="Back to top"
-                className="h-7 w-7 rounded-full flex items-center justify-center bg-slate-100 border border-slate-200 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-all"
+                className="h-8 w-8 rounded-full flex items-center justify-center bg-slate-800/70 backdrop-blur-sm border border-white/10 opacity-60 hover:opacity-100 hover:scale-105 active:scale-95 transition-all duration-150 touch-manipulation"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                 </svg>
               </button>
