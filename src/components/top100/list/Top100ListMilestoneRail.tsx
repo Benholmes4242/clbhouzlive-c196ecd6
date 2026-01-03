@@ -26,7 +26,7 @@ const TOKEN_SIZE = 78; // width
 const TOKEN_HEIGHT = TOKEN_SIZE * 1.05; // SquircleAvatar uses aspectRatio: 1 / 1.05 (allows sub-pixel height)
 const TOKEN_LABEL_HEIGHT = 22;
 const SQUIRCLE_RADIUS = '34%';
-const RING_TRACK_COLOR = 'var(--journey-rail-base)';
+const RING_TRACK_COLOR = 'rgba(15,23,42,0.12)';
 
 /**
  * Horizontal swipeable milestone rail with collectible token design.
@@ -34,7 +34,7 @@ const RING_TRACK_COLOR = 'var(--journey-rail-base)';
  * 
  * Visual states:
  * - UNLOCKED: Solid regional accent ring
- * - NEXT UP: Animated progress arc in regional color + aspirational copy
+ * - NEXT UP: SVG progress arc (track + arc on same path)
  * - LOCKED: Thin neutral grey ring
  * - COMPLETED (100 tile only): Trophy with gold accent
  */
@@ -167,7 +167,16 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   const ringThickness = showCompletionHero ? 4 : isNextUp ? 4 : isUnlocked ? 3 : 2;
   const ringBorderColor = (isUnlocked || showCompletionHero) ? theme.ringColor : RING_TRACK_COLOR;
 
-  const ringContainerStyle: React.CSSProperties = {
+  // For non-NEXT UP states, use CSS border ring
+  const ringContainerStyle: React.CSSProperties = isNextUp ? {
+    width: TOKEN_SIZE,
+    height: TOKEN_HEIGHT,
+    borderRadius: SQUIRCLE_RADIUS,
+    border: 'none', // No CSS border for NEXT UP - SVG handles it
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+    background: 'transparent',
+  } : {
     width: TOKEN_SIZE,
     height: TOKEN_HEIGHT,
     borderRadius: SQUIRCLE_RADIUS,
@@ -188,6 +197,13 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
     : isUnlocked
       ? `Milestone achieved — ${threshold} courses played.`
       : `Unlocks at ${threshold} courses played.`;
+
+  // SVG ring dimensions for NEXT UP
+  const svgSize = 36;
+  const svgCenter = svgSize / 2;
+  const svgRadius = 15;
+  const svgStrokeWidth = 3;
+  const circumference = 2 * Math.PI * svgRadius;
 
   const tokenButton = (
     <motion.button
@@ -217,40 +233,53 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
           />
         )}
 
-        {/* Ring container - matches SquircleAvatar geometry */}
+        {/* Ring container */}
         <div className="relative z-10" style={ringContainerStyle}>
-          {/* NEXT UP progress arc overlay (only paints the ring area) */}
+          {/* NEXT UP: SVG ring with track + progress arc on same path */}
           {isNextUp && (
-            prefersReducedMotion ? (
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  borderRadius: SQUIRCLE_RADIUS,
-                  padding: ringThickness,
-                  boxSizing: 'border-box',
-                  background: `conic-gradient(from -90deg, ${theme.ringColor} 0 calc(${progress} * 1turn), transparent 0)`,
-                  WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
-                  ['WebkitMaskComposite' as any]: 'xor',
-                  maskComposite: 'exclude',
-                } as any}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              viewBox={`0 0 ${svgSize} ${svgSize}`}
+              fill="none"
+              style={{ transform: 'rotate(-90deg)' }}
+            >
+              {/* Track circle (grey, full 360°) */}
+              <circle
+                cx={svgCenter}
+                cy={svgCenter}
+                r={svgRadius}
+                stroke={RING_TRACK_COLOR}
+                strokeWidth={svgStrokeWidth}
+                fill="none"
+                strokeLinecap="round"
               />
-            ) : (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                initial={{ ['--p' as any]: 0 }}
-                animate={{ ['--p' as any]: progress }}
-                transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-                style={{
-                  borderRadius: SQUIRCLE_RADIUS,
-                  padding: ringThickness,
-                  boxSizing: 'border-box',
-                  background: `conic-gradient(from -90deg, ${theme.ringColor} 0 calc(var(--p) * 1turn), transparent 0)`,
-                  WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
-                  ['WebkitMaskComposite' as any]: 'xor',
-                  maskComposite: 'exclude',
-                } as any}
-              />
-            )
+              {/* Progress arc (same geometry, overlays track) */}
+              {prefersReducedMotion ? (
+                <circle
+                  cx={svgCenter}
+                  cy={svgCenter}
+                  r={svgRadius}
+                  stroke={theme.ringColor}
+                  strokeWidth={svgStrokeWidth}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray={`${progress * circumference} ${circumference}`}
+                />
+              ) : (
+                <motion.circle
+                  cx={svgCenter}
+                  cy={svgCenter}
+                  r={svgRadius}
+                  stroke={theme.ringColor}
+                  strokeWidth={svgStrokeWidth}
+                  fill="none"
+                  strokeLinecap="round"
+                  initial={{ strokeDasharray: `0 ${circumference}` }}
+                  animate={{ strokeDasharray: `${progress * circumference} ${circumference}` }}
+                  transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
+                />
+              )}
+            </svg>
           )}
 
           {/* Center content */}
