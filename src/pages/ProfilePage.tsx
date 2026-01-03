@@ -51,14 +51,6 @@ const ProfilePage = () => {
     }
   }, [searchParams, user, navigate]);
 
-  // Sync activeSection with URL tab param when navigating from another page
-  useEffect(() => {
-    const tabFromUrl = searchParams.get('tab') || 'activity';
-    if (tabFromUrl !== activeSection) {
-      setActiveSection(tabFromUrl);
-    }
-  }, [searchParams]);
-
   // Loading state handled by route-level Suspense with ProfileSkeleton
   // Auth check still returns early - wait for both auth and profile to load
   // Also show skeleton during rehydration

@@ -27,14 +27,13 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
   // Handle deep link scroll to all-courses-played section
   useEffect(() => {
     if (location.hash === '#all-courses-played') {
-      // Longer delay to ensure DOM is fully ready after navigation
+      // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
         const element = document.getElementById('all-courses-played');
         if (element) {
-          // Use scrollIntoView with offset to account for any fixed headers
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          element.scrollIntoView({ behavior: 'instant', block: 'start' });
         }
-      }, 300);
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [location.hash]);
