@@ -116,7 +116,7 @@ export function AchievementDetailSheetV2({
             className="fixed inset-0 bg-black/50 z-[120]"
           />
 
-          {/* Sheet - must sit above bottom nav */}
+          {/* Sheet - sit above bottom nav by offsetting by its height */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -129,11 +129,12 @@ export function AchievementDetailSheetV2({
               if (info.offset.y > 100) onClose();
             }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[130]",
+              "fixed left-0 right-0 z-[130]",
               "bg-background rounded-t-3xl max-h-[85vh] overflow-hidden",
               "shadow-2xl"
             )}
             style={{
+              bottom: 'var(--bottom-nav-height, 64px)',
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
             }}
           >
