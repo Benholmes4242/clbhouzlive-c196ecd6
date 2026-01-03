@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
@@ -21,13 +21,43 @@ interface Top100ListMilestoneRailProps {
   onViewAll?: () => void;
 }
 
-// Token dimensions - squircle shape
+// Token dimensions - SDS global squircle shape
 const TOKEN_SIZE = 78;
 const SQUIRCLE_INSET = 8;
-const SQUIRCLE_SIZE = TOKEN_SIZE - (SQUIRCLE_INSET * 2);
-const SQUIRCLE_RADIUS = 16; // Corner radius for squircle
-// Perimeter approximation for rounded rect (for stroke dash)
-const SQUIRCLE_PERIMETER = (SQUIRCLE_SIZE * 2 + SQUIRCLE_SIZE * 2) - (8 * SQUIRCLE_RADIUS) + (2 * Math.PI * SQUIRCLE_RADIUS);
+const SQUIRCLE_SIZE = TOKEN_SIZE - (SQUIRCLE_INSET * 2); // 62px inner squircle
+
+/**
+ * Generate superellipse path (Lamé curve) for iOS-style continuous corners
+ * Matches the global SDS squircle shape (n=5)
+ */
+function superellipsePath(w: number, h: number, n = 5, steps = 160): string {
+  const a = w / 2;
+  const b = h / 2;
+  const m = 2 / n;
+  const pts: [number, number][] = [];
+  
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * Math.PI * 2;
+    const ct = Math.cos(t);
+    const st = Math.sin(t);
+    const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m);
+    const y = Math.sign(st) * b * Math.pow(Math.abs(st), m);
+    pts.push([x + a, y + b]);
+  }
+  
+  return `M ${pts.map(p => p.join(",")).join(" L ")} Z`;
+}
+
+/**
+ * Calculate the approximate perimeter of a superellipse for stroke-dasharray
+ */
+function superellipsePerimeter(w: number, h: number, n = 5): number {
+  // Approximation using Ramanujan-like formula adapted for superellipse
+  const a = w / 2;
+  const b = h / 2;
+  // For n=5 superellipse, perimeter is roughly 3.7 * (a + b)
+  return 3.7 * (a + b);
+}
 
 /**
  * Horizontal swipeable milestone rail with collectible token design.
@@ -158,6 +188,17 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   const prefersReducedMotion = typeof window !== 'undefined' 
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+  // Generate superellipse path for the ring (centered in TOKEN_SIZE)
+  const squirclePath = useMemo(() => {
+    // Create path for inner squircle, offset by SQUIRCLE_INSET
+    const path = superellipsePath(SQUIRCLE_SIZE, SQUIRCLE_SIZE);
+    // Translate path to be centered
+    return path;
+  }, []);
+
+  // Calculate perimeter for stroke animation
+  const squirclePerimeter = useMemo(() => superellipsePerimeter(SQUIRCLE_SIZE, SQUIRCLE_SIZE), []);
+
   // Calculate progress for next up (arc percentage)
   const getProgress = (): number => {
     if (!isNextUp) return isUnlocked ? 1 : 0;
@@ -165,7 +206,7 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
   };
 
   const progress = getProgress();
-  const strokeDashoffset = SQUIRCLE_PERIMETER * (1 - progress);
+  const strokeDashoffset = squirclePerimeter * (1 - progress);
 
   // Ring styling per state - using regional color for unlocked/next up
   const getRingConfig = () => {
@@ -225,49 +266,41 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
           />
         )}
 
-        {/* SVG Squircle Ring */}
+        {/* SVG Squircle Ring - using superellipse path for SDS global squircle */}
         <svg 
           width={TOKEN_SIZE} 
           height={TOKEN_SIZE} 
           className="absolute inset-0"
         >
-          {/* Base squircle ring (structure) */}
-          <rect
-            x={SQUIRCLE_INSET}
-            y={SQUIRCLE_INSET}
-            width={SQUIRCLE_SIZE}
-            height={SQUIRCLE_SIZE}
-            rx={SQUIRCLE_RADIUS}
-            ry={SQUIRCLE_RADIUS}
-            fill="none"
-            stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.05)'}
-            strokeWidth={isLocked ? 2 : 1}
-          />
-          
-          {/* Progress/solid squircle ring - uses regional color */}
-          {(isUnlocked || isNextUp || showCompletionHero) && (
-            <motion.rect
-              x={SQUIRCLE_INSET}
-              y={SQUIRCLE_INSET}
-              width={SQUIRCLE_SIZE}
-              height={SQUIRCLE_SIZE}
-              rx={SQUIRCLE_RADIUS}
-              ry={SQUIRCLE_RADIUS}
+          <g transform={`translate(${SQUIRCLE_INSET}, ${SQUIRCLE_INSET})`}>
+            {/* Base squircle ring (structure) */}
+            <path
+              d={squirclePath}
               fill="none"
-              stroke={ringConfig.stroke}
-              strokeWidth={ringConfig.strokeWidth}
-              strokeLinecap="round"
-              strokeDasharray={SQUIRCLE_PERIMETER}
-              initial={isNextUp && !prefersReducedMotion ? { strokeDashoffset: SQUIRCLE_PERIMETER } : { strokeDashoffset }}
-              animate={{ strokeDashoffset }}
-              transition={
-                isNextUp && !prefersReducedMotion 
-                  ? { duration: 0.8, ease: 'easeOut', delay: 0.2 }
-                  : { duration: 0 }
-              }
-              style={{ opacity: ringConfig.opacity }}
+              stroke={isLocked ? 'rgb(226, 232, 240)' : 'rgba(15, 23, 42, 0.05)'}
+              strokeWidth={isLocked ? 2 : 1}
             />
-          )}
+            
+            {/* Progress/solid squircle ring - uses regional color */}
+            {(isUnlocked || isNextUp || showCompletionHero) && (
+              <motion.path
+                d={squirclePath}
+                fill="none"
+                stroke={ringConfig.stroke}
+                strokeWidth={ringConfig.strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={squirclePerimeter}
+                initial={isNextUp && !prefersReducedMotion ? { strokeDashoffset: squirclePerimeter } : { strokeDashoffset }}
+                animate={{ strokeDashoffset }}
+                transition={
+                  isNextUp && !prefersReducedMotion 
+                    ? { duration: 0.8, ease: 'easeOut', delay: 0.2 }
+                    : { duration: 0 }
+                }
+                style={{ opacity: ringConfig.opacity }}
+              />
+            )}
+          </g>
         </svg>
 
         {/* Center content */}
