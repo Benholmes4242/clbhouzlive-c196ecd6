@@ -85,6 +85,14 @@ const PostPlayRatingModal = ({
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  
+  // Phase 3A: Track Outstanding tier entry for glow animation
+  const [justEnteredOutstanding, setJustEnteredOutstanding] = useState(false);
+  const prevTierRef = useRef<string | null>(null);
+  
+  // Phase 3A: Track Outstanding entry for breakdown sliders
+  const [breakdownOutstandingEntry, setBreakdownOutstandingEntry] = useState<Record<string, boolean>>({});
+  const prevBreakdownTiersRef = useRef<Record<string, string>>({});
 
   // Use passed existingRating or fetch internally as fallback
   const { data: existingRatingFetched } = useQuery({
@@ -877,12 +885,24 @@ const PostPlayRatingModal = ({
                 <Slider
                   value={[selectedRating || 5]}
                   onValueChange={(values) => {
-                    setSelectedRating(values[0]);
+                    const newValue = values[0];
+                    const newTier = getScoreTier(newValue).tier;
+                    const oldTier = prevTierRef.current;
+                    
+                    // Phase 3A: Detect crossing into Outstanding
+                    if (newTier === 'outstanding' && oldTier !== 'outstanding') {
+                      setJustEnteredOutstanding(true);
+                      // Clear after animation completes
+                      setTimeout(() => setJustEnteredOutstanding(false), 600);
+                    }
+                    
+                    prevTierRef.current = newTier;
+                    setSelectedRating(newValue);
                     analyticsEvents.ratings.sliderChanged({
                       courseId: course.id,
                       courseName: course.name,
                       category: "overall",
-                      value: values[0],
+                      value: newValue,
                     });
                   }}
                   min={0.5}
@@ -890,6 +910,7 @@ const PostPlayRatingModal = ({
                   step={0.1}
                   className="w-full rating-slider-primary"
                   data-tier={getScoreTier(selectedRating ?? 0.5).tier === 'outstanding' ? 'outstanding' : undefined}
+                  data-just-entered={justEnteredOutstanding ? 'true' : undefined}
                 />
               </div>
 
@@ -974,14 +995,28 @@ const PostPlayRatingModal = ({
                     <Slider
                       value={[score ?? 5]}
                       onValueChange={(values) => {
+                        const newValue = values[0];
+                        const newTier = getScoreTier(newValue).tier;
+                        const oldTier = prevBreakdownTiersRef.current[key];
+                        
+                        // Phase 3A: Detect crossing into Outstanding
+                        if (newTier === 'outstanding' && oldTier !== 'outstanding') {
+                          setBreakdownOutstandingEntry(prev => ({ ...prev, [key]: true }));
+                          setTimeout(() => {
+                            setBreakdownOutstandingEntry(prev => ({ ...prev, [key]: false }));
+                          }, 600);
+                        }
+                        
+                        prevBreakdownTiersRef.current[key] = newTier;
                         setTouched(true);
-                        setScore(values[0]);
+                        setScore(newValue);
                       }}
                       min={0.5}
                       max={10}
                       step={0.1}
                       className="w-full rating-slider-breakdown"
                       data-tier={score != null && getScoreTier(score).tier === 'outstanding' ? 'outstanding' : undefined}
+                      data-just-entered={breakdownOutstandingEntry[key] ? 'true' : undefined}
                     />
                   </div>
                 </div>
