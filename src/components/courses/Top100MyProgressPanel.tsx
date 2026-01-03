@@ -9,8 +9,7 @@ import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
 import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
 import { Top100ClosestBadgeCard } from '@/components/top100/Top100ClosestBadgeCard';
 import { Top100RecentRoundsCarousel } from '@/components/top100/Top100RecentRoundsCarousel';
-import { AchievementDetailSheetV2 } from '@/components/top100/AchievementDetailSheetV2';
-import { Top100ListCompletionSheet } from '@/components/top100/Top100ListCompletionSheet';
+import { UnifiedAchievementSheet, type AchievementData } from '@/components/top100/UnifiedAchievementSheet';
 import {
   Top100ProgressHeroSkeleton,
   Top100YearSummarySkeleton,
@@ -59,41 +58,33 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const isOwnProfile = !userId || userId === session?.user?.id;
   const prevTotalRef = useRef<number | null>(null);
 
-  // Achievement detail sheet state - unified controller (V2)
-  // All triggers pass threshold as the primary key
-  const [selectedThreshold, setSelectedThreshold] = useState<number | null>(null);
+  // Unified achievement sheet state - single controller for both milestone and regional
+  const [achievementSheetData, setAchievementSheetData] = useState<AchievementData | null>(null);
   const [isAchievementSheetOpen, setIsAchievementSheetOpen] = useState(false);
 
-  // Completion sheet state
-  const [completionSheetData, setCompletionSheetData] = useState<{
-    slug: 'global' | 'gb-i' | 'usa' | 'europe';
-    played: number;
-    total: number;
-  } | null>(null);
-  const [isCompletionSheetOpen, setIsCompletionSheetOpen] = useState(false);
+  // Open milestone achievement sheet
+  const openMilestoneSheet = useCallback((threshold: number) => {
+    setAchievementSheetData({
+      type: 'milestone',
+      threshold,
+      totalPlayed: data?.totalTop100Played ?? 0,
+    });
+    setIsAchievementSheetOpen(true);
+  }, [data?.totalTop100Played]);
 
-  // Unified sheet opener - single entry point for all triggers
-  const openAchievementSheet = useCallback((threshold: number) => {
-    setSelectedThreshold(threshold);
+  // Open regional achievement sheet
+  const openRegionalSheet = useCallback((slug: string, played: number, total: number) => {
+    setAchievementSheetData({
+      type: 'regional',
+      listSlug: slug as 'global' | 'gb-i' | 'usa' | 'europe',
+      played,
+      total,
+    });
     setIsAchievementSheetOpen(true);
   }, []);
 
   const closeAchievementSheet = useCallback(() => {
     setIsAchievementSheetOpen(false);
-  }, []);
-
-  // Completion sheet handlers
-  const openCompletionSheet = useCallback((slug: string, played: number, total: number) => {
-    setCompletionSheetData({
-      slug: slug as 'global' | 'gb-i' | 'usa' | 'europe',
-      played,
-      total,
-    });
-    setIsCompletionSheetOpen(true);
-  }, []);
-
-  const closeCompletionSheet = useCallback(() => {
-    setIsCompletionSheetOpen(false);
   }, []);
 
   // Milestone tracking - keeping ref update for future use
@@ -253,7 +244,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       <div className="mb-4">
         <Top100MilestonesCarousel 
           totalPlayed={data.totalTop100Played} 
-          onMilestoneClick={(milestone) => openAchievementSheet(milestone.threshold)}
+          onMilestoneClick={(milestone) => openMilestoneSheet(milestone.threshold)}
         />
       </div>
 
@@ -264,7 +255,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           <div className="flex justify-center mb-4 mt-2">
               <button
               type="button"
-              onClick={() => openAchievementSheet(data.next_milestone!.threshold)}
+              onClick={() => openMilestoneSheet(data.next_milestone!.threshold)}
               className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-muted/50 active:scale-[0.98] transition-all"
             >
               {/* Tightened copy (item 6) */}
@@ -323,7 +314,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       <div className="mb-4">
         <Top100ListCompletionsRow 
           lists={data.lists} 
-          onCardClick={openCompletionSheet}
+          onCardClick={openRegionalSheet}
         />
       </div>
 
@@ -331,7 +322,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       <div className="mb-4">
         <Top100ClosestBadgeCard 
           totalTop100Played={data.totalTop100Played} 
-          onOpenDetail={(milestone) => openAchievementSheet(milestone.threshold)}
+          onOpenDetail={(milestone) => openMilestoneSheet(milestone.threshold)}
         />
       </div>
 
@@ -348,21 +339,11 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-      {/* Achievement Detail Sheet V2 - unified controller */}
-      <AchievementDetailSheetV2
+      {/* Unified Achievement Sheet - handles both milestone and regional */}
+      <UnifiedAchievementSheet
         isOpen={isAchievementSheetOpen}
         onClose={closeAchievementSheet}
-        threshold={selectedThreshold}
-        totalTop100Played={data.totalTop100Played}
-      />
-
-      {/* Completion Sheet - region list completions */}
-      <Top100ListCompletionSheet
-        isOpen={isCompletionSheetOpen}
-        onClose={closeCompletionSheet}
-        listSlug={completionSheetData?.slug ?? null}
-        played={completionSheetData?.played ?? 0}
-        total={completionSheetData?.total ?? 100}
+        data={achievementSheetData}
       />
 
       {/* Scroll to top FAB */}
