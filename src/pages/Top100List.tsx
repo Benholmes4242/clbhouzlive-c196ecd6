@@ -137,13 +137,13 @@ const Top100List = () => {
       // Fetch ratings aggregates
       const { data: ratingsData } = await supabase
         .from('course_rating_aggregates')
-        .select('course_id, avg_overall_score, rating_count')
+        .select('course_id, avg_overall_score, review_count')
         .in('course_id', courseIds);
 
       const ratingsMap = new Map(
         (ratingsData || []).map((r: any) => [r.course_id, { 
           avgRating: r.avg_overall_score, 
-          reviewCount: r.rating_count || 0 
+          reviewCount: r.review_count || 0 
         }])
       );
 
