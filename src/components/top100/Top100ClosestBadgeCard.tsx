@@ -64,10 +64,10 @@ export function Top100ClosestBadgeCard({
         </span>
       </div>
 
-      {/* Single badge card - trophy-like feel (E2) */}
+      {/* Single badge card - lighter padding (E2) */}
       <div 
         className={cn(
-          "mx-2.5 rounded-sq-md border bg-card/60 p-4 relative overflow-hidden",
+          "mx-2.5 rounded-sq-md border bg-card/60 p-3.5 relative overflow-hidden",
           "hover:bg-card/80 transition-colors cursor-pointer"
         )}
         style={{ borderColor: `${accentColor}30` }}
