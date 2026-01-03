@@ -1092,27 +1092,33 @@ const PostPlayRatingModal = ({
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
-                              <div className="relative h-full w-full">
-                                {!preview ? (
-                                  <div className="h-full w-full bg-slate-200" />
-                                ) : preview.startsWith('blob:') ? (
-                                  <video
-                                    src={preview}
-                                    muted
-                                    playsInline
-                                    preload="metadata"
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
+                              <div className="relative h-full w-full bg-slate-800">
+                                {preview && !preview.startsWith('blob:') ? (
                                   <img
                                     src={preview}
                                     alt=""
                                     className="h-full w-full object-cover"
                                   />
+                                ) : (
+                                  <video
+                                    src={preview || undefined}
+                                    muted
+                                    playsInline
+                                    preload="metadata"
+                                    className="h-full w-full object-cover"
+                                    onLoadedData={(e) => {
+                                      // Try to seek to first frame for iOS
+                                      const video = e.currentTarget;
+                                      if (video.readyState >= 2) {
+                                        video.currentTime = 0.1;
+                                      }
+                                    }}
+                                  />
                                 )}
-                                <div className="absolute bottom-2 right-2 pointer-events-none">
-                                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
-                                    <div className="h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white" style={{ marginLeft: '1px' }} />
+                                {/* Centered play icon overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
+                                    <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
                                   </div>
                                 </div>
                               </div>
