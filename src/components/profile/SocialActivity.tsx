@@ -10,6 +10,8 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
+import { FullscreenReviewPost, ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
@@ -98,9 +100,49 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         </div>
       )}
 
-      {/* FullscreenMediaModal for posts */}
+      {/* Fullscreen viewer for posts */}
       {selectedPost && (() => {
-        // Transform post_media to MediaItem[] with proper poster URLs
+        // Check if this is a review post
+        const isReviewPost = selectedPost.isReview || 
+          selectedPost.categories?.includes('review') || 
+          !!selectedPost.source_review_id;
+
+        // Format location for review posts
+        const formatLocation = (course?: ActivityPost['course']) => {
+          if (!course) return '';
+          const parts = [course.sub_country || course.region, course.country].filter(Boolean);
+          return parts.join(', ');
+        };
+
+        // Review post: use FullscreenReviewPost
+        if (isReviewPost) {
+          const reviewMedia: ReviewMediaItem[] = (selectedPost.post_media || []).map(media => ({
+            id: media.id,
+            media_type: media.media_type,
+            media_url: media.media_url,
+            poster_url: media.poster_url,
+          }));
+
+          return (
+            <Dialog open={!!selectedPost} onOpenChange={() => setSelectedPost(null)}>
+              <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
+                <FullscreenReviewPost
+                  mode="live"
+                  courseId={selectedPost.course?.id || selectedPost.course_id || ''}
+                  courseName={selectedPost.course?.name || 'Course'}
+                  heroSubtitle={formatLocation(selectedPost.course)}
+                  rating={selectedPost.rating ?? 0}
+                  reviewText={selectedPost.content}
+                  media={reviewMedia}
+                  initialIndex={0}
+                  onBack={() => setSelectedPost(null)}
+                />
+              </DialogContent>
+            </Dialog>
+          );
+        }
+
+        // Regular post: use existing FullscreenMediaModal
         const mediaItems: MediaItem[] = (selectedPost.post_media || []).map(media => {
           if (media.media_type === 'video') {
             const streamId = getStreamIdFromUrl(media.media_url);

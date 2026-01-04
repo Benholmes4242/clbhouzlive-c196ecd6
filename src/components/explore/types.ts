@@ -84,6 +84,11 @@ export interface ExploreContentItem {
   height?: number; // Encoded media height
   categories?: string[]; // Category IDs from Create Moment (e.g., 'funny', 'tips-coaching')
   badges?: string[]; // Achievement badges (e.g., 'birdie', 'eagle', 'hio')
+  
+  // Review post fields
+  isReview?: boolean; // True if this is a shared review post
+  sourceReviewId?: string | null; // ID of the source course_rating
+  reviewRating?: number | null; // Rating from the review (1-10)
 }
 
 export interface CTAContentItem {

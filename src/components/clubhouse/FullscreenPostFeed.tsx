@@ -6,6 +6,7 @@ import MediaDisplay from '@/components/explore/MediaDisplay';
 import { QuickReactionButton } from './QuickReactionButton';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
+import { FullscreenReviewPost, ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 
 interface FullscreenPostFeedProps {
   content: ExploreContentItem[];
@@ -133,6 +134,124 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
     );
   }
 
+  // Check if current post is a review post
+  const isReviewPost = currentPost?.isReview || 
+    currentPost?.categories?.includes('review') || 
+    !!currentPost?.sourceReviewId;
+
+  // Format location string for review posts
+  const formatLocation = (course?: ExploreContentItem['golfCourse']) => {
+    if (!course) return '';
+    const parts = [course.sub_country || course.region, course.country].filter(Boolean);
+    return parts.join(', ');
+  };
+
+  // Transform media for FullscreenReviewPost
+  const reviewMedia: ReviewMediaItem[] = currentPost?.media?.map(m => ({
+    id: m.id,
+    media_type: m.media_type,
+    media_url: m.media_url,
+    poster_url: (m as any).poster_url,
+    display_order: (m as any).display_order,
+  })) || [];
+
+  // Action bar component - reused for both review and regular posts
+  const ActionBar = () => (
+    <div className="right-action-bar absolute right-4 bottom-20 flex flex-col gap-4 z-30">
+      {/* Mute/Unmute Toggle */}
+      {currentPost.type === 'video' && (
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+        >
+          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
+      )}
+      
+      {/* Emoji Reaction Button */}
+      <QuickReactionButton
+        postId={currentPost.id}
+        userReaction={getUserReaction(currentPost.id)}
+        onReact={handleReaction}
+      />
+      
+      {/* Comment Button */}
+      <button
+        onClick={() => onMediaClick(currentPost)}
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 relative"
+      >
+        <MessageCircle className="w-5 h-5" />
+        {(currentPost.comments ?? 0) > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+            {currentPost.comments}
+          </span>
+        )}
+      </button>
+      
+      {/* Share Button */}
+      <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+        <Send className="w-5 h-5" />
+      </button>
+      
+      {/* More Options */}
+      <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+        <MoreHorizontal className="w-5 h-5" />
+      </button>
+    </div>
+  );
+
+  // Navigation controls - reused for both types
+  const NavigationControls = () => (
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-30">
+      <button
+        onClick={goToPrevious}
+        disabled={currentIndex === 0}
+        className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
+          currentIndex === 0 ? 'opacity-50' : 'hover:bg-white/30'
+        }`}
+      >
+        <ChevronUp className="w-6 h-6" />
+      </button>
+      <button
+        onClick={goToNext}
+        disabled={currentIndex === content.length - 1}
+        className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
+          currentIndex === content.length - 1 ? 'opacity-50' : 'hover:bg-white/30'
+        }`}
+      >
+        <ChevronDown className="w-6 h-6" />
+      </button>
+    </div>
+  );
+
+  // Render review post with FullscreenReviewPost
+  if (isReviewPost) {
+    return (
+      <div 
+        ref={containerRef}
+        className="fixed inset-0 z-50 bg-black"
+        {...swipeHandlers}
+        style={{ overscrollBehavior: 'none' }}
+      >
+        <FullscreenReviewPost
+          mode="live"
+          courseId={currentPost.golfCourse?.id || ''}
+          courseName={currentPost.golfCourse?.name || 'Course'}
+          heroSubtitle={formatLocation(currentPost.golfCourse)}
+          rating={currentPost.reviewRating ?? 0}
+          reviewText={currentPost.title}
+          media={reviewMedia}
+          initialIndex={0}
+        >
+          {/* Navigation + Action bar rendered as children */}
+          <NavigationControls />
+          <ActionBar />
+        </FullscreenReviewPost>
+      </div>
+    );
+  }
+
+  // Regular post rendering (existing code)
   return (
     <div 
       ref={containerRef}
@@ -164,67 +283,10 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       </div>
 
       {/* Navigation Arrows */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-20">
-        <button
-          onClick={goToPrevious}
-          disabled={currentIndex === 0}
-          className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
-            currentIndex === 0 ? 'opacity-50' : 'hover:bg-white/30'
-          }`}
-        >
-          <ChevronUp className="w-6 h-6" />
-        </button>
-        <button
-          onClick={goToNext}
-          disabled={currentIndex === content.length - 1}
-          className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
-            currentIndex === content.length - 1 ? 'opacity-50' : 'hover:bg-white/30'
-          }`}
-        >
-          <ChevronDown className="w-6 h-6" />
-        </button>
-      </div>
+      <NavigationControls />
 
       {/* Right-hand Action Bar */}
-      <div className="right-action-bar absolute right-4 bottom-20 flex flex-col gap-4 z-20">
-        {/* Mute/Unmute Toggle */}
-        {currentPost.type === 'video' && (
-          <button
-            onClick={() => setIsMuted(!isMuted)}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
-          >
-            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
-        )}
-        
-        {/* Emoji Reaction Button */}
-        <QuickReactionButton
-          postId={currentPost.id}
-          userReaction={getUserReaction(currentPost.id)}
-          onReact={handleReaction}
-        />
-        
-        {/* Comment Button */}
-        <button
-          onClick={() => onMediaClick(currentPost)}
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 relative"
-        >
-          <MessageCircle className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-            24
-          </span>
-        </button>
-        
-        {/* Share Button */}
-        <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-          <Send className="w-5 h-5" />
-        </button>
-        
-        {/* More Options */}
-        <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
-      </div>
+      <ActionBar />
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6 z-10">
