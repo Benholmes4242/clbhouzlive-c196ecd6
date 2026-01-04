@@ -94,10 +94,9 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24 }}
-      whileTap={{ scale: 0.985 }}
       className={cn(
-        'rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-5',
-        'shadow-sm cursor-default',
+        'rounded-2xl border border-slate-200/70 bg-card/60 backdrop-blur-sm p-5',
+        'shadow-sm',
         className
       )}
     >
@@ -108,16 +107,17 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           <motion.button
             onClick={onEditClick}
             whileTap={{ scale: 0.95 }}
-            className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+            className="p-2 -m-0.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100/60 transition-colors"
+            aria-label="Edit clubs"
           >
-            <Pencil className="w-4 h-4 text-muted-foreground" />
+            <Pencil className="w-4 h-4" strokeWidth={2} />
           </motion.button>
         )}
       </div>
 
       {/* Home Club */}
       {homeClub && (
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-foreground">{homeClub.name}</span>
           <span className={cn(
             'px-2 py-0.5 text-xs font-medium rounded-full',
@@ -130,16 +130,16 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
 
       {/* Secondary Clubs */}
       {displayedSecondary.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-border/30">
-          <p className="text-xs text-muted-foreground mb-2">Also plays at</p>
+        <div className="mt-4 pt-3 border-t border-slate-200/60">
+          <p className="text-xs font-medium text-slate-500 mb-2.5">Also plays at</p>
           <div className="space-y-1.5">
             {displayedSecondary.map(club => (
-              <p key={club.id} className="text-sm text-foreground/90">
+              <p key={club.id} className="text-sm font-medium text-slate-900 truncate">
                 {club.name}
               </p>
             ))}
             {remainingCount > 0 && (
-              <button className="text-xs text-muted-foreground/80 hover:text-muted-foreground hover:underline transition-colors">
+              <button className="text-xs text-slate-500 hover:text-slate-700 hover:underline transition-colors">
                 + {remainingCount} more
               </button>
             )}
