@@ -1655,15 +1655,14 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
             alt={courseName}
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-transparent" />
 
-          {/* Glass back button */}
+          {/* Back button - matching Course Details page style */}
           <button
             onClick={onBack}
-            className="absolute left-4 top-4 rounded-full bg-white/15 backdrop-blur-md border border-white/25 w-10 h-10 flex items-center justify-center transition-colors hover:bg-white/25"
+            className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
             aria-label="Back"
           >
-            <ArrowLeft className="h-5 w-5 text-white" />
+            <ArrowLeft className="!h-5 !w-5 text-white" />
           </button>
 
           {/* Course name + location overlay */}
