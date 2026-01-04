@@ -475,6 +475,27 @@ html.lightbox-open {
 }
 
 /* ========================================
+   AUTOMATIC HEADER OFFSET - REGRESSION PREVENTION
+   ======================================== 
+   This rule auto-applies header offset to all page containers
+   when a fixed header is present. Uses high-specificity and !important
+   to prevent accidental overrides from CSS resets.
+   
+   Pages that genuinely need no offset should add .no-header-offset class.
+   ======================================== */
+body:has(header.fixed-header-safe) main,
+body:has(header.fixed-header-safe) .page-container,
+body:has(header.fixed-header-safe) .page-root,
+body:has(header.fixed-header-safe) .min-h-screen:not(.no-header-offset) {
+  padding-top: calc(40px + var(--sat)) !important;
+}
+
+/* Opt-out class for pages that handle their own header offset */
+.no-header-offset {
+  padding-top: 0 !important;
+}
+
+/* ========================================
    FIXED HEADER - Safe area positioning
    For position:fixed headers that need to respect notch
    ======================================== */
