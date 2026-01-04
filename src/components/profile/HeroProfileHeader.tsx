@@ -11,7 +11,7 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPosts } from './hooks/useActivityPosts';
+import { useActivityPostsV2 } from './activity/v2';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { toast } from 'sonner';
 import { trackBusinessEvent } from '@/analytics/businessAnalytics';
@@ -125,7 +125,7 @@ const HeroProfileHeader = ({
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const { trackScrollDepth } = useProfileAnalytics(profile?.id);
   const { data: top100Overview } = useTop100Overview(profile?.id);
-  const { posts, loading: postsLoading } = useActivityPosts(profile?.id);
+  const { items: posts, isLoading: postsLoading } = useActivityPostsV2(profile?.id);
   
   // Immersive profile
   const {

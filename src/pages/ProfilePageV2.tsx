@@ -11,7 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
+import { useActivityPostsV2 } from '@/components/profile/activity/v2';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
@@ -113,7 +113,7 @@ const ProfilePageV2: React.FC = () => {
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
   const { data: top100Overview } = useTop100Overview(profileUserId);
-  const { posts } = useActivityPosts(profileUserId);
+  const { items: posts } = useActivityPostsV2(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
   // Determine if viewing own profile

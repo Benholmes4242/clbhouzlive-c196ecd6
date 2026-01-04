@@ -1,15 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { IoFilter } from 'react-icons/io5';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
-import { useActivityPosts } from './hooks/useActivityPosts';
 import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
-import { ActivityMediaGrid } from './activity';
-import ActivityFiltersSheet, { ActivityFilters, ActivityFilterType } from './ActivityFiltersSheet';
+import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
+import ActivityFiltersSheet, { ActivityFilters } from './ActivityFiltersSheet';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { ActivityPost as LocalActivityPost } from './types/ActivityTypes';
-import { ActivityPost } from './activity/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
+
 interface ActivityFeedProps {
   userId: string;
   isOwnProfile: boolean;
@@ -17,34 +16,6 @@ interface ActivityFeedProps {
   userHandicap?: number;
   userProfilePhotoUrl?: string;
   onAchievementsClick?: () => void;
-}
-
-/**
- * Convert local activity post type to the new grid type
- */
-function convertToGridPost(post: LocalActivityPost): ActivityPost {
-  return {
-    id: post.id,
-    type: post.type,
-    content: post.content,
-    image: post.image,
-    likes: post.likes,
-    comments: post.comments,
-    shares: post.shares,
-    timeAgo: post.timeAgo,
-    created_at: post.created_at,
-    badges: post.badges,
-    post_media: post.post_media,
-    post_tags: post.post_tags.map(tag => ({
-      id: tag.id,
-      entity_type: tag.entity_type,
-      entity_id: tag.entity_id,
-      name: tag.name,
-      username: tag.username,
-      tagged_entity: tag.tagged_entity
-    })),
-    user: post.user
-  };
 }
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({
@@ -55,7 +26,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userProfilePhotoUrl,
   onAchievementsClick
 }) => {
-  const { posts, loading } = useActivityPosts(userId);
+  // V2: Cursor-based infinite query
+  const { 
+    items, 
+    isLoading, 
+    isFetchingNextPage, 
+    hasMore, 
+    fetchNextPage 
+  } = useActivityPostsV2(userId);
   
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);
@@ -66,47 +44,21 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
-  // Filter posts based on active filter (with null-safety)
-  const filteredPosts = useMemo(() => {
+  // Filter items based on active filter
+  const filteredItems = useMemo(() => {
     switch (filters.type) {
       case 'videos':
-        return posts.filter(post => {
-          const media = post.post_media ?? [];
-          return media.some(m => m.media_type === 'video');
-        });
+        return items.filter(item => item.type === 'video');
       case 'photos':
-        return posts.filter(post => {
-          const media = post.post_media ?? [];
-          return media.some(m => m.media_type === 'image');
-        });
+        return items.filter(item => item.type === 'image');
       case 'courses':
-        return posts.filter(post => {
-          const tags = post.post_tags ?? [];
-          return tags.some(tag => tag.entity_type === 'golf_club');
-        });
-      case 'swings':
-        return posts.filter(post => {
-          const tags = post.post_tags ?? [];
-          return tags.some(tag => tag.name?.toLowerCase().includes('swing'));
-        });
+        return items.filter(item => !!item.golfCourseId);
       case 'milestones':
-        return posts.filter(post => {
-          const tags = post.post_tags ?? [];
-          return post.content?.toLowerCase().includes('milestone') ||
-            tags.some(tag => tag.name?.toLowerCase().includes('achievement'));
-        });
+        return items.filter(item => item.isMilestone);
       default:
-        return posts;
+        return items;
     }
-  }, [posts, filters.type]);
-
-  // Posts with media only, converted to new type
-  const postsWithMedia = useMemo(() => 
-    filteredPosts
-      .filter(post => (post.post_media?.length ?? 0) > 0)
-      .map(convertToGridPost),
-    [filteredPosts]
-  );
+  }, [items, filters.type]);
 
   // For lightbox - extract all media URLs, types, and filter IDs
   const allMediaData = useMemo(() => {
@@ -115,30 +67,26 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     const filterIds: (string | null)[] = [];
     const studioEdits: (any | null)[] = [];
     
-    postsWithMedia.forEach(post => {
-      post.post_media.forEach(media => {
-        urls.push(media.media_url);
-        types.push(media.media_type);
-        filterIds.push((media as any).filter_id ?? (media as any).studio_edits?.filter ?? null);
-        studioEdits.push((media as any).studio_edits ?? null);
-      });
+    filteredItems.forEach(item => {
+      urls.push(item.url);
+      types.push(item.type);
+      filterIds.push(item.filterId ?? null);
+      studioEdits.push(item.studioEdits ?? null);
     });
     
     return { urls, types, filterIds, studioEdits };
-  }, [postsWithMedia]);
+  }, [filteredItems]);
 
-  // Handle post click - find the media index for lightbox
-  const handlePostPress = useCallback((postId: string) => {
-    let mediaIndex = 0;
-    for (const post of postsWithMedia) {
-      if (post.id === postId) {
-        setModalStartIndex(mediaIndex);
-        setModalOpen(true);
-        return;
-      }
-      mediaIndex += post.post_media.length;
-    }
-  }, [postsWithMedia]);
+  // Handle item click - open fullscreen modal
+  const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
+    setModalStartIndex(index);
+    setModalOpen(true);
+  }, []);
+
+  // Handle load more
+  const handleLoadMore = useCallback(() => {
+    fetchNextPage();
+  }, [fetchNextPage]);
 
   return (
     <>
@@ -159,32 +107,17 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         </button>
       </div>
 
-      {/* Empty states */}
-      {posts.length === 0 && !loading ? (
-        <div className="text-center py-16 px-4">
-          <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-muted-foreground/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">No posts yet</h3>
-          <p className="text-muted-foreground text-sm">
-            {isOwnProfile ? 'Share your golf moments to see them here' : 'No posts to show'}
-          </p>
-        </div>
-      ) : postsWithMedia.length === 0 && !loading ? (
-        <div className="text-center py-16 px-4">
-          <p className="text-muted-foreground">No posts found for this filter</p>
-        </div>
-      ) : (
-        /* Premium Activity Media Grid - full-bleed, no margins needed since parent has no padding */
-        <ActivityMediaGrid
-          posts={postsWithMedia}
-          isLoading={loading}
-          onPostPress={handlePostPress}
-          viewMode="compact"
+      {/* Activity Grid V2 - PP → L layout with cursor pagination */}
+      <div className="px-0 pb-16">
+        <ActivityGridV2
+          items={filteredItems}
+          isLoading={isLoading}
+          isFetchingNextPage={isFetchingNextPage}
+          hasMore={hasMore}
+          onLoadMore={handleLoadMore}
+          onItemClick={handleItemClick}
         />
-      )}
+      </div>
 
       {/* Filter Sheet */}
       <ActivityFiltersSheet
@@ -194,7 +127,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         onChange={setFilters}
       />
 
-      {/* Fullscreen Media Modal - only mount when open to prevent pauseAllAndSetActive on initial render */}
+      {/* Fullscreen Media Modal - only mount when open */}
       {modalOpen && (
         <FullscreenMediaModal
           isOpen={modalOpen}
