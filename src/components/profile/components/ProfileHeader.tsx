@@ -8,6 +8,7 @@ interface ProfileHeaderProps {
   profileId?: string;
   bio: string;
   profileUsername?: string;
+  homeClubName?: string | null;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -15,15 +16,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   username,
   profileId,
   bio,
-  profileUsername
+  profileUsername,
+  homeClubName
 }) => {
-  console.log('ProfileHeader - profileId:', profileId, 'profileUsername:', profileUsername);
-
   return (
     <div className="text-center space-y-2">
       <div className="mt-0">
         <h1 className="font-display text-2xl font-bold text-foreground">{displayName}</h1>
       </div>
+      
+      {/* Home Club - shown under name with secondary hierarchy */}
+      {homeClubName && (
+        <p className="text-sm text-muted-foreground/80">{homeClubName}</p>
+      )}
       
       {/* Show username for all personal profiles */}
       {username && (
