@@ -1742,8 +1742,8 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           className="px-4 pt-4 pb-4 animate-fade-in"
           style={{ animationDelay: '200ms' }}
         >
-          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3 px-2">
-            Review media
+          <p className="text-xs text-slate-500 tracking-wide mb-3 px-2">
+            From your review
           </p>
           <div className="grid grid-cols-3 gap-2">
             {submittedMedia.slice(0, 6).map((item, index) => {
