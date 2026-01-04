@@ -1,6 +1,7 @@
 import React from 'react';
 import { getListMilestoneState } from '@/lib/listMilestoneSystem';
 import { getRegionTheme } from '@/lib/regionTheme';
+import { AnimatedNumber } from '@/components/ui/motion';
 
 interface Top100ListProgressCardProps {
   playedCount: number;
@@ -42,7 +43,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
               Completed
             </p>
             <p className="text-xs mt-0.5" style={{ color: theme.ringColor }}>
-              100 of 100 played
+              <AnimatedNumber value={100} minCh={1} /> of 100 played
             </p>
           </div>
           <p className="text-xs font-medium italic whitespace-nowrap" style={{ color: theme.ringColor }}>
@@ -58,10 +59,10 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-900">
-            Next milestone: {nextMilestone}
+            Next milestone: <AnimatedNumber value={nextMilestone} minCh={1} />
           </p>
           <p className="text-xs text-slate-500 mt-0.5">
-            {toGo} course{toGo !== 1 ? 's' : ''} to go
+            <AnimatedNumber value={toGo} minCh={1} delay={0.05} /> course{toGo !== 1 ? 's' : ''} to go
           </p>
         </div>
         <p className="text-xs font-medium text-slate-500 italic whitespace-nowrap">

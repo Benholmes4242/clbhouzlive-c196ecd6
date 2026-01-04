@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import { Top100RankBadge } from './Top100RankBadge';
 import { getProgressInsight } from '@/lib/utils/progressInsightCopy';
+import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 
 type Top100RegionCardProps = {
   list: Top100ListSummary;
@@ -141,22 +142,28 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
 
           {/* Bottom content for default variant */}
           <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-1.5 px-4 pb-4">
-            {/* Progress summary */}
+            {/* Progress summary with animated number */}
             <p className="text-[13px] text-white font-medium">
-              Rated <span className="font-semibold">{rated}</span> of {total} courses
+              Rated <AnimatedNumber value={rated} minCh={1} className="font-semibold" /> of {total} courses
             </p>
 
-            {/* Progress bar + percentage */}
+            {/* Progress bar + percentage - animated */}
             <div className="flex items-center gap-2.5">
-              <div className="flex-1 h-[5px] overflow-hidden rounded-full bg-white/30">
-                <div
-                  className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
-                  style={{ width: `${completion}%` }}
-                />
-              </div>
-              <span className="text-[11px] font-semibold text-white tabular-nums min-w-[28px] text-right">
-                {completion}%
-              </span>
+              <AnimatedProgressBar
+                percentage={completion}
+                height="h-[5px]"
+                bgColor="bg-white/30"
+                fillColor="bg-white"
+                className="flex-1"
+                delay={0.15}
+              />
+              <AnimatedNumber 
+                value={completion} 
+                suffix="%" 
+                minCh={2}
+                delay={0.2}
+                className="text-[11px] font-semibold text-white tabular-nums min-w-[28px] text-right"
+              />
             </div>
 
             {/* Journey tone phrase - soft emotional reinforcement */}

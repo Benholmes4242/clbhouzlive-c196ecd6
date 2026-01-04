@@ -544,7 +544,12 @@ const ProfilePageV2: React.FC = () => {
             }}
           >
             <span className="text-sm text-slate-500">Posts</span>
-            <span className="text-base font-semibold text-[#0F0F0F] tabular-nums min-w-[2ch]">{postsCount}</span>
+            <AnimatedNumber 
+              value={postsCount} 
+              isLoading={statsLoading}
+              minCh={2}
+              className="text-base font-semibold text-[#0F0F0F]"
+            />
           </motion.button>
           
           {/* Followers */}
