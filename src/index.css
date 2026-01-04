@@ -548,9 +548,8 @@ html, body, #root {
 
 /* CRITICAL: Global header must always be flush to viewport top - no gaps allowed */
 /* Ensure page containers with headers have no top spacing */
-.page-with-header,
-.min-h-screen,
-[class*="min-h-screen"] {
+/* NOTE: Do NOT blanket-reset padding-top on .min-h-screen; it breaks compact-header-offset. */
+.page-with-header {
   margin: 0 !important;
   padding-top: 0 !important;
 }
