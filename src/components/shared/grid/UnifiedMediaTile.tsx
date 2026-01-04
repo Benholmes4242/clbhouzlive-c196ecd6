@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig } from './types';
-import { OverlayCorners } from '@/components/shared/overlay';
+import { OverlayCorners, ReviewTileOverlay } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -268,23 +268,32 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       {/* Bottom gradient overlay for text legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-      {/* Unified overlay system */}
-      <OverlayCorners
-        surface="tile"
-        variant={variant}
-        club={clubData}
-        durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
-        durationPlacement="top-left"
-        creatorName={item.creator?.name}
-        creatorAvatar={item.creator?.avatar}
-        likes={item.likes}
-        showCreator={config.showCreator}
-        showLikes={config.showLikes}
-        showAvatar={config.showCreator}
-        onCreatorClick={handleAuthorClick}
-        topLeftOverride={topLeftOverride}
-        hideRankingIfOverride={true}
-      />
+      {/* Review overlay for review posts - takes priority over standard overlay */}
+      {item.isReview && item.courseName && typeof item.reviewRating === 'number' ? (
+        <ReviewTileOverlay
+          courseName={item.courseName}
+          courseLocation={item.courseLocation}
+          rating={item.reviewRating}
+        />
+      ) : (
+        /* Unified overlay system for non-review posts */
+        <OverlayCorners
+          surface="tile"
+          variant={variant}
+          club={clubData}
+          durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
+          durationPlacement="top-left"
+          creatorName={item.creator?.name}
+          creatorAvatar={item.creator?.avatar}
+          likes={item.likes}
+          showCreator={config.showCreator}
+          showLikes={config.showLikes}
+          showAvatar={config.showCreator}
+          onCreatorClick={handleAuthorClick}
+          topLeftOverride={topLeftOverride}
+          hideRankingIfOverride={true}
+        />
+      )}
     </motion.button>
   );
 };

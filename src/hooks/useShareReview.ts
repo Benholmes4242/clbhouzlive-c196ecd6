@@ -71,7 +71,7 @@ export function useShareReview() {
           actor_id: userId,
           course_id: courseId,
           content: reviewText || null,
-          visibility: 'anyone' as const,
+          visibility: 'anyone',
           source_review_id: ratingId,
           categories: ['review'],
         })
