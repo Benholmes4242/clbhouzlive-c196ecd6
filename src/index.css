@@ -480,24 +480,15 @@ html.lightbox-open {
 /* ============================================================================
  * CRITICAL: PREVENT HEADER OFFSET REGRESSION
  * ============================================================================
- * Pages sit flush below the header by default. High specificity prevents
- * accidental resets from overriding. Only pages with `compact-header-offset`
- * get the spacing.
+ * High-specificity reset prevents accidental overrides from sliding content
+ * under the fixed header. The actual offset is defined above.
  * ============================================================================
  */
 body main,
 body .page-container,
-body .min-h-screen {
+body .min-h-screen:not(.compact-header-offset):not(.compact-header-offset-no-safe) {
   padding-top: 0 !important;
   margin-top: 0 !important;
-}
-
-body .compact-header-offset {
-  padding-top: calc(var(--app-header-height, 40px) + var(--sat)) !important;
-}
-
-body .compact-header-offset-no-safe {
-  padding-top: var(--app-header-height, 40px) !important;
 }
 
 

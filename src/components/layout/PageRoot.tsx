@@ -40,7 +40,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         ref={ref}
         className={cn(
           "page-root min-h-[100vh] w-full flex flex-col bg-[var(--bg-page)]",
-          shouldAutoApplyOffset && !hasExplicitOffsetClass && "compact-header-offset",
+          shouldAutoApplyOffset && !hasExplicitOffsetClass && "compact-header-offset-no-safe",
           className
         )}
         {...rest}
