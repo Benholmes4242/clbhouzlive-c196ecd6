@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trophy, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Star, Check, Trophy, X, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
@@ -1190,10 +1190,10 @@ const PostPlayRatingModal = ({
                                   });
                                 }
                               }}
-                              className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
+                              className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
                               aria-label="Remove media"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <X className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
@@ -1214,10 +1214,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(index)}
-                              className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
+                              className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
                               aria-label="Remove image"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <X className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
@@ -1282,10 +1282,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => removeVideo(draft.fileKey)}
-                              className="absolute bottom-2 right-2 min-w-[44px] min-h-[44px] w-7 h-7 bg-red-500/90 text-white rounded-md flex items-center justify-center backdrop-blur-sm hover:bg-red-600 transition-colors"
+                              className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
                               aria-label="Remove video"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <X className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
