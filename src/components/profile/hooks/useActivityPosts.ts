@@ -7,6 +7,7 @@ import { postKeys } from '@/queryKeys/posts';
 /**
  * Fetches activity posts for a personal profile.
  * Cache invalidation is handled globally by PostEventsBridge.
+ * Now includes review data (categories, source_review_id, rating) for overlay display.
  */
 export const useActivityPosts = (actorId?: string) => {
   const query = useQuery({
@@ -27,6 +28,8 @@ export const useActivityPosts = (actorId?: string) => {
             actor_id,
             course_id,
             badges,
+            categories,
+            source_review_id,
             post_media (
               id,
               media_type,
@@ -49,6 +52,13 @@ export const useActivityPosts = (actorId?: string) => {
                 name,
                 username
               )
+            ),
+            course:golf_courses!course_id (
+              id,
+              name,
+              country,
+              sub_country,
+              region
             )
           `)
           .eq('actor_type', 'personal')
@@ -69,6 +79,23 @@ export const useActivityPosts = (actorId?: string) => {
       const postsData = postsRes.data ?? [];
       const userProfile = profileRes.data;
 
+      // Batch fetch ratings for posts with source_review_id
+      const reviewIds = postsData
+        .filter((p: any) => p.source_review_id)
+        .map((p: any) => p.source_review_id);
+      
+      let ratingsMap = new Map<string, number>();
+      if (reviewIds.length > 0) {
+        const { data: ratings } = await supabase
+          .from('course_ratings')
+          .select('id, rating')
+          .in('id', reviewIds);
+        
+        if (ratings) {
+          ratingsMap = new Map(ratings.map(r => [r.id, r.rating]));
+        }
+      }
+
       return postsData
         .filter((post: any) => {
           const hasContent = post.content && post.content.trim().length > 0;
@@ -88,6 +115,19 @@ export const useActivityPosts = (actorId?: string) => {
               tagged_entity: tag.taggable_entities,
             })) || [];
 
+          // Determine if this is a review post
+          const isReview = 
+            (Array.isArray(post.categories) && post.categories.includes('review')) ||
+            !!post.source_review_id;
+
+          // Get rating if available
+          const rating = post.source_review_id 
+            ? ratingsMap.get(post.source_review_id) 
+            : undefined;
+
+          // Get course info
+          const course = post.course;
+
           return {
             id: post.id,
             type: 'post' as const,
@@ -99,6 +139,17 @@ export const useActivityPosts = (actorId?: string) => {
             created_at: post.created_at,
             course_id: post.course_id || null,
             badges: post.badges || [],
+            categories: post.categories || [],
+            source_review_id: post.source_review_id || null,
+            isReview,
+            rating,
+            course: course ? {
+              id: course.id,
+              name: course.name,
+              country: course.country,
+              sub_country: course.sub_country,
+              region: course.region,
+            } : undefined,
             post_media: (post.post_media || []).map((media: any) => ({
               id: media.id,
               media_type: media.media_type as 'image' | 'video',

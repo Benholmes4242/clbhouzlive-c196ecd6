@@ -1026,7 +1026,23 @@ export const useRealPostsFetcher = () => {
 
   // Helper: Check if a post passes vertical-only criteria
   // Returns meta_pending for posts with valid duration but missing AR (allowed through)
+  // Review posts (categories includes 'review' OR has source_review_id) bypass video-only requirement
   const passesVerticalFilter = (post: any): { passes: boolean; reason?: string } => {
+    // Check if this is a review post - allow image-only review posts into Clubhouse
+    const isReviewPost = 
+      (Array.isArray(post.categories) && post.categories.includes('review')) ||
+      !!post.source_review_id;
+    
+    if (isReviewPost) {
+      // Review posts are allowed regardless of media type (photos, videos, or both)
+      const hasAnyMedia = post.post_media && post.post_media.length > 0;
+      if (!hasAnyMedia) {
+        return { passes: false, reason: 'no_media' };
+      }
+      return { passes: true, reason: 'review_post' };
+    }
+    
+    // Non-review posts: apply standard video-only criteria
     const primaryMedia = getPrimaryVideoMedia(post);
     
     if (!primaryMedia) {
@@ -1114,6 +1130,7 @@ export const useRealPostsFetcher = () => {
             actor_id,
             course_id,
             categories,
+            source_review_id,
             post_media!inner (
               id,
               media_type,
