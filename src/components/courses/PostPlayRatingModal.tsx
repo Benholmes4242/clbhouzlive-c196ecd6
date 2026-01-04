@@ -1839,7 +1839,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={handleBackToCourse}
-            className="inline-flex flex-1 items-center justify-center rounded-2xl bg-slate-900 h-12 px-4 text-sm font-medium text-white hover:bg-slate-800 active:bg-slate-700 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Back to course
           </button>
