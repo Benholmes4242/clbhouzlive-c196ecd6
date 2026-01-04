@@ -1074,9 +1074,9 @@ export const useRealPostsFetcher = () => {
     cursor: string | null = null
   ): Promise<ExploreContentItem[]> => {
     try {
-      // Get current user to filter out their personal posts (business posts OK)
+      // Get current user - kept for potential future filtering needs
       const { data: { user: currentUser } } = await supabase.auth.getUser();
-      const currentUserId = currentUser?.id;
+      const _currentUserId = currentUser?.id; // Prefixed with _ to indicate intentionally unused
 
       const TARGET_COUNT = limit;
       const MAX_FETCHES = 5; // Prevent infinite loops
@@ -1145,14 +1145,13 @@ export const useRealPostsFetcher = () => {
           // Order post_media by display_order, then created_at for deterministic [0] selection
           .order('display_order', { ascending: true, foreignTable: 'post_media', nullsFirst: false })
           .order('created_at', { ascending: true, foreignTable: 'post_media' })
-          .order('created_at', { ascending: false })
-          .eq('post_media.media_type', 'video');
+          .order('created_at', { ascending: false });
+          // NOTE: Removed .eq('post_media.media_type', 'video') to allow images in Clubhouse feed
+          // This enables review posts with photos to appear in the feed
 
-        // Filter out current user's PERSONAL posts (business posts are allowed)
-        // Show posts where: user_id != currentUserId OR actor_type = 'business'
-        if (currentUserId) {
-          query = query.or(`user_id.neq.${currentUserId},actor_type.eq.business`);
-        }
+        // NOTE: Removed current user exclusion filter to allow users to see their own posts
+        // Users should see their own reviews and moments in Clubhouse feed
+        // Previously: query = query.or(`user_id.neq.${currentUserId},actor_type.eq.business`);
 
         // Cursor-based pagination
         if (currentCursor) {

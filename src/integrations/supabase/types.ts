@@ -4134,6 +4134,7 @@ export type Database = {
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
+          source_review_id: string | null
           studio_music: Json | null
           updated_at: string
           user_id: string
@@ -4157,6 +4158,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          source_review_id?: string | null
           studio_music?: Json | null
           updated_at?: string
           user_id: string
@@ -4180,6 +4182,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          source_review_id?: string | null
           studio_music?: Json | null
           updated_at?: string
           user_id?: string
@@ -4205,6 +4208,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_source_review_id_fkey"
+            columns: ["source_review_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
             referencedColumns: ["id"]
           },
         ]
