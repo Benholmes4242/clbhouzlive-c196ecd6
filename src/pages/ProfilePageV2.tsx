@@ -32,7 +32,8 @@ import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
-import { ProfileClubsSection } from '@/components/profile/ProfileClubsSection';
+import ClubsCard from '@/components/profile/clubs/ClubsCard';
+import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { GolfJourneyProgress, MilestoneBadges } from '@/components/profile/phase6';
 
 // Background color - matches course details page (slate-50)
@@ -41,6 +42,31 @@ const BG_COLOR = '#f8fafc'; // slate-50
 // UUID v4 detection regex
 const isUuid = (v: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+
+// Clubs section wrapper component
+const ClubsSectionWrapper: React.FC<{
+  profileId: string | undefined;
+  viewerId: string | undefined;
+  isPersonal: boolean;
+  isSelf: boolean;
+}> = ({ profileId, viewerId, isPersonal, isSelf }) => {
+  const navigate = useNavigate();
+  const { homeClub, secondaryClubs, isLoading, isPrivate } = useProfileClubs(profileId, viewerId);
+
+  if (!isPersonal || !profileId || !viewerId || isLoading) return null;
+
+  return (
+    <section className="px-5 mb-6">
+      <ClubsCard
+        homeClub={homeClub}
+        secondaryClubs={secondaryClubs}
+        isOwner={isSelf}
+        isPrivate={isPrivate}
+        onEditClick={() => navigate('/edit-profile')}
+      />
+    </section>
+  );
+};
 
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
@@ -558,15 +584,13 @@ const ProfilePageV2: React.FC = () => {
           )}
         </section>
 
-        {/* Clubs section - uses RPC for viewer-aware visibility */}
-        {isPersonal && profile?.id && user?.id && (
-          <section className="px-5 mb-6">
-            <ProfileClubsSection
-              profileUserId={profile.id}
-              viewerId={user.id}
-            />
-          </section>
-        )}
+        {/* Clubs section - uses new ClubsCard with useProfileClubs hook */}
+        <ClubsSectionWrapper 
+          profileId={profile?.id}
+          viewerId={user?.id}
+          isPersonal={isPersonal}
+          isSelf={isSelf}
+        />
 
         {/* Phase 6: Golf Journey Progress */}
         {isPersonal && profile?.id && (
