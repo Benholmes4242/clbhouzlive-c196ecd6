@@ -1709,186 +1709,34 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
   // Breakdown bars are ALWAYS slate - never gold (gold is only for community overall)
   const BREAKDOWN_BAR_FILL = '#64748B'; // slate-500
 
+  // Convert submittedMedia to the format expected by FullscreenReviewPost
+  const previewMedia = submittedMedia.map((item, index) => ({
+    id: item.id,
+    media_type: item.media_type as 'image' | 'video',
+    media_url: item.media_url,
+    poster_url: item.poster_url,
+    stream_id: item.stream_id,
+    display_order: index,
+  }));
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
-      {/* SECTION A – Hero Image Header */}
-      {showHero && (
-        <div className="relative h-[160px] w-full overflow-hidden">
-          <img
-            src={heroImageUrl!}
-            alt={courseName}
-            className="h-full w-full object-cover"
-          />
+    <div className="relative flex flex-col h-screen bg-black">
+      {/* Fullscreen Preview - takes most of the screen */}
+      <div className="flex-1 relative overflow-hidden">
+        <FullscreenReviewPost
+          mode="preview"
+          courseId={courseId}
+          courseName={courseName}
+          heroSubtitle={heroSubtitle}
+          rating={userRating}
+          reviewText={reviewText}
+          media={previewMedia}
+          onBack={onBack}
+        />
+      </div>
 
-          {/* Back button - matching Course Details page style */}
-          <button
-            onClick={onBack}
-            className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
-            aria-label="Back"
-          >
-            <ArrowLeft className="!h-5 !w-5 text-white" />
-          </button>
-
-          {/* Course name + location overlay */}
-          <div className="absolute left-4 bottom-4 right-4">
-            <div className="text-white text-xl font-semibold leading-tight drop-shadow-sm">
-              {courseName}
-            </div>
-            {heroSubtitle && (
-              <div className="text-white/80 text-sm mt-0.5 drop-shadow-sm">
-                {heroSubtitle}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* SECTION B – Success header (compact if hero exists) */}
-      <section className={`bg-slate-50 px-6 text-center animate-fade-in ${showHero ? 'pt-5 pb-4' : 'pt-14 pb-5'}`}>
-        <div 
-          className={`mx-auto mb-2 flex items-center justify-center rounded-full bg-emerald-100 shadow-[0_0_0_6px_rgba(16,185,129,0.1)] animate-scale-in ${showHero ? 'h-11 w-11' : 'h-14 w-14'}`}
-          style={{ animationDelay: '100ms' }}
-        >
-          <Check className={`text-emerald-600 ${showHero ? 'h-5 w-5' : 'h-7 w-7'}`} />
-        </div>
-
-        <h1 className="text-lg font-semibold text-slate-900">{title}</h1>
-        <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
-      </section>
-
-      {/* SECTION C – Hero Rating Card */}
-      <section 
-        className={`animate-fade-in ${showHero ? 'px-4' : 'px-6 py-4'}`}
-        style={{ animationDelay: '150ms' }}
-      >
-        <div className="rounded-2xl bg-white px-5 py-5 shadow-sm border border-slate-200/80">
-          {/* Header label */}
-          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3">
-            {overallHeading}
-          </p>
-          
-          {/* Large score + tier pill row */}
-          <div className="flex items-center justify-between">
-            <p className="text-4xl font-bold text-slate-900 tabular-nums">
-              {userRating === 10 ? '10' : userRating.toFixed(1)}
-            </p>
-            <RatingPill score={userRating} className="py-1.5 px-4" />
-          </div>
-
-          {/* Community comparison */}
-          {comparisonText && (
-            <div className="mt-4 flex items-center gap-1.5 pt-3 border-t border-slate-100">
-              {comparisonVariant === 'higher' && (
-                <ArrowUp className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
-              )}
-              {comparisonVariant === 'lower' && (
-                <ArrowDown className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
-              )}
-              {comparisonVariant === 'on-par' && (
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
-              )}
-              <p className={`text-xs font-medium ${
-                comparisonVariant === 'higher' ? 'text-emerald-600' :
-                comparisonVariant === 'lower' ? 'text-red-500' :
-                comparisonVariant === 'on-par' ? 'text-emerald-600' :
-                'text-slate-500'
-              }`}>
-                {comparisonText}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* SECTION D – User Media Thumbnails (premium grid) */}
-      {submittedMedia.length > 0 && (
-        <section 
-          className="px-4 pt-4 pb-4 animate-fade-in"
-          style={{ animationDelay: '200ms' }}
-        >
-          <p className="text-xs text-slate-500 tracking-wide mb-3 px-2">
-            From your review
-          </p>
-          <div className="grid grid-cols-3 gap-2">
-            {submittedMedia.slice(0, 6).map((item, index) => {
-              const isVideo = item.media_type === 'video';
-              const thumbnailUrl = isVideo && item.poster_url ? item.poster_url : item.media_url;
-              const isLastWithMore = index === 5 && submittedMedia.length > 6;
-              const extraCount = submittedMedia.length - 6;
-              
-              return (
-                <button 
-                  key={item.id}
-                  type="button"
-                  className="group relative aspect-square overflow-hidden rounded-2xl bg-slate-100 border border-slate-200/60 transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
-                  onClick={() => {/* TODO: open full-screen viewer */}}
-                >
-                  <img 
-                    src={thumbnailUrl}
-                    alt=""
-                    className={`w-full h-full object-cover transition-transform group-hover:scale-105 ${isLastWithMore ? 'blur-sm' : ''}`}
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                  
-                  {/* Video play indicator */}
-                  {isVideo && !isLastWithMore && <VideoPlayIndicator size="md" />}
-                  
-                  {/* +X more overlay for last tile */}
-                  {isLastWithMore && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                      <span className="text-white text-lg font-semibold">+{extraCount}</span>
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* SECTION E – Breakdown (always slate bars) */}
-      {breakdown.length > 0 && (
-        <section 
-          className="px-6 py-4 animate-fade-in"
-          style={{ animationDelay: submittedMedia.length > 0 ? '250ms' : '200ms' }}
-        >
-          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3">
-            {breakdownHeading}
-          </p>
-
-          <div className="space-y-3">
-            {breakdown.map((item) => (
-              <div key={item.label}>
-                <div className="mb-1.5 flex items-center justify-between text-sm">
-                  <span className="text-slate-600">{item.label}</span>
-                  <span className="font-semibold text-slate-900 tabular-nums">
-                    {item.value === 10 ? '10' : item.value.toFixed(1)}
-                  </span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/60">
-                  <div
-                    className="h-1.5 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: `${(item.value / 10) * 100}%`,
-                      backgroundColor: BREAKDOWN_BAR_FILL,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Spacer so actions sit near the bottom */}
-      <div className="flex-1 bg-slate-50 min-h-[40px]" />
-
-      {/* SECTION F – Actions row (premium buttons) */}
-      <section 
-        className="bg-slate-50 px-4 pb-10 pt-4 animate-fade-in"
-        style={{ animationDelay: '300ms' }}
-      >
+      {/* Bottom sticky CTA bar */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-16 pb-8 px-4">
         <div className="flex flex-col gap-3">
           {/* Primary CTA row */}
           <div className="flex gap-3">
@@ -1900,8 +1748,8 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
               className={cn(
                 "inline-flex flex-1 items-center justify-center gap-2 rounded-2xl h-12 px-4 text-sm font-medium transition-colors",
                 shareState === 'shared'
-                  ? "bg-emerald-100 border border-emerald-200 text-emerald-700"
-                  : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:bg-slate-100",
+                  ? "bg-emerald-500/90 text-white"
+                  : "bg-white text-slate-900 hover:bg-white/90 active:bg-white/80",
                 shareState === 'posting' && "opacity-70 cursor-not-allowed"
               )}
             >
@@ -1920,13 +1768,13 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
               {shareState === 'idle' && 'Share to Clubhouse + Profile'}
             </button>
 
-            {/* Back to course */}
+            {/* Back to course / Not now */}
             <button
               type="button"
               onClick={handleBackToCourse}
-              className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/30 bg-white/10 backdrop-blur-sm h-12 px-6 text-sm font-medium text-white hover:bg-white/20 active:bg-white/25 transition-colors"
             >
-              Back to course
+              {shareState === 'shared' ? 'Done' : 'Not now'}
             </button>
           </div>
           
@@ -1935,14 +1783,14 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
             <button
               type="button"
               onClick={handleViewInClubhouse}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-slate-900 h-12 px-4 text-sm font-medium text-white hover:bg-slate-800 active:bg-slate-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white h-12 px-4 text-sm font-medium text-slate-900 hover:bg-white/90 active:bg-white/80 transition-colors"
             >
               <ExternalLink className="h-4 w-4" />
               View in Clubhouse
             </button>
           )}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
