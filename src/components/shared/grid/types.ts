@@ -99,6 +99,12 @@ export interface UnifiedMediaItem {
   // Achievement badges
   badges?: string[] | null;
   
+  // Review post data (for overlay display)
+  isReview?: boolean;
+  reviewRating?: number;
+  courseLocation?: string; // e.g. "Scotland, UK"
+  sourceReviewId?: string | null;
+  
   // Computed tile display (set by layout utils)
   tileDisplay?: TileDisplayInfo;
 }

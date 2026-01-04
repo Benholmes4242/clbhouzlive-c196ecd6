@@ -1646,9 +1646,13 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     }
   };
   
-  // Navigate to Clubhouse
+  // Navigate to Clubhouse with deep link to specific post
   const handleViewInClubhouse = () => {
-    navigate('/discover?main=channels');
+    if (sharedPostId) {
+      navigate(`/discover?main=channels&focusPostId=${sharedPostId}`);
+    } else {
+      navigate('/discover?main=channels');
+    }
   };
 
   const isEdit = mode === 'updated';
@@ -1742,6 +1746,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           reviewText={reviewText}
           media={previewMedia}
           onBack={onBack}
+          dotsBottomOffset={shareState === 'shared' ? 168 : 108}
         />
       </div>
 

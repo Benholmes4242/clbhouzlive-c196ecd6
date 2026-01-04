@@ -1,7 +1,7 @@
 // Adapters to convert data from existing types to UnifiedMediaItem
 
 import { ExploreContentItem } from '@/components/explore/types';
-import { ActivityPost } from '@/components/profile/activity/types';
+import { ActivityPost } from '@/components/profile/types/ActivityTypes';
 import { UnifiedMediaItem, ContentCategory, AR_LANDSCAPE_THRESHOLD } from './types';
 import { getStreamPoster } from '@/utils/stream';
 import { uidFromNode, generateHlsUrl } from '@/utils/cloudflareStreamTransform';
@@ -87,7 +87,7 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
 
   const primaryMedia = media[0];
   
-  // Use canonical resolver
+  // Use canonical resolver for golf course
   const golfCourse = resolveGolfCourse(post);
   const isMilestone = post.content?.toLowerCase().includes('milestone') || 
     post.post_tags?.some(tag => tag.name?.toLowerCase().includes('achievement'));
@@ -105,6 +105,16 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
   // Compute orientation from aspect ratio
   const aspectRatio = primaryMedia.aspect_ratio ?? undefined;
   const orientation = classifyOrientation(aspectRatio);
+
+  // Build course location string for review overlay
+  let courseLocation: string | undefined;
+  const courseData = post.course || golfCourse;
+  if (courseData) {
+    const parts: string[] = [];
+    if (courseData.sub_country) parts.push(courseData.sub_country);
+    if (courseData.country) parts.push(courseData.country);
+    courseLocation = parts.join(', ') || undefined;
+  }
 
   return {
     id: primaryMedia.id,
@@ -148,6 +158,12 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     
     // Achievement badges
     badges: post.badges,
+    
+    // Review post data for overlay display
+    isReview: post.isReview ?? false,
+    reviewRating: post.rating,
+    courseLocation,
+    sourceReviewId: post.source_review_id,
   };
 }
 

@@ -36,6 +36,9 @@ export interface FullscreenReviewPostProps {
   initialIndex?: number;
   onBack?: () => void;
   
+  // Dynamic bottom offset for carousel dots (to avoid CTA overlap)
+  dotsBottomOffset?: number; // in pixels, default ~96 for preview, ~80 for live
+  
   // Optional: Render children (e.g., Clubhouse action bar) on top of the overlay
   children?: React.ReactNode;
 }
@@ -55,6 +58,7 @@ export function FullscreenReviewPost({
   media,
   initialIndex = 0,
   onBack,
+  dotsBottomOffset,
   children,
 }: FullscreenReviewPostProps) {
   // Sort media: video first as cover, then by display_order/created_at
@@ -245,12 +249,16 @@ export function FullscreenReviewPost({
       
       {/* Preview tag removed - now in top-left under location */}
       
-      {/* Media counter - positioned based on mode */}
+      {/* Media counter - positioned dynamically to avoid CTA overlap */}
       {hasMultipleMedia && (
-        <div className={cn(
-          "absolute left-1/2 -translate-x-1/2 z-20",
-          mode === 'preview' ? "bottom-24 mb-3" : "bottom-20"
-        )}>
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 z-20"
+          style={{ 
+            bottom: dotsBottomOffset 
+              ? `${dotsBottomOffset}px` 
+              : mode === 'preview' ? '108px' : '80px' 
+          }}
+        >
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
             {sortedMedia.map((_, idx) => (
               <button
