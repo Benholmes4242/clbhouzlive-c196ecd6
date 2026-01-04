@@ -3,7 +3,6 @@ import { Trophy, ChevronRight } from 'lucide-react';
 import { TOP100_MILESTONES } from '@/config/top100Milestones';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 import { cn } from '@/lib/utils';
-import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 
 interface Top100ClosestBadgeCardProps {
   totalTop100Played: number;
@@ -60,10 +59,11 @@ export function Top100ClosestBadgeCard({
         <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Closest Badge
         </h2>
-        <span className="text-xs font-medium text-muted-foreground tabular-nums">
-          <AnimatedNumber value={totalTop100Played} minCh={1} /> courses logged
+        <span className="text-xs font-medium text-muted-foreground">
+          {totalTop100Played} courses logged
         </span>
       </div>
+
       {/* Single badge card - lighter padding (E2) */}
       <div 
         className={cn(
@@ -105,17 +105,17 @@ export function Top100ClosestBadgeCard({
             </div>
 
             {/* Progress text */}
-            <p className="text-sm text-muted-foreground mt-0.5 tabular-nums">
-              <AnimatedNumber value={progress} minCh={1} /> / {target} courses
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {progress} / {target} courses
               <span className="text-foreground font-medium ml-2">
-                <AnimatedNumber value={closest.remaining} minCh={1} delay={0.05} /> away
+                {closest.remaining} away
               </span>
             </p>
 
             {/* Progress bar - increased contrast bg (item 8) */}
             <div className="mt-3 h-2 rounded-full bg-border/80 overflow-hidden">
               <div
-                className="h-full rounded-full transition-[width] duration-700 ease-out"
+                className="h-full rounded-full transition-all duration-500"
                 style={{ 
                   width: `${progressPercent}%`, 
                   backgroundColor: accentColor,

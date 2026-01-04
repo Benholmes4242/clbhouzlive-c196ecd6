@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserPlus, UserCheck, UserMinus, MoreVertical } from 'lucide-react';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
@@ -244,22 +244,10 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     </Button>
   );
 
-  const moreMenuRef = useRef<HTMLButtonElement>(null);
-  
   const moreMenu = (
-    <DropdownMenu onOpenChange={(open) => {
-      // Blur the trigger when menu closes to remove focus ring
-      if (!open) {
-        moreMenuRef.current?.blur();
-      }
-    }}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          ref={moreMenuRef}
-          variant="ghost" 
-          size="sm"
-          className="focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
-        >
+        <Button variant="ghost" size="sm">
           <MoreVertical className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>

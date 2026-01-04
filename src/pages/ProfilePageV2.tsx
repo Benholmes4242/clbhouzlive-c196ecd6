@@ -3,9 +3,7 @@
  * Exact match to design mock
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -139,10 +137,9 @@ const ProfilePageV2: React.FC = () => {
   
   const [activeSection, setActiveSection] = useState('activity');
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
-  const [followersCount, setFollowersCount] = useState<number | null>(null);
-  const [followingCount, setFollowingCount] = useState<number | null>(null);
-  const [friendsCount, setFriendsCount] = useState<number | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [friendsCount, setFriendsCount] = useState(0);
 
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
@@ -150,12 +147,8 @@ const ProfilePageV2: React.FC = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      if (!profile?.id) {
-        setStatsLoading(false);
-        return;
-      }
+      if (!profile?.id) return;
       
-      setStatsLoading(true);
       try {
         const { count: followers } = await supabase
           .from('user_follows')
@@ -176,13 +169,9 @@ const ProfilePageV2: React.FC = () => {
             .eq('status', 'accepted')
             .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
           setFriendsCount(friends || 0);
-        } else {
-          setFriendsCount(0);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
-      } finally {
-        setStatsLoading(false);
       }
     };
     
@@ -523,79 +512,44 @@ const ProfilePageV2: React.FC = () => {
         )}
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Friends - with staggered fade animations */}
+      {/* Mini-nav row: Posts | Followers | Friends - evenly distributed across full width */}
       <div className="mt-6 px-5">
-        <motion.div 
-          className="flex items-center justify-between"
-          initial="hidden"
-          animate="show"
-          variants={{
-            hidden: {},
-            show: { transition: { staggerChildren: 0.06 } }
-          }}
-        >
+        <div className="flex items-center justify-between">
           {/* Posts */}
-          <motion.button
+          <button
             onClick={() => setActiveMiniNav('posts')}
             className="pb-3 flex items-center gap-2"
-            variants={{
-              hidden: { opacity: 0, y: 4 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-            }}
           >
             <span className="text-sm text-slate-500">Posts</span>
-            <AnimatedNumber 
-              value={postsCount} 
-              isLoading={statsLoading}
-              minCh={2}
-              className="text-base font-semibold text-[#0F0F0F]"
-            />
-          </motion.button>
+            <span className="text-base font-semibold text-[#0F0F0F]">{postsCount}</span>
+          </button>
           
           {/* Followers */}
-          <motion.button
+          <button
             onClick={() => {
               setActiveMiniNav('followers');
               navigate(`/profile/${username}/followers`);
             }}
             className="pb-3 flex items-center gap-2"
-            variants={{
-              hidden: { opacity: 0, y: 4 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-            }}
           >
             <span className="text-sm text-slate-500">Followers</span>
-            <AnimatedNumber 
-              value={followersCount} 
-              isLoading={statsLoading} 
-              minCh={2}
-              className="text-base font-semibold text-[#0F0F0F]"
-            />
-          </motion.button>
+            <span className="text-base font-semibold text-[#0F0F0F]">{followersCount}</span>
+          </button>
           
           {/* Friends */}
           {isPersonal && (
-            <motion.button
+            <button
               onClick={() => {
                 setActiveMiniNav('friends');
                 navigate(`/profile/${username}/friends`);
               }}
               className="pb-3 flex items-center gap-2"
-              variants={{
-                hidden: { opacity: 0, y: 4 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-              }}
             >
               <span className="text-sm text-slate-500">Friends</span>
-              <AnimatedNumber 
-                value={friendsCount} 
-                isLoading={statsLoading} 
-                minCh={2}
-                className="text-base font-semibold text-[#0F0F0F]"
-              />
-            </motion.button>
+              <span className="text-base font-semibold text-[#0F0F0F]">{friendsCount}</span>
+            </button>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* White content sheet */}

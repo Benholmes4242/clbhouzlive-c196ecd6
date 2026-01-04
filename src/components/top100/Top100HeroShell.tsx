@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Top100RankBadge } from './Top100RankBadge';
 import { getRegionTheme } from '@/lib/regionTheme';
-import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 interface Top100HeroShellProps {
@@ -25,6 +25,8 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   onBack,
   showProgress = true,
 }) => {
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+  
   const hero = list.hero_course;
   const topRank = hero?.rank_in_list ?? null;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
@@ -45,6 +47,14 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   };
 
   const displayLabel = getDisplayLabel(list.short_label || list.name, list.slug);
+  
+  // Animate progress bar on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedProgress(percent);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [percent]);
 
   return (
     <div className="w-full">
@@ -107,23 +117,22 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           >
             {/* Top row: X / total (primary) + % complete (secondary) */}
             <div className="flex items-baseline justify-between gap-4">
-              <div className="text-white">
-                <AnimatedNumber 
-                  value={playedCount}
-                  minCh={1}
-                  className="text-3xl font-semibold leading-none drop-shadow-sm"
-                />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="text-white"
+              >
+                <span className="text-3xl font-semibold leading-none drop-shadow-sm">
+                  {playedCount}
+                </span>
                 <span className="text-white/70 text-lg ml-0.5">/{totalCount}</span>
-              </div>
+              </motion.div>
 
               <div className="flex items-baseline gap-1.5 text-white">
-                <AnimatedNumber 
-                  value={Math.round(percent)}
-                  suffix="%"
-                  minCh={1}
-                  delay={0.1}
-                  className="text-lg font-semibold drop-shadow-sm"
-                />
+                <span className="text-lg font-semibold drop-shadow-sm">
+                  {Math.round(percent)}%
+                </span>
                 <span className="text-[11px] text-white/70">
                   complete
                 </span>
@@ -133,12 +142,12 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             {/* Progress bar - uses regional accent color */}
             <div className="mt-2.5">
               <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full shadow-sm transition-[width] duration-700 ease-out"
-                  style={{ 
-                    backgroundColor: theme.ringColor,
-                    width: `${percent}%`,
-                  }}
+                <motion.div
+                  className="h-2 rounded-full shadow-sm"
+                  style={{ backgroundColor: theme.ringColor }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${animatedProgress}%` }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                 />
               </div>
             </div>

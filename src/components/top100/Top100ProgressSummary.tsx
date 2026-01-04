@@ -1,5 +1,4 @@
 import React from 'react';
-import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 
 type Props = {
   ratedCount: number;
@@ -15,29 +14,21 @@ export function Top100ProgressSummary({ ratedCount, listCount }: Props) {
 
   return (
     <section className="my-4 flex flex-col items-center text-center gap-2 px-4">
-      {/* Headline - clear hierarchy with animated number */}
+      {/* Headline - clear hierarchy */}
       <p className="text-sm font-medium text-foreground">
-        You've rated{' '}
-        <AnimatedNumber value={ratedCount} minCh={1} className="font-semibold" />
-        {' '}course{ratedCount === 1 ? '' : 's'} across{' '}
-        <AnimatedNumber value={listCount} minCh={1} className="font-semibold" delay={0.05} />
-        {' '}Top 100 list{listCount === 1 ? '' : 's'}
+        You've rated {ratedCount} course{ratedCount === 1 ? '' : 's'} across {listCount} Top 100 list{listCount === 1 ? '' : 's'}
       </p>
 
       {/* Secondary line - muted detail */}
-      <p className="text-xs text-muted-foreground tabular-nums">
-        <AnimatedNumber value={ratedCount} minCh={1} delay={0.1} /> / {totalCoursesPossible} courses ·{' '}
-        <AnimatedNumber value={Math.round(progressPercent)} minCh={1} suffix="%" delay={0.15} />
+      <p className="text-xs text-muted-foreground">
+        {ratedCount} / {totalCoursesPossible} courses · {Math.round(progressPercent)}%
       </p>
 
-      {/* Progress bar - animated fill */}
-      <div className="w-full max-w-[400px]">
-        <AnimatedProgressBar 
-          percentage={progressPercent}
-          height="h-2"
-          bgColor="bg-muted/80"
-          fillColor="bg-[hsl(var(--tab-orange))]"
-          delay={0.2}
+      {/* Progress bar - thicker, more presence */}
+      <div className="h-2 w-full max-w-[400px] overflow-hidden rounded-full bg-muted/80">
+        <div
+          className="h-full rounded-full bg-[hsl(var(--tab-orange))] transition-[width] duration-500 ease-out"
+          style={{ width: `${progressPercent}%` }}
         />
       </div>
     </section>
