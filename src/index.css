@@ -478,30 +478,26 @@ html.lightbox-open {
 }
 
 /* ============================================================================
- * CRITICAL: AUTOMATIC HEADER OFFSET (NON-REGRESSABLE)
+ * CRITICAL: PREVENT HEADER OFFSET REGRESSION
  * ============================================================================
- * Pages were regressing (content sliding under the fixed header) when broad CSS
- * resets overrode `compact-header-offset`.
- *
- * CompactHeader toggles `body.has-app-header` whenever it is used as the GLOBAL
- * header (non-Clubhouse). We then apply the offset with high specificity +
- * `!important` so future resets cannot accidentally break it.
- *
- * Opt-out per-page by adding `.no-header-offset` to the page root.
+ * Pages sit flush below the header by default. High specificity prevents
+ * accidental resets from overriding. Only pages with `compact-header-offset`
+ * get the spacing.
  * ============================================================================
  */
-body.has-app-header .page-root:not(.no-header-offset):not(.compact-header-offset-no-safe),
-body.has-app-header .compact-header-offset:not(.no-header-offset) {
+body main,
+body .page-container,
+body .min-h-screen {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+body .compact-header-offset {
   padding-top: calc(var(--app-header-height, 40px) + var(--sat)) !important;
 }
 
-body.has-app-header .page-root.compact-header-offset-no-safe:not(.no-header-offset),
-body.has-app-header .compact-header-offset-no-safe:not(.no-header-offset) {
+body .compact-header-offset-no-safe {
   padding-top: var(--app-header-height, 40px) !important;
-}
-
-.no-header-offset {
-  padding-top: 0 !important;
 }
 
 
