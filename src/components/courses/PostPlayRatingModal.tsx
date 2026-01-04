@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -17,6 +17,7 @@ import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
+import { useShareReview } from '@/hooks/useShareReview';
 
 // Track if modal is being unmounted
 let isUnmounting = false;
@@ -133,6 +134,10 @@ const PostPlayRatingModal = ({
   // Store last payload for retry
   const lastPayloadRef = useRef<any>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [submittedRatingId, setSubmittedRatingId] = useState<string | null>(null);
+  
+  // Share review hook
+  const { shareReview, isSharing } = useShareReview();
   
   // Selected IMAGES only (videos handled separately via videoDrafts)
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -376,6 +381,9 @@ const PostPlayRatingModal = ({
     onSuccess: async (ratingId: string, variables) => {
       // Mark submit as completed FIRST to prevent cleanup from running
       submitCompletedRef.current = true;
+      
+      // Store the rating ID for share functionality
+      setSubmittedRatingId(ratingId);
       
       // Attach pending videos to the review (if any ready)
       try {
@@ -757,6 +765,7 @@ const PostPlayRatingModal = ({
     resetVideoDrafts();
     setExistingMediaItems([]);
     setShowConfirmation(false);
+    setSubmittedRatingId(null);
     setIsSubmitting(false);
   };
   const handleClose = async () => {
@@ -1447,7 +1456,9 @@ const PostPlayRatingModal = ({
               mode={isEditFlow ? 'updated' : 'submitted'}
               courseName={course!.name}
               courseId={course!.id}
+              ratingId={submittedRatingId || existingRating?.id || ''}
               userRating={selectedRating || 0}
+              reviewText={review.trim() || null}
               breakdown={
                 [
                   designScore != null && designTouched ? { label: 'Course Design', value: designScore } : null,
@@ -1461,10 +1472,19 @@ const PostPlayRatingModal = ({
               heroImageUrl={course?.thumbnail_image || null}
               heroSubtitle={course ? formatCourseLocation(course) : ''}
               onBack={handleClose}
-              onShareReview={() => {
-                // TODO: Implement share review flow
-                console.log('Share review clicked');
+              onShareReview={async () => {
+                if (!submittedRatingId && !existingRating?.id) {
+                  console.error('[ShareReview] No rating ID available');
+                  return;
+                }
+                await shareReview({
+                  ratingId: submittedRatingId || existingRating?.id,
+                  courseId: course!.id,
+                  reviewText: review.trim() || null,
+                  media: existingMediaItems,
+                });
               }}
+              isSharing={isSharing}
             />
           )}
         </div>
@@ -1561,14 +1581,17 @@ type RatingConfirmationViewProps = {
   mode: 'submitted' | 'updated';
   courseName: string;
   courseId: string;
+  ratingId: string;
   userRating: number;
+  reviewText: string | null;
   breakdown?: BreakdownItem[];
   communityScore?: number | null;
   submittedMedia?: ExistingMedia[];
   heroImageUrl?: string | null;
   heroSubtitle?: string;
   onBack: () => void;
-  onShareReview: () => void;
+  onShareReview: () => Promise<void>;
+  isSharing?: boolean;
 };
 
 function RatingConfirmationView(props: RatingConfirmationViewProps) {
@@ -1576,7 +1599,9 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     mode,
     courseName,
     courseId,
+    ratingId,
     userRating,
+    reviewText,
     breakdown = [],
     communityScore = null,
     submittedMedia = [],
@@ -1584,6 +1609,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     heroSubtitle,
     onBack,
     onShareReview,
+    isSharing = false,
   } = props;
 
   const isEdit = mode === 'updated';
@@ -1830,9 +1856,17 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={onShareReview}
-            className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            disabled={isSharing}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Share your review
+            {isSharing ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Sharing...
+              </>
+            ) : (
+              'Share your review'
+            )}
           </button>
 
           {/* Primary – back to course */}
