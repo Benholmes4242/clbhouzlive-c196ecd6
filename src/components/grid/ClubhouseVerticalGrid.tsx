@@ -64,6 +64,8 @@ interface ClubhouseVerticalGridProps {
   onTopZoneChange?: (isAtTop: boolean) => void;
   onMeaningfulInteraction?: () => void;
   onFirstFrameReady?: () => void;
+  /** Initial post index for deep linking (e.g., from focusPostId) */
+  initialIndex?: number;
 }
 
 // ============ VideoWithAutoplay Component ============
@@ -172,7 +174,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   onNavOverlayRequest,
   onTopZoneChange,
   onMeaningfulInteraction,
-  onFirstFrameReady
+  onFirstFrameReady,
+  initialIndex = 0
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -240,6 +243,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     hasMore,
     isLoadingMore,
     onFirstFrameReady,
+    initialIndex,
   });
 
   // Runtime bridge

@@ -61,6 +61,12 @@ const Clubhouse = () => {
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
+  // Parse focusPostId from URL params (for deep linking from "View in Clubhouse")
+  const focusPostId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('focusPostId');
+  }, [location.search]);
+  
   // Clubhouse: explore feed with short videos only (<120s)
   const {
     posts,
@@ -69,6 +75,18 @@ const Clubhouse = () => {
     loadMore,
     isLoadingMore
   } = useInfiniteClubhouseShorts();
+  
+  // Find initial index for focus post
+  const focusPostIndex = useMemo(() => {
+    if (!focusPostId || posts.length === 0) return 0;
+    const idx = posts.findIndex(p => p.id === focusPostId);
+    if (idx >= 0) {
+      console.log('[Clubhouse] Found focusPostId at index:', idx);
+      return idx;
+    }
+    console.log('[Clubhouse] focusPostId not found in posts:', focusPostId);
+    return 0;
+  }, [focusPostId, posts]);
 
   // Skeleton timing for smooth loading experience
   const { 
@@ -294,6 +312,7 @@ const Clubhouse = () => {
             onCommentsOpenChange={() => {}}
             onPostDetailsOpen={() => console.log('Post details opened')}
             onFirstFrameReady={handleFirstFrameReady}
+            initialIndex={focusPostIndex}
           />
         ) : !isLoading ? (
           // Only show empty state when not loading and no posts

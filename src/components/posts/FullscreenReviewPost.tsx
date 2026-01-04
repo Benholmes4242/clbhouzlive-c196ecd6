@@ -6,6 +6,7 @@ import { getScoreTier } from '@/utils/getScoreTier';
 import HLSPlayer from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
 
 export interface ReviewMediaItem {
   id: string;
@@ -195,10 +196,10 @@ export function FullscreenReviewPost({
         )}
       </div>
       
-      {/* Top-right: Rating + tier - safe-area padding for notch devices */}
+      {/* Top-right: Rating + tier - centered stack for alignment */}
       <Sheet>
         <SheetTrigger asChild>
-          <button className="absolute top-4 right-4 z-20 flex flex-col items-end gap-0.5 max-w-[100px]">
+          <button className="absolute top-4 right-4 z-20 flex flex-col items-center text-center gap-0.5 max-w-[100px]">
             <span className="text-white text-2xl sm:text-3xl font-bold tabular-nums drop-shadow-lg">
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
@@ -282,7 +283,7 @@ export function FullscreenReviewPost({
         {children}
       </div>
       
-      {/* Navigation arrows - more glassy, larger tap targets */}
+      {/* Navigation arrows - smaller w-10 h-10 for polish */}
       {hasMultipleMedia && (
         <>
           <button
@@ -290,13 +291,13 @@ export function FullscreenReviewPost({
             disabled={currentIndex === 0}
             className={cn(
               "absolute left-3 top-1/2 -translate-y-1/2 z-20",
-              "w-11 h-11 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
+              "w-10 h-10 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
               "flex items-center justify-center transition-all active:scale-[0.98]",
               currentIndex === 0 ? "opacity-0 pointer-events-none" : "hover:bg-black/40"
             )}
             aria-label="Previous media"
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <ChevronLeft className="w-4 h-4 text-white" />
           </button>
           
           <button
@@ -304,13 +305,13 @@ export function FullscreenReviewPost({
             disabled={currentIndex === sortedMedia.length - 1}
             className={cn(
               "absolute right-3 top-1/2 -translate-y-1/2 z-20",
-              "w-11 h-11 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
+              "w-10 h-10 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
               "flex items-center justify-center transition-all active:scale-[0.98]",
               currentIndex === sortedMedia.length - 1 ? "opacity-0 pointer-events-none" : "hover:bg-black/40"
             )}
             aria-label="Next media"
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <ChevronRight className="w-4 h-4 text-white" />
           </button>
         </>
       )}
