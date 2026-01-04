@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Pencil } from 'lucide-react';
-import { getScoreTier } from '@/utils/getScoreTier';
+
 import { RatingBar } from '@/components/ui/RatingBar';
-import { RatingBadge } from '@/components/ui/RatingBadge';
+import { RatingPill } from '@/components/ui/RatingPill';
 import { RatingTierDistribution, RatingTierDistributionData } from './RatingTierDistribution';
 
 interface CategoryAverage {
@@ -59,7 +59,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   userHasRating,
   onRateCourse,
 }) => {
-  const tierData = getScoreTier(averageRating);
+  
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
   // Community highlights - only show when ≥3 reviews
@@ -133,7 +133,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   {averageRating.toFixed(1)}
                 </span>
               </div>
-              <RatingBadge tierData={tierData} />
+              <RatingPill score={averageRating} />
             </div>
 
             {/* Rating count - centered */}

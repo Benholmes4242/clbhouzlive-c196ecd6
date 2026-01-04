@@ -1680,7 +1680,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
       )}
 
       {/* SECTION B – Success header (compact if hero exists) */}
-      <section className={`bg-slate-50 px-6 text-center animate-fade-in ${showHero ? 'pt-5 pb-3' : 'pt-14 pb-5'}`}>
+      <section className={`bg-slate-50 px-6 text-center animate-fade-in ${showHero ? 'pt-5 pb-4' : 'pt-14 pb-5'}`}>
         <div 
           className={`mx-auto mb-2 flex items-center justify-center rounded-full bg-emerald-100 shadow-[0_0_0_6px_rgba(16,185,129,0.1)] animate-scale-in ${showHero ? 'h-11 w-11' : 'h-14 w-14'}`}
           style={{ animationDelay: '100ms' }}
@@ -1692,9 +1692,9 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
       </section>
 
-      {/* SECTION C – Hero Rating Card (overlaps hero if present) */}
+      {/* SECTION C – Hero Rating Card */}
       <section 
-        className={`animate-fade-in ${showHero ? '-mt-3 px-4' : 'px-6 py-4'}`}
+        className={`animate-fade-in ${showHero ? 'px-4' : 'px-6 py-4'}`}
         style={{ animationDelay: '150ms' }}
       >
         <div className="rounded-2xl bg-white px-5 py-5 shadow-sm border border-slate-200/80">
@@ -1739,7 +1739,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
       {/* SECTION D – User Media Thumbnails (premium grid) */}
       {submittedMedia.length > 0 && (
         <section 
-          className="px-4 py-4 animate-fade-in"
+          className="px-4 pt-4 pb-4 animate-fade-in"
           style={{ animationDelay: '200ms' }}
         >
           <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3 px-2">
