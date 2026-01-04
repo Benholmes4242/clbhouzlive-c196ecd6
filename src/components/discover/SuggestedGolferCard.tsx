@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { MutualFriendsAvatars, MutualFriend } from './MutualFriendsAvatars';
+import { AnimatedNumber } from '@/components/ui/motion';
 
 interface SuggestedGolferCardProps {
   golfer: {
@@ -109,18 +110,22 @@ export const SuggestedGolferCard: React.FC<SuggestedGolferCardProps> = ({
         <div className="flex items-center gap-1.5 justify-center">
           <MutualFriendsAvatars friends={golfer.mutual_friends} maxDisplay={3} />
           <span className="text-[11px] text-muted-foreground">
-            {golfer.mutual_count} {REASON_LABELS.mutuals}
+            <AnimatedNumber value={golfer.mutual_count ?? 0} minCh={1} className="inline" /> {REASON_LABELS.mutuals}
           </span>
         </div>
       );
     }
     
     // Fallback to text-only
-    const reasonLabel = golfer.reason 
-      ? golfer.reason === 'mutuals' && golfer.mutual_count
-        ? `${golfer.mutual_count} ${REASON_LABELS.mutuals}`
-        : REASON_LABELS[golfer.reason]
-      : REASON_LABELS.suggested;
+    if (golfer.reason === 'mutuals' && golfer.mutual_count) {
+      return (
+        <span className="text-[11px] text-muted-foreground text-center truncate w-full">
+          <AnimatedNumber value={golfer.mutual_count} minCh={1} className="inline" /> {REASON_LABELS.mutuals}
+        </span>
+      );
+    }
+    
+    const reasonLabel = golfer.reason ? REASON_LABELS[golfer.reason] : REASON_LABELS.suggested;
     
     return (
       <span className="text-[11px] text-muted-foreground text-center truncate w-full">

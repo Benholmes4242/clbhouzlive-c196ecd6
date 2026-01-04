@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 
 interface Top100Progress {
   listId: string;
@@ -24,42 +25,6 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
   isOwnProfile = true,
   className
 }) => {
-  const [animatedCount, setAnimatedCount] = useState(0);
-  const hasAnimatedCount = useRef(false);
-  const hasAnimatedBars = useRef(false);
-
-  // Count-up animation (once per mount, uses ref to survive re-renders)
-  useEffect(() => {
-    if (hasAnimatedCount.current || coursesPlayed === 0) {
-      setAnimatedCount(coursesPlayed);
-      return;
-    }
-
-    const duration = 450;
-    const steps = 30;
-    const increment = coursesPlayed / steps;
-    let current = 0;
-
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= coursesPlayed) {
-        setAnimatedCount(coursesPlayed);
-        hasAnimatedCount.current = true;
-        clearInterval(timer);
-      } else {
-        setAnimatedCount(Math.floor(current));
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [coursesPlayed]);
-
-  // Mark bars as animated after first render
-  useEffect(() => {
-    if (!hasAnimatedBars.current) {
-      hasAnimatedBars.current = true;
-    }
-  }, []);
 
   return (
     <motion.div
@@ -78,9 +43,11 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
 
       {/* 1. Courses Played - Primary KPI */}
       <div className="mb-6">
-        <div className="text-4xl font-bold text-foreground tabular-nums">
-          {animatedCount}
-        </div>
+        <AnimatedNumber 
+          value={coursesPlayed}
+          className="text-4xl font-bold text-foreground"
+          minCh={1}
+        />
         <p className="text-sm text-muted-foreground mt-1">Courses played</p>
       </div>
 
@@ -119,17 +86,14 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-sm text-foreground/90">{list.listName}</span>
                     <span className="text-sm font-medium text-foreground tabular-nums">
-                      {list.played} / {list.total}
+                      <AnimatedNumber value={list.played} minCh={1} delay={index * 0.05} />
+                      <span className="text-muted-foreground"> / {list.total}</span>
                     </span>
                   </div>
-                  <div className="h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={hasAnimatedBars.current ? false : { width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={hasAnimatedBars.current ? { duration: 0 } : { duration: 0.35 + index * 0.05, delay: 0.1 }}
-                      className="h-full bg-slate-500/80 rounded-full"
-                    />
-                  </div>
+                  <AnimatedProgressBar 
+                    percentage={percentage}
+                    delay={0.1 + index * 0.05}
+                  />
                 </div>
               );
             })}
