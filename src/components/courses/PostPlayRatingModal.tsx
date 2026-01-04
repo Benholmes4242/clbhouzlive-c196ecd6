@@ -1450,6 +1450,7 @@ const PostPlayRatingModal = ({
                 ].filter((item): item is BreakdownItem => item !== null)
               }
               communityScore={null}
+              submittedMedia={existingMediaItems}
               onBackToCourse={handleClose}
               onShareReview={() => {
                 // TODO: Implement share review flow
@@ -1554,21 +1555,10 @@ type RatingConfirmationViewProps = {
   userRating: number;
   breakdown?: BreakdownItem[];
   communityScore?: number | null;
+  submittedMedia?: ExistingMedia[];
   onBackToCourse: () => void;
   onShareReview: () => void;
 };
-
-function RatingBadge({ score }: { score: number }) {
-  const tierData = getScoreTier(score);
-
-  return (
-    <div
-      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${tierData.bg} ${tierData.border} ${tierData.text}`}
-    >
-      {tierData.label}
-    </div>
-  );
-}
 
 function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const {
@@ -1578,13 +1568,15 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     userRating,
     breakdown = [],
     communityScore = null,
+    submittedMedia = [],
     onBackToCourse,
     onShareReview,
   } = props;
 
   const isEdit = mode === 'updated';
   const isNewReview = !isEdit;
-  const comparison = getComparisonCopy(userRating, communityScore);
+  const tierData = getScoreTier(userRating);
+  const isOutstanding = tierData.tier === 'outstanding';
 
   // Track confirmation view
   useEffect(() => {
@@ -1608,10 +1600,10 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
 
   const title = isEdit ? 'Rating updated' : 'Rating submitted';
   const subtitle = isEdit
-    ? `Your updated rating for ${courseName} has been saved.`
+    ? `Your rating for ${courseName} has been saved.`
     : `Your rating for ${courseName} has been saved.`;
 
-  const overallHeading = isEdit ? 'Updated overall rating' : 'Submitted overall rating';
+  const overallHeading = isEdit ? 'Updated overall rating' : 'Your overall rating';
   const breakdownHeading = isEdit ? 'Updated breakdown' : 'Your breakdown';
 
   // Compute comparison for inside the rating card
@@ -1639,44 +1631,57 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
+  // Get bar fill color - gold for outstanding, slate for others
+  const getBarFillColor = (value: number) => {
+    const itemTier = getScoreTier(value);
+    return itemTier.tier === 'outstanding' ? '#C9A94A' : '#64748B';
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      {/* SECTION A – Success header */}
-      <section className="bg-slate-50 px-6 pt-16 pb-6 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-          <Check className="h-8 w-8 text-emerald-600" />
+      {/* SECTION A – Success header with animation */}
+      <section className="bg-slate-50 px-6 pt-14 pb-5 text-center animate-fade-in">
+        <div 
+          className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 animate-scale-in"
+          style={{ animationDelay: '100ms' }}
+        >
+          <Check className="h-7 w-7 text-emerald-600" />
         </div>
 
         <h1 className="text-lg font-semibold text-slate-900">{title}</h1>
         <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
       </section>
 
-      {/* SECTION B – Overall rating card */}
-      <section className="bg-slate-100 px-6 py-6">
-        <div className="rounded-2xl bg-white px-5 py-4 shadow-sm border border-slate-200">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                {overallHeading}
-              </p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900">
-                {userRating.toFixed(1)}
-              </p>
-            </div>
-
-            <RatingBadge score={userRating} />
+      {/* SECTION B – Hero Rating Card */}
+      <section 
+        className="px-6 py-4 animate-fade-in"
+        style={{ animationDelay: '150ms' }}
+      >
+        <div className="rounded-2xl bg-white px-5 py-5 shadow-sm border border-slate-200/80">
+          {/* Header label */}
+          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3">
+            {overallHeading}
+          </p>
+          
+          {/* Large score + tier pill row */}
+          <div className="flex items-center justify-between">
+            <p className="text-4xl font-bold text-slate-900 tabular-nums">
+              {userRating === 10 ? '10' : userRating.toFixed(1)}
+            </p>
+            <RatingPill score={userRating} className="py-1.5 px-4" />
           </div>
 
+          {/* Community comparison */}
           {comparisonText && (
-            <div className="mt-3 flex items-center gap-1.5">
+            <div className="mt-4 flex items-center gap-1.5 pt-3 border-t border-slate-100">
               {comparisonVariant === 'higher' && (
-                <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+                <ArrowUp className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
               )}
               {comparisonVariant === 'lower' && (
-                <ArrowDown className="h-3.5 w-3.5 text-red-500" />
+                <ArrowDown className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
               )}
               {comparisonVariant === 'on-par' && (
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
               )}
               <p className={`text-xs font-medium ${
                 comparisonVariant === 'higher' ? 'text-emerald-600' :
@@ -1691,24 +1696,70 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         </div>
       </section>
 
-      {/* SECTION C – Breakdown (optional) */}
-      {breakdown.length > 0 && (
-        <section className="bg-slate-50 px-6 py-6">
-          <h2 className="mb-3 text-sm font-semibold text-slate-800">{breakdownHeading}</h2>
+      {/* SECTION C – User Media Thumbnails */}
+      {submittedMedia.length > 0 && (
+        <section 
+          className="px-6 py-3 animate-fade-in"
+          style={{ animationDelay: '200ms' }}
+        >
+          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3">
+            Review media
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {submittedMedia.slice(0, 6).map((item) => {
+              const isVideo = item.media_type === 'video';
+              const thumbnailUrl = isVideo && item.poster_url ? item.poster_url : item.media_url;
+              
+              return (
+                <div 
+                  key={item.id}
+                  className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60"
+                >
+                  <img 
+                    src={thumbnailUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                  {isVideo && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                        <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-slate-700 border-b-[5px] border-b-transparent ml-0.5" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-          <div className="space-y-4">
+      {/* SECTION D – Breakdown (optional) */}
+      {breakdown.length > 0 && (
+        <section 
+          className="px-6 py-4 animate-fade-in"
+          style={{ animationDelay: submittedMedia.length > 0 ? '250ms' : '200ms' }}
+        >
+          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3">
+            {breakdownHeading}
+          </p>
+
+          <div className="space-y-3">
             {breakdown.map((item) => (
               <div key={item.label}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="text-slate-700">{item.label}</span>
-                  <span className="font-medium text-slate-900">
-                    {item.value.toFixed(1)}
+                <div className="mb-1.5 flex items-center justify-between text-sm">
+                  <span className="text-slate-600">{item.label}</span>
+                  <span className="font-semibold text-slate-900 tabular-nums">
+                    {item.value === 10 ? '10' : item.value.toFixed(1)}
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                   <div
-                    className="h-2 rounded-full bg-slate-900"
-                    style={{ width: `${(item.value / 10) * 100}%` }}
+                    className="h-1.5 rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${(item.value / 10) * 100}%`,
+                      backgroundColor: getBarFillColor(item.value),
+                    }}
                   />
                 </div>
               </div>
@@ -1717,18 +1768,20 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         </section>
       )}
 
-
       {/* Spacer so actions sit near the bottom */}
-      <div className="flex-1 bg-slate-50" />
+      <div className="flex-1 bg-slate-50 min-h-[40px]" />
 
       {/* SECTION E – Actions row */}
-      <section className="bg-slate-50 px-6 pb-8 pt-4">
+      <section 
+        className="bg-slate-50 px-6 pb-8 pt-4 animate-fade-in"
+        style={{ animationDelay: '300ms' }}
+      >
         <div className="flex gap-3">
           {/* Secondary – share review */}
           <button
             type="button"
             onClick={onShareReview}
-            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Share your review
           </button>
@@ -1737,7 +1790,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={handleBackToCourse}
-            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Back to course
           </button>
