@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { COURSE_MILESTONES, getNextMilestone, getMilestoneName } from '@/config/milestones';
@@ -24,13 +24,14 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
   className
 }) => {
   const [animatedCount, setAnimatedCount] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const hasAnimatedCount = useRef(false);
+  const hasAnimatedBars = useRef(false);
   const nextMilestone = getNextMilestone(coursesPlayed);
   const unlockedMilestones = COURSE_MILESTONES.filter(m => m <= coursesPlayed);
 
-  // Count-up animation (once per session)
+  // Count-up animation (once per mount, uses ref to survive re-renders)
   useEffect(() => {
-    if (hasAnimated || coursesPlayed === 0) {
+    if (hasAnimatedCount.current || coursesPlayed === 0) {
       setAnimatedCount(coursesPlayed);
       return;
     }
@@ -44,7 +45,7 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
       current += increment;
       if (current >= coursesPlayed) {
         setAnimatedCount(coursesPlayed);
-        setHasAnimated(true);
+        hasAnimatedCount.current = true;
         clearInterval(timer);
       } else {
         setAnimatedCount(Math.floor(current));
@@ -52,7 +53,14 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
     }, duration / steps);
 
     return () => clearInterval(timer);
-  }, [coursesPlayed, hasAnimated]);
+  }, [coursesPlayed]);
+
+  // Mark bars as animated after first render
+  useEffect(() => {
+    if (!hasAnimatedBars.current) {
+      hasAnimatedBars.current = true;
+    }
+  }, []);
 
   return (
     <motion.div
@@ -115,9 +123,9 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
                   </div>
                   <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
                     <motion.div
-                      initial={{ width: 0 }}
+                      initial={hasAnimatedBars.current ? false : { width: 0 }}
                       animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 0.4, delay: 0.1 }}
+                      transition={hasAnimatedBars.current ? { duration: 0 } : { duration: 0.4, delay: 0.1 }}
                       className="h-full bg-primary/70 rounded-full"
                     />
                   </div>
@@ -166,9 +174,9 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
             </div>
             <div className="h-1 bg-muted/50 rounded-full overflow-hidden">
               <motion.div
-                initial={{ width: 0 }}
+                initial={hasAnimatedBars.current ? false : { width: 0 }}
                 animate={{ width: `${(coursesPlayed / nextMilestone) * 100}%` }}
-                transition={{ duration: 0.35, delay: 0.15 }}
+                transition={hasAnimatedBars.current ? { duration: 0 } : { duration: 0.35, delay: 0.15 }}
                 className="h-full bg-primary/60 rounded-full"
               />
             </div>
