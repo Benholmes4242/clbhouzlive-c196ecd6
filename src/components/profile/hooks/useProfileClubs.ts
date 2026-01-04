@@ -28,12 +28,14 @@ export const useProfileClubs = (
       if (!profileId) return { homeClub: null, secondaryClubs: [], isPrivate: false };
 
       // First get the primary home club from user_profiles
+      // Include home_club text field as fallback if FK join fails
       const { data: profile } = await supabase
         .from('user_profiles')
         .select(`
           home_club_id,
+          home_club,
           home_club_visibility,
-          home_club:golf_clubs!home_club_id(id, name)
+          home_club_join:golf_clubs!home_club_id(id, name)
         `)
         .eq('id', profileId)
         .single();
@@ -45,13 +47,24 @@ export const useProfileClubs = (
       const canSeeHomeClub = isOwner || visibility === 'public';
 
       let homeClub: Club | null = null;
-      if (canSeeHomeClub && profile?.home_club) {
-        const club = profile.home_club as unknown as { id: string; name: string };
-        homeClub = {
-          id: club.id,
-          name: club.name,
-          isPrimary: true
-        };
+      if (canSeeHomeClub) {
+        // Try FK join first
+        if (profile?.home_club_join) {
+          const club = profile.home_club_join as unknown as { id: string; name: string };
+          homeClub = {
+            id: club.id,
+            name: club.name,
+            isPrimary: true
+          };
+        } 
+        // Fallback to text field if FK join failed but home_club text exists
+        else if (profile?.home_club && typeof profile.home_club === 'string') {
+          homeClub = {
+            id: profile.home_club_id ?? 'text-fallback',
+            name: profile.home_club,
+            isPrimary: true
+          };
+        }
       }
 
       // Get secondary clubs using RPC
