@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
 import CourseTag from '@/components/posts/CourseTag';
-import { Camera, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, Play, ChevronLeft, ChevronRight, Star, MapPin } from 'lucide-react';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -18,10 +18,16 @@ interface ActivityPostCardProps {
   isFirstVideo?: boolean; // Kept for API compatibility but no longer used
 }
 
+// Helper to format location string
+const formatLocation = (course?: ActivityPost['course']) => {
+  if (!course) return '';
+  const parts = [course.sub_country || course.region, course.country].filter(Boolean);
+  return parts.join(', ');
+};
+
 /**
  * ActivityPostCard - Grid card for activity feed
- * Legacy autoplay removed - videos show poster thumbnail only
- * For autoplay, use BusinessPostCard with useGridAutoplay
+ * Now includes review overlay for posts with isReview=true
  */
 const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardProps) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -47,6 +53,12 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
   const filterClass = getFilterClass(filterId as any);
   const cropClass = getCropWrapperClass(studioEdits?.crop);
   const pixelStyle = getPixelLayerStyle(studioEdits);
+
+  // Review overlay data
+  const isReview = post.isReview;
+  const courseName = post.course?.name;
+  const courseLocation = formatLocation(post.course);
+  const rating = post.rating;
 
   return (
     <div 
@@ -87,6 +99,42 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
             </div>
           )}
 
+          {/* Review overlay - always visible for review posts */}
+          {isReview && (
+            <>
+              {/* Top gradient for overlay readability */}
+              <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+              
+              {/* Top-left: Course name + location */}
+              {courseName && (
+                <div className="absolute top-2 left-2 z-10 max-w-[60%]">
+                  <p className="text-white text-xs font-semibold truncate drop-shadow-md">
+                    {courseName}
+                  </p>
+                  {courseLocation && (
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      <MapPin className="w-2.5 h-2.5 text-white/70" />
+                      <p className="text-white/70 text-[10px] truncate drop-shadow-md">
+                        {courseLocation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Top-right: Rating badge */}
+              {rating != null && (
+                <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-0.5">
+                  <div className="flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+                    <Star className="w-3 h-3 text-amber-400" fill="currentColor" />
+                    <span className="text-white text-xs font-bold">{rating.toFixed(1)}</span>
+                  </div>
+                  <span className="text-white/60 text-[9px] drop-shadow-md">From a review</span>
+                </div>
+              )}
+            </>
+          )}
+
           {hasMultipleMedia && (
             <>
               <button
@@ -124,28 +172,31 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
         </div>
       )}
       
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="absolute bottom-0 left-0 right-0 p-2">
-          <p className="text-white text-xs font-medium">{attributionText}</p>
-          {post.content && (
-            <p className="text-white text-xs opacity-90 mt-1 line-clamp-2">
-              {removeGolfCourseFromContent(post.content)}
-            </p>
-          )}
-          {courseTags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1" onClick={(e) => e.stopPropagation()}>
-              {courseTags.map((tag) => (
-                <CourseTag
-                  key={tag.id}
-                  courseName={tag.tagged_entity!.name}
-                  onClick={() => handleCourseTagClick(tag.tagged_entity!.name)}
-                  className="text-xs px-2 py-0.5"
-                />
-              ))}
-            </div>
-          )}
+      {/* Hover overlay - only for non-review posts (reviews already have persistent overlay) */}
+      {!isReview && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute bottom-0 left-0 right-0 p-2">
+            <p className="text-white text-xs font-medium">{attributionText}</p>
+            {post.content && (
+              <p className="text-white text-xs opacity-90 mt-1 line-clamp-2">
+                {removeGolfCourseFromContent(post.content)}
+              </p>
+            )}
+            {courseTags.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1" onClick={(e) => e.stopPropagation()}>
+                {courseTags.map((tag) => (
+                  <CourseTag
+                    key={tag.id}
+                    courseName={tag.tagged_entity!.name}
+                    onClick={() => handleCourseTagClick(tag.tagged_entity!.name)}
+                    className="text-xs px-2 py-0.5"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

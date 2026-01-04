@@ -25,6 +25,17 @@ export interface ActivityPost {
   created_at: string;
   course_id?: string | null;
   badges?: string[] | null;
+  categories?: string[] | null;
+  source_review_id?: string | null;
+  isReview?: boolean;
+  rating?: number;
+  course?: {
+    id: string;
+    name: string;
+    country?: string;
+    sub_country?: string;
+    region?: string;
+  };
   post_media: Array<{
     id: string;
     media_type: 'image' | 'video';
