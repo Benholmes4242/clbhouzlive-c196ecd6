@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
-import { Play } from 'lucide-react';
 import type { ExtendedMediaItem } from '@/components/media-grid';
+import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 
 interface MediaGridItemProps {
   item: ExtendedMediaItem;
@@ -46,18 +46,11 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
         onLoad={() => setIsLoaded(true)}
       />
 
-      {/* Video overlays: gradient + centered play + duration */}
+      {/* Video overlays: bottom-left play icon + duration pill */}
       {isVideo && (
         <>
-          {/* Bottom gradient for readability */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
-
-          {/* Centered play icon */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm">
-              <Play className="h-4 w-4 text-white fill-white ml-0.5" />
-            </div>
-          </div>
+          {/* Bottom-left play icon - matching VideoPlayIndicator */}
+          <VideoPlayIndicator size="md" />
 
           {/* Duration pill - bottom right */}
           <div className="absolute bottom-2 right-2">
