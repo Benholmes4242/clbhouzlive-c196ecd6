@@ -376,17 +376,18 @@ const PostPlayRatingModal = ({
       // Mark submit as completed FIRST to prevent cleanup from running
       submitCompletedRef.current = true;
       
-      // Attach pending videos to the review
-      if (videoDrafts.filter(d => d.status === 'ready').length > 0) {
-        try {
+      // Attach pending videos to the review (if any ready)
+      try {
+        if (videoDrafts.some(d => d.status === 'ready')) {
           const { attached } = await attachToReview(ratingId);
           console.log('[Rating] Attached', attached, 'videos to review:', ratingId);
-          // Clear video drafts after successful attach (so cleanup has nothing to act on)
-          resetVideoDrafts();
-        } catch (attachError) {
-          console.error('[Rating] Failed to attach videos:', attachError);
-          // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
         }
+      } catch (attachError) {
+        console.error('[Rating] Failed to attach videos:', attachError);
+        // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
+      } finally {
+        // Always clear video drafts after success (keeps state clean)
+        resetVideoDrafts();
       }
       
       // Get userId for proper query invalidation
@@ -721,8 +722,10 @@ const PostPlayRatingModal = ({
     setIsSubmitting(false);
   };
   const handleClose = async () => {
-    // Cleanup pending video uploads when modal is closed without submitting
-    await cleanupPending();
+    // Only cleanup pending video uploads if submit didn't complete successfully
+    if (!submitCompletedRef.current) {
+      await cleanupPending();
+    }
     onClose();
     resetForm();
   };
