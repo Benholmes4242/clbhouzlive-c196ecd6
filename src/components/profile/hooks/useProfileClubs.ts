@@ -19,6 +19,16 @@ interface UseProfileClubsResult {
 }
 
 /**
+ * Profile row shape returned by the single joined query.
+ */
+interface ProfileClubRow {
+  primary_club_id: string | null;
+  home_club: string | null;
+  home_club_visibility: string | null;
+  primary_club: { id: string; name: string } | null;
+}
+
+/**
  * Expected shape of `get_home_clubs_for_user` RPC response.
  * If the RPC evolves, update this type and parsing logic.
  */
@@ -33,16 +43,16 @@ interface ClubsRpcResult {
 function isClubsRpcResult(data: unknown): data is ClubsRpcResult {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const obj = data as Record<string, unknown>;
-  // Must have user_id string at minimum
   return typeof obj.user_id === 'string';
 }
 
 // ============================================================================
-// CANONICAL HOME CLUB GETTER
+// CANONICAL HOME CLUB GETTER (PURE FUNCTION)
 // ============================================================================
 
 /**
- * Resolves the canonical home club for a user profile.
+ * Resolves the canonical home club from an already-fetched profile row.
+ * NO additional network calls - pure function.
  * 
  * SCHEMA CONTEXT:
  * Due to legacy schema drift, user_profiles has multiple club-related fields:
@@ -51,55 +61,34 @@ function isClubsRpcResult(data: unknown): data is ClubsRpcResult {
  *   - `home_club` (text) - DENORMALIZED: display name for fast reads (header uses this)
  * 
  * PRIORITY ORDER:
- *   1. primary_club_id → join to golf_clubs for authoritative name
- *   2. home_club (text) → fallback if id missing but text exists
- *   3. null → user has no home club set
+ *   1. primary_club join → use golf_clubs.name from the embedded join
+ *   2. primary_club_id + home_club text → fallback if join returned null
+ *   3. home_club text only → fallback for legacy accounts without id
+ *   4. null → user has no home club set
  * 
  * We do NOT read from home_club_id anymore to avoid confusion.
  */
-async function resolveCanonicalHomeClub(
-  profileId: string,
+function resolveCanonicalHomeClubFromRow(
+  profile: ProfileClubRow | null,
   canSeeHomeClub: boolean
-): Promise<Club | null> {
-  if (!canSeeHomeClub) return null;
+): Club | null {
+  if (!canSeeHomeClub || !profile) return null;
 
-  // Fetch both the canonical ID and the denormalized text
-  const { data: profile, error } = await supabase
-    .from('user_profiles')
-    .select('primary_club_id, home_club')
-    .eq('id', profileId)
-    .maybeSingle();
+  const { primary_club_id, home_club, primary_club } = profile;
 
-  if (error) {
-    console.error('[resolveCanonicalHomeClub] Query error:', error);
-    return null;
+  // Priority 1: Use joined golf_clubs data if available (canonical + authoritative name)
+  if (primary_club?.id && primary_club?.name) {
+    return { id: primary_club.id, name: primary_club.name, isPrimary: true };
   }
 
-  if (!profile) return null;
-
-  const primaryClubId = profile.primary_club_id;
-  const homeClubText = profile.home_club;
-
-  // Priority 1: Use primary_club_id if available (canonical)
-  if (primaryClubId) {
-    const { data: clubRow, error: clubErr } = await supabase
-      .from('golf_clubs')
-      .select('id, name')
-      .eq('id', primaryClubId)
-      .maybeSingle();
-
-    if (!clubErr && clubRow) {
-      return { id: clubRow.id, name: clubRow.name, isPrimary: true };
-    }
-    // If join fails but we have the text fallback, use it
-    if (homeClubText) {
-      return { id: primaryClubId, name: homeClubText, isPrimary: true };
-    }
+  // Priority 2: Have canonical ID but join failed - use denormalized text
+  if (primary_club_id && home_club) {
+    return { id: primary_club_id, name: home_club, isPrimary: true };
   }
 
-  // Priority 2: Fall back to text-only (legacy accounts)
-  if (homeClubText) {
-    return { id: 'text-fallback', name: homeClubText, isPrimary: true };
+  // Priority 3: Text-only fallback (legacy accounts without proper club ID)
+  if (home_club) {
+    return { id: 'text-fallback', name: home_club, isPrimary: true };
   }
 
   return null;
@@ -112,6 +101,10 @@ async function resolveCanonicalHomeClub(
 /**
  * Fetches clubs for a user profile.
  * Uses canonical primary_club_id for home club and RPC for additional clubs.
+ * 
+ * PERFORMANCE: 2 network calls total:
+ *   1. Single user_profiles query with golf_clubs join
+ *   2. RPC for secondary clubs (viewer-aware)
  */
 export const useProfileClubs = (
   profileId: string | undefined,
@@ -122,28 +115,35 @@ export const useProfileClubs = (
     queryFn: async () => {
       if (!profileId) return { homeClub: null, secondaryClubs: [], isPrivate: false };
 
-      // Fetch visibility setting
-      const { data: visibilityRow } = await supabase
+      // CALL 1: Single query - profile fields + joined club name
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
-        .select('home_club_visibility')
+        .select(`
+          primary_club_id,
+          home_club,
+          home_club_visibility,
+          primary_club:golf_clubs!primary_club_id(id, name)
+        `)
         .eq('id', profileId)
         .maybeSingle();
 
+      if (profileError) {
+        console.error('[useProfileClubs] Profile query error:', profileError);
+      }
+
       const isOwner = viewerUserId === profileId;
-      const visibility = visibilityRow?.home_club_visibility ?? 'public';
+      const visibility = profile?.home_club_visibility ?? 'public';
       const canSeeHomeClub = isOwner || visibility === 'public';
 
-      // Resolve home club using canonical getter
-      const homeClub = await resolveCanonicalHomeClub(profileId, canSeeHomeClub);
+      // Resolve home club from already-fetched row (pure function, no extra queries)
+      const homeClub = resolveCanonicalHomeClubFromRow(profile as ProfileClubRow | null, canSeeHomeClub);
 
-      // Get secondary clubs using RPC (viewer-aware)
+      // CALL 2: RPC for secondary clubs (viewer-aware)
       let secondaryClubs: Club[] = [];
       
-      // Always pass viewer_id to RPC for proper visibility checks
-      // Owner viewing self should always see their clubs
       const { data: rpcResult, error: rpcError } = await supabase.rpc('get_home_clubs_for_user', {
         p_user_profile_id: profileId,
-        p_viewer_id: viewerUserId ?? profileId,
+        p_viewer_id: viewerUserId ?? profileId, // Owner viewing self should always see their clubs
       });
 
       if (rpcError) {
@@ -161,7 +161,6 @@ export const useProfileClubs = (
             .map((c) => ({ id: c.id, name: c.name }));
         }
       } else if (rpcResult !== null && process.env.NODE_ENV === 'development') {
-        // Log unexpected shape in dev only - helps catch RPC changes early
         console.warn('[useProfileClubs] Unexpected RPC response shape:', rpcResult);
       }
 
