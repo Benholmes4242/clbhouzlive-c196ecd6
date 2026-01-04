@@ -605,9 +605,9 @@ const ProfilePageV2: React.FC = () => {
 
       {/* White content sheet */}
       <div className="bg-white pt-5 pb-32 min-h-[60vh]">
-        {/* About section */}
-        <section className="px-5 mb-6">
-          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2">About</h3>
+        {/* About section - 20px section gap */}
+        <section className="px-5 mb-5">
+          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2.5">About</h3>
           <p className="text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
@@ -635,17 +635,19 @@ const ProfilePageV2: React.FC = () => {
           )}
         </section>
 
-        {/* Clubs section - uses new ClubsCard with useProfileClubs hook */}
-        <ClubsSectionWrapper 
-          profileId={profile?.id}
-          viewerId={user?.id}
-          isPersonal={isPersonal}
-          isSelf={isSelf}
-        />
+        {/* Clubs section - uses new ClubsCard with useProfileClubs hook - 20px gap */}
+        <div className="mb-5">
+          <ClubsSectionWrapper 
+            profileId={profile?.id}
+            viewerId={user?.id}
+            isPersonal={isPersonal}
+            isSelf={isSelf}
+          />
+        </div>
 
-        {/* Phase 6: Golf Journey Progress */}
+        {/* Phase 6: Golf Journey Progress - 20px gap */}
         {isPersonal && profile?.id && (
-          <section className="px-5 mb-6">
+          <section className="px-5 mb-5">
             <GolfJourneyProgress 
               userId={profile.id}
               isOwnProfile={isSelf}
@@ -654,14 +656,14 @@ const ProfilePageV2: React.FC = () => {
         )}
 
 
-        {/* Achievements */}
+        {/* Achievements - 16px gap to tabs */}
         {isPersonal && unlockedAchievements.length > 0 && (
-          <section className="px-5 mb-6">
-            <div className="flex items-center justify-between mb-3">
+          <section className="px-5 mb-4">
+            <div className="flex items-center justify-between mb-2.5">
               <h3 className="text-xl font-semibold text-[#0F0F0F]">Achievements</h3>
               <button 
                 onClick={() => navigate('/profile/quest')}
-                className="text-sm font-medium flex items-center gap-0.5 text-slate-500 hover:text-slate-700 transition-colors"
+                className="text-sm font-medium flex items-center gap-0.5 text-slate-500 hover:text-slate-700 transition-colors leading-none"
               >
                 View all <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -699,15 +701,15 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Tabs - matches Courses/Explore/Top100 pages exactly */}
-        <section className="px-4">
+        {/* Tabs row - fixed height 44px with consistent alignment */}
+        <section className="px-4 pt-2 pb-2">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0 px-0 py-0 mb-block gap-0">
+            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0 px-0 py-0 h-[44px] gap-0">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                  className="relative text-sm px-3 py-0 h-full font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -716,8 +718,8 @@ const ProfilePageV2: React.FC = () => {
           </Tabs>
         </section>
 
-        {/* Tab Content */}
-        <div className={cn("pt-4", activeSection === 'activity' ? 'px-0' : 'px-5')}>
+        {/* Tab Content - 14px gap from tabs to grid */}
+        <div className={cn("pt-3.5", activeSection === 'activity' ? 'px-0' : 'px-5')}>
           {getCurrentContent()}
         </div>
       </div>
