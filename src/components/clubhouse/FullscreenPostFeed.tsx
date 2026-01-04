@@ -155,14 +155,18 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
     display_order: (m as any).display_order,
   })) || [];
 
+  // Check if current media has video type
+  const hasVideoMedia = currentPost.media?.some(m => m.media_type === 'video');
+  
   // Action bar component - reused for both review and regular posts
+  // pointer-events-auto ensures buttons work even when parent has pointer-events-none
   const ActionBar = () => (
-    <div className="right-action-bar absolute right-4 bottom-20 flex flex-col gap-4 z-30">
+    <div className="right-action-bar absolute right-4 bottom-24 flex flex-col gap-3 z-40 pointer-events-auto">
       {/* Mute/Unmute Toggle */}
-      {currentPost.type === 'video' && (
+      {(currentPost.type === 'video' || hasVideoMedia) && (
         <button
           onClick={() => setIsMuted(!isMuted)}
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+          className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors"
         >
           {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
         </button>
@@ -178,7 +182,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       {/* Comment Button */}
       <button
         onClick={() => onMediaClick(currentPost)}
-        className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 relative"
+        className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors relative"
       >
         <MessageCircle className="w-5 h-5" />
         {(currentPost.comments ?? 0) > 0 && (
@@ -189,37 +193,37 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       </button>
       
       {/* Share Button */}
-      <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+      <button className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors">
         <Send className="w-5 h-5" />
       </button>
       
       {/* More Options */}
-      <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+      <button className="w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/60 transition-colors">
         <MoreHorizontal className="w-5 h-5" />
       </button>
     </div>
   );
 
-  // Navigation controls - reused for both types
+  // Navigation controls - positioned on left to avoid action bar conflict
   const NavigationControls = () => (
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-30">
+    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-30 pointer-events-auto">
       <button
         onClick={goToPrevious}
         disabled={currentIndex === 0}
-        className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
-          currentIndex === 0 ? 'opacity-50' : 'hover:bg-white/30'
+        className={`w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white transition-all ${
+          currentIndex === 0 ? 'opacity-30 pointer-events-none' : 'hover:bg-black/60'
         }`}
       >
-        <ChevronUp className="w-6 h-6" />
+        <ChevronUp className="w-5 h-5" />
       </button>
       <button
         onClick={goToNext}
         disabled={currentIndex === content.length - 1}
-        className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
-          currentIndex === content.length - 1 ? 'opacity-50' : 'hover:bg-white/30'
+        className={`w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white transition-all ${
+          currentIndex === content.length - 1 ? 'opacity-30 pointer-events-none' : 'hover:bg-black/60'
         }`}
       >
-        <ChevronDown className="w-6 h-6" />
+        <ChevronDown className="w-5 h-5" />
       </button>
     </div>
   );
