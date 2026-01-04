@@ -74,7 +74,10 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
 
   // Build layout from items (memoized)
   const layoutBlocks = useMemo(() => {
-    return buildLayoutBlocks(items, hasMore, config);
+    console.log('[ActivityGridV2] Building layout, items:', items.length, 'hasMore:', hasMore);
+    const blocks = buildLayoutBlocks(items, hasMore, config);
+    console.log('[ActivityGridV2] Built blocks:', blocks.length);
+    return blocks;
   }, [items, hasMore, config.landscapeLookahead]);
 
   // Flatten blocks to items for lazy loading and indexing
@@ -174,13 +177,25 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     onItemClick?.(item, index);
   }, [onItemClick]);
 
+  // Debug: Log state every render
+  console.log('[ActivityGridV2] State:', { 
+    itemsLength: items.length, 
+    flatItemsLength: flatItems.length,
+    isLoading, 
+    isFetchingNextPage,
+    hasMore,
+    layoutBlocksLength: layoutBlocks.length,
+  });
+
   // Loading state
   if (isLoading && items.length === 0) {
+    console.log('[ActivityGridV2] Showing loading skeleton');
     return (
       <div className="pb-4">
+        <p className="text-sm text-muted-foreground px-4 mb-2">Loading posts...</p>
         <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="aspect-[3/4] bg-muted/30 animate-pulse" />
+            <div key={i} className="aspect-[3/4] bg-slate-200 animate-pulse rounded" />
           ))}
         </div>
       </div>
@@ -189,24 +204,27 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
 
   // Empty state
   if (items.length === 0) {
+    console.log('[ActivityGridV2] Showing empty state');
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center mb-4">
-          <svg className="w-8 h-8 text-muted-foreground/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+          <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-1.5">No posts yet</h3>
-        <p className="text-muted-foreground text-sm max-w-[280px]">
-          Content will appear here
+        <h3 className="text-lg font-semibold text-slate-800 mb-1.5">No posts yet</h3>
+        <p className="text-slate-500 text-sm max-w-[280px]">
+          Content will appear here when you share your golf journey
         </p>
       </div>
     );
   }
 
+  console.log('[ActivityGridV2] Rendering main grid, flatItems:', flatItems.length);
+  
   return (
     <>
-      <div ref={gridRef} className="pb-4">
+      <div ref={gridRef} className="pb-4" data-testid="activity-grid-v2">
         <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
           {flatItems.map(({ item, variant, isHero }, flatIndex) => {
             const isVisible = visibleIndices.has(flatIndex);
