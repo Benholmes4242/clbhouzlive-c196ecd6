@@ -168,10 +168,10 @@ export function FullscreenReviewPost({
       </div>
       
       {/* Top gradient - lighter + shorter for cleaner media display */}
-      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 via-black/10 to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 via-black/10 to-transparent pointer-events-none z-[5]" />
       
       {/* Bottom gradient - softer fade, less muddy */}
-      <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
       {/* Top-left: Course info + Preview badge stacked */}
       <div className="absolute top-4 left-4 right-20 z-20">
@@ -191,15 +191,15 @@ export function FullscreenReviewPost({
         )}
       </div>
       
-      {/* Top-right: Rating + tier */}
+      {/* Top-right: Rating + tier - safe-area padding for notch devices */}
       <Sheet>
         <SheetTrigger asChild>
-          <button className="absolute top-4 right-4 z-20 flex flex-col items-end gap-1">
-            <span className="text-white text-3xl font-bold tabular-nums drop-shadow-lg">
+          <button className="absolute top-4 right-4 z-20 flex flex-col items-end gap-0.5 max-w-[100px]">
+            <span className="text-white text-2xl sm:text-3xl font-bold tabular-nums drop-shadow-lg">
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            <RatingPill score={rating} className="text-[10px] py-0.5 px-2" />
-            <span className="text-white/60 text-[10px] font-medium tracking-wide">
+            <RatingPill score={rating} className="text-[9px] sm:text-[10px] py-0.5 px-1.5 sm:px-2" />
+            <span className="text-white/70 text-[9px] sm:text-[10px] font-medium tracking-wide whitespace-nowrap">
               From a review
             </span>
           </button>
@@ -269,8 +269,10 @@ export function FullscreenReviewPost({
         </div>
       )}
       
-      {/* Render children (e.g., Clubhouse action bar) */}
-      {children}
+      {/* Render children (e.g., Clubhouse action bar) - z-30 to sit above gradients */}
+      <div className="pointer-events-auto z-30">
+        {children}
+      </div>
       
       {/* Navigation arrows - more glassy, larger tap targets */}
       {hasMultipleMedia && (
