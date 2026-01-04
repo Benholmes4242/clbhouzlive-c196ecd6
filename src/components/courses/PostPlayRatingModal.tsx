@@ -1190,10 +1190,10 @@ const PostPlayRatingModal = ({
                                   });
                                 }
                               }}
-                              className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove media"
                             >
-                              <Trash2 className="w-2 h-2 text-white" />
+                              <Trash2 className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
@@ -1214,10 +1214,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(index)}
-                              className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove image"
                             >
-                              <Trash2 className="w-2 h-2 text-white" />
+                              <Trash2 className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
@@ -1282,10 +1282,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => removeVideo(draft.fileKey)}
-                              className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                              className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-red-500/80 backdrop-blur-sm hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                               aria-label="Remove video"
                             >
-                              <Trash2 className="w-2 h-2 text-white" />
+                              <Trash2 className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         );
