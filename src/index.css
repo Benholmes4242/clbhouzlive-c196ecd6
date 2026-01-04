@@ -547,6 +547,11 @@ body .min-h-screen:not(.compact-header-offset):not(.compact-header-offset-no-saf
   background-color: var(--bg-page);
 }
 
+/* When GlobalHeader is present, it handles safe-area - disable app-shell top padding */
+body.has-app-header .app-shell {
+  padding-top: 0;
+}
+
 /* Fade mask utility for horizontal scroll rails */
 .mask-fade-right {
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
