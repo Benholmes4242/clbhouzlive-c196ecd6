@@ -25,7 +25,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     const { shouldHideHeader } = useModalContext();
 
     // Auto-apply the header offset whenever GlobalHeader would be visible.
-    // This prevents regressions where a page forgets the offset class.
+    // This prevents accidental regressions where a page forgets the offset class.
     const shouldAutoApplyOffset =
       !shouldHideHeader && !isGlobalHeaderExcluded(location.pathname);
 

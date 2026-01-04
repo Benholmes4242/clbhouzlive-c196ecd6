@@ -102,9 +102,6 @@ html.lightbox-open {
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 
-  /* Global header sizing (used by non-regressable offset rules) */
-  --app-header-height: 40px;
-
   /* Back-compat aliases (used by useChromeAnchors) */
   --safe-top: var(--sat);
   --safe-bottom: var(--sab);
@@ -468,30 +465,14 @@ html.lightbox-open {
  * ============================================================================
  */
 .compact-header-offset {
-  /* Header is fixed; content should start directly below it (no extra safe-area gap) */
-  padding-top: var(--app-header-height, 40px) !important;
+  padding-top: calc(40px + var(--sat)) !important;
 }
 
-/* Backward-compat alias (same behavior now) */
+/* Discover needs the compact header offset WITHOUT adding safe-area again
+   (CompactHeader already handles safe-area padding internally). */
 .compact-header-offset-no-safe {
-  padding-top: var(--app-header-height, 40px) !important;
+  padding-top: 40px;
 }
-
-
-/* ============================================================================
- * CRITICAL: PREVENT HEADER OFFSET REGRESSION
- * ============================================================================
- * High-specificity reset prevents accidental overrides from sliding content
- * under the fixed header. The actual offset is defined above.
- * ============================================================================
- */
-body main,
-body .page-container,
-body .min-h-screen:not(.compact-header-offset):not(.compact-header-offset-no-safe) {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
 
 /* ========================================
    FIXED HEADER - Safe area positioning
@@ -545,11 +526,6 @@ body .min-h-screen:not(.compact-header-offset):not(.compact-header-offset-no-saf
   
   /* Ensure background extends behind safe areas */
   background-color: var(--bg-page);
-}
-
-/* When GlobalHeader is present, it handles safe-area - disable app-shell top padding */
-body.has-app-header .app-shell {
-  padding-top: 0;
 }
 
 /* Fade mask utility for horizontal scroll rails */

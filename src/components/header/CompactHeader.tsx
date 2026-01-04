@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -99,31 +99,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Clubhouse uses 55px header, other pages use 40px
   const headerHeight = isClubhouseRoute ? 55 : 40;
-
-  // ---------------------------------------------------------------------------
-  // Non-regressable global header offset
-  // Toggle a body class so CSS can apply a high-specificity padding-top rule that
-  // won't be overridden by broad resets.
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
-    const body = document.body;
-    const root = document.documentElement;
-
-    if (isClubhouseRoute) {
-      body.classList.remove('has-app-header');
-      root.style.removeProperty('--app-header-height');
-      return;
-    }
-
-    body.classList.add('has-app-header');
-    root.style.setProperty('--app-header-height', `${headerHeight}px`);
-
-    return () => {
-      body.classList.remove('has-app-header');
-      root.style.removeProperty('--app-header-height');
-    };
-  }, [isClubhouseRoute, headerHeight]);
-
+  
   return (
     <>
       <header
@@ -132,6 +108,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
+          
           className
         )}
         style={{
