@@ -102,6 +102,9 @@ html.lightbox-open {
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 
+  /* Global header sizing (used by non-regressable offset rules) */
+  --app-header-height: 40px;
+
   /* Back-compat aliases (used by useChromeAnchors) */
   --safe-top: var(--sat);
   --safe-bottom: var(--sab);
@@ -473,6 +476,34 @@ html.lightbox-open {
 .compact-header-offset-no-safe {
   padding-top: 40px;
 }
+
+/* ============================================================================
+ * CRITICAL: AUTOMATIC HEADER OFFSET (NON-REGRESSABLE)
+ * ============================================================================
+ * Pages were regressing (content sliding under the fixed header) when broad CSS
+ * resets overrode `compact-header-offset`.
+ *
+ * CompactHeader toggles `body.has-app-header` whenever it is used as the GLOBAL
+ * header (non-Clubhouse). We then apply the offset with high specificity +
+ * `!important` so future resets cannot accidentally break it.
+ *
+ * Opt-out per-page by adding `.no-header-offset` to the page root.
+ * ============================================================================
+ */
+body.has-app-header .page-root:not(.no-header-offset):not(.compact-header-offset-no-safe),
+body.has-app-header .compact-header-offset:not(.no-header-offset) {
+  padding-top: calc(var(--app-header-height, 40px) + var(--sat)) !important;
+}
+
+body.has-app-header .page-root.compact-header-offset-no-safe:not(.no-header-offset),
+body.has-app-header .compact-header-offset-no-safe:not(.no-header-offset) {
+  padding-top: var(--app-header-height, 40px) !important;
+}
+
+.no-header-offset {
+  padding-top: 0 !important;
+}
+
 
 /* ========================================
    FIXED HEADER - Safe area positioning
