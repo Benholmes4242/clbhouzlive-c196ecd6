@@ -34,7 +34,7 @@ import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
-import { GolfJourneyProgress, MilestoneBadges } from '@/components/profile/phase6';
+import { GolfJourneyProgress } from '@/components/profile/phase6';
 
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
@@ -602,15 +602,6 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Phase 6: Milestones */}
-        {isPersonal && profile?.id && (
-          <section className="px-5 mb-6">
-            <MilestoneBadges
-              userId={profile.id}
-              isOwnProfile={isSelf}
-            />
-          </section>
-        )}
 
         {/* Achievements */}
         {isPersonal && unlockedAchievements.length > 0 && (
@@ -658,7 +649,7 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Tabs - Discover-style underline tabs */}
+        {/* Tabs - Discover-style with orange underline */}
         <section className="px-5 pb-3">
           <div className="flex w-full items-center">
             {tabs.map((tab) => (
@@ -666,22 +657,23 @@ const ProfilePageV2: React.FC = () => {
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
                 className={cn(
-                  "flex-1 py-[10px] px-4 text-center relative text-sm font-medium leading-tight",
-                  "transition-all duration-150 ease-out",
-                  "active:scale-[0.97]",
+                  "flex-1 py-3 text-center relative text-[15px] font-medium",
+                  "transition-colors duration-200",
                   activeSection === tab.id 
-                    ? "text-[#0F0F0F] font-semibold" 
+                    ? "text-slate-900" 
                     : "text-slate-500 hover:text-slate-700"
                 )}
               >
                 {tab.label}
-                {/* Active underline */}
-                {activeSection === tab.id && (
-                  <span 
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-[#0F0F0F] rounded-full"
-                    style={{ width: '40px', maxWidth: '100%' }}
-                  />
-                )}
+                {/* Orange underline - matches Discover/Top100 pages */}
+                <span 
+                  className={cn(
+                    "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full transition-all duration-200",
+                    activeSection === tab.id 
+                      ? "w-8 bg-orange-500" 
+                      : "w-0 bg-transparent"
+                  )}
+                />
               </button>
             ))}
           </div>
