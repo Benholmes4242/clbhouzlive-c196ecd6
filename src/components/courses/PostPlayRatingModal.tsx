@@ -81,6 +81,9 @@ const PostPlayRatingModal = ({
   const uploadSessionIdRef = useRef(crypto.randomUUID());
   const uploadSessionId = uploadSessionIdRef.current;
   
+  // Track if submit completed successfully (to skip cleanup on close)
+  const submitCompletedRef = useRef(false);
+  
   // Current user ID for upload ownership
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   
@@ -108,17 +111,21 @@ const PostPlayRatingModal = ({
   });
   
   // Fix #6: Cleanup pending videos on unmount (best-effort)
+  // Skip cleanup if submit completed successfully (videos are already attached)
   useEffect(() => {
     isUnmounting = false;
-    // Reset cleanup flag when modal opens with new session
+    // Reset flags when modal opens with new session
     resetCleanupFlag();
+    submitCompletedRef.current = false;
     
     return () => {
       isUnmounting = true;
-      // Best-effort cleanup on unmount - async but won't block unmount
-      cleanupPending().catch(err => {
-        console.error('[Rating] Unmount cleanup error (non-blocking):', err);
-      });
+      // Only cleanup if submit didn't complete successfully
+      if (!submitCompletedRef.current) {
+        cleanupPending().catch(err => {
+          console.warn('[Rating] Unmount cleanup error (non-blocking):', err);
+        });
+      }
     };
   }, [uploadSessionId]); // Only re-run if session changes
   
@@ -366,11 +373,16 @@ const PostPlayRatingModal = ({
       return ratingId;
     },
     onSuccess: async (ratingId: string, variables) => {
+      // Mark submit as completed FIRST to prevent cleanup from running
+      submitCompletedRef.current = true;
+      
       // Attach pending videos to the review
       if (videoDrafts.filter(d => d.status === 'ready').length > 0) {
         try {
           const { attached } = await attachToReview(ratingId);
           console.log('[Rating] Attached', attached, 'videos to review:', ratingId);
+          // Clear video drafts after successful attach (so cleanup has nothing to act on)
+          resetVideoDrafts();
         } catch (attachError) {
           console.error('[Rating] Failed to attach videos:', attachError);
           // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
