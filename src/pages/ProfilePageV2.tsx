@@ -450,10 +450,15 @@ const ProfilePageV2: React.FC = () => {
             </button>
             
             {/* Self: Three dots with Edit Profile */}
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={(open) => {
+              if (!open) {
+                // Blur the trigger button when menu closes to remove focus ring
+                (document.activeElement as HTMLElement)?.blur();
+              }
+            }}>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
+                  className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none focus-visible:outline-none active:outline-none"
                   style={{
                     background: '#fff',
                     border: '1px solid #E0E0E0'
