@@ -286,9 +286,17 @@ const ProfilePageV2: React.FC = () => {
   const getCurrentContent = () => {
     switch (activeSection) {
       case 'activity':
+        // Only render ActivityFeed when we have a valid profile ID
+        if (!profile?.id) {
+          return (
+            <div className="flex items-center justify-center py-20">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-600" />
+            </div>
+          );
+        }
         return (
           <ActivityFeed
-            userId={profile?.id || ''}
+            userId={profile.id}
             isOwnProfile={isSelf}
             profileDisplayName={profile?.display_name}
             userHandicap={profile?.eg_handicap_index}
@@ -297,9 +305,16 @@ const ProfilePageV2: React.FC = () => {
           />
         );
       case 'courses':
+        if (!profile?.id) {
+          return (
+            <div className="flex items-center justify-center py-20">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-600" />
+            </div>
+          );
+        }
         return (
           <ProfileCoursesTab 
-            userId={profile?.id || ''}
+            userId={profile.id}
             isOwnProfile={isSelf}
           />
         );

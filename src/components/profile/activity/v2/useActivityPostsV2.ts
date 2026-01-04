@@ -22,12 +22,15 @@ interface ActivityPageData {
  * Uses Supabase .range() for stable pagination
  */
 export function useActivityPostsV2(actorId?: string) {
+  console.log('[useActivityPostsV2] Hook called with actorId:', actorId);
+  
   const query = useInfiniteQuery<ActivityPageData>({
     queryKey: [...postKeys.actorPosts('personal', actorId ?? ''), 'v2'],
     enabled: !!actorId,
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<ActivityPageData> => {
+      console.log('[useActivityPostsV2] queryFn called, pageParam:', pageParam, 'actorId:', actorId);
       if (!actorId) {
         return { items: [], nextCursor: 0, hasMore: false };
       }
@@ -193,6 +196,13 @@ export function useActivityPostsV2(actorId?: string) {
         .filter((item): item is UnifiedMediaItem => item !== null);
 
       const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
+      
+      console.log('[useActivityPostsV2] Returning:', {
+        itemsCount: items.length,
+        postsDataCount: postsData?.length ?? 0,
+        hasMore,
+        nextCursor: startRange + PAGE_SIZE,
+      });
 
       return {
         items,
