@@ -1283,6 +1283,25 @@ export const useRealPostsFetcher = () => {
         console.log('[ClubhouseCourseHydration] fetched', fetched, 'missing', missing);
       }
 
+      // ===== Fetch ratings for review posts =====
+      const reviewPostIds = validPosts
+        .filter(p => p.source_review_id)
+        .map(p => p.source_review_id)
+        .filter(Boolean) as string[];
+      
+      const { data: ratings, error: ratingsError } = reviewPostIds.length > 0
+        ? await supabase
+          .from('course_ratings')
+          .select('id, rating')
+          .in('id', reviewPostIds)
+        : { data: [], error: null };
+
+      if (ratingsError) {
+        console.error('[ClubhouseRatings] course_ratings error:', ratingsError);
+      }
+
+      const ratingMap = new Map((ratings || []).map(r => [r.id, r.rating]));
+
       // Format posts with polymorphic creator hydration
       const formattedPosts = validPosts.map(post => {
         const firstMedia = post.post_media[0];
@@ -1406,12 +1425,22 @@ export const useRealPostsFetcher = () => {
             }
           : undefined;
 
+        // Determine if this is a review post
+        const isReviewPost = 
+          (Array.isArray(post.categories) && post.categories.includes('review')) ||
+          !!post.source_review_id;
+        
+        // Get rating for review posts
+        const reviewRating = post.source_review_id 
+          ? ratingMap.get(post.source_review_id) 
+          : null;
+
         return {
           id: post.id,
-          type: 'video' as const,
+          type: firstMedia.media_type as 'video' | 'image',
           src: firstMedia.media_url,
           thumbnailSrc: firstMedia.poster_url || getStreamPoster(firstMedia.media_url, '1s') || undefined,
-          title: post.content || 'Video',
+          title: post.content || 'Post',
           likes: post.post_likes?.[0]?.count || 0,
           comments: post.post_comments?.[0]?.count || 0,
           shares: Math.floor(Math.random() * 50) + 1,
@@ -1425,19 +1454,25 @@ export const useRealPostsFetcher = () => {
           business,
           golfCourse,
           categories: post.categories || [],
+          // Review post fields
+          isReview: isReviewPost,
+          sourceReviewId: post.source_review_id || null,
+          reviewRating: reviewRating ?? null,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
-          media: [{
-            id: firstMedia.id,
-            media_type: firstMedia.media_type as 'video' | 'image',
-            media_url: firstMedia.media_url,
-            width: firstMedia.width,
-            height: firstMedia.height,
-            aspect_ratio: firstMedia.aspect_ratio,
-            studio_edits: firstMedia.studio_edits,
-            filter_id: firstMedia.filter_id
-          } as any],
-          audioTrack: Math.random() > 0.6 ? {
+          media: post.post_media.map((m: any) => ({
+            id: m.id,
+            media_type: m.media_type as 'video' | 'image',
+            media_url: m.media_url,
+            width: m.width,
+            height: m.height,
+            aspect_ratio: m.aspect_ratio,
+            studio_edits: m.studio_edits,
+            filter_id: m.filter_id,
+            poster_url: m.poster_url,
+            display_order: m.display_order,
+          })),
+          audioTrack: !isReviewPost && Math.random() > 0.6 ? {
             title: ["Eye of the Tiger", "The Final Countdown", "Original Audio"][Math.floor(Math.random() * 3)],
             artist: Math.random() > 0.5 ? "Survivor" : undefined,
             isOriginal: Math.random() > 0.5

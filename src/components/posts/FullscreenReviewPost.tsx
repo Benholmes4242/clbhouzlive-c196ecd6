@@ -18,7 +18,7 @@ export interface ReviewMediaItem {
 }
 
 export interface FullscreenReviewPostProps {
-  mode: 'preview' | 'feed';
+  mode: 'preview' | 'live';
   
   // Core identity
   courseId: string;
@@ -35,11 +35,15 @@ export interface FullscreenReviewPostProps {
   // Controls
   initialIndex?: number;
   onBack?: () => void;
+  
+  // Optional: Render children (e.g., Clubhouse action bar) on top of the overlay
+  children?: React.ReactNode;
 }
 
 /**
  * Fullscreen review post preview/display component.
  * Matches Clubhouse visual language - fullscreen media with overlay info.
+ * Used for: Preview page, Clubhouse feed, Profile fullscreen viewer
  */
 export function FullscreenReviewPost({
   mode,
@@ -51,6 +55,7 @@ export function FullscreenReviewPost({
   media,
   initialIndex = 0,
   onBack,
+  children,
 }: FullscreenReviewPostProps) {
   // Sort media: video first as cover, then by display_order/created_at
   const sortedMedia = React.useMemo(() => {
@@ -240,9 +245,12 @@ export function FullscreenReviewPost({
       
       {/* Preview tag removed - now in top-left under location */}
       
-      {/* Media counter - positioned higher to not collide with CTA bar */}
+      {/* Media counter - positioned based on mode */}
       {hasMultipleMedia && (
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 mb-3">
+        <div className={cn(
+          "absolute left-1/2 -translate-x-1/2 z-20",
+          mode === 'preview' ? "bottom-24 mb-3" : "bottom-20"
+        )}>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
             {sortedMedia.map((_, idx) => (
               <button
@@ -260,6 +268,9 @@ export function FullscreenReviewPost({
           </div>
         </div>
       )}
+      
+      {/* Render children (e.g., Clubhouse action bar) */}
+      {children}
       
       {/* Navigation arrows - more glassy, larger tap targets */}
       {hasMultipleMedia && (
