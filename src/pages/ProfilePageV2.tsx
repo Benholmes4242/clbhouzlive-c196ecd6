@@ -658,31 +658,33 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Tabs */}
-        <section className="px-5">
-          <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-            <TabsList 
-              className="grid w-full rounded-full px-1 py-1"
-              style={{ 
-                gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
-                background: '#F0F0F0',
-                border: '1px solid #E0E0E0'
-              }}
-            >
-              {tabs.map((tab) => (
-                <TabsTrigger 
-                  key={tab.id}
-                  value={tab.id}
-                  className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                  style={{
-                    color: '#0F0F0F'
-                  }}
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+        {/* Tabs - Discover-style underline tabs */}
+        <section className="px-5 pb-3">
+          <div className="flex w-full items-center">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSection(tab.id)}
+                className={cn(
+                  "flex-1 py-[10px] px-4 text-center relative text-sm font-medium leading-tight",
+                  "transition-all duration-150 ease-out",
+                  "active:scale-[0.97]",
+                  activeSection === tab.id 
+                    ? "text-[#0F0F0F] font-semibold" 
+                    : "text-slate-500 hover:text-slate-700"
+                )}
+              >
+                {tab.label}
+                {/* Active underline */}
+                {activeSection === tab.id && (
+                  <span 
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-[#0F0F0F] rounded-full"
+                    style={{ width: '40px', maxWidth: '100%' }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </section>
 
         {/* Tab Content */}
