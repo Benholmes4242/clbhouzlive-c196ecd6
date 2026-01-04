@@ -26,8 +26,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userProfilePhotoUrl,
   onAchievementsClick
 }) => {
-  console.log('[ActivityFeed] Rendering with userId:', userId);
-  
   // V2: Cursor-based infinite query
   const { 
     items, 
@@ -36,8 +34,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     hasMore, 
     fetchNextPage 
   } = useActivityPostsV2(userId);
-  
-  console.log('[ActivityFeed] Query result:', { itemsCount: items.length, isLoading, hasMore });
   
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);
