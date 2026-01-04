@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -25,11 +24,27 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
   username
 }) => {
   const { toast } = useToast();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Blur trigger on close to prevent stuck focus ring
+  const handleOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      // Small timeout to ensure blur happens after close animation
+      requestAnimationFrame(() => {
+        triggerRef.current?.blur();
+      });
+    }
+  }, []);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="px-2 py-1 h-7 w-7 flex-shrink-0">
+        <Button 
+          ref={triggerRef}
+          variant="outline" 
+          size="sm" 
+          className="px-2 py-1 h-7 w-7 flex-shrink-0 focus:ring-0 focus-visible:ring-2 focus-visible:ring-ring"
+        >
           <MoreHorizontal className="w-3 h-3" />
         </Button>
       </DropdownMenuTrigger>

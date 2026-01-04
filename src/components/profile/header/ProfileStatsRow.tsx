@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { AnimatedNumber } from '@/components/ui/motion';
 
 interface ProfileStatsRowProps {
   postsCount: number;
@@ -18,19 +19,24 @@ interface StatItemProps {
   label: string;
   onClick?: () => void;
   isClickable?: boolean;
+  delay?: number;
 }
 
 const StatItem: React.FC<StatItemProps> = ({ 
   value, 
   label, 
   onClick, 
-  isClickable = false
+  isClickable = false,
+  delay = 0
 }) => {
   const content = (
     <div className="flex flex-col items-center">
-      <span className="profile-stat-number text-base font-semibold tabular-nums">
-        {value}
-      </span>
+      <AnimatedNumber 
+        value={value}
+        delay={delay}
+        className="profile-stat-number text-base font-semibold"
+        minCh={1}
+      />
       <span className="profile-stat-label mt-1 text-[11px] uppercase tracking-[0.06em]">
         {label}
       </span>
@@ -70,7 +76,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
 }) => {
   return (
     <section className="mt-5 flex items-center justify-center gap-8 px-4">
-      <StatItem value={postsCount} label="Posts" />
+      <StatItem value={postsCount} label="Posts" delay={0} />
       
       {isPersonal && (
         <StatItem 
@@ -78,6 +84,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
           label="Friends" 
           onClick={onFriendsClick}
           isClickable
+          delay={0.05}
         />
       )}
       
@@ -86,6 +93,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         label="Following" 
         onClick={onFollowingClick}
         isClickable
+        delay={0.1}
       />
       
       <StatItem 
@@ -93,6 +101,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         label="Followers" 
         onClick={onFollowersClick}
         isClickable
+        delay={0.15}
       />
     </section>
   );
