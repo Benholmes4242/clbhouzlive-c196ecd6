@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trophy, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
@@ -1210,11 +1211,7 @@ const PostPlayRatingModal = ({
                                   <div className="h-full w-full bg-slate-700" />
                                 )}
                                 {/* Play icon overlay */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm">
-                                    <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
-                                  </div>
-                                </div>
+                                <VideoPlayIndicator size="md" />
                               </div>
                             ) : (
                               <img
@@ -1306,11 +1303,7 @@ const PostPlayRatingModal = ({
                                   }}
                                 />
                                 {/* Play icon overlay */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm">
-                                    <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
-                                  </div>
-                                </div>
+                                <VideoPlayIndicator size="md" />
                               </div>
                             ) : draft.status === 'failed' ? (
                               // Failed state with retry
@@ -1323,9 +1316,7 @@ const PostPlayRatingModal = ({
                             ) : (
                               // Fallback placeholder
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm mb-2">
-                                  <div className="h-0 w-0 border-y-[7px] border-y-transparent border-l-[12px] border-l-white" style={{ marginLeft: '2px' }} />
-                                </div>
+                                <VideoPlayIndicator size="md" className="static mb-2" />
                                 <span className="text-xs text-slate-300 text-center px-2 truncate max-w-full">
                                   {displayName}
                                 </span>
@@ -1737,13 +1728,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
                     alt=""
                     className="w-full h-full object-cover"
                   />
-                  {isVideo && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
-                        <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-slate-700 border-b-[5px] border-b-transparent ml-0.5" />
-                      </div>
-                    </div>
-                  )}
+                  {isVideo && <VideoPlayIndicator size="md" />}
                 </div>
               );
             })}

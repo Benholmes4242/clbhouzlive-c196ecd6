@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Play, Trash2 } from "lucide-react";
+import { VideoPlayIndicator } from "@/components/ui/VideoPlayIndicator";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { StudioEdits } from "@/types/studio";
 import { buildVideoPosterUrl } from "@/utils/mediaThumbs";
@@ -157,11 +158,7 @@ function ThumbContent({
 
 
       {/* Video indicator - bottom left, inside thumbnail */}
-      {item.type === 'video' && (
-        <div className="absolute bottom-1 left-1 w-4 h-4 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center z-10">
-          <Play className="w-2 h-2 text-white fill-white" />
-        </div>
-      )}
+      {item.type === 'video' && <VideoPlayIndicator />}
 
       {/* Remove button - bottom right, inside thumbnail (not during drag overlay) */}
       {!isDragOverlay && (
