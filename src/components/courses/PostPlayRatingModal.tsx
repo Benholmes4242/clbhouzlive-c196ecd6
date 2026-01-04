@@ -386,8 +386,29 @@ const PostPlayRatingModal = ({
         console.error('[Rating] Failed to attach videos:', attachError);
         // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
       } finally {
-        // Always clear video drafts after success (keeps state clean)
+        // Always clear ALL local media state to prevent duplicate display with existingMediaItems
+        console.log('[Rating] Clearing local media state:', {
+          selectedImages: selectedImages.length,
+          videoDrafts: videoDrafts.length,
+        });
+        
         resetVideoDrafts();
+        
+        // Revoke blob URLs to prevent memory leaks
+        try {
+          imagePreviews.forEach((url) => {
+            if (typeof url === 'string' && url.startsWith('blob:')) {
+              URL.revokeObjectURL(url);
+            }
+          });
+        } catch {
+          // no-op
+        }
+        
+        setSelectedImages([]);
+        setImagePreviews(new Map());
+        
+        console.log('[Rating] Local media state cleared');
       }
       
       // Get userId for proper query invalidation
