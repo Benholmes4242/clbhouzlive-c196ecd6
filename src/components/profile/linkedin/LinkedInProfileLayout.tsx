@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPosts } from '../hooks/useActivityPosts';
+import { useActivityPostsV2 } from '../activity/v2';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import ProfileAvatarRing from '../header/ProfileAvatarRing';
@@ -67,7 +67,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
 
   // Data hooks
   const { data: top100Overview } = useTop100Overview(profile?.id);
-  const { posts } = useActivityPosts(profile?.id);
+  const { items: posts } = useActivityPostsV2(profile?.id);
   const { data: achievements } = useUserAchievements(profile?.id);
   
   // Profile type
