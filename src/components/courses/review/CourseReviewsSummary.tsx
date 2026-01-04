@@ -43,7 +43,7 @@ const computeHighlights = (categoryAverages: CategoryAverage): string[] => {
   
   // Take top 2, or 3 if there's a clear gap
   const top = categories.slice(0, 2);
-  if (categories.length >= 3 && categories[2].value >= 7.0) {
+  if (categories.length >= 3 && categories[2].value >= 8.0) {
     top.push(categories[2]);
   }
   
