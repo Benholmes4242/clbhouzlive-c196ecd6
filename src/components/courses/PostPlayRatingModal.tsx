@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { Star, Check, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle, AlertCircle, RefreshCw, Loader2, ExternalLink } from 'lucide-react';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -18,6 +18,9 @@ import { RatingPill } from '@/components/ui/RatingPill';
 import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
 import { useShareReview } from '@/hooks/useShareReview';
+import { FullscreenReviewPost, type ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 // Track if modal is being unmounted
 let isUnmounting = false;
@@ -1475,16 +1478,16 @@ const PostPlayRatingModal = ({
               onShareReview={async () => {
                 if (!submittedRatingId && !existingRating?.id) {
                   console.error('[ShareReview] No rating ID available');
-                  return;
+                  return { success: false };
                 }
-                await shareReview({
+                const result = await shareReview({
                   ratingId: submittedRatingId || existingRating?.id,
                   courseId: course!.id,
                   reviewText: review.trim() || null,
                   media: existingMediaItems,
                 });
+                return result || { success: false };
               }}
-              isSharing={isSharing}
             />
           )}
         </div>
@@ -1577,6 +1580,8 @@ function getComparisonCopy(user: number, community: number | null) {
 
 type BreakdownItem = { label: string; value: number };
 
+type ShareState = 'idle' | 'posting' | 'shared';
+
 type RatingConfirmationViewProps = {
   mode: 'submitted' | 'updated';
   courseName: string;
@@ -1590,11 +1595,11 @@ type RatingConfirmationViewProps = {
   heroImageUrl?: string | null;
   heroSubtitle?: string;
   onBack: () => void;
-  onShareReview: () => Promise<void>;
-  isSharing?: boolean;
+  onShareReview: () => Promise<{ success: boolean; postId?: string; alreadyShared?: boolean } | void>;
 };
 
 function RatingConfirmationView(props: RatingConfirmationViewProps) {
+  const navigate = useNavigate();
   const {
     mode,
     courseName,
@@ -1609,8 +1614,41 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     heroSubtitle,
     onBack,
     onShareReview,
-    isSharing = false,
   } = props;
+  
+  // CTA state machine
+  const [shareState, setShareState] = useState<ShareState>('idle');
+  const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  
+  // Handle share with state machine
+  const handleShare = async () => {
+    if (shareState !== 'idle') return;
+    
+    setShareState('posting');
+    try {
+      const result = await onShareReview();
+      // Handle both void and object returns
+      if (result && typeof result === 'object' && (result.success || result.alreadyShared)) {
+        setShareState('shared');
+        if (result.postId) {
+          setSharedPostId(result.postId);
+        }
+      } else if (result === undefined) {
+        // void return - assume success for backwards compat
+        setShareState('shared');
+      } else {
+        setShareState('idle');
+      }
+    } catch (err) {
+      console.error('[RatingConfirmation] Share failed:', err);
+      setShareState('idle');
+    }
+  };
+  
+  // Navigate to Clubhouse
+  const handleViewInClubhouse = () => {
+    navigate('/discover?main=channels');
+  };
 
   const isEdit = mode === 'updated';
   const isNewReview = !isEdit;
@@ -1851,32 +1889,58 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         className="bg-slate-50 px-4 pb-10 pt-4 animate-fade-in"
         style={{ animationDelay: '300ms' }}
       >
-        <div className="flex gap-3">
-          {/* Secondary – share review */}
-          <button
-            type="button"
-            onClick={onShareReview}
-            disabled={isSharing}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSharing ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Sharing...
-              </>
-            ) : (
-              'Share your review'
-            )}
-          </button>
+        <div className="flex flex-col gap-3">
+          {/* Primary CTA row */}
+          <div className="flex gap-3">
+            {/* Share button with state machine */}
+            <button
+              type="button"
+              onClick={handleShare}
+              disabled={shareState !== 'idle'}
+              className={cn(
+                "inline-flex flex-1 items-center justify-center gap-2 rounded-2xl h-12 px-4 text-sm font-medium transition-colors",
+                shareState === 'shared'
+                  ? "bg-emerald-100 border border-emerald-200 text-emerald-700"
+                  : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:bg-slate-100",
+                shareState === 'posting' && "opacity-70 cursor-not-allowed"
+              )}
+            >
+              {shareState === 'posting' && (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Sharing…
+                </>
+              )}
+              {shareState === 'shared' && (
+                <>
+                  <Check className="h-4 w-4" />
+                  Shared
+                </>
+              )}
+              {shareState === 'idle' && 'Share to Clubhouse + Profile'}
+            </button>
 
-          {/* Primary – back to course */}
-          <button
-            type="button"
-            onClick={handleBackToCourse}
-            className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
-          >
-            Back to course
-          </button>
+            {/* Back to course */}
+            <button
+              type="button"
+              onClick={handleBackToCourse}
+              className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            >
+              Back to course
+            </button>
+          </div>
+          
+          {/* Secondary CTA after shared */}
+          {shareState === 'shared' && (
+            <button
+              type="button"
+              onClick={handleViewInClubhouse}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-slate-900 h-12 px-4 text-sm font-medium text-white hover:bg-slate-800 active:bg-slate-700 transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View in Clubhouse
+            </button>
+          )}
         </div>
       </section>
     </div>
