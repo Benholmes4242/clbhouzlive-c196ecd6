@@ -610,10 +610,9 @@ const ProfilePageV2: React.FC = () => {
               <h3 className="text-xl font-semibold text-[#0F0F0F]">Achievements</h3>
               <button 
                 onClick={() => navigate('/profile/quest')}
-                className="text-base font-medium flex items-center gap-1"
-                style={{ color: '#0066FF' }}
+                className="text-sm font-medium flex items-center gap-0.5 text-slate-500 hover:text-slate-700 transition-colors"
               >
-                View all <ChevronRight className="w-4 h-4" />
+                View all <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
