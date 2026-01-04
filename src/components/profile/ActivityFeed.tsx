@@ -149,14 +149,16 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         className="mb-6"
       />
 
-      {/* Filter button row - aligned with tabs (44px height, vertically centered) */}
-      <div className="h-[44px] flex items-center justify-end px-4 -mt-[44px]">
-        <button 
-          onClick={() => setFiltersOpen(true)}
-          className="p-2 hover:bg-muted/50 transition-colors rounded-sq-sm focus:outline-none focus-visible:outline-none"
-        >
-          <IoFilter className="w-5 h-5 text-foreground" />
-        </button>
+      {/* Filter button row */}
+      <div>
+        <div className="flex justify-end">
+          <button 
+            onClick={() => setFiltersOpen(true)}
+            className="p-2 hover:bg-muted/50 transition-colors rounded-sq-sm"
+          >
+            <IoFilter className="w-5 h-5 text-foreground" />
+          </button>
+        </div>
       </div>
 
       {/* Empty states */}
