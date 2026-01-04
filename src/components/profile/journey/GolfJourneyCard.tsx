@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { COURSE_MILESTONES, getNextMilestone, getMilestoneName } from '@/config/milestones';
 
 interface Top100Progress {
   listId: string;
@@ -14,6 +13,7 @@ interface GolfJourneyCardProps {
   coursesPlayed: number;
   countries: string[];
   top100Progress: Top100Progress[];
+  isOwnProfile?: boolean;
   className?: string;
 }
 
@@ -21,13 +21,12 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
   coursesPlayed,
   countries,
   top100Progress,
+  isOwnProfile = true,
   className
 }) => {
   const [animatedCount, setAnimatedCount] = useState(0);
   const hasAnimatedCount = useRef(false);
   const hasAnimatedBars = useRef(false);
-  const nextMilestone = getNextMilestone(coursesPlayed);
-  const unlockedMilestones = COURSE_MILESTONES.filter(m => m <= coursesPlayed);
 
   // Count-up animation (once per mount, uses ref to survive re-renders)
   useEffect(() => {
@@ -73,7 +72,9 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
         className
       )}
     >
-      <h3 className="text-base font-semibold text-foreground mb-5">Your Golf Journey</h3>
+      <h3 className="text-base font-semibold text-foreground mb-5">
+        {isOwnProfile ? 'Your Golf Journey' : 'Golf Journey'}
+      </h3>
 
       {/* 1. Courses Played - Primary KPI */}
       <div className="mb-6">
@@ -106,12 +107,12 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
         </div>
       )}
 
-      {/* 3. Top 100 Progress */}
+      {/* 3. Top 100 Progress - with animated bars */}
       {top100Progress.length > 0 && (
-        <div className="mb-6">
+        <div>
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Top 100 Progress</p>
           <div className="space-y-3">
-            {top100Progress.map(list => {
+            {top100Progress.map((list, index) => {
               const percentage = (list.played / list.total) * 100;
               return (
                 <div key={list.listId}>
@@ -121,12 +122,12 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
                       {list.played} / {list.total}
                     </span>
                   </div>
-                  <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
                     <motion.div
                       initial={hasAnimatedBars.current ? false : { width: 0 }}
                       animate={{ width: `${percentage}%` }}
-                      transition={hasAnimatedBars.current ? { duration: 0 } : { duration: 0.4, delay: 0.1 }}
-                      className="h-full bg-primary/70 rounded-full"
+                      transition={hasAnimatedBars.current ? { duration: 0 } : { duration: 0.35 + index * 0.05, delay: 0.1 }}
+                      className="h-full bg-slate-500/80 rounded-full"
                     />
                   </div>
                 </div>
@@ -135,54 +136,6 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
           </div>
         </div>
       )}
-
-      {/* 4. Milestones */}
-      <div>
-        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Milestones</p>
-        
-        {/* Milestone badges */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {COURSE_MILESTONES.slice(0, 7).map(milestone => {
-            const isUnlocked = unlockedMilestones.includes(milestone);
-            return (
-              <span
-                key={milestone}
-                className={cn(
-                  'px-2.5 py-1 text-xs rounded-full transition-all',
-                  isUnlocked
-                    ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10'
-                    : 'bg-muted/30 text-muted-foreground/50 border border-border/20'
-                )}
-              >
-                {milestone === 1 ? '1st' : milestone}
-              </span>
-            );
-          })}
-        </div>
-
-        {/* Next Milestone */}
-        {nextMilestone && (
-          <div className="pt-3 border-t border-border/30">
-            <p className="text-xs text-muted-foreground mb-1.5">Next milestone</p>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-foreground">
-                {getMilestoneName(nextMilestone)}
-              </span>
-              <span className="text-sm text-muted-foreground tabular-nums">
-                {coursesPlayed} / {nextMilestone}
-              </span>
-            </div>
-            <div className="h-1 bg-muted/50 rounded-full overflow-hidden">
-              <motion.div
-                initial={hasAnimatedBars.current ? false : { width: 0 }}
-                animate={{ width: `${(coursesPlayed / nextMilestone) * 100}%` }}
-                transition={hasAnimatedBars.current ? { duration: 0 } : { duration: 0.35, delay: 0.15 }}
-                className="h-full bg-primary/60 rounded-full"
-              />
-            </div>
-          </div>
-        )}
-      </div>
     </motion.div>
   );
 };

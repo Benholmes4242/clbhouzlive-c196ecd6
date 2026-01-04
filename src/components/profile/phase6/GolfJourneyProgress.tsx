@@ -102,8 +102,8 @@ export const GolfJourneyProgress: React.FC<GolfJourneyProgressProps> = ({
 
   if (!stats || stats.totalCoursesPlayed === 0) {
     return (
-      <div className={cn("bg-white rounded-xl p-5", className)}>
-        <h3 className="text-base font-semibold text-slate-900 mb-2">
+      <div className={cn("bg-white rounded-xl p-4", className)}>
+        <h3 className="text-base font-semibold text-slate-900 mb-1.5">
           {isOwnProfile ? 'Your Golf Journey' : 'Golf Journey'}
         </h3>
         <p className="text-sm text-slate-500">
@@ -142,39 +142,50 @@ export const GolfJourneyProgress: React.FC<GolfJourneyProgressProps> = ({
             <Globe className="h-4 w-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-700">Countries</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {stats.regionsPlayed.map((region) => (
               <span
                 key={region.code}
-                className="inline-flex items-center px-3 py-1.5 text-sm bg-slate-50 text-slate-700 rounded-full"
+                className="inline-flex items-center px-2.5 py-1 text-sm bg-slate-50 text-slate-700 rounded-full border border-slate-100"
               >
                 {region.name}
-                <span className="ml-1.5 text-xs text-slate-400">{region.count}</span>
+                <span className="ml-1.5 text-xs text-slate-500 font-medium">{region.count}</span>
               </span>
             ))}
           </div>
         </div>
       )}
 
-      {/* Top 100 progress */}
+      {/* Top 100 progress with animated bars */}
       {stats.top100Progress.length > 0 && stats.top100Progress.some(p => p.played > 0) && (
         <div className="pt-4 border-t border-slate-100">
           <div className="flex items-center gap-2 mb-3">
             <MapPin className="h-4 w-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-700">Top 100 Progress</span>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {stats.top100Progress
               .filter(p => p.played > 0)
               .slice(0, 4)
-              .map((progress) => (
-                <div key={progress.listName} className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">{progress.listName}</span>
-                  <span className="text-sm font-medium text-slate-900">
-                    {progress.played} <span className="text-slate-400">/ {progress.total}</span>
-                  </span>
-                </div>
-              ))}
+              .map((progress) => {
+                const percentage = (progress.played / progress.total) * 100;
+                return (
+                  <div key={progress.listName}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-slate-600">{progress.listName}</span>
+                      <span className="text-sm font-medium text-slate-900 tabular-nums">
+                        {progress.played} <span className="text-slate-400">/ {progress.total}</span>
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-slate-500/80 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}

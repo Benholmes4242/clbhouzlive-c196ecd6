@@ -131,7 +131,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       {/* Secondary Clubs */}
       {displayedSecondary.length > 0 && (
         <div className="mt-4 pt-3 border-t border-slate-200/60">
-          <p className="text-xs font-medium text-slate-500 mb-2.5">Also plays at</p>
+          <p className="text-xs font-medium text-slate-500 mt-1 mb-2.5">Also plays at</p>
           <div className="space-y-1.5">
             {displayedSecondary.map(club => (
               <p key={club.id} className="text-sm font-medium text-slate-900 truncate">
