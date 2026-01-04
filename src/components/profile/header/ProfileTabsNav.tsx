@@ -34,6 +34,9 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
     onTabChange(newTabId, scrollSnapshotRef.current);
   };
 
+  // Tab trigger class matching Top100Hub/Discover pages exactly
+  const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50";
+
   return (
     <section 
       className="mt-6 px-4"
@@ -41,7 +44,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
     >
       <Tabs value={activeSection} onValueChange={handleValueChange} className="w-full">
         <TabsList 
-          className="profile-tabs-container grid w-full"
+          className="grid w-full bg-transparent border-0 px-0 py-0 gap-0"
           style={{ 
             gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
           }}
@@ -51,7 +54,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               key={tab.id}
               value={tab.id}
               disabled={disabled}
-              className="rounded-full text-sm px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard disabled:pointer-events-none disabled:opacity-50 data-[state=active]:profile-tab-active data-[state=inactive]:profile-tab-inactive"
+              className={tabTriggerClass}
             >
               {tab.label}
             </TabsTrigger>
