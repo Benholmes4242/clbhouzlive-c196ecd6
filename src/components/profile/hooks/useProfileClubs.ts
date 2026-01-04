@@ -39,9 +39,10 @@ export const useProfileClubs = (
         .single();
 
       // Check visibility for home club
+      // Note: visibility uses 'public', 'friends', 'private' - not 'everyone'
       const isOwner = viewerUserId === profileId;
-      const visibility = profile?.home_club_visibility ?? 'everyone';
-      const canSeeHomeClub = isOwner || visibility === 'everyone';
+      const visibility = profile?.home_club_visibility ?? 'public';
+      const canSeeHomeClub = isOwner || visibility === 'public';
 
       let homeClub: Club | null = null;
       if (canSeeHomeClub && profile?.home_club) {
@@ -68,7 +69,7 @@ export const useProfileClubs = (
 
       // Determine if clubs are private (RPC returned null for non-owner)
       const isPrivate = !isOwner && !homeClub && secondaryClubs.length === 0 && 
-        visibility !== 'everyone';
+        visibility === 'private';
 
       return { homeClub, secondaryClubs, isPrivate };
     },
