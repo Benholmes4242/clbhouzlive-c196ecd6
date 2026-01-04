@@ -27,62 +27,75 @@ export const useProfileClubs = (
     queryFn: async () => {
       if (!profileId) return { homeClub: null, secondaryClubs: [], isPrivate: false };
 
-      // First get the primary home club from user_profiles
-      // Include home_club text field as fallback if FK join fails
-      const { data: profile } = await supabase
+      // Fetch canonical home club fields from user_profiles.
+      // NOTE: the app writes the canonical club id to `primary_club_id` (not `home_club_id`).
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
-        .select(`
-          home_club_id,
-          home_club,
-          home_club_visibility,
-          home_club_join:golf_clubs!home_club_id(id, name)
-        `)
+        .select('primary_club_id, home_club, home_club_visibility')
         .eq('id', profileId)
-        .single();
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('[useProfileClubs] Failed to load profile club fields:', profileError);
+      }
 
       // Check visibility for home club
-      // Note: visibility uses 'public', 'friends', 'private' - not 'everyone'
       const isOwner = viewerUserId === profileId;
-      const visibility = profile?.home_club_visibility ?? 'public';
+      const visibility = (profile as any)?.home_club_visibility ?? 'public';
       const canSeeHomeClub = isOwner || visibility === 'public';
 
       let homeClub: Club | null = null;
-      if (canSeeHomeClub) {
-        // Try FK join first
-        if (profile?.home_club_join) {
-          const club = profile.home_club_join as unknown as { id: string; name: string };
-          homeClub = {
-            id: club.id,
-            name: club.name,
-            isPrimary: true
-          };
-        } 
-        // Fallback to text field if FK join failed but home_club text exists
-        else if (profile?.home_club && typeof profile.home_club === 'string') {
-          homeClub = {
-            id: profile.home_club_id ?? 'text-fallback',
-            name: profile.home_club,
-            isPrimary: true
-          };
+
+      // Prefer the denormalized text name (this is what the profile header uses)
+      if (canSeeHomeClub && (profile as any)?.home_club) {
+        homeClub = {
+          id: (profile as any)?.primary_club_id ?? 'text-fallback',
+          name: (profile as any).home_club as string,
+          isPrimary: true,
+        };
+      }
+
+      // Optional: if text is missing but we have a canonical id, fetch the club name
+      if (!homeClub && canSeeHomeClub && (profile as any)?.primary_club_id) {
+        const { data: clubRow, error: clubErr } = await supabase
+          .from('golf_clubs')
+          .select('id, name')
+          .eq('id', (profile as any).primary_club_id)
+          .maybeSingle();
+
+        if (!clubErr && clubRow) {
+          homeClub = { id: clubRow.id, name: clubRow.name, isPrimary: true };
         }
       }
 
-      // Get secondary clubs using RPC
-      const { data: secondaryData } = await supabase
-        .rpc('get_home_clubs_for_user', { p_user_profile_id: profileId });
+      // Get secondary clubs using RPC (viewer-aware)
+      let secondaryClubs: Club[] = [];
+      const { data: rpcResult } = viewerUserId
+        ? await supabase.rpc('get_home_clubs_for_user', {
+            p_user_profile_id: profileId,
+            p_viewer_id: viewerUserId,
+          })
+        : await supabase.rpc('get_home_clubs_for_user', { p_user_profile_id: profileId });
 
-      const secondaryClubs: Club[] = Array.isArray(secondaryData)
-        ? secondaryData
-            .filter((c: any) => c.club_id !== profile?.home_club_id)
-            .map((c: any) => ({
-              id: c.club_id,
-              name: c.club_name
-            }))
-        : [];
+      // RPC payloads differ across versions:
+      // - Newer shape: { primary, additional_count, additional_preview }
+      // - Older shape: array rows with { club_id, club_name }
+      if (rpcResult && typeof rpcResult === 'object' && !Array.isArray(rpcResult)) {
+        const preview = (rpcResult as any).additional_preview;
+        if (Array.isArray(preview)) {
+          secondaryClubs = preview
+            .map((c: any) => ({ id: c.id, name: c.name }))
+            .filter((c: Club) => c.id && c.name);
+        }
+      } else if (Array.isArray(rpcResult)) {
+        secondaryClubs = rpcResult
+          .map((c: any) => ({ id: c.club_id, name: c.club_name }))
+          .filter((c: Club) => c.id && c.name);
+      }
 
-      // Determine if clubs are private (RPC returned null for non-owner)
-      const isPrivate = !isOwner && !homeClub && secondaryClubs.length === 0 && 
-        visibility === 'private';
+      // Determine if clubs are private (nothing visible and not public)
+      const isPrivate =
+        !isOwner && !homeClub && secondaryClubs.length === 0 && visibility !== 'public';
 
       return { homeClub, secondaryClubs, isPrivate };
     },
