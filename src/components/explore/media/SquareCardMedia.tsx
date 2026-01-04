@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import { Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
 import { getStreamPoster } from '@/utils/stream';
@@ -7,6 +6,7 @@ import { devlog } from '@/utils/log';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
+import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 
 /**
  * Square Card Media Component
@@ -74,13 +74,9 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
         </div>
       </div>
       
-      {/* Video play icon in bottom right for video sources */}
+      {/* Video play icon - bottom left, matching VideoPlayIndicator */}
       {media.media_type === 'video' && (
-        <div className="absolute bottom-1 right-1 z-20">
-          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 flex items-center justify-center">
-            <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="currentColor" />
-          </div>
-        </div>
+        <VideoPlayIndicator size="md" />
       )}
     </div>
   );
