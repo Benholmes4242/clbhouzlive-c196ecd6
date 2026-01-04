@@ -330,9 +330,9 @@ const ProfilePageV2: React.FC = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - tall, full bleed */}
-      <div className="relative">
+    <PageRoot className="min-h-screen compact-header-offset-no-safe" style={{ background: BG_COLOR }}>
+      {/* Hero Section - tall, full bleed - negative margin pulls it flush to header */}
+      <div className="relative -mt-[40px]">
         {/* Hero Image */}
         <div className="relative h-[250px] w-full overflow-hidden">
           {heroUrl ? (
