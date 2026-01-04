@@ -648,34 +648,21 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Tabs - Discover-style with orange underline */}
-        <section className="px-5 pb-3">
-          <div className="flex w-full items-center">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
-                className={cn(
-                  "flex-1 py-3 text-center relative text-[15px] font-medium",
-                  "transition-colors duration-200",
-                  activeSection === tab.id 
-                    ? "text-slate-900" 
-                    : "text-slate-500 hover:text-slate-700"
-                )}
-              >
-                {tab.label}
-                {/* Orange underline - matches Discover/Top100 pages */}
-                <span 
-                  className={cn(
-                    "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full transition-all duration-200",
-                    activeSection === tab.id 
-                      ? "w-8 bg-orange-500" 
-                      : "w-0 bg-transparent"
-                  )}
-                />
-              </button>
-            ))}
-          </div>
+        {/* Tabs - matches Courses/Explore/Top100 pages exactly */}
+        <section className="px-4">
+          <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
+            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0 px-0 py-0 mb-block gap-0">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </section>
 
         {/* Tab Content */}
