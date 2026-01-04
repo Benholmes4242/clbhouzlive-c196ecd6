@@ -269,8 +269,14 @@ export function useReviewVideoUpload({
             dbRowId: draft.dbRowId || undefined,
           });
           console.log('[ReviewVideoUpload] Cleaned up:', draft.streamId);
-        } catch (error) {
-          console.error('[ReviewVideoUpload] Cleanup error for', draft.streamId, error);
+        } catch (error: any) {
+          // Treat "Cannot delete attached media" as non-error (belt and braces)
+          const msg = error?.message || String(error);
+          if (msg.includes('attached')) {
+            console.warn('[ReviewVideoUpload] Video already attached, skipping cleanup:', draft.streamId);
+          } else {
+            console.warn('[ReviewVideoUpload] Cleanup error for', draft.streamId, error);
+          }
           // Non-blocking - TTL cleanup will catch orphans
         }
       }
