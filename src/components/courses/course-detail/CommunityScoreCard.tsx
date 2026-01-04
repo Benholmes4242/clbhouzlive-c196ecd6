@@ -146,7 +146,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     
     // Sort categories by score descending, take top 2-3
     const sorted = [...categories]
-      .filter(c => c.score && c.score >= 7.0) // Only include decent scores
+      .filter(c => c.score && c.score >= 8.0) // Only include high scores
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, 3);
     
