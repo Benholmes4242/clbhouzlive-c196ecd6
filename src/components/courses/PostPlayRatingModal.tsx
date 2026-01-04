@@ -408,6 +408,22 @@ const PostPlayRatingModal = ({
         setSelectedImages([]);
         setImagePreviews(new Map());
         
+        // Refetch the actual submitted media from DB to show accurate confirmation
+        // This ensures we show exactly what was saved, not stale edit-mode data
+        try {
+          const { data: mediaData } = await supabase
+            .from('course_review_media')
+            .select('id, media_url, media_type, poster_url, stream_id')
+            .eq('review_id', ratingId);
+          
+          if (mediaData) {
+            setExistingMediaItems(mediaData);
+            console.log('[Rating] Refreshed media for confirmation:', mediaData.length, 'items');
+          }
+        } catch {
+          // Non-blocking - confirmation will just show whatever was already in state
+        }
+        
         console.log('[Rating] Local media state cleared');
       }
       
@@ -1599,9 +1615,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
   };
 
   const title = isEdit ? 'Rating updated' : 'Rating submitted';
-  const subtitle = isEdit
-    ? `Your rating for ${courseName} has been saved.`
-    : `Your rating for ${courseName} has been saved.`;
+  const subtitle = `Your rating for ${courseName} has been saved.`;
 
   const overallHeading = isEdit ? 'Updated overall rating' : 'Your overall rating';
   const breakdownHeading = isEdit ? 'Updated breakdown' : 'Your breakdown';
@@ -1631,10 +1645,13 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
-  // Get bar fill color - gold for outstanding, slate for others
+  // Get bar fill color using CSS tokens - gold for outstanding, neutral slate for others
   const getBarFillColor = (value: number) => {
     const itemTier = getScoreTier(value);
-    return itemTier.tier === 'outstanding' ? '#C9A94A' : '#64748B';
+    // Use CSS custom property values defined in index.css
+    return itemTier.tier === 'outstanding' 
+      ? 'var(--rating-band-outstanding)' 
+      : 'var(--rating-bar-fill-neutral)';
   };
 
   return (
