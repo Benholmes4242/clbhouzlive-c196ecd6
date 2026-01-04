@@ -468,14 +468,15 @@ html.lightbox-open {
  * ============================================================================
  */
 .compact-header-offset {
-  padding-top: calc(40px + var(--sat)) !important;
+  /* Header is fixed; content should start directly below it (no extra safe-area gap) */
+  padding-top: var(--app-header-height, 40px) !important;
 }
 
-/* Discover needs the compact header offset WITHOUT adding safe-area again
-   (CompactHeader already handles safe-area padding internally). */
+/* Backward-compat alias (same behavior now) */
 .compact-header-offset-no-safe {
-  padding-top: 40px;
+  padding-top: var(--app-header-height, 40px) !important;
 }
+
 
 /* ============================================================================
  * CRITICAL: PREVENT HEADER OFFSET REGRESSION

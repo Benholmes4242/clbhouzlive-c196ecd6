@@ -24,8 +24,12 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     const location = useLocation();
     const { shouldHideHeader } = useModalContext();
 
-    // Pages should sit flush below header by default. Only apply offset
-    // if explicitly requested via className.
+    // Auto-apply the header offset whenever GlobalHeader would be visible.
+    // This prevents regressions where a page forgets the offset class.
+    const shouldAutoApplyOffset =
+      !shouldHideHeader && !isGlobalHeaderExcluded(location.pathname);
+
+    // If a page explicitly manages its offset (or uses a variant), don't duplicate.
     const hasExplicitOffsetClass =
       typeof className === "string" &&
       (className.includes("compact-header-offset") ||
@@ -36,6 +40,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         ref={ref}
         className={cn(
           "page-root min-h-[100vh] w-full flex flex-col bg-[var(--bg-page)]",
+          shouldAutoApplyOffset && !hasExplicitOffsetClass && "compact-header-offset",
           className
         )}
         {...rest}
