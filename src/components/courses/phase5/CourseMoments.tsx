@@ -3,7 +3,8 @@
  * Phase 5: Emotional anchor, turns courses into chapters
  */
 import React from 'react';
-import { Image, Film, Camera } from 'lucide-react';
+import { Camera } from 'lucide-react';
+import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,9 +65,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
                   muted
                   playsInline
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <Film className="h-5 w-5 text-white" />
-                </div>
+                <VideoPlayIndicator size="md" />
               </>
             ) : (
               <img
