@@ -139,9 +139,9 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
               </p>
             ))}
             {remainingCount > 0 && (
-              <p className="text-xs text-muted-foreground">
+              <button className="text-xs text-muted-foreground/80 hover:text-muted-foreground hover:underline transition-colors">
                 + {remainingCount} more
-              </p>
+              </button>
             )}
           </div>
         </div>
