@@ -1458,7 +1458,9 @@ const PostPlayRatingModal = ({
               }
               communityScore={null}
               submittedMedia={existingMediaItems}
-              onBackToCourse={handleClose}
+              heroImageUrl={course?.thumbnail_image || null}
+              heroSubtitle={course ? formatCourseLocation(course) : ''}
+              onBack={handleClose}
               onShareReview={() => {
                 // TODO: Implement share review flow
                 console.log('Share review clicked');
@@ -1563,7 +1565,9 @@ type RatingConfirmationViewProps = {
   breakdown?: BreakdownItem[];
   communityScore?: number | null;
   submittedMedia?: ExistingMedia[];
-  onBackToCourse: () => void;
+  heroImageUrl?: string | null;
+  heroSubtitle?: string;
+  onBack: () => void;
   onShareReview: () => void;
 };
 
@@ -1576,14 +1580,16 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     breakdown = [],
     communityScore = null,
     submittedMedia = [],
-    onBackToCourse,
+    heroImageUrl,
+    heroSubtitle,
+    onBack,
     onShareReview,
   } = props;
 
   const isEdit = mode === 'updated';
   const isNewReview = !isEdit;
   const tierData = getScoreTier(userRating);
-  const isOutstanding = tierData.tier === 'outstanding';
+  const showHero = !!heroImageUrl;
 
   // Track confirmation view
   useEffect(() => {
@@ -1602,7 +1608,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
       courseName,
       isNewReview,
     });
-    onBackToCourse();
+    onBack();
   };
 
   const title = isEdit ? 'Rating updated' : 'Rating submitted';
@@ -1636,33 +1642,60 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
-  // Get bar fill color using CSS tokens - gold for outstanding, neutral slate for others
-  const getBarFillColor = (value: number) => {
-    const itemTier = getScoreTier(value);
-    // Use CSS custom property values defined in index.css
-    return itemTier.tier === 'outstanding' 
-      ? 'var(--rating-band-outstanding)' 
-      : 'var(--rating-bar-fill-neutral)';
-  };
+  // Breakdown bars are ALWAYS slate - never gold (gold is only for community overall)
+  const BREAKDOWN_BAR_FILL = '#64748B'; // slate-500
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      {/* SECTION A – Success header with animation */}
-      <section className="bg-slate-50 px-6 pt-14 pb-5 text-center animate-fade-in">
+      {/* SECTION A – Hero Image Header */}
+      {showHero && (
+        <div className="relative h-[160px] w-full overflow-hidden">
+          <img
+            src={heroImageUrl!}
+            alt={courseName}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-transparent" />
+
+          {/* Glass back button */}
+          <button
+            onClick={onBack}
+            className="absolute left-4 top-4 rounded-full bg-white/15 backdrop-blur-md border border-white/25 w-10 h-10 flex items-center justify-center transition-colors hover:bg-white/25"
+            aria-label="Back"
+          >
+            <ArrowLeft className="h-5 w-5 text-white" />
+          </button>
+
+          {/* Course name + location overlay */}
+          <div className="absolute left-4 bottom-4 right-4">
+            <div className="text-white text-xl font-semibold leading-tight drop-shadow-sm">
+              {courseName}
+            </div>
+            {heroSubtitle && (
+              <div className="text-white/80 text-sm mt-0.5 drop-shadow-sm">
+                {heroSubtitle}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION B – Success header (compact if hero exists) */}
+      <section className={`bg-slate-50 px-6 text-center animate-fade-in ${showHero ? 'pt-5 pb-3' : 'pt-14 pb-5'}`}>
         <div 
-          className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 animate-scale-in"
+          className={`mx-auto mb-2 flex items-center justify-center rounded-full bg-emerald-100 shadow-[0_0_0_6px_rgba(16,185,129,0.1)] animate-scale-in ${showHero ? 'h-11 w-11' : 'h-14 w-14'}`}
           style={{ animationDelay: '100ms' }}
         >
-          <Check className="h-7 w-7 text-emerald-600" />
+          <Check className={`text-emerald-600 ${showHero ? 'h-5 w-5' : 'h-7 w-7'}`} />
         </div>
 
         <h1 className="text-lg font-semibold text-slate-900">{title}</h1>
-        <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+        <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
       </section>
 
-      {/* SECTION B – Hero Rating Card */}
+      {/* SECTION C – Hero Rating Card (overlaps hero if present) */}
       <section 
-        className="px-6 py-4 animate-fade-in"
+        className={`animate-fade-in ${showHero ? '-mt-3 px-4' : 'px-6 py-4'}`}
         style={{ animationDelay: '150ms' }}
       >
         <div className="rounded-2xl bg-white px-5 py-5 shadow-sm border border-slate-200/80">
@@ -1704,39 +1737,54 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         </div>
       </section>
 
-      {/* SECTION C – User Media Thumbnails */}
+      {/* SECTION D – User Media Thumbnails (premium grid) */}
       {submittedMedia.length > 0 && (
         <section 
-          className="px-6 py-3 animate-fade-in"
+          className="px-4 py-4 animate-fade-in"
           style={{ animationDelay: '200ms' }}
         >
-          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3">
+          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-slate-500 mb-3 px-2">
             Review media
           </p>
           <div className="grid grid-cols-3 gap-2">
-            {submittedMedia.slice(0, 6).map((item) => {
+            {submittedMedia.slice(0, 6).map((item, index) => {
               const isVideo = item.media_type === 'video';
               const thumbnailUrl = isVideo && item.poster_url ? item.poster_url : item.media_url;
+              const isLastWithMore = index === 5 && submittedMedia.length > 6;
+              const extraCount = submittedMedia.length - 6;
               
               return (
-                <div 
+                <button 
                   key={item.id}
-                  className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200/60"
+                  type="button"
+                  className="group relative aspect-square overflow-hidden rounded-2xl bg-slate-100 border border-slate-200/60 transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+                  onClick={() => {/* TODO: open full-screen viewer */}}
                 >
                   <img 
                     src={thumbnailUrl}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover transition-transform group-hover:scale-105 ${isLastWithMore ? 'blur-sm' : ''}`}
                   />
-                  {isVideo && <VideoPlayIndicator size="md" />}
-                </div>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                  
+                  {/* Video play indicator */}
+                  {isVideo && !isLastWithMore && <VideoPlayIndicator size="md" />}
+                  
+                  {/* +X more overlay for last tile */}
+                  {isLastWithMore && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <span className="text-white text-lg font-semibold">+{extraCount}</span>
+                    </div>
+                  )}
+                </button>
               );
             })}
           </div>
         </section>
       )}
 
-      {/* SECTION D – Breakdown (optional) */}
+      {/* SECTION E – Breakdown (always slate bars) */}
       {breakdown.length > 0 && (
         <section 
           className="px-6 py-4 animate-fade-in"
@@ -1755,12 +1803,12 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
                     {item.value === 10 ? '10' : item.value.toFixed(1)}
                   </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200/60">
                   <div
                     className="h-1.5 rounded-full transition-all duration-500"
                     style={{ 
                       width: `${(item.value / 10) * 100}%`,
-                      backgroundColor: getBarFillColor(item.value),
+                      backgroundColor: BREAKDOWN_BAR_FILL,
                     }}
                   />
                 </div>
@@ -1773,9 +1821,9 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
       {/* Spacer so actions sit near the bottom */}
       <div className="flex-1 bg-slate-50 min-h-[40px]" />
 
-      {/* SECTION E – Actions row */}
+      {/* SECTION F – Actions row (premium buttons) */}
       <section 
-        className="bg-slate-50 px-6 pb-8 pt-4 animate-fade-in"
+        className="bg-slate-50 px-4 pb-10 pt-4 animate-fade-in"
         style={{ animationDelay: '300ms' }}
       >
         <div className="flex gap-3">
@@ -1783,7 +1831,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={onShareReview}
-            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-300 bg-white h-12 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Share your review
           </button>
@@ -1792,7 +1840,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={handleBackToCourse}
-            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl bg-slate-900 h-12 px-4 text-sm font-medium text-white hover:bg-slate-800 active:bg-slate-700 transition-colors"
           >
             Back to course
           </button>
