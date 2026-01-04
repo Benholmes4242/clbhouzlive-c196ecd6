@@ -1735,9 +1735,9 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         />
       </div>
 
-      {/* Bottom sticky CTA bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-16 pb-8 px-4">
-        <div className="flex flex-col gap-3">
+      {/* Bottom sticky CTA bar - pointer-events-none allows swipe gestures through */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-16 pb-8 px-4">
+        <div className="pointer-events-auto flex flex-col gap-3">
           {/* Primary CTA row */}
           <div className="flex gap-3">
             {/* Share button with state machine */}
