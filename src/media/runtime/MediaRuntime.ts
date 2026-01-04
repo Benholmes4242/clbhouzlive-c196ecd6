@@ -74,7 +74,8 @@ export interface RuntimeTelemetry {
 // ============ Constants ============
 
 const MAX_WARM_PLAYERS = 2; // prev + next
-const SCROLL_SETTLE_DELAY = 50; // Reduced from 150ms for instant response
+const SCROLL_SETTLE_DELAY = 150; // Premium feel - not too twitchy on iOS
+const MAX_PREWARM_CANDIDATES = 2; // Explicit limit for paused-video pool
 const INTENT_SUPPRESS_DURATION = 2000; // 2s after user pause, suppress autoplay
 const SCRUB_SUPPRESS_DURATION = 600; // 600ms after scrub, suppress autoplay switching
 const BUFFERING_SUPPRESS_DURATION = 500; // 500ms grace for buffering videos

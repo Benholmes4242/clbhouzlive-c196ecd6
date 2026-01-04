@@ -1,7 +1,8 @@
 // Activity Grid V2 - Premium PP → L Layout
 // Implements Clubhouse signature pattern with stable infinite scroll
 
-import React, { useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useMemo, useRef, useEffect, useCallback, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import UnifiedMediaTile from '@/components/shared/grid/UnifiedMediaTile';
 import LazyTilePlaceholder from '@/components/shared/grid/LazyTilePlaceholder';
@@ -24,12 +25,6 @@ interface ActivityGridV2Props {
   config?: Partial<ActivityGridV2Config>;
 }
 
-const DEBUG = false;
-const log = (msg: string, data?: any) => {
-  if (!DEBUG) return;
-  console.log(`[ActivityGridV2] ${msg}`, data || '');
-};
-
 /**
  * Activity Grid V2 - Premium layout with PP → L pattern
  * 
@@ -39,6 +34,7 @@ const log = (msg: string, data?: any) => {
  * - Cursor-based infinite scroll (stable append-only)
  * - Smart landscape detection with 5-item lookahead
  * - Hero portrait fallback for lone items
+ * - Accessibility: respects prefers-reduced-motion
  */
 const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   items,
@@ -52,12 +48,28 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   const config = { ...DEFAULT_ACTIVITY_GRID_CONFIG, ...configOverrides };
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const renderTimeRef = useRef(performance.now());
 
-  // Set up autoplay
+  // Check for reduced motion preference
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReducedMotion(mq.matches);
+      
+      const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    }
+  }, []);
+
+  // Set up autoplay with correct thresholds
+  // Autoplay is disabled when user prefers reduced motion
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
-    startThreshold: config.playThreshold,
-    stopThreshold: 1 - config.pauseThreshold,
+    startThreshold: config.playThreshold,  // 0.6
+    stopThreshold: config.pauseThreshold,  // 0.2 (use directly, don't invert)
   });
 
   // Build layout from items (memoized)
@@ -119,6 +131,45 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, isLoading, isFetchingNextPage, onLoadMore]);
 
+  // Track initial render time (metric)
+  useEffect(() => {
+    if (items.length > 0 && !isLoading) {
+      const renderTime = performance.now() - renderTimeRef.current;
+      console.log('[ActivityGridV2:Metric] grid_render_time', renderTime.toFixed(2) + 'ms');
+    }
+  }, [items.length, isLoading]);
+
+  // Track landscape utilization (metric)
+  useEffect(() => {
+    if (layoutBlocks.length === 0) return;
+    
+    const landscapeBlocks = layoutBlocks.filter(b => b.type === 'landscape').length;
+    const totalBlocks = layoutBlocks.length;
+    // Expected landscape = 1 per every 2 blocks (PP → L pattern)
+    const expectedLandscapes = Math.floor(totalBlocks / 2);
+    const utilizationRate = expectedLandscapes > 0 ? landscapeBlocks / expectedLandscapes : 0;
+    
+    console.log('[ActivityGridV2:Metric] landscape_utilization', {
+      landscapeBlocks,
+      totalBlocks,
+      utilizationRate: `${(utilizationRate * 100).toFixed(1)}%`,
+    });
+  }, [layoutBlocks]);
+
+  // Track autoplay failures (metric)
+  useEffect(() => {
+    const handlePlayFailure = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log('[ActivityGridV2:Metric] autoplay_failure', {
+        mediaId: customEvent.detail?.mediaId,
+        reason: customEvent.detail?.reason,
+      });
+    };
+    
+    window.addEventListener('media:play:failed', handlePlayFailure);
+    return () => window.removeEventListener('media:play:failed', handlePlayFailure);
+  }, []);
+
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
     onItemClick?.(item, index);
   }, [onItemClick]);
@@ -177,11 +228,27 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
               );
             }
 
-            // Render actual tile
+            // Render actual tile with accessibility
             return (
               <div
                 key={`tile-${item.id}-${flatIndex}`}
-                className={isFullWidth ? 'col-span-2' : ''}
+                ref={(el) => registerTile(flatIndex, el)}
+                className={cn(
+                  "relative overflow-hidden bg-muted/10 cursor-pointer",
+                  "transition-transform duration-100 active:scale-[0.98]",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                  isFullWidth && "col-span-2",
+                )}
+                onClick={() => handleItemClick(item, flatIndex)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleItemClick(item, flatIndex);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`View ${item.type} post${item.creator?.name ? ` from ${item.creator.name}` : ''}`}
               >
                 <UnifiedMediaTile
                   item={item}
@@ -189,7 +256,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                     showCreator: false,
                     showLikes: true,
                     infiniteScroll: true,
-                    autoplayEnabled: config.autoplayEnabled,
+                    autoplayEnabled: config.autoplayEnabled && !prefersReducedMotion,
                     surface: 'profile-activity',
                   }}
                   variant={isHero ? 'portrait' : variant}

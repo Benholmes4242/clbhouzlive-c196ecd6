@@ -47,9 +47,9 @@ export interface ActivityGridV2Config {
   autoplayEnabled: boolean;
   /** Maximum concurrent autoplaying videos */
   maxAutoplay: number;
-  /** Play threshold (0-1) */
+  /** Play threshold (0-1) - start playing at this visibility */
   playThreshold: number;
-  /** Pause threshold (0-1) */
+  /** Pause threshold (0-1) - stop playing at this visibility (hysteresis) */
   pauseThreshold: number;
 }
 
@@ -59,6 +59,6 @@ export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
   gapPx: 2,
   autoplayEnabled: true,
   maxAutoplay: 2,
-  playThreshold: 0.4,
-  pauseThreshold: 0.6,
+  playThreshold: 0.6,    // Start playing at 60% visible
+  pauseThreshold: 0.2,   // Stop playing at 20% visible (hysteresis)
 };
