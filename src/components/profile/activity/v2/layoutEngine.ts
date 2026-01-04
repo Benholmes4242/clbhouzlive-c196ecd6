@@ -8,16 +8,10 @@ import {
   DEFAULT_ACTIVITY_GRID_CONFIG,
 } from './types';
 
-const DEBUG = false;
-const log = (msg: string, data?: any) => {
-  if (!DEBUG) return;
-  console.log(`[LayoutEngine] ${msg}`, data || '');
-};
-
 /**
  * PP → L Block Pattern:
  * 1. Two portraits (PP) - each takes 1 column
- * 2. One landscape (L) - spans 2 columns
+ * 2. One landscape (L) - spans 2 columns (immediately after each PP)
  * 3. Repeat
  * 
  * If no landscape-eligible item exists in lookahead window,
@@ -36,55 +30,13 @@ export function buildLayoutBlocks(
 
   const blocks: LayoutBlock[] = [];
   const usedIndices = new Set<number>();
-  
   let currentIndex = 0;
-  let portraitPairsInSequence = 0; // Count of PP blocks since last L
-
-  log('buildLayoutBlocks start', { itemCount: items.length });
 
   while (currentIndex < items.length) {
-    // After 2 portrait pairs, look for a landscape
-    const lookForLandscape = portraitPairsInSequence >= 2;
-
-    if (lookForLandscape) {
-      // Try to find a landscape-eligible item in lookahead window
-      const landscapeIdx = findLandscapeCandidate(
-        items, 
-        usedIndices, 
-        currentIndex, 
-        config.landscapeLookahead
-      );
-
-      if (landscapeIdx !== null) {
-        // Found landscape candidate - create landscape block
-        const item = items[landscapeIdx];
-        blocks.push({
-          type: 'landscape',
-          items: [enrichForLandscape(item)],
-        });
-        usedIndices.add(landscapeIdx);
-        portraitPairsInSequence = 0; // Reset counter
-        
-        // Advance currentIndex if we used it
-        if (landscapeIdx === currentIndex) {
-          currentIndex++;
-        }
-        
-        // Skip used indices
-        while (currentIndex < items.length && usedIndices.has(currentIndex)) {
-          currentIndex++;
-        }
-        continue;
-      }
-      
-      // No landscape found - reset and continue with portraits
-      portraitPairsInSequence = 0;
-    }
-
-    // Build portrait pair
+    // STEP 1: Build a portrait pair (PP)
     const pairItems: UnifiedMediaItem[] = [];
     
-    // Get first item for pair
+    // Get first portrait
     while (currentIndex < items.length && usedIndices.has(currentIndex)) {
       currentIndex++;
     }
@@ -95,7 +47,7 @@ export function buildLayoutBlocks(
       currentIndex++;
     }
     
-    // Get second item for pair
+    // Get second portrait
     while (currentIndex < items.length && usedIndices.has(currentIndex)) {
       currentIndex++;
     }
@@ -106,15 +58,14 @@ export function buildLayoutBlocks(
       currentIndex++;
     }
 
+    // Add the portrait pair block
     if (pairItems.length === 2) {
-      // Full portrait pair
       blocks.push({
         type: 'portrait-pair',
         items: pairItems.map(enrichForPortrait),
       });
-      portraitPairsInSequence++;
     } else if (pairItems.length === 1) {
-      // Lone portrait at end of feed
+      // Lone portrait at end
       if (!hasMore) {
         // No more pages - render as hero portrait (full-width)
         blocks.push({
@@ -122,22 +73,51 @@ export function buildLayoutBlocks(
           items: [enrichForHeroPortrait(pairItems[0])],
         });
       } else {
-        // More pages coming - still render it as portrait pair with single item
-        // Grid will handle the spacing
+        // More pages coming - render as single-item portrait pair
         blocks.push({
           type: 'portrait-pair',
           items: pairItems.map(enrichForPortrait),
         });
       }
+      break; // Exit loop, nothing more to process
+    } else {
+      // No items left
+      break;
+    }
+
+    // STEP 2: Immediately look for a landscape (L) after EACH portrait pair
+    // This creates PP → L pattern, not PP → PP → L
+    const landscapeIdx = findLandscapeCandidate(
+      items,
+      usedIndices,
+      currentIndex,
+      config.landscapeLookahead
+    );
+
+    if (landscapeIdx !== null) {
+      // Found landscape - add it
+      const item = items[landscapeIdx];
+      blocks.push({
+        type: 'landscape',
+        items: [enrichForLandscape(item)],
+      });
+      usedIndices.add(landscapeIdx);
+      
+      // If landscape was at current position, advance
+      if (landscapeIdx === currentIndex) {
+        currentIndex++;
+      }
     }
     
-    // Skip used indices
+    // If no landscape found, that's fine - continue with next portrait pair
+    // This naturally handles all-portrait feeds
+    
+    // Skip any used indices
     while (currentIndex < items.length && usedIndices.has(currentIndex)) {
       currentIndex++;
     }
   }
 
-  log('buildLayoutBlocks done', { blockCount: blocks.length });
   return blocks;
 }
 
