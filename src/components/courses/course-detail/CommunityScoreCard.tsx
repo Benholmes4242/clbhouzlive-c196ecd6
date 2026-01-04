@@ -3,9 +3,9 @@ import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Chevr
 import { Button } from '@/components/ui/button';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
-import { getScoreTier } from '@/utils/getScoreTier';
+
 import { RatingBar } from '@/components/ui/RatingBar';
-import { RatingBadge } from '@/components/ui/RatingBadge';
+import { RatingPill } from '@/components/ui/RatingPill';
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
 interface CommunityScoreCardProps {
@@ -129,7 +129,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
-  const tierData = getScoreTier(communityAverage);
+  
 
   // Check if we have distribution data
   const hasDistribution = distribution && (
@@ -186,7 +186,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </span>
 
           {/* Quality chip centered under score */}
-          <RatingBadge tierData={tierData} />
+          <RatingPill score={communityAverage} />
         </div>
       </div>
 
