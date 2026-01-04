@@ -45,7 +45,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           className
         )}
       >
-        <h3 className="text-base font-semibold text-foreground mb-3">Clubs</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">Clubs & Memberships</h3>
         <p className="text-sm text-muted-foreground mb-4">
           Add your home club and any clubs you play at.
         </p>
@@ -54,8 +54,8 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           whileTap={{ scale: 0.985 }}
           transition={{ duration: 0.1 }}
           className={cn(
-            'inline-flex items-center gap-1.5 text-sm font-medium text-primary',
-            'hover:underline hover:decoration-primary/50 transition-all'
+            'inline-flex items-center gap-1.5 text-sm font-medium text-slate-600',
+            'hover:text-slate-900 hover:underline hover:decoration-slate-400 transition-all'
           )}
         >
           <Plus className="w-4 h-4" />
@@ -78,7 +78,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           className
         )}
       >
-        <h3 className="text-base font-semibold text-foreground mb-3">Clubs</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">Clubs & Memberships</h3>
         <p className="text-sm text-muted-foreground">
           Clubs are private.
         </p>
@@ -103,7 +103,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-foreground">Clubs</h3>
+        <h3 className="text-base font-semibold text-foreground">Clubs & Memberships</h3>
         {isOwner && onEditClick && (
           <motion.button
             onClick={onEditClick}
