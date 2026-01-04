@@ -70,16 +70,18 @@ export const useProfileClubs = (
 
       // Get secondary clubs using RPC (viewer-aware)
       let secondaryClubs: Club[] = [];
-      const { data: rpcResult } = viewerUserId
-        ? await supabase.rpc('get_home_clubs_for_user', {
-            p_user_profile_id: profileId,
-            p_viewer_id: viewerUserId,
-          })
-        : await supabase.rpc('get_home_clubs_for_user', { p_user_profile_id: profileId });
+      
+      // Always pass viewer_id to RPC for proper visibility checks
+      const { data: rpcResult, error: rpcError } = await supabase.rpc('get_home_clubs_for_user', {
+        p_user_profile_id: profileId,
+        p_viewer_id: viewerUserId ?? profileId, // Owner viewing self should always see their clubs
+      });
 
-      // RPC payloads differ across versions:
-      // - Newer shape: { primary, additional_count, additional_preview }
-      // - Older shape: array rows with { club_id, club_name }
+      if (rpcError) {
+        console.error('[useProfileClubs] RPC error:', rpcError);
+      }
+
+      // Parse RPC response - shape: { additional_preview: [{id, name}], additional_count, primary_club, user_id }
       if (rpcResult && typeof rpcResult === 'object' && !Array.isArray(rpcResult)) {
         const preview = (rpcResult as any).additional_preview;
         if (Array.isArray(preview)) {
@@ -87,10 +89,6 @@ export const useProfileClubs = (
             .map((c: any) => ({ id: c.id, name: c.name }))
             .filter((c: Club) => c.id && c.name);
         }
-      } else if (Array.isArray(rpcResult)) {
-        secondaryClubs = rpcResult
-          .map((c: any) => ({ id: c.club_id, name: c.club_name }))
-          .filter((c: Club) => c.id && c.name);
       }
 
       // Determine if clubs are private (nothing visible and not public)
