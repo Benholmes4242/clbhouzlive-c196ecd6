@@ -32,6 +32,8 @@ interface UseVerticalFeedLogicOptions {
   hasMore?: boolean;
   isLoadingMore?: boolean;
   onFirstFrameReady?: () => void;
+  /** Initial index to start at (for deep linking) */
+  initialIndex?: number;
 }
 
 export function useVerticalFeedLogic({
@@ -42,10 +44,11 @@ export function useVerticalFeedLogic({
   hasMore = false,
   isLoadingMore = false,
   onFirstFrameReady,
+  initialIndex = 0,
 }: UseVerticalFeedLogicOptions) {
   const scrollViewRef = useRef<HTMLDivElement>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [visualIndex, setVisualIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [visualIndex, setVisualIndex] = useState(initialIndex);
   const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
   
@@ -121,6 +124,32 @@ export function useVerticalFeedLogic({
       }
     }
   }, [posts]);
+  
+  // Scroll to initial index on mount (for deep linking via focusPostId)
+  const hasScrolledToInitialRef = useRef(false);
+  useEffect(() => {
+    if (hasScrolledToInitialRef.current || initialIndex === 0 || !posts.length) return;
+    if (!scrollViewRef.current) return;
+    
+    // Wait for layout to stabilize
+    requestAnimationFrame(() => {
+      const itemHeight = window.innerHeight;
+      const targetScrollTop = initialIndex * itemHeight;
+      
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollTo({ top: targetScrollTop, behavior: 'instant' });
+        hasScrolledToInitialRef.current = true;
+        console.log('[VerticalFeed] Scrolled to initialIndex:', initialIndex);
+        
+        // Update maps for the target post
+        const targetPost = posts[initialIndex];
+        if (targetPost) {
+          setShouldAttachMap(m => ({ ...m, [targetPost.id]: true }));
+          setAutoplayMap(m => ({ ...m, [targetPost.id]: true }));
+        }
+      }
+    });
+  }, [initialIndex, posts]);
   
   // Setup dual intersection observers
   useEffect(() => {
