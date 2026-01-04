@@ -162,13 +162,13 @@ export function FullscreenReviewPost({
         )}
       </div>
       
-      {/* Top gradient */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 via-black/30 to-transparent pointer-events-none z-10" />
+      {/* Top gradient - lighter + shorter for cleaner media display */}
+      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 via-black/10 to-transparent pointer-events-none z-10" />
       
-      {/* Bottom gradient */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-10" />
+      {/* Bottom gradient - softer fade, less muddy */}
+      <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-10" />
       
-      {/* Top-left: Course info */}
+      {/* Top-left: Course info + Preview badge stacked */}
       <div className="absolute top-4 left-4 right-20 z-20">
         <h2 className="text-white text-lg font-semibold leading-tight drop-shadow-md line-clamp-2">
           {courseName}
@@ -178,17 +178,23 @@ export function FullscreenReviewPost({
             {heroSubtitle}
           </p>
         )}
+        {/* Preview pill under location */}
+        {mode === 'preview' && (
+          <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-white/80 text-[10px] font-medium tracking-wide">
+            Preview
+          </span>
+        )}
       </div>
       
       {/* Top-right: Rating + tier */}
       <Sheet>
         <SheetTrigger asChild>
-          <button className="absolute top-4 right-4 z-20 flex flex-col items-end gap-1.5">
+          <button className="absolute top-4 right-4 z-20 flex flex-col items-end gap-1">
             <span className="text-white text-3xl font-bold tabular-nums drop-shadow-lg">
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            <RatingPill score={rating} className="text-[10px] py-1 px-2.5" />
-            <span className="text-white/70 text-[11px] font-medium tracking-wide mt-0.5">
+            <RatingPill score={rating} className="text-[10px] py-0.5 px-2" />
+            <span className="text-white/60 text-[10px] font-medium tracking-wide">
               From a review
             </span>
           </button>
@@ -232,19 +238,12 @@ export function FullscreenReviewPost({
         </SheetContent>
       </Sheet>
       
-      {/* Preview tag */}
-      {mode === 'preview' && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
-          <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
-            Preview
-          </span>
-        </div>
-      )}
+      {/* Preview tag removed - now in top-left under location */}
       
-      {/* Media counter */}
+      {/* Media counter - positioned higher to not collide with CTA bar */}
       {hasMultipleMedia && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm">
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 mb-3">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
             {sortedMedia.map((_, idx) => (
               <button
                 key={idx}
@@ -262,7 +261,7 @@ export function FullscreenReviewPost({
         </div>
       )}
       
-      {/* Navigation arrows */}
+      {/* Navigation arrows - more glassy, larger tap targets */}
       {hasMultipleMedia && (
         <>
           <button
@@ -270,9 +269,9 @@ export function FullscreenReviewPost({
             disabled={currentIndex === 0}
             className={cn(
               "absolute left-3 top-1/2 -translate-y-1/2 z-20",
-              "w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm",
-              "flex items-center justify-center transition-all",
-              currentIndex === 0 ? "opacity-0 pointer-events-none" : "hover:bg-black/60"
+              "w-11 h-11 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
+              "flex items-center justify-center transition-all active:scale-[0.98]",
+              currentIndex === 0 ? "opacity-0 pointer-events-none" : "hover:bg-black/40"
             )}
             aria-label="Previous media"
           >
@@ -284,9 +283,9 @@ export function FullscreenReviewPost({
             disabled={currentIndex === sortedMedia.length - 1}
             className={cn(
               "absolute right-3 top-1/2 -translate-y-1/2 z-20",
-              "w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm",
-              "flex items-center justify-center transition-all",
-              currentIndex === sortedMedia.length - 1 ? "opacity-0 pointer-events-none" : "hover:bg-black/60"
+              "w-11 h-11 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
+              "flex items-center justify-center transition-all active:scale-[0.98]",
+              currentIndex === sortedMedia.length - 1 ? "opacity-0 pointer-events-none" : "hover:bg-black/40"
             )}
             aria-label="Next media"
           >
