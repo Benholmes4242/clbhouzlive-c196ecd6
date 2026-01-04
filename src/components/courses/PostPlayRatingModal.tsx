@@ -1600,6 +1600,7 @@ type RatingConfirmationViewProps = {
 
 function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     mode,
     courseName,
@@ -1665,13 +1666,22 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     });
   }, [courseId, courseName, isNewReview, userRating]);
 
-  // Handle back to course with analytics
+  // Handle back to course with analytics + toast
   const handleBackToCourse = () => {
     analyticsEvents.ratings.flowCompleted({
       courseId,
       courseName,
       isNewReview,
     });
+    
+    // Show toast confirming rating was saved
+    if (shareState !== 'shared') {
+      toast({
+        title: 'Rating saved',
+        description: `Your rating for ${courseName} has been saved.`,
+      });
+    }
+    
     onBack();
   };
 
@@ -1735,8 +1745,8 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         />
       </div>
 
-      {/* Bottom sticky CTA bar - pointer-events-none allows swipe gestures through */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-16 px-4 pb-[calc(env(safe-area-inset-bottom)+2rem)]">
+      {/* Bottom sticky CTA bar - softer gradient, pointer-events-none allows swipe gestures through */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent pt-12 px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
         <div className="pointer-events-auto flex flex-col gap-3">
           {/* Primary CTA row */}
           <div className="flex gap-3">
