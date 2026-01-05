@@ -278,6 +278,7 @@ const HeroProfileHeader = ({
             <ProfileCoursesTab 
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
+              displayName={profile?.display_name ?? profile?.username}
             />
           );
         case 'top100':

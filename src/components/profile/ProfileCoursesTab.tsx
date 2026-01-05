@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface ProfileCoursesTabProps {
   userId: string;
   isOwnProfile: boolean;
+  displayName?: string;
 }
 
 /**
@@ -34,7 +35,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
   isOwnProfile,
   displayName,
-}: ProfileCoursesTabProps & { displayName?: string }) => {
+}) => {
   const [showAddModal, setShowAddModal] = useState(false);
   
   const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
