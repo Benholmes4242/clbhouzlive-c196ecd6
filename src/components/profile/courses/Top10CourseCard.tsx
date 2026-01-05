@@ -42,22 +42,25 @@ interface RatingBarProps {
 const getRankingBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
   switch (position) {
     case 1:
+      // Gold - matches Outstanding bar color (#C9A94A)
       return { 
-        bg: 'linear-gradient(145deg, #FFD700 0%, #C9A94A 50%, #B8963C 100%)', 
+        bg: 'linear-gradient(145deg, #D4B35A 0%, #C9A94A 50%, #B8963C 100%)', 
         text: '#422006',
         shadow: '0 2px 8px rgba(201, 169, 74, 0.4)'
       };
     case 2:
+      // Silver - warm-toned to match gold style
       return { 
-        bg: 'linear-gradient(145deg, #E8E8E8 0%, #C0C0C0 50%, #A8A8A8 100%)', 
+        bg: 'linear-gradient(145deg, #B8B8B8 0%, #9CA3AF 50%, #8B9299 100%)', 
         text: '#1f2937',
-        shadow: '0 2px 6px rgba(160, 160, 160, 0.3)'
+        shadow: '0 2px 6px rgba(156, 163, 175, 0.35)'
       };
     case 3:
+      // Bronze - warm copper tones matching the gold warmth
       return { 
-        bg: 'linear-gradient(145deg, #CD9B6A 0%, #B87333 50%, #A0522D 100%)', 
+        bg: 'linear-gradient(145deg, #C9956A 0%, #B8845A 50%, #A67348 100%)', 
         text: '#fff',
-        shadow: '0 2px 6px rgba(184, 115, 51, 0.3)'
+        shadow: '0 2px 6px rgba(184, 132, 90, 0.35)'
       };
     default:
       return { 
