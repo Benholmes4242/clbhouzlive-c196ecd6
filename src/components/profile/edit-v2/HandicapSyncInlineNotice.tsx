@@ -35,7 +35,8 @@ const HandicapSyncInlineNotice: React.FC<HandicapSyncInlineNoticeProps> = ({
       setIsRegistered(true);
       toast.success("You're registered. We'll email you as soon as official sync goes live.");
       
-      // Invalidate profile queries
+      // Invalidate profile queries (both keys used across the app)
+      queryClient.invalidateQueries({ queryKey: ['user-profile'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['profile'], exact: false });
     } catch (error) {
       console.error('Error registering interest:', error);
