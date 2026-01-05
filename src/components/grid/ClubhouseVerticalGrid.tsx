@@ -824,6 +824,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           }))}
                           initialIndex={0}
                           dotsBottomOffset={0}
+                          hideCarouselArrows={true}
                         />
                       </div>
                     )}
@@ -875,6 +876,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           }))}
                           initialIndex={0}
                           dotsBottomOffset={0}
+                          hideCarouselArrows={true}
                         />
                       </div>
                     ) : (
@@ -1008,6 +1010,14 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           onMuteToggle={() => {
             setGlobalMute(!isGloballyMuted);
             onMeaningfulInteraction?.();
+          }}
+          isReviewPost={filteredPosts[currentIndex].categories?.includes('review')}
+          onNextPost={() => {
+            if (currentIndex < filteredPosts.length - 1) {
+              const nextIndex = currentIndex + 1;
+              const nextItem = itemRefs.current[nextIndex];
+              nextItem?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
           }}
         />
       )}

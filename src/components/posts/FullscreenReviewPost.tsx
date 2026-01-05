@@ -40,6 +40,9 @@ export interface FullscreenReviewPostProps {
   // Dynamic bottom offset for carousel dots (to avoid CTA overlap)
   dotsBottomOffset?: number; // in pixels, default ~96 for preview, ~80 for live
   
+  // Hide carousel arrows when used in Clubhouse feed (feed nav takes over)
+  hideCarouselArrows?: boolean;
+  
   // Optional: Render children (e.g., Clubhouse action bar) on top of the overlay
   children?: React.ReactNode;
 }
@@ -60,6 +63,7 @@ export function FullscreenReviewPost({
   initialIndex = 0,
   onBack,
   dotsBottomOffset,
+  hideCarouselArrows = false,
   children,
 }: FullscreenReviewPostProps) {
   // Sort media: video first as cover, then by display_order/created_at
@@ -178,8 +182,8 @@ export function FullscreenReviewPost({
       {/* Bottom gradient - softer fade, less muddy */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
-      {/* Top-left: Course info + Preview badge stacked */}
-      <div className="absolute top-4 left-4 right-20 z-20">
+      {/* Top-left: Course info + Preview badge stacked - positioned below status bar */}
+      <div className="absolute top-20 left-4 right-20 z-20">
         <h2 className="text-white text-lg font-semibold leading-tight drop-shadow-md line-clamp-2">
           {courseName}
         </h2>
@@ -199,7 +203,7 @@ export function FullscreenReviewPost({
       {/* Top-right: Rating + tier - centered stack for alignment */}
       <Sheet>
         <SheetTrigger asChild>
-          <button className="absolute top-4 right-4 z-20 flex flex-col items-center text-center gap-0.5 max-w-[100px]">
+          <button className="absolute top-20 right-4 z-20 flex flex-col items-center text-center gap-0.5 max-w-[100px]">
             <span className="text-white text-2xl sm:text-3xl font-bold tabular-nums drop-shadow-lg">
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
@@ -283,8 +287,8 @@ export function FullscreenReviewPost({
         {children}
       </div>
       
-      {/* Navigation arrows - smaller w-10 h-10 for polish */}
-      {hasMultipleMedia && (
+      {/* Navigation arrows - hidden in Clubhouse mode */}
+      {!hideCarouselArrows && hasMultipleMedia && (
         <>
           <button
             onClick={goToPrevious}
