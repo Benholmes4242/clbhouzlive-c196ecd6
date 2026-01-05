@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronDown } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
@@ -246,7 +246,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       {/* Slot 6: Next Post (for review posts only) */}
       {isReviewPost && onNextPost && (
         <ActionSlot
-          icon={ChevronDown}
+          icon={ChevronRight}
           onClick={onNextPost}
           ariaLabel="Next post"
           showCount={false}
