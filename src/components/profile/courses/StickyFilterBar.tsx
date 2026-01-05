@@ -80,7 +80,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
               >
                 <span>{option.label}</span>
                 {option.count !== undefined && option.count > 0 && (
-                  <span className="text-xs text-muted-foreground/60 ml-1">
+                  <span className="text-[10px] text-muted-foreground/50 ml-1">
                     {option.count}
                   </span>
                 )}

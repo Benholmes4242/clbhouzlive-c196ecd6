@@ -53,8 +53,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         return items.filter(item => item.type === 'image');
       case 'courses':
         return items.filter(item => !!item.golfCourseId);
-      case 'milestones':
-        return items.filter(item => item.isMilestone);
       default:
         return items;
     }

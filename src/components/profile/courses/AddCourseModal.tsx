@@ -175,24 +175,24 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         </button>
       </div>
 
-      {/* Tab buttons */}
+      {/* Tab buttons - slate styling to match app */}
       <div className="flex gap-2 px-5 pb-4">
         <button
           onClick={() => setActiveTab('manage')}
-          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+          className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
             activeTab === 'manage'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted/50 text-muted-foreground'
+              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+              : 'bg-muted text-muted-foreground'
           }`}
         >
           Manage ({topTen.length}/10)
         </button>
         <button
           onClick={() => setActiveTab('add')}
-          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+          className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
             activeTab === 'add'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted/50 text-muted-foreground'
+              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+              : 'bg-muted text-muted-foreground'
           }`}
         >
           Add Course
@@ -373,7 +373,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
       {course.has_rating && course.rating_value && (
         <div className="flex items-center gap-1 mt-0.5">
           <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-          <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+          <span className="text-xs text-foreground font-medium">
             {course.rating_value.toFixed(1)}
           </span>
         </div>

@@ -108,24 +108,15 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             <div className="text-xs text-muted-foreground truncate mt-0.5">
               {course.sub_country || course.country}
             </div>
-            {/* Meta row - always single line */}
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              {/* Top 100 label - softer gold */}
-              <span 
-                className="text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
-                style={{ backgroundColor: 'rgba(210, 180, 97, 0.12)', color: '#A68A35' }}
-              >
-                Top 100 Course
-              </span>
-              {course.last_played_at && (
-                <div className="flex items-center gap-1 whitespace-nowrap">
-                  <Calendar className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-[10px] text-muted-foreground">
-                    {format(new Date(course.last_played_at), 'd MMM yyyy')}
-                  </span>
-                </div>
-              )}
-            </div>
+            {/* Date row - single line */}
+            {course.last_played_at && (
+              <div className="flex items-center gap-1 mt-1.5 whitespace-nowrap">
+                <Calendar className="w-3 h-3 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground">
+                  {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Rating - fixed width column on right */}
