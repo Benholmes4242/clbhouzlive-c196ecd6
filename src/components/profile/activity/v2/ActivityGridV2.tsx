@@ -138,18 +138,33 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     console.log('[ActivityGridV2] Infinite scroll setup');
     
     const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      const scrollThreshold = scrollHeight - clientHeight - 300; // Reduced for easier triggering
+      const distanceFromBottom = scrollHeight - clientHeight - scrollTop;
+      
+      // Log every scroll event to debug (only after initial scroll)
+      if (scrollTop > 100) {
+        console.log('[ActivityGridV2] Scroll event:', {
+          scrollTop: Math.round(scrollTop),
+          scrollHeight: Math.round(scrollHeight),
+          clientHeight: Math.round(clientHeight),
+          threshold: Math.round(scrollThreshold),
+          distanceFromBottom: Math.round(distanceFromBottom),
+          hasMore: hasMoreRef.current,
+          isLoading: isLoadingRef.current,
+          isFetching: isFetchingRef.current,
+          loadingLocked: loadingRef.current
+        });
+      }
+      
       if (!gridRef.current || !hasMoreRef.current || loadingRef.current || isLoadingRef.current || isFetchingRef.current) {
         return;
       }
 
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      const scrollThreshold = scrollHeight - clientHeight - 800;
-
       if (scrollTop > scrollThreshold && onLoadMoreRef.current) {
-        console.log('[ActivityGridV2] Triggering fetchNextPage - hasMore:', hasMoreRef.current);
+        console.log('[ActivityGridV2] ✅ Triggering fetchNextPage - hasMore:', hasMoreRef.current);
         loadingRef.current = true;
         onLoadMoreRef.current();
-        // Debounce - 1 second lockout
         setTimeout(() => {
           loadingRef.current = false;
         }, 1000);
