@@ -133,57 +133,75 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   useEffect(() => { isFetchingRef.current = isFetchingNextPage; }, [isFetchingNextPage]);
   useEffect(() => { onLoadMoreRef.current = onLoadMore; }, [onLoadMore]);
 
-  // Infinite scroll using Intersection Observer (mobile-friendly)
+  // Infinite scroll using Intersection Observer - setup after items load
   useEffect(() => {
-    console.log('[ActivityGridV2] Setting up infinite scroll observer');
-    
-    const gridContainer = gridRef.current;
-    if (!gridContainer) {
-      console.log('[ActivityGridV2] No grid container found');
+    // Don't set up until we have items and the grid has rendered
+    if (flatItems.length === 0 || !hasMore || !onLoadMore) {
+      console.log('[ActivityGridV2] Skipping observer setup', {
+        hasItems: flatItems.length > 0,
+        hasMore,
+        hasOnLoadMore: !!onLoadMore
+      });
       return;
     }
     
-    // Create a sentinel element at the bottom
-    const sentinel = document.createElement('div');
-    sentinel.style.height = '1px';
-    sentinel.style.width = '100%';
-    sentinel.dataset.infiniteScrollSentinel = 'true';
-    gridContainer.appendChild(sentinel);
+    console.log('[ActivityGridV2] Setting up infinite scroll observer');
     
-    // Observe when sentinel comes into view
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        console.log('[ActivityGridV2] Sentinel intersection:', {
-          isIntersecting: entry.isIntersecting,
-          hasMore: hasMoreRef.current,
-          loadingLocked: loadingRef.current,
-          isFetching: isFetchingRef.current
-        });
-        
-        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingRef.current) {
-          console.log('[ActivityGridV2] ✅ Sentinel visible - triggering fetchNextPage');
-          loadingRef.current = true;
-          onLoadMoreRef.current?.();
-          setTimeout(() => {
-            loadingRef.current = false;
-          }, 1000);
-        }
-      },
-      {
-        // Trigger 800px before sentinel is visible
-        rootMargin: '800px',
+    let observer: IntersectionObserver | null = null;
+    let sentinel: HTMLDivElement | null = null;
+    
+    // Wait for next tick to ensure grid is in DOM
+    const timeoutId = setTimeout(() => {
+      const gridContainer = gridRef.current;
+      if (!gridContainer) {
+        console.log('[ActivityGridV2] Grid ref not found');
+        return;
       }
-    );
-    
-    observer.observe(sentinel);
-    console.log('[ActivityGridV2] Observer attached to sentinel');
+      
+      // Create sentinel element
+      sentinel = document.createElement('div');
+      sentinel.style.height = '1px';
+      sentinel.style.width = '100%';
+      sentinel.dataset.infiniteScrollSentinel = 'true';
+      gridContainer.appendChild(sentinel);
+      console.log('[ActivityGridV2] Sentinel appended to grid');
+      
+      // Observe when sentinel comes into view
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          console.log('[ActivityGridV2] Sentinel intersection:', {
+            isIntersecting: entry.isIntersecting,
+            hasMore: hasMoreRef.current,
+            loading: loadingRef.current,
+            fetching: isFetchingRef.current
+          });
+          
+          if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingRef.current) {
+            console.log('[ActivityGridV2] ✅ Triggering fetchNextPage');
+            loadingRef.current = true;
+            onLoadMoreRef.current?.();
+            setTimeout(() => {
+              loadingRef.current = false;
+            }, 1000);
+          }
+        },
+        {
+          rootMargin: '800px',
+          threshold: 0
+        }
+      );
+      
+      observer.observe(sentinel);
+      console.log('[ActivityGridV2] Observer attached');
+    }, 100);
     
     return () => {
-      observer.disconnect();
-      sentinel.remove();
+      clearTimeout(timeoutId);
+      observer?.disconnect();
+      sentinel?.remove();
     };
-  }, []); // Empty deps - uses refs
+  }, [flatItems.length, hasMore, onLoadMore]);
 
   // Track initial render time (metric)
   useEffect(() => {
