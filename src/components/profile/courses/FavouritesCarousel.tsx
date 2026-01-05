@@ -136,12 +136,19 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
+  // Stable sorted course IDs for consistent query key
+  const courseIds = React.useMemo(() => 
+    topTen.map(c => c.course_id).sort(), 
+    [topTen]
+  );
+
   // Fetch user ratings with breakdown scores
-  const courseIds = React.useMemo(() => topTen.map(c => c.course_id), [topTen]);
   const { data: ratingsMap = {} } = useQuery({
     queryKey: ['user-course-ratings-breakdown', userId, courseIds],
     enabled: !!userId && courseIds.length > 0,
     queryFn: async () => {
+      if (courseIds.length === 0) return {};
+      
       const { data, error } = await supabase
         .from('course_ratings')
         .select('course_id, rating, design_score, condition_score, facilities_score')
