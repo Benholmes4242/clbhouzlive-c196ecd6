@@ -52,16 +52,20 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     }
   };
 
-  // Top 100 card - premium treatment with refined styling
+  // Top 100 card - premium treatment with trophy gold styling
   if (isTop100) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-card border border-amber-200/40 dark:border-amber-800/30 rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-all group"
+        className="relative bg-card border rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-all group"
+        style={{ borderColor: 'rgba(210, 180, 97, 0.3)' }}
       >
-        {/* Refined gold accent line - thinner 1.5px */}
-        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300 dark:from-amber-600 dark:via-amber-500 dark:to-amber-600" />
+        {/* Trophy gold accent line - thinner 1.5px */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-[1.5px]" 
+          style={{ background: 'linear-gradient(to right, rgba(210, 180, 97, 0.6), #D2B461, rgba(210, 180, 97, 0.6))' }} 
+        />
         
         <div className="flex">
           {/* Thumbnail */}
@@ -75,8 +79,11 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : (
               <div className="w-20 h-20 bg-gradient-to-br from-muted to-muted/50" />
             )}
-            {/* Top 100 icon overlay - refined */}
-            <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-amber-500/90 flex items-center justify-center shadow-sm">
+            {/* Top 100 icon overlay - trophy gold */}
+            <div 
+              className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm"
+              style={{ backgroundColor: 'rgba(210, 180, 97, 0.9)' }}
+            >
               <Trophy className="w-2.5 h-2.5 text-white" />
             </div>
           </div>
@@ -104,7 +111,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
-                className="text-[10px] text-amber-600 dark:text-amber-400 font-medium hover:underline"
+                className="text-[10px] font-medium hover:underline"
+                style={{ color: '#D2B461' }}
               >
                 Rate
               </button>

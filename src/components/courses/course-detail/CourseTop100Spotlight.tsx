@@ -39,10 +39,12 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   };
 
   return (
-    <div className="rounded-[22px] bg-gradient-to-br from-amber-50/60 to-white shadow-[0_1px_4px_rgba(180,130,40,0.12)] border border-amber-100/50 px-4 py-4">
+    <div className="rounded-[22px] bg-gradient-to-br from-[#D2B461]/10 to-white shadow-[0_1px_4px_rgba(180,130,40,0.12)] border border-[#D2B461]/20 px-4 py-4">
       {/* Row 1 – Title */}
       <div className="flex items-center gap-2 mb-1">
-        <Trophy className="h-4 w-4 text-amber-500" />
+        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(210, 180, 97, 0.15)' }}>
+          <Trophy className="h-3.5 w-3.5" style={{ color: '#D2B461' }} />
+        </div>
         <span className="text-sm font-semibold text-slate-900">
           Top 100 Spotlight
         </span>

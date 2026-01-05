@@ -1,21 +1,19 @@
 /**
  * FavouritesCarousel - Crown jewel horizontal carousel for favourite courses
  * 
- * "If Tiger Woods had a Top 10 list, this is where it would live."
- * 
- * Matches the design language of Recent Top 100 Rounds carousel.
- * Features cinematic imagery, ranking badges, and swipeable interaction.
+ * Matches the layout of Top100RecentRoundsCarousel from the progress page.
+ * Uses UnifiedCourseCard for consistent card rendering.
  */
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings2, Trophy, Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Settings2, Trophy, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { RatingPill } from '@/components/ui/RatingPill';
+import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
+import { CourseCardModel } from '@/types/courseCard';
 import {
   Carousel,
   CarouselContent,
@@ -30,99 +28,31 @@ interface FavouritesCarouselProps {
   onManage?: () => void;
 }
 
-interface FavouriteCardProps {
-  course: TopTenCourse;
-  position: number;
-  userRating?: number;
-  designScore?: number;
-  conditionScore?: number;
-  facilitiesScore?: number;
-  onClick: () => void;
-}
-
 /**
- * Cinematic favourite course card with ranking badge overlay
+ * Convert TopTenCourse to CourseCardModel for UnifiedCourseCard
  */
-const FavouriteCard: React.FC<FavouriteCardProps> = ({
-  course,
-  position,
-  userRating,
-  designScore,
-  conditionScore,
-  facilitiesScore,
-  onClick,
-}) => {
-  const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
-  const hasBreakdown = designScore || conditionScore || facilitiesScore;
-
-  return (
-    <motion.div
-      onClick={onClick}
-      whileTap={{ scale: 0.98 }}
-      className="relative bg-card rounded-xl overflow-hidden cursor-pointer group shadow-sm border border-border/40"
-    >
-      {/* Hero image */}
-      <div className="aspect-[16/10] relative overflow-hidden">
-        {course.thumbnail_image ? (
-          <img
-            src={course.thumbnail_image}
-            alt={course.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-muted to-muted/50" />
-        )}
-        
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Rank badge - prominent position */}
-        <div className="absolute top-3 left-3 z-10">
-          <div className="w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-lg">
-            <span className="text-sm font-bold text-foreground">#{position}</span>
-          </div>
-        </div>
-
-        {/* Top 100 badge */}
-        {isTop100 && (
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/90 backdrop-blur-sm rounded-full">
-            <Trophy className="w-3 h-3 text-white" />
-            <span className="text-[10px] font-semibold text-white">Top 100</span>
-          </div>
-        )}
-
-        {/* Content overlay - bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h4 className="font-semibold text-lg text-white truncate drop-shadow-md mb-0.5">
-            {course.name}
-          </h4>
-          <p className="text-sm text-white/80 truncate mb-3">
-            {course.sub_country || course.country}
-          </p>
-
-          {/* Rating row */}
-          <div className="flex items-center gap-3">
-            {userRating && userRating > 0 && (
-              <div className="flex items-center gap-1.5">
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="text-sm font-semibold text-white">{userRating.toFixed(1)}</span>
-              </div>
-            )}
-
-            {/* Mini breakdown */}
-            {hasBreakdown && (
-              <div className="flex items-center gap-2 text-[11px] text-white/70">
-                {designScore && <span>Design {designScore.toFixed(1)}</span>}
-                {conditionScore && <span>· Condition {conditionScore.toFixed(1)}</span>}
-                {facilitiesScore && <span>· Facilities {facilitiesScore.toFixed(1)}</span>}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+function toCourseCardModel(
+  course: TopTenCourse, 
+  position: number,
+  userRating?: number
+): CourseCardModel {
+  return {
+    id: course.course_id,
+    name: course.name,
+    imageUrl: course.thumbnail_image || undefined,
+    locationText: course.sub_country || course.country,
+    country: course.country,
+    communityRating: userRating,
+    ranks: {
+      global: course.global_rank || undefined,
+      regional: course.regional_rank || undefined,
+      usa: course.usa_rank || undefined,
+    },
+    context: {
+      isPlayedByViewer: true,
+    },
+  };
+}
 
 export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   userId,
@@ -142,7 +72,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     [topTen]
   );
 
-  // Fetch user ratings with breakdown scores
+  // Fetch user ratings
   const { data: ratingsMap = {} } = useQuery({
     queryKey: ['user-course-ratings-breakdown', userId, courseIds],
     enabled: !!userId && courseIds.length > 0,
@@ -151,18 +81,13 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('course_id, rating, design_score, condition_score, facilities_score')
+        .select('course_id, rating')
         .eq('user_id', userId)
         .in('course_id', courseIds);
 
       if (error) throw error;
-      return (data || []).reduce((acc: Record<string, any>, r) => {
-        acc[r.course_id] = {
-          rating: r.rating,
-          design: r.design_score,
-          condition: r.condition_score,
-          facilities: r.facilities_score,
-        };
+      return (data || []).reduce((acc: Record<string, number>, r) => {
+        acc[r.course_id] = r.rating;
         return acc;
       }, {});
     },
@@ -186,34 +111,33 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     };
   }, [api, onSelect]);
 
-  const handleCourseClick = (courseId: string) => {
-    navigate(`/courses/${courseId}`);
-  };
-
   if (isLoading) {
     return (
-      <div className={cn("py-4", className)}>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <div className="h-5 w-36 bg-muted rounded animate-pulse" />
+      <section className={cn("w-full", className)}>
+        <div className="flex items-center justify-between mb-2 px-2.5">
+          <div className="h-4 w-36 bg-muted rounded animate-pulse" />
         </div>
-        <div className="flex gap-3 overflow-hidden">
+        <div className="flex gap-2 overflow-hidden px-2.5">
           {[1, 2].map(i => (
-            <div key={i} className="flex-shrink-0 w-[280px] aspect-[16/10] bg-muted rounded-xl animate-pulse" />
+            <div key={i} className="flex-shrink-0 w-[85%] aspect-[1.77/1] bg-muted rounded-xl animate-pulse" />
           ))}
         </div>
-      </div>
+      </section>
     );
   }
 
-  // Empty state
+  // Empty state matching Top100RecentRoundsCarousel
   if (topTen.length === 0) {
     return (
-      <section className={cn("py-4", className)}>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h3 className="text-base font-semibold text-foreground">Favourite Courses</h3>
+      <section className={cn("mt-6 w-full", className)}>
+        <div className="flex items-center justify-between mb-2 px-2.5">
+          <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+            Favourite Courses
+          </h3>
         </div>
         
-        <div className="rounded-xl border border-dashed border-border/60 bg-muted/20 p-8 text-center">
+        {/* Premium empty state card */}
+        <div className="mx-2.5 rounded-sq-md border border-border/50 bg-card/60 p-6 text-center">
           <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
             <Trophy className="w-5 h-5 text-muted-foreground" />
           </div>
@@ -226,7 +150,12 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               : "This golfer hasn't picked their favourite courses yet."}
           </p>
           {isOwnProfile && onManage && (
-            <Button onClick={onManage} size="sm" className="rounded-full">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onManage}
+              className="rounded-full"
+            >
               Build your Top 10
             </Button>
           )}
@@ -236,60 +165,55 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   }
 
   return (
-    <section className={cn("py-2", className)}>
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-3 px-1">
-        <div>
-          <h3 className="text-base font-semibold text-foreground">Favourite Courses</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {isOwnProfile 
-              ? `Your all-time favourites · ${topTen.length} of 10`
-              : `${topTen.length} of 10 favourites`}
-          </p>
-        </div>
+    <section className={cn("w-full", className)}>
+      {/* Section header matching Top100RecentRoundsCarousel */}
+      <div className="flex items-center justify-between mb-3 px-2.5">
+        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+          Favourite Courses
+        </h3>
         {isOwnProfile && onManage && (
-          <button 
+          <button
+            type="button"
             onClick={onManage}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
-            title="Manage favourites"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Settings2 className="w-4 h-4 text-muted-foreground" />
+            Manage →
           </button>
         )}
       </div>
 
-      {/* Carousel */}
+      {/* Swipe snap carousel matching Top100RecentRoundsCarousel */}
       <Carousel
         setApi={setApi}
         opts={{
           align: 'start',
           loop: false,
         }}
-        className="w-full -mx-1"
+        className="w-full"
       >
-        <CarouselContent className="-ml-3 px-1">
+        <CarouselContent className="-ml-2 px-2.5">
           {topTen.map((course) => {
-            const ratings = ratingsMap[course.course_id];
+            const userRating = ratingsMap[course.course_id];
+            const cardModel = toCourseCardModel(course, course.position, userRating);
+            
             return (
               <CarouselItem 
                 key={course.id} 
-                className="pl-3 basis-[85%] sm:basis-[70%] md:basis-[50%] lg:basis-[40%]"
+                className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]"
               >
-                <FavouriteCard
-                  course={course}
-                  position={course.position}
-                  userRating={ratings?.rating}
-                  designScore={ratings?.design}
-                  conditionScore={ratings?.condition}
-                  facilitiesScore={ratings?.facilities}
-                  onClick={() => handleCourseClick(course.course_id)}
+                <UnifiedCourseCard
+                  course={cardModel}
+                  showRankBadges={true}
+                  showRating={true}
+                  hideLocation={false}
+                  contextTag={`#${course.position}`}
                 />
               </CarouselItem>
             );
           })}
         </CarouselContent>
 
-        {/* Navigation controls */}
+        {/* Navigation controls matching Top100RecentRoundsCarousel */}
         {count > 1 && (
           <div className="flex items-center justify-center gap-4 mt-4">
             <button
@@ -337,6 +261,21 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           </div>
         )}
       </Carousel>
+
+      {/* Add to favourites CTA (owner only) */}
+      {isOwnProfile && onManage && topTen.length < 10 && (
+        <div className="mt-4 px-2.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onManage}
+            className="w-full rounded-full border-dashed"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Add to favourites ({topTen.length}/10)
+          </Button>
+        </div>
+      )}
     </section>
   );
 };

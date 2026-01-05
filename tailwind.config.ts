@@ -144,7 +144,9 @@ export default {
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
 				'brand-black': 'hsl(var(--brand-black))',
 				'hud-bg': 'var(--hud-bg)',
-				'hud-border': 'var(--hud-border)'
+				'hud-border': 'var(--hud-border)',
+				// Top 100 trophy gold - matches Outstanding rating tier
+				'trophy-gold': 'var(--rating-band-outstanding)',
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
