@@ -1,11 +1,8 @@
 /**
  * FavouritesCarousel - Crown jewel horizontal carousel for Top 10 Rated Courses
  * 
- * Matches the layout of Top100RecentRoundsCarousel from the progress page.
+ * Matches the layout of Top100RecentRoundsCarousel from the progress page EXACTLY.
  * Uses UnifiedCourseCard for consistent card rendering.
- * 
- * Section renamed to "Top 10 Rated Courses" with dynamic subtitles.
- * Includes overall rating bar and mini breakdown bars for each card.
  */
 import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
 import { CourseCardModel } from '@/types/courseCard';
-import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 import {
   Carousel,
   CarouselContent,
@@ -33,18 +29,10 @@ interface FavouritesCarouselProps {
   onManage?: () => void;
 }
 
-interface RatingBreakdown {
-  overall: number;
-  design: number | null;
-  condition: number | null;
-  facilities: number | null;
-  clubhouse: number | null;
-}
-
 /**
  * Convert TopTenCourse to CourseCardModel for UnifiedCourseCard
  */
-function toCourseCardModel(
+function createCardModel(
   course: TopTenCourse, 
   position: number,
   userRating?: number
@@ -67,75 +55,6 @@ function toCourseCardModel(
   };
 }
 
-/**
- * Mini rating bar component for breakdown scores
- */
-const MiniRatingBar: React.FC<{
-  label: string;
-  score: number | null;
-  maxScore?: number;
-}> = ({ label, score, maxScore = 10 }) => {
-  if (score === null || score === undefined) return null;
-  
-  const percentage = (score / maxScore) * 100;
-  const theme = getRatingTheme(score);
-  
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-[8px] text-muted-foreground w-14 truncate">{label}</span>
-      <div className="flex-1 h-[3px] bg-muted/60 rounded-full overflow-hidden">
-        <div 
-          className="h-full rounded-full transition-all duration-300"
-          style={{ 
-            width: `${percentage}%`,
-            backgroundColor: theme.accent,
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-/**
- * Top 10 Card with rating bars
- */
-const Top10CardWithBars: React.FC<{
-  course: TopTenCourse;
-  position: number;
-  ratingBreakdown?: RatingBreakdown;
-  onClick: () => void;
-}> = ({ course, position, ratingBreakdown, onClick }) => {
-  const cardModel = toCourseCardModel(course, position, ratingBreakdown?.overall);
-  const hasBreakdown = ratingBreakdown && (
-    ratingBreakdown.design !== null ||
-    ratingBreakdown.condition !== null ||
-    ratingBreakdown.facilities !== null ||
-    ratingBreakdown.clubhouse !== null
-  );
-
-  return (
-    <div className="flex flex-col" onClick={onClick}>
-      <UnifiedCourseCard
-        course={cardModel}
-        showRankBadges={true}
-        showRating={true}
-        hideLocation={false}
-        contextTag={`#${position}`}
-      />
-      
-      {/* Rating breakdown bars - shown below card */}
-      {hasBreakdown && (
-        <div className="px-4 py-2 bg-background border-x border-b border-border/60 rounded-b-sq-md -mt-1 space-y-1">
-          <MiniRatingBar label="Design" score={ratingBreakdown.design} />
-          <MiniRatingBar label="Condition" score={ratingBreakdown.condition} />
-          <MiniRatingBar label="Facilities" score={ratingBreakdown.facilities} />
-          <MiniRatingBar label="Clubhouse" score={ratingBreakdown.clubhouse} />
-        </div>
-      )}
-    </div>
-  );
-};
-
 export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   userId,
   isOwnProfile,
@@ -155,28 +74,22 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     [topTen]
   );
 
-  // Fetch user ratings with breakdown scores
+  // Fetch user ratings for overall scores
   const { data: ratingsMap = {} } = useQuery({
-    queryKey: ['user-course-ratings-breakdown', userId, courseIds],
+    queryKey: ['user-course-ratings', userId, courseIds],
     enabled: !!userId && courseIds.length > 0,
     queryFn: async () => {
       if (courseIds.length === 0) return {};
       
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('course_id, rating, design_score, condition_score, facilities_score, clubhouse_score')
+        .select('course_id, rating')
         .eq('user_id', userId)
         .in('course_id', courseIds);
 
       if (error) throw error;
-      return (data || []).reduce((acc: Record<string, RatingBreakdown>, r) => {
-        acc[r.course_id] = {
-          overall: r.rating,
-          design: r.design_score,
-          condition: r.condition_score,
-          facilities: r.facilities_score,
-          clubhouse: r.clubhouse_score,
-        };
+      return (data || []).reduce((acc: Record<string, number>, r) => {
+        acc[r.course_id] = r.rating;
         return acc;
       }, {});
     },
@@ -292,18 +205,20 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       >
         <CarouselContent className="-ml-2 px-2.5">
           {topTen.map((course) => {
-            const breakdown = ratingsMap[course.course_id];
+            const rating = ratingsMap[course.course_id];
+            const cardModel = createCardModel(course, course.position, rating);
             
             return (
               <CarouselItem 
                 key={course.id} 
                 className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]"
               >
-                <Top10CardWithBars
-                  course={course}
-                  position={course.position}
-                  ratingBreakdown={breakdown}
-                  onClick={() => navigate(`/courses/${course.course_id}`)}
+                <UnifiedCourseCard
+                  course={cardModel}
+                  showRankBadges={true}
+                  showRating={true}
+                  hideLocation={true}
+                  contextTag={`#${course.position}`}
                 />
               </CarouselItem>
             );
