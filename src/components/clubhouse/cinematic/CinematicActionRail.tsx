@@ -183,12 +183,11 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   
   const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
-  // Align share button bottom with CreatorCapsule bottom.
-  // CreatorCapsule is fixed at: calc(env(safe-area-inset-bottom, 0px) + 80px)
-  const SHARE_TO_BOTTOM_PX = onSave ? SLOT_HEIGHT + GAP : 0;
-  const CAPSULE_BOTTOM_OFFSET = onSave
-    ? `calc(env(safe-area-inset-bottom, 0px) + 80px - ${SHARE_TO_BOTTOM_PX}px)`
-    : 'calc(env(safe-area-inset-bottom, 0px) + 80px)';
+  // Align the *circular button* bottom (not the full slot) with CreatorCapsule bottom.
+  // Each slot reserves COUNT_HEIGHT + 4px under the circle even when showCount=false,
+  // so the circle sits (SLOT_HEIGHT - ICON_SIZE) px above the rail's bottom.
+  const CAPSULE_BOTTOM_OFFSET = `calc(env(safe-area-inset-bottom, 0px) + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
+
 
   return (
     <motion.div
