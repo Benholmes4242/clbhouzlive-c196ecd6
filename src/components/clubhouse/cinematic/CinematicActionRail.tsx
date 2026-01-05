@@ -175,14 +175,15 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   hasNextMedia = false,
   hasPrevMedia = false,
 }) => {
-  // Total rail height is fixed: 5 slots * SLOT_HEIGHT + 4 gaps * 12px
+  // Calculate slot count dynamically based on what's actually rendered
   const GAP = 12;
-  const slotCount = onSave ? 5 : 4;
+  let slotCount = onSave ? 5 : 4; // base: mute, like, comment, share (+ optional save)
+  const hasNextMediaSlot = isReviewPost && onNextMedia && hasNextMedia;
+  if (hasNextMediaSlot) slotCount++; // add next media button slot
+  
   const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
   // Position rail so bottom of share icon aligns with bottom of CreatorCapsule
-  // CreatorCapsule is positioned above the bottom nav bar
-  // Bottom nav is ~64px, plus safe area, plus 80px offset for capsule = 144px total
   const CAPSULE_BOTTOM_OFFSET = 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 80px)';
 
   return (
