@@ -116,8 +116,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         className
       )}
     >
-      {/* Hero image */}
-      <div className="relative aspect-[16/10] overflow-hidden">
+      {/* Hero image - matching UnifiedCourseCard aspect ratio */}
+      <div className="relative aspect-[1.77/1] overflow-hidden">
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -156,8 +156,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
       </div>
       
-      {/* Rating bars section */}
-      <div className="p-3 space-y-2">
+      {/* Rating bars section - matching UnifiedCourseCard meta padding */}
+      <div className="px-4 py-3 space-y-2">
         {/* Primary rating bar */}
         {rating !== undefined && (
           <div className="flex items-center gap-2">
