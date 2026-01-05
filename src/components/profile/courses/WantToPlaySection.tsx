@@ -190,11 +190,11 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   if (wantToPlay.length === 0) {
     return (
       <section className={cn("py-4", className)}>
-        <div className="flex items-center justify-between mb-3 px-2.5">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-semibold text-foreground">Want to Play</h3>
         </div>
         
-        <div className="mx-2.5 rounded-xl border border-dashed border-border/60 bg-muted/10 p-6 text-center">
+        <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-6 text-center">
           <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
             <Bookmark className="w-5 h-5 text-muted-foreground" />
           </div>
@@ -227,7 +227,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   return (
     <section className={cn("py-4", className)}>
       {/* Section header */}
-      <div className="flex items-center justify-between mb-3 px-2.5">
+      <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-base font-semibold text-foreground">Want to Play</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -243,7 +243,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
       </div>
 
       {/* Course list with batch animation */}
-      <div className="relative overflow-hidden px-2.5">
+      <div className="relative overflow-hidden">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={batchIndex}
