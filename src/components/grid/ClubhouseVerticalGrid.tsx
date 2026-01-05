@@ -901,25 +901,30 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows */}
+                {/* Navigation Arrows - positioned higher for review posts, hide right for reviews */}
                 {hasMultipleMedia && (
                   <>
                     <button
                       data-control="media-nav"
                       onClick={handlePrevMedia}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-0 w-10 h-10 flex items-center justify-center"
+                      className={`absolute left-4 z-30 p-0 w-10 h-10 flex items-center justify-center ${
+                        item.categories?.includes('review') ? 'top-32' : 'top-1/2 -translate-y-1/2'
+                      }`}
                       aria-label="Previous media"
                     >
                       <ChevronLeft className="w-6 h-6 text-white" />
                     </button>
-                    <button
-                      data-control="media-nav"
-                      onClick={handleNextMedia}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-10 h-10 flex items-center justify-center"
-                      aria-label="Next media"
-                    >
-                      <ChevronRight className="w-6 h-6 text-white" />
-                    </button>
+                    {/* Hide right arrow for review posts - next button is in action rail */}
+                    {!item.categories?.includes('review') && (
+                      <button
+                        data-control="media-nav"
+                        onClick={handleNextMedia}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-10 h-10 flex items-center justify-center"
+                        aria-label="Next media"
+                      >
+                        <ChevronRight className="w-6 h-6 text-white" />
+                      </button>
+                    )}
                   </>
                 )}
               </div>

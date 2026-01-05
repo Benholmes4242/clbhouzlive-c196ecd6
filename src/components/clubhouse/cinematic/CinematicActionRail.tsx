@@ -198,7 +198,17 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         height: totalHeight,
       }}
     >
-      {/* Slot 1: Mute/Unmute */}
+      {/* Slot 1: Next Post (for review posts only - at top) */}
+      {isReviewPost && onNextPost && (
+        <ActionSlot
+          icon={ChevronRight}
+          onClick={onNextPost}
+          ariaLabel="Next post"
+          showCount={false}
+        />
+      )}
+
+      {/* Slot 2: Mute/Unmute */}
       <ActionSlot
         icon={isMuted ? VolumeX : Volume2}
         onClick={onMuteToggle}
@@ -206,7 +216,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         showCount={false}
       />
 
-      {/* Slot 2: Like */}
+      {/* Slot 3: Like */}
       <ActionSlot
         icon={Heart}
         count={likesCount}
@@ -217,7 +227,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         isLikeButton
       />
 
-      {/* Slot 3: Comment */}
+      {/* Slot 4: Comment */}
       <ActionSlot
         icon={MessageSquare}
         count={commentsCount}
@@ -225,7 +235,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         ariaLabel="Comments"
       />
 
-      {/* Slot 4: Reshare */}
+      {/* Slot 5: Reshare */}
       <ActionSlot
         icon={Send}
         onClick={onShare}
@@ -233,22 +243,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         showCount={false}
       />
 
-      {/* Slot 5: Save/Bookmark (optional) */}
+      {/* Slot 6: Save/Bookmark (optional) */}
       {onSave && (
         <ActionSlot
           icon={Bookmark}
           onClick={onSave}
           ariaLabel="Save"
-          showCount={false}
-        />
-      )}
-
-      {/* Slot 6: Next Post (for review posts only) */}
-      {isReviewPost && onNextPost && (
-        <ActionSlot
-          icon={ChevronRight}
-          onClick={onNextPost}
-          ariaLabel="Next post"
           showCount={false}
         />
       )}
