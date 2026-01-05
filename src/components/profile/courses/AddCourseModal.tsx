@@ -8,13 +8,13 @@
  *   A) Rated courses → Add immediately
  *   B) Unrated courses → Prompt to rate first
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, X, Star, Plus } from 'lucide-react';
+import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -42,11 +42,13 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   existingCourseIds,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'manage' | 'add'>('manage');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   
   const { data: userActivity = [] } = useUserCourseActivity(userId);
-  const { addCourse, topTen } = useUserTopTenCourses(userId);
+  const { addCourse, removeCourse, reorderTopTen, topTen, isRemoving, isReordering } = useUserTopTenCourses(userId);
 
   // Get all played course IDs (not already in Top 10)
   const playedCourseIds = useMemo(() => {
@@ -124,6 +126,28 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
     navigate(`/courses/${courseId}?action=rate`);
   };
 
+  const handleRemoveCourse = (courseId: string) => {
+    removeCourse(courseId);
+    toast({
+      title: 'Course removed',
+      description: 'Successfully removed from your Top 10',
+    });
+  };
+
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    const newOrder = [...topTen];
+    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+    reorderTopTen(newOrder.map((c, i) => ({ course_id: c.course_id, position: i + 1 })));
+  };
+
+  const handleMoveDown = (index: number) => {
+    if (index === topTen.length - 1) return;
+    const newOrder = [...topTen];
+    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+    reorderTopTen(newOrder.map((c, i) => ({ course_id: c.course_id, position: i + 1 })));
+  };
+
   return (
     <BottomSheet
       open
@@ -140,7 +164,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       {/* Header with close button */}
       <div className="flex items-center justify-between px-5 pb-3">
         <h2 id="add-course-title" className="text-lg font-semibold text-foreground">
-          Add Course to Top 10
+          Top 10 Courses
         </h2>
         <button
           onClick={onClose}
@@ -151,77 +175,166 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         </button>
       </div>
 
-      {/* Search input */}
-      <div className="px-5 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search your played courses..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-            autoFocus
-          />
-        </div>
+      {/* Tab buttons */}
+      <div className="flex gap-2 px-5 pb-4">
+        <button
+          onClick={() => setActiveTab('manage')}
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'manage'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted/50 text-muted-foreground'
+          }`}
+        >
+          Manage ({topTen.length}/10)
+        </button>
+        <button
+          onClick={() => setActiveTab('add')}
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'add'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted/50 text-muted-foreground'
+          }`}
+        >
+          Add Course
+        </button>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-5 pb-8" style={{ maxHeight: 'calc(85vh - 160px)' }}>
-        {isLoading ? (
-          <div className="text-center py-8 text-muted-foreground">
-            Loading your courses...
+      {/* Search input - only show in add tab */}
+      {activeTab === 'add' && (
+        <div className="px-5 pb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+              placeholder="Search your played courses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+              ref={searchInputRef}
+            />
           </div>
-        ) : filteredCourses.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            {searchQuery
-              ? 'No matching courses found in your played courses'
-              : playedCourses.length === 0
-                ? "You haven't played any courses yet. Play and rate courses to add them to your Top 10."
-                : 'Start typing to search your played courses'}
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Rated courses section */}
-            {ratedCourses.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                  Your rated courses
-                </h3>
-                <div className="space-y-2">
-                  {ratedCourses.map((course) => (
-                    <CourseRow
-                      key={course.id}
-                      course={course}
-                      onAction={() => handleAddCourse(course.id)}
-                      actionLabel="Add to Top 10"
-                      actionIcon={<Plus className="w-4 h-4" />}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+        </div>
+      )}
 
-            {/* Unrated courses section */}
-            {unratedCourses.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                  Rate to add
-                </h3>
-                <div className="space-y-2">
-                  {unratedCourses.map((course) => (
-                    <CourseRow
-                      key={course.id}
-                      course={course}
-                      onAction={() => handleRateFirst(course.id)}
-                      actionLabel="Rate first"
-                      actionIcon={<Star className="w-4 h-4" />}
-                      isSecondary
-                    />
-                  ))}
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto px-5 pb-28" style={{ maxHeight: 'calc(85vh - 180px)' }}>
+        {activeTab === 'manage' ? (
+          /* Manage existing Top 10 */
+          topTen.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Your Top 10 is empty.</p>
+              <p className="text-sm mt-1">Switch to "Add Course" to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {topTen.map((course, index) => (
+                <div
+                  key={course.course_id}
+                  className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50"
+                >
+                  {/* Position */}
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-primary">#{index + 1}</span>
+                  </div>
+
+                  {/* Course info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate text-sm">{course.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {course.sub_country || course.country}
+                    </div>
+                  </div>
+
+                  {/* Reorder buttons */}
+                  <div className="flex flex-col gap-0.5">
+                    <button
+                      onClick={() => handleMoveUp(index)}
+                      disabled={index === 0 || isReordering}
+                      className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+                      aria-label="Move up"
+                    >
+                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                    <button
+                      onClick={() => handleMoveDown(index)}
+                      disabled={index === topTen.length - 1 || isReordering}
+                      className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+                      aria-label="Move down"
+                    >
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  </div>
+
+                  {/* Remove button */}
+                  <button
+                    onClick={() => handleRemoveCourse(course.course_id)}
+                    disabled={isRemoving}
+                    className="p-2 rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50"
+                    aria-label="Remove from Top 10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )
+        ) : (
+          /* Add courses tab */
+          isLoading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading your courses...
+            </div>
+          ) : filteredCourses.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {searchQuery
+                ? 'No matching courses found in your played courses'
+                : playedCourses.length === 0
+                  ? "You haven't played any courses yet. Play and rate courses to add them to your Top 10."
+                  : 'Start typing to search your played courses'}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Rated courses section */}
+              {ratedCourses.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                    Your rated courses
+                  </h3>
+                  <div className="space-y-2">
+                    {ratedCourses.map((course) => (
+                      <CourseRow
+                        key={course.id}
+                        course={course}
+                        onAction={() => handleAddCourse(course.id)}
+                        actionLabel="Add to Top 10"
+                        actionIcon={<Plus className="w-4 h-4" />}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Unrated courses section */}
+              {unratedCourses.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                    Rate to add
+                  </h3>
+                  <div className="space-y-2">
+                    {unratedCourses.map((course) => (
+                      <CourseRow
+                        key={course.id}
+                        course={course}
+                        onAction={() => handleRateFirst(course.id)}
+                        actionLabel="Rate first"
+                        actionIcon={<Star className="w-4 h-4" />}
+                        isSecondary
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
         )}
       </div>
     </BottomSheet>
