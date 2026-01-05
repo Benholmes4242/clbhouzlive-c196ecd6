@@ -14,7 +14,7 @@ interface AllCoursesListProps {
   isOwnProfile: boolean;
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 
 export const AllCoursesList: React.FC<AllCoursesListProps> = ({ 
   userId,
