@@ -157,6 +157,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     
     sortIndex: overallIndex,
     
+    // Autoplay: all videos are candidates for autoplay
+    isAutoplayCandidate: isVideo,
+    
     // Studio edits (text overlays, etc.)
     studioEdits: (primaryMedia as any).studio_edits,
     
