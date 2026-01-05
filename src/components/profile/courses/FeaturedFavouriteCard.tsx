@@ -54,9 +54,9 @@ export const FeaturedFavouriteCard: React.FC<FeaturedFavouriteCardProps> = ({
           </div>
         </div>
 
-        {/* Top 100 badge - top right */}
+        {/* Top 100 badge - top right - uses trophy gold */}
         {isTop100 && (
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/90 backdrop-blur-sm rounded-sq-pill">
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1 backdrop-blur-sm rounded-sq-pill" style={{ backgroundColor: 'rgba(210, 180, 97, 0.9)' }}>
             <Trophy className="w-3 h-3 text-white" />
             <span className="text-[10px] font-semibold text-white">Top 100</span>
           </div>

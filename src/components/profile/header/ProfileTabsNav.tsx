@@ -39,28 +39,30 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 
   return (
     <section 
-      className="mt-6 px-4"
+      className="mt-6 sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/30"
       onPointerDown={handlePointerDown}
     >
-      <Tabs value={activeSection} onValueChange={handleValueChange} className="w-full">
-        <TabsList 
-          className="grid w-full bg-transparent border-0 px-0 py-0 gap-0"
-          style={{ 
-            gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
-          }}
-        >
-          {tabs.map((tab) => (
-            <TabsTrigger 
-              key={tab.id}
-              value={tab.id}
-              disabled={disabled}
-              className={tabTriggerClass}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <div className="px-4">
+        <Tabs value={activeSection} onValueChange={handleValueChange} className="w-full">
+          <TabsList 
+            className="grid w-full bg-transparent border-0 px-0 py-0 gap-0"
+            style={{ 
+              gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
+            }}
+          >
+            {tabs.map((tab) => (
+              <TabsTrigger 
+                key={tab.id}
+                value={tab.id}
+                disabled={disabled}
+                className={tabTriggerClass}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
     </section>
   );
 };

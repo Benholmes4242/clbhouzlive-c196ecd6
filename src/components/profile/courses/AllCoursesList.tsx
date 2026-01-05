@@ -5,15 +5,16 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
 import { StickyFilterBar, CourseFilterType } from './StickyFilterBar';
-import { useInView } from 'react-intersection-observer';
+import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
+import { scrollToTop } from '@/utils/scrollToTop';
 
 interface AllCoursesListProps {
   userId: string;
   isOwnProfile: boolean;
 }
 
-const INITIAL_LOAD = 15;
-const LOAD_MORE_COUNT = 15;
+const PAGE_SIZE = 25;
 
 export const AllCoursesList: React.FC<AllCoursesListProps> = ({ 
   userId,
@@ -22,8 +23,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<CourseFilterType>('all');
-  const [displayCount, setDisplayCount] = useState(INITIAL_LOAD);
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isSticky, setIsSticky] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
@@ -105,21 +107,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   // Reset display count when filter changes
   useEffect(() => {
-    setDisplayCount(INITIAL_LOAD);
+    setDisplayCount(PAGE_SIZE);
   }, [filter]);
-
-  // Infinite scroll trigger
-  const { ref: loadMoreRef, inView } = useInView({
-    threshold: 0,
-    rootMargin: '200px',
-  });
-
-  // Load more when scrolling near bottom
-  useEffect(() => {
-    if (inView && displayCount < filteredCourses.length) {
-      setDisplayCount(prev => Math.min(prev + LOAD_MORE_COUNT, filteredCourses.length));
-    }
-  }, [inView, displayCount, filteredCourses.length]);
 
   // Sticky filter detection
   useEffect(() => {
@@ -137,6 +126,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   const displayedCourses = filteredCourses.slice(0, displayCount);
   const hasMore = displayCount < filteredCourses.length;
+  const remainingCount = Math.min(PAGE_SIZE, filteredCourses.length - displayCount);
+  const totalFiltered = filteredCourses.length;
+
+  // Load more handler matching Explore page pattern
+  const loadMore = useCallback(() => {
+    if (!hasMore || isLoadingMore) return;
+    
+    setIsLoadingMore(true);
+    
+    // Simulate loading delay for smooth UX
+    setTimeout(() => {
+      setDisplayCount(prev => Math.min(prev + PAGE_SIZE, filteredCourses.length));
+      setIsLoadingMore(false);
+    }, 300);
+  }, [hasMore, isLoadingMore, filteredCourses.length]);
 
   // Empty state messages
   const getEmptyMessage = () => {
@@ -208,29 +212,53 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               isOwnProfile={isOwnProfile}
             />
           ))}
+        </div>
+      )}
 
-          {/* Infinite scroll trigger / Load more */}
-          {hasMore && (
-            <div ref={loadMoreRef} className="py-4">
-              <div className="space-y-2">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-16 bg-muted/30 rounded-xl animate-pulse" />
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Pagination - Load More button matching Explore page exactly */}
+      {hasMore && (
+        <div className="flex flex-col items-center gap-2 pt-4 px-4 pb-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadMore}
+            disabled={isLoadingMore}
+            className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
+          >
+            {isLoadingMore ? (
+              <>
+                <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                Loading next courses…
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                Next {remainingCount} courses
+              </>
+            )}
+          </Button>
+          <p className="text-[11px] text-muted-foreground">
+            Showing 1–{displayedCourses.length} of {totalFiltered.toLocaleString()} courses
+          </p>
+        </div>
+      )}
 
-          {/* End-of-list closure */}
-          {!hasMore && filteredCourses.length > 0 && (
-            <div className="text-center pt-6 pb-4">
-              <p className="text-sm text-foreground font-medium">
-                That's your journey so far.
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {filteredCourses.length} courses played. On to {filteredCourses.length + 1}.
-              </p>
-            </div>
-          )}
+      {/* End message when all courses shown */}
+      {!hasMore && filteredCourses.length > PAGE_SIZE && (
+        <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
+          You've reached the end • {totalFiltered.toLocaleString()} courses total
+        </p>
+      )}
+
+      {/* End-of-list closure for smaller lists */}
+      {!hasMore && filteredCourses.length > 0 && filteredCourses.length <= PAGE_SIZE && (
+        <div className="text-center pt-6 pb-4">
+          <p className="text-sm text-foreground font-medium">
+            That's your journey so far.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {filteredCourses.length} courses played. On to {filteredCourses.length + 1}.
+          </p>
         </div>
       )}
     </div>
