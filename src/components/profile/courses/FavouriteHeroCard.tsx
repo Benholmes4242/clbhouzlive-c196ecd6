@@ -64,7 +64,7 @@ export const FavouriteHeroCard: React.FC<FavouriteHeroCardProps> = ({
           <img
             src={course.thumbnail_image}
             alt={course.name}
-            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+            className="h-full w-full object-cover"
           />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-slate-100 to-slate-200" />

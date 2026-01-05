@@ -29,7 +29,7 @@ export const FeaturedFavouriteCard: React.FC<FeaturedFavouriteCardProps> = ({
   return (
     <motion.div
       onClick={onClick}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ opacity: 0.92 }}
       className="relative bg-slate-900 rounded-sq-md overflow-hidden cursor-pointer group"
     >
       {/* Hero image with gradient overlay - slightly reduced height */}
