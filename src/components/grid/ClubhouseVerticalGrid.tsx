@@ -824,7 +824,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           }))}
                           initialIndex={0}
                           dotsBottomOffset={0}
-                          hideCarouselArrows={true}
                         />
                       </div>
                     )}
@@ -876,7 +875,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           }))}
                           initialIndex={0}
                           dotsBottomOffset={0}
-                          hideCarouselArrows={true}
                         />
                       </div>
                     ) : (
@@ -901,25 +899,28 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - positioned higher for review posts, hide right for reviews */}
+                {/* Navigation Arrows - show based on current media position */}
                 {hasMultipleMedia && (
                   <>
-                    <button
-                      data-control="media-nav"
-                      onClick={handlePrevMedia}
-                      className={`absolute left-4 z-30 p-0 w-10 h-10 flex items-center justify-center ${
-                        item.categories?.includes('review') ? 'top-32' : 'top-1/2 -translate-y-1/2'
-                      }`}
-                      aria-label="Previous media"
-                    >
-                      <ChevronLeft className="w-6 h-6 text-white" />
-                    </button>
-                    {/* Hide right arrow for review posts - next button is in action rail */}
-                    {!item.categories?.includes('review') && (
+                    {/* Left arrow - only show when not on first media */}
+                    {currentMediaIndex > 0 && (
+                      <button
+                        data-control="media-nav"
+                        onClick={handlePrevMedia}
+                        className={`absolute left-4 z-30 p-0 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm ${
+                          item.categories?.includes('review') ? 'top-32' : 'top-1/2 -translate-y-1/2'
+                        }`}
+                        aria-label="Previous media"
+                      >
+                        <ChevronLeft className="w-6 h-6 text-white" />
+                      </button>
+                    )}
+                    {/* Right arrow - only show for non-review posts when not on last media (reviews use action rail) */}
+                    {!item.categories?.includes('review') && currentMediaIndex < mediaItems.length - 1 && (
                       <button
                         data-control="media-nav"
                         onClick={handleNextMedia}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-10 h-10 flex items-center justify-center"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         aria-label="Next media"
                       >
                         <ChevronRight className="w-6 h-6 text-white" />
@@ -995,37 +996,56 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       )}
 
       {/* Cinematic Action Rail */}
-      {filteredPosts[currentIndex] && (
-        <CinematicActionRail
-          postId={filteredPosts[currentIndex].id}
-          likesCount={currentPostEngagement.likesCount}
-          commentsCount={currentPostEngagement.commentsCount}
-          hasLiked={currentPostEngagement.hasLiked}
-          isMuted={isGloballyMuted}
-          isVisible={true}
-          onLike={() => {
-            currentPostEngagement.toggleLike();
-            onMeaningfulInteraction?.();
-          }}
-          onComment={() => handleComment(filteredPosts[currentIndex].id)}
-          onShare={() => {
-            handleShare();
-            onMeaningfulInteraction?.();
-          }}
-          onMuteToggle={() => {
-            setGlobalMute(!isGloballyMuted);
-            onMeaningfulInteraction?.();
-          }}
-          isReviewPost={filteredPosts[currentIndex].categories?.includes('review')}
-          onNextPost={() => {
-            if (currentIndex < filteredPosts.length - 1) {
-              const nextIndex = currentIndex + 1;
-              const nextItem = itemRefs.current[nextIndex];
-              nextItem?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }}
-        />
-      )}
+      {filteredPosts[currentIndex] && (() => {
+        const currentPost = filteredPosts[currentIndex];
+        const mediaItems = currentPost.media && currentPost.media.length > 0 ? currentPost.media : [{
+          id: `${currentPost.id}-single`,
+          media_type: currentPost.type as 'video' | 'image',
+          media_url: currentPost.src
+        }];
+        const currentMediaIdx = mediaIndices[currentPost.id] || 0;
+        const hasNextMedia = currentMediaIdx < mediaItems.length - 1;
+        const hasPrevMedia = currentMediaIdx > 0;
+        
+        return (
+          <CinematicActionRail
+            postId={currentPost.id}
+            likesCount={currentPostEngagement.likesCount}
+            commentsCount={currentPostEngagement.commentsCount}
+            hasLiked={currentPostEngagement.hasLiked}
+            isMuted={isGloballyMuted}
+            isVisible={true}
+            onLike={() => {
+              currentPostEngagement.toggleLike();
+              onMeaningfulInteraction?.();
+            }}
+            onComment={() => handleComment(currentPost.id)}
+            onShare={() => {
+              handleShare();
+              onMeaningfulInteraction?.();
+            }}
+            onMuteToggle={() => {
+              setGlobalMute(!isGloballyMuted);
+              onMeaningfulInteraction?.();
+            }}
+            isReviewPost={currentPost.categories?.includes('review')}
+            onNextMedia={() => {
+              setMediaIndices(prev => ({
+                ...prev,
+                [currentPost.id]: currentMediaIdx + 1
+              }));
+            }}
+            onPrevMedia={() => {
+              setMediaIndices(prev => ({
+                ...prev,
+                [currentPost.id]: currentMediaIdx - 1
+              }));
+            }}
+            hasNextMedia={hasNextMedia}
+            hasPrevMedia={hasPrevMedia}
+          />
+        );
+      })()}
 
       {/* Creator Capsule */}
       {filteredPosts[currentIndex] && (() => {
