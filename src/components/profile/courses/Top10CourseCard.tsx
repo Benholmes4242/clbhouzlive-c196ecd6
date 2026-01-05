@@ -2,16 +2,17 @@
  * Top10CourseCard - Crown jewel card for Top 10 Rated Courses carousel
  * 
  * Features:
- * - Overall rating bar (primary)
+ * - Overall rating bar (primary) with tier-based colors
  * - 4 mini breakdown bars (Design, Condition, Facilities, Experience)
- * - Museum-quality, prestige-led design
+ * - Uses global color system (Fair → Outstanding)
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, MapPin } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
@@ -30,7 +31,6 @@ interface RatingBarProps {
   value: number | null | undefined;
   label: string;
   maxValue?: number;
-  showLabel?: boolean;
   size?: 'primary' | 'mini';
 }
 
@@ -38,7 +38,6 @@ const RatingBar: React.FC<RatingBarProps> = ({
   value,
   label,
   maxValue = 10,
-  showLabel = false,
   size = 'mini',
 }) => {
   if (value === null || value === undefined) return null;
@@ -46,16 +45,17 @@ const RatingBar: React.FC<RatingBarProps> = ({
   const percentage = Math.min((value / maxValue) * 100, 100);
   const isPrimary = size === 'primary';
   
-  // Prestige-led consistent palette: gold/cream (no value-based switching)
-  const barColor = isPrimary 
-    ? 'bg-gradient-to-r from-amber-400 to-amber-500' // Gold for overall
-    : 'bg-gradient-to-r from-amber-300/70 to-amber-400/70'; // Muted champagne for breakdown
-
+  // Get tier-based color from global system
+  const tierData = getScoreTier(value);
+  
   return (
-    <div className="w-full">
+    <div className="flex items-center gap-1.5 w-full">
+      {!isPrimary && (
+        <span className="text-[9px] text-muted-foreground w-14 flex-shrink-0">{label}</span>
+      )}
       <div 
         className={cn(
-          "w-full rounded-full overflow-hidden",
+          "flex-1 rounded-full overflow-hidden",
           isPrimary ? "h-1.5 bg-muted/50" : "h-[3px] bg-muted/30"
         )}
       >
@@ -63,12 +63,13 @@ const RatingBar: React.FC<RatingBarProps> = ({
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-          className={cn("h-full rounded-full", barColor)}
+          className="h-full rounded-full"
+          style={{ backgroundColor: tierData.accent }}
         />
       </div>
-      {showLabel && (
-        <span className="text-[9px] text-muted-foreground mt-0.5 block">
-          {label}
+      {isPrimary && (
+        <span className="text-xs font-semibold text-foreground min-w-[24px] text-right">
+          {value.toFixed(1)}
         </span>
       )}
     </div>
@@ -83,17 +84,11 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
-  const [showBreakdown, setShowBreakdown] = useState(false);
   
   const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
   
   const handleClick = () => {
     navigate(`/courses/${course.course_id}`);
-  };
-
-  const handleTouch = (e: React.TouchEvent | React.MouseEvent) => {
-    // Toggle breakdown visibility on tap/hover
-    setShowBreakdown(prev => !prev);
   };
 
   const hasBreakdown = breakdown && (
@@ -106,9 +101,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   return (
     <motion.div
       onClick={handleClick}
-      onMouseEnter={() => setShowBreakdown(true)}
-      onMouseLeave={() => setShowBreakdown(false)}
-      onTouchStart={handleTouch}
       whileTap={{ scale: 0.98 }}
       className={cn(
         "relative w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 cursor-pointer",
@@ -160,67 +152,30 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       <div className="px-4 py-3 bg-background space-y-2">
         {/* Primary rating bar */}
         {rating !== undefined && (
-          <div className="flex items-center gap-2">
-            <RatingBar 
-              value={rating} 
-              label="Overall" 
-              size="primary"
-            />
-            <span className="text-xs font-semibold text-foreground min-w-[24px] text-right">
-              {rating.toFixed(1)}
-            </span>
-          </div>
+          <RatingBar 
+            value={rating} 
+            label="Overall" 
+            size="primary"
+          />
         )}
         
-        {/* Mini breakdown bars - shown on hover/tap */}
-        <AnimatePresence>
-          {hasBreakdown && showBreakdown && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-1.5 pt-1 border-t border-border/30"
-            >
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                {breakdown.design !== null && breakdown.design !== undefined && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] text-muted-foreground w-12">Design</span>
-                    <div className="flex-1">
-                      <RatingBar value={breakdown.design} label="Design" size="mini" />
-                    </div>
-                  </div>
-                )}
-                {breakdown.condition !== null && breakdown.condition !== undefined && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] text-muted-foreground w-12">Condition</span>
-                    <div className="flex-1">
-                      <RatingBar value={breakdown.condition} label="Condition" size="mini" />
-                    </div>
-                  </div>
-                )}
-                {breakdown.facilities !== null && breakdown.facilities !== undefined && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] text-muted-foreground w-12">Facilities</span>
-                    <div className="flex-1">
-                      <RatingBar value={breakdown.facilities} label="Facilities" size="mini" />
-                    </div>
-                  </div>
-                )}
-                {breakdown.experience !== null && breakdown.experience !== undefined && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] text-muted-foreground w-12">Experience</span>
-                    <div className="flex-1">
-                      <RatingBar value={breakdown.experience} label="Experience" size="mini" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        {/* Hint removed for premium feel - breakdown appears on hover/tap */}
+        {/* Mini breakdown bars - always visible */}
+        {hasBreakdown && (
+          <div className="space-y-1.5 pt-1 border-t border-border/30">
+            {breakdown.design !== null && breakdown.design !== undefined && (
+              <RatingBar value={breakdown.design} label="Design" size="mini" />
+            )}
+            {breakdown.condition !== null && breakdown.condition !== undefined && (
+              <RatingBar value={breakdown.condition} label="Condition" size="mini" />
+            )}
+            {breakdown.facilities !== null && breakdown.facilities !== undefined && (
+              <RatingBar value={breakdown.facilities} label="Facilities" size="mini" />
+            )}
+            {breakdown.experience !== null && breakdown.experience !== undefined && (
+              <RatingBar value={breakdown.experience} label="Experience" size="mini" />
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );
