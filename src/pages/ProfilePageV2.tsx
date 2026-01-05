@@ -719,7 +719,7 @@ const ProfilePageV2: React.FC = () => {
         </section>
 
         {/* Tab Content - 14px gap from tabs to grid */}
-        <div className={cn("pt-3.5", (activeSection === 'activity' || activeSection === 'courses') ? 'px-1' : 'px-5')}>
+        <div className={cn("pt-3.5", (activeSection === 'activity' || activeSection === 'courses') ? 'px-2.5' : 'px-5')}>
           {getCurrentContent()}
         </div>
       </div>
