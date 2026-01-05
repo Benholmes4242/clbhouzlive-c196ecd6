@@ -194,7 +194,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2">
+        <CarouselContent className="-ml-2 px-2.5">
           {topTen.map((course) => {
             const ratingData = ratingsMap[course.course_id];
             
