@@ -45,10 +45,11 @@ const RatingBar: React.FC<RatingBarProps> = ({
   const percentage = Math.min((value / maxValue) * 100, 100);
   const isPrimary = size === 'primary';
   
-  // Color scheme: slate for Fair→Excellent, gold for Outstanding
+  // Color scheme: breakdown bars always slate, primary bar uses gold only for Outstanding
   const tierData = getScoreTier(value);
   const isOutstanding = tierData.tier === 'outstanding';
-  const barColor = isOutstanding ? '#C9A94A' : '#64748b'; // gold : slate-500
+  // Breakdown bars (mini) = always slate, Primary bar = gold for outstanding, slate otherwise
+  const barColor = isPrimary && isOutstanding ? '#C9A94A' : '#64748b';
   
   return (
     <div className="flex items-center gap-1.5 w-full">
