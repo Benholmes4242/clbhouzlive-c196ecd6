@@ -822,7 +822,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                             display_order: m.display_order ?? null,
                             created_at: m.created_at || null,
                           }))}
-                          initialIndex={0}
+                          initialIndex={mediaIndices[item.id] || 0}
                           dotsBottomOffset={0}
                         />
                       </div>
@@ -873,7 +873,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                             display_order: m.display_order ?? null,
                             created_at: m.created_at || null,
                           }))}
-                          initialIndex={0}
+                          initialIndex={mediaIndices[item.id] || 0}
                           dotsBottomOffset={0}
                         />
                       </div>
@@ -902,14 +902,12 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 {/* Navigation Arrows - show based on current media position */}
                 {hasMultipleMedia && (
                   <>
-                    {/* Left arrow - only show when not on first media */}
+                    {/* Left arrow - centered vertically to align with action rail */}
                     {currentMediaIndex > 0 && (
                       <button
                         data-control="media-nav"
                         onClick={handlePrevMedia}
-                        className={`absolute left-4 z-30 p-0 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm ${
-                          item.categories?.includes('review') ? 'top-32' : 'top-1/2 -translate-y-1/2'
-                        }`}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         aria-label="Previous media"
                       >
                         <ChevronLeft className="w-6 h-6 text-white" />
@@ -920,7 +918,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       <button
                         data-control="media-nav"
                         onClick={handleNextMedia}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         aria-label="Next media"
                       >
                         <ChevronRight className="w-6 h-6 text-white" />
