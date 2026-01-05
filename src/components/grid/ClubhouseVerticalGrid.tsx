@@ -735,6 +735,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         style={pixelLayerStyle}
                       >
                         <VideoWithAutoplay
+                          key={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
                           ref={(el) => {
                             registerVideoRef(item.id, el);
                             if (index === currentIndex && el) {
@@ -839,6 +840,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         style={pixelLayerStyle}
                       >
                         <img
+                          key={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
                           src={currentMedia.media_url}
                           alt={item.title || 'Content image'}
                           className="absolute inset-0 w-full h-full object-cover select-none"
