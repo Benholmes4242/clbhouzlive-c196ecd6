@@ -133,47 +133,57 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   useEffect(() => { isFetchingRef.current = isFetchingNextPage; }, [isFetchingNextPage]);
   useEffect(() => { onLoadMoreRef.current = onLoadMore; }, [onLoadMore]);
 
-  // Infinite scroll handler
+  // Infinite scroll using Intersection Observer (mobile-friendly)
   useEffect(() => {
-    console.log('[ActivityGridV2] Infinite scroll setup');
+    console.log('[ActivityGridV2] Setting up infinite scroll observer');
     
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      const scrollThreshold = scrollHeight - clientHeight - 300; // Reduced for easier triggering
-      const distanceFromBottom = scrollHeight - clientHeight - scrollTop;
-      
-      // Log every scroll event to debug (only after initial scroll)
-      if (scrollTop > 100) {
-        console.log('[ActivityGridV2] Scroll event:', {
-          scrollTop: Math.round(scrollTop),
-          scrollHeight: Math.round(scrollHeight),
-          clientHeight: Math.round(clientHeight),
-          threshold: Math.round(scrollThreshold),
-          distanceFromBottom: Math.round(distanceFromBottom),
+    const gridContainer = gridRef.current;
+    if (!gridContainer) {
+      console.log('[ActivityGridV2] No grid container found');
+      return;
+    }
+    
+    // Create a sentinel element at the bottom
+    const sentinel = document.createElement('div');
+    sentinel.style.height = '1px';
+    sentinel.style.width = '100%';
+    sentinel.dataset.infiniteScrollSentinel = 'true';
+    gridContainer.appendChild(sentinel);
+    
+    // Observe when sentinel comes into view
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        console.log('[ActivityGridV2] Sentinel intersection:', {
+          isIntersecting: entry.isIntersecting,
           hasMore: hasMoreRef.current,
-          isLoading: isLoadingRef.current,
-          isFetching: isFetchingRef.current,
-          loadingLocked: loadingRef.current
+          loadingLocked: loadingRef.current,
+          isFetching: isFetchingRef.current
         });
+        
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingRef.current) {
+          console.log('[ActivityGridV2] ✅ Sentinel visible - triggering fetchNextPage');
+          loadingRef.current = true;
+          onLoadMoreRef.current?.();
+          setTimeout(() => {
+            loadingRef.current = false;
+          }, 1000);
+        }
+      },
+      {
+        // Trigger 800px before sentinel is visible
+        rootMargin: '800px',
       }
-      
-      if (!gridRef.current || !hasMoreRef.current || loadingRef.current || isLoadingRef.current || isFetchingRef.current) {
-        return;
-      }
-
-      if (scrollTop > scrollThreshold && onLoadMoreRef.current) {
-        console.log('[ActivityGridV2] ✅ Triggering fetchNextPage - hasMore:', hasMoreRef.current);
-        loadingRef.current = true;
-        onLoadMoreRef.current();
-        setTimeout(() => {
-          loadingRef.current = false;
-        }, 1000);
-      }
+    );
+    
+    observer.observe(sentinel);
+    console.log('[ActivityGridV2] Observer attached to sentinel');
+    
+    return () => {
+      observer.disconnect();
+      sentinel.remove();
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []); // Empty deps - handler uses refs
+  }, []); // Empty deps - uses refs
 
   // Track initial render time (metric)
   useEffect(() => {
