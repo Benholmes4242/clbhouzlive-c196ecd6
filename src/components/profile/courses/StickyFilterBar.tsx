@@ -62,7 +62,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   return (
     <div 
       className={cn(
-        "border-b border-border/30 transition-all",
+        "transition-all",
         isSticky && "bg-background/95 backdrop-blur-md shadow-sm"
       )}
     >
