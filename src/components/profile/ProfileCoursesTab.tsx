@@ -20,15 +20,14 @@ interface ProfileCoursesTabProps {
  * 
  * Section order (MANDATORY):
  * 1. Journey Summary Card (merged stats)
- * 2. Top 10 Rated Courses (crown jewel carousel) - formerly "Favourite Courses"
+ * 2. Favourite Courses (crown jewel carousel)
  * 3. Want to Play (planning + social)
  * 4. All Courses Played (refined history)
  */
 export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
   isOwnProfile,
-  displayName,
-}: ProfileCoursesTabProps & { displayName?: string }) => {
+}) => {
   const [showAddModal, setShowAddModal] = useState(false);
   
   const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
@@ -78,12 +77,11 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         isOwnProfile={isOwnProfile}
       />
 
-      {/* Section 2: Top 10 Rated Courses Carousel (Crown Jewel) */}
+      {/* Section 2: Favourite Courses Carousel (Crown Jewel) */}
       <FavouritesCarousel 
         userId={userId} 
         isOwnProfile={isOwnProfile}
         onManage={() => setShowAddModal(true)}
-        displayName={displayName}
       />
 
       {/* Section 3: Want to Play */}

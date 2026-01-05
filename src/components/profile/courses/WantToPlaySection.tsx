@@ -1,21 +1,24 @@
 /**
  * WantToPlaySection - Aspirational planning surface for courses
  * 
- * Refined per design brief:
- * - Removed star icon
- * - Shows 5 courses at a time with "Next 5" batch navigation
- * - Actions: Rate (navigates to rating flow), Remove
- * - Slides left/right for batch transitions
+ * This replaces the Journey tab functionality while preserving its value.
+ * Shows courses the user wants to play - aspirational, social, planning-driven.
+ * 
+ * Key rules:
+ * - A course can ONLY be in one state: played OR want_to_play OR neither
+ * - "Played" = has course_ratings row with rating > 0
+ * - NO "Played" badges shown here
+ * - NO ratings shown here (this is planning, not history)
+ * - "Rate this course" navigates to rating page (no DB write here)
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, MapPin, Trophy, X, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Bookmark, MapPin, Trophy, Star, X, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 
 interface WantToPlaySectionProps {
   userId: string;
@@ -30,8 +33,6 @@ interface WantToPlayCardProps {
   onRemove: () => void;
   onClick: () => void;
 }
-
-const BATCH_SIZE = 5;
 
 const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
   course,
@@ -55,7 +56,6 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
 
   return (
     <motion.div
-      layout
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
       className={cn(
@@ -102,15 +102,15 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
           </div>
         </div>
 
-        {/* Actions (self view only) - Rate and Remove only, no star */}
+        {/* Actions (self view only) */}
         {isOwnProfile && (
           <div className="flex items-center gap-1.5 px-2">
             <button
               onClick={handleRate}
-              className="text-[11px] font-medium px-2.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors"
+              className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
               title="Rate this course"
             >
-              Rate
+              <Star className="w-4 h-4 text-primary" />
             </button>
             <button
               onClick={handleRemove}
@@ -133,44 +133,19 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
 }) => {
   const navigate = useNavigate();
   const { wantToPlay, isLoading, remove } = useUserWantToPlay(userId);
-  const [batchIndex, setBatchIndex] = useState(0);
-  const [direction, setDirection] = useState<'left' | 'right'>('right');
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/courses/${courseId}`);
   };
 
   const handleRate = (course: WantToPlayCourse) => {
+    // Navigate to rating page - no DB write here
     navigate(`/courses/${course.course_id}/rate`);
   };
 
   const handleRemove = (course: WantToPlayCourse) => {
     remove(course.course_id);
     toast.success(`Removed from Want to Play`);
-  };
-
-  // Calculate batch navigation
-  const totalCourses = wantToPlay.length;
-  const totalBatches = Math.ceil(totalCourses / BATCH_SIZE);
-  const startIndex = batchIndex * BATCH_SIZE;
-  const endIndex = Math.min(startIndex + BATCH_SIZE, totalCourses);
-  const currentBatch = wantToPlay.slice(startIndex, endIndex);
-  const hasNextBatch = batchIndex < totalBatches - 1;
-  const hasPrevBatch = batchIndex > 0;
-  const nextBatchCount = Math.min(BATCH_SIZE, totalCourses - endIndex);
-
-  const handleNextBatch = () => {
-    if (hasNextBatch) {
-      setDirection('right');
-      setBatchIndex(prev => prev + 1);
-    }
-  };
-
-  const handlePrevBatch = () => {
-    if (hasPrevBatch) {
-      setDirection('left');
-      setBatchIndex(prev => prev - 1);
-    }
   };
 
   if (isLoading) {
@@ -208,22 +183,6 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
     );
   }
 
-  // Animation variants for batch transitions
-  const slideVariants = {
-    enter: (direction: 'left' | 'right') => ({
-      x: direction === 'right' ? 100 : -100,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: 'left' | 'right') => ({
-      x: direction === 'right' ? -100 : 100,
-      opacity: 0,
-    }),
-  };
-
   return (
     <section className={cn("py-4", className)}>
       {/* Section header */}
@@ -231,70 +190,24 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         <div>
           <h3 className="text-base font-semibold text-foreground">Want to Play</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {totalCourses} {totalCourses === 1 ? 'course' : 'courses'} on the bucket list
+            {wantToPlay.length} {wantToPlay.length === 1 ? 'course' : 'courses'} on the bucket list
           </p>
         </div>
-        {/* Batch indicator for multiple batches */}
-        {totalBatches > 1 && (
-          <span className="text-xs text-muted-foreground">
-            {startIndex + 1}–{endIndex} of {totalCourses}
-          </span>
-        )}
       </div>
 
-      {/* Course list with batch animation */}
-      <div className="relative overflow-hidden">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={batchIndex}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="space-y-2"
-          >
-            {currentBatch.map((course) => (
-              <WantToPlayCard
-                key={course.id}
-                course={course}
-                isOwnProfile={isOwnProfile}
-                onRate={() => handleRate(course)}
-                onRemove={() => handleRemove(course)}
-                onClick={() => handleCourseClick(course.course_id)}
-              />
-            ))}
-          </motion.div>
-        </AnimatePresence>
+      {/* Course list */}
+      <div className="space-y-2">
+        {wantToPlay.map((course) => (
+          <WantToPlayCard
+            key={course.id}
+            course={course}
+            isOwnProfile={isOwnProfile}
+            onRate={() => handleRate(course)}
+            onRemove={() => handleRemove(course)}
+            onClick={() => handleCourseClick(course.course_id)}
+          />
+        ))}
       </div>
-
-      {/* Batch navigation */}
-      {totalBatches > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-4">
-          {hasPrevBatch && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handlePrevBatch}
-              className="gap-1 text-xs"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous 5
-            </Button>
-          )}
-          {hasNextBatch && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNextBatch}
-              className="gap-1 text-xs"
-            >
-              Next {nextBatchCount} →
-            </Button>
-          )}
-        </div>
-      )}
     </section>
   );
 };

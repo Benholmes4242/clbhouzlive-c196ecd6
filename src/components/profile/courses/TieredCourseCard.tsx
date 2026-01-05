@@ -24,11 +24,10 @@ interface TieredCourseCardProps {
 }
 
 /**
- * Tiered course card with clear visual hierarchy:
- * - Top 100: Larger cards with gold accent, trophy icon, strong visual weight
- * - Non-Top-100: Reduced card height, smaller image, muted border - no gold accent
- * 
- * Top 100 must ALWAYS dominate visually - core Clbhouz principle.
+ * Tiered course card with three visual treatments:
+ * - Top 100: Taller with gold accent
+ * - Rated: Standard card
+ * - Unrated: Compact with muted styling and rate prompt
  */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
   course,
@@ -38,6 +37,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
   const navigate = useNavigate();
   const isTop100 = course.is_top100;
   const isRated = course.has_rating && course.rating_value !== null;
+  const isUnrated = !isRated;
 
   const handleClick = () => {
     navigate(`/courses/${course.id}`);
@@ -52,75 +52,66 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     }
   };
 
-  // Top 100 card - LARGER with gold accent and trophy styling (premium treatment)
+  // Top 100 card - premium treatment with trophy gold styling
   if (isTop100) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-card border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group"
-        style={{ borderColor: 'rgba(210, 180, 97, 0.4)' }}
+        className="relative bg-card border rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-all group"
+        style={{ borderColor: 'rgba(210, 180, 97, 0.3)' }}
       >
-        {/* Trophy gold accent line - prominent 2px */}
+        {/* Trophy gold accent line - thinner 1.5px */}
         <div 
-          className="absolute top-0 left-0 right-0 h-[2px]" 
+          className="absolute top-0 left-0 right-0 h-[1.5px]" 
           style={{ background: 'linear-gradient(to right, rgba(210, 180, 97, 0.6), #D2B461, rgba(210, 180, 97, 0.6))' }} 
         />
         
         <div className="flex">
-          {/* Thumbnail - LARGER for Top 100 */}
+          {/* Thumbnail */}
           <div className="relative flex-shrink-0">
             {course.thumbnail_image ? (
               <img
                 src={course.thumbnail_image}
                 alt={course.name}
-                className="w-24 h-24 object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50" />
+              <div className="w-20 h-20 bg-gradient-to-br from-muted to-muted/50" />
             )}
             {/* Top 100 icon overlay - trophy gold */}
             <div 
-              className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: 'rgba(210, 180, 97, 0.95)' }}
+              className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm"
+              style={{ backgroundColor: 'rgba(210, 180, 97, 0.9)' }}
             >
-              <Trophy className="w-3 h-3 text-white" />
+              <Trophy className="w-2.5 h-2.5 text-white" />
             </div>
           </div>
 
-          {/* Content - generous padding for prominence */}
-          <div className="flex-1 py-3 px-3.5 flex flex-col justify-center min-w-0">
-            <div className="font-semibold text-sm text-foreground truncate">{course.name}</div>
-            <div className="text-xs text-muted-foreground truncate mt-0.5">
+          {/* Content - normalized padding */}
+          <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
+            <div className="font-medium text-sm text-foreground truncate">{course.name}</div>
+            <div className="text-xs text-muted-foreground truncate">
               {course.sub_country || course.country}
             </div>
-            <div className="flex items-center gap-2 mt-2">
-              {/* Top 100 label */}
-              <span 
-                className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-                style={{ backgroundColor: 'rgba(210, 180, 97, 0.15)', color: '#B8963C' }}
-              >
-                Top 100 Course
-              </span>
-              {course.last_played_at && (
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-[10px] text-muted-foreground">
-                    {format(new Date(course.last_played_at), 'd MMM yyyy')}
-                  </span>
-                </div>
-              )}
-            </div>
+            {course.last_played_at && (
+              <div className="flex items-center gap-1 mt-1">
+                <Calendar className="w-3 h-3 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground">
+                  {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Rating - aligned */}
           <div className="flex items-center pr-3">
             {isRated && course.rating_value ? (
-              <RatingPill score={course.rating_value} className="text-[11px] px-3 py-1 h-7" />
+              <RatingPill score={course.rating_value} className="text-[10px] px-2.5 py-0.5 h-6" />
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
-                className="text-[11px] font-medium hover:underline"
+                className="text-[10px] font-medium hover:underline"
                 style={{ color: '#D2B461' }}
               >
                 Rate
@@ -132,41 +123,40 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Non-Top-100 cards - SMALLER with muted styling
-  // Unrated: Even more compact
-  if (!isRated) {
+  // Unrated card - compact with muted styling
+  if (isUnrated) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="bg-muted/20 border border-border/30 rounded-lg overflow-hidden cursor-pointer hover:border-border/50 transition-colors"
+        className="bg-muted/30 border border-border/40 rounded-xl overflow-hidden cursor-pointer hover:border-border/60 transition-colors"
       >
         <div className="flex">
-          {/* Thumbnail - smaller, muted */}
+          {/* Thumbnail - muted */}
           {course.thumbnail_image ? (
             <img
               src={course.thumbnail_image}
               alt={course.name}
-              className="w-14 h-14 object-cover flex-shrink-0 opacity-70"
+              className="w-16 h-16 object-cover flex-shrink-0 opacity-75"
             />
           ) : (
-            <div className="w-14 h-14 bg-muted/50 flex-shrink-0" />
+            <div className="w-16 h-16 bg-muted flex-shrink-0" />
           )}
 
-          {/* Content - compact */}
-          <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-            <div className="font-medium text-[13px] text-foreground/75 truncate">{course.name}</div>
-            <div className="text-[11px] text-muted-foreground truncate">
+          {/* Content */}
+          <div className="flex-1 py-2 px-3 flex flex-col justify-center min-w-0">
+            <div className="font-medium text-sm text-foreground/80 truncate">{course.name}</div>
+            <div className="text-xs text-muted-foreground truncate">
               {course.sub_country || course.country}
             </div>
           </div>
 
           {/* Rate CTA */}
           {isOwnProfile && (
-            <div className="flex items-center pr-2.5">
+            <div className="flex items-center pr-3">
               <button 
                 onClick={handleRateClick}
-                className="text-[10px] text-muted-foreground hover:text-foreground font-medium px-2 py-1 bg-background border border-border/50 rounded-md hover:border-border transition-colors"
+                className="text-[11px] text-muted-foreground hover:text-foreground font-medium px-2.5 py-1 bg-background border border-border rounded-lg hover:border-border/80 transition-colors"
               >
                 Rate
               </button>
@@ -177,45 +167,45 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Standard rated non-Top-100 card - moderate sizing, no gold accent
+  // Standard rated card
   return (
     <motion.div
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
-      className="bg-card border border-border/30 rounded-lg overflow-hidden cursor-pointer hover:border-border/50 transition-colors"
+      className="bg-card border border-border/40 rounded-xl overflow-hidden cursor-pointer hover:border-border/60 transition-colors"
     >
       <div className="flex">
-        {/* Thumbnail - standard size */}
+        {/* Thumbnail */}
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
             alt={course.name}
-            className="w-16 h-16 object-cover flex-shrink-0"
+            className="w-18 h-18 object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-16 h-16 bg-muted flex-shrink-0" />
+          <div className="w-18 h-18 bg-muted flex-shrink-0" />
         )}
 
-        {/* Content */}
-        <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-          <div className="font-medium text-[13px] text-foreground truncate">{course.name}</div>
-          <div className="text-[11px] text-muted-foreground truncate">
+        {/* Content - normalized padding */}
+        <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
+          <div className="font-medium text-sm text-foreground truncate">{course.name}</div>
+          <div className="text-xs text-muted-foreground truncate">
             {course.sub_country || course.country}
           </div>
           {course.last_played_at && (
             <div className="flex items-center gap-1 mt-1">
-              <Calendar className="w-2.5 h-2.5 text-muted-foreground" />
-              <span className="text-[9px] text-muted-foreground">
+              <Calendar className="w-3 h-3 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">
                 {format(new Date(course.last_played_at), 'd MMM yyyy')}
               </span>
             </div>
           )}
         </div>
 
-        {/* Rating */}
-        <div className="flex items-center pr-2.5">
+        {/* Rating - aligned */}
+        <div className="flex items-center pr-3">
           {course.rating_value && (
-            <RatingPill score={course.rating_value} className="text-[10px] px-2 py-0.5 h-5" />
+            <RatingPill score={course.rating_value} className="text-[10px] px-2.5 py-0.5 h-6" />
           )}
         </div>
       </div>
