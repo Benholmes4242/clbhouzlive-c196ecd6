@@ -72,6 +72,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
           <ProfileCoursesTab 
             userId={userId}
             isOwnProfile={isOwnProfile}
+            displayName={profileData?.profile?.display_name ?? profileData?.profile?.username}
           />
         );
       

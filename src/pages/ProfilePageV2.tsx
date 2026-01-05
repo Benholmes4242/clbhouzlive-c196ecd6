@@ -301,6 +301,7 @@ const ProfilePageV2: React.FC = () => {
           <ProfileCoursesTab 
             userId={profile?.id || ''}
             isOwnProfile={isSelf}
+            displayName={profile?.display_name ?? profile?.username}
           />
         );
       case 'top100':
