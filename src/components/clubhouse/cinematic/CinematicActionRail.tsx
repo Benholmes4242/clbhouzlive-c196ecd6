@@ -180,10 +180,9 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   const slotCount = onSave ? 5 : 4;
   const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
-  // Position rail so bottom aligns with bottom of CreatorCapsule
+  // Position rail so bottom of share icon aligns with bottom of CreatorCapsule
   // CreatorCapsule uses: bottom: calc(env(safe-area-inset-bottom, 0px) + 80px)
-  // TEMPORARILY: Use top positioning for testing
-  const TEMP_TOP_OFFSET = '96px'; // top-24
+  const CAPSULE_BOTTOM_OFFSET = 'calc(env(safe-area-inset-bottom, 0px) + 80px)';
 
   return (
     <motion.div
@@ -199,7 +198,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         'pointer-events-auto'
       )}
       style={{
-        top: TEMP_TOP_OFFSET, // TEMPORARY - normally uses bottom positioning
+        bottom: CAPSULE_BOTTOM_OFFSET,
         gap: GAP,
         height: totalHeight,
       }}
