@@ -58,6 +58,8 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
         <div className="flex-1 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
           {filterOptions.map((option) => {
             const isActive = activeFilter === option.key;
+            const isTop100Filter = option.key === 'top100';
+            
             return (
               <motion.button
                 key={option.key}
@@ -65,26 +67,42 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                 whileTap={{ scale: 0.95 }}
                 className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sq-pill whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-slate-900 text-white shadow-sm'
+                    ? isTop100Filter
+                      ? 'bg-amber-50 text-amber-900 shadow-sm border border-amber-200'
+                      : 'bg-slate-900 text-white shadow-sm'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {/* Active underline indicator */}
+                {/* Active underline indicator - gold for Top 100 */}
                 {isActive && (
                   <motion.div
                     layoutId="activeFilterIndicator"
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-slate-900 rounded-full"
+                    className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full ${
+                      isTop100Filter ? 'bg-amber-500' : 'bg-slate-900'
+                    }`}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}
                 {option.icon && (
-                  <span className={isActive ? 'text-white' : 'text-slate-500'}>
+                  <span className={
+                    isActive 
+                      ? isTop100Filter 
+                        ? 'text-amber-600' 
+                        : 'text-white'
+                      : 'text-slate-500'
+                  }>
                     {option.icon}
                   </span>
                 )}
                 <span>{option.label}</span>
                 {option.count !== undefined && option.count > 0 && (
-                  <span className={`text-[10px] ${isActive ? 'text-white/70' : 'text-slate-400'}`}>
+                  <span className={`text-[10px] ${
+                    isActive 
+                      ? isTop100Filter 
+                        ? 'text-amber-600/70' 
+                        : 'text-white/70'
+                      : 'text-slate-400'
+                  }`}>
                     {option.count}
                   </span>
                 )}

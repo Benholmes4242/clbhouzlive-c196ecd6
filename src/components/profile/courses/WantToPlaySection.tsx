@@ -10,15 +10,18 @@
  * - NO "Played" badges shown here
  * - NO ratings shown here (this is planning, not history)
  * - "Rate this course" navigates to rating page (no DB write here)
+ * 
+ * Pagination: Shows 5 courses at a time with sliding animation
  */
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, MapPin, Trophy, Star, X, Calendar } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Bookmark, MapPin, Trophy, X, Calendar, ChevronRight, ChevronLeft, ClipboardList } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 interface WantToPlaySectionProps {
   userId: string;
@@ -33,6 +36,8 @@ interface WantToPlayCardProps {
   onRemove: () => void;
   onClick: () => void;
 }
+
+const PAGE_SIZE = 5;
 
 const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
   course,
@@ -56,6 +61,10 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
 
   return (
     <motion.div
+      layout
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
       className={cn(
@@ -102,15 +111,15 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
           </div>
         </div>
 
-        {/* Actions (self view only) */}
+        {/* Actions (self view only) - Rate and Remove only, no star */}
         {isOwnProfile && (
           <div className="flex items-center gap-1.5 px-2">
             <button
               onClick={handleRate}
-              className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+              className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-[10px] font-medium text-primary"
               title="Rate this course"
             >
-              <Star className="w-4 h-4 text-primary" />
+              <ClipboardList className="w-4 h-4" />
             </button>
             <button
               onClick={handleRemove}
@@ -133,13 +142,23 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
 }) => {
   const navigate = useNavigate();
   const { wantToPlay, isLoading, remove } = useUserWantToPlay(userId);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
+
+  const totalPages = Math.ceil(wantToPlay.length / PAGE_SIZE);
+  const currentPageCourses = wantToPlay.slice(
+    pageIndex * PAGE_SIZE,
+    (pageIndex + 1) * PAGE_SIZE
+  );
+  const hasNextPage = pageIndex < totalPages - 1;
+  const hasPrevPage = pageIndex > 0;
+  const remainingCount = Math.min(PAGE_SIZE, wantToPlay.length - (pageIndex + 1) * PAGE_SIZE);
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/courses/${courseId}`);
   };
 
   const handleRate = (course: WantToPlayCourse) => {
-    // Navigate to rating page - no DB write here
     navigate(`/courses/${course.course_id}/rate`);
   };
 
@@ -147,6 +166,20 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
     remove(course.course_id);
     toast.success(`Removed from Want to Play`);
   };
+
+  const goToNextPage = useCallback(() => {
+    if (hasNextPage) {
+      setDirection(1);
+      setPageIndex(prev => prev + 1);
+    }
+  }, [hasNextPage]);
+
+  const goToPrevPage = useCallback(() => {
+    if (hasPrevPage) {
+      setDirection(-1);
+      setPageIndex(prev => prev - 1);
+    }
+  }, [hasPrevPage]);
 
   if (isLoading) {
     return (
@@ -195,19 +228,72 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         </div>
       </div>
 
-      {/* Course list */}
-      <div className="space-y-2">
-        {wantToPlay.map((course) => (
-          <WantToPlayCard
-            key={course.id}
-            course={course}
-            isOwnProfile={isOwnProfile}
-            onRate={() => handleRate(course)}
-            onRemove={() => handleRemove(course)}
-            onClick={() => handleCourseClick(course.course_id)}
-          />
-        ))}
+      {/* Course list with slide animation */}
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={pageIndex}
+            custom={direction}
+            initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="space-y-2"
+          >
+            {currentPageCourses.map((course) => (
+              <WantToPlayCard
+                key={course.id}
+                course={course}
+                isOwnProfile={isOwnProfile}
+                onRate={() => handleRate(course)}
+                onRemove={() => handleRemove(course)}
+                onClick={() => handleCourseClick(course.course_id)}
+              />
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-4">
+          {/* Previous button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToPrevPage}
+            disabled={!hasPrevPage}
+            className="h-8 w-8 p-0 rounded-full"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+
+          {/* Page indicator */}
+          <span className="text-xs text-muted-foreground">
+            {pageIndex + 1} of {totalPages}
+          </span>
+
+          {/* Next button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToNextPage}
+            disabled={!hasNextPage}
+            className="h-8 px-3 gap-1 rounded-full"
+          >
+            {hasNextPage ? (
+              <>
+                Next {remainingCount}
+                <ChevronRight className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                <ChevronRight className="w-4 h-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </section>
   );
 };

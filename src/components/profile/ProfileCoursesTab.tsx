@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface ProfileCoursesTabProps {
   userId: string;
   isOwnProfile: boolean;
+  displayName?: string;
 }
 
 /**
@@ -27,6 +28,7 @@ interface ProfileCoursesTabProps {
 export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
   isOwnProfile,
+  displayName,
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   
@@ -77,10 +79,11 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         isOwnProfile={isOwnProfile}
       />
 
-      {/* Section 2: Favourite Courses Carousel (Crown Jewel) */}
+      {/* Section 2: Top 10 Rated Courses Carousel (Crown Jewel) */}
       <FavouritesCarousel 
         userId={userId} 
         isOwnProfile={isOwnProfile}
+        displayName={displayName}
         onManage={() => setShowAddModal(true)}
       />
 
