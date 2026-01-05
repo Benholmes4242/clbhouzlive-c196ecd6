@@ -116,9 +116,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   // Dynamic subtitle
   const getSubtitle = () => {
     if (isOwnProfile) {
-      return "Your Personal Top 10 Golf Courses";
+      return "Your Personal Top 10";
     }
-    return `${displayName || 'Their'}'s Personal Top 10 Golf Courses`;
+    return `${displayName || 'Their'}'s Personal Top 10`;
   };
 
   // Empty state
@@ -127,7 +127,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       <section className={cn("mt-6 w-full", className)}>
         <div className="flex flex-col mb-2 px-2.5">
           <h3 className="text-lg font-semibold text-foreground">
-            Top 10 Rated Courses
+            Top 10 Rated Golf Courses
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             {getSubtitle()}
@@ -168,7 +168,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       <div className="flex items-center justify-between mb-3 px-2.5">
         <div>
           <h3 className="text-lg font-semibold text-foreground">
-            Top 10 Rated Courses
+            Top 10 Rated Golf Courses
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             {getSubtitle()}
