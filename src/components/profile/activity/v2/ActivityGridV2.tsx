@@ -156,6 +156,49 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     });
   }, [layoutBlocks]);
 
+  // DEBUG: Log layout blocks structure
+  useEffect(() => {
+    console.log('[ActivityGridV2:DEBUG] Layout blocks:', layoutBlocks.map(b => ({
+      type: b.type,
+      items: b.items.map(i => ({
+        id: i.id.slice(0, 8),
+        type: i.type,
+        aspectRatio: i.aspectRatio,
+        url: i.url?.slice(0, 50)
+      }))
+    })));
+  }, [layoutBlocks]);
+
+  // DEBUG: Check if tiles have dimensions in DOM
+  useEffect(() => {
+    if (flatItems.length === 0) return;
+    
+    const timer = setTimeout(() => {
+      const tiles = document.querySelectorAll('[data-tile-index]');
+      console.log('[ActivityGridV2:DEBUG] Tiles in DOM:', tiles.length);
+      tiles.forEach((tile, i) => {
+        const rect = tile.getBoundingClientRect();
+        console.log(`[ActivityGridV2:DEBUG] Tile ${i}:`, {
+          width: rect.width,
+          height: rect.height,
+          visible: rect.height > 0
+        });
+      });
+      
+      // Also check grid container
+      const gridContainer = document.querySelector('.grid.grid-cols-2');
+      if (gridContainer) {
+        const gridRect = gridContainer.getBoundingClientRect();
+        console.log('[ActivityGridV2:DEBUG] Grid container:', {
+          width: gridRect.width,
+          height: gridRect.height,
+          childCount: gridContainer.children.length
+        });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [flatItems]);
+
   // Track autoplay failures (metric)
   useEffect(() => {
     const handlePlayFailure = (event: Event) => {
