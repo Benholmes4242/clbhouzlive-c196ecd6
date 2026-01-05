@@ -194,7 +194,39 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
   // Filter posts
   const filteredPosts = useMemo(() => {
+    // Log A: Incoming posts before any filtering
+    const reviewPostsIncoming = posts.filter(p => p.categories?.includes('review'));
+    if (reviewPostsIncoming.length > 0) {
+      console.log('[ClubhouseAudit] Incoming posts to grid:', {
+        totalCount: posts.length,
+        reviewPosts: reviewPostsIncoming.map(p => ({
+          id: p.id,
+          type: p.type,
+          hasVideo: p.type === 'video',
+          durationSeconds: p.durationSeconds,
+          mediaCount: p.media?.length,
+          firstMediaType: p.media?.[0]?.media_type,
+          width: (p.media?.[0] as any)?.width,
+          height: (p.media?.[0] as any)?.height,
+        }))
+      });
+    }
+
     const shortsOnly = posts.filter(post => {
+      // Review posts bypass video-only requirement
+      const isReviewPost = post.categories?.includes('review');
+      
+      if (isReviewPost) {
+        // Review posts: allow if they have any media (photo or video)
+        const hasMedia = post.media && post.media.length > 0;
+        if (!hasMedia) {
+          console.log('[ClubhouseAudit] Review post rejected: no media', { id: post.id });
+          return false;
+        }
+        return true; // Allow review posts through
+      }
+      
+      // Non-review posts: require video with duration < 120s
       if (post.type !== 'video') return false;
       if (typeof post.durationSeconds !== 'number') return false;
       if (post.durationSeconds >= 120) return false;
@@ -204,6 +236,11 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     if (!FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) return shortsOnly;
     
     const filtered = shortsOnly.filter(post => {
+      // Review posts bypass portrait check
+      if (post.categories?.includes('review')) {
+        return true;
+      }
+      
       const media = post.media?.[0];
       if (!media) return false;
       const mediaWithDimensions = media as any;
@@ -213,6 +250,17 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         aspect_ratio: mediaWithDimensions.aspect_ratio
       });
     });
+
+    // Log B: Final filtered list
+    const reviewPostsFinal = filtered.filter(p => p.categories?.includes('review'));
+    if (reviewPostsIncoming.length > 0) {
+      console.log('[ClubhouseAudit] Final filtered posts:', {
+        originalCount: posts.length,
+        filteredCount: filtered.length,
+        reviewPostsKept: reviewPostsFinal.map(p => p.id),
+        reviewPostsLost: reviewPostsIncoming.filter(r => !reviewPostsFinal.some(f => f.id === r.id)).map(p => p.id)
+      });
+    }
 
     if (posts.length > 0) {
       logClubhouseFiltering(posts.length, filtered.length);
