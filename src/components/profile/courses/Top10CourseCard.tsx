@@ -2,6 +2,8 @@
  * Top10CourseCard - Crown jewel card for Top 10 Rated Courses carousel
  * 
  * Features:
+ * - Ranking badge (gold #1, silver #2, bronze #3, slate #4-10)
+ * - Trophy icons for top 3 only
  * - Overall rating bar (primary) with tier-based colors
  * - 4 mini breakdown bars (Design, Condition, Facilities, Experience)
  * - Uses global color system (Fair → Outstanding)
@@ -35,6 +37,46 @@ interface RatingBarProps {
   size?: 'primary' | 'mini';
   showBadge?: boolean;
 }
+
+// Medal colors for ranking badges
+const getRankingBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
+  switch (position) {
+    case 1:
+      return { 
+        bg: 'linear-gradient(145deg, #FFD700 0%, #C9A94A 50%, #B8963C 100%)', 
+        text: '#422006',
+        shadow: '0 2px 8px rgba(201, 169, 74, 0.4)'
+      };
+    case 2:
+      return { 
+        bg: 'linear-gradient(145deg, #E8E8E8 0%, #C0C0C0 50%, #A8A8A8 100%)', 
+        text: '#1f2937',
+        shadow: '0 2px 6px rgba(160, 160, 160, 0.3)'
+      };
+    case 3:
+      return { 
+        bg: 'linear-gradient(145deg, #CD9B6A 0%, #B87333 50%, #A0522D 100%)', 
+        text: '#fff',
+        shadow: '0 2px 6px rgba(184, 115, 51, 0.3)'
+      };
+    default:
+      return { 
+        bg: 'linear-gradient(145deg, #475569 0%, #334155 100%)', 
+        text: '#fff',
+        shadow: '0 1px 4px rgba(0,0,0,0.15)'
+      };
+  }
+};
+
+// Trophy color for top 3
+const getTrophyColor = (position: number): string => {
+  switch (position) {
+    case 1: return '#FFD700'; // Gold
+    case 2: return '#C0C0C0'; // Silver
+    case 3: return '#CD7F32'; // Bronze
+    default: return '';
+  }
+};
 
 const RatingBar: React.FC<RatingBarProps> = ({
   value,
@@ -105,8 +147,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
-  
   const handleClick = () => {
     navigate(`/courses/${course.course_id}`);
   };
@@ -117,6 +157,10 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
     breakdown.facilities || 
     breakdown.experience
   );
+
+  const badgeStyle = getRankingBadgeStyle(position);
+  const trophyColor = getTrophyColor(position);
+  const showTrophy = position <= 3;
 
   return (
     <motion.div
@@ -145,15 +189,36 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         {/* Gradient overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         
-        {/* Position badge */}
-        <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full">
-          <span className="text-xs font-semibold text-white">#{position}</span>
+        {/* Ranking badge - new medal-style design */}
+        <div 
+          className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{
+            background: badgeStyle.bg,
+            boxShadow: badgeStyle.shadow,
+          }}
+        >
+          <span 
+            className="text-sm font-bold"
+            style={{ color: badgeStyle.text }}
+          >
+            {position}
+          </span>
         </div>
         
-        {/* Top 100 badge */}
-        {isTop100 && (
-          <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-amber-500/90 flex items-center justify-center shadow-sm">
-            <Trophy className="w-3 h-3 text-white" />
+        {/* Trophy for top 3 only */}
+        {showTrophy && (
+          <div 
+            className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
+            style={{
+              background: 'rgba(0,0,0,0.4)',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <Trophy 
+              className="w-4 h-4" 
+              style={{ color: trophyColor }}
+              fill={trophyColor}
+            />
           </div>
         )}
         
@@ -170,7 +235,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       
       {/* Rating bars section - matching UnifiedCourseCard meta area */}
       <div className="px-4 py-3 bg-background space-y-2">
-      {/* Primary rating bar with badge */}
+        {/* Primary rating bar with badge */}
         {rating !== undefined && (
           <RatingBar 
             value={rating} 

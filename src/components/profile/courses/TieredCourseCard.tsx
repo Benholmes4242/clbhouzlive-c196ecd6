@@ -1,3 +1,14 @@
+/**
+ * TieredCourseCard - Visual hierarchy cards for All Courses Played
+ * 
+ * Design brief updates:
+ * - Top 100: Tallest cards (currently correct)
+ * - Non-Top 100: Increased height (~85-90% of Top 100)
+ * - Course name: Never truncate, allow up to 2 lines
+ * - Meta row (badge + date): Always single line, inline
+ * - Rating pill: Right-aligned in fixed column, never affects text wrapping
+ * - Top 100 badge: One line, softer gold tone
+ */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Trophy } from 'lucide-react';
@@ -26,7 +37,7 @@ interface TieredCourseCardProps {
 /**
  * Tiered course card with clear visual hierarchy:
  * - Top 100: Larger cards with gold accent, trophy icon, strong visual weight
- * - Non-Top-100: Reduced card height, smaller image, muted border - no gold accent
+ * - Non-Top-100: Slightly smaller, muted styling - still readable
  * 
  * Top 100 must ALWAYS dominate visually - core Clbhouz principle.
  */
@@ -74,10 +85,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               <img
                 src={course.thumbnail_image}
                 alt={course.name}
-                className="w-24 h-24 object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-24 h-[88px] object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50" />
+              <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
             )}
             {/* Top 100 icon overlay - trophy gold */}
             <div 
@@ -88,22 +99,26 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             </div>
           </div>
 
-          {/* Content - generous padding for prominence */}
-          <div className="flex-1 py-3 px-3.5 flex flex-col justify-center min-w-0">
-            <div className="font-semibold text-sm text-foreground truncate">{course.name}</div>
+          {/* Content - flexible column */}
+          <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
+            {/* Course name - allow 2 lines, never truncate */}
+            <div className="font-semibold text-sm text-foreground leading-tight line-clamp-2">
+              {course.name}
+            </div>
             <div className="text-xs text-muted-foreground truncate mt-0.5">
               {course.sub_country || course.country}
             </div>
-            <div className="flex items-center gap-2 mt-2">
-              {/* Top 100 label */}
+            {/* Meta row - always single line */}
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              {/* Top 100 label - softer gold */}
               <span 
-                className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-                style={{ backgroundColor: 'rgba(210, 180, 97, 0.15)', color: '#B8963C' }}
+                className="text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
+                style={{ backgroundColor: 'rgba(210, 180, 97, 0.12)', color: '#A68A35' }}
               >
                 Top 100 Course
               </span>
               {course.last_played_at && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 whitespace-nowrap">
                   <Calendar className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">
                     {format(new Date(course.last_played_at), 'd MMM yyyy')}
@@ -113,17 +128,17 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             </div>
           </div>
 
-          {/* Rating - aligned */}
-          <div className="flex items-center pr-3">
+          {/* Rating - fixed width column on right */}
+          <div className="flex items-center pr-3 pl-2 flex-shrink-0">
             {isRated && course.rating_value ? (
-              <RatingPill score={course.rating_value} className="text-[11px] px-3 py-1 h-7" />
+              <RatingPill score={course.rating_value} className="text-[11px] px-2.5 py-1" />
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
-                className="text-[11px] font-medium hover:underline"
+                className="text-[11px] font-medium hover:underline whitespace-nowrap"
                 style={{ color: '#D2B461' }}
               >
-                Rate
+                Review
               </button>
             ) : null}
           </div>
@@ -132,8 +147,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Non-Top-100 cards - SMALLER with muted styling
-  // Unrated: Even more compact
+  // Non-Top-100 cards - ~85-90% height of Top 100
+  // Unrated: Slightly more compact
   if (!isRated) {
     return (
       <motion.div
@@ -147,28 +162,39 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             <img
               src={course.thumbnail_image}
               alt={course.name}
-              className="w-14 h-14 object-cover flex-shrink-0 opacity-70"
+              className="w-16 h-[68px] object-cover flex-shrink-0 opacity-80"
             />
           ) : (
-            <div className="w-14 h-14 bg-muted/50 flex-shrink-0" />
+            <div className="w-16 h-[68px] bg-muted/50 flex-shrink-0" />
           )}
 
-          {/* Content - compact */}
+          {/* Content - flexible column */}
           <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-            <div className="font-medium text-[13px] text-foreground/75 truncate">{course.name}</div>
-            <div className="text-[11px] text-muted-foreground truncate">
+            {/* Course name - allow 2 lines */}
+            <div className="font-medium text-[13px] text-foreground/80 leading-tight line-clamp-2">
+              {course.name}
+            </div>
+            <div className="text-[11px] text-muted-foreground truncate mt-0.5">
               {course.sub_country || course.country}
             </div>
+            {course.last_played_at && (
+              <div className="flex items-center gap-1 mt-1">
+                <Calendar className="w-2.5 h-2.5 text-muted-foreground" />
+                <span className="text-[9px] text-muted-foreground">
+                  {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Rate CTA */}
+          {/* Review CTA - fixed column */}
           {isOwnProfile && (
-            <div className="flex items-center pr-2.5">
+            <div className="flex items-center pr-2.5 pl-2 flex-shrink-0">
               <button 
                 onClick={handleRateClick}
-                className="text-[10px] text-muted-foreground hover:text-foreground font-medium px-2 py-1 bg-background border border-border/50 rounded-md hover:border-border transition-colors"
+                className="text-[10px] text-muted-foreground hover:text-foreground font-medium px-2 py-1 bg-background border border-border/50 rounded-md hover:border-border transition-colors whitespace-nowrap"
               >
-                Rate
+                Review
               </button>
             </div>
           )}
@@ -177,7 +203,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Standard rated non-Top-100 card - moderate sizing, no gold accent
+  // Standard rated non-Top-100 card - ~85% of Top 100 height
   return (
     <motion.div
       onClick={handleClick}
@@ -185,21 +211,24 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       className="bg-card border border-border/30 rounded-lg overflow-hidden cursor-pointer hover:border-border/50 transition-colors"
     >
       <div className="flex">
-        {/* Thumbnail - standard size */}
+        {/* Thumbnail - standard size (~85% of Top 100) */}
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
             alt={course.name}
-            className="w-16 h-16 object-cover flex-shrink-0"
+            className="w-[72px] h-[76px] object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-16 h-16 bg-muted flex-shrink-0" />
+          <div className="w-[72px] h-[76px] bg-muted flex-shrink-0" />
         )}
 
-        {/* Content */}
+        {/* Content - flexible column */}
         <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-          <div className="font-medium text-[13px] text-foreground truncate">{course.name}</div>
-          <div className="text-[11px] text-muted-foreground truncate">
+          {/* Course name - allow 2 lines */}
+          <div className="font-medium text-[13px] text-foreground leading-tight line-clamp-2">
+            {course.name}
+          </div>
+          <div className="text-[11px] text-muted-foreground truncate mt-0.5">
             {course.sub_country || course.country}
           </div>
           {course.last_played_at && (
@@ -212,10 +241,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           )}
         </div>
 
-        {/* Rating */}
-        <div className="flex items-center pr-2.5">
+        {/* Rating - fixed column */}
+        <div className="flex items-center pr-2.5 pl-2 flex-shrink-0">
           {course.rating_value && (
-            <RatingPill score={course.rating_value} className="text-[10px] px-2 py-0.5 h-5" />
+            <RatingPill score={course.rating_value} className="text-[10px] px-2 py-0.5" />
           )}
         </div>
       </div>

@@ -20,9 +20,15 @@ interface ProfileCoursesTabProps {
  * 
  * Section order (MANDATORY):
  * 1. Journey Summary Card (merged stats)
- * 2. Top 10 Rated Courses (crown jewel carousel) - formerly "Favourite Courses"
- * 3. Want to Play (planning + social)
+ * 2. Top 10 Rated Courses (crown jewel carousel)
+ * 3. Courses to Play (aspirational bucket list)
  * 4. All Courses Played (refined history)
+ * 
+ * Vertical Rhythm (per design brief):
+ * - Journey → Top 10: 24-32px (generous transition from stats to prestige)
+ * - Top 10 → Courses to Play: 20-24px (slightly tighter)
+ * - Courses to Play → All Courses: 24px (medium reset)
+ * - Section header → content: 12-16px
  */
 export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
@@ -67,7 +73,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }
 
   return (
-    <div className="space-y-2 pb-8">
+    <div className="pb-8">
       <ScrollToTopGlass />
 
       {/* Section 1: Journey Summary Card */}
@@ -79,24 +85,33 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       />
 
       {/* Section 2: Top 10 Rated Courses Carousel (Crown Jewel) */}
-      <FavouritesCarousel 
-        userId={userId} 
-        isOwnProfile={isOwnProfile}
-        onManage={() => setShowAddModal(true)}
-        displayName={displayName}
-      />
+      {/* Generous 28px spacing from Journey to Top 10 */}
+      <div className="mt-7">
+        <FavouritesCarousel 
+          userId={userId} 
+          isOwnProfile={isOwnProfile}
+          onManage={() => setShowAddModal(true)}
+          displayName={displayName}
+        />
+      </div>
 
-      {/* Section 3: Want to Play */}
-      <WantToPlaySection 
-        userId={userId} 
-        isOwnProfile={isOwnProfile} 
-      />
+      {/* Section 3: Courses to Play (Aspirational) */}
+      {/* Slightly tighter 20px spacing */}
+      <div className="mt-5">
+        <WantToPlaySection 
+          userId={userId} 
+          isOwnProfile={isOwnProfile} 
+        />
+      </div>
 
       {/* Section 4: All Courses Played */}
-      <AllCoursesList 
-        userId={userId} 
-        isOwnProfile={isOwnProfile} 
-      />
+      {/* Medium 24px spacing for context reset */}
+      <div className="mt-6">
+        <AllCoursesList 
+          userId={userId} 
+          isOwnProfile={isOwnProfile} 
+        />
+      </div>
 
       {/* Add Course Modal (for managing favourites) */}
       {showAddModal && (
