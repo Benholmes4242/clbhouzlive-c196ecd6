@@ -1,19 +1,14 @@
 /**
  * JourneySummaryCard - Premium hero card for Course Journey stats
  * 
- * Replaces fragmented pills with a single, elegant overview of a golfer's journey.
- * Shows: Courses Played, Countries, Avg Rating, Next Milestone progress
- * 
- * Polished per design brief:
- * - Tighter spacing between progress bar and "X to go" label
- * - Subtle glow/emphasis when ≤3 courses from milestone
+ * Shows: Courses Played (primary), Countries, Average Rating
+ * No milestone logic - milestones only apply to Top 100 section
  */
 import React from 'react';
-import { MapPin, Globe, Star, Trophy, Sparkles } from 'lucide-react';
+import { MapPin, Globe, Star } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/ui/motion';
-import { AnimatedProgressBar } from '@/components/ui/motion/AnimatedProgressBar';
 
 interface JourneySummaryCardProps {
   coursesPlayed: number;
@@ -23,19 +18,6 @@ interface JourneySummaryCardProps {
   className?: string;
 }
 
-const MILESTONES = [
-  { target: 10, name: '10 Club' },
-  { target: 25, name: '25 Club' },
-  { target: 50, name: '50 Club' },
-  { target: 100, name: '100 Club' },
-  { target: 150, name: '150 Club' },
-  { target: 200, name: '200 Club' },
-  { target: 250, name: '250 Club' },
-  { target: 300, name: '300 Club' },
-  { target: 400, name: '400 Club' },
-  { target: 500, name: '500 Club' },
-];
-
 export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
@@ -44,20 +26,6 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   className,
 }) => {
   const prefersReducedMotion = useReducedMotion();
-
-  // Calculate next milestone
-  const nextMilestone = MILESTONES.find(m => m.target > coursesPlayed) || MILESTONES[MILESTONES.length - 1];
-  const previousMilestone = MILESTONES.filter(m => m.target <= coursesPlayed).pop();
-  const coursesToNextMilestone = Math.max(0, nextMilestone.target - coursesPlayed);
-  
-  // Calculate progress from previous milestone (or 0) to next milestone
-  const progressBase = previousMilestone?.target || 0;
-  const progressRange = nextMilestone.target - progressBase;
-  const progressValue = coursesPlayed - progressBase;
-  const progressPercent = Math.min((progressValue / progressRange) * 100, 100);
-
-  // Close to milestone - within 3 courses
-  const isCloseToMilestone = coursesToNextMilestone <= 3 && coursesToNextMilestone > 0;
 
   // Empty state
   if (coursesPlayed === 0) {
@@ -92,7 +60,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "relative overflow-hidden rounded-xl p-5",
+        "relative overflow-hidden rounded-xl p-6",
         "bg-gradient-to-br from-amber-50/80 via-background to-stone-50/50 dark:from-amber-950/20 dark:via-background dark:to-stone-950/20",
         "border border-border/40 shadow-sm",
         className
@@ -115,100 +83,50 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         </h3>
 
         {/* Main stat - Courses Played with AnimatedNumber */}
-        <div className="flex items-baseline gap-2 mb-5">
+        <div className="flex items-baseline gap-2 mb-6">
           <AnimatedNumber 
             value={coursesPlayed}
-            className="text-4xl font-bold text-foreground tracking-tight"
+            className="text-5xl font-bold text-foreground tracking-tight"
           />
           <span className="text-base text-muted-foreground">
             Courses Played
           </span>
         </div>
 
-        {/* Secondary stats row */}
-        <div className="flex gap-6 mb-5">
+        {/* Secondary stats row - polished spacing */}
+        <div className="flex gap-8">
           {/* Countries */}
           {countriesPlayed > 0 && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
+                <Globe className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div className="flex flex-col">
                 <AnimatedNumber 
                   value={countriesPlayed} 
-                  className="font-semibold"
+                  className="text-lg font-semibold text-foreground leading-tight"
                 />
-                <span className="text-muted-foreground ml-1">
+                <span className="text-xs text-muted-foreground">
                   {countriesPlayed === 1 ? 'country' : 'countries'}
                 </span>
-              </span>
+              </div>
             </div>
           )}
 
           {/* Average Rating */}
           {avgRating !== null && avgRating > 0 && (
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-amber-500" />
-              <span className="text-sm text-foreground">
-                <span className="font-semibold">{avgRating.toFixed(1)}</span>
-                <span className="text-muted-foreground ml-1">avg rating</span>
-              </span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-amber-100/60 dark:bg-amber-900/30 flex items-center justify-center">
+                <Star className="w-4 h-4 text-amber-500" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-semibold text-foreground leading-tight">
+                  {avgRating.toFixed(1)}
+                </span>
+                <span className="text-xs text-muted-foreground">avg rating</span>
+              </div>
             </div>
           )}
-        </div>
-
-        {/* Milestone progress - tighter spacing */}
-        <div className={cn(
-          "backdrop-blur-sm rounded-lg p-3.5 border border-border/30",
-          isCloseToMilestone 
-            ? "bg-amber-50/80 dark:bg-amber-900/20 border-amber-200/50 dark:border-amber-700/30" 
-            : "bg-background/60"
-        )}>
-          <div className="flex items-center justify-between mb-1.5">
-            <div className="flex items-center gap-1.5">
-              {isCloseToMilestone ? (
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                </motion.div>
-              ) : (
-                <Trophy className="w-3.5 h-3.5 text-amber-500" />
-              )}
-              <span className="text-xs font-medium text-muted-foreground">
-                Next milestone
-              </span>
-            </div>
-            <span className={cn(
-              "text-xs font-semibold",
-              isCloseToMilestone ? "text-amber-600 dark:text-amber-400" : "text-amber-600 dark:text-amber-400"
-            )}>
-              {nextMilestone.name}
-            </span>
-          </div>
-
-          {/* Progress bar */}
-          <AnimatedProgressBar
-            percentage={progressPercent}
-            height="h-2"
-            bgColor={isCloseToMilestone ? "bg-amber-200/50 dark:bg-amber-800/30" : "bg-muted/50"}
-            fillColor={isCloseToMilestone 
-              ? "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 animate-pulse" 
-              : "bg-gradient-to-r from-amber-400 to-amber-500"
-            }
-            delay={0.1}
-          />
-
-          {/* Progress label - tighter spacing (mt-1 instead of mt-1.5) */}
-          <div className="flex justify-end mt-1">
-            <span className={cn(
-              "text-xs",
-              isCloseToMilestone 
-                ? "text-amber-600 dark:text-amber-400 font-medium" 
-                : "text-muted-foreground"
-            )}>
-              {coursesToNextMilestone} to go
-            </span>
-          </div>
         </div>
       </div>
     </motion.div>
