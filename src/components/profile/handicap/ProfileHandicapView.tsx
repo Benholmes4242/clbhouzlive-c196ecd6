@@ -8,6 +8,7 @@ interface ProfileHandicapViewProps {
   profile: {
     eg_handicap_index?: number | null;
     handicap_sync_interest?: boolean | null;
+    updated_at?: string | null;
     [key: string]: any;
   };
   isOwnProfile: boolean;
@@ -18,10 +19,10 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
   profile,
   isOwnProfile,
 }) => {
+  // Use eg_handicap_index for manual handicap (matches Edit Profile field)
   const handicapIndex = profile?.eg_handicap_index ?? null;
-  // Note: using eg_handicap_index updated_at would require schema change,
-  // for now we use the profile's updated_at as a proxy
-  const lastUpdatedAt = null; // Will be set when handicap_last_updated_at field is added
+  // Use profile updated_at as proxy until dedicated handicap timestamp field exists
+  const lastUpdatedAt = handicapIndex != null ? profile?.updated_at ?? null : null;
 
   return (
     <div className="pb-8">
