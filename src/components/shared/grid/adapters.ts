@@ -145,7 +145,7 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     likes: post.likes,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
-    courseName: golfCourse?.name,
+    courseName: golfCourse?.name || post.course?.name || '',
     
     // Creator info
     creator: post.user ? {
