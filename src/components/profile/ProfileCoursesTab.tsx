@@ -109,7 +109,8 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       <div className="mt-6">
         <AllCoursesList 
           userId={userId} 
-          isOwnProfile={isOwnProfile} 
+          isOwnProfile={isOwnProfile}
+          displayName={displayName}
         />
       </div>
 

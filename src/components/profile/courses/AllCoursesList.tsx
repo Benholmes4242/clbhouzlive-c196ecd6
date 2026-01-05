@@ -12,13 +12,15 @@ import { scrollToTop } from '@/utils/scrollToTop';
 interface AllCoursesListProps {
   userId: string;
   isOwnProfile: boolean;
+  displayName?: string;
 }
 
 const PAGE_SIZE = 20;
 
 export const AllCoursesList: React.FC<AllCoursesListProps> = ({ 
   userId,
-  isOwnProfile 
+  isOwnProfile,
+  displayName,
 }) => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -149,7 +151,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <h3 className="text-base font-semibold text-foreground mb-3">All Courses Played</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">Complete Journey</h3>
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-18 bg-muted/50 rounded-xl animate-pulse" />
@@ -159,6 +161,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     );
   }
 
+  // Compute owner name for subtitle
+  const ownerName = isOwnProfile ? 'Your' : displayName ? `${displayName}'s` : "This player's";
+
   return (
     <div ref={sectionRef} className="py-4">
 
@@ -166,10 +171,10 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-base font-semibold text-foreground">
-            All Courses Played
+            Complete Journey
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Your complete journey
+            {ownerName} full course history
           </p>
         </div>
       </div>

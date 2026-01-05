@@ -1,5 +1,5 @@
 import React from 'react';
-import { Video, Image, MapPin, Trophy, Sparkles, Target } from 'lucide-react';
+import { Video, Image, MapPin, Sparkles, Check } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
-export type ActivityFilterType = 'all' | 'videos' | 'photos' | 'courses' | 'swings' | 'milestones' | 'hole-in-ones';
+export type ActivityFilterType = 'all' | 'videos' | 'photos' | 'courses';
 
 export interface ActivityFilters {
   type: ActivityFilterType;
@@ -26,8 +26,6 @@ const FILTER_OPTIONS: { id: ActivityFilterType; label: string; icon: React.Eleme
   { id: 'videos', label: 'Videos only', icon: Video, description: 'Just the videos' },
   { id: 'photos', label: 'Photos only', icon: Image, description: 'Just the photos' },
   { id: 'courses', label: 'Courses tagged', icon: MapPin, description: 'Posts with golf courses' },
-  { id: 'swings', label: 'Golf swings', icon: Target, description: 'Swing videos' },
-  { id: 'milestones', label: 'Milestones', icon: Trophy, description: 'Achievement posts' },
 ];
 
 /**
@@ -62,11 +60,11 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-sq-md",
+                  "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl",
                   "transition-all duration-200",
                   isActive 
-                    ? "bg-slate-100 text-slate-800" 
-                    : "hover:bg-slate-50 text-muted-foreground hover:text-foreground"
+                    ? "bg-slate-100 dark:bg-slate-800" 
+                    : "hover:bg-muted/50"
                 )}
               >
                 {/* Icon container with slate styling */}
@@ -74,12 +72,12 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
                   "w-10 h-10 rounded-full flex items-center justify-center",
                   "transition-colors duration-200",
                   isActive 
-                    ? "bg-slate-200" 
+                    ? "bg-slate-200 dark:bg-slate-700" 
                     : "bg-muted/50"
                 )}>
                   <Icon className={cn(
                     "w-5 h-5 transition-colors duration-200",
-                    isActive ? "text-slate-700" : "text-muted-foreground"
+                    isActive ? "text-slate-700 dark:text-slate-200" : "text-muted-foreground"
                   )} />
                 </div>
                 
@@ -87,16 +85,16 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
                 <div className="flex-1 text-left">
                   <div className={cn(
                     "font-medium text-sm",
-                    isActive ? "text-slate-800" : "text-foreground"
+                    isActive ? "text-foreground" : "text-foreground"
                   )}>
                     {option.label}
                   </div>
                   <div className="text-xs text-muted-foreground">{option.description}</div>
                 </div>
                 
-                {/* Active indicator dot */}
+                {/* Active indicator checkmark */}
                 {isActive && (
-                  <div className="w-2 h-2 rounded-full bg-slate-600" />
+                  <Check className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                 )}
               </button>
             );
