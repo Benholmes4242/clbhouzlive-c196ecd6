@@ -105,6 +105,23 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     estimatedRowHeight: 250,
   });
 
+  // Force initial tiles visible if lazy loading isn't populating correctly
+  const effectiveVisibleIndices = useMemo(() => {
+    const indices = new Set(visibleIndices);
+    // Fallback: force first 6 to be visible if lazy loading returned empty
+    if (indices.size === 0 && flatItems.length > 0) {
+      for (let i = 0; i < Math.min(6, flatItems.length); i++) {
+        indices.add(i);
+      }
+    }
+    return indices;
+  }, [visibleIndices, flatItems.length]);
+
+  // Debug: log visible indices
+  useEffect(() => {
+    console.log('[ActivityGridV2:DEBUG] visibleIndices size:', visibleIndices.size, 'effective:', effectiveVisibleIndices.size);
+  }, [visibleIndices, effectiveVisibleIndices]);
+
   // Infinite scroll handler
   useEffect(() => {
     if (!onLoadMore) return;
@@ -252,7 +269,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
       <div ref={gridRef} className="pb-4">
         <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
           {flatItems.map(({ item, variant, isHero }, flatIndex) => {
-            const isVisible = visibleIndices.has(flatIndex);
+            const isVisible = effectiveVisibleIndices.has(flatIndex);
             const isFullWidth = variant === 'landscape';
 
             // Placeholder for non-visible tiles
