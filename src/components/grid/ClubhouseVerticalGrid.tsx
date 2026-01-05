@@ -901,21 +901,27 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
                 {/* Navigation Arrows - aligned with top slot of CinematicActionRail */}
                 {hasMultipleMedia && (() => {
-                  // Match CinematicActionRail positioning exactly
+                  // Match CinematicActionRail geometry (stable; no jumping when Next Media slot disappears)
                   const SLOT_HEIGHT = 64;
                   const ICON_SIZE = 44;
                   const GAP = 12;
+
+                  // CinematicActionRail bottom = calc(env(safe-area-inset-bottom, 0px) + 80px - (SLOT_HEIGHT - ICON_SIZE))
+                  // With SLOT_HEIGHT=64 and ICON_SIZE=44 => 80 - 20 = 60
+                  const RAIL_BOTTOM_OFFSET_PX = 80 - (SLOT_HEIGHT - ICON_SIZE); // 60
+
+                  // Always assume the "max" rail layout (5 slots: Next Media + Mute + Like + Comment + Share)
+                  // so the arrows remain anchored even when Next Media is not currently rendered.
+                  const MAX_SLOTS = 5;
+                  const totalHeight = MAX_SLOTS * SLOT_HEIGHT + (MAX_SLOTS - 1) * GAP;
+
+                  // Align arrow (44x44) center with the top slot's circular button center.
+                  // Top circle center = railBottom + totalHeight - (ICON_SIZE / 2)
+                  // Arrow center = arrowBottom + (ICON_SIZE / 2)
+                  // => arrowBottom = railBottom + totalHeight - ICON_SIZE
+                  const arrowBottom = `calc(env(safe-area-inset-bottom, 0px) + ${RAIL_BOTTOM_OFFSET_PX + totalHeight - ICON_SIZE}px)`;
+
                   const isReviewPost = item.categories?.includes('review');
-                  // Base slots: mute, like, comment, share = 4 (no onSave passed to rail)
-                  // Review posts with next media get +1 slot at top
-                  const hasNextMediaSlot = isReviewPost && currentMediaIndex < mediaItems.length - 1;
-                  const slotCount = hasNextMediaSlot ? 5 : 4;
-                  const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
-                  // Rail bottom = safe-area + 80px - (SLOT_HEIGHT - ICON_SIZE) = safe-area + 60px
-                  // Top slot button bottom = rail_bottom + totalHeight - SLOT_HEIGHT + ICON_SIZE
-                  // Simplify: safe-area + 60 + totalHeight - 64 + 44 = safe-area + 40 + totalHeight
-                  const arrowBottom = `calc(env(safe-area-inset-bottom, 0px) + ${40 + totalHeight - SLOT_HEIGHT}px)`;
-                  
                   return (
                     <>
                       {/* Left arrow - positioned to match the top slot of action rail */}
