@@ -480,6 +480,21 @@ const PostPlayRatingModal = ({
           console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
           // Continue - rating is still successful even if badge check fails
         }
+
+        // Remove from want_to_play shortlist (if present) now that course is played
+        try {
+          if (userId && course?.id) {
+            await supabase
+              .from('course_shortlists')
+              .delete()
+              .eq('user_id', userId)
+              .eq('course_id', course.id)
+              .eq('list_key', 'want_to_play');
+          }
+        } catch (shortlistError) {
+          console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
+          // Non-blocking - rating is still successful
+        }
       }
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
@@ -531,6 +546,12 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
+      
+      // Invalidate want-to-play queries (course is now played, should be removed from want-to-play)
+      queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
       
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
