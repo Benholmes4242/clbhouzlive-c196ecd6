@@ -79,7 +79,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
           </p>
           {lastUpdatedAt && (
             <p className="text-xs text-muted-foreground mt-1">
-              Last edited {formatDate(lastUpdatedAt)} · Added by you
+              Last edited {formatDate(lastUpdatedAt)}{isOwnProfile ? ' · Added by you' : ''}
             </p>
           )}
         </div>
@@ -90,7 +90,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
             onClick={() => navigate('/edit-profile?tab=basic')}
             className="text-muted-foreground"
           >
-            Edit
+            Edit handicap
           </Button>
         )}
       </div>
