@@ -168,7 +168,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
           />
         );
       case 'stats':
-        return <HandicapSection userId={profile?.id || ''} profile={profile} />;
+        return <HandicapSection userId={profile?.id || ''} profile={profile} isOwnProfile={isOwnProfile} />;
       default:
         return null;
     }

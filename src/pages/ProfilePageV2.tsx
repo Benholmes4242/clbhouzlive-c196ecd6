@@ -322,6 +322,7 @@ const ProfilePageV2: React.FC = () => {
           <HandicapSection 
             userId={profile?.id || ''}
             profile={profile}
+            isOwnProfile={isSelf}
           />
         );
       default:

@@ -7051,6 +7051,8 @@ export type Database = {
           featured_post_id: string | null
           golfer_verified_at: string | null
           golfer_verified_by: string | null
+          handicap_sync_interest: boolean | null
+          handicap_sync_interest_at: string | null
           has_completed_onboarding: boolean | null
           has_profile_video: boolean | null
           header_photo_url: string | null
@@ -7145,6 +7147,8 @@ export type Database = {
           featured_post_id?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
+          handicap_sync_interest?: boolean | null
+          handicap_sync_interest_at?: string | null
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           header_photo_url?: string | null
@@ -7239,6 +7243,8 @@ export type Database = {
           featured_post_id?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
+          handicap_sync_interest?: boolean | null
+          handicap_sync_interest_at?: string | null
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           header_photo_url?: string | null
