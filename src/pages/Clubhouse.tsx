@@ -76,17 +76,8 @@ const Clubhouse = () => {
     isLoadingMore
   } = useInfiniteClubhouseShorts();
   
-  // Find initial index for focus post
-  const focusPostIndex = useMemo(() => {
-    if (!focusPostId || posts.length === 0) return 0;
-    const idx = posts.findIndex(p => p.id === focusPostId);
-    if (idx >= 0) {
-      console.log('[Clubhouse] Found focusPostId at index:', idx);
-      return idx;
-    }
-    console.log('[Clubhouse] focusPostId not found in posts:', focusPostId);
-    return 0;
-  }, [focusPostId, posts]);
+  // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
+  // the correct index from filteredPosts (fixes race condition and index mismatch)
 
   // Skeleton timing for smooth loading experience
   const { 
@@ -312,7 +303,7 @@ const Clubhouse = () => {
             onCommentsOpenChange={() => {}}
             onPostDetailsOpen={() => console.log('Post details opened')}
             onFirstFrameReady={handleFirstFrameReady}
-            initialIndex={focusPostIndex}
+            focusPostId={focusPostId ?? undefined}
           />
         ) : !isLoading ? (
           // Only show empty state when not loading and no posts
