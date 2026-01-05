@@ -122,24 +122,33 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     console.log('[ActivityGridV2:DEBUG] visibleIndices size:', visibleIndices.size, 'effective:', effectiveVisibleIndices.size);
   }, [visibleIndices, effectiveVisibleIndices]);
 
+  // Store refs for scroll handler to avoid stale closures
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
+  const isFetchingRef = useRef(isFetchingNextPage);
+  const onLoadMoreRef = useRef(onLoadMore);
+  
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+  useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
+  useEffect(() => { isFetchingRef.current = isFetchingNextPage; }, [isFetchingNextPage]);
+  useEffect(() => { onLoadMoreRef.current = onLoadMore; }, [onLoadMore]);
+
   // Infinite scroll handler
   useEffect(() => {
-    console.log('[ActivityGridV2] Infinite scroll setup - hasMore:', hasMore, 'onLoadMore:', !!onLoadMore);
+    console.log('[ActivityGridV2] Infinite scroll setup');
     
-    if (!onLoadMore) return;
-
     const handleScroll = () => {
-      if (!gridRef.current || !hasMore || loadingRef.current || isLoading || isFetchingNextPage) {
+      if (!gridRef.current || !hasMoreRef.current || loadingRef.current || isLoadingRef.current || isFetchingRef.current) {
         return;
       }
 
       const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
       const scrollThreshold = scrollHeight - clientHeight - 800;
 
-      if (scrollTop > scrollThreshold) {
-        console.log('[ActivityGridV2] Triggering fetchNextPage');
+      if (scrollTop > scrollThreshold && onLoadMoreRef.current) {
+        console.log('[ActivityGridV2] Triggering fetchNextPage - hasMore:', hasMoreRef.current);
         loadingRef.current = true;
-        onLoadMore();
+        onLoadMoreRef.current();
         // Debounce - 1 second lockout
         setTimeout(() => {
           loadingRef.current = false;
@@ -149,7 +158,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, isLoading, isFetchingNextPage, onLoadMore]);
+  }, []); // Empty deps - handler uses refs
 
   // Track initial render time (metric)
   useEffect(() => {
