@@ -111,8 +111,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       onTouchStart={handleTouch}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "relative bg-card border border-border/40 rounded-xl overflow-hidden cursor-pointer",
-        "hover:border-border/60 transition-all group",
+        "relative w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 cursor-pointer",
+        "hover:sm:shadow-md transition-all group",
         className
       )}
     >
@@ -156,8 +156,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
       </div>
       
-      {/* Rating bars section - matching UnifiedCourseCard meta padding */}
-      <div className="px-4 py-3 space-y-2">
+      {/* Rating bars section - matching UnifiedCourseCard meta area */}
+      <div className="px-4 py-3 bg-background space-y-2">
         {/* Primary rating bar */}
         {rating !== undefined && (
           <div className="flex items-center gap-2">
