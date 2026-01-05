@@ -22,18 +22,13 @@ interface ActivityPageData {
  * Uses Supabase .range() for stable pagination
  */
 export function useActivityPostsV2(actorId?: string) {
-  console.log('[useActivityPostsV2] Hook called with actorId:', actorId);
-  
   const query = useInfiniteQuery<ActivityPageData>({
     queryKey: [...postKeys.actorPosts('personal', actorId ?? ''), 'v2'],
     enabled: !!actorId,
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<ActivityPageData> => {
-      console.log('[useActivityPostsV2] queryFn called - actorId:', actorId, 'pageParam:', pageParam);
-      
       if (!actorId) {
-        console.log('[useActivityPostsV2] No actorId, returning empty');
         return { items: [], nextCursor: 0, hasMore: false };
       }
 
@@ -93,11 +88,9 @@ export function useActivityPostsV2(actorId?: string) {
         .range(startRange, endRange);
 
       if (postsError) {
-        console.error('[useActivityPostsV2] Supabase Error:', postsError);
+        console.error('[useActivityPostsV2] Supabase error:', postsError);
         return { items: [], nextCursor: startRange, hasMore: false };
       }
-      
-      console.log('[useActivityPostsV2] Posts fetched:', postsData?.length ?? 0, 'posts');
 
       // Fetch user profile once (first page only optimization could be added)
       const { data: profileData } = await supabase
@@ -199,16 +192,11 @@ export function useActivityPostsV2(actorId?: string) {
         });
 
       // Convert to UnifiedMediaItem
-      console.log('[useActivityPostsV2] ActivityPosts with media:', activityPosts.length);
-      
       const items = activityPosts
         .map((post, index) => activityPostToUnified(post, startRange + index))
         .filter((item): item is UnifiedMediaItem => item !== null);
 
-      console.log('[useActivityPostsV2] Unified items produced:', items.length);
-      
       const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
-      console.log('[useActivityPostsV2] hasMore:', hasMore, 'postsData.length:', postsData?.length, 'PAGE_SIZE:', PAGE_SIZE);
 
       return {
         items,

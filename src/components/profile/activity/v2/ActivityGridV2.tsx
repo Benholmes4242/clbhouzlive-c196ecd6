@@ -117,11 +117,6 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     return indices;
   }, [visibleIndices, flatItems.length]);
 
-  // Debug: log visible indices
-  useEffect(() => {
-    console.log('[ActivityGridV2:DEBUG] visibleIndices size:', visibleIndices.size, 'effective:', effectiveVisibleIndices.size);
-  }, [visibleIndices, effectiveVisibleIndices]);
-
   // Store refs for scroll handler to avoid stale closures
   const hasMoreRef = useRef(hasMore);
   const isLoadingRef = useRef(isLoading);
@@ -183,87 +178,6 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     };
   }, [flatItems.length, hasMore, onLoadMore]);
 
-  // Track initial render time (metric)
-  useEffect(() => {
-    if (items.length > 0 && !isLoading) {
-      const renderTime = performance.now() - renderTimeRef.current;
-      console.log('[ActivityGridV2:Metric] grid_render_time', renderTime.toFixed(2) + 'ms');
-    }
-  }, [items.length, isLoading]);
-
-  // Track landscape utilization (metric)
-  useEffect(() => {
-    if (layoutBlocks.length === 0) return;
-    
-    const landscapeBlocks = layoutBlocks.filter(b => b.type === 'landscape').length;
-    const totalBlocks = layoutBlocks.length;
-    // Expected landscape = 1 per every 2 blocks (PP → L pattern)
-    const expectedLandscapes = Math.floor(totalBlocks / 2);
-    const utilizationRate = expectedLandscapes > 0 ? landscapeBlocks / expectedLandscapes : 0;
-    
-    console.log('[ActivityGridV2:Metric] landscape_utilization', {
-      landscapeBlocks,
-      totalBlocks,
-      utilizationRate: `${(utilizationRate * 100).toFixed(1)}%`,
-    });
-  }, [layoutBlocks]);
-
-  // DEBUG: Log layout blocks structure
-  useEffect(() => {
-    console.log('[ActivityGridV2:DEBUG] Layout blocks:', layoutBlocks.map(b => ({
-      type: b.type,
-      items: b.items.map(i => ({
-        id: i.id.slice(0, 8),
-        type: i.type,
-        aspectRatio: i.aspectRatio,
-        url: i.url?.slice(0, 50)
-      }))
-    })));
-  }, [layoutBlocks]);
-
-  // DEBUG: Check if tiles have dimensions in DOM
-  useEffect(() => {
-    if (flatItems.length === 0) return;
-    
-    const timer = setTimeout(() => {
-      const tiles = document.querySelectorAll('[data-tile-index]');
-      console.log('[ActivityGridV2:DEBUG] Tiles in DOM:', tiles.length);
-      tiles.forEach((tile, i) => {
-        const rect = tile.getBoundingClientRect();
-        console.log(`[ActivityGridV2:DEBUG] Tile ${i}:`, {
-          width: rect.width,
-          height: rect.height,
-          visible: rect.height > 0
-        });
-      });
-      
-      // Also check grid container
-      const gridContainer = document.querySelector('.grid.grid-cols-2');
-      if (gridContainer) {
-        const gridRect = gridContainer.getBoundingClientRect();
-        console.log('[ActivityGridV2:DEBUG] Grid container:', {
-          width: gridRect.width,
-          height: gridRect.height,
-          childCount: gridContainer.children.length
-        });
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [flatItems]);
-
-  // Track autoplay failures (metric)
-  useEffect(() => {
-    const handlePlayFailure = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      console.log('[ActivityGridV2:Metric] autoplay_failure', {
-        mediaId: customEvent.detail?.mediaId,
-        reason: customEvent.detail?.reason,
-      });
-    };
-    
-    window.addEventListener('media:play:failed', handlePlayFailure);
-    return () => window.removeEventListener('media:play:failed', handlePlayFailure);
-  }, []);
 
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
     onItemClick?.(item, index);
