@@ -183,8 +183,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   
   const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
 
-  // Match the HUD capsule's bottom offset exactly
-  const CAPSULE_BOTTOM_OFFSET = 'calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 16px)';
+  // Align share button bottom with CreatorCapsule bottom.
+  // CreatorCapsule is fixed at: calc(env(safe-area-inset-bottom, 0px) + 80px)
+  const SHARE_TO_BOTTOM_PX = onSave ? SLOT_HEIGHT + GAP : 0;
+  const CAPSULE_BOTTOM_OFFSET = onSave
+    ? `calc(env(safe-area-inset-bottom, 0px) + 80px - ${SHARE_TO_BOTTOM_PX}px)`
+    : 'calc(env(safe-area-inset-bottom, 0px) + 80px)';
 
   return (
     <motion.div
