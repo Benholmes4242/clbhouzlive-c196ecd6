@@ -1,57 +1,31 @@
 /**
- * FavouritesCarousel - Crown jewel horizontal carousel for favourite courses
+ * FavouritesCarousel - Crown jewel carousel for Top 10 Rated Courses
  * 
- * Matches the layout of Top100RecentRoundsCarousel from the progress page.
- * Uses UnifiedCourseCard for consistent card rendering.
+ * Renamed from "Favourite Courses" to "Top 10 Rated Courses" per design brief.
+ * Uses UnifiedCourseCard for consistent card rendering with rating bars.
  */
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings2, Trophy, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
-import { CourseCardModel } from '@/types/courseCard';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
+import { Top10CourseCard } from './Top10CourseCard';
 
 interface FavouritesCarouselProps {
   userId: string;
   isOwnProfile: boolean;
   className?: string;
   onManage?: () => void;
-}
-
-/**
- * Convert TopTenCourse to CourseCardModel for UnifiedCourseCard
- */
-function toCourseCardModel(
-  course: TopTenCourse, 
-  position: number,
-  userRating?: number
-): CourseCardModel {
-  return {
-    id: course.course_id,
-    name: course.name,
-    imageUrl: course.thumbnail_image || undefined,
-    locationText: course.sub_country || course.country,
-    country: course.country,
-    communityRating: userRating,
-    ranks: {
-      global: course.global_rank || undefined,
-      regional: course.regional_rank || undefined,
-      usa: course.usa_rank || undefined,
-    },
-    context: {
-      isPlayedByViewer: true,
-    },
-  };
+  displayName?: string; // For subtitle on other profiles
 }
 
 export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
@@ -59,6 +33,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   isOwnProfile,
   className,
   onManage,
+  displayName,
 }) => {
   const navigate = useNavigate();
   const { topTen, isLoading } = useUserTopTenCourses(userId);
@@ -72,7 +47,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     [topTen]
   );
 
-  // Fetch user ratings
+  // Fetch user ratings with breakdown scores
   const { data: ratingsMap = {} } = useQuery({
     queryKey: ['user-course-ratings-breakdown', userId, courseIds],
     enabled: !!userId && courseIds.length > 0,
@@ -81,13 +56,25 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('course_id, rating')
+        .select('course_id, rating, design_score, condition_score, facilities_score, clubhouse_score')
         .eq('user_id', userId)
         .in('course_id', courseIds);
 
       if (error) throw error;
-      return (data || []).reduce((acc: Record<string, number>, r) => {
-        acc[r.course_id] = r.rating;
+      return (data || []).reduce((acc: Record<string, {
+        rating: number;
+        design_score: number | null;
+        condition_score: number | null;
+        facilities_score: number | null;
+        clubhouse_score: number | null;
+      }>, r) => {
+        acc[r.course_id] = {
+          rating: r.rating,
+          design_score: r.design_score,
+          condition_score: r.condition_score,
+          facilities_score: r.facilities_score,
+          clubhouse_score: r.clubhouse_score,
+        };
         return acc;
       }, {});
     },
@@ -126,14 +113,25 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     );
   }
 
-  // Empty state matching Top100RecentRoundsCarousel
+  // Dynamic subtitle
+  const getSubtitle = () => {
+    if (isOwnProfile) {
+      return "Your top 10 rated courses worldwide";
+    }
+    return `${displayName || 'Their'} top 10 rated courses worldwide`;
+  };
+
+  // Empty state
   if (topTen.length === 0) {
     return (
       <section className={cn("mt-6 w-full", className)}>
-        <div className="flex items-center justify-between mb-2 px-2.5">
-          <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
-            Favourite Courses
+        <div className="flex flex-col mb-2 px-2.5">
+          <h3 className="text-lg font-semibold text-foreground">
+            Top 10 Rated Courses
           </h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {getSubtitle()}
+          </p>
         </div>
         
         {/* Premium empty state card */}
@@ -142,12 +140,12 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
             <Trophy className="w-5 h-5 text-muted-foreground" />
           </div>
           <p className="text-sm font-medium text-foreground mb-1">
-            {isOwnProfile ? "You haven't picked your favourites yet" : "No favourites added yet"}
+            {isOwnProfile ? "You haven't picked your top 10 yet" : "No top 10 added yet"}
           </p>
           <p className="text-xs text-muted-foreground mb-4">
             {isOwnProfile 
-              ? "Choose your favourite courses to build your all-time list."
-              : "This golfer hasn't picked their favourite courses yet."}
+              ? "Choose your top rated courses to showcase your all-time favourites."
+              : "This golfer hasn't picked their top 10 courses yet."}
           </p>
           {isOwnProfile && onManage && (
             <Button
@@ -166,23 +164,28 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
   return (
     <section className={cn("w-full", className)}>
-      {/* Section header matching Top100RecentRoundsCarousel */}
+      {/* Section header - updated title and subtitle */}
       <div className="flex items-center justify-between mb-3 px-2.5">
-        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
-          Favourite Courses
-        </h3>
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">
+            Top 10 Rated Courses
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {getSubtitle()}
+          </p>
+        </div>
         {isOwnProfile && onManage && (
           <button
             type="button"
             onClick={onManage}
             className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Manage →
+            Manage Top 10 →
           </button>
         )}
       </div>
 
-      {/* Swipe snap carousel matching Top100RecentRoundsCarousel */}
+      {/* Swipe snap carousel */}
       <Carousel
         setApi={setApi}
         opts={{
@@ -193,27 +196,30 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       >
         <CarouselContent className="-ml-2 px-2.5">
           {topTen.map((course) => {
-            const userRating = ratingsMap[course.course_id];
-            const cardModel = toCourseCardModel(course, course.position, userRating);
+            const ratingData = ratingsMap[course.course_id];
             
             return (
               <CarouselItem 
                 key={course.id} 
                 className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]"
               >
-                <UnifiedCourseCard
-                  course={cardModel}
-                  showRankBadges={true}
-                  showRating={true}
-                  hideLocation={false}
-                  contextTag={`#${course.position}`}
+                <Top10CourseCard
+                  course={course}
+                  position={course.position}
+                  rating={ratingData?.rating}
+                  breakdown={{
+                    design: ratingData?.design_score,
+                    condition: ratingData?.condition_score,
+                    facilities: ratingData?.facilities_score,
+                    experience: ratingData?.clubhouse_score,
+                  }}
                 />
               </CarouselItem>
             );
           })}
         </CarouselContent>
 
-        {/* Navigation controls matching Top100RecentRoundsCarousel */}
+        {/* Navigation controls */}
         {count > 1 && (
           <div className="flex items-center justify-center gap-4 mt-4">
             <button
@@ -262,20 +268,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         )}
       </Carousel>
 
-      {/* Add to favourites CTA (owner only) */}
-      {isOwnProfile && onManage && topTen.length < 10 && (
-        <div className="mt-4 px-2.5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onManage}
-            className="w-full rounded-full border-dashed"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            Add to favourites ({topTen.length}/10)
-          </Button>
-        </div>
-      )}
+      {/* Removed "Add to favourites" button per design brief */}
     </section>
   );
 };
