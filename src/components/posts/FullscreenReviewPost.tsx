@@ -152,7 +152,10 @@ export function FullscreenReviewPost({
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-full bg-black overflow-hidden"
+      className={cn(
+        "relative w-full h-full overflow-hidden",
+        renderMedia ? "bg-black" : "bg-transparent"
+      )}
       {...swipeHandlers}
       style={{ touchAction: 'pan-y' }}
     >
