@@ -97,6 +97,12 @@ export function FullscreenReviewPost({
   }, [media]);
   
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  
+  // Sync internal state when parent updates initialIndex
+  React.useEffect(() => {
+    setCurrentIndex(initialIndex);
+  }, [initialIndex]);
+  
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
