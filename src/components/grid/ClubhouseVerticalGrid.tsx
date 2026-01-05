@@ -899,26 +899,26 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - show based on current media position */}
+                {/* Navigation Arrows - temporarily at top-24 for testing */}
                 {hasMultipleMedia && (
                   <>
-                    {/* Left arrow - centered vertically to align with action rail */}
+                    {/* Left arrow - temporarily at top */}
                     {currentMediaIndex > 0 && (
                       <button
                         data-control="media-nav"
                         onClick={handlePrevMedia}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        className="absolute left-4 top-24 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         aria-label="Previous media"
                       >
                         <ChevronLeft className="w-6 h-6 text-white" />
                       </button>
                     )}
-                    {/* Right arrow - only show for non-review posts when not on last media (reviews use action rail) */}
+                    {/* Right arrow - only for non-review posts, temporarily at top */}
                     {!item.categories?.includes('review') && currentMediaIndex < mediaItems.length - 1 && (
                       <button
                         data-control="media-nav"
                         onClick={handleNextMedia}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        className="absolute right-4 top-24 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         aria-label="Next media"
                       >
                         <ChevronRight className="w-6 h-6 text-white" />
