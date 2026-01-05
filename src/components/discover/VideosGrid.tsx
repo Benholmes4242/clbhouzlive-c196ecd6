@@ -13,10 +13,6 @@ import {
   logVideosArrayUpdate,
   logLazyTilesState,
   logRenderedCards,
-  logObserverSetup,
-  logObserverCallback,
-  logScrollPosition,
-  logObserverDisconnect,
 } from '@/utils/debugWatchPage';
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -92,97 +88,65 @@ const VideosGrid: React.FC<VideosGridProps> = ({
 
   // Refs to avoid stale closure in IntersectionObserver callback
   const hasMoreRef = useRef(hasMore);
-  const loadingRef = useRef(isLoading);
+  const loadingRef = useRef(false);
+  const isFetchingRef = useRef(false);
   const onLoadMoreRef = useRef(onLoadMore);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Keep refs in sync with props - this avoids stale closures
-  useEffect(() => {
-    hasMoreRef.current = hasMore;
-    loadingRef.current = isLoading;
-    onLoadMoreRef.current = onLoadMore;
-  }, [hasMore, isLoading, onLoadMore]);
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+  useEffect(() => { isFetchingRef.current = isLoading; }, [isLoading]);
+  useEffect(() => { onLoadMoreRef.current = onLoadMore; }, [onLoadMore]);
 
-  // Intersection observer for infinite scroll - stable observer, uses refs
+  // Infinite scroll using Intersection Observer - setup after items load
   useEffect(() => {
-    const sentinel = sentinelRef.current;
+    // Don't set up until we have items and the grid has rendered
+    if (itemsToRender.length === 0 || !hasMore || !onLoadMore) {
+      return;
+    }
     
-    // Debug: Log observer setup
-    logObserverSetup({
-      rootMargin: '400px 0px',
-      threshold: 0,
-      hasSentinel: !!sentinel,
-      sentinelRect: sentinel?.getBoundingClientRect(),
-    });
+    let observer: IntersectionObserver | null = null;
+    let sentinel: HTMLDivElement | null = null;
     
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        const willTrigger = entry.isIntersecting && hasMoreRef.current && !loadingRef.current;
-        
-        // Debug: Log observer callback
-        logObserverCallback({
-          isIntersecting: entry.isIntersecting,
-          intersectionRatio: entry.intersectionRatio,
-          boundingClientRect: entry.boundingClientRect,
-          hasMore: hasMoreRef.current,
-          isLoading: loadingRef.current,
-          willTrigger,
-        });
-        
-        // Use refs to always get current values, not stale closure values
-        if (willTrigger) {
-          onLoadMoreRef.current();
+    // Wait for next tick to ensure grid is in DOM
+    const timeoutId = setTimeout(() => {
+      const gridContainer = gridRef.current;
+      if (!gridContainer) return;
+      
+      // Create sentinel element
+      sentinel = document.createElement('div');
+      sentinel.style.height = '1px';
+      sentinel.style.width = '100%';
+      sentinel.dataset.infiniteScrollSentinel = 'true';
+      gridContainer.appendChild(sentinel);
+      
+      // Observe when sentinel comes into view
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingRef.current) {
+            loadingRef.current = true;
+            onLoadMoreRef.current?.();
+            setTimeout(() => {
+              loadingRef.current = false;
+            }, 1000);
+          }
+        },
+        {
+          rootMargin: '800px',
+          threshold: 0
         }
-      },
-      { 
-        root: null,
-        rootMargin: '400px 0px', // Trigger 400px BEFORE reaching bottom
-        threshold: 0,
-      }
-    );
-
-    observer.observe(sentinel);
-
+      );
+      
+      observer.observe(sentinel);
+    }, 100);
+    
     return () => {
-      logObserverDisconnect();
-      observer.disconnect();
-    };
-  }, []); // Empty deps - observer created once, uses refs for current values
-
-  // Debug: Scroll position tracking for infinite scroll debugging
-  useEffect(() => {
-    const handleScroll = () => {
-      const sentinel = sentinelRef.current;
-      if (!sentinel) return;
-
-      const sentinelRect = sentinel.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const distanceFromBottom = sentinelRect.top - viewportHeight;
-
-      logScrollPosition({
-        sentinelTop: sentinelRect.top,
-        viewportHeight,
-        distanceFromBottom,
-        scrollY: window.scrollY,
-      });
-    };
-
-    // Throttle scroll events
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const throttledScroll = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleScroll, 200);
+      observer?.disconnect();
+      sentinel?.remove();
     };
-
-    window.addEventListener('scroll', throttledScroll);
-    return () => {
-      window.removeEventListener('scroll', throttledScroll);
-      clearTimeout(timeoutId);
-    };
-  }, []);
+  }, [itemsToRender.length, hasMore, onLoadMore]);
 
   if (itemsToRender.length === 0 && !isLoading) {
     return (
@@ -203,7 +167,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     <>
       {isCinematicMode ? (
         // Landscape cards layout - full width edge to edge with lazy loading
-        <div className="flex flex-col gap-3 pb-4">
+        <div ref={gridRef} className="flex flex-col gap-3 pb-4">
           {itemsToRender.map((item, index) => {
             // Channel suggestions and shorts blocks always render (non-video content)
             if (item.kind === 'channel_suggestion') {
@@ -295,17 +259,12 @@ const VideosGrid: React.FC<VideosGridProps> = ({
         </div>
       )}
 
-      {/* Infinite scroll sentinel */}
-      <div 
-        ref={sentinelRef}
-        className="h-20 w-full mt-8"
-      >
-        {isLoading && hasMore && (
-          <div className="flex justify-center py-4">
-            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-          </div>
-        )}
-      </div>
+      {/* Loading indicator */}
+      {isLoading && hasMore && (
+        <div className="flex justify-center py-4">
+          <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+        </div>
+      )}
       
       {/* All caught up message */}
       {!hasMore && itemsToRender.length > 0 && !isLoading && (

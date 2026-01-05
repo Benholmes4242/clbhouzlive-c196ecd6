@@ -137,15 +137,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
   useEffect(() => {
     // Don't set up until we have items and the grid has rendered
     if (flatItems.length === 0 || !hasMore || !onLoadMore) {
-      console.log('[ActivityGridV2] Skipping observer setup', {
-        hasItems: flatItems.length > 0,
-        hasMore,
-        hasOnLoadMore: !!onLoadMore
-      });
       return;
     }
-    
-    console.log('[ActivityGridV2] Setting up infinite scroll observer');
     
     let observer: IntersectionObserver | null = null;
     let sentinel: HTMLDivElement | null = null;
@@ -153,10 +146,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     // Wait for next tick to ensure grid is in DOM
     const timeoutId = setTimeout(() => {
       const gridContainer = gridRef.current;
-      if (!gridContainer) {
-        console.log('[ActivityGridV2] Grid ref not found');
-        return;
-      }
+      if (!gridContainer) return;
       
       // Create sentinel element
       sentinel = document.createElement('div');
@@ -164,21 +154,12 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
       sentinel.style.width = '100%';
       sentinel.dataset.infiniteScrollSentinel = 'true';
       gridContainer.appendChild(sentinel);
-      console.log('[ActivityGridV2] Sentinel appended to grid');
       
       // Observe when sentinel comes into view
       observer = new IntersectionObserver(
         (entries) => {
           const entry = entries[0];
-          console.log('[ActivityGridV2] Sentinel intersection:', {
-            isIntersecting: entry.isIntersecting,
-            hasMore: hasMoreRef.current,
-            loading: loadingRef.current,
-            fetching: isFetchingRef.current
-          });
-          
           if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingRef.current) {
-            console.log('[ActivityGridV2] ✅ Triggering fetchNextPage');
             loadingRef.current = true;
             onLoadMoreRef.current?.();
             setTimeout(() => {
@@ -193,7 +174,6 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
       );
       
       observer.observe(sentinel);
-      console.log('[ActivityGridV2] Observer attached');
     }, 100);
     
     return () => {
