@@ -4,8 +4,9 @@
  * Sources from course_shortlists with list_key='want_to_play'
  * A course can only be in ONE state: played, want_to_play, or neither.
  * 
- * CRITICAL: "Played" = has a course_ratings row.
- * When marking as played, we create a rating row (minimal rating) AND remove from shortlist.
+ * CRITICAL: "Played" = course_ratings row exists with rating > 0.
+ * There is NO "mark as played" action - user must submit a real rating.
+ * On rating submit, the course should be removed from want_to_play.
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,13 +50,14 @@ export function useUserWantToPlay(userId: string | undefined) {
 
       const courseIds = shortlists.map(s => s.course_id);
 
-      // Also check if any of these are already played (have ratings)
+      // Check if any of these are already played (have ratings with rating > 0)
       // This enforces mutual exclusivity at query time
       const { data: existingRatings } = await supabase
         .from('course_ratings')
-        .select('course_id')
+        .select('course_id, rating')
         .eq('user_id', userId)
-        .in('course_id', courseIds);
+        .in('course_id', courseIds)
+        .gt('rating', 0); // Only count as played if rating > 0
 
       const playedCourseIds = new Set((existingRatings || []).map(r => r.course_id));
 
@@ -129,56 +131,7 @@ export function useUserWantToPlay(userId: string | undefined) {
     staleTime: 60_000,
   });
 
-  /**
-   * Mark as played mutation
-   * CRITICAL: Creates a course_rating row (canonical "played" state) AND removes from shortlist.
-   * This ensures the course moves from "want_to_play" to "played" atomically.
-   */
-  const markAsPlayedMutation = useMutation({
-    mutationFn: async (courseId: string) => {
-      if (!currentUserId) throw new Error('Not authenticated');
-
-      // 1. Check if rating already exists (shouldn't, but safety check)
-      const { data: existingRating } = await supabase
-        .from('course_ratings')
-        .select('id')
-        .eq('user_id', currentUserId)
-        .eq('course_id', courseId)
-        .maybeSingle();
-
-      // 2. If no rating exists, create a placeholder rating (user will edit later)
-      if (!existingRating) {
-        const { error: insertError } = await supabase
-          .from('course_ratings')
-          .insert({
-            user_id: currentUserId,
-            course_id: courseId,
-            rating: 0, // Placeholder - user should rate properly
-            is_mock: false,
-          });
-
-        if (insertError) throw insertError;
-      }
-
-      // 3. Remove from shortlist (want_to_play)
-      const { error: deleteError } = await supabase
-        .from('course_shortlists')
-        .delete()
-        .eq('course_id', courseId)
-        .eq('user_id', currentUserId);
-
-      if (deleteError) throw deleteError;
-    },
-    onSuccess: () => {
-      // Invalidate all relevant queries
-      queryClient.invalidateQueries({ queryKey: ['user-want-to-play', userId] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-summary'] });
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status'] });
-    },
-  });
-
-  // Remove from want to play mutation (does NOT mark as played)
+  // Remove from want to play mutation
   const removeMutation = useMutation({
     mutationFn: async (courseId: string) => {
       if (!currentUserId) throw new Error('Not authenticated');
@@ -201,8 +154,7 @@ export function useUserWantToPlay(userId: string | undefined) {
     wantToPlay,
     isLoading,
     error,
-    markAsPlayed: markAsPlayedMutation.mutate,
     remove: removeMutation.mutate,
-    isUpdating: markAsPlayedMutation.isPending || removeMutation.isPending,
+    isUpdating: removeMutation.isPending,
   };
 }

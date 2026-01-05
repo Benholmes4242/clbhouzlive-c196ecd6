@@ -6,12 +6,14 @@
  * 
  * Key rules:
  * - A course can ONLY be in one state: played OR want_to_play OR neither
+ * - "Played" = has course_ratings row with rating > 0
  * - NO "Played" badges shown here
  * - NO ratings shown here (this is planning, not history)
+ * - "Rate this course" navigates to rating page (no DB write here)
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, MapPin, Trophy, Check, X, Calendar } from 'lucide-react';
+import { Bookmark, MapPin, Trophy, Star, X, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
@@ -27,7 +29,7 @@ interface WantToPlaySectionProps {
 interface WantToPlayCardProps {
   course: WantToPlayCourse;
   isOwnProfile: boolean;
-  onMarkPlayed: () => void;
+  onRate: () => void;
   onRemove: () => void;
   onClick: () => void;
 }
@@ -35,16 +37,16 @@ interface WantToPlayCardProps {
 const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
   course,
   isOwnProfile,
-  onMarkPlayed,
+  onRate,
   onRemove,
   onClick,
 }) => {
   const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
   const addedAgo = formatDistanceToNow(new Date(course.added_at), { addSuffix: true });
 
-  const handleMarkPlayed = (e: React.MouseEvent) => {
+  const handleRate = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onMarkPlayed();
+    onRate();
   };
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -104,11 +106,11 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
         {isOwnProfile && (
           <div className="flex items-center gap-1.5 px-2">
             <button
-              onClick={handleMarkPlayed}
-              className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors"
-              title="Mark as played"
+              onClick={handleRate}
+              className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+              title="Rate this course"
             >
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <Star className="w-4 h-4 text-primary" />
             </button>
             <button
               onClick={handleRemove}
@@ -130,21 +132,15 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
-  const { wantToPlay, isLoading, markAsPlayed, remove } = useUserWantToPlay(userId);
+  const { wantToPlay, isLoading, remove } = useUserWantToPlay(userId);
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/courses/${courseId}`);
   };
 
-  const handleMarkPlayed = (course: WantToPlayCourse) => {
-    markAsPlayed(course.course_id);
-    toast.success(`${course.course_name} marked as played`, {
-      description: 'Go rate it to add to your played courses!',
-      action: {
-        label: 'Rate now',
-        onClick: () => navigate(`/courses/${course.course_id}/rate`),
-      },
-    });
+  const handleRate = (course: WantToPlayCourse) => {
+    // Navigate to rating page - no DB write here
+    navigate(`/courses/${course.course_id}/rate`);
   };
 
   const handleRemove = (course: WantToPlayCourse) => {
@@ -206,7 +202,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
             key={course.id}
             course={course}
             isOwnProfile={isOwnProfile}
-            onMarkPlayed={() => handleMarkPlayed(course)}
+            onRate={() => handleRate(course)}
             onRemove={() => handleRemove(course)}
             onClick={() => handleCourseClick(course.course_id)}
           />
