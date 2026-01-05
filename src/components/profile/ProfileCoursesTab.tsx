@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
+import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { JourneySummaryCard } from './courses/JourneySummaryCard';
 import { FavouritesCarousel } from './courses/FavouritesCarousel';
 import { WantToPlaySection } from './courses/WantToPlaySection';
@@ -30,6 +31,13 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   const [showAddModal, setShowAddModal] = useState(false);
   
   const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
+  const { topTen } = useUserTopTenCourses(userId);
+
+  // Stable list of existing top ten course IDs for the modal
+  const existingTopTenCourseIds = useMemo(() => 
+    topTen.map(c => c.course_id).sort(), 
+    [topTen]
+  );
 
   // Fetch average rating for the summary card
   const { data: avgRating } = useQuery({
@@ -40,7 +48,8 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         .from('course_ratings')
         .select('rating')
         .eq('user_id', userId)
-        .eq('is_mock', false);
+        .eq('is_mock', false)
+        .gt('rating', 0); // Only count actual ratings, not placeholders
 
       if (!ratings || ratings.length === 0) return null;
       return ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
@@ -92,7 +101,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         <AddCourseModal
           userId={userId}
           onClose={() => setShowAddModal(false)}
-          existingCourseIds={[]}
+          existingCourseIds={existingTopTenCourseIds}
         />
       )}
     </div>

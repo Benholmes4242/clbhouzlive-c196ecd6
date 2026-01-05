@@ -3,11 +3,15 @@
  * 
  * Replaces fragmented pills with a single, elegant overview of a golfer's journey.
  * Shows: Courses Played, Countries, Avg Rating, Next Milestone progress
+ * 
+ * Uses shared animation components for consistency (AnimatedNumber, AnimatedProgressBar)
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { MapPin, Globe, Star, Trophy } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { AnimatedNumber } from '@/components/ui/motion';
+import { AnimatedProgressBar } from '@/components/ui/motion/AnimatedProgressBar';
 
 interface JourneySummaryCardProps {
   coursesPlayed: number;
@@ -37,7 +41,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   isOwnProfile,
   className,
 }) => {
-  const [animatedProgress, setAnimatedProgress] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   // Calculate next milestone
   const nextMilestone = MILESTONES.find(m => m.target > coursesPlayed) || MILESTONES[MILESTONES.length - 1];
@@ -49,14 +53,6 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   const progressRange = nextMilestone.target - progressBase;
   const progressValue = coursesPlayed - progressBase;
   const progressPercent = Math.min((progressValue / progressRange) * 100, 100);
-
-  // Animate progress bar on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedProgress(progressPercent);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [progressPercent]);
 
   // Empty state
   if (coursesPlayed === 0) {
@@ -87,7 +83,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
@@ -113,11 +109,12 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           {isOwnProfile ? 'Your Course Journey' : 'Course Journey'}
         </h3>
 
-        {/* Main stat - Courses Played */}
+        {/* Main stat - Courses Played with AnimatedNumber */}
         <div className="flex items-baseline gap-2 mb-5">
-          <span className="text-4xl font-bold text-foreground tracking-tight">
-            {coursesPlayed}
-          </span>
+          <AnimatedNumber 
+            value={coursesPlayed}
+            className="text-4xl font-bold text-foreground tracking-tight"
+          />
           <span className="text-base text-muted-foreground">
             Courses Played
           </span>
@@ -130,7 +127,10 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm text-foreground">
-                <span className="font-semibold">{countriesPlayed}</span>
+                <AnimatedNumber 
+                  value={countriesPlayed} 
+                  className="font-semibold"
+                />
                 <span className="text-muted-foreground ml-1">
                   {countriesPlayed === 1 ? 'country' : 'countries'}
                 </span>
@@ -150,7 +150,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           )}
         </div>
 
-        {/* Milestone progress */}
+        {/* Milestone progress using shared AnimatedProgressBar */}
         <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border border-border/30">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -164,22 +164,14 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
             </span>
           </div>
 
-          {/* Progress bar */}
-          <div className="relative h-2 bg-muted/50 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${animatedProgress}%` }}
-              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-            />
-            {/* Position marker */}
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-background border-2 border-amber-500 rounded-full shadow-sm"
-              initial={{ left: 0 }}
-              animate={{ left: `calc(${animatedProgress}% - 6px)` }}
-              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-            />
-          </div>
+          {/* Progress bar - using shared component */}
+          <AnimatedProgressBar
+            percentage={progressPercent}
+            height="h-2"
+            bgColor="bg-muted/50"
+            fillColor="bg-gradient-to-r from-amber-400 to-amber-500"
+            delay={0.1}
+          />
 
           {/* Progress label */}
           <div className="flex justify-end mt-1.5">
