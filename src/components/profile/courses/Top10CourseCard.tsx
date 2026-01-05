@@ -45,18 +45,20 @@ const RatingBar: React.FC<RatingBarProps> = ({
   const percentage = Math.min((value / maxValue) * 100, 100);
   const isPrimary = size === 'primary';
   
-  // Get tier-based color from global system
+  // Color scheme: slate for Fair→Excellent, gold for Outstanding
   const tierData = getScoreTier(value);
+  const isOutstanding = tierData.tier === 'outstanding';
+  const barColor = isOutstanding ? '#C9A94A' : '#64748b'; // gold : slate-500
   
   return (
     <div className="flex items-center gap-1.5 w-full">
       {!isPrimary && (
-        <span className="text-[9px] text-muted-foreground w-14 flex-shrink-0">{label}</span>
+        <span className="text-[9px] text-muted-foreground w-10 flex-shrink-0">{label}</span>
       )}
       <div 
         className={cn(
           "flex-1 rounded-full overflow-hidden",
-          isPrimary ? "h-1.5 bg-muted/50" : "h-[3px] bg-muted/30"
+          isPrimary ? "h-1.5 bg-muted/50" : "h-[3px] bg-slate-200"
         )}
       >
         <motion.div
@@ -64,7 +66,7 @@ const RatingBar: React.FC<RatingBarProps> = ({
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
           className="h-full rounded-full"
-          style={{ backgroundColor: tierData.accent }}
+          style={{ backgroundColor: barColor }}
         />
       </div>
       {isPrimary && (
@@ -159,20 +161,20 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           />
         )}
         
-        {/* Mini breakdown bars - always visible */}
+        {/* Mini breakdown bars - 2x2 grid, always visible */}
         {hasBreakdown && (
-          <div className="space-y-1.5 pt-1 border-t border-border/30">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 pt-1 border-t border-border/30">
             {breakdown.design !== null && breakdown.design !== undefined && (
               <RatingBar value={breakdown.design} label="Design" size="mini" />
             )}
             {breakdown.condition !== null && breakdown.condition !== undefined && (
-              <RatingBar value={breakdown.condition} label="Condition" size="mini" />
+              <RatingBar value={breakdown.condition} label="Cond." size="mini" />
             )}
             {breakdown.facilities !== null && breakdown.facilities !== undefined && (
-              <RatingBar value={breakdown.facilities} label="Facilities" size="mini" />
+              <RatingBar value={breakdown.facilities} label="Facil." size="mini" />
             )}
             {breakdown.experience !== null && breakdown.experience !== undefined && (
-              <RatingBar value={breakdown.experience} label="Experience" size="mini" />
+              <RatingBar value={breakdown.experience} label="Exp." size="mini" />
             )}
           </div>
         )}
