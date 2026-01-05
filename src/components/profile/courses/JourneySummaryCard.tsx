@@ -4,10 +4,12 @@
  * Replaces fragmented pills with a single, elegant overview of a golfer's journey.
  * Shows: Courses Played, Countries, Avg Rating, Next Milestone progress
  * 
- * Uses shared animation components for consistency (AnimatedNumber, AnimatedProgressBar)
+ * Polished per design brief:
+ * - Tighter spacing between progress bar and "X to go" label
+ * - Subtle glow/emphasis when ≤3 courses from milestone
  */
 import React from 'react';
-import { MapPin, Globe, Star, Trophy } from 'lucide-react';
+import { MapPin, Globe, Star, Trophy, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/ui/motion';
@@ -53,6 +55,9 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   const progressRange = nextMilestone.target - progressBase;
   const progressValue = coursesPlayed - progressBase;
   const progressPercent = Math.min((progressValue / progressRange) * 100, 100);
+
+  // Close to milestone - within 3 courses
+  const isCloseToMilestone = coursesToNextMilestone <= 3 && coursesToNextMilestone > 0;
 
   // Empty state
   if (coursesPlayed === 0) {
@@ -150,32 +155,57 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           )}
         </div>
 
-        {/* Milestone progress using shared AnimatedProgressBar */}
-        <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border border-border/30">
-          <div className="flex items-center justify-between mb-2">
+        {/* Milestone progress - tighter spacing */}
+        <div className={cn(
+          "backdrop-blur-sm rounded-lg p-3.5 border border-border/30",
+          isCloseToMilestone 
+            ? "bg-amber-50/80 dark:bg-amber-900/20 border-amber-200/50 dark:border-amber-700/30" 
+            : "bg-background/60"
+        )}>
+          <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
-              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              {isCloseToMilestone ? (
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                </motion.div>
+              ) : (
+                <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              )}
               <span className="text-xs font-medium text-muted-foreground">
                 Next milestone
               </span>
             </div>
-            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+            <span className={cn(
+              "text-xs font-semibold",
+              isCloseToMilestone ? "text-amber-600 dark:text-amber-400" : "text-amber-600 dark:text-amber-400"
+            )}>
               {nextMilestone.name}
             </span>
           </div>
 
-          {/* Progress bar - using shared component */}
+          {/* Progress bar */}
           <AnimatedProgressBar
             percentage={progressPercent}
             height="h-2"
-            bgColor="bg-muted/50"
-            fillColor="bg-gradient-to-r from-amber-400 to-amber-500"
+            bgColor={isCloseToMilestone ? "bg-amber-200/50 dark:bg-amber-800/30" : "bg-muted/50"}
+            fillColor={isCloseToMilestone 
+              ? "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 animate-pulse" 
+              : "bg-gradient-to-r from-amber-400 to-amber-500"
+            }
             delay={0.1}
           />
 
-          {/* Progress label */}
-          <div className="flex justify-end mt-1.5">
-            <span className="text-xs text-muted-foreground">
+          {/* Progress label - tighter spacing (mt-1 instead of mt-1.5) */}
+          <div className="flex justify-end mt-1">
+            <span className={cn(
+              "text-xs",
+              isCloseToMilestone 
+                ? "text-amber-600 dark:text-amber-400 font-medium" 
+                : "text-muted-foreground"
+            )}>
               {coursesToNextMilestone} to go
             </span>
           </div>

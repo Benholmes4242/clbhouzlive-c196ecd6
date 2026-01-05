@@ -239,11 +239,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       {/* End-of-list closure for smaller lists */}
       {!hasMore && filteredCourses.length > 0 && filteredCourses.length <= PAGE_SIZE && (
         <div className="text-center pt-6 pb-4">
-          <p className="text-sm text-foreground font-medium">
-            That's your journey so far.
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            On to the next tee.
+          <p className="text-sm text-foreground font-medium italic">
+            That's your journey so far. On to the next tee.
           </p>
         </div>
       )}

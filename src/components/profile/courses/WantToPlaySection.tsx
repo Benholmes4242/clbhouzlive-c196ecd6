@@ -1,21 +1,15 @@
 /**
  * WantToPlaySection - Aspirational planning surface for courses
  * 
- * This replaces the Journey tab functionality while preserving its value.
- * Shows courses the user wants to play - aspirational, social, planning-driven.
- * 
- * Key rules:
- * - A course can ONLY be in one state: played OR want_to_play OR neither
- * - "Played" = has course_ratings row with rating > 0
- * - NO "Played" badges shown here
- * - NO ratings shown here (this is planning, not history)
- * - "Rate this course" navigates to rating page (no DB write here)
- * 
- * Pagination: Shows 5 courses at a time with sliding animation
+ * Refined per design brief:
+ * - Removed star icon
+ * - Shows 5 courses at a time with "Next 5" batch navigation
+ * - Actions: Rate (navigates to rating flow), Remove
+ * - Slides left/right for batch transitions
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, MapPin, Trophy, X, Calendar, ChevronRight, ChevronLeft, ClipboardList } from 'lucide-react';
+import { Bookmark, MapPin, Trophy, X, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
@@ -37,7 +31,7 @@ interface WantToPlayCardProps {
   onClick: () => void;
 }
 
-const PAGE_SIZE = 5;
+const BATCH_SIZE = 5;
 
 const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
   course,
@@ -62,9 +56,6 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
       className={cn(
@@ -116,10 +107,10 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
           <div className="flex items-center gap-1.5 px-2">
             <button
               onClick={handleRate}
-              className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-[10px] font-medium text-primary"
+              className="text-[11px] font-medium px-2.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors"
               title="Rate this course"
             >
-              <ClipboardList className="w-4 h-4" />
+              Rate
             </button>
             <button
               onClick={handleRemove}
@@ -142,17 +133,8 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
 }) => {
   const navigate = useNavigate();
   const { wantToPlay, isLoading, remove } = useUserWantToPlay(userId);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
-
-  const totalPages = Math.ceil(wantToPlay.length / PAGE_SIZE);
-  const currentPageCourses = wantToPlay.slice(
-    pageIndex * PAGE_SIZE,
-    (pageIndex + 1) * PAGE_SIZE
-  );
-  const hasNextPage = pageIndex < totalPages - 1;
-  const hasPrevPage = pageIndex > 0;
-  const remainingCount = Math.min(PAGE_SIZE, wantToPlay.length - (pageIndex + 1) * PAGE_SIZE);
+  const [batchIndex, setBatchIndex] = useState(0);
+  const [direction, setDirection] = useState<'left' | 'right'>('right');
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/courses/${courseId}`);
@@ -167,19 +149,29 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
     toast.success(`Removed from Want to Play`);
   };
 
-  const goToNextPage = useCallback(() => {
-    if (hasNextPage) {
-      setDirection(1);
-      setPageIndex(prev => prev + 1);
-    }
-  }, [hasNextPage]);
+  // Calculate batch navigation
+  const totalCourses = wantToPlay.length;
+  const totalBatches = Math.ceil(totalCourses / BATCH_SIZE);
+  const startIndex = batchIndex * BATCH_SIZE;
+  const endIndex = Math.min(startIndex + BATCH_SIZE, totalCourses);
+  const currentBatch = wantToPlay.slice(startIndex, endIndex);
+  const hasNextBatch = batchIndex < totalBatches - 1;
+  const hasPrevBatch = batchIndex > 0;
+  const nextBatchCount = Math.min(BATCH_SIZE, totalCourses - endIndex);
 
-  const goToPrevPage = useCallback(() => {
-    if (hasPrevPage) {
-      setDirection(-1);
-      setPageIndex(prev => prev - 1);
+  const handleNextBatch = () => {
+    if (hasNextBatch) {
+      setDirection('right');
+      setBatchIndex(prev => prev + 1);
     }
-  }, [hasPrevPage]);
+  };
+
+  const handlePrevBatch = () => {
+    if (hasPrevBatch) {
+      setDirection('left');
+      setBatchIndex(prev => prev - 1);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -216,6 +208,22 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
     );
   }
 
+  // Animation variants for batch transitions
+  const slideVariants = {
+    enter: (direction: 'left' | 'right') => ({
+      x: direction === 'right' ? 100 : -100,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: 'left' | 'right') => ({
+      x: direction === 'right' ? -100 : 100,
+      opacity: 0,
+    }),
+  };
+
   return (
     <section className={cn("py-4", className)}>
       {/* Section header */}
@@ -223,24 +231,31 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         <div>
           <h3 className="text-base font-semibold text-foreground">Want to Play</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {wantToPlay.length} {wantToPlay.length === 1 ? 'course' : 'courses'} on the bucket list
+            {totalCourses} {totalCourses === 1 ? 'course' : 'courses'} on the bucket list
           </p>
         </div>
+        {/* Batch indicator for multiple batches */}
+        {totalBatches > 1 && (
+          <span className="text-xs text-muted-foreground">
+            {startIndex + 1}–{endIndex} of {totalCourses}
+          </span>
+        )}
       </div>
 
-      {/* Course list with slide animation */}
+      {/* Course list with batch animation */}
       <div className="relative overflow-hidden">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
-            key={pageIndex}
+            key={batchIndex}
             custom={direction}
-            initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="space-y-2"
           >
-            {currentPageCourses.map((course) => (
+            {currentBatch.map((course) => (
               <WantToPlayCard
                 key={course.id}
                 course={course}
@@ -254,44 +269,30 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Pagination controls */}
-      {totalPages > 1 && (
+      {/* Batch navigation */}
+      {totalBatches > 1 && (
         <div className="flex items-center justify-center gap-3 mt-4">
-          {/* Previous button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToPrevPage}
-            disabled={!hasPrevPage}
-            className="h-8 w-8 p-0 rounded-full"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-
-          {/* Page indicator */}
-          <span className="text-xs text-muted-foreground">
-            {pageIndex + 1} of {totalPages}
-          </span>
-
-          {/* Next button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={goToNextPage}
-            disabled={!hasNextPage}
-            className="h-8 px-3 gap-1 rounded-full"
-          >
-            {hasNextPage ? (
-              <>
-                Next {remainingCount}
-                <ChevronRight className="w-4 h-4" />
-              </>
-            ) : (
-              <>
-                <ChevronRight className="w-4 h-4" />
-              </>
-            )}
-          </Button>
+          {hasPrevBatch && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePrevBatch}
+              className="gap-1 text-xs"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous 5
+            </Button>
+          )}
+          {hasNextBatch && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextBatch}
+              className="gap-1 text-xs"
+            >
+              Next {nextBatchCount} →
+            </Button>
+          )}
         </div>
       )}
     </section>

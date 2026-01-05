@@ -1,147 +1,39 @@
 /**
- * FavouritesCarousel - Crown jewel horizontal carousel for Top 10 Rated Courses
+ * FavouritesCarousel - Crown jewel carousel for Top 10 Rated Courses
  * 
- * Matches the layout of Top100RecentRoundsCarousel from the progress page.
- * Uses UnifiedCourseCard for consistent card rendering.
- * 
- * Section renamed to "Top 10 Rated Courses" with dynamic subtitles.
- * Includes overall rating bar and mini breakdown bars for each card.
+ * Renamed from "Favourite Courses" to "Top 10 Rated Courses" per design brief.
+ * Uses UnifiedCourseCard for consistent card rendering with rating bars.
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings2, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
-import { CourseCardModel } from '@/types/courseCard';
-import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
+import { Top10CourseCard } from './Top10CourseCard';
 
 interface FavouritesCarouselProps {
   userId: string;
   isOwnProfile: boolean;
-  displayName?: string;
   className?: string;
   onManage?: () => void;
+  displayName?: string; // For subtitle on other profiles
 }
-
-interface RatingBreakdown {
-  overall: number;
-  design: number | null;
-  condition: number | null;
-  facilities: number | null;
-  clubhouse: number | null;
-}
-
-/**
- * Convert TopTenCourse to CourseCardModel for UnifiedCourseCard
- */
-function toCourseCardModel(
-  course: TopTenCourse, 
-  position: number,
-  userRating?: number
-): CourseCardModel {
-  return {
-    id: course.course_id,
-    name: course.name,
-    imageUrl: course.thumbnail_image || undefined,
-    locationText: course.sub_country || course.country,
-    country: course.country,
-    communityRating: userRating,
-    ranks: {
-      global: course.global_rank || undefined,
-      regional: course.regional_rank || undefined,
-      usa: course.usa_rank || undefined,
-    },
-    context: {
-      isPlayedByViewer: true,
-    },
-  };
-}
-
-/**
- * Mini rating bar component for breakdown scores
- */
-const MiniRatingBar: React.FC<{
-  label: string;
-  score: number | null;
-  maxScore?: number;
-}> = ({ label, score, maxScore = 10 }) => {
-  if (score === null || score === undefined) return null;
-  
-  const percentage = (score / maxScore) * 100;
-  const theme = getRatingTheme(score);
-  
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-[8px] text-muted-foreground w-14 truncate">{label}</span>
-      <div className="flex-1 h-[3px] bg-muted/60 rounded-full overflow-hidden">
-        <div 
-          className="h-full rounded-full transition-all duration-300"
-          style={{ 
-            width: `${percentage}%`,
-            backgroundColor: theme.accent,
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-/**
- * Top 10 Card with rating bars
- */
-const Top10CardWithBars: React.FC<{
-  course: TopTenCourse;
-  position: number;
-  ratingBreakdown?: RatingBreakdown;
-  onClick: () => void;
-}> = ({ course, position, ratingBreakdown, onClick }) => {
-  const cardModel = toCourseCardModel(course, position, ratingBreakdown?.overall);
-  const hasBreakdown = ratingBreakdown && (
-    ratingBreakdown.design !== null ||
-    ratingBreakdown.condition !== null ||
-    ratingBreakdown.facilities !== null ||
-    ratingBreakdown.clubhouse !== null
-  );
-
-  return (
-    <div className="flex flex-col" onClick={onClick}>
-      <UnifiedCourseCard
-        course={cardModel}
-        showRankBadges={true}
-        showRating={true}
-        hideLocation={false}
-        contextTag={`#${position}`}
-      />
-      
-      {/* Rating breakdown bars - shown below card */}
-      {hasBreakdown && (
-        <div className="px-4 py-2 bg-background border-x border-b border-border/60 rounded-b-sq-md -mt-1 space-y-1">
-          <MiniRatingBar label="Design" score={ratingBreakdown.design} />
-          <MiniRatingBar label="Condition" score={ratingBreakdown.condition} />
-          <MiniRatingBar label="Facilities" score={ratingBreakdown.facilities} />
-          <MiniRatingBar label="Clubhouse" score={ratingBreakdown.clubhouse} />
-        </div>
-      )}
-    </div>
-  );
-};
 
 export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   userId,
   isOwnProfile,
-  displayName,
   className,
   onManage,
+  displayName,
 }) => {
   const navigate = useNavigate();
   const { topTen, isLoading } = useUserTopTenCourses(userId);
@@ -150,7 +42,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   const [count, setCount] = useState(0);
 
   // Stable sorted course IDs for consistent query key
-  const courseIds = useMemo(() => 
+  const courseIds = React.useMemo(() => 
     topTen.map(c => c.course_id).sort(), 
     [topTen]
   );
@@ -169,13 +61,19 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         .in('course_id', courseIds);
 
       if (error) throw error;
-      return (data || []).reduce((acc: Record<string, RatingBreakdown>, r) => {
+      return (data || []).reduce((acc: Record<string, {
+        rating: number;
+        design_score: number | null;
+        condition_score: number | null;
+        facilities_score: number | null;
+        clubhouse_score: number | null;
+      }>, r) => {
         acc[r.course_id] = {
-          overall: r.rating,
-          design: r.design_score,
-          condition: r.condition_score,
-          facilities: r.facilities_score,
-          clubhouse: r.clubhouse_score,
+          rating: r.rating,
+          design_score: r.design_score,
+          condition_score: r.condition_score,
+          facilities_score: r.facilities_score,
+          clubhouse_score: r.clubhouse_score,
         };
         return acc;
       }, {});
@@ -200,11 +98,6 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     };
   }, [api, onSelect]);
 
-  // Dynamic subtitle
-  const subtitle = isOwnProfile 
-    ? "Your Personal Top 10 Golf Courses"
-    : `${displayName || 'Their'} Personal Top 10 Golf Courses`;
-
   if (isLoading) {
     return (
       <section className={cn("w-full", className)}>
@@ -220,15 +113,25 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     );
   }
 
+  // Dynamic subtitle
+  const getSubtitle = () => {
+    if (isOwnProfile) {
+      return "Your top 10 rated courses worldwide";
+    }
+    return `${displayName || 'Their'} top 10 rated courses worldwide`;
+  };
+
   // Empty state
   if (topTen.length === 0) {
     return (
       <section className={cn("mt-6 w-full", className)}>
         <div className="flex flex-col mb-2 px-2.5">
-          <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+          <h3 className="text-lg font-semibold text-foreground">
             Top 10 Rated Courses
           </h3>
-          <p className="text-xs text-muted-foreground/70 mt-0.5">{subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {getSubtitle()}
+          </p>
         </div>
         
         {/* Premium empty state card */}
@@ -237,12 +140,12 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
             <Trophy className="w-5 h-5 text-muted-foreground" />
           </div>
           <p className="text-sm font-medium text-foreground mb-1">
-            {isOwnProfile ? "You haven't picked your Top 10 yet" : "No Top 10 courses selected yet"}
+            {isOwnProfile ? "You haven't picked your top 10 yet" : "No top 10 added yet"}
           </p>
           <p className="text-xs text-muted-foreground mb-4">
             {isOwnProfile 
-              ? "Rate and rank your favourite courses to build your personal Top 10."
-              : "This golfer hasn't selected their Top 10 courses yet."}
+              ? "Choose your top rated courses to showcase your all-time favourites."
+              : "This golfer hasn't picked their top 10 courses yet."}
           </p>
           {isOwnProfile && onManage && (
             <Button
@@ -261,22 +164,23 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
   return (
     <section className={cn("w-full", className)}>
-      {/* Section header - renamed to Top 10 Rated Courses */}
+      {/* Section header - updated title and subtitle */}
       <div className="flex items-center justify-between mb-3 px-2.5">
-        <div className="flex flex-col">
-          <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">
             Top 10 Rated Courses
           </h3>
-          <p className="text-xs text-muted-foreground/70 mt-0.5">{subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {getSubtitle()}
+          </p>
         </div>
         {isOwnProfile && onManage && (
           <button
             type="button"
             onClick={onManage}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Settings2 className="w-3.5 h-3.5" />
-            Manage Top 10
+            Manage Top 10 →
           </button>
         )}
       </div>
@@ -292,18 +196,23 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       >
         <CarouselContent className="-ml-2 px-2.5">
           {topTen.map((course) => {
-            const breakdown = ratingsMap[course.course_id];
+            const ratingData = ratingsMap[course.course_id];
             
             return (
               <CarouselItem 
                 key={course.id} 
                 className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]"
               >
-                <Top10CardWithBars
+                <Top10CourseCard
                   course={course}
                   position={course.position}
-                  ratingBreakdown={breakdown}
-                  onClick={() => navigate(`/courses/${course.course_id}`)}
+                  rating={ratingData?.rating}
+                  breakdown={{
+                    design: ratingData?.design_score,
+                    condition: ratingData?.condition_score,
+                    facilities: ratingData?.facilities_score,
+                    experience: ratingData?.clubhouse_score,
+                  }}
                 />
               </CarouselItem>
             );
@@ -359,7 +268,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         )}
       </Carousel>
 
-      {/* Removed: "Add to favourites" CTA - as per brief */}
+      {/* Removed "Add to favourites" button per design brief */}
     </section>
   );
 };

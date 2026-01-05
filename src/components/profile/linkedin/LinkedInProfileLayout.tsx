@@ -150,7 +150,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
           />
         );
       case 'courses':
-        return <ProfileCoursesTab userId={profile?.id || ''} isOwnProfile={isOwnProfile} displayName={profile?.display_name} />;
+        return <ProfileCoursesTab userId={profile?.id || ''} isOwnProfile={isOwnProfile} />;
       case 'top100':
         return isOwnProfile ? (
           <Top100MyProgressPanel userId={profile?.id} />

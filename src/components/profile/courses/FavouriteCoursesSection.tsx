@@ -179,11 +179,11 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
     <div>
       <div className="flex items-start justify-between mb-2">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">Top 10 Rated Courses</h3>
+          <h3 className="text-base font-semibold text-slate-900">Favourite Courses</h3>
           <p className="text-xs text-slate-500 mt-0.5">
             {isOwnProfile 
-              ? "Your personal Top 10. Drag to reorder."
-              : "This golfer's personal Top 10."}
+              ? "Your personal all-time favourites. Drag to reorder."
+              : "This golfer's all-time favourites."}
           </p>
         </div>
         {isOwnProfile && (
@@ -192,7 +192,7 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
             className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1"
           >
             <Settings2 className="w-3.5 h-3.5" />
-            Manage Top 10
+            Manage
           </button>
         )}
       </div>
@@ -201,8 +201,8 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
       {topTen.length > 0 && (
         <p className="text-[11px] text-slate-400 mb-3">
           {isOwnProfile 
-            ? `You've selected ${topTen.length} of 10 courses`
-            : `${topTen.length} of 10 courses selected`}
+            ? `You've picked ${topTen.length} of 10 favourites`
+            : `${topTen.length} of 10 favourites picked`}
         </p>
       )}
 
@@ -229,10 +229,10 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
       {topTen.length === 0 ? (
         <div className="bg-slate-50 border border-slate-100 rounded-sq-md p-8 text-center">
           <p className="font-medium text-slate-700 mb-1">
-            {isOwnProfile ? "You haven't picked your Top 10 yet." : "No Top 10 courses selected yet."}
+            {isOwnProfile ? "You haven't picked your Top 10 yet." : "No favourites added yet."}
           </p>
           <p className="text-sm text-slate-500 mb-4">
-            Rate and rank your favourite courses to build your personal Top 10.
+            Choose your favourite courses to build your all-time list.
           </p>
           {isOwnProfile && (
             <Button onClick={() => setShowAddModal(true)} size="sm">

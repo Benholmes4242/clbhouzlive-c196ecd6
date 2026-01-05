@@ -13,7 +13,6 @@ import { supabase } from '@/integrations/supabase/client';
 interface ProfileCoursesTabProps {
   userId: string;
   isOwnProfile: boolean;
-  displayName?: string;
 }
 
 /**
@@ -21,7 +20,7 @@ interface ProfileCoursesTabProps {
  * 
  * Section order (MANDATORY):
  * 1. Journey Summary Card (merged stats)
- * 2. Favourite Courses (crown jewel carousel)
+ * 2. Top 10 Rated Courses (crown jewel carousel) - formerly "Favourite Courses"
  * 3. Want to Play (planning + social)
  * 4. All Courses Played (refined history)
  */
@@ -29,7 +28,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
   isOwnProfile,
   displayName,
-}) => {
+}: ProfileCoursesTabProps & { displayName?: string }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   
   const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
@@ -83,8 +82,8 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       <FavouritesCarousel 
         userId={userId} 
         isOwnProfile={isOwnProfile}
-        displayName={displayName}
         onManage={() => setShowAddModal(true)}
+        displayName={displayName}
       />
 
       {/* Section 3: Want to Play */}

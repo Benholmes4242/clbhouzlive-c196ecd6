@@ -149,8 +149,8 @@ export const JourneyHero: React.FC<JourneyHeroProps> = ({
             />
           </div>
           
-          {/* Progress fraction - tighter spacing */}
-          <div className="flex justify-between mt-1">
+          {/* Progress fraction */}
+          <div className="flex justify-between mt-1.5">
             <span className="text-[10px] text-slate-400">{progressBase}</span>
             <span className="text-[10px] text-slate-500 font-medium">
               {coursesPlayed} / {nextMilestone.target}
