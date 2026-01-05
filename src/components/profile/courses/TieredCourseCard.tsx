@@ -52,59 +52,59 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     }
   };
 
-  // Top 100 card - premium treatment
+  // Top 100 card - premium treatment with refined styling
   if (isTop100) {
     return (
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-white border border-amber-200/50 rounded-sq-sm overflow-hidden cursor-pointer hover:shadow-md transition-all group"
+        className="relative bg-card border border-amber-200/40 dark:border-amber-800/30 rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-all group"
       >
-        {/* Gold accent line - consistent 2px */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 rounded-t-sq-sm" />
+        {/* Refined gold accent line - thinner 1.5px */}
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300 dark:from-amber-600 dark:via-amber-500 dark:to-amber-600" />
         
         <div className="flex">
-          {/* Thumbnail - slightly larger */}
+          {/* Thumbnail */}
           <div className="relative flex-shrink-0">
             {course.thumbnail_image ? (
               <img
                 src={course.thumbnail_image}
                 alt={course.name}
-                className="w-24 h-24 object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-20 h-20 object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200" />
+              <div className="w-20 h-20 bg-gradient-to-br from-muted to-muted/50" />
             )}
-            {/* Top 100 icon overlay */}
-            <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-amber-500/90 flex items-center justify-center shadow-sm">
-              <Trophy className="w-3 h-3 text-white" />
+            {/* Top 100 icon overlay - refined */}
+            <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-amber-500/90 flex items-center justify-center shadow-sm">
+              <Trophy className="w-2.5 h-2.5 text-white" />
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 p-3 flex flex-col justify-center min-w-0">
-            <div className="font-semibold text-sm text-slate-900 truncate">{course.name}</div>
-            <div className="text-xs text-slate-500 truncate">
+          {/* Content - normalized padding */}
+          <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
+            <div className="font-medium text-sm text-foreground truncate">{course.name}</div>
+            <div className="text-xs text-muted-foreground truncate">
               {course.sub_country || course.country}
             </div>
             {course.last_played_at && (
-              <div className="flex items-center gap-1 mt-1.5">
-                <Calendar className="w-3 h-3 text-slate-400" />
-                <span className="text-[10px] text-slate-400">
+              <div className="flex items-center gap-1 mt-1">
+                <Calendar className="w-3 h-3 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground">
                   {format(new Date(course.last_played_at), 'd MMM yyyy')}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Rating - refined pill */}
-          <div className="flex items-center px-3">
+          {/* Rating - aligned */}
+          <div className="flex items-center pr-3">
             {isRated && course.rating_value ? (
-              <RatingPill score={course.rating_value} className="text-[10px] px-3 py-0.5 h-6" />
+              <RatingPill score={course.rating_value} className="text-[10px] px-2.5 py-0.5 h-6" />
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
-                className="text-[10px] text-amber-600 font-medium hover:underline"
+                className="text-[10px] text-amber-600 dark:text-amber-400 font-medium hover:underline"
               >
                 Rate
               </button>
@@ -121,7 +121,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="bg-slate-50/80 border border-slate-100 rounded-sq-sm overflow-hidden cursor-pointer hover:border-slate-200 transition-colors"
+        className="bg-muted/30 border border-border/40 rounded-xl overflow-hidden cursor-pointer hover:border-border/60 transition-colors"
       >
         <div className="flex">
           {/* Thumbnail - muted */}
@@ -129,28 +129,28 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             <img
               src={course.thumbnail_image}
               alt={course.name}
-              className="w-16 h-16 object-cover flex-shrink-0 opacity-80"
+              className="w-16 h-16 object-cover flex-shrink-0 opacity-75"
             />
           ) : (
-            <div className="w-16 h-16 bg-slate-100 flex-shrink-0" />
+            <div className="w-16 h-16 bg-muted flex-shrink-0" />
           )}
 
           {/* Content */}
-          <div className="flex-1 p-2.5 flex flex-col justify-center min-w-0">
-            <div className="font-medium text-sm text-slate-700 truncate">{course.name}</div>
-            <div className="text-xs text-slate-400 truncate">
+          <div className="flex-1 py-2 px-3 flex flex-col justify-center min-w-0">
+            <div className="font-medium text-sm text-foreground/80 truncate">{course.name}</div>
+            <div className="text-xs text-muted-foreground truncate">
               {course.sub_country || course.country}
             </div>
           </div>
 
           {/* Rate CTA */}
           {isOwnProfile && (
-            <div className="flex items-center px-3">
+            <div className="flex items-center pr-3">
               <button 
                 onClick={handleRateClick}
-                className="text-[11px] text-slate-500 hover:text-slate-700 font-medium px-2 py-1 bg-white border border-slate-200 rounded-sq-xs hover:border-slate-300 transition-colors"
+                className="text-[11px] text-muted-foreground hover:text-foreground font-medium px-2.5 py-1 bg-background border border-border rounded-lg hover:border-border/80 transition-colors"
               >
-                Rate this course
+                Rate
               </button>
             </div>
           )}
@@ -164,7 +164,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     <motion.div
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
-      className="bg-white border border-slate-100 rounded-sq-sm overflow-hidden cursor-pointer hover:border-slate-200 transition-colors"
+      className="bg-card border border-border/40 rounded-xl overflow-hidden cursor-pointer hover:border-border/60 transition-colors"
     >
       <div className="flex">
         {/* Thumbnail */}
@@ -172,32 +172,32 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           <img
             src={course.thumbnail_image}
             alt={course.name}
-            className="w-20 h-20 object-cover flex-shrink-0"
+            className="w-18 h-18 object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-20 h-20 bg-slate-100 flex-shrink-0" />
+          <div className="w-18 h-18 bg-muted flex-shrink-0" />
         )}
 
-        {/* Content */}
-        <div className="flex-1 p-3 flex flex-col justify-center min-w-0">
-          <div className="font-medium text-sm text-slate-900 truncate">{course.name}</div>
-          <div className="text-xs text-slate-500 truncate">
+        {/* Content - normalized padding */}
+        <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
+          <div className="font-medium text-sm text-foreground truncate">{course.name}</div>
+          <div className="text-xs text-muted-foreground truncate">
             {course.sub_country || course.country}
           </div>
           {course.last_played_at && (
-            <div className="flex items-center gap-1 mt-1.5">
-              <Calendar className="w-3 h-3 text-slate-400" />
-              <span className="text-[10px] text-slate-400">
+            <div className="flex items-center gap-1 mt-1">
+              <Calendar className="w-3 h-3 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">
                 {format(new Date(course.last_played_at), 'd MMM yyyy')}
               </span>
             </div>
           )}
         </div>
 
-        {/* Rating - refined pill */}
-        <div className="flex items-center px-3">
+        {/* Rating - aligned */}
+        <div className="flex items-center pr-3">
           {course.rating_value && (
-            <RatingPill score={course.rating_value} className="text-[10px] px-3 py-0.5 h-6" />
+            <RatingPill score={course.rating_value} className="text-[10px] px-2.5 py-0.5 h-6" />
           )}
         </div>
       </div>

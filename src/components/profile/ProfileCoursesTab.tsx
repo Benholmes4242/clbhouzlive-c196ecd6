@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
-import { JourneyHero } from './courses/JourneyHero';
-import { CourseDNA } from './courses/CourseDNA';
-import { FavouritesShowcase } from './courses/FavouritesShowcase';
+import { JourneySummaryCard } from './courses/JourneySummaryCard';
+import { FavouritesCarousel } from './courses/FavouritesCarousel';
+import { WantToPlaySection } from './courses/WantToPlaySection';
 import { AllCoursesList } from './courses/AllCoursesList';
 import { AddCourseModal } from './courses/AddCourseModal';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -14,6 +14,15 @@ interface ProfileCoursesTabProps {
   isOwnProfile: boolean;
 }
 
+/**
+ * ProfileCoursesTab - A personal golf legacy surface
+ * 
+ * Section order (MANDATORY):
+ * 1. Journey Summary Card (merged stats)
+ * 2. Favourite Courses (crown jewel carousel)
+ * 3. Want to Play (planning + social)
+ * 4. All Courses Played (refined history)
+ */
 export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   userId,
   isOwnProfile,
@@ -22,47 +31,22 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   
   const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
 
-  // Fetch additional stats for CourseDNA
-  const { data: statsData } = useQuery({
-    queryKey: ['user-course-stats', userId],
+  // Fetch average rating for the summary card
+  const { data: avgRating } = useQuery({
+    queryKey: ['user-avg-rating', userId],
     enabled: !!userId,
     queryFn: async () => {
-      // Get average rating and Top 100 count
       const { data: ratings } = await supabase
         .from('course_ratings')
         .select('rating')
         .eq('user_id', userId)
         .eq('is_mock', false);
 
-      const avgRating = ratings?.length 
-        ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
-        : null;
-
-      // Get Top 100 courses played count by joining activity with Top 100 memberships
-      const { data: activity } = await supabase
-        .from('user_course_activity' as any)
-        .select('course_id')
-        .eq('user_id', userId);
-
-      const courseIds = (activity || []).map((a: any) => a.course_id);
-      
-      // Check which of these are Top 100 courses
-      const { data: top100Memberships } = await supabase
-        .from('course_top100_memberships')
-        .select('course_id')
-        .in('course_id', courseIds);
-
-      const top100Set = new Set((top100Memberships || []).map(m => m.course_id));
-      const top100Count = courseIds.filter(id => top100Set.has(id)).length;
-
-      return { avgRating, top100Count };
+      if (!ratings || ratings.length === 0) return null;
+      return ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
     },
     staleTime: 60_000,
   });
-
-  // Mock data for now - would come from real queries
-  const uniqueClubsPlayed = Math.max(1, Math.floor(totalCoursesPlayed * 0.7));
-  const newCoursesThisYear = Math.min(totalCoursesPlayed, 6);
 
   if (isLoading) {
     return (
@@ -73,35 +57,37 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-2 pb-8">
       <ScrollToTopGlass />
 
-      {/* Phase 1: Journey Hero */}
-      <JourneyHero
+      {/* Section 1: Journey Summary Card */}
+      <JourneySummaryCard
         coursesPlayed={totalCoursesPlayed}
-        uniqueClubs={uniqueClubsPlayed}
-        newCoursesThisYear={newCoursesThisYear}
+        countriesPlayed={countriesPlayed}
+        avgRating={avgRating || null}
         isOwnProfile={isOwnProfile}
-        onAddCourse={() => setShowAddModal(true)}
       />
 
-      {/* Phase 7: Course DNA Summary */}
-      {totalCoursesPlayed > 0 && (
-        <CourseDNA
-          countriesPlayed={countriesPlayed}
-          avgRating={statsData?.avgRating || null}
-          top100Count={statsData?.top100Count || 0}
-          totalCourses={totalCoursesPlayed}
-        />
-      )}
+      {/* Section 2: Favourite Courses Carousel (Crown Jewel) */}
+      <FavouritesCarousel 
+        userId={userId} 
+        isOwnProfile={isOwnProfile}
+        onManage={() => setShowAddModal(true)}
+      />
 
-      {/* Phase 2: Favourites Showcase */}
-      <FavouritesShowcase userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Section 3: Want to Play */}
+      <WantToPlaySection 
+        userId={userId} 
+        isOwnProfile={isOwnProfile} 
+      />
 
-      {/* Phase 3-5: All Courses with tiered cards, filters, infinite scroll */}
-      <AllCoursesList userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Section 4: All Courses Played */}
+      <AllCoursesList 
+        userId={userId} 
+        isOwnProfile={isOwnProfile} 
+      />
 
-      {/* Add Course Modal */}
+      {/* Add Course Modal (for managing favourites) */}
       {showAddModal && (
         <AddCourseModal
           userId={userId}

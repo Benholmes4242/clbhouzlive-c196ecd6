@@ -1,0 +1,194 @@
+/**
+ * JourneySummaryCard - Premium hero card for Course Journey stats
+ * 
+ * Replaces fragmented pills with a single, elegant overview of a golfer's journey.
+ * Shows: Courses Played, Countries, Avg Rating, Next Milestone progress
+ */
+import React, { useEffect, useState } from 'react';
+import { MapPin, Globe, Star, Trophy } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+interface JourneySummaryCardProps {
+  coursesPlayed: number;
+  countriesPlayed: number;
+  avgRating: number | null;
+  isOwnProfile: boolean;
+  className?: string;
+}
+
+const MILESTONES = [
+  { target: 10, name: '10 Club' },
+  { target: 25, name: '25 Club' },
+  { target: 50, name: '50 Club' },
+  { target: 100, name: '100 Club' },
+  { target: 150, name: '150 Club' },
+  { target: 200, name: '200 Club' },
+  { target: 250, name: '250 Club' },
+  { target: 300, name: '300 Club' },
+  { target: 400, name: '400 Club' },
+  { target: 500, name: '500 Club' },
+];
+
+export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
+  coursesPlayed,
+  countriesPlayed,
+  avgRating,
+  isOwnProfile,
+  className,
+}) => {
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+
+  // Calculate next milestone
+  const nextMilestone = MILESTONES.find(m => m.target > coursesPlayed) || MILESTONES[MILESTONES.length - 1];
+  const previousMilestone = MILESTONES.filter(m => m.target <= coursesPlayed).pop();
+  const coursesToNextMilestone = Math.max(0, nextMilestone.target - coursesPlayed);
+  
+  // Calculate progress from previous milestone (or 0) to next milestone
+  const progressBase = previousMilestone?.target || 0;
+  const progressRange = nextMilestone.target - progressBase;
+  const progressValue = coursesPlayed - progressBase;
+  const progressPercent = Math.min((progressValue / progressRange) * 100, 100);
+
+  // Animate progress bar on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedProgress(progressPercent);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [progressPercent]);
+
+  // Empty state
+  if (coursesPlayed === 0) {
+    return (
+      <div className={cn(
+        "relative overflow-hidden bg-gradient-to-br from-muted/30 via-background to-muted/20",
+        "border border-border/40 rounded-xl p-6",
+        className
+      )}>
+        <div className="flex flex-col items-center text-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center">
+            <MapPin className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-1">
+              {isOwnProfile ? 'Start your course journey' : 'No courses played yet'}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              {isOwnProfile 
+                ? 'Play and rate your first course to unlock your journey stats.'
+                : 'This golfer hasn\'t logged any courses yet.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        "relative overflow-hidden rounded-xl p-5",
+        "bg-gradient-to-br from-amber-50/80 via-background to-stone-50/50 dark:from-amber-950/20 dark:via-background dark:to-stone-950/20",
+        "border border-border/40 shadow-sm",
+        className
+      )}
+    >
+      {/* Subtle texture */}
+      <div 
+        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          maskImage: 'linear-gradient(to right, black 40%, transparent 80%)',
+          WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 80%)',
+        }}
+      />
+
+      <div className="relative z-10">
+        {/* Header */}
+        <h3 className="text-sm font-medium text-muted-foreground mb-4">
+          {isOwnProfile ? 'Your Course Journey' : 'Course Journey'}
+        </h3>
+
+        {/* Main stat - Courses Played */}
+        <div className="flex items-baseline gap-2 mb-5">
+          <span className="text-4xl font-bold text-foreground tracking-tight">
+            {coursesPlayed}
+          </span>
+          <span className="text-base text-muted-foreground">
+            Courses Played
+          </span>
+        </div>
+
+        {/* Secondary stats row */}
+        <div className="flex gap-6 mb-5">
+          {/* Countries */}
+          {countriesPlayed > 0 && (
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-foreground">
+                <span className="font-semibold">{countriesPlayed}</span>
+                <span className="text-muted-foreground ml-1">
+                  {countriesPlayed === 1 ? 'country' : 'countries'}
+                </span>
+              </span>
+            </div>
+          )}
+
+          {/* Average Rating */}
+          {avgRating !== null && avgRating > 0 && (
+            <div className="flex items-center gap-2">
+              <Star className="w-4 h-4 text-amber-500" />
+              <span className="text-sm text-foreground">
+                <span className="font-semibold">{avgRating.toFixed(1)}</span>
+                <span className="text-muted-foreground ml-1">avg rating</span>
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Milestone progress */}
+        <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border border-border/30">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              <span className="text-xs font-medium text-muted-foreground">
+                Next milestone
+              </span>
+            </div>
+            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+              {nextMilestone.name}
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="relative h-2 bg-muted/50 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${animatedProgress}%` }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+            />
+            {/* Position marker */}
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-background border-2 border-amber-500 rounded-full shadow-sm"
+              initial={{ left: 0 }}
+              animate={{ left: `calc(${animatedProgress}% - 6px)` }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+            />
+          </div>
+
+          {/* Progress label */}
+          <div className="flex justify-end mt-1.5">
+            <span className="text-xs text-muted-foreground">
+              {coursesToNextMilestone} to go
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
