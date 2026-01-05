@@ -123,7 +123,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
     );
   }
 
-  // Unrated card - compact with muted styling
+  // Unrated card - compact with muted styling (restored to proper size)
   if (isUnrated) {
     return (
       <motion.div
@@ -132,23 +132,31 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         className="bg-muted/30 border border-border/40 rounded-xl overflow-hidden cursor-pointer hover:border-border/60 transition-colors"
       >
         <div className="flex">
-          {/* Thumbnail - muted */}
+          {/* Thumbnail - muted, standard size matching rated cards */}
           {course.thumbnail_image ? (
             <img
               src={course.thumbnail_image}
               alt={course.name}
-              className="w-16 h-16 object-cover flex-shrink-0 opacity-75"
+              className="w-18 h-18 object-cover flex-shrink-0 opacity-75"
             />
           ) : (
-            <div className="w-16 h-16 bg-muted flex-shrink-0" />
+            <div className="w-18 h-18 bg-muted flex-shrink-0" />
           )}
 
-          {/* Content */}
-          <div className="flex-1 py-2 px-3 flex flex-col justify-center min-w-0">
+          {/* Content - normalized padding */}
+          <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
             <div className="font-medium text-sm text-foreground/80 truncate">{course.name}</div>
             <div className="text-xs text-muted-foreground truncate">
               {course.sub_country || course.country}
             </div>
+            {course.last_played_at && (
+              <div className="flex items-center gap-1 mt-1">
+                <Calendar className="w-3 h-3 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground">
+                  {format(new Date(course.last_played_at), 'd MMM yyyy')}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Rate CTA */}

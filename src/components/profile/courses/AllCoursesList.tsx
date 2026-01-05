@@ -243,7 +243,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             That's your journey so far.
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            {filteredCourses.length} courses played. On to {filteredCourses.length + 1}.
+            On to the next tee.
           </p>
         </div>
       )}
