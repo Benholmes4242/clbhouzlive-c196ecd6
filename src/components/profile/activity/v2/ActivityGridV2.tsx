@@ -276,11 +276,15 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
               <div
                 key={`tile-${item.id}-${flatIndex}`}
                 ref={(el) => registerTile(flatIndex, el)}
+                data-tile-index={flatIndex}
                 className={cn(
                   "relative overflow-hidden bg-muted/10 cursor-pointer",
                   "transition-transform duration-100 active:scale-[0.98]",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                   isFullWidth && "col-span-2",
+                  // Apply aspect ratio based on variant
+                  variant === 'portrait' && "aspect-[3/4]",
+                  variant === 'landscape' && "aspect-[16/9]",
                 )}
                 onClick={() => handleItemClick(item, flatIndex)}
                 onKeyDown={(e) => {
