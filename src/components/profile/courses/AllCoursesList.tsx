@@ -110,19 +110,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     setDisplayCount(PAGE_SIZE);
   }, [filter]);
 
-  // Sticky filter detection
-  useEffect(() => {
-    const handleScroll = () => {
-      if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect();
-        setIsSticky(rect.top <= 56); // Header height
-      }
-    };
-
-    const scrollContainer = document.getElementById('root');
-    scrollContainer?.addEventListener('scroll', handleScroll);
-    return () => scrollContainer?.removeEventListener('scroll', handleScroll);
-  }, []);
+  // No sticky behavior - filter bar scrolls with page
 
   const displayedCourses = filteredCourses.slice(0, displayCount);
   const hasMore = displayCount < filteredCourses.length;
@@ -188,15 +176,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         </div>
       </div>
 
-      {/* Sticky filter bar */}
-      <div className={isSticky ? 'sticky top-14 z-10' : ''}>
-        <StickyFilterBar
-          activeFilter={filter}
-          onFilterChange={setFilter}
-          counts={filterCounts}
-          isSticky={isSticky}
-        />
-      </div>
+      {/* Filter bar */}
+      <StickyFilterBar
+        activeFilter={filter}
+        onFilterChange={setFilter}
+        counts={filterCounts}
+        isSticky={false}
+      />
 
       {/* Course list */}
       {filteredCourses.length === 0 ? (
