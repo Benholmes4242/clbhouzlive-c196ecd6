@@ -566,6 +566,24 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         }}
       >
         {filteredPosts.map((item, index) => {
+          // TEMPORARY DEBUG LOG - Review metadata verification
+          if (item.categories?.includes('review')) {
+            console.log('[ClubhouseAudit] Review post rendering:', {
+              id: item.id,
+              hasSourceReviewId: !!(item as any).sourceReviewId,
+              sourceReviewId: (item as any).sourceReviewId,
+              hasRating: !!(item as any).reviewRating,
+              reviewRating: (item as any).reviewRating,
+              hasCourseName: !!(item as any).courseName,
+              courseName: (item as any).courseName,
+              hasGolfCourse: !!item.golfCourse,
+              golfCourseName: item.golfCourse?.name,
+              hasMedia: !!item.media?.[0],
+              mediaType: item.type,
+              mediaCount: item.media?.length
+            });
+          }
+          
           const distance = Math.abs(index - currentIndex);
           const isNearbyItem = distance <= 1;
 
