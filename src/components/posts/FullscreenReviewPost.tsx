@@ -287,37 +287,20 @@ export function FullscreenReviewPost({
         {children}
       </div>
       
-      {/* Navigation arrows - hidden in Clubhouse mode */}
-      {!hideCarouselArrows && hasMultipleMedia && (
-        <>
-          <button
-            onClick={goToPrevious}
-            disabled={currentIndex === 0}
-            className={cn(
-              "absolute left-3 top-1/2 -translate-y-1/2 z-20",
-              "w-10 h-10 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
-              "flex items-center justify-center transition-all active:scale-[0.98]",
-              currentIndex === 0 ? "opacity-0 pointer-events-none" : "hover:bg-black/40"
-            )}
-            aria-label="Previous media"
-          >
-            <ChevronLeft className="w-4 h-4 text-white" />
-          </button>
-          
-          <button
-            onClick={goToNext}
-            disabled={currentIndex === sortedMedia.length - 1}
-            className={cn(
-              "absolute right-3 top-1/2 -translate-y-1/2 z-20",
-              "w-10 h-10 rounded-full bg-black/25 backdrop-blur-md border border-white/10",
-              "flex items-center justify-center transition-all active:scale-[0.98]",
-              currentIndex === sortedMedia.length - 1 ? "opacity-0 pointer-events-none" : "hover:bg-black/40"
-            )}
-            aria-label="Next media"
-          >
-            <ChevronRight className="w-4 h-4 text-white" />
-          </button>
-        </>
+      {/* Navigation arrows - only left arrow, positioned at top-32 for reviews */}
+      {/* Right arrow is in the action rail for Clubhouse, or not needed in preview mode */}
+      {!hideCarouselArrows && hasMultipleMedia && currentIndex > 0 && (
+        <button
+          onClick={goToPrevious}
+          className={cn(
+            "absolute left-3 top-32 z-20 pointer-events-auto",
+            "w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm",
+            "flex items-center justify-center transition-all hover:bg-black/70"
+          )}
+          aria-label="Previous media"
+        >
+          <ChevronLeft className="w-6 h-6 text-white" />
+        </button>
       )}
     </div>
   );

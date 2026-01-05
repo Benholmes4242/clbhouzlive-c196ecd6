@@ -23,7 +23,10 @@ interface CinematicActionRailProps {
   onSave?: () => void;
   onMuteToggle: () => void;
   isReviewPost?: boolean;
-  onNextPost?: () => void;
+  onNextMedia?: () => void;
+  onPrevMedia?: () => void;
+  hasNextMedia?: boolean;
+  hasPrevMedia?: boolean;
 }
 
 const formatCount = (count: number): string => {
@@ -167,7 +170,10 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   onSave,
   onMuteToggle,
   isReviewPost = false,
-  onNextPost,
+  onNextMedia,
+  onPrevMedia,
+  hasNextMedia = false,
+  hasPrevMedia = false,
 }) => {
   // Total rail height is fixed: 5 slots * SLOT_HEIGHT + 4 gaps * 12px
   const GAP = 12;
@@ -198,12 +204,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         height: totalHeight,
       }}
     >
-      {/* Slot 1: Next Post (for review posts only - at top) */}
-      {isReviewPost && onNextPost && (
+      {/* Slot 1: Next Media (for review posts with more media ahead - at top) */}
+      {isReviewPost && onNextMedia && hasNextMedia && (
         <ActionSlot
           icon={ChevronRight}
-          onClick={onNextPost}
-          ariaLabel="Next post"
+          onClick={onNextMedia}
+          ariaLabel="Next media"
           showCount={false}
         />
       )}
