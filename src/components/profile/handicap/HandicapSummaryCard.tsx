@@ -79,7 +79,7 @@ const HandicapSummaryCard: React.FC<HandicapSummaryCardProps> = ({
           </p>
           {lastUpdatedAt && (
             <p className="text-xs text-muted-foreground mt-1">
-              Updated {formatDate(lastUpdatedAt)}
+              Last edited {formatDate(lastUpdatedAt)} · Added by you
             </p>
           )}
         </div>

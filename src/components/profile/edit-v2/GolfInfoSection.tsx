@@ -568,7 +568,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             className="h-11"
           />
           <p className="text-[11px] text-muted-foreground">
-            Your official handicap index (optional).
+            Enter your current handicap index (optional).
           </p>
           
           {/* Handicap Sync Interest Notice */}
