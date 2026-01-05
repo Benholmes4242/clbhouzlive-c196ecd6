@@ -43,15 +43,12 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   onOpenFilters,
   isSticky = false,
 }) => {
-  // Ordered by how golfers think
+  // Ordered by how golfers think - cleaned up per design brief
   const filterOptions: FilterOption[] = [
     { key: 'all', label: 'All' },
     { key: 'top100', label: 'Top 100', icon: <Trophy className="w-3 h-3" />, count: counts.top100 },
     { key: 'highest-rated', label: 'Highest', icon: <Star className="w-3 h-3" /> },
-    { key: 'rated', label: 'Rated', count: counts.rated },
-    { key: 'unrated', label: 'Unrated', count: counts.unrated },
     { key: 'recently-played', label: 'Recent', icon: <Clock className="w-3 h-3" /> },
-    { key: 'travel', label: 'Travel', icon: <Globe className="w-3 h-3" /> },
   ];
 
   return (
