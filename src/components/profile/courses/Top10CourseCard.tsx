@@ -32,6 +32,7 @@ interface RatingBarProps {
   label: string;
   maxValue?: number;
   size?: 'primary' | 'mini';
+  showBadge?: boolean;
 }
 
 const RatingBar: React.FC<RatingBarProps> = ({
@@ -39,6 +40,7 @@ const RatingBar: React.FC<RatingBarProps> = ({
   label,
   maxValue = 10,
   size = 'mini',
+  showBadge = false,
 }) => {
   if (value === null || value === undefined) return null;
   
@@ -52,29 +54,51 @@ const RatingBar: React.FC<RatingBarProps> = ({
   const barColor = isPrimary && isOutstanding ? '#C9A94A' : '#64748b';
   
   return (
-    <div className="flex items-center gap-1.5 w-full">
-      {!isPrimary && (
-        <span className="text-[9px] text-muted-foreground w-10 flex-shrink-0">{label}</span>
-      )}
-      <div 
-        className={cn(
-          "flex-1 rounded-full overflow-hidden",
-          isPrimary ? "h-1.5 bg-muted/50" : "h-[3px] bg-slate-200"
+    <div className="w-full">
+      {/* Title row - label above, badge on right for primary */}
+      <div className="flex items-center justify-between mb-1">
+        <span className={cn(
+          "text-muted-foreground",
+          isPrimary ? "text-[10px] font-medium" : "text-[9px]"
+        )}>
+          {label}
+        </span>
+        {isPrimary && showBadge && (
+          <span 
+            className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+            style={{ 
+              backgroundColor: tierData.bgLight,
+              color: '#1e293b'
+            }}
+          >
+            {tierData.label}
+          </span>
         )}
-      >
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-          className="h-full rounded-full"
-          style={{ backgroundColor: barColor }}
-        />
       </div>
-      {isPrimary && (
-        <span className="text-xs font-semibold text-foreground min-w-[24px] text-right">
+      
+      {/* Bar row - bar with score at end */}
+      <div className="flex items-center gap-1.5 w-full">
+        <div 
+          className={cn(
+            "flex-1 rounded-full overflow-hidden",
+            isPrimary ? "h-1.5 bg-slate-200" : "h-[3px] bg-slate-200"
+          )}
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+            className="h-full rounded-full"
+            style={{ backgroundColor: barColor }}
+          />
+        </div>
+        <span className={cn(
+          "text-muted-foreground min-w-[20px] text-right",
+          isPrimary ? "text-xs font-semibold" : "text-[9px]"
+        )}>
           {value.toFixed(1)}
         </span>
-      )}
+      </div>
     </div>
   );
 };
@@ -153,29 +177,30 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
       
       {/* Rating bars section - matching UnifiedCourseCard meta area */}
       <div className="px-4 py-3 bg-background space-y-2">
-        {/* Primary rating bar */}
+      {/* Primary rating bar with badge */}
         {rating !== undefined && (
           <RatingBar 
             value={rating} 
-            label="Overall" 
+            label="Overall Rating" 
             size="primary"
+            showBadge
           />
         )}
         
         {/* Mini breakdown bars - 2x2 grid, always visible */}
         {hasBreakdown && (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 pt-1 border-t border-border/30">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2 border-t border-border/30">
             {breakdown.design !== null && breakdown.design !== undefined && (
               <RatingBar value={breakdown.design} label="Design" size="mini" />
             )}
             {breakdown.condition !== null && breakdown.condition !== undefined && (
-              <RatingBar value={breakdown.condition} label="Cond." size="mini" />
+              <RatingBar value={breakdown.condition} label="Condition" size="mini" />
             )}
             {breakdown.facilities !== null && breakdown.facilities !== undefined && (
-              <RatingBar value={breakdown.facilities} label="Facil." size="mini" />
+              <RatingBar value={breakdown.facilities} label="Facilities" size="mini" />
             )}
             {breakdown.experience !== null && breakdown.experience !== undefined && (
-              <RatingBar value={breakdown.experience} label="Exp." size="mini" />
+              <RatingBar value={breakdown.experience} label="Experience" size="mini" />
             )}
           </div>
         )}
