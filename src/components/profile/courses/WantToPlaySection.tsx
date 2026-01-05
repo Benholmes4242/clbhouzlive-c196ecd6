@@ -1,10 +1,10 @@
 /**
  * WantToPlaySection - Aspirational planning surface for courses
  * 
- * Refined per design brief:
- * - Removed star icon
+ * Renamed per design brief:
+ * - Title: "Courses to Play" (aspirational)
+ * - CTA: "Review" instead of "Rate" (self-view only)
  * - Shows 5 courses at a time with "Next 5" batch navigation
- * - Actions: Rate (navigates to rating flow), Remove
  * - Slides left/right for batch transitions
  */
 import React, { useState } from 'react';
@@ -26,7 +26,7 @@ interface WantToPlaySectionProps {
 interface WantToPlayCardProps {
   course: WantToPlayCourse;
   isOwnProfile: boolean;
-  onRate: () => void;
+  onReview: () => void;
   onRemove: () => void;
   onClick: () => void;
 }
@@ -36,16 +36,16 @@ const BATCH_SIZE = 5;
 const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
   course,
   isOwnProfile,
-  onRate,
+  onReview,
   onRemove,
   onClick,
 }) => {
   const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
   const addedAgo = formatDistanceToNow(new Date(course.added_at), { addSuffix: true });
 
-  const handleRate = (e: React.MouseEvent) => {
+  const handleReview = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onRate();
+    onReview();
   };
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -102,15 +102,15 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
           </div>
         </div>
 
-        {/* Actions (self view only) - Rate and Remove only, no star */}
+        {/* Actions (self view only) - Review and Remove only */}
         {isOwnProfile && (
           <div className="flex items-center gap-1.5 px-2">
             <button
-              onClick={handleRate}
+              onClick={handleReview}
               className="text-[11px] font-medium px-2.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors"
-              title="Rate this course"
+              title="Review this course"
             >
-              Rate
+              Review
             </button>
             <button
               onClick={handleRemove}
@@ -140,13 +140,13 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
     navigate(`/courses/${courseId}`);
   };
 
-  const handleRate = (course: WantToPlayCourse) => {
+  const handleReview = (course: WantToPlayCourse) => {
     navigate(`/courses/${course.course_id}/rate`);
   };
 
   const handleRemove = (course: WantToPlayCourse) => {
     remove(course.course_id);
-    toast.success(`Removed from Want to Play`);
+    toast.success(`Removed from bucket list`);
   };
 
   // Calculate batch navigation
@@ -175,7 +175,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("py-4", className)}>
+      <div className={cn("", className)}>
         <div className="h-5 w-32 bg-muted rounded animate-pulse mb-3" />
         <div className="space-y-2">
           {[1, 2].map(i => (
@@ -189,9 +189,9 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   // Empty state
   if (wantToPlay.length === 0) {
     return (
-      <section className={cn("py-4", className)}>
+      <section className={cn("", className)}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-semibold text-foreground">Want to Play</h3>
+          <h3 className="text-base font-semibold text-foreground">Courses to Play</h3>
         </div>
         
         <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-6 text-center">
@@ -225,11 +225,11 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   };
 
   return (
-    <section className={cn("py-4", className)}>
+    <section className={cn("", className)}>
       {/* Section header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-base font-semibold text-foreground">Want to Play</h3>
+          <h3 className="text-base font-semibold text-foreground">Courses to Play</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             {totalCourses} {totalCourses === 1 ? 'course' : 'courses'} on the bucket list
           </p>
@@ -260,7 +260,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 key={course.id}
                 course={course}
                 isOwnProfile={isOwnProfile}
-                onRate={() => handleRate(course)}
+                onReview={() => handleReview(course)}
                 onRemove={() => handleRemove(course)}
                 onClick={() => handleCourseClick(course.course_id)}
               />

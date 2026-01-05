@@ -1,3 +1,11 @@
+/**
+ * StickyFilterBar - Filter pills for All Courses Played
+ * 
+ * Design brief updates:
+ * - Remove underline from active pill
+ * - Active state: filled background + slight elevation/glow
+ * - No underline anywhere
+ */
 import React from 'react';
 import { Trophy, Star, Clock, Globe, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -69,26 +77,16 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                   "relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all",
                   isActive
                     ? isTop100Filter
-                      // Top 100 filter when active gets gold emphasis
-                      ? "bg-amber-500 text-white shadow-sm"
-                      : "bg-slate-900 text-white shadow-sm"
+                      // Top 100 filter when active gets gold emphasis with glow
+                      ? "bg-amber-500 text-white shadow-md shadow-amber-500/25"
+                      : "bg-slate-900 text-white shadow-md shadow-slate-900/20"
                     : isTop100Filter
                       // Top 100 filter when inactive gets subtle gold hint
                       ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200/50 dark:border-amber-700/30"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                 )}
               >
-                {/* Active underline indicator - gold for Top 100 */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeFilterIndicator"
-                    className={cn(
-                      "absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full",
-                      isTop100Filter ? "bg-amber-400" : "bg-slate-900 dark:bg-white"
-                    )}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                )}
+                {/* No underline indicator - removed per design brief */}
                 {option.icon && (
                   <span className={cn(
                     isActive 
