@@ -1,14 +1,10 @@
 /**
- * StickyFilterBar - Filter pills for All Courses Played
+ * StickyFilterBar - Filter tabs for All Courses Played
  * 
- * Design brief updates:
- * - Remove underline from active pill
- * - Active state: filled background + slight elevation/glow
- * - No underline anywhere
+ * Updated to match ProfileTabsNav style (underline indicator)
  */
 import React from 'react';
-import { Trophy, Star, Clock, Globe, Filter } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Trophy, Star, Clock, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type CourseFilterType = 
@@ -43,54 +39,50 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   onOpenFilters,
   isSticky = false,
 }) => {
-  // Ordered by how golfers think - cleaned up per design brief
   const filterOptions: FilterOption[] = [
     { key: 'all', label: 'All' },
-    { key: 'top100', label: 'Top 100', icon: <Trophy className="w-3 h-3" />, count: counts.top100 },
-    { key: 'highest-rated', label: 'Highest', icon: <Star className="w-3 h-3" /> },
-    { key: 'recently-played', label: 'Recent', icon: <Clock className="w-3 h-3" /> },
+    { key: 'top100', label: 'Top 100', icon: <Trophy className="w-3.5 h-3.5" />, count: counts.top100 },
+    { key: 'highest-rated', label: 'Highest', icon: <Star className="w-3.5 h-3.5" /> },
+    { key: 'recently-played', label: 'Recent', icon: <Clock className="w-3.5 h-3.5" /> },
   ];
+
+  // Tab trigger class matching ProfileTabsNav style
+  const tabClass = (isActive: boolean) => cn(
+    "relative flex items-center gap-1.5 text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out whitespace-nowrap",
+    isActive 
+      ? "text-foreground" 
+      : "text-muted-foreground hover:text-foreground",
+    // Underline indicator
+    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out",
+    isActive 
+      ? "after:w-full after:opacity-[0.85]" 
+      : "after:w-0 after:opacity-0"
+  );
 
   return (
     <div 
       className={cn(
-        "py-3 transition-all",
-        isSticky && "bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm"
+        "border-b border-border/30 transition-all",
+        isSticky && "bg-background/95 backdrop-blur-md shadow-sm"
       )}
     >
-      <div className="flex items-center gap-2">
-        {/* Filter pills - horizontal scroll */}
-        <div className="flex-1 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+      <div className="flex items-center">
+        {/* Filter tabs - horizontal scroll */}
+        <div className="flex-1 flex overflow-x-auto scrollbar-hide">
           {filterOptions.map((option) => {
             const isActive = activeFilter === option.key;
-            const isTop100Filter = option.key === 'top100';
             
             return (
-              <motion.button
+              <button
                 key={option.key}
                 onClick={() => onFilterChange(option.key)}
-                whileTap={{ scale: 0.95 }}
-                className={cn(
-                  "relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all",
-                  isActive
-                    ? isTop100Filter
-                      // Top 100 filter when active gets gold emphasis with glow
-                      ? "bg-amber-500 text-white shadow-md shadow-amber-500/25"
-                      : "bg-slate-900 text-white shadow-md shadow-slate-900/20"
-                    : isTop100Filter
-                      // Top 100 filter when inactive gets subtle gold hint
-                      ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200/50 dark:border-amber-700/30"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                )}
+                className={tabClass(isActive)}
               >
-                {/* No underline indicator - removed per design brief */}
                 {option.icon && (
                   <span className={cn(
                     isActive 
-                      ? "text-white" 
-                      : isTop100Filter 
-                        ? "text-amber-600 dark:text-amber-400" 
-                        : "text-slate-500 dark:text-slate-400"
+                      ? "text-foreground" 
+                      : "text-muted-foreground"
                   )}>
                     {option.icon}
                   </span>
@@ -98,17 +90,15 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                 <span>{option.label}</span>
                 {option.count !== undefined && option.count > 0 && (
                   <span className={cn(
-                    "text-[10px]",
+                    "text-xs",
                     isActive 
-                      ? "text-white/70" 
-                      : isTop100Filter
-                        ? "text-amber-500 dark:text-amber-400"
-                        : "text-slate-400 dark:text-slate-500"
+                      ? "text-muted-foreground" 
+                      : "text-muted-foreground/60"
                   )}>
                     {option.count}
                   </span>
                 )}
-              </motion.button>
+              </button>
             );
           })}
         </div>
@@ -117,10 +107,10 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
         {onOpenFilters && (
           <button
             onClick={onOpenFilters}
-            className="flex-shrink-0 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="flex-shrink-0 p-2 rounded-lg hover:bg-muted transition-colors"
             title="More filters"
           >
-            <Filter className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            <Filter className="w-4 h-4 text-muted-foreground" />
           </button>
         )}
       </div>
