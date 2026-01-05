@@ -899,26 +899,39 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - temporarily at top-24 for testing */}
+                {/* Navigation Arrows - left arrow aligned with right arrow in CinematicActionRail */}
                 {hasMultipleMedia && (
                   <>
-                    {/* Left arrow - temporarily at top */}
+                    {/* Left arrow - positioned to match right arrow in action rail */}
                     {currentMediaIndex > 0 && (
                       <button
                         data-control="media-nav"
                         onClick={handlePrevMedia}
-                        className="absolute left-4 top-24 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        className="fixed left-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        style={{
+                          // Match the right arrow position in CinematicActionRail
+                          // Rail bottom: env(safe-area-inset-bottom) + 80px - 20px = env(safe-area-inset-bottom) + 60px
+                          // Arrow is at top of rail: bottom + totalHeight - SLOT_HEIGHT
+                          // For 5 slots: totalHeight = 5*64 + 4*12 = 368px, so arrow bottom = 60 + 368 - 64 = 364px
+                          // Simplify: arrow center should be at same height as right arrow
+                          // Right arrow is first slot in rail, its center is at rail_bottom + totalHeight - 32px
+                          // Use CSS calc matching the rail's exact offset
+                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 304px)',
+                        }}
                         aria-label="Previous media"
                       >
                         <ChevronLeft className="w-6 h-6 text-white" />
                       </button>
                     )}
-                    {/* Right arrow - only for non-review posts, temporarily at top */}
+                    {/* Right arrow - only for non-review posts */}
                     {!item.categories?.includes('review') && currentMediaIndex < mediaItems.length - 1 && (
                       <button
                         data-control="media-nav"
                         onClick={handleNextMedia}
-                        className="absolute right-4 top-24 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        className="fixed right-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                        style={{
+                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 304px)',
+                        }}
                         aria-label="Next media"
                       >
                         <ChevronRight className="w-6 h-6 text-white" />
