@@ -902,21 +902,21 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                 {/* Navigation Arrows - left arrow aligned with right arrow in CinematicActionRail */}
                 {hasMultipleMedia && (
                   <>
-                    {/* Left arrow - positioned to match right arrow in action rail */}
+                    {/* Left arrow - positioned to match the top slot of action rail (next media button) */}
                     {currentMediaIndex > 0 && (
                       <button
                         data-control="media-nav"
                         onClick={handlePrevMedia}
                         className="fixed left-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         style={{
-                          // Match the right arrow position in CinematicActionRail
-                          // Rail bottom: env(safe-area-inset-bottom) + 80px - 20px = env(safe-area-inset-bottom) + 60px
-                          // Arrow is at top of rail: bottom + totalHeight - SLOT_HEIGHT
-                          // For 5 slots: totalHeight = 5*64 + 4*12 = 368px, so arrow bottom = 60 + 368 - 64 = 364px
-                          // Simplify: arrow center should be at same height as right arrow
-                          // Right arrow is first slot in rail, its center is at rail_bottom + totalHeight - 32px
-                          // Use CSS calc matching the rail's exact offset
-                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 304px)',
+                          // Match the right arrow (next media) position in CinematicActionRail
+                          // Rail bottom: env(safe-area-inset-bottom) + 80px - 20px = 60px + safe-area
+                          // Rail has 6 slots (with save + next): totalHeight = 6*64 + 5*12 = 444px
+                          // Top slot icon center is at rail_bottom + totalHeight - SLOT_HEIGHT/2 = 60 + 444 - 32 = 472px
+                          // But we want bottom of button (h-11 = 44px), so bottom = center - 22 = 450px
+                          // Actually, just position the top of the arrow at same height as right arrow top
+                          // Right arrow top = rail_bottom + totalHeight - SLOT_HEIGHT = 60 + 444 - 64 = 440px
+                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 444px - 64px)',
                         }}
                         aria-label="Previous media"
                       >
@@ -930,7 +930,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         onClick={handleNextMedia}
                         className="fixed right-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
                         style={{
-                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 304px)',
+                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 444px - 64px)',
                         }}
                         aria-label="Next media"
                       >
