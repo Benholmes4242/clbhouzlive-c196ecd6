@@ -36,6 +36,17 @@ export function useUserTopTenCourses(userId: string | undefined) {
     staleTime: 30_000,
   });
 
+  const invalidateTopTenQueries = async () => {
+    // Invalidate all possible query key variations
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], exact: false }),
+      queryClient.invalidateQueries({ queryKey: ['userTopTenCourses'], exact: false }),
+      queryClient.invalidateQueries({ queryKey: ['user_top_ten_courses_view'], exact: false }),
+    ]);
+    // Force refetch active queries
+    await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses', userId], exact: true, type: 'active' });
+  };
+
   const addCourseMutation = useMutation({
     mutationFn: async (courseId: string) => {
       if (!userId) throw new Error('No user ID');
@@ -61,26 +72,41 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', userId] });
-    },
+    onSuccess: invalidateTopTenQueries,
   });
 
   const removeCourseMutation = useMutation({
     mutationFn: async (courseId: string) => {
       if (!userId) throw new Error('No user ID');
 
-      const { error } = await supabase
+      // Delete the course
+      const { error: deleteError } = await supabase
         .from('user_top_ten_courses')
         .delete()
         .eq('user_id', userId)
         .eq('course_id', courseId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
+
+      // Pack remaining positions (no gaps)
+      const remainingCourses = topTen
+        .filter(c => c.course_id !== courseId)
+        .sort((a, b) => a.position - b.position);
+
+      if (remainingCourses.length > 0) {
+        const updates = remainingCourses.map((course, index) =>
+          supabase
+            .from('user_top_ten_courses')
+            .update({ position: index + 1, updated_at: new Date().toISOString() })
+            .eq('user_id', userId)
+            .eq('course_id', course.course_id)
+        );
+        const results = await Promise.all(updates);
+        const error = results.find(r => r.error)?.error;
+        if (error) throw error;
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', userId] });
-    },
+    onSuccess: invalidateTopTenQueries,
   });
 
   const reorderMutation = useMutation({
@@ -100,9 +126,7 @@ export function useUserTopTenCourses(userId: string | undefined) {
       const error = results.find(r => r.error)?.error;
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', userId] });
-    },
+    onSuccess: invalidateTopTenQueries,
   });
 
   return {
