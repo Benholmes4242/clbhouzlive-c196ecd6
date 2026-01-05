@@ -149,7 +149,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <h3 className="text-base font-semibold text-foreground mb-3 px-1">All Courses Played</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">All Courses Played</h3>
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-18 bg-muted/50 rounded-xl animate-pulse" />
@@ -165,7 +165,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-5" />
 
       {/* Section header */}
-      <div className="flex items-start justify-between mb-3 px-1">
+      <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-base font-semibold text-foreground">
             All Courses Played

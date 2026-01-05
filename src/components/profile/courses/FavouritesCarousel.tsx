@@ -101,10 +101,10 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   if (isLoading) {
     return (
       <section className={cn("w-full", className)}>
-        <div className="flex items-center justify-between mb-2 px-1">
+        <div className="flex items-center justify-between mb-2">
           <div className="h-4 w-36 bg-muted rounded animate-pulse" />
         </div>
-        <div className="flex gap-2 overflow-hidden px-1">
+        <div className="flex gap-2 overflow-hidden">
           {[1, 2].map(i => (
             <div key={i} className="flex-shrink-0 w-[85%] aspect-[1.77/1] bg-muted rounded-xl animate-pulse" />
           ))}
@@ -125,7 +125,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   if (topTen.length === 0) {
     return (
       <section className={cn("mt-6 w-full", className)}>
-        <div className="flex flex-col mb-2 px-1">
+        <div className="flex flex-col mb-2">
           <h3 className="text-lg font-semibold text-foreground">
             Top 10 Rated Golf Courses
           </h3>
@@ -135,7 +135,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         </div>
         
         {/* Premium empty state card */}
-        <div className="mx-1 rounded-sq-md border border-border/50 bg-card/60 p-6 text-center">
+        <div className="rounded-sq-md border border-border/50 bg-card/60 p-6 text-center">
           <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
             <Trophy className="w-5 h-5 text-muted-foreground" />
           </div>
@@ -165,7 +165,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   return (
     <section className={cn("w-full", className)}>
       {/* Section header - updated title and subtitle */}
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-lg font-semibold text-foreground">
             Top 10 Rated Golf Courses
@@ -194,7 +194,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 px-1">
+        <CarouselContent className="-ml-2">
           {topTen.map((course) => {
             const ratingData = ratingsMap[course.course_id];
             

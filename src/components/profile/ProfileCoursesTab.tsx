@@ -71,14 +71,12 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       <ScrollToTopGlass />
 
       {/* Section 1: Journey Summary Card */}
-      <div className="px-1">
-        <JourneySummaryCard
-          coursesPlayed={totalCoursesPlayed}
-          countriesPlayed={countriesPlayed}
-          avgRating={avgRating || null}
-          isOwnProfile={isOwnProfile}
-        />
-      </div>
+      <JourneySummaryCard
+        coursesPlayed={totalCoursesPlayed}
+        countriesPlayed={countriesPlayed}
+        avgRating={avgRating || null}
+        isOwnProfile={isOwnProfile}
+      />
 
       {/* Section 2: Top 10 Rated Courses Carousel (Crown Jewel) */}
       <FavouritesCarousel 
