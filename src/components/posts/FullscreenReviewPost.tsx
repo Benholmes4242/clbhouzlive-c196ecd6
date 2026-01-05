@@ -287,20 +287,7 @@ export function FullscreenReviewPost({
         {children}
       </div>
       
-      {/* Navigation arrows - left arrow centered to align with action rail */}
-      {!hideCarouselArrows && hasMultipleMedia && currentIndex > 0 && (
-        <button
-          onClick={goToPrevious}
-          className={cn(
-            "absolute left-4 top-1/2 -translate-y-1/2 z-20 pointer-events-auto",
-            "w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm",
-            "flex items-center justify-center transition-all hover:bg-black/70"
-          )}
-          aria-label="Previous media"
-        >
-          <ChevronLeft className="w-6 h-6 text-white" />
-        </button>
-      )}
+      {/* Navigation arrows removed - handled by ClubhouseVerticalGrid */}
     </div>
   );
 }
