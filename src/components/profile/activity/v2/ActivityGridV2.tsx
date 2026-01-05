@@ -124,6 +124,8 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
 
   // Infinite scroll handler
   useEffect(() => {
+    console.log('[ActivityGridV2] Infinite scroll setup - hasMore:', hasMore, 'onLoadMore:', !!onLoadMore);
+    
     if (!onLoadMore) return;
 
     const handleScroll = () => {
@@ -135,6 +137,7 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
       const scrollThreshold = scrollHeight - clientHeight - 800;
 
       if (scrollTop > scrollThreshold) {
+        console.log('[ActivityGridV2] Triggering fetchNextPage');
         loadingRef.current = true;
         onLoadMore();
         // Debounce - 1 second lockout

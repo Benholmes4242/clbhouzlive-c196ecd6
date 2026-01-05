@@ -60,6 +60,8 @@ export function useActivityPostsV2(actorId?: string) {
             media_url,
             poster_url,
             aspect_ratio,
+            width,
+            height,
             duration_seconds,
             filter_id,
             studio_edits
@@ -179,6 +181,8 @@ export function useActivityPostsV2(actorId?: string) {
               media_url: media.media_url,
               poster_url: media.poster_url,
               aspect_ratio: media.aspect_ratio,
+              width: media.width,
+              height: media.height,
               duration_seconds: media.duration_seconds,
               filter_id: media.filter_id,
               studio_edits: media.studio_edits,
@@ -204,6 +208,7 @@ export function useActivityPostsV2(actorId?: string) {
       console.log('[useActivityPostsV2] Unified items produced:', items.length);
       
       const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
+      console.log('[useActivityPostsV2] hasMore:', hasMore, 'postsData.length:', postsData?.length, 'PAGE_SIZE:', PAGE_SIZE);
 
       return {
         items,
