@@ -116,9 +116,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   // Dynamic subtitle
   const getSubtitle = () => {
     if (isOwnProfile) {
-      return "Your top 10 rated courses worldwide";
+      return "Your Personal Top 10 Golf Courses";
     }
-    return `${displayName || 'Their'} top 10 rated courses worldwide`;
+    return `${displayName || 'Their'}'s Personal Top 10 Golf Courses`;
   };
 
   // Empty state
