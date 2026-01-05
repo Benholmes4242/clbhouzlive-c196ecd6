@@ -156,11 +156,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   if (isLoading) {
     return (
-      <div ref={sectionRef}>
-        <h3 className="text-base font-semibold text-slate-900 mb-3">All Courses Played</h3>
-        <div className="space-y-3">
+      <div ref={sectionRef} className="py-4">
+        <h3 className="text-base font-semibold text-foreground mb-3 px-1">All Courses Played</h3>
+        <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 bg-slate-50 rounded-sq-sm clb-skeleton" />
+            <div key={i} className="h-18 bg-muted/50 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -168,17 +168,17 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   }
 
   return (
-    <div ref={sectionRef}>
+    <div ref={sectionRef} className="py-4">
       {/* Section divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-6" />
+      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-5" />
 
-      {/* Section header with breathing room */}
-      <div className="flex items-start justify-between mb-3 pt-2">
+      {/* Section header */}
+      <div className="flex items-start justify-between mb-3 px-1">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">
+          <h3 className="text-base font-semibold text-foreground">
             All Courses Played
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Your complete journey
           </p>
         </div>
@@ -196,11 +196,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Course list */}
       {filteredCourses.length === 0 ? (
-        <div className="bg-slate-50 border border-slate-100 rounded-sq-md p-8 text-center mt-2">
-          <p className="text-sm text-slate-500">{getEmptyMessage()}</p>
+        <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 text-center mt-3">
+          <p className="text-sm text-muted-foreground">{getEmptyMessage()}</p>
         </div>
       ) : (
-        <div className="space-y-2 mt-2">
+        <div className="space-y-2 mt-3">
           {displayedCourses.map((course) => (
             <TieredCourseCard
               key={course.id}
@@ -212,24 +212,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           {/* Infinite scroll trigger / Load more */}
           {hasMore && (
             <div ref={loadMoreRef} className="py-4">
-              <div className="flex flex-col items-center gap-2">
-                {/* Skeleton loaders */}
-                <div className="w-full space-y-2">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 bg-slate-50 rounded-sq-sm clb-skeleton" />
-                  ))}
-                </div>
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-16 bg-muted/30 rounded-xl animate-pulse" />
+                ))}
               </div>
             </div>
           )}
 
           {/* End-of-list closure */}
           {!hasMore && filteredCourses.length > 0 && (
-            <div className="text-center pt-4 pb-8">
-              <p className="text-sm text-slate-600 font-medium">
+            <div className="text-center pt-6 pb-4">
+              <p className="text-sm text-foreground font-medium">
                 That's your journey so far.
               </p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {filteredCourses.length} courses played. On to {filteredCourses.length + 1}.
               </p>
             </div>

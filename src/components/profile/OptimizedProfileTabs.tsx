@@ -3,10 +3,10 @@ import { ProfileTabsSkeleton, ActivityFeedSkeleton } from '@/components/skeleton
 import OptimizedActivityFeed from './OptimizedActivityFeed';
 import { OptimizedProfileData } from '@/hooks/useOptimizedProfileData';
 import AchievementsPane from './AchievementsPane';
+import { ProfileCoursesTab } from './ProfileCoursesTab';
 
 // Lazy load heavy components for better initial load
 const CourseHighlightsCarousel = lazy(() => import('./CourseHighlightsCarousel'));
-const CoursesJourney = lazy(() => import('./CoursesJourney'));
 const PinnedAchievements = lazy(() => import('./PinnedAchievements'));
 const ProfileProgressSection = lazy(() => import('./ProfileProgressSection'));
 
@@ -69,9 +69,8 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
       
       case 'courses':
         return (
-          <CoursesJourney 
+          <ProfileCoursesTab 
             userId={userId}
-            userDisplayName={profileData.profile?.display_name || 'User'}
             isOwnProfile={isOwnProfile}
           />
         );

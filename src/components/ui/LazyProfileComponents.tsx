@@ -3,7 +3,9 @@ import { lazy } from 'react';
 
 // Lazy load heavy profile components to improve initial page load
 export const LazyActivityFeed = lazy(() => import('@/components/profile/ActivityFeed'));
-export const LazyCoursesJourney = lazy(() => import('@/components/profile/CoursesJourney'));
+export const LazyProfileCoursesTab = lazy(() => 
+  import('@/components/profile/ProfileCoursesTab').then(m => ({ default: m.ProfileCoursesTab }))
+);
 export const LazyAchievementsPane = lazy(() => import('@/components/profile/AchievementsPane'));
 export const LazyHandicapSection = lazy(() => import('@/components/profile/HandicapSection'));
 export const LazyProfileSectionCarousel = lazy(() => import('@/components/profile/ProfileSectionCarousel'));
