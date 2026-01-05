@@ -65,8 +65,8 @@ interface ClubhouseVerticalGridProps {
   onTopZoneChange?: (isAtTop: boolean) => void;
   onMeaningfulInteraction?: () => void;
   onFirstFrameReady?: () => void;
-  /** Initial post index for deep linking (e.g., from focusPostId) */
-  initialIndex?: number;
+  /** Post ID to focus on for deep linking (finds index in filteredPosts) */
+  focusPostId?: string;
 }
 
 // ============ VideoWithAutoplay Component ============
@@ -176,7 +176,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   onTopZoneChange,
   onMeaningfulInteraction,
   onFirstFrameReady,
-  initialIndex = 0
+  focusPostId,
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -270,6 +270,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
     return filtered;
   }, [posts, isPortrait]);
 
+  // Calculate initial index from focusPostId in FILTERED posts (fixes race condition)
+  const initialIndex = useMemo(() => {
+    if (!focusPostId || filteredPosts.length === 0) return 0;
+    
+    const idx = filteredPosts.findIndex(p => p.id === focusPostId);
+    
+    if (idx === -1) {
+      console.log('[ClubhouseGrid] Focus post not in filtered results:', focusPostId);
+      return 0;
+    }
+    
+    console.log('[ClubhouseGrid] Found focus post at index:', idx);
+    return idx;
+  }, [focusPostId, filteredPosts]);
 
   // Use vertical feed logic hook
   const {
