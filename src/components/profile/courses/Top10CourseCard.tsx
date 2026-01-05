@@ -10,7 +10,7 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -68,15 +68,6 @@ const getRankingBadgeStyle = (position: number): { bg: string; text: string; sha
   }
 };
 
-// Trophy color for top 3
-const getTrophyColor = (position: number): string => {
-  switch (position) {
-    case 1: return '#FFD700'; // Gold
-    case 2: return '#C0C0C0'; // Silver
-    case 3: return '#CD7F32'; // Bronze
-    default: return '';
-  }
-};
 
 const RatingBar: React.FC<RatingBarProps> = ({
   value,
@@ -159,8 +150,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   );
 
   const badgeStyle = getRankingBadgeStyle(position);
-  const trophyColor = getTrophyColor(position);
-  const showTrophy = position <= 3;
 
   return (
     <motion.div
@@ -205,22 +194,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           </span>
         </div>
         
-        {/* Trophy for top 3 only */}
-        {showTrophy && (
-          <div 
-            className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
-            style={{
-              background: 'rgba(0,0,0,0.4)',
-              backdropFilter: 'blur(4px)',
-            }}
-          >
-            <Trophy 
-              className="w-4 h-4" 
-              style={{ color: trophyColor }}
-              fill={trophyColor}
-            />
-          </div>
-        )}
         
         {/* Course info overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-3">
