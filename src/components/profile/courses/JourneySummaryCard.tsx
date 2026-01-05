@@ -207,6 +207,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
                 : "text-muted-foreground"
             )}>
               {coursesToNextMilestone} to go
+              {isCloseToMilestone && " 🔥"}
             </span>
           </div>
         </div>

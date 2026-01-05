@@ -46,10 +46,13 @@ const RatingBar: React.FC<RatingBarProps> = ({
   const percentage = Math.min((value / maxValue) * 100, 100);
   const isPrimary = size === 'primary';
   
-  // Prestige-led consistent palette: gold/cream (no value-based switching)
-  const barColor = isPrimary 
-    ? 'bg-gradient-to-r from-amber-400 to-amber-500' // Gold for overall
-    : 'bg-gradient-to-r from-amber-300/70 to-amber-400/70'; // Muted champagne for breakdown
+  // Color based on value
+  const getBarColor = () => {
+    if (value >= 8) return 'bg-gradient-to-r from-amber-400 to-amber-500';
+    if (value >= 6) return 'bg-gradient-to-r from-emerald-400 to-emerald-500';
+    if (value >= 4) return 'bg-gradient-to-r from-blue-400 to-blue-500';
+    return 'bg-gradient-to-r from-slate-400 to-slate-500';
+  };
 
   return (
     <div className="w-full">
@@ -63,7 +66,7 @@ const RatingBar: React.FC<RatingBarProps> = ({
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-          className={cn("h-full rounded-full", barColor)}
+          className={cn("h-full rounded-full", getBarColor())}
         />
       </div>
       {showLabel && (
@@ -220,7 +223,12 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           )}
         </AnimatePresence>
         
-        {/* Hint removed for premium feel - breakdown appears on hover/tap */}
+        {/* Hint for breakdown visibility */}
+        {hasBreakdown && !showBreakdown && (
+          <p className="text-[9px] text-muted-foreground/60 text-center">
+            Tap for breakdown
+          </p>
+        )}
       </div>
     </motion.div>
   );
