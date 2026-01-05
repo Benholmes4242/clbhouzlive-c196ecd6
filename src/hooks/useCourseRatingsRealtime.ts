@@ -17,6 +17,7 @@ export function useCourseRatingsRealtime() {
         { event: '*', schema: 'public', table: 'course_ratings' },
         (payload) => {
           const courseId = (payload.new as any)?.course_id || (payload.old as any)?.course_id;
+          const userId = (payload.new as any)?.user_id || (payload.old as any)?.user_id;
           
           if (courseId) {
             // Invalidate the specific course's aggregates
@@ -31,6 +32,25 @@ export function useCourseRatingsRealtime() {
             void queryClient.refetchQueries({ queryKey: ['course-reviews-full', courseId], type: 'active' });
             void queryClient.refetchQueries({ queryKey: ['course-detail', courseId], type: 'active' });
           }
+          
+          // Invalidate Top 10 carousel ratings (uses user-course-ratings-breakdown query)
+          // This ensures the Top 10 section shows updated ratings in real-time
+          if (userId) {
+            queryClient.invalidateQueries({ 
+              queryKey: ['user-course-ratings-breakdown', userId], 
+              exact: false 
+            });
+            void queryClient.refetchQueries({ 
+              queryKey: ['user-course-ratings-breakdown', userId], 
+              exact: false, 
+              type: 'active' 
+            });
+          }
+          // Also invalidate with fuzzy match for any active breakdown queries
+          queryClient.invalidateQueries({ 
+            queryKey: ['user-course-ratings-breakdown'], 
+            exact: false 
+          });
           
           // Invalidate feed queries so cards update
           queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
