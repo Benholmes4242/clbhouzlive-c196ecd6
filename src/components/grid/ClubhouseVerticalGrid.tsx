@@ -824,6 +824,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           }))}
                           initialIndex={mediaIndices[item.id] || 0}
                           dotsBottomOffset={0}
+                          renderMedia={false}
                         />
                       </div>
                     )}
@@ -875,6 +876,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                           }))}
                           initialIndex={mediaIndices[item.id] || 0}
                           dotsBottomOffset={0}
+                          renderMedia={false}
                         />
                       </div>
                     ) : (

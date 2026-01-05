@@ -45,6 +45,9 @@ export interface FullscreenReviewPostProps {
   
   // Optional: Render children (e.g., Clubhouse action bar) on top of the overlay
   children?: React.ReactNode;
+  
+  // When false, skip rendering the media layer (used in Clubhouse where media is already rendered)
+  renderMedia?: boolean;
 }
 
 /**
@@ -65,6 +68,7 @@ export function FullscreenReviewPost({
   dotsBottomOffset,
   hideCarouselArrows = false,
   children,
+  renderMedia = true,
 }: FullscreenReviewPostProps) {
   // Sort media: video first as cover, then by display_order/created_at
   const sortedMedia = React.useMemo(() => {
@@ -152,29 +156,31 @@ export function FullscreenReviewPost({
       {...swipeHandlers}
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Main Media */}
-      <div className="absolute inset-0">
-        {currentMedia.media_type === 'video' ? (
-          <HLSPlayer
-            key={`review-video-${currentMedia.id}-${currentIndex}`}
-            src={currentMedia.media_url}
-            className="w-full h-full object-cover"
-            muted={isMuted}
-            loop={true}
-            autoplay={true}
-            showMuteButton={false}
-            showPlayButton={false}
-            mediaId={`review-preview-${currentMedia.id}`}
-          />
-        ) : (
-          <img
-            src={currentMedia.media_url}
-            alt={courseName}
-            className="w-full h-full object-cover"
-            draggable={false}
-          />
-        )}
-      </div>
+      {/* Main Media - only render if renderMedia is true */}
+      {renderMedia && (
+        <div className="absolute inset-0">
+          {currentMedia.media_type === 'video' ? (
+            <HLSPlayer
+              key={`review-video-${currentMedia.id}-${currentIndex}`}
+              src={currentMedia.media_url}
+              className="w-full h-full object-cover"
+              muted={isMuted}
+              loop={true}
+              autoplay={true}
+              showMuteButton={false}
+              showPlayButton={false}
+              mediaId={`review-preview-${currentMedia.id}`}
+            />
+          ) : (
+            <img
+              src={currentMedia.media_url}
+              alt={courseName}
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
+          )}
+        </div>
+      )}
       
       {/* Top gradient - lighter + shorter for cleaner media display */}
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 via-black/10 to-transparent pointer-events-none z-[5]" />
