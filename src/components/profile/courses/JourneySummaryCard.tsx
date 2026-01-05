@@ -76,32 +76,32 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         }}
       />
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col items-center text-center">
         {/* Header */}
-        <h3 className="text-sm font-medium text-muted-foreground mb-4">
+        <h3 className="text-sm font-medium text-muted-foreground mb-5">
           {isOwnProfile ? 'Your Course Journey' : 'Course Journey'}
         </h3>
 
         {/* Main stat - Courses Played with AnimatedNumber */}
-        <div className="flex items-baseline gap-2 mb-6">
+        <div className="flex flex-col items-center mb-6">
           <AnimatedNumber 
             value={coursesPlayed}
             className="text-5xl font-bold text-foreground tracking-tight"
           />
-          <span className="text-base text-muted-foreground">
+          <span className="text-base text-muted-foreground mt-1">
             Courses Played
           </span>
         </div>
 
-        {/* Secondary stats row - polished spacing */}
-        <div className="flex gap-8">
+        {/* Secondary stats row - centred */}
+        <div className="flex justify-center gap-8">
           {/* Countries */}
           {countriesPlayed > 0 && (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
                 <Globe className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start">
                 <AnimatedNumber 
                   value={countriesPlayed} 
                   className="text-lg font-semibold text-foreground leading-tight"
@@ -119,7 +119,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
               <div className="w-8 h-8 rounded-full bg-amber-100/60 dark:bg-amber-900/30 flex items-center justify-center">
                 <Star className="w-4 h-4 text-amber-500" />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start">
                 <span className="text-lg font-semibold text-foreground leading-tight">
                   {avgRating.toFixed(1)}
                 </span>
