@@ -899,46 +899,52 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Arrows - left arrow aligned with right arrow in CinematicActionRail */}
-                {hasMultipleMedia && (
-                  <>
-                    {/* Left arrow - positioned to match the top slot of action rail (next media button) */}
-                    {currentMediaIndex > 0 && (
-                      <button
-                        data-control="media-nav"
-                        onClick={handlePrevMedia}
-                        className="fixed left-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
-                        style={{
-                          // Match the right arrow (next media) position in CinematicActionRail
-                          // Rail bottom: env(safe-area-inset-bottom) + 80px - 20px = 60px + safe-area
-                          // Rail has 6 slots (with save + next): totalHeight = 6*64 + 5*12 = 444px
-                          // Top slot icon center is at rail_bottom + totalHeight - SLOT_HEIGHT/2 = 60 + 444 - 32 = 472px
-                          // But we want bottom of button (h-11 = 44px), so bottom = center - 22 = 450px
-                          // Actually, just position the top of the arrow at same height as right arrow top
-                          // Right arrow top = rail_bottom + totalHeight - SLOT_HEIGHT = 60 + 444 - 64 = 440px
-                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 444px - 64px)',
-                        }}
-                        aria-label="Previous media"
-                      >
-                        <ChevronLeft className="w-6 h-6 text-white" />
-                      </button>
-                    )}
-                    {/* Right arrow - only for non-review posts */}
-                    {!item.categories?.includes('review') && currentMediaIndex < mediaItems.length - 1 && (
-                      <button
-                        data-control="media-nav"
-                        onClick={handleNextMedia}
-                        className="fixed right-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
-                        style={{
-                          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px + 444px - 64px)',
-                        }}
-                        aria-label="Next media"
-                      >
-                        <ChevronRight className="w-6 h-6 text-white" />
-                      </button>
-                    )}
-                  </>
-                )}
+                {/* Navigation Arrows - aligned with top slot of CinematicActionRail */}
+                {hasMultipleMedia && (() => {
+                  // Match CinematicActionRail positioning exactly
+                  const SLOT_HEIGHT = 64;
+                  const ICON_SIZE = 44;
+                  const GAP = 12;
+                  const isReviewPost = item.categories?.includes('review');
+                  // Base slots: mute, like, comment, share = 4 (no onSave passed to rail)
+                  // Review posts with next media get +1 slot at top
+                  const hasNextMediaSlot = isReviewPost && currentMediaIndex < mediaItems.length - 1;
+                  const slotCount = hasNextMediaSlot ? 5 : 4;
+                  const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
+                  // Rail bottom = safe-area + 80px - (SLOT_HEIGHT - ICON_SIZE) = safe-area + 60px
+                  // Top slot button bottom = rail_bottom + totalHeight - SLOT_HEIGHT + ICON_SIZE
+                  // Simplify: safe-area + 60 + totalHeight - 64 + 44 = safe-area + 40 + totalHeight
+                  const arrowBottom = `calc(env(safe-area-inset-bottom, 0px) + ${40 + totalHeight - SLOT_HEIGHT}px)`;
+                  
+                  return (
+                    <>
+                      {/* Left arrow - positioned to match the top slot of action rail */}
+                      {currentMediaIndex > 0 && (
+                        <button
+                          data-control="media-nav"
+                          onClick={handlePrevMedia}
+                          className="fixed left-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                          style={{ bottom: arrowBottom }}
+                          aria-label="Previous media"
+                        >
+                          <ChevronLeft className="w-6 h-6 text-white" />
+                        </button>
+                      )}
+                      {/* Right arrow - only for non-review posts (review posts use CinematicActionRail) */}
+                      {!isReviewPost && currentMediaIndex < mediaItems.length - 1 && (
+                        <button
+                          data-control="media-nav"
+                          onClick={handleNextMedia}
+                          className="fixed right-4 z-30 p-0 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+                          style={{ bottom: arrowBottom }}
+                          aria-label="Next media"
+                        >
+                          <ChevronRight className="w-6 h-6 text-white" />
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Overlay layer above video (not clipped) */}
