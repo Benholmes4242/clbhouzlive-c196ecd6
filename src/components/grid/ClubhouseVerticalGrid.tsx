@@ -42,6 +42,7 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
+import { FullscreenReviewPost, type ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -802,49 +803,87 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                       />
                     )}
                   </>
-                ) : (
-                  <div className="relative w-full h-full bg-black overflow-hidden">
-                    {/* Crop wrapper */}
-                    <div className={cn("absolute inset-0", cropClass)}>
-                      {/* Filtered + rotated pixel layer for image */}
-                      <div 
-                        className={cn("w-full h-full", filterClass)}
-                        style={pixelLayerStyle}
-                      >
-                        <img
-                          src={currentMedia.media_url}
-                          alt={item.title || 'Content image'}
-                          className="absolute inset-0 w-full h-full object-cover select-none"
-                          style={{ objectPosition: 'center center' }}
-                          draggable={false}
-                          loading="eager"
-                          onLoad={() => {
-                            if (index === 0) handleFirstFrameReady();
-                          }}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-                          }}
+                ) : (() => {
+                  // Check if this is a review post
+                  const isReviewPost = item.categories?.includes('review') && !!(item as any).sourceReviewId;
+                  
+                  // Prepare review media for FullscreenReviewPost
+                  const reviewMedia: ReviewMediaItem[] = isReviewPost 
+                    ? (item.media || []).map((m: any) => ({
+                        id: m.id || `${item.id}-${Math.random()}`,
+                        media_type: m.media_type || 'image',
+                        media_url: m.media_url || '',
+                        poster_url: m.poster_url || null,
+                        stream_id: m.stream_id || null,
+                        display_order: m.display_order ?? null,
+                        created_at: m.created_at || null,
+                      }))
+                    : [];
+                  
+                  // Review post: use FullscreenReviewPost overlay
+                  if (isReviewPost) {
+                    return (
+                      <div className="relative w-full h-full bg-black overflow-hidden">
+                        <FullscreenReviewPost
+                          mode="live"
+                          courseId={item.golfCourse?.id || ''}
+                          courseName={(item as any).courseName || item.golfCourse?.name || 'Course'}
+                          heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
+                          rating={(item as any).reviewRating ?? 0}
+                          reviewText={(item as any).content || item.title || ''}
+                          media={reviewMedia}
+                          initialIndex={currentMediaIndex}
+                          dotsBottomOffset={120}
                         />
                       </div>
-                    </div>
-                    
-                    {/* Text overlays from studio_edits - OUTSIDE filter layer */}
-                    {studioEdits?.textOverlays?.length > 0 && (
-                      <TextOverlayRenderer
-                        textOverlays={studioEdits.textOverlays}
-                        isEditable={false}
+                    );
+                  }
+                  
+                  // Standard image post rendering
+                  return (
+                    <div className="relative w-full h-full bg-black overflow-hidden">
+                      {/* Crop wrapper */}
+                      <div className={cn("absolute inset-0", cropClass)}>
+                        {/* Filtered + rotated pixel layer for image */}
+                        <div 
+                          className={cn("w-full h-full", filterClass)}
+                          style={pixelLayerStyle}
+                        >
+                          <img
+                            src={currentMedia.media_url}
+                            alt={item.title || 'Content image'}
+                            className="absolute inset-0 w-full h-full object-cover select-none"
+                            style={{ objectPosition: 'center center' }}
+                            draggable={false}
+                            loading="eager"
+                            onLoad={() => {
+                              if (index === 0) handleFirstFrameReady();
+                            }}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                            }}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Text overlays from studio_edits - OUTSIDE filter layer */}
+                      {studioEdits?.textOverlays?.length > 0 && (
+                        <TextOverlayRenderer
+                          textOverlays={studioEdits.textOverlays}
+                          isEditable={false}
+                        />
+                      )}
+                      
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+                        style={{
+                          height: '35vh',
+                          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
+                        }}
                       />
-                    )}
-                    
-                    <div 
-                      className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
-                      style={{
-                        height: '35vh',
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
-                      }}
-                    />
-                  </div>
-                )}
+                    </div>
+                  );
+                })()}
 
                 {/* Navigation Arrows */}
                 {hasMultipleMedia && (
