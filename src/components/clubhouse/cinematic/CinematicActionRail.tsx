@@ -182,8 +182,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
   // Position rail so bottom aligns with bottom of CreatorCapsule
   // CreatorCapsule uses: bottom: calc(env(safe-area-inset-bottom, 0px) + 80px)
-  // Use same offset so bottoms align
-  const CAPSULE_BOTTOM_OFFSET = 'calc(env(safe-area-inset-bottom, 0px) + 80px)';
+  // TEMPORARILY: Use top positioning for testing
+  const TEMP_TOP_OFFSET = '96px'; // top-24
 
   return (
     <motion.div
@@ -199,7 +199,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         'pointer-events-auto'
       )}
       style={{
-        bottom: CAPSULE_BOTTOM_OFFSET,
+        top: TEMP_TOP_OFFSET, // TEMPORARY - normally uses bottom positioning
         gap: GAP,
         height: totalHeight,
       }}
