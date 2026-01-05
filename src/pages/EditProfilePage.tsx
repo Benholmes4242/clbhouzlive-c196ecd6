@@ -524,6 +524,7 @@ const EditProfilePage: React.FC = () => {
               userId={user?.id}
               homeClubVisibility={formData.homeClubVisibility}
               additionalClubsVisibility={formData.additionalClubsVisibility}
+              handicapSyncInterest={(profile as any)?.handicap_sync_interest ?? false}
               onChange={handleFieldChange}
               onVisibilityChange={handleVisibilityChange}
             />

@@ -304,6 +304,7 @@ const HeroProfileHeader = ({
             <HandicapSection 
               userId={profile?.id || ''}
               profile={profile}
+              isOwnProfile={isOwnProfile}
             />
           );
         default:

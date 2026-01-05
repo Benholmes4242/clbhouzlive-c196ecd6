@@ -11,6 +11,7 @@ import { InviteClubModal } from './InviteClubModal';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
+import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
 
 interface GolfInfoSectionProps {
   homeClub: string;
@@ -19,6 +20,7 @@ interface GolfInfoSectionProps {
   userId?: string;
   homeClubVisibility: VisibilityValue;
   additionalClubsVisibility: VisibilityValue;
+  handicapSyncInterest?: boolean;
   onChange: (field: string, value: string | null) => void;
   onVisibilityChange: (field: 'homeClubVisibility' | 'additionalClubsVisibility', value: VisibilityValue) => void;
 }
@@ -42,6 +44,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   userId,
   homeClubVisibility,
   additionalClubsVisibility,
+  handicapSyncInterest = false,
   onChange,
   onVisibilityChange,
 }) => {
@@ -567,6 +570,14 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
           <p className="text-[11px] text-muted-foreground">
             Your official handicap index (optional).
           </p>
+          
+          {/* Handicap Sync Interest Notice */}
+          {userId && (
+            <HandicapSyncInlineNotice
+              userId={userId}
+              hasRegisteredInterest={handicapSyncInterest}
+            />
+          )}
         </div>
       </div>
 
