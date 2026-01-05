@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { RatingPill } from '@/components/ui/RatingPill';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
@@ -55,7 +56,7 @@ const RatingBar: React.FC<RatingBarProps> = ({
   
   return (
     <div className="w-full">
-      {/* Title row - label above, badge on right for primary */}
+      {/* Title row - label above, RatingPill badge on right for primary */}
       <div className="flex items-center justify-between mb-1">
         <span className={cn(
           "text-muted-foreground",
@@ -64,15 +65,7 @@ const RatingBar: React.FC<RatingBarProps> = ({
           {label}
         </span>
         {isPrimary && showBadge && (
-          <span 
-            className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-            style={{ 
-              backgroundColor: tierData.bgLight,
-              color: '#1e293b'
-            }}
-          >
-            {tierData.label}
-          </span>
+          <RatingPill score={value} className="text-[8px] px-1.5 py-0.5 tracking-[0.05em]" />
         )}
       </div>
       
