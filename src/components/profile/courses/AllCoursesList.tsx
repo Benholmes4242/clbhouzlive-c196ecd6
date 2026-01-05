@@ -161,8 +161,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   return (
     <div ref={sectionRef} className="py-4">
-      {/* Section divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-5" />
 
       {/* Section header */}
       <div className="flex items-start justify-between mb-3">
