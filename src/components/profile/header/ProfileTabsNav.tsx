@@ -39,7 +39,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 
   return (
     <section 
-      className="mt-6 sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/30"
+      className="mt-6 border-b border-border/30"
       onPointerDown={handlePointerDown}
     >
       <div className="px-4">
