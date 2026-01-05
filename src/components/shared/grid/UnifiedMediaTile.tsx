@@ -269,6 +269,22 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       {/* Bottom gradient overlay for text legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
+      {/* DEBUG: Log review fields */}
+      {(() => {
+        if (item.isReview || item.sourceReviewId) {
+          console.log('[UnifiedMediaTile] Review item:', {
+            id: item.id,
+            postId: item.postId,
+            isReview: item.isReview,
+            courseName: item.courseName,
+            reviewRating: item.reviewRating,
+            sourceReviewId: item.sourceReviewId,
+            courseLocation: item.courseLocation
+          });
+        }
+        return null;
+      })()}
+
       {/* Review overlay for review posts - takes priority over standard overlay */}
       {item.isReview && item.courseName && typeof item.reviewRating === 'number' ? (
         <ReviewTileOverlay
