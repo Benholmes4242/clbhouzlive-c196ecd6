@@ -102,8 +102,15 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     ? (primaryMedia.poster_url || getStreamPoster(primaryMedia.media_url, '1s') || primaryMedia.media_url)
     : primaryMedia.media_url;
 
-  // Compute orientation from aspect ratio
-  const aspectRatio = primaryMedia.aspect_ratio ?? undefined;
+  // Compute orientation from aspect ratio - prefer stored, fallback to computed from dimensions
+  let aspectRatio = primaryMedia.aspect_ratio ?? undefined;
+  if (!aspectRatio && (primaryMedia as any).width && (primaryMedia as any).height) {
+    const w = (primaryMedia as any).width as number;
+    const h = (primaryMedia as any).height as number;
+    if (h > 0) {
+      aspectRatio = w / h;
+    }
+  }
   const orientation = classifyOrientation(aspectRatio);
 
   // Build course location string for review overlay
