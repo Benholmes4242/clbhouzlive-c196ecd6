@@ -805,25 +805,27 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     
                     {/* Review overlay for video review posts */}
                     {item.categories?.includes('review') && (item as any).sourceReviewId && (
-                      <FullscreenReviewPost
-                        mode="live"
-                        courseId={item.golfCourse?.id || ''}
-                        courseName={(item as any).courseName || item.golfCourse?.name || 'Course'}
-                        heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
-                        rating={(item as any).reviewRating ?? 0}
-                        reviewText={(item as any).content || item.title || ''}
-                        media={(item.media || []).map((m: any) => ({
-                          id: m.id || `${item.id}-${Math.random()}`,
-                          media_type: m.media_type || 'image',
-                          media_url: m.media_url || '',
-                          poster_url: m.poster_url || null,
-                          stream_id: m.stream_id || null,
-                          display_order: m.display_order ?? null,
-                          created_at: m.created_at || null,
-                        }))}
-                        initialIndex={currentMediaIndex}
-                        dotsBottomOffset={120}
-                      />
+                      <div className="absolute inset-0 pointer-events-none">
+                        <FullscreenReviewPost
+                          mode="live"
+                          courseId={item.golfCourse?.id || ''}
+                          courseName={(item as any).courseName || item.golfCourse?.name || 'Course'}
+                          heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
+                          rating={(item as any).reviewRating ?? 0}
+                          reviewText={(item as any).content || item.title || ''}
+                          media={(item.media || []).map((m: any) => ({
+                            id: m.id || `${item.id}-media`,
+                            media_type: m.media_type || 'image',
+                            media_url: m.url || m.media_url || '',
+                            poster_url: m.posterUrl || m.poster_url || null,
+                            stream_id: m.streamId || m.stream_id || null,
+                            display_order: m.display_order ?? null,
+                            created_at: m.created_at || null,
+                          }))}
+                          initialIndex={0}
+                          dotsBottomOffset={0}
+                        />
+                      </div>
                     )}
                   </>
                 ) : (
@@ -854,25 +856,27 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     
                     {/* Review overlay - conditionally rendered */}
                     {item.categories?.includes('review') && (item as any).sourceReviewId ? (
-                      <FullscreenReviewPost
-                        mode="live"
-                        courseId={item.golfCourse?.id || ''}
-                        courseName={(item as any).courseName || item.golfCourse?.name || 'Course'}
-                        heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
-                        rating={(item as any).reviewRating ?? 0}
-                        reviewText={(item as any).content || item.title || ''}
-                        media={(item.media || []).map((m: any) => ({
-                          id: m.id || `${item.id}-${Math.random()}`,
-                          media_type: m.media_type || 'image',
-                          media_url: m.media_url || '',
-                          poster_url: m.poster_url || null,
-                          stream_id: m.stream_id || null,
-                          display_order: m.display_order ?? null,
-                          created_at: m.created_at || null,
-                        }))}
-                        initialIndex={currentMediaIndex}
-                        dotsBottomOffset={120}
-                      />
+                      <div className="absolute inset-0 pointer-events-none">
+                        <FullscreenReviewPost
+                          mode="live"
+                          courseId={item.golfCourse?.id || ''}
+                          courseName={(item as any).courseName || item.golfCourse?.name || 'Course'}
+                          heroSubtitle={item.golfCourse ? `${item.golfCourse.region || ''}, ${item.golfCourse.country || ''}`.replace(/^, |, $/g, '') : ''}
+                          rating={(item as any).reviewRating ?? 0}
+                          reviewText={(item as any).content || item.title || ''}
+                          media={(item.media || []).map((m: any) => ({
+                            id: m.id || `${item.id}-media`,
+                            media_type: m.media_type || 'image',
+                            media_url: m.url || m.media_url || '',
+                            poster_url: m.posterUrl || m.poster_url || null,
+                            stream_id: m.streamId || m.stream_id || null,
+                            display_order: m.display_order ?? null,
+                            created_at: m.created_at || null,
+                          }))}
+                          initialIndex={0}
+                          dotsBottomOffset={0}
+                        />
+                      </div>
                     ) : (
                       <>
                         {/* Text overlays from studio_edits - OUTSIDE filter layer */}
