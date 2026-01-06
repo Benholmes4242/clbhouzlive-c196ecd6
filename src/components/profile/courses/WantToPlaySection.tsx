@@ -269,30 +269,51 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Batch navigation */}
+      {/* Batch navigation - carousel style */}
       {totalBatches > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-4">
-          {hasPrevBatch && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handlePrevBatch}
-              className="gap-1 text-xs"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous 5
-            </Button>
-          )}
-          {hasNextBatch && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNextBatch}
-              className="gap-1 text-xs"
-            >
-              Next {nextBatchCount} →
-            </Button>
-          )}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button
+            type="button"
+            onClick={handlePrevBatch}
+            disabled={!hasPrevBatch}
+            className={cn(
+              'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+              !hasPrevBatch
+                ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
+                : 'bg-muted/50 text-foreground hover:bg-muted'
+            )}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          {/* Dot indicators */}
+          <div className="flex gap-1.5">
+            {Array.from({ length: totalBatches }).map((_, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  'h-1.5 rounded-full transition-all',
+                  idx === batchIndex
+                    ? 'w-5 bg-foreground/60'
+                    : 'w-2 bg-foreground/20'
+                )}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleNextBatch}
+            disabled={!hasNextBatch}
+            className={cn(
+              'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+              !hasNextBatch
+                ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
+                : 'bg-muted/50 text-foreground hover:bg-muted'
+            )}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       )}
     </section>
