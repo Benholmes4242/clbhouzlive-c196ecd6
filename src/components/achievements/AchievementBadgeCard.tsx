@@ -229,6 +229,8 @@ export interface AchievementBadgeCardProps {
   isCurrentTarget?: boolean;
   /** For showing "Requires X courses" in locked ghost cards */
   threshold?: number;
+  /** Show witty tagline subtext (only true on Quest page) */
+  showSubtext?: boolean;
 }
 
 /**
@@ -247,6 +249,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   totalTop100Played,
   isCurrentTarget = false,
   threshold: propThreshold,
+  showSubtext = false,
 }) => {
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
@@ -352,12 +355,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         />
       )}
 
-      {/* Watermark pattern */}
-      {isMilestone ? (
-        <WatermarkPattern pattern={tierStyle.pattern} color={accentColor} unlocked={unlocked && !isGhost} />
-      ) : (
+      {/* Watermark pattern - only for regional cards */}
+      {isRegional && (
         <div 
-          className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+          className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none"
           style={{ color: accentColor, opacity: unlocked && !isGhost ? 0.08 : 0.04 }}
         >
           {getRegionalIcon(tier)}
@@ -485,16 +486,18 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
               >
                 {clubName}
               </div>
-              {/* Witty tagline as subtitle */}
-              <div 
-                className="text-[10px] leading-tight mt-0.5 line-clamp-2"
-                style={{ color: unlocked && !isGhost ? `${accentColor}90` : 'var(--quest-text-tertiary, #97A1AA)' }}
-              >
-                {isMilestone 
-                  ? (MILESTONE_TAGLINES[threshold] || subtitle)
-                  : (REGION_TAGLINES[TIER_TO_REGION_SLUG[tier]] || subtitle)
-                }
-              </div>
+              {/* Witty tagline as subtitle - only shown when showSubtext is true */}
+              {showSubtext && (
+                <div 
+                  className="text-[10px] leading-tight mt-0.5 line-clamp-2"
+                  style={{ color: unlocked && !isGhost ? `${accentColor}90` : 'var(--quest-text-tertiary, #97A1AA)' }}
+                >
+                  {isMilestone 
+                    ? (MILESTONE_TAGLINES[threshold] || subtitle)
+                    : (REGION_TAGLINES[TIER_TO_REGION_SLUG[tier]] || subtitle)
+                  }
+                </div>
+              )}
             </>
           )}
         </div>

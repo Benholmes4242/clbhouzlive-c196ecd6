@@ -30,7 +30,7 @@ import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseS
 // Phase 3 Cinematic components
 import { TrophyRoomHero } from '@/components/quest/TrophyRoomHero';
 import { TrophyCase } from '@/components/quest/TrophyCase';
-import { BadgeDetailSheet } from '@/components/quest/BadgeDetailSheet';
+import { UnifiedAchievementSheet, type AchievementData } from '@/components/top100/UnifiedAchievementSheet';
 
 // Existing Quest components
 import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
@@ -98,11 +98,8 @@ const ProfileQuestView: React.FC = () => {
 
   const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
   
-  // Badge detail sheet state
-  const [badgeDetail, setBadgeDetail] = useState<{
-    type: 'milestone' | 'region';
-    id: string;
-  } | null>(null);
+  // Badge detail sheet state - now uses UnifiedAchievementSheet format
+  const [achievementData, setAchievementData] = useState<AchievementData | null>(null);
 
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
@@ -167,12 +164,32 @@ const ProfileQuestView: React.FC = () => {
 
   // Handle milestone click from ladder
   const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean }) => {
-    setBadgeDetail({ type: 'milestone', id: String(milestone.threshold) });
+    setAchievementData({
+      type: 'milestone',
+      threshold: milestone.threshold,
+      totalPlayed,
+    });
   };
 
   // Handle badge click from trophy case
-  const handleBadgeClick = (badge: { type: 'milestone' | 'region'; id: string }) => {
-    setBadgeDetail(badge);
+  const handleBadgeClick = (badge: { type: 'milestone' | 'region'; id: string; threshold?: number }) => {
+    if (badge.type === 'milestone' && badge.threshold) {
+      setAchievementData({
+        type: 'milestone',
+        threshold: badge.threshold,
+        totalPlayed,
+      });
+    } else if (badge.type === 'region') {
+      const region = regionProgress.find(r => r.id === badge.id);
+      if (region) {
+        setAchievementData({
+          type: 'regional',
+          listSlug: badge.id as 'gb-i' | 'europe' | 'usa' | 'global',
+          played: region.played,
+          total: region.total,
+        });
+      }
+    }
   };
 
   // Continue Journey scroll handler
@@ -331,14 +348,11 @@ const ProfileQuestView: React.FC = () => {
         onClose={() => setSelectedRegion(null)}
       />
 
-      {/* Badge Detail Sheet */}
-      <BadgeDetailSheet
-        open={!!badgeDetail}
-        onClose={() => setBadgeDetail(null)}
-        badgeType={badgeDetail?.type || null}
-        badgeId={badgeDetail?.id || null}
-        totalPlayed={totalPlayed}
-        regionProgress={regionProgress}
+      {/* Unified Achievement Sheet (replaces BadgeDetailSheet) */}
+      <UnifiedAchievementSheet
+        isOpen={!!achievementData}
+        onClose={() => setAchievementData(null)}
+        data={achievementData}
       />
 
       {/* Milestone Unlock Sheet */}
