@@ -175,25 +175,27 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         </button>
       </div>
 
-      {/* Tab buttons - slate styling to match app */}
+      {/* Tab buttons - slate styling to match ActivityFiltersSheet */}
       <div className="flex gap-2 px-5 pb-4">
         <button
           onClick={() => setActiveTab('manage')}
-          className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-            activeTab === 'manage'
-              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
-              : 'bg-muted text-muted-foreground'
-          }`}
+          className="flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors"
+          style={{
+            background: activeTab === 'manage' ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+            color: activeTab === 'manage' ? 'white' : 'var(--cm-text-secondary)',
+            border: activeTab === 'manage' ? 'none' : '1px solid var(--cm-border-subtle)',
+          }}
         >
           Manage ({topTen.length}/10)
         </button>
         <button
           onClick={() => setActiveTab('add')}
-          className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-            activeTab === 'add'
-              ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
-              : 'bg-muted text-muted-foreground'
-          }`}
+          className="flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors"
+          style={{
+            background: activeTab === 'add' ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+            color: activeTab === 'add' ? 'white' : 'var(--cm-text-secondary)',
+            border: activeTab === 'add' ? 'none' : '1px solid var(--cm-border-subtle)',
+          }}
         >
           Add Course
         </button>
