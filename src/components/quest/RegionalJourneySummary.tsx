@@ -35,55 +35,69 @@ const RegionRow: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="w-full text-left py-3 transition-colors hover:bg-black/[0.03] -mx-2 px-2 rounded-lg"
+      className="w-full text-left py-4 transition-all hover:bg-black/[0.02] -mx-3 px-3 rounded-xl group"
     >
-      <div className="flex items-center justify-between mb-2">
-        <span
-          className="text-sm font-medium"
-          style={{ color: 'var(--quest-text-primary)' }}
-        >
-          {region.name}
-        </span>
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2.5">
+          {/* Region color indicator */}
+          <div 
+            className={cn("w-2 h-2 rounded-full", theme.barClass)}
+            style={{ opacity: region.played > 0 ? 1 : 0.4 }}
+          />
           <span
-            className="text-xs px-2 py-0.5 rounded-full"
+            className="text-sm font-semibold"
+            style={{ color: 'var(--quest-text-primary)' }}
+          >
+            {region.name}
+          </span>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <span
+            className="text-xs font-medium px-2.5 py-1 rounded-full transition-all"
             style={{
               background: isComplete
-                ? 'rgba(210, 180, 97, 0.18)'
+                ? 'rgba(210, 180, 97, 0.15)'
                 : region.played > 0
-                ? 'rgba(247, 147, 30, 0.16)'
+                ? 'rgba(247, 147, 30, 0.12)'
                 : 'var(--quest-pill-inactive)',
               border: isComplete
-                ? '1px solid rgba(210, 180, 97, 0.35)'
+                ? '1px solid rgba(210, 180, 97, 0.3)'
                 : region.played > 0
-                ? '1px solid rgba(247, 147, 30, 0.26)'
+                ? '1px solid rgba(247, 147, 30, 0.2)'
                 : '1px solid var(--quest-stroke)',
               color: isComplete
                 ? '#B8A053'
                 : region.played > 0
-                ? 'var(--quest-text-primary)'
+                ? '#C97A1A'
                 : 'var(--quest-text-tertiary)',
             }}
           >
-            {isComplete ? 'Complete' : region.played > 0 ? 'In progress' : 'Not started'}
+            {isComplete ? '✓ Complete' : region.played > 0 ? 'In progress' : 'Not started'}
           </span>
           <span
-            className="text-sm"
-            style={{ color: 'var(--quest-text-tertiary)' }}
+            className="text-sm font-medium tabular-nums"
+            style={{ color: 'var(--quest-text-secondary)' }}
           >
-            {region.played} / {region.total}
+            {region.played}/{region.total}
           </span>
-          <ChevronRight className="w-4 h-4" style={{ color: 'var(--quest-text-tertiary)' }} />
+          <ChevronRight 
+            className="w-4 h-4 transition-transform group-hover:translate-x-0.5" 
+            style={{ color: 'var(--quest-text-tertiary)' }} 
+          />
         </div>
       </div>
 
       {/* Progress bar - uses region-specific colors from Top 100 theme system */}
       <div
-        className="h-1.5 rounded-full overflow-hidden"
+        className="h-2 rounded-full overflow-hidden"
         style={{ background: 'var(--quest-track)' }}
       >
         <div
-          className={cn("h-full rounded-full transition-all duration-500", theme.barClass)}
+          className={cn(
+            "h-full rounded-full transition-all duration-500",
+            theme.barClass,
+            isComplete && "animate-quest-glow"
+          )}
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -108,28 +122,35 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
 
   return (
     <section>
-      <h2
-        className="text-sm font-semibold uppercase tracking-wider mb-4 px-1 quest-section-title"
-        style={{ color: 'var(--quest-text-secondary)' }}
-      >
-        Journey Summary
+      <h2 className="quest-section-title mb-3 px-1">
+        Regional Progress
       </h2>
 
       <div 
-        className="quest-card rounded-xl p-4"
+        className="quest-card quest-card-interactive rounded-2xl p-4"
         style={{
           background: 'var(--quest-card)',
           border: '1px solid var(--quest-stroke)',
           boxShadow: 'var(--quest-shadow)',
         }}
       >
-        <div className="divide-y" style={{ borderColor: 'var(--quest-hairline)' }}>
-          {regions.map(region => (
-            <RegionRow
-              key={region.id}
-              region={region}
-              onClick={() => handleRegionClick(region)}
-            />
+        <div className="space-y-1">
+          {regions.map((region, index) => (
+            <React.Fragment key={region.id}>
+              <RegionRow
+                region={region}
+                onClick={() => handleRegionClick(region)}
+              />
+              {index < regions.length - 1 && (
+                <div 
+                  className="mx-3" 
+                  style={{ 
+                    height: '1px', 
+                    background: 'var(--quest-hairline)' 
+                  }} 
+                />
+              )}
+            </React.Fragment>
           ))}
         </div>
       </div>

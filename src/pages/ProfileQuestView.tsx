@@ -176,47 +176,50 @@ const ProfileQuestView: React.FC = () => {
 
   return (
     <PageRoot className="quest-theme-light min-h-screen">
-      {/* Background texture for unlocked rewards */}
-      {rewards.hasBackgroundTexture && (
-        <div
-          className="fixed inset-0 pointer-events-none opacity-10"
-          style={{
-            background: 'radial-gradient(ellipse at 50% 0%, rgba(110, 146, 119, 0.15) 0%, transparent 70%)',
-          }}
-        />
-      )}
+      {/* Premium background with depth */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: rewards.hasBackgroundTexture
+            ? 'radial-gradient(ellipse at 50% 0%, rgba(210, 180, 97, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(110, 146, 119, 0.06) 0%, transparent 40%)'
+            : 'radial-gradient(ellipse at 50% 0%, rgba(31, 36, 40, 0.02) 0%, transparent 50%)',
+        }}
+      />
 
       {/* Header - Back CTA top left, centered title + subtitle */}
-      <div className="safe-top px-4 pt-4">
+      <div className="relative safe-top px-4 pt-4">
         {/* Back link */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1 text-sm transition-colors hover:opacity-70 mb-4"
+          className="flex items-center gap-1.5 text-sm transition-all hover:opacity-70 hover:-translate-x-0.5 mb-5"
           style={{ color: 'var(--quest-text-secondary)' }}
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
+          <span className="font-medium">Back</span>
         </button>
 
-        {/* Centered title + subtitle */}
-        <div className="text-center mb-2">
+        {/* Centered title + subtitle with premium typography */}
+        <div className="text-center mb-4">
           <h1
-            className="text-2xl font-bold mb-1"
-            style={{ color: 'var(--quest-text-primary)' }}
+            className="text-3xl font-bold tracking-tight mb-1.5"
+            style={{ 
+              color: 'var(--quest-text-primary)',
+              letterSpacing: '-0.02em',
+            }}
           >
             The Quest
           </h1>
           <p
-            className="text-sm"
-            style={{ color: 'var(--quest-text-secondary)' }}
+            className="text-sm font-medium"
+            style={{ color: 'var(--quest-text-tertiary)' }}
           >
             Your journey across the world's greatest courses
           </p>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-4 pb-32 space-y-8">
+      {/* Content with premium spacing */}
+      <div className="relative px-4 pb-32 space-y-10">
         {/* Section 1: Hero - Overall Progress */}
         <QuestHero
           totalPlayed={totalPlayed}
@@ -225,34 +228,52 @@ const ProfileQuestView: React.FC = () => {
         />
 
         {/* Section 2: Milestones Earned Row */}
-        <MilestonesEarnedRow totalPlayed={totalPlayed} />
+        <section>
+          <h2 className="quest-section-title mb-3 px-1">Milestones Earned</h2>
+          <MilestonesEarnedRow totalPlayed={totalPlayed} />
+        </section>
+
+        {/* Section Divider */}
+        <div className="quest-section-divider" />
 
         {/* Section 3: Next Target Card */}
-        <NextTargetCard
-          totalPlayed={totalPlayed}
-          nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
-          suggestedRegion={suggestedRegion}
-          suggestedFocus={nextMilestone?.name}
-          onShare={() => {/* Share placeholder */}}
-          showHint={onboarding.shouldShowTargetHint}
-          onHintDismiss={onboarding.markTargetHintSeen}
-        />
+        <section>
+          <h2 className="quest-section-title mb-3 px-1">Next Target</h2>
+          <NextTargetCard
+            totalPlayed={totalPlayed}
+            nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
+            suggestedRegion={suggestedRegion}
+            suggestedFocus={nextMilestone?.name}
+            onShare={() => {/* Share placeholder */}}
+            showHint={onboarding.shouldShowTargetHint}
+            onHintDismiss={onboarding.markTargetHintSeen}
+          />
+        </section>
 
-        {/* Section 4: Journey Map (Milestone Ladder ONLY) */}
-        {showJourneyHint && (
-          <p
-            className="text-xs px-1 transition-opacity duration-500"
-            style={{ color: 'var(--quest-text-tertiary)' }}
-          >
-            Your journey unfolds here
-          </p>
-        )}
-        <MilestoneLadder
-          totalPlayed={totalPlayed}
-          onMilestoneClick={handleMilestoneClick}
-        />
+        {/* Section Divider */}
+        <div className="quest-section-divider" />
 
-        {/* Section 5: Journey Summary (Regional Lists ONLY) */}
+        {/* Section 4: Journey Map (Milestone Ladder with Mastery Track) */}
+        <section>
+          <h2 className="quest-section-title mb-3 px-1">Journey Map</h2>
+          {showJourneyHint && (
+            <p
+              className="text-xs px-1 mb-2 transition-opacity duration-500"
+              style={{ color: 'var(--quest-text-tertiary)' }}
+            >
+              Your journey unfolds here
+            </p>
+          )}
+          <MilestoneLadder
+            totalPlayed={totalPlayed}
+            onMilestoneClick={handleMilestoneClick}
+          />
+        </section>
+
+        {/* Section Divider */}
+        <div className="quest-section-divider" />
+
+        {/* Section 5: Journey Summary (Regional Lists) */}
         <RegionalJourneySummary
           regions={regionProgress}
           onRegionClick={handleRegionClick}
