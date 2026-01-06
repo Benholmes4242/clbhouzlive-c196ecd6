@@ -88,22 +88,17 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
       if (deleteError) throw deleteError;
 
-      // Pack remaining positions (no gaps)
+      // Pack remaining positions using RPC (avoids constraint violations)
       const remainingCourses = topTen
         .filter(c => c.course_id !== courseId)
         .sort((a, b) => a.position - b.position);
 
       if (remainingCourses.length > 0) {
-        const updates = remainingCourses.map((course, index) =>
-          supabase
-            .from('user_top_ten_courses')
-            .update({ position: index + 1, updated_at: new Date().toISOString() })
-            .eq('user_id', userId)
-            .eq('course_id', course.course_id)
-        );
-        const results = await Promise.all(updates);
-        const error = results.find(r => r.error)?.error;
-        if (error) throw error;
+        const { error: reorderError } = await supabase.rpc('reorder_after_removal', {
+          p_user_id: userId,
+          p_course_ids: remainingCourses.map(c => c.course_id),
+        });
+        if (reorderError) throw reorderError;
       }
     },
     onSuccess: invalidateTopTenQueries,

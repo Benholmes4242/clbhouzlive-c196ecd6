@@ -1,3 +1,7 @@
+/**
+ * @deprecated This hook uses the legacy JSON-based storage (user_top_ten_lists table).
+ * Use `useUserTopTenCourses` instead, which uses the normalized `user_top_ten_courses` table.
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';

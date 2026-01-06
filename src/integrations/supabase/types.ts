@@ -9492,6 +9492,10 @@ export type Database = {
         Args: { p_note?: string; p_user_id: string }
         Returns: undefined
       }
+      reorder_after_removal: {
+        Args: { p_course_ids: string[]; p_user_id: string }
+        Returns: undefined
+      }
       reorder_top_ten_courses: {
         Args: { p_course_ids: string[]; p_user_id: string }
         Returns: undefined
