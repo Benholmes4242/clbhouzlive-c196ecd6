@@ -92,7 +92,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <CreatorProfileSection
         userId={userId}
         isOwnProfile={isOwnProfile}
-        className="mb-6"
+        className="mb-4"
       />
 
       {/* Activity Filter Toolbar - dedicated row for filter controls */}
