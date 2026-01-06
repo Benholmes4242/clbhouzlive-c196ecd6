@@ -1,47 +1,48 @@
 /**
  * Create Moment Modal - Light Slate Theme
- * Clean, Apple-inspired design tokens for the light mode composer
+ * Matches Quest page slate/white color palette
  */
 
 :root {
   /* ========================================
      CREATE MOMENT LIGHT PALETTE
+     Aligned with Quest page (Tailwind Slate)
      ======================================== */
   
-  /* Surfaces */
-  --cm-surface-card: #FAFAFB;
-  --cm-surface-alt: #EDEFF2;
-  --cm-surface-slate: #3A3F46;
+  /* Surfaces - matching Quest page */
+  --cm-surface-card: #ffffff;           /* white - main panels */
+  --cm-surface-alt: #f8fafc;            /* slate-50 - media stage background */
+  --cm-surface-slate: #334155;          /* slate-700 - primary buttons */
   
   /* Inputs */
-  --cm-surface-input: #EDEFF2;
-  --cm-surface-input-hover: #E8EAEC;
-  --cm-surface-input-focus: #E0E2E4;
+  --cm-surface-input: #f1f5f9;          /* slate-100 */
+  --cm-surface-input-hover: #e2e8f0;    /* slate-200 */
+  --cm-surface-input-focus: #e2e8f0;    /* slate-200 */
   
-  /* Borders */
-  --cm-border: #D4D7DB;
-  --cm-border-subtle: #E5E7EA;
+  /* Borders - matching Quest page border-slate-200/60 */
+  --cm-border: #cbd5e1;                 /* slate-300 */
+  --cm-border-subtle: rgba(226, 232, 240, 0.6); /* slate-200/60 */
   
-  /* Text hierarchy */
-  --cm-text-primary: #1F2428;
-  --cm-text-secondary: #5E666D;
-  --cm-text-tertiary: #97A1AA;
+  /* Text hierarchy - matching Quest page */
+  --cm-text-primary: #0f172a;           /* slate-900 */
+  --cm-text-secondary: #64748b;         /* slate-500 */
+  --cm-text-tertiary: #94a3b8;          /* slate-400 */
   
   /* Icons */
-  --cm-icon-primary: #3A3F46;
-  --cm-icon-secondary: #7A8490;
+  --cm-icon-primary: #334155;           /* slate-700 */
+  --cm-icon-secondary: #64748b;         /* slate-500 */
   
   /* Backdrop */
-  --cm-backdrop: rgba(31, 36, 40, 0.35);
+  --cm-backdrop: rgba(15, 23, 42, 0.4); /* slate-900/40 */
   
   /* Accent - Slate based (no orange) */
-  --cm-accent: #3A3F46;
-  --cm-accent-subtle: rgba(58, 63, 70, 0.10);
-  --cm-accent-muted: rgba(58, 63, 70, 0.50);
+  --cm-accent: #334155;                 /* slate-700 */
+  --cm-accent-subtle: rgba(51, 65, 85, 0.10);
+  --cm-accent-muted: rgba(51, 65, 85, 0.50);
   
   /* Shadows */
-  --cm-shadow-soft: 0 4px 24px rgba(31, 36, 40, 0.08);
-  --cm-shadow-button: 0 2px 8px rgba(31, 36, 40, 0.06);
+  --cm-shadow-soft: 0 4px 24px rgba(15, 23, 42, 0.08);
+  --cm-shadow-button: 0 2px 8px rgba(15, 23, 42, 0.06);
 }
 
 /* ========================================
@@ -82,7 +83,7 @@
   background: var(--cm-surface-input-focus);
   border-color: var(--cm-border);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(247, 147, 30, 0.15);
+  box-shadow: 0 0 0 2px rgba(51, 65, 85, 0.15);
 }
 
 .cm-button-primary {
@@ -93,7 +94,7 @@
 }
 
 .cm-button-primary:hover {
-  background: #4A5058;
+  background: #475569; /* slate-600 */
 }
 
 .cm-button-secondary {
@@ -125,13 +126,13 @@
 }
 
 .cm-row-tile:hover {
-  background: var(--cm-surface-alt);
+  background: var(--cm-surface-input); /* slate-100 for hover */
 }
 
 .cm-grabber {
   width: 36px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(148, 163, 184, 0.6); /* slate-400/60 - visible on slate-50 */
   border-radius: 2px;
   position: relative;
   z-index: 10;
