@@ -36,6 +36,40 @@ interface CourseWithRating {
   has_rating: boolean;
 }
 
+// Position badge colors - matches Top10CourseCard carousel
+const getPositionBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
+  switch (position) {
+    case 1:
+      // Gold
+      return { 
+        bg: 'linear-gradient(145deg, #D4B35A 0%, #C9A94A 50%, #B8963C 100%)', 
+        text: '#422006',
+        shadow: '0 2px 8px rgba(201, 169, 74, 0.4)'
+      };
+    case 2:
+      // Silver
+      return { 
+        bg: 'linear-gradient(145deg, #B8B8B8 0%, #9CA3AF 50%, #8B9299 100%)', 
+        text: '#1f2937',
+        shadow: '0 2px 6px rgba(156, 163, 175, 0.35)'
+      };
+    case 3:
+      // Bronze
+      return { 
+        bg: 'linear-gradient(145deg, #C9956A 0%, #B8845A 50%, #A67348 100%)', 
+        text: '#fff',
+        shadow: '0 2px 6px rgba(184, 132, 90, 0.35)'
+      };
+    default:
+      // Slate grey (matches Fair rating pill style)
+      return { 
+        bg: '#f1f5f9', 
+        text: '#475569',
+        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
+      };
+  }
+};
+
 export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   userId,
   onClose,
@@ -156,11 +190,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       ariaLabelledBy="add-course-title"
       className="max-h-[85vh]"
     >
-      {/* Drag handle */}
-      <div className="flex justify-center pt-3 pb-2">
-        <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-      </div>
-
       {/* Header with close button */}
       <div className="flex items-center justify-between px-5 pb-3">
         <h2 id="add-course-title" className="text-lg font-semibold text-foreground">
@@ -228,55 +257,71 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             </div>
           ) : (
             <div className="space-y-2">
-              {topTen.map((course, index) => (
-                <div
-                  key={course.course_id}
-                  className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50"
-                >
-                  {/* Position */}
-                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-primary">#{index + 1}</span>
-                  </div>
-
-                  {/* Course info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate text-sm">{course.name}</div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {course.sub_country || course.country}
-                    </div>
-                  </div>
-
-                  {/* Reorder buttons */}
-                  <div className="flex flex-col gap-0.5">
-                    <button
-                      onClick={() => handleMoveUp(index)}
-                      disabled={index === 0 || isReordering}
-                      className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-                      aria-label="Move up"
-                    >
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                    <button
-                      onClick={() => handleMoveDown(index)}
-                      disabled={index === topTen.length - 1 || isReordering}
-                      className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-                      aria-label="Move down"
-                    >
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  </div>
-
-                  {/* Remove button */}
-                  <button
-                    onClick={() => handleRemoveCourse(course.course_id)}
-                    disabled={isRemoving}
-                    className="p-2 rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50"
-                    aria-label="Remove from Top 10"
+              {topTen.map((course, index) => {
+                const position = index + 1;
+                const badgeStyle = getPositionBadgeStyle(position);
+                
+                return (
+                  <div
+                    key={course.course_id}
+                    className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                    {/* Position badge - gold/silver/bronze/slate */}
+                    <div 
+                      className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: badgeStyle.bg,
+                        boxShadow: badgeStyle.shadow,
+                      }}
+                    >
+                      <span 
+                        className="text-xs font-bold"
+                        style={{ color: badgeStyle.text }}
+                      >
+                        #{position}
+                      </span>
+                    </div>
+
+                    {/* Course info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate text-sm">{course.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {course.sub_country || course.country}
+                      </div>
+                    </div>
+
+                    {/* Reorder buttons */}
+                    <div className="flex flex-col gap-0.5">
+                      <button
+                        onClick={() => handleMoveUp(index)}
+                        disabled={index === 0 || isReordering}
+                        className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Move up"
+                      >
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                      <button
+                        onClick={() => handleMoveDown(index)}
+                        disabled={index === topTen.length - 1 || isReordering}
+                        className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Move down"
+                      >
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </div>
+
+                    {/* Remove button */}
+                    <button
+                      onClick={() => handleRemoveCourse(course.course_id)}
+                      disabled={isRemoving}
+                      className="p-2 rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50"
+                      aria-label="Remove from Top 10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )
         ) : (
