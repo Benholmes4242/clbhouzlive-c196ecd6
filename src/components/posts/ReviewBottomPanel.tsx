@@ -35,7 +35,7 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
   courseId,
   rating,
   onReadFullReview,
-  bottomOffsetPx = 80,
+  bottomOffsetPx = 100,
   className,
 }) => {
   const navigate = useNavigate();
