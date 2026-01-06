@@ -1,6 +1,7 @@
 /**
  * Hub Home Page
  * Standalone glass page showing Hub dashboard with tiles
+ * Apple-level design with Today header, Messages, Games, Echo, Golf Life, and Action Dock
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -9,10 +10,15 @@ import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequ
 import { useHub } from '../useHub';
 import { prefersReduced } from '@/lib/ui/motion';
 import { useChromeState } from '@/hooks/useChromeState';
+
+// New Hub components
+import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
+import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
+import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
-import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
-import { YourGamesTile } from '../home/tiles/YourGamesTile';
+import { HubGolfLifeCarousel } from '../home/tiles/HubGolfLifeCarousel';
+import { HubActionDock } from '../home/tiles/HubActionDock';
 
 import '../home/hubThemeLight.css';
 
@@ -214,41 +220,52 @@ export function HubHomePage() {
         {/* Grabber bar */}
         <div className="hub-grabber" />
 
-      {/* Hub Dashboard */}
-      <div className="no-header-offset w-full overflow-y-auto h-screen pt-[max(env(safe-area-inset-top,0px),12px)] px-3.5">
-        <div>
-        {/* Nearby Golfers - Full width */}
-        <div style={{ height: 'var(--hub-tile-fixed-h)' }}>
-          <NearbyGolfersTile />
-        </div>
-
-        {/* Your Games - calculated height to push bottom tiles to 30px from edge */}
+        {/* Hub Dashboard - scrollable content */}
         <div 
-          className="mt-3.5" 
-          style={{ 
-            height: 'calc(100vh - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 30px - env(safe-area-inset-top, 0px) - ((100vw - 28px - 0.875rem) / 2))' 
+          className="no-header-offset w-full overflow-y-auto px-3.5 pb-28"
+          style={{
+            height: '100vh',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
           }}
         >
-          <YourGamesTile />
+          {/* A. Today Header */}
+          <HubHeaderToday />
+
+          {/* B. Messages Card */}
+          <div style={{ height: '200px' }}>
+            <HubMessagesCard />
+          </div>
+
+          {/* C. Your Golf Schedule (Games) */}
+          <div 
+            className="mt-3.5" 
+            style={{ height: '280px' }}
+          >
+            <YourGamesTile />
+          </div>
+
+          {/* D. Echo & Quick Actions */}
+          <div
+            className="grid mt-3.5"
+            style={{ 
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+              gap: '0.875rem',
+            }}
+          >
+            <div style={{ aspectRatio: '1', width: '100%' }}>
+              <EchoTile />
+            </div>
+            <div style={{ aspectRatio: '1', width: '100%' }}>
+              <QuickActionsTile />
+            </div>
+          </div>
+
+          {/* E. Your Golf Life Carousel */}
+          <HubGolfLifeCarousel />
         </div>
 
-        {/* Echo & Quick Actions - bottom squares */}
-        <div
-          className="grid mt-3.5 pb-6"
-          style={{ 
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-            gap: '0.875rem',
-          }}
-        >
-          <div style={{ aspectRatio: '1', width: '100%' }}>
-            <EchoTile />
-          </div>
-          <div style={{ aspectRatio: '1', width: '100%' }}>
-            <QuickActionsTile />
-          </div>
-        </div>
-        </div>
-      </div>
+        {/* F. Persistent Action Dock */}
+        <HubActionDock />
       </div>
     </div>
   );

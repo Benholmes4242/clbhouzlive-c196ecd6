@@ -168,6 +168,8 @@ const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGameP
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
 const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
 const HubSwingPage = lazy(() => import("./features/hub/pages/HubSwingPage").then(m => ({ default: m.HubSwingPage })));
+const HubMessagesListPage = lazy(() => import("./features/hub/pages/HubMessagesListPage").then(m => ({ default: m.HubMessagesListPage })));
+const HubChatPlaceholderPage = lazy(() => import("./features/hub/pages/HubChatPlaceholderPage").then(m => ({ default: m.HubChatPlaceholderPage })));
 const HubEchoHistoryPage = lazy(() => import("./features/hub/pages/HubEchoHistoryPage").then(m => ({ default: m.HubEchoHistoryPage })));
 const HubEchoSharePage = lazy(() => import("./features/hub/pages/HubEchoSharePage").then(m => ({ default: m.HubEchoSharePage })));
 const HubEchoTagsPage = lazy(() => import("./features/hub/pages/HubEchoTagsPage"));
@@ -437,6 +439,8 @@ function AppRoutes() {
             <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
             <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
             <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
+            <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
+            <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
           <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
           <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
           <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
@@ -460,6 +464,8 @@ function AppRoutes() {
           <Route path="/hub/games" element={<HubGamesPage />} />
           <Route path="/hub/your-games" element={<HubYourGamesPage />} />
           <Route path="/hub/swing" element={<HubSwingPage />} />
+          <Route path="/hub/messages" element={<HubMessagesListPage />} />
+          <Route path="/hub/messages/:conversationId" element={<HubChatPlaceholderPage />} />
           <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
           <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
           <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
