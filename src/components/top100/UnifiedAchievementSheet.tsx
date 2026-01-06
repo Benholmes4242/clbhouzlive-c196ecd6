@@ -7,7 +7,7 @@
  * 1. Drag handle
  * 2. Icon disc (72px, frosted white, Apple-style)
  * 3. Title (large, confident)
- * 4. Purpose sentence
+ * 4. Purpose sentence (from achievementTaglines - single source of truth)
  * 5. Status pill (emotional feedback)
  * 6. Progress module
  * 7. Primary CTA
@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils';
 import { useAchievementUnlock } from '@/hooks/useAchievementUnlock';
 import { AchievementConfetti, getConfettiTheme } from './AchievementConfetti';
 import { haptic } from '@/utils/haptics';
+import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -104,12 +105,7 @@ function getMilestoneName(threshold: number): string {
   return tierMeta?.tierName || `${threshold} Club`;
 }
 
-function getMotivationalSubcopy(remaining: number): string {
-  if (remaining <= 3) return 'Momentum building';
-  if (remaining <= 10) return 'Keep chipping away';
-  if (remaining <= 25) return 'On the hunt';
-  return 'More ahead';
-}
+// Removed getMotivationalSubcopy - no longer used per polish spec
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICON DISC COMPONENT (72px, frosted white, Apple-style)
@@ -225,7 +221,7 @@ interface StatusPillProps {
 function StatusPill({ isUnlocked, remaining, color }: StatusPillProps) {
   if (isUnlocked) {
     return (
-      <div className="flex flex-col items-center gap-1 mb-5">
+      <div className="flex justify-center mb-5">
         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-600">
           <Check className="w-3.5 h-3.5" />
           Unlocked
@@ -234,24 +230,11 @@ function StatusPill({ isUnlocked, remaining, color }: StatusPillProps) {
     );
   }
 
-  // In Progress (close) or Locked (far away)
-  const isInProgress = remaining <= 50;
-  const subcopy = getMotivationalSubcopy(remaining);
-  
+  // Single concise status chip - "XX courses to go"
   return (
-    <div className="flex flex-col items-center gap-1 mb-5">
-      <span 
-        className={cn(
-          "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium",
-          isInProgress 
-            ? "bg-amber-500/10 text-amber-700" 
-            : "bg-muted text-muted-foreground"
-        )}
-      >
-        {remaining} {remaining === 1 ? 'more course' : 'more courses'} to unlock
-      </span>
-      <span className="text-xs text-muted-foreground/70">
-        {subcopy}
+    <div className="flex justify-center mb-5">
+      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-muted text-muted-foreground">
+        {remaining} {remaining === 1 ? 'course' : 'courses'} to go
       </span>
     </div>
   );
@@ -270,7 +253,6 @@ interface ProgressModuleProps {
 
 function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProps) {
   const progressPercent = total > 0 ? Math.min(100, (played / total) * 100) : 0;
-  const remaining = Math.max(0, total - played);
   
   return (
     <div className="rounded-xl border border-border/60 p-4 mb-5 bg-card/50">
@@ -296,12 +278,9 @@ function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProp
         />
       </div>
 
-      {/* Dynamic copy below bar */}
+      {/* Footer copy - "Milestone achieved" or "Progress in motion" */}
       <p className="text-xs text-muted-foreground text-center">
-        {isUnlocked 
-          ? 'Achievement complete' 
-          : `${remaining} more ${remaining === 1 ? 'course' : 'courses'} to go`
-        }
+        {isUnlocked ? 'Milestone achieved' : 'Progress in motion'}
       </p>
     </div>
   );
@@ -407,7 +386,8 @@ export function UnifiedAchievementSheet({
   if (isMilestone) {
     const { threshold, totalPlayed } = data as MilestoneData;
     title = getMilestoneName(threshold);
-    purposeSentence = `Awarded for playing ${threshold} Top 100 courses worldwide`;
+    // Use single source of truth for description (same as Journey Map)
+    purposeSentence = MILESTONE_TAGLINES[threshold] || `Awarded for playing ${threshold} Top 100 courses worldwide`;
     
     // Unified colour: success green when unlocked, tier colour when in progress
     color = getMilestoneColor(threshold, isUnlocked);
@@ -422,8 +402,10 @@ export function UnifiedAchievementSheet({
     const { listSlug, played: p, total: t } = data as RegionalData;
     regionSlug = listSlug;
     const theme = getRegionTheme(listSlug);
-    title = theme.primaryLabel;
-    purposeSentence = `Complete the ${theme.shortName} Top 100 to earn this badge`;
+    // Use full region name (not abbreviation) - e.g. "Great Britain & Ireland Top 100"
+    title = REGION_FULL_NAMES[listSlug] || theme.primaryLabel;
+    // Use single source of truth for description (same as Journey Map)
+    purposeSentence = REGION_TAGLINES[listSlug] || `Complete the ${theme.shortName} Top 100 to earn this badge`;
     
     // Unified colour: success green when unlocked, region colour when in progress
     const isComplete = p >= t && t > 0;
