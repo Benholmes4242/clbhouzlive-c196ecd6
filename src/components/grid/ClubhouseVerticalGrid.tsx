@@ -774,30 +774,42 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         className={cn("w-full h-full", filterClass)}
                         style={pixelLayerStyle}
                       >
-                        <VideoWithAutoplay
-                          key={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
-                          ref={(el) => {
-                            registerVideoRef(item.id, el);
-                            if (index === currentIndex && el) {
-                              setActiveVideoEl(el);
-                              onActiveVideoRefChange?.(el);
-                            }
-                          }}
-                          src={currentMedia.media_url}
-                          muted={videoMuted}
-                          className="w-full h-full"
-                          isMobile={isMobile}
-                          // Enforce immediate autoplay for the very first card on initial landing
-                          eagerMount={index === 0 && currentIndex === 0}
-                          // Review posts can contain video media even when post.type !== 'video'.
-                          // If the active carousel media is a video, force attach+autoplay.
-                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
-                          autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
-                          isNearby={isNearbyItem}
-                          isActive={index === currentIndex}
-                          postId={item.id}
-                          onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
-                        />
+                        {(() => {
+                          // Use media ID for carousel videos so each gets unique MediaRuntime registration
+                          const mediaIdForRuntime = currentMedia.id || `${item.id}-media-${currentMediaIndex}`;
+                          console.log('[ClubhouseGrid] 🎬 Rendering carousel video:', {
+                            postId: item.id?.substring(0, 8),
+                            mediaId: mediaIdForRuntime?.substring(0, 8),
+                            mediaIndex: currentMediaIndex,
+                            isReviewPost: item.categories?.includes('review'),
+                          });
+                          return (
+                            <VideoWithAutoplay
+                              key={mediaIdForRuntime}
+                              ref={(el) => {
+                                registerVideoRef(item.id, el);
+                                if (index === currentIndex && el) {
+                                  setActiveVideoEl(el);
+                                  onActiveVideoRefChange?.(el);
+                                }
+                              }}
+                              src={currentMedia.media_url}
+                              muted={videoMuted}
+                              className="w-full h-full"
+                              isMobile={isMobile}
+                              // Enforce immediate autoplay for the very first card on initial landing
+                              eagerMount={index === 0 && currentIndex === 0}
+                              // Review posts can contain video media even when post.type !== 'video'.
+                              // If the active carousel media is a video, force attach+autoplay.
+                              shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
+                              autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
+                              isNearby={isNearbyItem}
+                              isActive={index === currentIndex}
+                              postId={mediaIdForRuntime}
+                              onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
+                            />
+                          );
+                        })()}
                       </div>
                     </div>
                     
