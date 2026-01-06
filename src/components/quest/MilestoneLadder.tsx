@@ -107,7 +107,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
       {/* Connecting line - starts from center of node circle and ends at center of next node */}
-      {!isLast && (
+      {/* Don't render line for the last core milestone - it should end there */}
+      {!isLast && milestone.type === 'milestone' && (
         <div
           className="absolute left-5 w-0.5 z-0"
           style={{
@@ -272,23 +273,13 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   // Check if all core milestones are complete (400 Club achieved)
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
 
-  // Calculate height for background line - ends at last core milestone (Grand Slam)
-  const coreCount = coreMilestones.length;
-  // Each milestone node is ~88px height + 16px gap, line should end at center of last node
-  const lineEndOffset = regionMilestones.length > 0 ? '200px' : '40px';
+  // Calculate height for background line - ends at center of last core milestone (Grand Slam)
+  // Each milestone card is ~100px, line should stop at the last node's center (not extend past it)
 
   return (
     <div className="relative">
       <div className="relative pl-2">
-        {/* Background path line - ends at Grand Slam node, NOT extending into Mastery Track */}
-        <div
-          className="absolute left-7 w-0.5"
-          style={{ 
-            background: 'rgba(31, 36, 40, 0.12)',
-            top: '20px',
-            height: `calc(100% - ${lineEndOffset})`,
-          }}
-        />
+        {/* Background path line - hidden since individual node lines handle this */}
 
         <div className="space-y-0">
           {coreMilestones.map((milestone, index) => (
