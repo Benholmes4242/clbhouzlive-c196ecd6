@@ -1,13 +1,14 @@
 /**
- * HubHeaderToday - Dynamic "Today" Header
+ * HubHeaderToday - Dynamic "Today" Header (Fixed Height ~72-80px)
  * Shows personalized greeting + next game info
+ * Truncates course names to prevent wrapping
  */
 
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
-import { differenceInDays, isToday, isTomorrow, format } from 'date-fns';
+import { format } from 'date-fns';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -42,7 +43,7 @@ export function HubHeaderToday() {
     return upcoming[0] || null;
   }, [gamesData]);
 
-  // Build the subline
+  // Build the subline - compact format: "Playing {course} · {date}"
   const subline = React.useMemo(() => {
     if (!nextGame) {
       return "No games planned — fancy one this week?";
@@ -50,33 +51,21 @@ export function HubHeaderToday() {
 
     const gameDate = new Date(nextGame.start_time);
     const courseName = nextGame.course_name || 'a course';
+    const formattedDate = format(gameDate, 'MMM d');
     
-    if (isToday(gameDate)) {
-      return `You're playing ${courseName} today`;
-    }
-    
-    if (isTomorrow(gameDate)) {
-      return `You're playing ${courseName} tomorrow`;
-    }
-    
-    const daysUntil = differenceInDays(gameDate, new Date());
-    if (daysUntil <= 7) {
-      return `You're playing ${courseName} in ${daysUntil} days`;
-    }
-    
-    return `You're playing ${courseName} on ${format(gameDate, 'MMM d')}`;
+    return `Playing ${courseName} · ${formattedDate}`;
   }, [nextGame]);
 
   return (
-    <div className="px-1 pt-2 pb-4">
+    <div className="h-[72px] flex flex-col justify-center px-1">
       <h1 
-        className="text-[26px] font-bold leading-tight"
+        className="text-[24px] font-bold leading-tight truncate"
         style={{ color: 'var(--hub-text)' }}
       >
         {greeting}, {firstName} 👋
       </h1>
       <p 
-        className="text-[15px] mt-1"
+        className="text-[14px] mt-0.5 truncate"
         style={{ color: 'var(--hub-text-sub)' }}
       >
         {subline}
