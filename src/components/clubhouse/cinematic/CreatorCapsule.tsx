@@ -267,20 +267,14 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     <div className="flex flex-col gap-2.5 p-3">
       {/* Top row: Avatar + Name + "Rated this course" + Tier pill */}
       <div className="flex items-center gap-2.5">
-        {/* Avatar */}
-        <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-white/10">
-          {user?.avatar ? (
-            <img 
-              src={user.avatar} 
-              alt={user.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm">
-              {userInitials}
-            </div>
-          )}
-        </div>
+        {/* Avatar - squircle shape matching regular mode */}
+        <SquircleAvatar
+          size={40}
+          src={user?.avatar}
+          alt={user?.name ?? 'Creator'}
+          fallback={userInitials}
+          hideRing
+        />
         
         {/* Name + "Rated this course" + pill */}
         <div className="flex-1 min-w-0">
