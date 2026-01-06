@@ -14,6 +14,7 @@ import { MILESTONE_TIER_META, type AchievementMilestone } from '@/config/achieve
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
 import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // MILESTONE DATA TYPES
@@ -66,14 +67,16 @@ const REGION_TO_TIER: Record<Top100ListSlug, AchievementTier> = {
   'global': 'WORLD',
 };
 
+// Region accent colors - used for unlocked mastery cards
+const REGION_ACCENT_COLORS: Record<Top100ListSlug, string> = {
+  'gb-i': '#4A7C59',   // Green
+  'europe': '#5B7EC0', // Blue
+  'usa': '#C75B5B',    // Red
+  'global': '#D4AF37', // Gold
+};
+
 function getRegionAccentColor(slug: Top100ListSlug): string {
-  const colors: Record<Top100ListSlug, string> = {
-    'gb-i': '#4A7C59',
-    'europe': '#5B7EC0',
-    'usa': '#C75B5B',
-    'global': '#7A8FC0',
-  };
-  return colors[slug];
+  return REGION_ACCENT_COLORS[slug];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -204,8 +207,8 @@ function buildMilestoneItems(totalPlayed: number): MilestoneItem[] {
   return MILESTONE_TIER_META.map(meta => ({
     id: `milestone_${meta.threshold}`,
     threshold: meta.threshold,
-    name: `${meta.threshold} Club`,
-    tierName: meta.tierName,
+    name: meta.tierName, // Use "Rookie Club", "Fairway Club" etc.
+    tierName: MILESTONE_TAGLINES[meta.threshold] || '', // Witty tagline as subtitle
     type: 'milestone' as const,
     isUnlocked: totalPlayed >= meta.threshold,
   }));
@@ -221,14 +224,13 @@ function buildRegionCompletionItems(regions: RegionCompletionData[]): MilestoneI
     const region = regions.find(r => r.slug === slug);
     if (!region) continue;
     
-    const theme = getRegionTheme(slug);
     const isComplete = region.played >= region.total && region.total > 0;
     
     items.push({
       id: `region_${slug}`,
       threshold: region.total,
-      name: theme.completionTitle,
-      tierName: theme.primaryLabel,
+      name: REGION_FULL_NAMES[slug] || region.name, // Full display name
+      tierName: REGION_TAGLINES[slug] || '', // Witty tagline as subtitle
       type: 'list_completion',
       isUnlocked: isComplete,
       regionSlug: slug,
@@ -270,16 +272,21 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   // Check if all core milestones are complete (400 Club achieved)
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
 
+  // Calculate height for background line - ends at last core milestone (Grand Slam)
+  const coreCount = coreMilestones.length;
+  // Each milestone node is ~88px height + 16px gap, line should end at center of last node
+  const lineEndOffset = regionMilestones.length > 0 ? '200px' : '40px';
+
   return (
     <div className="relative">
       <div className="relative pl-2">
-        {/* Background path line - starts at center of first node, ends at center of last core milestone node */}
+        {/* Background path line - ends at Grand Slam node, NOT extending into Mastery Track */}
         <div
           className="absolute left-7 w-0.5"
           style={{ 
             background: 'rgba(31, 36, 40, 0.12)',
-            top: '20px', // Start at center of first node circle
-            height: `calc(100% - ${regionMilestones.length > 0 ? '120px' : '40px'})`, // Don't extend into mastery track
+            top: '20px',
+            height: `calc(100% - ${lineEndOffset})`,
           }}
         />
 
@@ -297,13 +304,18 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           ))}
         </div>
 
-        {/* Mastery Track Section - Regional Completions - Separate chapter block */}
+        {/* Mastery Track Section - Separate chapter with no connecting line */}
         {regionMilestones.length > 0 && (
           <motion.div 
-            className="mt-8 pt-6 border-t-0"
+            className="relative mt-8 pt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
+            style={{
+              // Cover any background line that might peek through
+              background: 'var(--quest-bg, #F4F5F7)',
+              zIndex: 2,
+            }}
           >
             {/* Chapter break card */}
             <div 
@@ -333,29 +345,42 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
               </p>
             </div>
 
-            {/* Regional items as stacked mini cards - no connecting line */}
-            <div className="space-y-3 pl-0">
-              {regionMilestones.map((milestone, index) => (
-                <motion.div
-                  key={milestone.id}
-                  className="relative"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.05 }}
-                  onClick={() => onMilestoneClick?.(milestone)}
-                >
-                  <AchievementBadgeCard
-                    tier={milestone.regionSlug ? REGION_TO_TIER[milestone.regionSlug] : 'GBI'}
-                    title={milestone.name}
-                    subtitle={milestone.tierName}
-                    unlocked={milestone.isUnlocked}
-                    isGhost={!milestone.isUnlocked}
-                    status={milestone.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
-                    playedOnList={milestone.played}
-                    totalOnList={milestone.total}
-                  />
-                </motion.div>
-              ))}
+            {/* Regional items as stacked cards - no connecting line, regional color accents */}
+            <div className="space-y-3">
+              {regionMilestones.map((milestone, index) => {
+                const regionSlug = milestone.regionSlug as Top100ListSlug;
+                const accentColor = getRegionAccentColor(regionSlug);
+                
+                return (
+                  <motion.div
+                    key={milestone.id}
+                    className="relative rounded-2xl overflow-hidden"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + index * 0.05 }}
+                    onClick={() => onMilestoneClick?.(milestone)}
+                    style={{
+                      // Subtle regional color tint for unlocked cards
+                      background: milestone.isUnlocked 
+                        ? `linear-gradient(135deg, ${accentColor}08 0%, transparent 100%)`
+                        : undefined,
+                      // Top accent strip for unlocked
+                      borderTop: milestone.isUnlocked ? `2px solid ${accentColor}50` : undefined,
+                    }}
+                  >
+                    <AchievementBadgeCard
+                      tier={REGION_TO_TIER[regionSlug]}
+                      title={milestone.name}
+                      subtitle={milestone.tierName}
+                      unlocked={milestone.isUnlocked}
+                      isGhost={!milestone.isUnlocked && !coreComplete}
+                      status={milestone.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
+                      playedOnList={milestone.played}
+                      totalOnList={milestone.total}
+                    />
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
