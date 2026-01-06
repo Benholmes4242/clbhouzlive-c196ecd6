@@ -2,18 +2,39 @@
  * MilestoneLadder - Vertical timeline showing milestone progression (5→400 Club)
  * This is the "Journey Map" showing ONLY milestones, not regional lists
  * Light theme version - now uses AchievementBadgeCard for consistent design
+ * 
+ * EXTENSION POINT: This component is designed to accept additional milestones
+ * (e.g., Top 100 List Completions) via the `extensionMilestones` prop in Phase 2.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Check, Lock, Trophy } from 'lucide-react';
-import { CLUB_STEPS } from '@/lib/top100Club';
+import { ACHIEVEMENT_MILESTONES, MILESTONE_TIER_META, type AchievementMilestone } from '@/config/achievements';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// MILESTONE DATA TYPES
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export interface MilestoneItem {
+  id: string;
+  threshold: number;
+  name: string;
+  tierName: string;
+  type: 'milestone' | 'list_completion';
+  isUnlocked: boolean;
+}
 
 interface MilestoneLadderProps {
   totalPlayed: number;
   onMilestoneClick?: (milestone: { threshold: number; name: string; isUnlocked: boolean }) => void;
+  /**
+   * EXTENSION POINT (Phase 2): Additional milestones to display after the main progression.
+   * These could be Top 100 List Completions or other achievement types.
+   */
+  extensionMilestones?: MilestoneItem[];
 }
 
 interface MilestoneNodeProps {
@@ -26,6 +47,10 @@ interface MilestoneNodeProps {
   totalPlayed: number;
   onClick?: () => void;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// MILESTONE NODE COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════════════════
 
 const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   threshold,
@@ -123,20 +148,45 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   );
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// BUILD MILESTONES FROM SINGLE SOURCE OF TRUTH
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Builds the milestone list from src/config/achievements.ts.
+ * This is the single source of truth for milestone thresholds.
+ */
+function buildMilestoneItems(totalPlayed: number): MilestoneItem[] {
+  return MILESTONE_TIER_META.map(meta => ({
+    id: `milestone_${meta.threshold}`,
+    threshold: meta.threshold,
+    name: `${meta.threshold} Club`,
+    tierName: meta.tierName,
+    type: 'milestone' as const,
+    isUnlocked: totalPlayed >= meta.threshold,
+  }));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// MILESTONE LADDER COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
 export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   totalPlayed,
   onMilestoneClick,
+  extensionMilestones = [], // Phase 2: Top 100 List Completions
 }) => {
-  // Build milestones from CLUB_STEPS
-  const milestones = CLUB_STEPS.map(step => ({
-    threshold: step.threshold,
-    name: `${step.threshold} Club`,
-    tierName: step.tierName,
-    isUnlocked: totalPlayed >= step.threshold,
-  }));
+  // Build milestones from single source of truth
+  const coreMilestones = useMemo(() => buildMilestoneItems(totalPlayed), [totalPlayed]);
+  
+  // Combine core milestones with any extension milestones (Phase 2)
+  const allMilestones = useMemo(() => [
+    ...coreMilestones,
+    ...extensionMilestones,
+  ], [coreMilestones, extensionMilestones]);
 
   // Find current milestone (first not unlocked)
-  const currentMilestoneIndex = milestones.findIndex(m => !m.isUnlocked);
+  const currentMilestoneIndex = allMilestones.findIndex(m => !m.isUnlocked);
 
   return (
     <section>
@@ -155,15 +205,15 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         />
 
         <div className="space-y-0">
-          {milestones.map((milestone, index) => (
+          {allMilestones.map((milestone, index) => (
             <MilestoneNode
-              key={milestone.threshold}
+              key={milestone.id}
               threshold={milestone.threshold}
               name={milestone.name}
               tierName={milestone.tierName}
               isUnlocked={milestone.isUnlocked}
               isCurrent={index === currentMilestoneIndex}
-              isLast={index === milestones.length - 1}
+              isLast={index === allMilestones.length - 1}
               totalPlayed={totalPlayed}
               onClick={() => onMilestoneClick?.(milestone)}
             />
