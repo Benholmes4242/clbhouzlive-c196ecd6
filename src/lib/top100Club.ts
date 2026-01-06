@@ -1,25 +1,23 @@
-// src/lib/top100Club.ts
-// New unified Top 100 club tier system based on total_top100_rated
-// 
-// IMPORTANT: All colors are sourced from globalAchievementMilestoneSystem.ts
-// This file references the global system for ring colors.
+/**
+ * src/lib/top100Club.ts
+ * 
+ * Top 100 Club tier system based on total_top100_rated.
+ * 
+ * IMPORTANT: Milestone thresholds are sourced from src/config/achievements.ts
+ * IMPORTANT: All colors are sourced from globalAchievementMilestoneSystem.ts
+ */
 
 import { 
-  MILESTONE_THEMES, 
-  getRingColorForTotalPlayed,
+  ACHIEVEMENT_MILESTONES,
+  MILESTONE_TIER_META,
+  type MilestoneTierId,
+} from '@/config/achievements';
+import { 
   getRingColorForThreshold 
 } from './globalAchievementMilestoneSystem';
 
-export type Top100TierId =
-  | 'none'
-  | 'rookie'
-  | 'fairway'
-  | 'founders'
-  | 'heritage'
-  | 'century'
-  | 'elite'
-  | 'legendary'
-  | 'grandslam';
+// Re-export the tier ID type with backwards-compatible name
+export type Top100TierId = MilestoneTierId;
 
 // Glass intensity presets for badge styling
 export const glassIntensity = {
@@ -36,18 +34,31 @@ export type Top100ClubMeta = {
   glassIntensity: number; // opacity for glass badge effect
 };
 
-// Ordered lowest → highest
-// NOTE: ringColor removed - use getRingColorForThreshold(step.threshold) from globalAchievementMilestoneSystem.ts
-export const CLUB_STEPS: Top100ClubMeta[] = [
-  { threshold: 5,   shortLabel: 'Rookie',     tierName: 'Rookie Club',     tierId: 'rookie',    glassIntensity: glassIntensity.subtle },
-  { threshold: 10,  shortLabel: 'Fairway',    tierName: 'Fairway Club',    tierId: 'fairway',   glassIntensity: glassIntensity.standard },
-  { threshold: 20,  shortLabel: 'Founders',   tierName: 'Founders Club',   tierId: 'founders',  glassIntensity: glassIntensity.standard },
-  { threshold: 50,  shortLabel: 'Heritage',   tierName: 'Heritage Club',   tierId: 'heritage',  glassIntensity: glassIntensity.vivid },
-  { threshold: 100, shortLabel: 'Century',    tierName: 'Century Club',    tierId: 'century',   glassIntensity: glassIntensity.standard },
-  { threshold: 200, shortLabel: 'Elite',      tierName: 'Elite Club',      tierId: 'elite',     glassIntensity: glassIntensity.vivid },
-  { threshold: 300, shortLabel: 'Legendary',  tierName: 'Legendary Club',  tierId: 'legendary', glassIntensity: glassIntensity.vivid },
-  { threshold: 400, shortLabel: 'Grand Slam', tierName: 'Grand Slam Club', tierId: 'grandslam', glassIntensity: glassIntensity.standard },
-];
+// Glass intensity by threshold (higher tiers get more vivid)
+const GLASS_BY_THRESHOLD: Record<number, number> = {
+  5: glassIntensity.subtle,
+  10: glassIntensity.standard,
+  20: glassIntensity.standard,
+  50: glassIntensity.vivid,
+  100: glassIntensity.standard,
+  200: glassIntensity.vivid,
+  300: glassIntensity.vivid,
+  400: glassIntensity.standard,
+};
+
+/**
+ * CLUB_STEPS - Derived from the single source of truth in src/config/achievements.ts
+ * Ordered lowest → highest.
+ * 
+ * NOTE: ringColor removed - use getRingColorForThreshold(step.threshold) from globalAchievementMilestoneSystem.ts
+ */
+export const CLUB_STEPS: Top100ClubMeta[] = MILESTONE_TIER_META.map(meta => ({
+  threshold: meta.threshold,
+  shortLabel: meta.shortLabel,
+  tierName: meta.tierName,
+  tierId: meta.tierId,
+  glassIntensity: GLASS_BY_THRESHOLD[meta.threshold] ?? glassIntensity.standard,
+}));
 
 // Lookup map for quick access by tierId
 export const TIER_BY_ID: Record<Top100TierId, Top100ClubMeta | null> = {

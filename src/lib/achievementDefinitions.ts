@@ -1,22 +1,28 @@
 /**
  * Achievement Definitions
  * 
+ * IMPORTANT: Milestone thresholds are sourced from src/config/achievements.ts
  * IMPORTANT: All colors are sourced from globalAchievementMilestoneSystem.ts
- * This file only defines structure, labels, and thresholds.
+ * 
+ * This file only defines structure and combines milestones with list achievements.
  * DO NOT add ringColor values here - they come from the global system.
  */
 
 import { 
+  ACHIEVEMENT_MILESTONES,
+  MILESTONE_TIER_META,
+  type AchievementMilestone,
+} from '@/config/achievements';
+import { 
   MILESTONE_THEMES, 
   REGION_THEMES,
-  getRingColorForThreshold 
 } from './globalAchievementMilestoneSystem';
 
 export type AchievementType = 'milestone' | 'list_completion';
 
 export interface AchievementDefinition {
   id: string;
-  threshold?: number; // For milestones only
+  threshold?: AchievementMilestone; // For milestones only - explicitly typed
   label: string;
   shortLabel: string;
   type: AchievementType;
@@ -56,67 +62,19 @@ export function getAchievementGlassIntensity(achievement: AchievementDefinition)
   return glassIntensity.subtle;
 }
 
-// Milestone achievements - earned by playing Top 100 courses
-// User earns ALL milestones where totalPlayed >= threshold
-// NOTE: Colors come from MILESTONE_THEMES in globalAchievementMilestoneSystem.ts
-export const MILESTONE_ACHIEVEMENTS: AchievementDefinition[] = [
-  { 
-    id: 'milestone_5', 
-    threshold: 5, 
-    label: 'Rookie Club', 
-    shortLabel: '5 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_10', 
-    threshold: 10, 
-    label: 'Fairway Club', 
-    shortLabel: '10 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_20', 
-    threshold: 20, 
-    label: 'Founders Club', 
-    shortLabel: '20 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_50', 
-    threshold: 50, 
-    label: 'Heritage Club', 
-    shortLabel: '50 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_100', 
-    threshold: 100, 
-    label: 'Century Club', 
-    shortLabel: '100 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_200', 
-    threshold: 200, 
-    label: 'Elite Club', 
-    shortLabel: '200 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_300', 
-    threshold: 300, 
-    label: 'Legendary Club', 
-    shortLabel: '300 Club',
-    type: 'milestone',
-  },
-  { 
-    id: 'milestone_400', 
-    threshold: 400, 
-    label: 'Grand Slam Club', 
-    shortLabel: '400 Club',
-    type: 'milestone',
-  },
-];
+/**
+ * MILESTONE_ACHIEVEMENTS - Derived from the single source of truth in src/config/achievements.ts
+ * 
+ * User earns ALL milestones where totalPlayed >= threshold.
+ * Colors come from MILESTONE_THEMES in globalAchievementMilestoneSystem.ts.
+ */
+export const MILESTONE_ACHIEVEMENTS: AchievementDefinition[] = MILESTONE_TIER_META.map(meta => ({
+  id: `milestone_${meta.threshold}`,
+  threshold: meta.threshold,
+  label: meta.tierName,
+  shortLabel: `${meta.threshold} Club`,
+  type: 'milestone' as const,
+}));
 
 // List completion achievements - earned by completing regional Top 100 lists
 // NOTE: Colors come from REGION_THEMES in globalAchievementMilestoneSystem.ts

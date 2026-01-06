@@ -3,6 +3,7 @@ import { Trophy } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
+import { ACHIEVEMENT_MILESTONES } from '@/config/achievements';
 import { 
   getTierPalette, 
   MILESTONE_THEMES,
@@ -95,8 +96,11 @@ const GLOW_INTENSITY: Record<string, { opacity: number; scale: number; blur: num
   'WORLD': { opacity: 0.18, scale: 3.0, blur: 9 },
 };
 
-// Milestone thresholds for next tier calculation
-const MILESTONE_THRESHOLDS: number[] = [5, 10, 20, 50, 100, 200, 300, 400];
+/**
+ * MILESTONE_THRESHOLDS - Derived from the single source of truth.
+ * Used for next tier calculation.
+ */
+const MILESTONE_THRESHOLDS: readonly number[] = ACHIEVEMENT_MILESTONES;
 
 /**
  * Get the tier accent color from CLBHOUZ_ACHIEVEMENT_PALETTE

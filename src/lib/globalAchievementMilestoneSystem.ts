@@ -40,17 +40,27 @@
  */
 
 import {
+  ACHIEVEMENT_MILESTONES,
+  MILESTONE_TIER_META,
+  type AchievementMilestone,
+} from '@/config/achievements';
+import {
   CLBHOUZ_ACHIEVEMENT_PALETTE,
   buildTheme,
   THEME_COLORS,
+  MILESTONE_PALETTE_MAP,
   type AchievementColorTheme,
 } from './clbhouzAchievementPalette';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // MILESTONE THEMES (5 → 400 Club)
+// 
+// Thresholds are sourced from src/config/achievements.ts (single source of truth).
+// Colors are sourced from clbhouzAchievementPalette.ts.
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-export type MilestoneTier = 5 | 10 | 20 | 50 | 100 | 200 | 300 | 400;
+// Re-export type for backwards compatibility
+export type MilestoneTier = AchievementMilestone;
 
 export interface MilestoneTheme {
   id: string;
@@ -61,26 +71,30 @@ export interface MilestoneTheme {
   bgDark: string;    // Card gradient end
 }
 
-// Build themes from the unified palette
-const t5   = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.FAIR);
-const t10  = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.MILD);
-const t20  = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.STEADY);
-const t50  = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE);
-const t100 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD);
-const t200 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD);
-const t300 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT);
-const t400 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING);
-
-export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     bgLight: t5.bgLight,   bgDark: t5.bgDark,   accent: THEME_COLORS.icon },
-  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    bgLight: t10.bgLight,  bgDark: t10.bgDark,  accent: THEME_COLORS.icon },
-  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   bgLight: t20.bgLight,  bgDark: t20.bgDark,  accent: THEME_COLORS.icon },
-  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   bgLight: t50.bgLight,  bgDark: t50.bgDark,  accent: THEME_COLORS.icon },
-  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    bgLight: t100.bgLight, bgDark: t100.bgDark, accent: THEME_COLORS.icon },
-  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      bgLight: t200.bgLight, bgDark: t200.bgDark, accent: THEME_COLORS.icon },
-  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  bgLight: t300.bgLight, bgDark: t300.bgDark, accent: THEME_COLORS.icon },
-  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', bgLight: t400.bgLight, bgDark: t400.bgDark, accent: THEME_COLORS.icon },
-};
+/**
+ * Build MILESTONE_THEMES dynamically from the single source of truth.
+ * 
+ * The mapping:
+ *   5 → FAIR, 10 → MILD, 20 → STEADY, 50 → RESPECTABLE,
+ *   100 → GOOD, 200 → VERY_GOOD, 300 → EXCELLENT, 400 → OUTSTANDING
+ */
+export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fromEntries(
+  MILESTONE_TIER_META.map(meta => {
+    const paletteKey = MILESTONE_PALETTE_MAP[meta.threshold];
+    const theme = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey]);
+    return [
+      meta.threshold,
+      {
+        id: meta.tierId,
+        name: meta.tierName,
+        tier: meta.tierId.toUpperCase().replace('GRANDSLAM', 'GRAND_SLAM'),
+        bgLight: theme.bgLight,
+        bgDark: theme.bgDark,
+        accent: THEME_COLORS.icon,
+      },
+    ];
+  })
+) as Record<MilestoneTier, MilestoneTheme>;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // COURSE RATING THEMES (Fair → Outstanding)
@@ -308,12 +322,15 @@ export function getRingColorForThreshold(threshold: number): string {
 /**
  * Get ring color for user's highest global milestone
  * Returns softer pastel color (bgDark) to match card appearance
+ * 
+ * Uses milestones from src/config/achievements.ts (single source of truth).
  */
 export function getRingColorForTotalPlayed(totalPlayed: number): string {
-  const thresholds: MilestoneTier[] = [400, 300, 200, 100, 50, 20, 10, 5];
-  for (const t of thresholds) {
-    if (totalPlayed >= t) {
-      return MILESTONE_THEMES[t].bgDark;
+  // Iterate from highest to lowest threshold
+  const reversedMilestones = [...ACHIEVEMENT_MILESTONES].reverse();
+  for (const threshold of reversedMilestones) {
+    if (totalPlayed >= threshold) {
+      return MILESTONE_THEMES[threshold].bgDark;
     }
   }
   return '#D1D5DB';
