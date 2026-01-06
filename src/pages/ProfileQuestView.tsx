@@ -266,7 +266,6 @@ const ProfileQuestView: React.FC = () => {
 
         {/* Section 3: Next Target Card - KEEP CARD */}
         <div className="px-4 py-5 border-t border-slate-200/60">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Next Target</h2>
           <NextTargetCard
             totalPlayed={totalPlayed}
             nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
@@ -280,9 +279,9 @@ const ProfileQuestView: React.FC = () => {
 
         {/* Section 4: Journey Map - KEEP CARD */}
         <div className="px-4 py-5 border-t border-slate-200/60" ref={journeyMapRef}>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Journey Map</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Journey Map</h2>
           {showJourneyHint && (
-            <p className="text-xs px-1 mb-2 text-slate-400 transition-opacity duration-500">
+            <p className="text-xs mb-2 text-slate-400 transition-opacity duration-500">
               Your journey unfolds here
             </p>
           )}
@@ -308,7 +307,7 @@ const ProfileQuestView: React.FC = () => {
           <MomentumCard recentlyPlayed={recentCourses} />
         </div>
 
-        {/* Section 7: Leaderboard - KEEP CARD */}
+        {/* Section 7: Leaderboard - KEEP CARD (has own header) */}
         <div className="px-4 py-5 border-t border-slate-200/60">
           <LeaderboardCard userId={user?.id} />
         </div>

@@ -117,8 +117,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             // Height extends down to connect with next node
             height: 'calc(100% + 16px)',
             background: milestone.isUnlocked
-              ? `linear-gradient(to bottom, ${accentColor}80, rgba(31, 36, 40, 0.12))`
-              : 'rgba(31, 36, 40, 0.08)',
+              ? `linear-gradient(to bottom, ${accentColor}80, rgb(226 232 240 / 0.6))`
+              : 'rgb(226 232 240 / 0.6)',
           }}
         />
       )}
@@ -128,21 +128,21 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         onClick={onClick}
         className={cn(
           'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
-          milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-[#F4F5F7]',
-          isCurrent && !milestone.isUnlocked && 'ring-1 ring-offset-1 ring-offset-[#F4F5F7]',
+          milestone.isUnlocked && 'ring-2 ring-offset-2 ring-offset-white',
+          isCurrent && !milestone.isUnlocked && 'ring-1 ring-offset-1 ring-offset-white',
         )}
         style={{
           background: milestone.isUnlocked
             ? accentColor
             : isCurrent
               ? 'var(--quest-accent-green)'
-              : 'var(--quest-card)',
+              : 'white',
           border: `2px solid ${
             milestone.isUnlocked
               ? accentColor
               : isCurrent
                 ? 'var(--quest-accent-green)'
-                : 'var(--quest-stroke)'
+                : 'rgb(226 232 240 / 0.6)'
           }`,
           boxShadow: milestone.isUnlocked
             ? `0 0 16px ${accentColor}30`
@@ -278,7 +278,10 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   // Each milestone card is ~100px, line should stop at the last node's center (not extend past it)
 
   return (
-    <div className="relative">
+    <div 
+      className="relative rounded-2xl bg-white border border-slate-200/60 p-4"
+      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)' }}
+    >
       <div className="relative pl-2">
         {/* Background path line - hidden since individual node lines handle this */}
 
@@ -299,15 +302,11 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         {/* Mastery Track Section - Separate chapter with no connecting line */}
         {regionMilestones.length > 0 && (
           <motion.div 
-            className="relative mt-8 pt-6"
+            className="relative mt-8 pt-6 bg-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            style={{
-              // Cover any background line that might peek through
-              background: 'var(--quest-bg, #F4F5F7)',
-              zIndex: 2,
-            }}
+            style={{ zIndex: 2 }}
           >
             {/* Chapter break card */}
             <div 
