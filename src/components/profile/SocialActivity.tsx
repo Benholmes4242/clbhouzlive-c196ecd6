@@ -12,6 +12,7 @@ import { MediaItem } from '@/types/media';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
+import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 
@@ -111,14 +112,9 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         // Format location for review posts - use short format matching Clubhouse
         const formatLocation = (course?: ActivityPost['course']) => {
           if (!course) return '';
-          // Use region + country format, matching Clubhouse overlay style
-          const region = course.region;
-          const country = course.country;
-          if (region && country && region !== country) {
-            return `${region}, ${country}`;
-          }
-          return region || country || '';
+          return (course.country as string | undefined) || (course.region as string | undefined) || '';
         };
+
 
         // Review post: use FullscreenReviewPost
         if (isReviewPost) {
@@ -149,9 +145,21 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
                     username: selectedPost.user?.username || undefined,
                     avatar: selectedPost.user?.profile_photo_url || undefined,
                   }}
-                  showReviewCapsule={true}
+                  showReviewCapsule={false}
                   renderMedia={true}
-                />
+                >
+                  <ReviewBottomPanel
+                    user={{
+                      id: selectedPost.user?.id || '',
+                      name: selectedPost.user?.display_name || selectedPost.user?.username || 'Golfer',
+                      username: selectedPost.user?.username || undefined,
+                      avatar: selectedPost.user?.profile_photo_url || undefined,
+                    }}
+                    courseId={selectedPost.course?.id || selectedPost.course_id || ''}
+                    rating={selectedPost.rating ?? 0}
+                  />
+                </ReviewPostViewer>
+
               </DialogContent>
             </Dialog>
           );

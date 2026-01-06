@@ -19,6 +19,7 @@ import { getMediaType, isVideoFile } from '@/utils/getMediaType';
 import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks/useReviewVideoUpload';
 import { useShareReview } from '@/hooks/useShareReview';
 import { FullscreenReviewPost, type ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
+import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -1787,7 +1788,17 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           media={previewMedia}
           onBack={onBack}
           dotsBottomOffset={shareState === 'shared' ? 168 : 108}
-        />
+        >
+          {shareState === 'idle' && (
+            <ReviewBottomPanel
+              user={{ id: 'me', name: 'You' }}
+              courseId={courseId}
+              rating={userRating}
+              bottomOffsetPx={168}
+            />
+          )}
+        </FullscreenReviewPost>
+
       </div>
 
       {/* Bottom sticky CTA bar - softer gradient, pointer-events-none allows swipe gestures through */}
