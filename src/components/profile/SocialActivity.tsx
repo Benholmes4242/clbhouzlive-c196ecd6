@@ -10,7 +10,8 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
-import { FullscreenReviewPost, ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
+import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
+import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 
@@ -126,7 +127,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           return (
             <Dialog open={!!selectedPost} onOpenChange={() => setSelectedPost(null)}>
               <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
-                <FullscreenReviewPost
+                <ReviewPostViewer
                   mode="live"
                   courseId={selectedPost.course?.id || selectedPost.course_id || ''}
                   courseName={selectedPost.course?.name || 'Course'}
@@ -136,6 +137,15 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
                   media={reviewMedia}
                   initialIndex={0}
                   onBack={() => setSelectedPost(null)}
+                  sourceReviewId={selectedPost.source_review_id || ''}
+                  creator={{
+                    id: selectedPost.user?.id || '',
+                    name: selectedPost.user?.display_name || selectedPost.user?.username || 'Golfer',
+                    username: selectedPost.user?.username || undefined,
+                    avatar: selectedPost.user?.profile_photo_url || undefined,
+                  }}
+                  showReviewCapsule={true}
+                  renderMedia={true}
                 />
               </DialogContent>
             </Dialog>
