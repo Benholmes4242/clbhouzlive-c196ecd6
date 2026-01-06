@@ -446,10 +446,11 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             )}
             
             {/* Display number for milestones, icon for regional/locked */}
-            {isMilestone && unlocked && !isGhost ? (
+            {/* In compact mode for locked cards, show number/trophy instead of lock (lock goes to bottom right) */}
+            {isMilestone ? (
               <span 
                 className={cn("font-bold relative z-10", compact ? "text-xs" : "text-base")}
-                style={{ color: accentColor }}
+                style={{ color: unlocked && !isGhost ? accentColor : lockedColor }}
               >
                 {threshold}
               </span>
@@ -458,9 +459,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
                 className={cn("relative z-10", compact ? "w-3 h-3" : "w-4 h-4")}
                 style={{ color: accentColor }} 
               />
+            ) : compact ? (
+              // Compact locked regional: show trophy placeholder (lock at bottom right)
+              <Trophy 
+                className="relative z-10 w-3 h-3"
+                style={{ color: lockedColor }} 
+              />
             ) : (
               <Lock 
-                className={cn("relative z-10", compact ? "w-3 h-3" : "w-4 h-4")}
+                className="relative z-10 w-4 h-4"
                 style={{ color: lockedColor }} 
               />
             )}
@@ -473,16 +480,16 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           {compact ? (
             <div 
               className="text-[11px] font-semibold leading-tight line-clamp-1"
-              style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
+              style={{ color: unlocked && !isGhost ? accentColor : 'var(--quest-text-tertiary, #97A1AA)' }}
             >
               {clubName}
             </div>
           ) : (
             <>
-              {/* FULL MODE: Club name as title */}
+              {/* FULL MODE: Club name as title - colored by tier */}
               <div 
                 className="text-[13px] font-semibold leading-tight truncate"
-                style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
+                style={{ color: unlocked && !isGhost ? accentColor : 'var(--quest-text-tertiary, #97A1AA)' }}
               >
                 {clubName}
               </div>
@@ -542,6 +549,31 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             {isNew && <Sparkles className="w-2.5 h-2.5" />}
             {statusLabel}
           </motion.div>
+        </div>
+      )}
+
+      {/* Compact mode: "X CLUB" label at bottom left for unlocked milestones */}
+      {compact && unlocked && !isGhost && isMilestone && (
+        <div 
+          className="absolute bottom-1.5 left-2 z-10 text-[8px] font-semibold uppercase tracking-widest"
+          style={{ color: `${accentColor}60` }}
+        >
+          {threshold} CLUB
+        </div>
+      )}
+
+      {/* Compact mode: Lock indicator at bottom right for locked cards */}
+      {compact && !unlocked && !isGhost && (
+        <div className="absolute bottom-1.5 right-2 z-10">
+          <div 
+            className="flex items-center justify-center w-4 h-4 rounded-full"
+            style={{
+              backgroundColor: 'rgba(148, 163, 184, 0.12)',
+              border: '1px solid rgba(148, 163, 184, 0.2)',
+            }}
+          >
+            <Lock className="w-2.5 h-2.5" style={{ color: lockedColor }} />
+          </div>
         </div>
       )}
     </motion.div>

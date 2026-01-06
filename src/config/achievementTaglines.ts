@@ -15,7 +15,7 @@ export const MILESTONE_TAGLINES: Record<number, string> = {
   100: "100 down. More than most golfers dream of.",
   200: "You've entered rare air. Keep chasing greatness.",
   300: "Legendary. This separates the great from the rest.",
-  400: "Only a handful ever reach this level. Seve. Jack. Tiger. And now, you.",
+  400: "Only a handful ever reach this level. Seve. Jack. Tiger. You.",
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
