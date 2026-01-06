@@ -42,30 +42,64 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
 
   return (
     <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
-      {/* Tile variant layout */}
+      {/* Tile variant - Compact Premium Glass Panel */}
       {variant === 'tile' && (
         <>
-          {/* Top gradient for tile */}
-          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+          {/* Top gradient for legibility */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 via-black/25 to-transparent" />
+          {/* Bottom gradient for legibility */}
+          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
           
-          {/* Top-left: Course name only (truncated) */}
-          <div className="absolute top-2 left-2 right-2 z-10">
-            <div className="text-white font-bold text-xs leading-tight line-clamp-1 drop-shadow-md">
-              {courseName}
+          {/* Top glass panel - scaled for tile size */}
+          <div
+            className={cn(
+              "absolute top-1.5 left-1.5 right-1.5 z-10",
+              "rounded-lg p-1.5 backdrop-blur-md border",
+              "shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+            )}
+            style={{
+              backgroundColor: isOutstanding
+                ? 'rgba(210, 180, 97, 0.08)'
+                : 'rgba(0, 0, 0, 0.5)',
+              borderColor: isOutstanding
+                ? 'rgba(210, 180, 97, 0.3)'
+                : 'rgba(255, 255, 255, 0.12)',
+            }}
+          >
+            <div className="flex items-start justify-between gap-1.5">
+              {/* Left: Course name + location */}
+              <div className="flex-1 min-w-0">
+                <div className="text-white font-bold text-[10px] leading-tight line-clamp-1">
+                  {courseName}
+                </div>
+                {courseLocation && (
+                  <div className="text-white/60 text-[8px] mt-0.5 line-clamp-1">
+                    {courseLocation}
+                  </div>
+                )}
+              </div>
+              
+              {/* Right: Rating + pill (vertical stack) */}
+              <div className="flex-shrink-0 flex flex-col items-end">
+                <span 
+                  className="font-bold text-sm leading-none tabular-nums"
+                  style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+                >
+                  {rating === 10 ? '10' : rating.toFixed(1)}
+                </span>
+                <RatingPill score={rating} className="text-[6px] py-0 px-1 mt-0.5" />
+              </div>
+            </div>
+            
+            {/* "From a review" label */}
+            <div className="text-[7px] text-white/40 font-medium uppercase tracking-wide mt-1">
+              From a review
             </div>
           </div>
           
-          {/* Bottom-right: Rating + pill */}
-          <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1">
-            <span className="text-white font-bold text-sm tabular-nums drop-shadow-lg">
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
-            <RatingPill score={rating} className="text-[8px] py-0.5 px-1.5" />
-          </div>
-          
-          {/* Bottom-left: "Review" micro-label */}
-          <div className="absolute bottom-2 left-2 z-10">
-            <span className="text-[9px] text-white/50 font-medium uppercase tracking-wide drop-shadow-sm">
+          {/* Optional: "REVIEW" badge bottom-left (subtle) */}
+          <div className="absolute bottom-1.5 left-1.5 z-10">
+            <span className="text-[7px] text-white/40 font-bold uppercase tracking-wide px-1 py-0.5 bg-black/30 rounded">
               Review
             </span>
           </div>
