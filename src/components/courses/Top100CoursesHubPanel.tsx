@@ -251,18 +251,18 @@ const Top100CoursesHubPanel = () => {
             role="link"
           >
             <div className="flex gap-3 items-stretch">
-              {/* Left: Badge tile - reduced by ~10% */}
-              <div className="w-[135px] shrink-0">
+              {/* Left: Badge tile - uses full AchievementBadgeCard (same as My Progress) */}
+              <div className="shrink-0">
                 {totalRated >= 5 ? (
                   <AchievementBadgeCard
                     tier={club.threshold?.toString() as AchievementTier || '5'}
                     title={`${club.threshold} Club`}
                     subtitle={club.tierName || 'Top 100 Club'}
                     unlocked={true}
-                    compact={true}
+                    totalTop100Played={totalRated}
                   />
                 ) : (
-                  <div className="h-full rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">
+                  <div className="h-[88px] w-[180px] rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">
                     <Award className="w-6 h-6 text-muted-foreground/50" />
                   </div>
                 )}
