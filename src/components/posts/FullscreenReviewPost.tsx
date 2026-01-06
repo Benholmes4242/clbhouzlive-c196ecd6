@@ -99,10 +99,52 @@ export function FullscreenReviewPost({
   
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   
+  // DEBUG: Log component render
+  console.log('[FullscreenReviewPost] Component rendered:', {
+    courseId: courseId?.substring(0, 8),
+    mediaCount: sortedMedia.length,
+    currentIndex,
+    currentMediaType: sortedMedia[currentIndex]?.media_type,
+    currentMediaId: sortedMedia[currentIndex]?.id?.substring(0, 8),
+    renderMedia,
+    mode,
+  });
+  
   // Sync internal state when parent updates initialIndex
   React.useEffect(() => {
+    console.log('[FullscreenReviewPost] 🔄 initialIndex changed from parent:', {
+      oldIndex: currentIndex,
+      newIndex: initialIndex,
+      courseId: courseId?.substring(0, 8),
+    });
     setCurrentIndex(initialIndex);
   }, [initialIndex]);
+  
+  // DEBUG: Track index changes
+  React.useEffect(() => {
+    const currentMedia = sortedMedia[currentIndex];
+    console.log('[FullscreenReviewPost] 🎯 INDEX CHANGED:', {
+      newIndex: currentIndex,
+      totalMedia: sortedMedia.length,
+      currentMedia: {
+        id: currentMedia?.id?.substring(0, 8),
+        type: currentMedia?.media_type,
+        url: currentMedia?.media_url?.substring(0, 50),
+      },
+      renderMedia,
+    });
+    
+    if (currentMedia?.media_type === 'video') {
+      console.log('[FullscreenReviewPost] 📹 Current item is VIDEO - should trigger autoplay');
+      console.log('[FullscreenReviewPost] Video details:', {
+        mediaId: currentMedia?.id?.substring(0, 8),
+        hasPoster: !!currentMedia?.poster_url,
+        hasStreamId: !!currentMedia?.stream_id,
+      });
+    } else {
+      console.log('[FullscreenReviewPost] 🖼️ Current item is IMAGE - no video playback expected');
+    }
+  }, [currentIndex, sortedMedia, renderMedia]);
   
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -134,18 +176,62 @@ export function FullscreenReviewPost({
   
   // Navigation
   const goToNext = useCallback(() => {
-    if (isTransitioning || currentIndex >= sortedMedia.length - 1) return;
+    console.log('[FullscreenReviewPost] ▶️ NEXT triggered:', {
+      currentIndex,
+      maxIndex: sortedMedia.length - 1,
+      isTransitioning,
+    });
+    
+    if (isTransitioning || currentIndex >= sortedMedia.length - 1) {
+      console.log('[FullscreenReviewPost] ❌ Navigation blocked:', {
+        reason: isTransitioning ? 'transitioning' : 'at end',
+      });
+      return;
+    }
+    
+    const nextIndex = currentIndex + 1;
+    const nextMedia = sortedMedia[nextIndex];
+    
+    console.log('[FullscreenReviewPost] ✅ Navigating to index:', {
+      from: currentIndex,
+      to: nextIndex,
+      nextMediaType: nextMedia?.media_type,
+      nextMediaId: nextMedia?.id?.substring(0, 8),
+    });
+    
     setIsTransitioning(true);
-    setCurrentIndex(prev => prev + 1);
+    setCurrentIndex(nextIndex);
     setTimeout(() => setIsTransitioning(false), 300);
-  }, [isTransitioning, currentIndex, sortedMedia.length]);
+  }, [isTransitioning, currentIndex, sortedMedia]);
   
   const goToPrevious = useCallback(() => {
-    if (isTransitioning || currentIndex <= 0) return;
+    console.log('[FullscreenReviewPost] ◀️ PREVIOUS triggered:', {
+      currentIndex,
+      minIndex: 0,
+      isTransitioning,
+    });
+    
+    if (isTransitioning || currentIndex <= 0) {
+      console.log('[FullscreenReviewPost] ❌ Navigation blocked:', {
+        reason: isTransitioning ? 'transitioning' : 'at start',
+      });
+      return;
+    }
+    
+    const prevIndex = currentIndex - 1;
+    const prevMedia = sortedMedia[prevIndex];
+    
+    console.log('[FullscreenReviewPost] ✅ Navigating to index:', {
+      from: currentIndex,
+      to: prevIndex,
+      prevMediaType: prevMedia?.media_type,
+      prevMediaId: prevMedia?.id?.substring(0, 8),
+    });
+    
     setIsTransitioning(true);
-    setCurrentIndex(prev => prev - 1);
+    setCurrentIndex(prevIndex);
     setTimeout(() => setIsTransitioning(false), 300);
-  }, [isTransitioning, currentIndex]);
+  }, [isTransitioning, currentIndex, sortedMedia]);
   
   // Swipe handlers
   const swipeHandlers = useSwipeable({
@@ -189,29 +275,62 @@ export function FullscreenReviewPost({
       {/* Main Media - only render if renderMedia is true */}
       {renderMedia && (
         <div className="absolute inset-0">
-          {currentMedia.media_type === 'video' ? (
-            <HLSPlayer
-              key={`review-video-${currentMedia.id}-${currentIndex}`}
-              ref={videoPlayerRef}
-              src={currentMedia.media_url}
-              className="w-full h-full object-cover"
-              muted={isMuted}
-              loop={true}
-              autoplay={true}
-              showMuteButton={false}
-              showPlayButton={false}
-              mediaId={`review-preview-${currentMedia.id}`}
-            />
-          ) : (
-            <img
-              src={currentMedia.media_url}
-              alt={courseName}
-              className="w-full h-full object-cover"
-              draggable={false}
-            />
-          )}
+          {(() => {
+            console.log('[FullscreenReviewPost] 🎬 RENDERING MEDIA:', {
+              index: currentIndex,
+              type: currentMedia.media_type,
+              id: currentMedia.id?.substring(0, 8),
+              isVideo: currentMedia.media_type === 'video',
+            });
+            
+            if (currentMedia.media_type === 'video') {
+              console.log('[FullscreenReviewPost] 🎥 Rendering HLSPlayer:', {
+                key: `review-video-${currentMedia.id}-${currentIndex}`,
+                src: currentMedia.media_url?.substring(0, 50),
+                autoplay: true,
+                muted: isMuted,
+                poster: currentMedia.poster_url?.substring(0, 50),
+                mediaId: `review-preview-${currentMedia.id}`,
+              });
+              
+              return (
+                <HLSPlayer
+                  key={`review-video-${currentMedia.id}-${currentIndex}`}
+                  ref={videoPlayerRef}
+                  src={currentMedia.media_url}
+                  className="w-full h-full object-cover"
+                  muted={isMuted}
+                  loop={true}
+                  autoplay={true}
+                  showMuteButton={false}
+                  showPlayButton={false}
+                  mediaId={`review-preview-${currentMedia.id}`}
+                />
+              );
+            } else {
+              console.log('[FullscreenReviewPost] 🖼️ Rendering image element');
+              return (
+                <img
+                  src={currentMedia.media_url}
+                  alt={courseName}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              );
+            }
+          })()}
         </div>
       )}
+      
+      {/* DEBUG: Log when renderMedia is false */}
+      {!renderMedia && (() => {
+        console.log('[FullscreenReviewPost] ⚠️ renderMedia=false - parent owns media rendering', {
+          currentIndex,
+          currentMediaType: currentMedia?.media_type,
+          currentMediaId: currentMedia?.id?.substring(0, 8),
+        });
+        return null;
+      })()}
       
       {/* Top gradient - subtle fade behind panel */}
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none z-[4]" />
