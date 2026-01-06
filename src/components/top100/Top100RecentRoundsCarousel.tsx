@@ -117,7 +117,7 @@ export function Top100RecentRoundsCarousel({
         className="w-full"
       >
         <CarouselContent className="-ml-2 px-2.5">
-          {rounds.slice(0, 10).map((round, index) => (
+          {rounds.slice(0, 25).map((round, index) => (
             <CarouselItem key={`${round.course_id}-${round.played_at}`} className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]">
               <UnifiedCourseCard
                 course={fromTop100Round(round)}
