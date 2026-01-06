@@ -293,7 +293,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             </span>
             <RatingPill 
               score={reviewData.rating} 
-              showRatingInPill
               className="text-[8px] py-0.5 px-1.5 flex-shrink-0" 
             />
           </div>
