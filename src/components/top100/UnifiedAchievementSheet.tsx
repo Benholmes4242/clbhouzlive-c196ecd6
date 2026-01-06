@@ -252,7 +252,9 @@ interface ProgressModuleProps {
 }
 
 function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProps) {
-  const progressPercent = total > 0 ? Math.min(100, (played / total) * 100) : 0;
+  // Cap displayed progress at total when unlocked (e.g., 22 played but milestone is 5 → show 5/5)
+  const displayedPlayed = isUnlocked ? total : played;
+  const progressPercent = total > 0 ? Math.min(100, (displayedPlayed / total) * 100) : 0;
   
   return (
     <div className="rounded-xl border border-border/60 p-4 mb-5 bg-card/50">
@@ -263,7 +265,7 @@ function ProgressModule({ played, total, color, isUnlocked }: ProgressModuleProp
           className="text-sm font-bold"
           style={{ color }}
         >
-          {played} / {total}
+          {displayedPlayed} / {total}
         </span>
       </div>
 
