@@ -22,7 +22,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   onChange,
 }) => {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center justify-center gap-2">
       {FILTER_OPTIONS.map((option) => {
         const isSelected = value === option.key;
         
