@@ -312,7 +312,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       title: 'Course added',
       description: 'Successfully added to your Top 10',
     });
-    onClose();
   };
 
   const handleRateFirst = (courseId: string) => {
