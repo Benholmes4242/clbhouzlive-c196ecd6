@@ -99,52 +99,10 @@ export function FullscreenReviewPost({
   
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   
-  // DEBUG: Log component render
-  console.log('[FullscreenReviewPost] Component rendered:', {
-    courseId: courseId?.substring(0, 8),
-    mediaCount: sortedMedia.length,
-    currentIndex,
-    currentMediaType: sortedMedia[currentIndex]?.media_type,
-    currentMediaId: sortedMedia[currentIndex]?.id?.substring(0, 8),
-    renderMedia,
-    mode,
-  });
-  
   // Sync internal state when parent updates initialIndex
   React.useEffect(() => {
-    console.log('[FullscreenReviewPost] 🔄 initialIndex changed from parent:', {
-      oldIndex: currentIndex,
-      newIndex: initialIndex,
-      courseId: courseId?.substring(0, 8),
-    });
     setCurrentIndex(initialIndex);
   }, [initialIndex]);
-  
-  // DEBUG: Track index changes
-  React.useEffect(() => {
-    const currentMedia = sortedMedia[currentIndex];
-    console.log('[FullscreenReviewPost] 🎯 INDEX CHANGED:', {
-      newIndex: currentIndex,
-      totalMedia: sortedMedia.length,
-      currentMedia: {
-        id: currentMedia?.id?.substring(0, 8),
-        type: currentMedia?.media_type,
-        url: currentMedia?.media_url?.substring(0, 50),
-      },
-      renderMedia,
-    });
-    
-    if (currentMedia?.media_type === 'video') {
-      console.log('[FullscreenReviewPost] 📹 Current item is VIDEO - should trigger autoplay');
-      console.log('[FullscreenReviewPost] Video details:', {
-        mediaId: currentMedia?.id?.substring(0, 8),
-        hasPoster: !!currentMedia?.poster_url,
-        hasStreamId: !!currentMedia?.stream_id,
-      });
-    } else {
-      console.log('[FullscreenReviewPost] 🖼️ Current item is IMAGE - no video playback expected');
-    }
-  }, [currentIndex, sortedMedia, renderMedia]);
   
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -176,60 +134,16 @@ export function FullscreenReviewPost({
   
   // Navigation
   const goToNext = useCallback(() => {
-    console.log('[FullscreenReviewPost] ▶️ NEXT triggered:', {
-      currentIndex,
-      maxIndex: sortedMedia.length - 1,
-      isTransitioning,
-    });
-    
-    if (isTransitioning || currentIndex >= sortedMedia.length - 1) {
-      console.log('[FullscreenReviewPost] ❌ Navigation blocked:', {
-        reason: isTransitioning ? 'transitioning' : 'at end',
-      });
-      return;
-    }
-    
-    const nextIndex = currentIndex + 1;
-    const nextMedia = sortedMedia[nextIndex];
-    
-    console.log('[FullscreenReviewPost] ✅ Navigating to index:', {
-      from: currentIndex,
-      to: nextIndex,
-      nextMediaType: nextMedia?.media_type,
-      nextMediaId: nextMedia?.id?.substring(0, 8),
-    });
-    
+    if (isTransitioning || currentIndex >= sortedMedia.length - 1) return;
     setIsTransitioning(true);
-    setCurrentIndex(nextIndex);
+    setCurrentIndex(currentIndex + 1);
     setTimeout(() => setIsTransitioning(false), 300);
   }, [isTransitioning, currentIndex, sortedMedia]);
   
   const goToPrevious = useCallback(() => {
-    console.log('[FullscreenReviewPost] ◀️ PREVIOUS triggered:', {
-      currentIndex,
-      minIndex: 0,
-      isTransitioning,
-    });
-    
-    if (isTransitioning || currentIndex <= 0) {
-      console.log('[FullscreenReviewPost] ❌ Navigation blocked:', {
-        reason: isTransitioning ? 'transitioning' : 'at start',
-      });
-      return;
-    }
-    
-    const prevIndex = currentIndex - 1;
-    const prevMedia = sortedMedia[prevIndex];
-    
-    console.log('[FullscreenReviewPost] ✅ Navigating to index:', {
-      from: currentIndex,
-      to: prevIndex,
-      prevMediaType: prevMedia?.media_type,
-      prevMediaId: prevMedia?.id?.substring(0, 8),
-    });
-    
+    if (isTransitioning || currentIndex <= 0) return;
     setIsTransitioning(true);
-    setCurrentIndex(prevIndex);
+    setCurrentIndex(currentIndex - 1);
     setTimeout(() => setIsTransitioning(false), 300);
   }, [isTransitioning, currentIndex, sortedMedia]);
   

@@ -92,56 +92,22 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
 
   const playerRef = React.useRef<HLSPlayerRef>(null);
 
-  // DEBUG: Log component mount/props change
-  React.useEffect(() => {
-    console.log('[VideoWithAutoplay] 🎬 MOUNT/UPDATE:', {
-      postId: postId?.substring(0, 8),
-      src: src?.substring(0, 50),
-      hlsUrl: hlsUrl?.substring(0, 50),
-      shouldAttach,
-      autoplay,
-      isActive,
-      isNearby,
-      eagerMount,
-    });
-  }, [postId, src, hlsUrl, shouldAttach, autoplay, isActive, isNearby, eagerMount]);
-
   React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
 
   React.useEffect(() => {
     if (!playerRef.current) return;
     
-    console.log('[VideoWithAutoplay] 📝 Attach/Detach check:', {
-      postId: postId?.substring(0, 8),
-      shouldAttach,
-      eagerMount,
-      isNearby,
-      willAttach: shouldAttach || eagerMount,
-      willDetach: !isNearby && !(shouldAttach || eagerMount),
-    });
-    
     if (shouldAttach || eagerMount) {
-      console.log('[VideoWithAutoplay] ✅ Attaching video:', postId?.substring(0, 8));
       playerRef.current.attach();
     } else if (!isNearby) {
-      console.log('[VideoWithAutoplay] ❌ Detaching video:', postId?.substring(0, 8));
       playerRef.current.detach();
     }
-  }, [shouldAttach, isNearby, eagerMount, postId]);
+  }, [shouldAttach, isNearby, eagerMount]);
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
       {hlsUrl ? (
         <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
-          {(() => {
-            console.log('[VideoWithAutoplay] 🎥 Rendering HLSPlayer:', {
-              postId: postId?.substring(0, 8),
-              hlsUrl: hlsUrl?.substring(0, 50),
-              autoplayValue: autoplay && isActive && (shouldAttach || eagerMount),
-              muted,
-            });
-            return null;
-          })()}
           <HLSPlayer
             ref={playerRef}
             src={hlsUrl}
@@ -175,30 +141,16 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
       />
     </div>
   );
-}), (prevProps, nextProps) => {
-  const areEqual = (
-    prevProps.src === nextProps.src &&
-    prevProps.muted === nextProps.muted &&
-    prevProps.shouldAttach === nextProps.shouldAttach &&
-    prevProps.autoplay === nextProps.autoplay &&
-    prevProps.isNearby === nextProps.isNearby &&
-    prevProps.isActive === nextProps.isActive &&
-    prevProps.postId === nextProps.postId &&
-    prevProps.eagerMount === nextProps.eagerMount
-  );
-  
-  if (!areEqual) {
-    console.log('[VideoWithAutoplay] 🔄 Props changed - will re-render:', {
-      postId: nextProps.postId?.substring(0, 8),
-      srcChanged: prevProps.src !== nextProps.src,
-      shouldAttachChanged: prevProps.shouldAttach !== nextProps.shouldAttach,
-      autoplayChanged: prevProps.autoplay !== nextProps.autoplay,
-      isActiveChanged: prevProps.isActive !== nextProps.isActive,
-    });
-  }
-  
-  return areEqual;
-});
+}), (prevProps, nextProps) => (
+  prevProps.src === nextProps.src &&
+  prevProps.muted === nextProps.muted &&
+  prevProps.shouldAttach === nextProps.shouldAttach &&
+  prevProps.autoplay === nextProps.autoplay &&
+  prevProps.isNearby === nextProps.isNearby &&
+  prevProps.isActive === nextProps.isActive &&
+  prevProps.postId === nextProps.postId &&
+  prevProps.eagerMount === nextProps.eagerMount
+));
 
 VideoWithAutoplay.displayName = 'VideoWithAutoplay';
 
@@ -340,10 +292,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   const [selectedPostId, setSelectedPostId] = useState<string>('');
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   
-  // DEBUG: Track mediaIndices changes for carousel debugging
-  useEffect(() => {
-    console.log('[ClubhouseGrid] 🔄 mediaIndices changed:', mediaIndices);
-  }, [mediaIndices]);
   const [showTapHeart, setShowTapHeart] = useState<Record<string, boolean>>({});
   const [videoControlsVisible, setVideoControlsVisible] = useState<Record<string, boolean>>({});
   const [videosPlaying, setVideosPlaying] = useState<Record<string, boolean>>({});
@@ -774,42 +722,30 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                         className={cn("w-full h-full", filterClass)}
                         style={pixelLayerStyle}
                       >
-                        {(() => {
-                          // Use media ID for carousel videos so each gets unique MediaRuntime registration
-                          const mediaIdForRuntime = currentMedia.id || `${item.id}-media-${currentMediaIndex}`;
-                          console.log('[ClubhouseGrid] 🎬 Rendering carousel video:', {
-                            postId: item.id?.substring(0, 8),
-                            mediaId: mediaIdForRuntime?.substring(0, 8),
-                            mediaIndex: currentMediaIndex,
-                            isReviewPost: item.categories?.includes('review'),
-                          });
-                          return (
-                            <VideoWithAutoplay
-                              key={mediaIdForRuntime}
-                              ref={(el) => {
-                                registerVideoRef(item.id, el);
-                                if (index === currentIndex && el) {
-                                  setActiveVideoEl(el);
-                                  onActiveVideoRefChange?.(el);
-                                }
-                              }}
-                              src={currentMedia.media_url}
-                              muted={videoMuted}
-                              className="w-full h-full"
-                              isMobile={isMobile}
-                              // Enforce immediate autoplay for the very first card on initial landing
-                              eagerMount={index === 0 && currentIndex === 0}
-                              // Review posts can contain video media even when post.type !== 'video'.
-                              // If the active carousel media is a video, force attach+autoplay.
-                              shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
-                              autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
-                              isNearby={isNearbyItem}
-                              isActive={index === currentIndex}
-                              postId={mediaIdForRuntime}
-                              onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
-                            />
-                          );
-                        })()}
+                        <VideoWithAutoplay
+                          key={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
+                          ref={(el) => {
+                            registerVideoRef(item.id, el);
+                            if (index === currentIndex && el) {
+                              setActiveVideoEl(el);
+                              onActiveVideoRefChange?.(el);
+                            }
+                          }}
+                          src={currentMedia.media_url}
+                          muted={videoMuted}
+                          className="w-full h-full"
+                          isMobile={isMobile}
+                          // Enforce immediate autoplay for the very first card on initial landing
+                          eagerMount={index === 0 && currentIndex === 0}
+                          // Review posts can contain video media even when post.type !== 'video'.
+                          // If the active carousel media is a video, force attach+autoplay.
+                          shouldAttach={index === 0 && currentIndex === 0 ? true : (!!shouldAttachMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
+                          autoplay={index === 0 && currentIndex === 0 ? true : (!!autoplayMap[item.id] || (item.categories?.includes('review') && index === currentIndex))}
+                          isNearby={isNearbyItem}
+                          isActive={index === currentIndex}
+                          postId={currentMedia.id || `${item.id}-media-${currentMediaIndex}`}
+                          onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
+                        />
                       </div>
                     </div>
                     
@@ -861,17 +797,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     {/* Review overlay for video review posts */}
                     {item.categories?.includes('review') && (item as any).sourceReviewId && (
                       <div className="absolute inset-0 pointer-events-none">
-                        {(() => {
-                          console.log('[ClubhouseGrid] 📋 Rendering review overlay (video post):', {
-                            postId: item.id?.substring(0, 8),
-                            mediaCount: item.media?.length,
-                            currentMediaIndex: mediaIndices[item.id] || 0,
-                            currentMedia: item.media?.[mediaIndices[item.id] || 0],
-                            renderMedia: false,
-                            isActivePost: index === currentIndex,
-                          });
-                          return null;
-                        })()}
                         <FullscreenReviewPost
                           mode="live"
                           courseId={item.golfCourse?.id || ''}
@@ -926,17 +851,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
                     {/* Review overlay - conditionally rendered */}
                     {item.categories?.includes('review') && (item as any).sourceReviewId ? (
                       <div className="absolute inset-0 pointer-events-none">
-                        {(() => {
-                          console.log('[ClubhouseGrid] 📋 Rendering review overlay (image post):', {
-                            postId: item.id?.substring(0, 8),
-                            mediaCount: item.media?.length,
-                            currentMediaIndex: mediaIndices[item.id] || 0,
-                            currentMedia: item.media?.[mediaIndices[item.id] || 0],
-                            renderMedia: false,
-                            isActivePost: index === currentIndex,
-                          });
-                          return null;
-                        })()}
                         <FullscreenReviewPost
                           mode="live"
                           courseId={item.golfCourse?.id || ''}
