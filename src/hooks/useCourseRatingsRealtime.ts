@@ -40,10 +40,12 @@ export function useCourseRatingsRealtime() {
               queryKey: ['user-course-ratings-breakdown', userId], 
               exact: false 
             });
+            // Refetch even if the query is currently inactive (e.g. user updates a rating on a course page,
+            // then navigates back to profile). Our app often uses refetchOnMount=false for perf.
             void queryClient.refetchQueries({ 
               queryKey: ['user-course-ratings-breakdown', userId], 
-              exact: false, 
-              type: 'active' 
+              exact: false,
+              type: 'all',
             });
           }
           // Also invalidate with fuzzy match for any active breakdown queries
