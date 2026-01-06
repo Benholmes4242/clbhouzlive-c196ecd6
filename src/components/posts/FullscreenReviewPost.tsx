@@ -71,6 +71,19 @@ export function FullscreenReviewPost({
   children,
   renderMedia = true,
 }: FullscreenReviewPostProps) {
+  console.log('[FullscreenReviewPost] Component rendered with:', {
+    mediaCount: media?.length,
+    initialIndex,
+    renderMedia,
+  });
+
+  useEffect(() => {
+    console.log('[FullscreenReviewPost] Component mounted');
+    return () => {
+      console.log('[FullscreenReviewPost] Component unmounting');
+    };
+  }, []);
+
   // Sort media: video first as cover, then by display_order/created_at
   const sortedMedia = React.useMemo(() => {
     if (!media.length) return [];
@@ -117,30 +130,73 @@ export function FullscreenReviewPost({
   
   // Video playback fix: Explicitly play video when navigating to it in carousel
   useEffect(() => {
-    if (currentMedia?.media_type === 'video' && videoPlayerRef.current) {
-      // Small delay to ensure video element is ready after index change
-      const timer = setTimeout(() => {
-        videoPlayerRef.current?.play().catch((err) => {
-          console.log('[FullscreenReviewPost] Video autoplay prevented:', err);
-        });
-      }, 100);
+    console.log('[FullscreenReviewPost] Index changed:', {
+      currentIndex,
+      mediaType: currentMedia?.media_type,
+      mediaId: currentMedia?.id,
+      hasVideoRef: !!videoPlayerRef.current,
+      videoSrc: currentMedia?.media_url,
+    });
+
+    if (currentMedia?.media_type === 'video') {
+      console.log('[FullscreenReviewPost] Current media is video');
       
-      return () => clearTimeout(timer);
+      if (videoPlayerRef.current) {
+        console.log('[FullscreenReviewPost] videoPlayerRef exists, attempting play in 100ms');
+        
+        // Small delay to ensure video element is ready after index change
+        const timer = setTimeout(() => {
+          const videoEl = videoPlayerRef.current?.getElement?.();
+          console.log('[FullscreenReviewPost] Timer fired, checking video state:', {
+            paused: videoEl?.paused,
+            readyState: videoEl?.readyState,
+            networkState: videoEl?.networkState,
+            currentSrc: videoEl?.currentSrc,
+          });
+          
+          videoPlayerRef.current?.play()
+            .then((success) => {
+              console.log('[FullscreenReviewPost] ✅ Video play() result:', success);
+            })
+            .catch((err) => {
+              console.error('[FullscreenReviewPost] ❌ Video play() failed:', err);
+            });
+        }, 100);
+        
+        return () => {
+          console.log('[FullscreenReviewPost] Cleaning up timer for index:', currentIndex);
+          clearTimeout(timer);
+        };
+      } else {
+        console.warn('[FullscreenReviewPost] ⚠️ videoPlayerRef.current is null!');
+      }
+    } else {
+      console.log('[FullscreenReviewPost] Current media is NOT video, type:', currentMedia?.media_type);
     }
   }, [currentIndex, currentMedia?.media_type, currentMedia?.id]);
   
   // Navigation
   const goToNext = useCallback(() => {
+    console.log('[FullscreenReviewPost] Next button clicked, current index:', currentIndex);
     if (isTransitioning || currentIndex >= sortedMedia.length - 1) return;
     setIsTransitioning(true);
-    setCurrentIndex(prev => prev + 1);
+    setCurrentIndex(prev => {
+      const newIndex = prev + 1;
+      console.log('[FullscreenReviewPost] → New index:', newIndex);
+      return newIndex;
+    });
     setTimeout(() => setIsTransitioning(false), 300);
   }, [isTransitioning, currentIndex, sortedMedia.length]);
   
   const goToPrevious = useCallback(() => {
+    console.log('[FullscreenReviewPost] Previous button clicked, current index:', currentIndex);
     if (isTransitioning || currentIndex <= 0) return;
     setIsTransitioning(true);
-    setCurrentIndex(prev => prev - 1);
+    setCurrentIndex(prev => {
+      const newIndex = prev - 1;
+      console.log('[FullscreenReviewPost] → New index:', newIndex);
+      return newIndex;
+    });
     setTimeout(() => setIsTransitioning(false), 300);
   }, [isTransitioning, currentIndex]);
   
@@ -187,25 +243,40 @@ export function FullscreenReviewPost({
       {renderMedia && (
         <div className="absolute inset-0">
           {currentMedia.media_type === 'video' ? (
-            <HLSPlayer
-              key={`review-video-${currentMedia.id}-${currentIndex}`}
-              ref={videoPlayerRef}
-              src={currentMedia.media_url}
-              className="w-full h-full object-cover"
-              muted={isMuted}
-              loop={true}
-              autoplay={true}
-              showMuteButton={false}
-              showPlayButton={false}
-              mediaId={`review-preview-${currentMedia.id}`}
-            />
+            <>
+              {console.log('[FullscreenReviewPost] Rendering video element:', {
+                key: `review-video-${currentMedia.id}-${currentIndex}`,
+                src: currentMedia.media_url,
+                autoplay: true,
+                muted: isMuted,
+                hasRef: !!videoPlayerRef,
+              })}
+              <HLSPlayer
+                key={`review-video-${currentMedia.id}-${currentIndex}`}
+                ref={videoPlayerRef}
+                src={currentMedia.media_url}
+                className="w-full h-full object-cover"
+                muted={isMuted}
+                loop={true}
+                autoplay={true}
+                showMuteButton={false}
+                showPlayButton={false}
+                mediaId={`review-preview-${currentMedia.id}`}
+              />
+            </>
           ) : (
-            <img
-              src={currentMedia.media_url}
-              alt={courseName}
-              className="w-full h-full object-cover"
-              draggable={false}
-            />
+            <>
+              {console.log('[FullscreenReviewPost] Rendering image element:', {
+                key: `review-image-${currentMedia.id}-${currentIndex}`,
+                src: currentMedia.media_url,
+              })}
+              <img
+                src={currentMedia.media_url}
+                alt={courseName}
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+            </>
           )}
         </div>
       )}

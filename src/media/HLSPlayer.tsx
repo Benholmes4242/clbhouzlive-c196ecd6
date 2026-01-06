@@ -153,6 +153,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   usePausedVideo,
   customLoadingComponent,
 }, ref) => {
+  console.log('[HLSPlayer] Render with props:', {
+    src: src?.substring(src.lastIndexOf('/') + 1) || 'unknown',
+    autoplay,
+    muted,
+    mediaId: mediaId?.slice(0, 20),
+    managedByMediaRuntime,
+  });
+
   // ============ Paused Video Mode (Permanent) ============
   // Paused video mode is now the default behavior
   // usePausedVideo={false} can override to use poster mode if needed
@@ -270,8 +278,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   useImperativeHandle(ref, () => ({
     play: async () => {
       const video = videoRef.current;
+      console.log('[HLSPlayer] play() called via ref, video exists:', !!video, 'paused:', video?.paused);
       if (!video) return false;
-      return safePlay(video);
+      const result = await safePlay(video);
+      console.log('[HLSPlayer] safePlay result:', result);
+      return result;
     },
     pause: () => {
       videoRef.current?.pause();
@@ -1023,11 +1034,18 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const handleLoadedData = useCallback(() => {
     if (!mountedRef.current) return;
     
+    const video = videoRef.current;
+    console.log('[HLSPlayer] Video loaded (loadeddata):', {
+      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
+      readyState: video?.readyState,
+      duration: video?.duration,
+      mediaId: mediaId?.slice(0, 20),
+    });
+    
     setIsReady(true);
     
     // Don't hide poster here - wait for requestVideoFrameCallback
     // Only trigger first frame detection
-    const video = videoRef.current;
     if (video) {
       waitForFirstFrame(video);
 
@@ -1058,6 +1076,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const handlePlay = useCallback(() => {
     if (!mountedRef.current) return;
     
+    const video = videoRef.current;
+    console.log('[HLSPlayer] ▶️ Video started playing (play event):', {
+      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
+      mediaId: mediaId?.slice(0, 20),
+    });
+    
     setIsPlaying(true);
     setHasError(false);
     
@@ -1072,7 +1096,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     }
     
     // If first frame not yet detected, trigger detection now
-    const video = videoRef.current;
     if (video) {
       const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
       const id = video.dataset.mediaAutoplayId;
@@ -1098,9 +1121,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const handlePause = useCallback(() => {
     if (!mountedRef.current) return;
     
+    const video = videoRef.current;
+    console.log('[HLSPlayer] ⏸️ Video paused:', {
+      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
+      mediaId: mediaId?.slice(0, 20),
+    });
+    
     setIsPlaying(false);
 
-    const video = videoRef.current;
     if (video) {
       const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
       const id = video.dataset.mediaAutoplayId;
@@ -1118,7 +1146,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Do NOT re-show poster on pause - keep last video frame visible
     // Poster only comes back on detach/ended/error
     onPause?.();
-  }, [onPause]);
+  }, [onPause, mediaId]);
   
   const handleEnded = useCallback(() => {
     if (!mountedRef.current) return;
@@ -1136,6 +1164,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     const video = e.currentTarget;
+    
+    console.error('[HLSPlayer] ❌ Video error:', {
+      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
+      error: video.error,
+      mediaId: mediaId?.slice(0, 20),
+    });
     
     setHasError(true);
     setIsPosterVisible(true);
