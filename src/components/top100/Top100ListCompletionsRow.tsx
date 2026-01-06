@@ -59,7 +59,8 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
                 subtitle={`${played} / ${total} courses`}
                 unlocked={complete}
                 remaining={complete ? undefined : remaining}
-                compact
+                playedOnList={played}
+                totalOnList={total}
               />
             </button>
           );
