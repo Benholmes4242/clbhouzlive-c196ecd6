@@ -1180,28 +1180,13 @@ export const useRealPostsFetcher = () => {
         const { data: postsData, error } = await query;
 
         if (error) {
-          console.error('[ClubhouseAudit] Query error:', error);
+          console.error('[useRealPostsFetcher] Query error:', error);
           break;
         }
 
-        if (!postsData || postsData.length === 0) {
-          console.log('[ClubhouseAudit] No more posts from Supabase');
-          break;
-        }
+        if (!postsData || postsData.length === 0) break;
         
         totalRawFetched += postsData.length;
-        
-        // DEBUG: Log review posts found in raw results (before filtering)
-        const reviewPostsInBatch = postsData.filter((p: any) => 
-          (Array.isArray(p.categories) && p.categories.includes('review')) || !!p.source_review_id
-        );
-        if (reviewPostsInBatch.length > 0) {
-          console.log('[ClubhouseAudit] Review posts in batch (pre-filter):', {
-            count: reviewPostsInBatch.length,
-            ids: reviewPostsInBatch.map((p: any) => p.id),
-            sourceReviewIds: reviewPostsInBatch.map((p: any) => p.source_review_id)
-          });
-        }
         
         // Update cursor for next fetch
         currentCursor = postsData[postsData.length - 1].created_at;
@@ -1212,18 +1197,6 @@ export const useRealPostsFetcher = () => {
           
           const result = passesVerticalFilter(post);
           
-          // DEBUG: Log filter decision for review posts specifically
-          const isReviewPost = (Array.isArray(post.categories) && post.categories.includes('review')) || !!post.source_review_id;
-          if (isReviewPost) {
-            console.log('[ClubhouseAudit] Review post filter decision:', {
-              postId: post.id,
-              sourceReviewId: post.source_review_id,
-              passes: result.passes,
-              reason: result.reason,
-              mediaCount: post.post_media?.length
-            });
-          }
-          
           if (result.passes) {
             validPosts.push(post);
             rejectionReasons.passed++;
@@ -1232,18 +1205,6 @@ export const useRealPostsFetcher = () => {
           }
         }
       }
-
-      console.log('[ClubhouseAudit] Filter results:', {
-        totalRawFetched,
-        fetchCount,
-        valid: validPosts.length,
-        rejectionReasons,
-        verticalBand: { min: VERTICAL_MIN_AR, max: VERTICAL_MAX_AR },
-        clubhouseVerticalOnly: FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY,
-        reviewPostsInFinal: validPosts.filter((p: any) => 
-          (Array.isArray(p.categories) && p.categories.includes('review')) || !!p.source_review_id
-        ).length
-      });
 
       // Split posts by actor_type for polymorphic hydration
       const personalPosts = validPosts.filter(p => !p.actor_type || p.actor_type === 'personal');

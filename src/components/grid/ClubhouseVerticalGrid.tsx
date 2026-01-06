@@ -198,24 +198,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
 
   // Filter posts
   const filteredPosts = useMemo(() => {
-    // Log A: Incoming posts before any filtering
-    const reviewPostsIncoming = posts.filter(p => p.categories?.includes('review'));
-    if (reviewPostsIncoming.length > 0) {
-      console.log('[ClubhouseAudit] Incoming posts to grid:', {
-        totalCount: posts.length,
-        reviewPosts: reviewPostsIncoming.map(p => ({
-          id: p.id,
-          type: p.type,
-          hasVideo: p.type === 'video',
-          durationSeconds: p.durationSeconds,
-          mediaCount: p.media?.length,
-          firstMediaType: p.media?.[0]?.media_type,
-          width: (p.media?.[0] as any)?.width,
-          height: (p.media?.[0] as any)?.height,
-        }))
-      });
-    }
-
     const shortsOnly = posts.filter(post => {
       // Review posts bypass video-only requirement
       const isReviewPost = post.categories?.includes('review');
@@ -223,10 +205,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       if (isReviewPost) {
         // Review posts: allow if they have any media (photo or video)
         const hasMedia = post.media && post.media.length > 0;
-        if (!hasMedia) {
-          console.log('[ClubhouseAudit] Review post rejected: no media', { id: post.id });
-          return false;
-        }
+        if (!hasMedia) return false;
         return true; // Allow review posts through
       }
       
@@ -254,17 +233,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         aspect_ratio: mediaWithDimensions.aspect_ratio
       });
     });
-
-    // Log B: Final filtered list
-    const reviewPostsFinal = filtered.filter(p => p.categories?.includes('review'));
-    if (reviewPostsIncoming.length > 0) {
-      console.log('[ClubhouseAudit] Final filtered posts:', {
-        originalCount: posts.length,
-        filteredCount: filtered.length,
-        reviewPostsKept: reviewPostsFinal.map(p => p.id),
-        reviewPostsLost: reviewPostsIncoming.filter(r => !reviewPostsFinal.some(f => f.id === r.id)).map(p => p.id)
-      });
-    }
 
     if (posts.length > 0) {
       logClubhouseFiltering(posts.length, filtered.length);
@@ -583,25 +551,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           touchAction: 'pan-y'
         }}
       >
-        {filteredPosts.map((item, index) => {
-          // TEMPORARY DEBUG LOG - Review metadata verification
-          if (item.categories?.includes('review')) {
-            console.log('[ClubhouseAudit] Review post rendering:', {
-              id: item.id,
-              hasSourceReviewId: !!(item as any).sourceReviewId,
-              sourceReviewId: (item as any).sourceReviewId,
-              hasRating: !!(item as any).reviewRating,
-              reviewRating: (item as any).reviewRating,
-              hasCourseName: !!(item as any).courseName,
-              courseName: (item as any).courseName,
-              hasGolfCourse: !!item.golfCourse,
-              golfCourseName: item.golfCourse?.name,
-              hasMedia: !!item.media?.[0],
-              mediaType: item.type,
-              mediaCount: item.media?.length
-            });
-          }
-          
+      {filteredPosts.map((item, index) => {
           const distance = Math.abs(index - currentIndex);
           const isNearbyItem = distance <= 1;
 
