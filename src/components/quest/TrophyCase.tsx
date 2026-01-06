@@ -77,16 +77,10 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
   return (
     <section>
       <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="quest-section-title">Trophy Case</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Trophy Case</h2>
         
-        {/* Filter toggle - Global Slate active pill */}
-        <div 
-          className="flex rounded-full p-0.5"
-          style={{ 
-            background: 'var(--quest-chip-bg)',
-            border: '1px solid var(--quest-stroke)',
-          }}
-        >
+        {/* Filter toggle - pill style matching Course Details */}
+        <div className="flex rounded-full p-0.5 bg-slate-100 border border-slate-200/60">
           <button
             onClick={() => setFilter('milestones')}
             className="px-3 py-1 text-xs font-semibold rounded-full transition-all"
@@ -110,15 +104,8 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
         </div>
       </div>
 
-      {/* Trophy cabinet container */}
-      <div
-        className="rounded-2xl p-4"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.9) 100%)',
-          border: '1px solid var(--quest-stroke)',
-          boxShadow: 'var(--quest-shadow-sm), inset 0 1px 0 rgba(255,255,255,0.8)',
-        }}
-      >
+      {/* Trophy cabinet container - no card wrapper, badges sit on bg-slate-50 */}
+      <div className="py-2">
         <AnimatePresence mode="wait">
           {!hasItems ? (
             <motion.div

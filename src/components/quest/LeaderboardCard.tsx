@@ -41,14 +41,13 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
 
   return (
     <section>
-      <h2 className="quest-section-title mb-3 px-1">Leaderboard</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Leaderboard</h2>
       
+      {/* KEEP CARD wrapper for Leaderboard */}
       <motion.div
-        className="rounded-2xl p-4"
+        className="rounded-2xl p-4 bg-white border border-slate-200/60"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.9) 100%)',
-          border: '1px solid var(--quest-stroke)',
-          boxShadow: 'var(--quest-shadow-sm)',
+          boxShadow: '0 6px 18px rgba(0, 0, 0, 0.08)',
         }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

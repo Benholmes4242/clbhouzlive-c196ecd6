@@ -95,15 +95,11 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
 
   return (
     <section>
-      <h2 className="quest-section-title mb-3 px-1">Momentum</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Momentum</h2>
       
+      {/* No card wrapper - content sits on bg-slate-50 */}
       <motion.div
-        className="rounded-2xl p-4"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.9) 100%)',
-          border: '1px solid var(--quest-stroke)',
-          boxShadow: 'var(--quest-shadow-sm)',
-        }}
+        className="py-2"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}

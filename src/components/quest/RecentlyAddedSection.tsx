@@ -26,8 +26,7 @@ const RecentCourseRow: React.FC<{
 }> = ({ course, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-3 py-3 border-b text-left transition-colors hover:bg-black/[0.02]"
-    style={{ borderColor: 'var(--quest-divider)' }}
+    className="w-full flex items-center gap-3 py-3 text-left transition-colors hover:bg-black/[0.02]"
   >
     <div
       className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -65,39 +64,30 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
 
   return (
     <section>
-      <div className="mb-4 px-1">
-        <h2
-          className="text-sm font-semibold uppercase tracking-wider"
-          style={{ color: 'var(--quest-text-secondary)' }}
-        >
+      <div className="mb-3 px-1">
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
           Recently Added
         </h2>
       </div>
 
-      <div
-        className="rounded-xl p-4"
-        style={{
-          background: 'var(--quest-surface)',
-          border: hasGoldTrim 
-            ? '1px solid rgba(210, 180, 97, 0.25)' 
-            : '1px solid var(--quest-stroke)',
-          boxShadow: hasGoldTrim 
-            ? '0 0 15px rgba(210, 180, 97, 0.1)' 
-            : 'var(--quest-shadow)',
-        }}
-      >
-        {courses.map((course) => (
-          <RecentCourseRow
-            key={course.id}
-            course={course}
-            onClick={() => {
-              if (onCourseClick) {
-                onCourseClick(course);
-              } else {
-                navigate(`/courses/${course.id}`);
-              }
-            }}
-          />
+      {/* No card wrapper - rows sit on bg-slate-50 with dividers */}
+      <div className="space-y-0">
+        {courses.map((course, index) => (
+          <React.Fragment key={course.id}>
+            <RecentCourseRow
+              course={course}
+              onClick={() => {
+                if (onCourseClick) {
+                  onCourseClick(course);
+                } else {
+                  navigate(`/courses/${course.id}`);
+                }
+              }}
+            />
+            {index < courses.length - 1 && (
+              <div className="h-px bg-slate-200/60" />
+            )}
+          </React.Fragment>
         ))}
       </div>
     </section>

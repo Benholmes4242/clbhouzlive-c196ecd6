@@ -49,15 +49,10 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
 
   return (
     <motion.section 
-      className="relative text-center py-10 px-6 rounded-3xl overflow-hidden"
+      className="relative text-center py-10 px-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      style={{
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,250,251,0.95) 100%)',
-        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,1)',
-        border: '1px solid rgba(31, 36, 40, 0.06)',
-      }}
     >
       {/* Animated background shimmer */}
       <motion.div 
