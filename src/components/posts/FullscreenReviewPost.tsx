@@ -4,7 +4,7 @@ import { useSwipeable } from 'react-swipeable';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
-import HLSPlayer from '@/media/HLSPlayer';
+import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
@@ -107,12 +107,27 @@ export function FullscreenReviewPost({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoPlayerRef = useRef<HLSPlayerRef>(null);
   
   const hasMultipleMedia = sortedMedia.length > 1;
   const currentMedia = sortedMedia[currentIndex];
   const tierData = getScoreTier(rating);
   const theme = getReviewOverlayTheme(rating);
   const isOutstanding = rating >= 9.0;
+  
+  // Video playback fix: Explicitly play video when navigating to it in carousel
+  useEffect(() => {
+    if (currentMedia?.media_type === 'video' && videoPlayerRef.current) {
+      // Small delay to ensure video element is ready after index change
+      const timer = setTimeout(() => {
+        videoPlayerRef.current?.play().catch((err) => {
+          console.log('[FullscreenReviewPost] Video autoplay prevented:', err);
+        });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, currentMedia?.media_type, currentMedia?.id]);
   
   // Navigation
   const goToNext = useCallback(() => {
@@ -174,6 +189,7 @@ export function FullscreenReviewPost({
           {currentMedia.media_type === 'video' ? (
             <HLSPlayer
               key={`review-video-${currentMedia.id}-${currentIndex}`}
+              ref={videoPlayerRef}
               src={currentMedia.media_url}
               className="w-full h-full object-cover"
               muted={isMuted}

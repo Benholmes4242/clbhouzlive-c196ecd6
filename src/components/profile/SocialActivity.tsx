@@ -14,6 +14,7 @@ import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
 
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
@@ -104,20 +105,14 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
       {/* Fullscreen viewer for posts */}
       {selectedPost && (() => {
-        // Check if this is a review post
-        const isReviewPost = selectedPost.isReview || 
-          selectedPost.categories?.includes('review') || 
-          !!selectedPost.source_review_id;
+        // Check if this is a review post using unified helper
+        const isReview = checkIsReviewPost(selectedPost);
 
-        // Format location for review posts - use short format matching Clubhouse
-        const formatLocation = (course?: ActivityPost['course']) => {
-          if (!course) return '';
-          return (course.country as string | undefined) || (course.region as string | undefined) || '';
-        };
-
-
-        // Review post: use FullscreenReviewPost
-        if (isReviewPost) {
+        // Review post: use FullscreenReviewPost with unified data extraction
+        if (isReview) {
+          const reviewData = extractReviewData(selectedPost);
+          const userData = extractUserData(selectedPost);
+          
           const reviewMedia: ReviewMediaItem[] = (selectedPost.post_media || []).map(media => ({
             id: media.id,
             media_type: media.media_type,
@@ -130,33 +125,33 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
               <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
                 <ReviewPostViewer
                   mode="live"
-                  courseId={selectedPost.course?.id || selectedPost.course_id || ''}
-                  courseName={selectedPost.course?.name || 'Course'}
-                  heroSubtitle={formatLocation(selectedPost.course)}
-                  rating={selectedPost.rating ?? 0}
+                  courseId={reviewData?.courseId || ''}
+                  courseName={reviewData?.courseName || 'Course'}
+                  heroSubtitle={reviewData?.courseLocation}
+                  rating={reviewData?.rating ?? 0}
                   reviewText={selectedPost.content}
                   media={reviewMedia}
                   initialIndex={0}
                   onBack={() => setSelectedPost(null)}
-                  sourceReviewId={selectedPost.source_review_id || ''}
+                  sourceReviewId={reviewData?.sourceReviewId || ''}
                   creator={{
-                    id: selectedPost.user?.id || '',
-                    name: selectedPost.user?.display_name || selectedPost.user?.username || 'Golfer',
-                    username: selectedPost.user?.username || undefined,
-                    avatar: selectedPost.user?.profile_photo_url || undefined,
+                    id: userData.id,
+                    name: userData.name,
+                    username: userData.username,
+                    avatar: userData.avatar,
                   }}
                   showReviewCapsule={false}
                   renderMedia={true}
                 >
                   <ReviewBottomPanel
                     user={{
-                      id: selectedPost.user?.id || '',
-                      name: selectedPost.user?.display_name || selectedPost.user?.username || 'Golfer',
-                      username: selectedPost.user?.username || undefined,
-                      avatar: selectedPost.user?.profile_photo_url || undefined,
+                      id: userData.id,
+                      name: userData.name,
+                      username: userData.username,
+                      avatar: userData.avatar,
                     }}
-                    courseId={selectedPost.course?.id || selectedPost.course_id || ''}
-                    rating={selectedPost.rating ?? 0}
+                    courseId={reviewData?.courseId || ''}
+                    rating={reviewData?.rating ?? 0}
                   />
                 </ReviewPostViewer>
 
