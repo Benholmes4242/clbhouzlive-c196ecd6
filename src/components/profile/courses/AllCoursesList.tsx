@@ -78,7 +78,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         filtered = filtered.filter(c => !c.has_rating);
         break;
       case 'top100':
-        filtered = filtered.filter(c => c.is_top100);
+        filtered = filtered
+          .filter(c => c.is_top100)
+          .sort((a, b) => {
+            const dateA = a.last_played_at ? new Date(a.last_played_at).getTime() : 0;
+            const dateB = b.last_played_at ? new Date(b.last_played_at).getTime() : 0;
+            return dateB - dateA;
+          });
         break;
       case 'highest-rated':
         filtered = filtered
