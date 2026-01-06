@@ -92,11 +92,11 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
           </p>
           
           {isOwnProfile && (
-            <button
-              onClick={() => navigate('/edit-profile?tab=basic')}
-              className="mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1.5"
-            >
-              <Plus className="h-3.5 w-3.5" />
+          <button
+            onClick={() => navigate('/edit-profile?tab=basic')}
+            className="mt-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+          >
+            <Plus className="h-3.5 w-3.5" />
               Add handicap
             </button>
           )}
@@ -116,7 +116,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
                 We're finalising connections with official handicap authorities. 
-                Once live, your handicap will update automatically across Clubhouse.
+                Once live, your handicap will update automatically across clbhouse.
               </p>
             </section>
 
@@ -165,7 +165,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
         {isOwnProfile && (
           <button
             onClick={() => navigate('/edit-profile?tab=basic')}
-            className="mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            className="mt-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Edit handicap
           </button>
@@ -184,9 +184,9 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
                 Official handicap sync — launching soon
               </p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-              We're finalising connections with official handicap authorities. 
-              Once live, your handicap will update automatically across Clubhouse.
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
+                We're finalising connections with official handicap authorities. 
+                Once live, your handicap will update automatically across clbhouse.
             </p>
           </section>
 
