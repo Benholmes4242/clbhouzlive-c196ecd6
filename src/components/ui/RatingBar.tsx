@@ -1,57 +1,40 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { CLBHOUZ_ACHIEVEMENT_PALETTE } from '@/lib/clbhouzAchievementPalette';
 
-export type RatingBand =
-  | 'outstanding'
-  | 'excellent'
-  | 'veryGood'
-  | 'good'
-  | 'fair';
-
-export type RatingBarMode = 'neutral' | 'banded';
+/**
+ * RatingBar Component
+ * 
+ * NEW COLOR SYSTEM (Jan 2026):
+ * - Fair → Excellent: All use slate (#64748B)
+ * - Outstanding (9.0+): Uses gold (#D2B461)
+ * 
+ * The old green progression colors have been decommissioned.
+ */
 
 interface RatingBarProps {
   /** Value to render, e.g. 8.3 */
   value: number;
   /** Max value (default 10) */
   max?: number;
-  /** neutral = dark slate, banded = band colour */
-  mode?: RatingBarMode;
-  /** Required when mode === 'banded' */
-  band?: RatingBand;
+  /** If true and value >= 9.0, uses gold fill instead of slate */
+  showOutstandingGold?: boolean;
   /** Extra classes for width/margins etc. */
   className?: string;
 }
 
-/**
- * Bar fill colors from CLBHOUZ_ACHIEVEMENT_PALETTE:
- * - Fair → #C1CFA1 (pale green)
- * - Good → #88B67B (fairway green)
- * - Very Good → #5B9E55 (strong green)
- * - Excellent → #3F7F41 (deep championship green)
- * - Outstanding → #D2B461 (warm trophy gold)
- */
-const bandToFillColor: Record<RatingBand, string> = {
-  fair: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
-  good: CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD,
-  veryGood: CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD,
-  excellent: CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT,
-  outstanding: CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING,
-};
-
 export function RatingBar({
   value,
   max = 10,
-  mode = 'neutral',
-  band = 'veryGood',
+  showOutstandingGold = false,
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
-  const fillColor =
-    mode === 'neutral'
-      ? 'var(--rating-bar-fill-neutral)'
-      : bandToFillColor[band];
+  
+  // New color system: slate for all, gold only for Outstanding (9.0+)
+  const isOutstanding = showOutstandingGold && value >= 9.0;
+  const fillColor = isOutstanding 
+    ? 'var(--rating-bar-fill-outstanding)' 
+    : 'var(--rating-bar-fill-neutral)';
 
   return (
     <div
@@ -61,7 +44,7 @@ export function RatingBar({
       )}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: '#E8ECEF', // Lighter track for better contrast on white cards
+        backgroundColor: '#E8ECEF',
         borderRadius: 'var(--rating-bar-radius)',
       }}
     >

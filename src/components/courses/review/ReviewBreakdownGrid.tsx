@@ -42,7 +42,7 @@ export const ReviewBreakdownGrid: React.FC<ReviewBreakdownGridProps> = ({ scores
               {cat.label}
             </span>
             <div className="flex items-center gap-2">
-              <RatingBar value={cat.value || 0} mode="neutral" />
+              <RatingBar value={cat.value || 0} />
               <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                 {formatScore(cat.value)}
               </span>

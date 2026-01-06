@@ -235,7 +235,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                     {cat.label}
                   </span>
                   <div className="flex items-center gap-2">
-                    <RatingBar value={score} mode="neutral" />
+                    <RatingBar value={score} />
                     <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                       {formatScore(score)}
                     </span>

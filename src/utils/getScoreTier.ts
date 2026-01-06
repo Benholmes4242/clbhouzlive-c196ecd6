@@ -1,8 +1,11 @@
 /**
  * Score Tier Utility
  * 
- * IMPORTANT: This file uses the Global Colour System from globalAchievementMilestoneSystem.ts
- * All rating colors come from COURSE_RATING_THEMES - do not define colors locally.
+ * NEW COLOR SYSTEM (Jan 2026):
+ * - Fair → Excellent: All use slate styling
+ * - Outstanding: Uses gold styling
+ * 
+ * All rating colors come from COURSE_RATING_THEMES.
  */
 
 import { getRatingTheme, type RatingTheme } from '@/lib/globalAchievementMilestoneSystem';
@@ -16,10 +19,10 @@ export interface ScoreTierData {
   border: string;
   text: string;
   barFill: string;
-  // New: raw hex values from global system
   accent: string;
   bgLight: string;
   bgDark: string;
+  isOutstanding: boolean;
 }
 
 // Map RatingTheme key to ScoreTier
@@ -33,26 +36,24 @@ const tierKeyMap: Record<string, ScoreTier> = {
 
 /**
  * Get the score tier data for a given rating score.
- * Returns consistent badge styling tokens used across Community Score and Review Cards.
- * 
- * All colors are sourced from the Global Colour System (COURSE_RATING_THEMES).
+ * Returns consistent styling tokens - slate for Fair→Excellent, gold for Outstanding.
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
   const tier = tierKeyMap[theme.key];
+  const isOutstanding = theme.key === 'OUTSTANDING';
   
   return {
     tier,
     label: theme.label,
-    // Tailwind classes - note: border/text now use dark slate for consistency
-    bg: `bg-[${theme.bgLight}]`,
-    border: 'border-slate-900',
-    text: 'text-slate-900',
+    bg: theme.bgClass,
+    border: theme.borderClass,
+    text: theme.textClass,
     barFill: theme.barFillClass,
-    // Raw values for direct style usage
     accent: theme.accent,
     bgLight: theme.bgLight,
     bgDark: theme.bgDark,
+    isOutstanding,
   };
 }
 
