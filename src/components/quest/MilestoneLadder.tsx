@@ -104,10 +104,10 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line */}
+      {/* Connecting line - constrained to node column only, behind cards */}
       {!isLast && (
         <div
-          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)]"
+          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)] z-0"
           style={{
             background: milestone.isUnlocked
               ? `linear-gradient(to bottom, ${accentColor}80, rgba(31, 36, 40, 0.12))`
@@ -170,9 +170,9 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         )}
       </motion.button>
 
-      {/* Milestone card with locked state clarity */}
-      <div className="flex-1 mb-3" onClick={onClick}>
-        <div className="relative">
+      {/* Milestone card with locked state clarity - z-10 ensures cards are above connector line */}
+      <div className="flex-1 mb-3 relative z-10" onClick={onClick}>
+        <div className="relative bg-[var(--quest-page,#F4F5F7)]">
           <AchievementBadgeCard
             tier={isRegional && milestone.regionSlug 
               ? REGION_TO_TIER[milestone.regionSlug] 
@@ -192,7 +192,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           {/* Locked milestone clarity - show requirement */}
           {isLocked && !isRegional && (
             <div 
-              className="mt-1.5 text-[10px] font-medium px-1"
+              className="mt-1 text-[10px] font-medium px-1"
               style={{ color: 'var(--quest-text-tertiary)' }}
             >
               Requires {milestone.threshold} courses · {remaining} to go

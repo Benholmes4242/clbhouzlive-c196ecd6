@@ -54,33 +54,39 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
   if (unlockedMilestones.length === 0 && !nextMilestone) return null;
 
   return (
-    <div className="relative">
-      {/* Left fade gradient */}
+    <div className="relative overflow-visible">
+      {/* Left fade gradient - positioned as overlay, not clipping */}
       {showLeftFade && (
         <div 
-          className="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
+          className="absolute left-0 top-0 bottom-0 w-8 z-20 pointer-events-none"
           style={{
             background: 'linear-gradient(90deg, var(--quest-page, #F4F5F7) 0%, transparent 100%)',
           }}
         />
       )}
 
-      {/* Right fade gradient - scroll hint */}
+      {/* Right fade gradient - scroll hint, positioned as overlay */}
       {showRightFade && (
         <div 
-          className="absolute right-0 top-0 bottom-0 w-12 z-10 pointer-events-none"
+          className="absolute right-0 top-0 bottom-0 w-12 z-20 pointer-events-none"
           style={{
             background: 'linear-gradient(270deg, var(--quest-page, #F4F5F7) 0%, transparent 100%)',
           }}
         />
       )}
 
+      {/* Scroll container - overflow-x for scroll, overflow-y visible for shadows/glows */}
       <div 
         ref={scrollRef}
-        className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
-        style={{ scrollbarWidth: 'thin' }}
+        className="-mx-4 px-4 scroll-smooth snap-x snap-mandatory"
+        style={{ 
+          scrollbarWidth: 'thin',
+          overflowX: 'auto',
+          overflowY: 'visible',
+        }}
       >
-        <div className="flex items-stretch gap-4 pb-3">
+        {/* Cards container with padding for shadows */}
+        <div className="flex items-stretch gap-4 pt-3 pb-4">
           {/* Unlocked milestones with trophy styling */}
           {unlockedMilestones.map((m, index) => {
             const accentColor = getRingColorForThreshold(m.threshold);
