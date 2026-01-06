@@ -62,6 +62,7 @@ export function Top100HeroSection({
               tier={clubRing}
               showSubtitle={false}
               size="compact"
+              totalTop100Played={totalPlayed}
             />
           </div>
         )}
