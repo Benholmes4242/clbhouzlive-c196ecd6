@@ -14,7 +14,7 @@ import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -269,6 +269,11 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     key={course.course_id}
                     className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50"
                   >
+                    {/* Drag handle - centered vertically */}
+                    <div className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none">
+                      <GripVertical className="w-5 h-5 text-muted-foreground/50" />
+                    </div>
+
                     {/* Position badge - gold/silver/bronze/slate */}
                     <div 
                       className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
