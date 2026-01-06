@@ -110,11 +110,23 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
             </div>
           </div>
 
-          {/* Title - matches courses page section header */}
-          <h1 className="text-xl font-bold text-foreground tracking-tight">
+          {/* Title */}
+          <p
+            className="text-xs font-semibold uppercase tracking-wider mb-2"
+            style={{ color: 'var(--dgp-accent-gold)' }}
+          >
+            Milestone Unlocked
+          </p>
+          <h2
+            className="text-2xl font-bold mb-2"
+            style={{ color: 'var(--dgp-text-primary)' }}
+          >
             {unlockedMilestone.name}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2 mb-6">
+          </h2>
+          <p
+            className="text-sm mb-6"
+            style={{ color: 'var(--dgp-text-secondary)' }}
+          >
             {unlockedMilestone.description}
           </p>
 
