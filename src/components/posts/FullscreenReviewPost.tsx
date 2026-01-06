@@ -194,86 +194,108 @@ export function FullscreenReviewPost({
         </div>
       )}
       
-      {/* Top gradient - lighter for premium look (40% opacity) */}
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/40 via-black/20 to-transparent pointer-events-none z-[5]" />
+      {/* Top gradient - subtle fade behind panel */}
+      <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none z-[4]" />
       
       {/* Bottom gradient - softer fade */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
-      {/* Top-left: Course info + Preview badge - below header */}
-      <div className="absolute left-4 right-24 z-20 top-16">
-        {/* Preview badge - above course name */}
-        {mode === 'preview' && (
-          <span className="inline-block mb-2 px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 backdrop-blur-sm text-blue-200 text-[10px] font-semibold tracking-wide uppercase">
-            Preview
-          </span>
-        )}
-        <h2 className="text-white text-lg sm:text-xl font-bold leading-tight drop-shadow-md line-clamp-2">
-          {courseName}
-        </h2>
-        {heroSubtitle && (
-          <p className="text-white/70 text-sm mt-1 drop-shadow-sm">
-            {heroSubtitle}
-          </p>
-        )}
-      </div>
-      
-      {/* Top-right: Rating + tier - centered stack below header */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <button className="absolute right-4 z-20 top-16 flex flex-col items-center text-center gap-1.5">
-            <span 
-              className="text-5xl sm:text-6xl font-bold tabular-nums drop-shadow-lg"
-              style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
-            >
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
-            <RatingPill score={rating} className="text-[9px] sm:text-[10px] py-0.5 px-2" />
-            <span className="text-white/50 text-[10px] font-medium tracking-wider uppercase whitespace-nowrap">
-              From a review
-            </span>
-          </button>
-        </SheetTrigger>
-        
-        <SheetContent side="bottom" className="max-h-[70vh] rounded-t-3xl">
-          <SheetHeader className="text-left pb-2">
-            <SheetTitle className="text-lg">{courseName}</SheetTitle>
+      {/* Premium Top Overlay Panel - Glass Card */}
+      <div 
+        className="absolute left-4 right-4 z-20 top-14"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderRadius: '16px',
+          padding: '16px',
+        }}
+      >
+        {/* Two-column grid: Left (course info) / Right (rating) */}
+        <div className="flex justify-between items-start gap-4">
+          {/* Left Stack - Course Identity */}
+          <div className="flex-1 min-w-0 space-y-1">
+            {/* Course Name - largest, bold */}
+            <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
+              {courseName}
+            </h2>
+            
+            {/* Location - smaller, muted */}
             {heroSubtitle && (
-              <p className="text-sm text-muted-foreground">{heroSubtitle}</p>
-            )}
-          </SheetHeader>
-          
-          <div className="space-y-4 pt-2">
-            {/* Rating */}
-            <div className="flex items-center gap-3">
-              <span className="text-3xl font-bold tabular-nums">
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </span>
-              <RatingPill score={rating} />
-            </div>
-            
-            {/* Review text */}
-            {reviewText && (
-              <div className="pt-2 border-t">
-                <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                  {reviewText}
-                </p>
-              </div>
+              <p className="text-white/60 text-sm drop-shadow-sm">
+                {heroSubtitle}
+              </p>
             )}
             
-            {/* Preview mode helper text */}
+            {/* Preview pill - under location */}
             {mode === 'preview' && (
-              <div className="pt-3 border-t">
-                <p className="text-xs text-muted-foreground">
-                  This is how your post will look in Clubhouse + Profile.
-                </p>
-              </div>
+              <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
+                Preview
+              </span>
             )}
           </div>
-        </SheetContent>
-      </Sheet>
-      
-      {/* Preview tag removed - now in top-left under location */}
+          
+          {/* Right Stack - Rating (center-aligned vertical stack) */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="flex flex-col items-center text-center gap-1 flex-shrink-0">
+                {/* Numeric Rating - large anchor */}
+                <span 
+                  className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none"
+                  style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+                >
+                  {rating === 10 ? '10' : rating.toFixed(1)}
+                </span>
+                
+                {/* Tier Badge */}
+                <RatingPill score={rating} className="text-[9px] py-0.5 px-2" />
+                
+                {/* "FROM A REVIEW" label */}
+                <span className="text-[9px] font-medium text-white/40 tracking-wider uppercase mt-0.5">
+                  From a review
+                </span>
+              </button>
+            </SheetTrigger>
+            
+            <SheetContent side="bottom" className="max-h-[70vh] rounded-t-3xl">
+              <SheetHeader className="text-left pb-2">
+                <SheetTitle className="text-lg">{courseName}</SheetTitle>
+                {heroSubtitle && (
+                  <p className="text-sm text-muted-foreground">{heroSubtitle}</p>
+                )}
+              </SheetHeader>
+              
+              <div className="space-y-4 pt-2">
+                {/* Rating */}
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold tabular-nums">
+                    {rating === 10 ? '10' : rating.toFixed(1)}
+                  </span>
+                  <RatingPill score={rating} />
+                </div>
+                
+                {/* Review text */}
+                {reviewText && (
+                  <div className="pt-2 border-t">
+                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                      {reviewText}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Preview mode helper text */}
+                {mode === 'preview' && (
+                  <div className="pt-3 border-t">
+                    <p className="text-xs text-muted-foreground">
+                      This is how your post will look in Clubhouse + Profile.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
       
       {/* Media counter - positioned dynamically to avoid CTA overlap */}
       {hasMultipleMedia && (
