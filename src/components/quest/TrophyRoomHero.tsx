@@ -217,14 +217,14 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         </motion.p>
       )}
 
-      {/* Continue Journey CTA */}
+      {/* Continue Journey CTA - Global Slate with shimmer */}
       <motion.button
         onClick={onContinueJourney}
-        className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all"
+        className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all overflow-hidden"
         style={{
-          background: 'var(--quest-text-primary)',
+          background: 'hsl(var(--slate-900))',
           color: '#FFFFFF',
-          boxShadow: '0 4px 16px rgba(31, 36, 40, 0.25)',
+          boxShadow: '0 4px 16px hsla(var(--slate-900), 0.25)',
         }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -232,8 +232,18 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         whileHover={{ scale: 1.03, y: -2 }}
         whileTap={{ scale: 0.98 }}
       >
-        Continue Journey
-        <ChevronDown className="w-4 h-4" />
+        {/* Shimmer overlay */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+            backgroundSize: '200% 100%',
+          }}
+          animate={{ backgroundPosition: ['200% 0%', '-200% 0%'] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
+        />
+        <span className="relative z-10">Continue Journey</span>
+        <ChevronDown className="w-4 h-4 relative z-10" />
       </motion.button>
     </motion.section>
   );

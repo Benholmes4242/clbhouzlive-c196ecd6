@@ -173,11 +173,6 @@ const ProfileQuestView: React.FC = () => {
     setBadgeDetail(badge);
   };
 
-  // Handle region click
-  const handleRegionClick = (region: RegionProgress) => {
-    setSelectedRegion(region);
-  };
-
   // Continue Journey scroll handler
   const handleContinueJourney = () => {
     journeyMapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -303,10 +298,9 @@ const ProfileQuestView: React.FC = () => {
         {/* Section Divider */}
         <div className="quest-section-divider" />
 
-        {/* Section 5: Journey Summary (Regional Lists) */}
+        {/* Section 5: Journey Summary (Regional Lists) - taps navigate to Top 100 pages */}
         <RegionalJourneySummary
           regions={regionProgress}
-          onRegionClick={handleRegionClick}
         />
 
         {/* Section 6: Recently Added */}

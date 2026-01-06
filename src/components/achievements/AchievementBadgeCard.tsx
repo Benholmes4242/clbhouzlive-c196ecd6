@@ -208,6 +208,7 @@ export interface AchievementBadgeCardProps {
   isPrimary?: boolean;
   unlockedAt?: string;
   remaining?: number;
+  /** Mini size for Trophy Case grid (3-across) */
   compact?: boolean;
   isGhost?: boolean;
   status?: AchievementStatus;
@@ -231,6 +232,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   unlocked,
   isPrimary = false,
   remaining,
+  compact = false,
   isGhost = false,
   status,
   totalTop100Played,
@@ -289,7 +291,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     <motion.div
       className={cn(
         'rounded-2xl flex flex-col justify-between relative overflow-hidden cursor-default select-none',
-        'min-w-[180px] h-[88px] px-4 py-2.5',
+        // Mini size for Trophy Case (3-across grid)
+        compact 
+          ? 'min-w-0 h-[72px] px-2.5 py-2'
+          : 'min-w-[180px] h-[88px] px-4 py-2.5',
         // Ghost styling - premium etched glass look
         isGhost && 'border-2 border-dashed'
       )}
@@ -389,11 +394,11 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       )}
 
       {/* Top row: Icon + Content */}
-      <div className="flex items-start gap-3 relative z-10">
+      <div className={cn("flex items-start relative z-10", compact ? "gap-2" : "gap-3")}>
         {/* Trophy/Number medallion */}
         <div className="relative flex-shrink-0">
           {/* Rarity glow aura */}
-          {unlocked && !isGhost && (
+          {unlocked && !isGhost && !compact && (
             <motion.div 
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -406,7 +411,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           
           {/* Medallion container */}
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden"
+            className={cn(
+              "rounded-xl flex items-center justify-center relative overflow-hidden",
+              compact ? "w-8 h-8" : "w-10 h-10"
+            )}
             style={{ 
               backgroundColor: unlocked && !isGhost 
                 ? `${accentColor}12` 
@@ -418,29 +426,31 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             }}
           >
             {/* Inner highlight */}
-            <div 
-              className="absolute top-0 left-0 w-4 h-4 pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle at top left, rgba(255,255,255,0.6) 0%, transparent 70%)',
-              }}
-            />
+            {!compact && (
+              <div 
+                className="absolute top-0 left-0 w-4 h-4 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle at top left, rgba(255,255,255,0.6) 0%, transparent 70%)',
+                }}
+              />
+            )}
             
             {/* Display number for milestones, icon for regional/locked */}
             {isMilestone && unlocked && !isGhost ? (
               <span 
-                className="text-base font-bold relative z-10"
+                className={cn("font-bold relative z-10", compact ? "text-xs" : "text-base")}
                 style={{ color: accentColor }}
               >
                 {threshold}
               </span>
             ) : unlocked && !isGhost ? (
               <Trophy 
-                className="w-4 h-4 relative z-10"
+                className={cn("relative z-10", compact ? "w-3 h-3" : "w-4 h-4")}
                 style={{ color: accentColor }} 
               />
             ) : (
               <Lock 
-                className="w-4 h-4 relative z-10"
+                className={cn("relative z-10", compact ? "w-3 h-3" : "w-4 h-4")}
                 style={{ color: lockedColor }} 
               />
             )}
@@ -451,59 +461,67 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div className="flex-1 min-w-0 overflow-hidden text-left">
           {/* Tier label */}
           <div 
-            className="font-bold leading-tight truncate text-[11px] tracking-wide uppercase"
+            className={cn(
+              "font-bold leading-tight truncate tracking-wide uppercase",
+              compact ? "text-[9px]" : "text-[11px]"
+            )}
             style={{ color: accentColor }}
           >
             {tierLabel}
           </div>
-          {/* Club name / subtitle */}
-          <div 
-            className="text-[13px] font-medium truncate mt-0.5"
-            style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
-          >
-            {isMilestone ? clubName : subtitle}
-          </div>
+          {/* Club name / subtitle - hide in compact mode if space is tight */}
+          {!compact && (
+            <div 
+              className="text-[13px] font-medium truncate mt-0.5"
+              style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
+            >
+              {isMilestone ? clubName : subtitle}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Bottom row: Status chip */}
-      <div className="flex justify-between items-end relative z-10">
-        {/* Milestone number display for unlocked milestones */}
-        {isMilestone && unlocked && !isGhost && (
-          <div 
-            className="text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: `${accentColor}60` }}
-          >
-            {threshold} CLUB
-          </div>
-        )}
-        {(!isMilestone || !unlocked || isGhost) && <div />}
-        
-        <motion.div 
-          className={cn(
-            "inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-wide",
-            isNew && "gap-1"
+      {/* Bottom row: Status chip - hidden in compact mode */}
+      {!compact && (
+        <div className="flex justify-between items-end relative z-10">
+          {/* Milestone number display for unlocked milestones */}
+          {isMilestone && unlocked && !isGhost && (
+            <div 
+              className="text-[10px] font-semibold uppercase tracking-widest"
+              style={{ color: `${accentColor}60` }}
+            >
+              {threshold} CLUB
+            </div>
           )}
-          style={{
-            backgroundColor: isNew 
-              ? `${accentColor}18`
-              : unlocked && !isGhost 
-                ? `${accentColor}10` 
-                : 'rgba(148, 163, 184, 0.08)',
-            border: `1px solid ${
-              isNew 
-                ? `${accentColor}35`
+          {(!isMilestone || !unlocked || isGhost) && <div />}
+          
+          <motion.div 
+            className={cn(
+              "inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-wide",
+              isNew && "gap-1"
+            )}
+            style={{
+              backgroundColor: isNew 
+                ? `${accentColor}18`
                 : unlocked && !isGhost 
-                  ? `${accentColor}20` 
-                  : 'rgba(148, 163, 184, 0.12)'
-            }`,
-            color: unlocked && !isGhost ? accentColor : '#94a3b8',
-          }}
-          whileHover={unlocked ? { scale: 1.05 } : {}}
-        >
-          {statusLabel}
-        </motion.div>
-      </div>
+                  ? `${accentColor}10` 
+                  : 'rgba(148, 163, 184, 0.08)',
+              border: `1px solid ${
+                isNew 
+                  ? `${accentColor}35`
+                  : unlocked && !isGhost 
+                    ? `${accentColor}20` 
+                    : 'rgba(148, 163, 184, 0.12)'
+              }`,
+              color: unlocked && !isGhost ? accentColor : '#94a3b8',
+            }}
+            whileHover={unlocked ? { scale: 1.05 } : {}}
+          >
+            {isNew && <Sparkles className="w-2.5 h-2.5" />}
+            {statusLabel}
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 };

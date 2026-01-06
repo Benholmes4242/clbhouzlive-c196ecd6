@@ -103,11 +103,15 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line - constrained to node column only, hidden behind cards via z-index */}
+      {/* Connecting line - starts from center of node circle and ends at center of next node */}
       {!isLast && (
         <div
-          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)] z-0"
+          className="absolute left-5 w-0.5 z-0"
           style={{
+            // Start from center of circle (20px from top for 40px circle)
+            top: '20px',
+            // Height extends down to connect with next node
+            height: 'calc(100% + 16px)',
             background: milestone.isUnlocked
               ? `linear-gradient(to bottom, ${accentColor}80, rgba(31, 36, 40, 0.12))`
               : 'rgba(31, 36, 40, 0.08)',
@@ -269,10 +273,14 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   return (
     <div className="relative">
       <div className="relative pl-2">
-        {/* Background path line */}
+        {/* Background path line - starts at center of first node, ends at center of last core milestone node */}
         <div
-          className="absolute left-7 top-0 bottom-0 w-0.5"
-          style={{ background: 'rgba(31, 36, 40, 0.12)' }}
+          className="absolute left-7 w-0.5"
+          style={{ 
+            background: 'rgba(31, 36, 40, 0.12)',
+            top: '20px', // Start at center of first node circle
+            height: `calc(100% - ${regionMilestones.length > 0 ? '120px' : '40px'})`, // Don't extend into mastery track
+          }}
         />
 
         <div className="space-y-0">
@@ -281,7 +289,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
               key={milestone.id}
               milestone={milestone}
               isCurrent={index === currentMilestoneIndex}
-              isLast={index === coreMilestones.length - 1 && regionMilestones.length === 0}
+              isLast={index === coreMilestones.length - 1}
               totalPlayed={totalPlayed}
               index={index}
               onClick={() => onMilestoneClick?.(milestone)}
@@ -289,64 +297,67 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           ))}
         </div>
 
-        {/* Mastery Track Section - Regional Completions */}
+        {/* Mastery Track Section - Regional Completions - Separate chapter block */}
         {regionMilestones.length > 0 && (
-          <>
-            {/* Mastery Track divider - distinct visual identity */}
-            <motion.div 
-              className="flex items-center gap-3 my-8 px-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+          <motion.div 
+            className="mt-8 pt-6 border-t-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            {/* Chapter break card */}
+            <div 
+              className="rounded-2xl p-4 mb-6"
+              style={{
+                background: 'linear-gradient(135deg, rgba(210, 180, 97, 0.08) 0%, rgba(255,255,255,0.95) 100%)',
+                border: '1px solid rgba(210, 180, 97, 0.2)',
+                boxShadow: '0 4px 16px rgba(210, 180, 97, 0.08)',
+              }}
             >
-              <div 
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(210, 180, 97, 0.15) 0%, rgba(210, 180, 97, 0.05) 100%)',
-                  border: '1px solid rgba(210, 180, 97, 0.25)',
-                }}
-              >
-                <Crown className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
+              <div className="flex items-center gap-2 mb-2">
+                <Crown className="w-5 h-5" style={{ color: 'var(--quest-accent-gold)' }} />
                 <span 
-                  className="text-xs font-bold uppercase tracking-wider"
+                  className="text-sm font-bold uppercase tracking-wider"
                   style={{ color: 'var(--quest-accent-gold)' }}
                 >
                   Mastery Track
                 </span>
               </div>
-              <div 
-                className="flex-1 h-px" 
-                style={{ background: 'linear-gradient(90deg, rgba(210, 180, 97, 0.3) 0%, transparent 100%)' }}
-              />
-            </motion.div>
+              <p
+                className="text-xs"
+                style={{ color: 'var(--quest-text-secondary)' }}
+              >
+                {coreComplete 
+                  ? 'Complete each regional Top 100 list to achieve mastery' 
+                  : 'Complete the 400 Club to unlock regional mastery challenges'}
+              </p>
+            </div>
 
-            {/* Mastery Track subtitle */}
-            <motion.p
-              className="text-xs mb-4 px-1"
-              style={{ color: 'var(--quest-text-tertiary)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              {coreComplete 
-                ? 'Complete each regional Top 100 list' 
-                : 'Complete the 400 Club to unlock regional mastery'}
-            </motion.p>
-
-            <div className="space-y-0">
+            {/* Regional items as stacked mini cards - no connecting line */}
+            <div className="space-y-3 pl-0">
               {regionMilestones.map((milestone, index) => (
-                <MilestoneNode
+                <motion.div
                   key={milestone.id}
-                  milestone={milestone}
-                  isCurrent={coreMilestones.length + index === currentMilestoneIndex}
-                  isLast={index === regionMilestones.length - 1}
-                  totalPlayed={totalPlayed}
-                  index={coreMilestones.length + index}
+                  className="relative"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
                   onClick={() => onMilestoneClick?.(milestone)}
-                />
+                >
+                  <AchievementBadgeCard
+                    tier={milestone.regionSlug ? REGION_TO_TIER[milestone.regionSlug] : 'GBI'}
+                    title={milestone.name}
+                    subtitle={milestone.tierName}
+                    unlocked={milestone.isUnlocked}
+                    isGhost={!milestone.isUnlocked}
+                    status={milestone.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
+                    playedOnList={milestone.played}
+                    totalOnList={milestone.total}
+                  />
+                </motion.div>
               ))}
             </div>
-          </>
+          </motion.div>
         )}
       </div>
     </div>
