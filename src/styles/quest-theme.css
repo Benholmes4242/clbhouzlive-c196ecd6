@@ -99,18 +99,11 @@
   font-size: 0.75rem;
 }
 
-/* Section divider - consistent spacing */
+/* Section divider */
 .quest-theme-light .quest-section-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, var(--quest-stroke-strong) 50%, transparent 100%);
-  margin: 1.5rem 0;
-}
-
-/* Consistent vertical rhythm between sections */
-.quest-theme-light section + .quest-section-divider,
-.quest-theme-light .quest-section-divider + section {
-  margin-top: 1.25rem;
-  margin-bottom: 1.25rem;
+  margin: 2rem 0;
 }
 
 /* Quest status pills */

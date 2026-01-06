@@ -6,7 +6,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Trophy, Share2, ChevronRight, Sparkles, X } from 'lucide-react';
+import { Trophy, Share2, ChevronRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Confetti from 'react-confetti';
 import { ACHIEVEMENT_MILESTONES, MILESTONE_TIER_META } from '@/config/achievements';
@@ -27,29 +27,6 @@ interface Milestone {
 }
 
 const STORAGE_KEY = 'quest-milestones-seen';
-const SNOOZE_KEY = 'quest_milestone_snooze_until';
-const SNOOZE_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-// Check if milestones are snoozed
-function isSnoozed(): boolean {
-  try {
-    const snoozeUntil = localStorage.getItem(SNOOZE_KEY);
-    if (!snoozeUntil) return false;
-    return Date.now() < parseInt(snoozeUntil, 10);
-  } catch {
-    return false;
-  }
-}
-
-// Set snooze for 7 days
-function setSnooze(): void {
-  try {
-    const snoozeUntil = Date.now() + SNOOZE_DURATION_MS;
-    localStorage.setItem(SNOOZE_KEY, String(snoozeUntil));
-  } catch {
-    // Ignore storage errors
-  }
-}
 
 // Build milestones from single source of truth
 const MILESTONES: Milestone[] = MILESTONE_TIER_META.map(meta => {
@@ -102,9 +79,6 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   }, []);
 
   useEffect(() => {
-    // Check if snoozed
-    if (isSnoozed()) return;
-    
     // Find newly unlocked milestone
     const seen = getSeenMilestones();
     
@@ -122,13 +96,6 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
       }
     }
   }, [totalPlayed]);
-  
-  const handleSnooze = useCallback(() => {
-    setSnooze();
-    setUnlockedMilestone(null);
-    setProgress(0);
-    setShowConfetti(false);
-  }, []);
 
   const handleClose = useCallback(() => {
     if (unlockedMilestone) {
@@ -172,16 +139,6 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
         )}
 
         <div className="py-8 text-center relative">
-          {/* Not now / Snooze button */}
-          <button
-            onClick={handleSnooze}
-            className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-black/5"
-            style={{ color: 'var(--quest-text-tertiary)' }}
-          >
-            <X className="w-3.5 h-3.5" />
-            Not now
-          </button>
-
           {/* Background glow */}
           <div 
             className="absolute inset-0 pointer-events-none"

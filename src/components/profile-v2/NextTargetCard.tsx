@@ -1,12 +1,11 @@
 /**
  * NextTargetCard - Smart guidance module for Quest
- * Light theme version with tier-themed progress bar
+ * Light theme version
  */
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Target, Trophy, Share2, Compass } from 'lucide-react';
-import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
+import { Target, Trophy, Share2, Compass, ChevronRight } from 'lucide-react';
 
 interface NextTargetCardProps {
   totalPlayed: number;
@@ -131,73 +130,55 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
         </span>
       </div>
 
-      {/* Milestone progress with tier-themed colors */}
-      {nextMilestone && (() => {
-        const tierColor = getRingColorForThreshold(nextMilestone.threshold);
-        
-        return (
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              {/* Milestone name with small badge icon */}
-              <div className="flex items-center gap-2">
-                <div 
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold"
-                  style={{
-                    background: `${tierColor}15`,
-                    border: `1px solid ${tierColor}30`,
-                    color: tierColor,
-                  }}
-                >
-                  {nextMilestone.threshold}
-                </div>
-                <span
-                  className="text-lg font-bold"
-                  style={{ color: 'var(--quest-text-primary)' }}
-                >
-                  {nextMilestone.name}
-                </span>
-              </div>
-              <span
-                className="text-sm font-medium"
-                style={{ color: tierColor }}
-              >
-                {remaining} to go
-              </span>
-            </div>
-            
-            {/* Progress bar with tier theme */}
-            <div
-              className="h-2.5 rounded-full overflow-hidden relative"
-              style={{ background: 'var(--quest-track)' }}
+      {/* Milestone progress */}
+      {nextMilestone && (
+        <div className="mb-4">
+          <div className="flex items-baseline justify-between mb-2">
+            <span
+              className="text-lg font-bold"
+              style={{ color: 'var(--quest-text-primary)' }}
             >
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${Math.min(progressPercent, 100)}%`,
-                  background: `linear-gradient(90deg, ${tierColor}90, ${tierColor})`,
-                  boxShadow: `0 0 8px ${tierColor}40`,
-                }}
-              />
-            </div>
-            
-            <p
-              className="text-xs mt-2"
-              style={{ color: 'var(--quest-text-tertiary)' }}
+              {nextMilestone.name}
+            </span>
+            <span
+              className="text-sm"
+              style={{ color: 'var(--quest-accent-green)' }}
             >
-              {totalPlayed} / {nextMilestone.threshold} courses
-            </p>
-            {/* Onboarding hint */}
-            {hintVisible && (
-              <p
-                className="text-xs mt-2 transition-opacity duration-500"
-                style={{ color: 'var(--quest-text-tertiary)', fontStyle: 'italic' }}
-              >
-                This updates as you play more courses
-              </p>
-            )}
+              {remaining} to go
+            </span>
           </div>
-        );
-      })()}
+          
+          {/* Progress bar */}
+          <div
+            className="h-2 rounded-full overflow-hidden"
+            style={{ background: 'var(--quest-track)' }}
+          >
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${Math.min(progressPercent, 100)}%`,
+                background: 'linear-gradient(90deg, var(--quest-accent-green), var(--quest-accent-gold))',
+              }}
+            />
+          </div>
+          
+          <p
+            className="text-xs mt-2"
+            style={{ color: 'var(--quest-text-tertiary)' }}
+          >
+            {totalPlayed} / {nextMilestone.threshold} courses
+          </p>
+          {/* Onboarding hint */}
+          {hintVisible && (
+            <p
+              className="text-xs mt-2 transition-opacity duration-500"
+              style={{ color: 'var(--quest-text-tertiary)', fontStyle: 'italic' }}
+            >
+              This updates as you play more courses
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Suggestions */}
       <div className="space-y-2">

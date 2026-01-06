@@ -18,7 +18,6 @@ interface RecentlyAddedSectionProps {
   courses: RecentCourse[];
   hasGoldTrim?: boolean;
   onCourseClick?: (course: RecentCourse) => void;
-  profileId?: string;
 }
 
 const RecentCourseRow: React.FC<{
@@ -59,28 +58,10 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
   courses,
   hasGoldTrim = false,
   onCourseClick,
-  profileId,
 }) => {
   const navigate = useNavigate();
 
   if (courses.length === 0) return null;
-
-  // Sort by date (newest first) and limit to 10
-  const sortedCourses = [...courses]
-    .sort((a, b) => {
-      if (!a.dateAdded || !b.dateAdded) return 0;
-      return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
-    })
-    .slice(0, 10);
-
-  // Navigate to profile courses tab
-  const handleSeeAll = () => {
-    if (profileId) {
-      navigate(`/profile/${profileId}?tab=courses`);
-    } else {
-      navigate('/profile?tab=courses');
-    }
-  };
 
   return (
     <section>
@@ -92,7 +73,7 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
           Recently Added
         </h2>
         <button
-          onClick={handleSeeAll}
+          onClick={() => navigate('/top100?tab=my-progress')}
           className="text-xs font-medium flex items-center gap-1"
           style={{ color: 'var(--quest-accent-green)' }}
         >
@@ -112,7 +93,7 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
             : 'var(--quest-shadow)',
         }}
       >
-        {sortedCourses.map((course) => (
+        {courses.map((course) => (
           <RecentCourseRow
             key={course.id}
             course={course}

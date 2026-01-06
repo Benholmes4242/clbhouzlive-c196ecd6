@@ -11,14 +11,13 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy } from 'lucide-react';
 
 import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuestCourses } from '@/hooks/useQuestCourses';
-import { useUserProfile } from '@/hooks/useUserProfile';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
@@ -49,40 +48,14 @@ interface MilestoneClub {
 
 const ProfileQuestView: React.FC = () => {
   const navigate = useNavigate();
-  const { userId: profileUserId } = useParams<{ userId?: string }>();
   const { user } = useSupabaseSession();
   const { recentlyPlayed, isLoading: questLoading } = useQuestCourses();
   
-  // Determine which user's profile we're viewing
-  const viewingUserId = profileUserId || user?.id;
-  const isOwnProfile = !profileUserId || profileUserId === user?.id;
-  
-  // Fetch profile data for dynamic title
-  const { data: profileData } = useUserProfile(viewingUserId);
-  
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
-  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(viewingUserId);
+  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
   const isLoading = questLoading || progressLoading;
   
   const totalPlayed = progressData?.totalTop100Played ?? 0;
-  
-  // Dynamic page title
-  const pageTitle = useMemo(() => {
-    if (isOwnProfile) return 'Top 100 Journey';
-    
-    // Extract first name from display_name or fallback to username
-    const displayName = profileData?.display_name || profileData?.username || 'User';
-    const firstName = displayName.split(' ')[0];
-    // Handle names ending in 's' - use apostrophe only
-    const possessive = firstName.endsWith('s') ? `${firstName}'` : `${firstName}'s`;
-    return `${possessive} Top 100 Journey`;
-  }, [isOwnProfile, profileData]);
-  
-  // Dynamic subtitle
-  const pageSubtitle = useMemo(() => {
-    if (isOwnProfile) return 'Your journey across the world\'s greatest courses';
-    return 'Their journey across the world\'s greatest courses';
-  }, [isOwnProfile]);
   
   // Map Top100ProgressForUser list data to RegionProgress format for Journey Summary
   const regionProgress: RegionProgress[] = useMemo(() => {
@@ -234,13 +207,13 @@ const ProfileQuestView: React.FC = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            {pageTitle}
+            The Quest
           </h1>
           <p
             className="text-sm font-medium"
             style={{ color: 'var(--quest-text-tertiary)' }}
           >
-            {pageSubtitle}
+            Your journey across the world's greatest courses
           </p>
         </div>
       </div>
@@ -282,7 +255,7 @@ const ProfileQuestView: React.FC = () => {
 
         {/* Section 4: Journey Map (Milestone Ladder with Mastery Track) */}
         <section>
-          {/* Note: MilestoneLadder has its own header, so no duplicate here */}
+          <h2 className="quest-section-title mb-3 px-1">Journey Map</h2>
           {showJourneyHint && (
             <p
               className="text-xs px-1 mb-2 transition-opacity duration-500"
@@ -310,7 +283,6 @@ const ProfileQuestView: React.FC = () => {
         <RecentlyAddedSection
           courses={recentCourses}
           hasGoldTrim={rewards.hasGoldTrim}
-          profileId={viewingUserId}
         />
       </div>
 
@@ -405,7 +377,7 @@ const ProfileQuestView: React.FC = () => {
                       : 'var(--quest-text-secondary)',
                   }}
                 >
-                  {selectedClub.isUnlocked ? '✓ Earned' : `${selectedClub.remaining} more to earn`}
+                  {selectedClub.isUnlocked ? '✓ Unlocked' : `${selectedClub.remaining} more to unlock`}
                 </div>
               </div>
             </>

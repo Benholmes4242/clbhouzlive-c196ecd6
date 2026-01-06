@@ -90,7 +90,6 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
 }) => {
   const isRegional = milestone.type === 'list_completion';
   const remaining = milestone.threshold - totalPlayed;
-  const isLocked = !milestone.isUnlocked && !isCurrent;
   
   // Get colors based on type
   const accentColor = isRegional && milestone.regionSlug
@@ -104,10 +103,10 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line - constrained to node column only, behind cards */}
+      {/* Connecting line */}
       {!isLast && (
         <div
-          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)] z-0"
+          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)]"
           style={{
             background: milestone.isUnlocked
               ? `linear-gradient(to bottom, ${accentColor}80, rgba(31, 36, 40, 0.12))`
@@ -170,35 +169,23 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         )}
       </motion.button>
 
-      {/* Milestone card with locked state clarity - z-10 ensures cards are above connector line */}
-      <div className="flex-1 mb-3 relative z-10" onClick={onClick}>
-        <div className="relative bg-[var(--quest-page,#F4F5F7)]">
-          <AchievementBadgeCard
-            tier={isRegional && milestone.regionSlug 
-              ? REGION_TO_TIER[milestone.regionSlug] 
-              : String(milestone.threshold) as AchievementTier}
-            title={milestone.name}
-            subtitle={milestone.tierName}
-            unlocked={milestone.isUnlocked}
-            isGhost={isLocked}
-            status={milestone.isUnlocked ? 'UNLOCKED' : isCurrent ? undefined : 'LOCKED'}
-            remaining={!milestone.isUnlocked && !isRegional ? remaining : undefined}
-            totalTop100Played={totalPlayed}
-            isCurrentTarget={isCurrent}
-            playedOnList={milestone.played}
-            totalOnList={milestone.total}
-          />
-          
-          {/* Locked milestone clarity - show requirement */}
-          {isLocked && !isRegional && (
-            <div 
-              className="mt-1 text-[10px] font-medium px-1"
-              style={{ color: 'var(--quest-text-tertiary)' }}
-            >
-              Requires {milestone.threshold} courses · {remaining} to go
-            </div>
-          )}
-        </div>
+      {/* Milestone card */}
+      <div className="flex-1 mb-4" onClick={onClick}>
+        <AchievementBadgeCard
+          tier={isRegional && milestone.regionSlug 
+            ? REGION_TO_TIER[milestone.regionSlug] 
+            : String(milestone.threshold) as AchievementTier}
+          title={milestone.name}
+          subtitle={milestone.tierName}
+          unlocked={milestone.isUnlocked}
+          isGhost={!milestone.isUnlocked && !isCurrent}
+          status={milestone.isUnlocked ? 'UNLOCKED' : isCurrent ? undefined : 'LOCKED'}
+          remaining={!milestone.isUnlocked && !isRegional ? remaining : undefined}
+          totalTop100Played={totalPlayed}
+          isCurrentTarget={isCurrent}
+          playedOnList={milestone.played}
+          totalOnList={milestone.total}
+        />
       </div>
     </motion.div>
   );
