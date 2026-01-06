@@ -305,7 +305,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-2xl relative overflow-hidden cursor-default select-none',
         // Mini size for Trophy Case (3-across grid) - use flex-col with centered content
         compact 
-          ? 'min-w-0 h-[88px] px-2 py-2 flex flex-col items-center justify-start'
+          ? 'min-w-0 h-[72px] px-2 py-2 flex flex-col items-center justify-start'
           : 'min-w-[180px] h-[88px] px-4 py-2.5 flex flex-col justify-between',
         // Ghost styling - premium etched glass look
         isGhost && 'border-2 border-dashed'
