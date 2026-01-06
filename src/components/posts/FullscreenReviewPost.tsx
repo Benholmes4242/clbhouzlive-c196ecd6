@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import HLSPlayer from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -110,6 +111,8 @@ export function FullscreenReviewPost({
   const hasMultipleMedia = sortedMedia.length > 1;
   const currentMedia = sortedMedia[currentIndex];
   const tierData = getScoreTier(rating);
+  const theme = getReviewOverlayTheme(rating);
+  const isOutstanding = rating >= 9.0;
   
   // Navigation
   const goToNext = useCallback(() => {
@@ -218,12 +221,15 @@ export function FullscreenReviewPost({
       {/* Top-right: Rating + tier - centered stack for alignment */}
       <Sheet>
         <SheetTrigger asChild>
-          <button className="absolute top-20 right-4 z-20 flex flex-col items-center text-center gap-0.5 max-w-[100px]">
-            <span className="text-white text-2xl sm:text-3xl font-bold tabular-nums drop-shadow-lg">
+          <button className="absolute top-20 right-4 z-20 flex flex-col items-center text-center gap-1 max-w-[100px]">
+            <span 
+              className="text-2xl sm:text-3xl font-bold tabular-nums drop-shadow-lg"
+              style={{ color: isOutstanding ? theme.pillText : '#FFFFFF' }}
+            >
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
             <RatingPill score={rating} className="text-[9px] sm:text-[10px] py-0.5 px-1.5 sm:px-2" />
-            <span className="text-white/70 text-[9px] sm:text-[10px] font-medium tracking-wide whitespace-nowrap">
+            <span className="text-white/60 text-[10px] font-medium tracking-wide uppercase whitespace-nowrap">
               From a review
             </span>
           </button>

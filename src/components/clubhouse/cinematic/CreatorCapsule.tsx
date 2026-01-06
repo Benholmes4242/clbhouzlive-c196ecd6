@@ -1,6 +1,11 @@
 /**
- * CreatorCapsule - Bottom-left floating creator info
- * Collapsed: Single row pill with avatar, username, course
+ * CreatorCapsule - Bottom-left floating adaptive capsule
+ * 
+ * Two modes:
+ * - Regular: Shows creator info (avatar, username, caption, course, music)
+ * - Review: Shows review info ("Rated this course • 8.5 EXCELLENT") with tier colors
+ * 
+ * Collapsed: Single row pill with mode-specific content
  * Expanded: Reveals caption, follow button, profile/course links
  */
 
@@ -10,9 +15,11 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { ChevronUp, User, Music } from 'lucide-react';
+import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
+import { getReviewOverlayTheme, type ExtractedReviewData } from '@/lib/postHelpers';
+import { RatingPill } from '@/components/ui/RatingPill';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (
@@ -34,6 +41,23 @@ const SoundwaveAnimation: React.FC = () => (
   </div>
 );
 
+/** Golf flag icon for review mode */
+const GolfFlagIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className, style }) => (
+  <svg 
+    className={className} 
+    style={style}
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={2}
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <path d="M4 21V4" />
+    <path d="M4 4l12 4-12 4" />
+  </svg>
+);
+
 interface GolfCourseInfo {
   id?: string | null;
   name?: string | null;
@@ -49,6 +73,7 @@ interface MusicTrackInfo {
 }
 
 interface CreatorCapsuleProps {
+  // Regular mode props
   user: {
     id: string;
     name: string;
@@ -68,6 +93,14 @@ interface CreatorCapsuleProps {
   onViewProfile?: () => void;
   /** Optional callback when music row is tapped (e.g., toggle mute) */
   onMusicTap?: () => void;
+  
+  // NEW: Review mode props
+  /** Whether this is a review post */
+  isReview?: boolean;
+  /** Review data for review mode */
+  reviewData?: ExtractedReviewData;
+  /** Callback when review capsule is tapped */
+  onReviewTap?: () => void;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
@@ -82,15 +115,30 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onFollow,
   onViewProfile,
   onMusicTap,
+  // Review mode
+  isReview = false,
+  reviewData,
+  onReviewTap,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
+  // Get review theme if in review mode
+  const reviewTheme = isReview && reviewData 
+    ? getReviewOverlayTheme(reviewData.rating)
+    : null;
+  const isOutstanding = isReview && reviewData && reviewData.rating >= 9.0;
+
   const handleToggle = useCallback(() => {
+    if (isReview) {
+      // In review mode, tap navigates to course
+      onReviewTap?.();
+      return;
+    }
     setIsExpanded(prev => !prev);
-  }, []);
+  }, [isReview, onReviewTap]);
 
   // Touch handlers for swipe gestures
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -226,11 +274,101 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     </div>
   );
 
+  // Review mode content (collapsed only - no expansion)
+  const reviewContent = reviewData && (
+    <button
+      type="button"
+      onClick={handleToggle}
+      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-transparent active:bg-transparent"
+    >
+      {/* Golf flag icon with tier color background */}
+      <div 
+        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border"
+        style={{
+          backgroundColor: isOutstanding ? 'rgba(210, 180, 97, 0.15)' : 'rgba(100, 116, 139, 0.12)',
+          borderColor: isOutstanding ? 'rgba(210, 180, 97, 0.4)' : 'rgba(100, 116, 139, 0.35)',
+        }}
+      >
+        <GolfFlagIcon 
+          className="w-5 h-5" 
+          style={{ color: isOutstanding ? '#D2B461' : '#94A3B8' }}
+        />
+      </div>
+      
+      {/* Text content */}
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <span className="text-sm font-medium text-white truncate">
+          Rated this course
+        </span>
+        
+        {/* Rating badge inline */}
+        <RatingPill score={reviewData.rating} className="text-[9px] py-0.5 px-1.5 flex-shrink-0" />
+      </div>
+      
+      {/* Arrow icon indicating navigation */}
+      <ChevronRight className="w-4 h-4 text-white/50 flex-shrink-0" />
+    </button>
+  );
+
+  // Regular mode collapsed content
+  const regularCollapsedContent = (
+    <button
+      type="button"
+      onClick={handleToggle}
+      className={cn(
+        'w-full flex items-center gap-3 px-3 py-2.5',
+        'text-left',
+        // No hover/active/focus states - static identity element
+        'hover:bg-transparent active:bg-transparent focus:bg-transparent',
+        'active:opacity-100 focus-visible:outline-none'
+      )}
+    >
+      {/* Avatar */}
+      <SquircleAvatar
+        size={40}
+        src={user?.avatar}
+        alt={user?.name ?? 'Creator'}
+        fallback={initials}
+        hideRing
+      />
+
+      {/* Name */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[13px] font-semibold text-white truncate">
+            @{user?.username || user?.name?.toLowerCase().replace(/\s/g, '') || 'golfer'}
+          </span>
+        </div>
+        
+        {/* Caption preview (collapsed) */}
+        {!isExpanded && caption && (
+          <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
+            {truncatedCaption}
+          </p>
+        )}
+      </div>
+
+      {/* Expand/Collapse chevron */}
+      <motion.div
+        animate={{ rotate: isExpanded ? 180 : 0 }}
+        transition={{ duration: 0.2 }}
+        className="flex-shrink-0"
+      >
+        <ChevronUp className="w-4 h-4 text-white/50" />
+      </motion.div>
+    </button>
+  );
+
+  // Determine border color based on mode
+  const borderColor = isReview && isOutstanding 
+    ? 'rgba(210, 180, 97, 0.3)' 
+    : 'rgba(255, 255, 255, 0.08)';
+
   return (
     <>
       {/* Backdrop for tap-outside when expanded */}
       <AnimatePresence>
-        {isExpanded && (
+        {isExpanded && !isReview && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -268,72 +406,31 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           className={cn(
             'rounded-sq-lg overflow-hidden',
             'bg-black/50 backdrop-blur-xl',
-            'border border-white/[0.08]',
+            'border',
             'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]'
           )}
+          style={{ borderColor }}
         >
-          {/* Collapsed State - Always visible */}
-          <button
-            type="button"
-            onClick={handleToggle}
-            className={cn(
-              'w-full flex items-center gap-3 px-3 py-2.5',
-              'text-left',
-              // No hover/active/focus states - static identity element
-              'hover:bg-transparent active:bg-transparent focus:bg-transparent',
-              'active:opacity-100 focus-visible:outline-none'
-            )}
-          >
-            {/* Avatar */}
-            <SquircleAvatar
-              size={40}
-              src={user?.avatar}
-              alt={user?.name ?? 'Creator'}
-              fallback={initials}
-              hideRing
-            />
+          {/* Collapsed State - mode-dependent */}
+          {isReview ? reviewContent : regularCollapsedContent}
 
-            {/* Name */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[13px] font-semibold text-white truncate">
-                  @{user?.username || user?.name?.toLowerCase().replace(/\s/g, '') || 'golfer'}
-                </span>
-              </div>
-              
-              {/* Caption preview (collapsed) */}
-              {!isExpanded && caption && (
-                <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
-                  {truncatedCaption}
-                </p>
+          {/* Expanded Content - only for regular mode */}
+          {!isReview && (
+            <AnimatePresence mode={popLayoutForGolfTag ? 'popLayout' : 'sync'}>
+              {isExpanded && (
+                <motion.div
+                  key="expanded"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+                  className="overflow-hidden"
+                >
+                  {expandedInner}
+                </motion.div>
               )}
-            </div>
-
-            {/* Expand/Collapse chevron */}
-            <motion.div
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex-shrink-0"
-            >
-              <ChevronUp className="w-4 h-4 text-white/50" />
-            </motion.div>
-          </button>
-
-          {/* Expanded Content */}
-          <AnimatePresence mode={popLayoutForGolfTag ? 'popLayout' : 'sync'}>
-            {isExpanded && (
-              <motion.div
-                key="expanded"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                className="overflow-hidden"
-              >
-                {expandedInner}
-              </motion.div>
-            )}
-          </AnimatePresence>
+            </AnimatePresence>
+          )}
         </motion.div>
       </motion.div>
     </>

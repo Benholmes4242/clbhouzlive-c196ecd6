@@ -556,12 +556,28 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
       
+      // PHASE 4: Skip confirmation screen if no media attached
+      // Check for any media: existing from DB, new images, or video drafts
+      const hasAnyMedia = existingMediaItems.length > 0 || selectedImages.length > 0 || videoDrafts.length > 0;
+      
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
       setTimeout(() => {
-        setShowConfirmation(true);
-        setIsSubmitting(false);
-        setButtonText('Add to Played');
+        if (!hasAnyMedia) {
+          // No media - skip confirmation screen, show toast and close
+          toast({
+            title: isEditMode ? 'Rating updated' : 'Rating saved',
+            description: `Your rating for ${course?.name || 'this course'} has been saved.`,
+          });
+          setIsSubmitting(false);
+          setButtonText('Add to Played');
+          onClose();
+        } else {
+          // Has media - show confirmation/share screen
+          setShowConfirmation(true);
+          setIsSubmitting(false);
+          setButtonText('Add to Played');
+        }
       }, 1500);
     },
     onError: (error: any) => {

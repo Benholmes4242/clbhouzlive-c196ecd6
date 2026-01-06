@@ -1088,37 +1088,67 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         );
       })()}
 
-      {/* Creator Capsule */}
+      {/* Creator Capsule - Adaptive for regular posts and review posts */}
       {filteredPosts[currentIndex] && (() => {
-        const currentMediaItem = filteredPosts[currentIndex].media?.[0] as any;
+        const currentPost = filteredPosts[currentIndex];
+        const currentMediaItem = currentPost.media?.[0] as any;
         const currentStudioEdits = currentMediaItem?.studio_edits;
         const currentMusicData = currentStudioEdits?.music;
         const currentAudioMode = currentStudioEdits?.audioMode || 'original';
         const showMusicTrack = currentAudioMode === 'music_only' && currentMusicData?.title;
         
+        // Detect review posts
+        const isReviewPost = currentPost.categories?.includes('review') && (currentPost as any).sourceReviewId;
+        
+        // Extract review data if this is a review post
+        const reviewData = isReviewPost ? {
+          courseId: currentPost.golfCourse?.id || '',
+          courseName: (currentPost as any).courseName || currentPost.golfCourse?.name || 'Golf Course',
+          courseLocation: currentPost.golfCourse 
+            ? `${currentPost.golfCourse.region || ''}, ${currentPost.golfCourse.country || ''}`.replace(/^, |, $/g, '')
+            : undefined,
+          rating: (currentPost as any).reviewRating ?? 0,
+          tierLabel: 'EXCELLENT', // Will be computed by theme function
+          sourceReviewId: (currentPost as any).sourceReviewId || '',
+        } : undefined;
+        
+        // Handle review capsule tap - navigate to course reviews
+        const handleReviewTap = () => {
+          if (reviewData?.courseId) {
+            // Deep linking to course reviews tab (focusReviewId deferred to separate ticket)
+            console.log('[ClubhouseGrid] Navigate to course:', `/courses/${reviewData.courseId}?tab=reviews`);
+            // TODO: Implement navigation when deep linking is ready
+            // navigate(`/courses/${reviewData.courseId}?tab=reviews`);
+          }
+        };
+        
         return (
           <CreatorCapsule
             user={{
-              id: filteredPosts[currentIndex].user?.id || '',
-              name: filteredPosts[currentIndex].user?.name || 'Unknown User',
-              username: filteredPosts[currentIndex].user?.username,
-              avatar: filteredPosts[currentIndex].user?.avatar
+              id: currentPost.user?.id || '',
+              name: currentPost.user?.name || 'Unknown User',
+              username: currentPost.user?.username,
+              avatar: currentPost.user?.avatar
             }}
             caption={removeGolfCourseFromContent(
-              (filteredPosts[currentIndex].title as string | null) ?? 
-              (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
+              (currentPost.title as string | null) ?? 
+              (currentPost.ctaDescription as string | null) ?? ''
             )}
-            golfCourse={filteredPosts[currentIndex].golfCourse}
+            golfCourse={currentPost.golfCourse}
             musicTrack={showMusicTrack ? {
               title: currentMusicData.title,
               artist: currentMusicData.artist
             } : null}
             isMusicPlaying={showMusicTrack && !isGloballyMuted}
             isFollowing={isFollowing === true}
-            isOwnPost={filteredPosts[currentIndex].user?.id === user?.id}
+            isOwnPost={currentPost.user?.id === user?.id}
             isVisible={true}
             onFollow={handleFollowToggle}
             onMusicTap={() => setGlobalMute(!isGloballyMuted)}
+            // Review mode props
+            isReview={isReviewPost}
+            reviewData={reviewData}
+            onReviewTap={handleReviewTap}
           />
         );
       })()}
