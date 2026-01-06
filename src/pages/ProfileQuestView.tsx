@@ -359,7 +359,6 @@ const ProfileQuestView: React.FC = () => {
         onClose={() => setSelectedRegion(null)}
       />
 
-      {/* Unified Achievement Sheet (replaces BadgeDetailSheet) */}
       <UnifiedAchievementSheet
         isOpen={!!achievementData}
         onClose={() => setAchievementData(null)}
