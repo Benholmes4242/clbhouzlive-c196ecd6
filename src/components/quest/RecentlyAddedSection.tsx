@@ -73,7 +73,7 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
           Recently Added
         </h2>
         <button
-          onClick={() => navigate('/top100?tab=my-progress')}
+          onClick={() => navigate('/profile?tab=courses')}
           className="text-xs font-medium flex items-center gap-1"
           style={{ color: 'var(--quest-accent-green)' }}
         >

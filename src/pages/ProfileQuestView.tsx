@@ -142,13 +142,15 @@ const ProfileQuestView: React.FC = () => {
     return lowest.name;
   }, [regionProgress]);
 
-  // Transform recently played for component
-  const recentCourses = recentlyPlayed.map(course => ({
-    id: course.id,
-    name: course.name,
-    region: course.region,
-    dateAdded: course.dateAdded,
-  }));
+  // Transform recently played for component (up to 10, sorted by date descending)
+  const recentCourses = recentlyPlayed
+    .slice(0, 10)
+    .map(course => ({
+      id: course.id,
+      name: course.name,
+      region: course.region,
+      dateAdded: course.dateAdded,
+    }));
 
   // Handle milestone click
   const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean }) => {
@@ -207,7 +209,7 @@ const ProfileQuestView: React.FC = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            The Quest
+            Top 100 Journey
           </h1>
           <p
             className="text-sm font-medium"
