@@ -37,6 +37,8 @@ import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
 import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
 import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
+import { MomentumCard } from '@/components/quest/MomentumCard';
+import { LeaderboardCard } from '@/components/quest/LeaderboardCard';
 import { CLUB_STEPS } from '@/lib/top100Club';
 
 // Milestone club type for sheet
@@ -243,6 +245,7 @@ const ProfileQuestView: React.FC = () => {
           target={100}
           hasPremiumAccent={rewards.hasPremiumAccent}
           onContinueJourney={handleContinueJourney}
+          regionProgress={regionProgress}
         />
 
         {/* Section 2: Trophy Case (replaces Milestones Earned Row) */}
@@ -303,7 +306,13 @@ const ProfileQuestView: React.FC = () => {
           regions={regionProgress}
         />
 
-        {/* Section 6: Recently Added */}
+        {/* Section 6: Momentum */}
+        <MomentumCard recentlyPlayed={recentCourses} />
+
+        {/* Section 7: Leaderboard */}
+        <LeaderboardCard userId={user?.id} />
+
+        {/* Section 8: Recently Added */}
         <RecentlyAddedSection
           courses={recentCourses}
           hasGoldTrim={rewards.hasGoldTrim}
