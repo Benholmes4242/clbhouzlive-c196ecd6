@@ -194,6 +194,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             playedOnList={milestone.played}
             totalOnList={milestone.total}
             threshold={milestone.threshold}
+            showSubtext={true}
           />
       </div>
     </motion.div>
@@ -368,6 +369,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                       status={milestone.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
                       playedOnList={milestone.played}
                       totalOnList={milestone.total}
+                      showSubtext={true}
                     />
                   </motion.div>
                 );
