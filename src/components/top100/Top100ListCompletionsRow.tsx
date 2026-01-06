@@ -16,7 +16,7 @@ const TIER_MAP: Record<string, AchievementTier> = {
   europe: 'EU',
 };
 
-const COMPLETION_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'] as const;
+const COMPLETION_LIST_SLUGS = ['global', 'usa', 'gb-i', 'europe'] as const;
 
 interface Top100ListCompletionsRowProps {
   lists: Top100ListProgress[];
