@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
-import { Trophy } from 'lucide-react';
+/**
+ * AchievementBadgeCard - "Collector Card" Design (Phase 2)
+ * 
+ * Premium collectible trophy card with:
+ * - Tiered visual language with distinct states (LOCKED/UNLOCKED/NEW/GHOST)
+ * - Large milestone numbers prominently displayed
+ * - Emblem watermarks with subtle patterns
+ * - Micro-animations via Framer Motion
+ * - Premium glass styling with tier-weighted glows
+ */
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Trophy, Lock, Sparkles } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { ACHIEVEMENT_MILESTONES } from '@/config/achievements';
-import { 
-  getTierPalette, 
-  MILESTONE_THEMES,
-  MilestoneTier,
-} from '@/lib/globalAchievementMilestoneSystem';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
-import { getEmblemPath } from '@/lib/achievementEmblems';
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED' | 'NEW';
 export type AchievementType = 'MILESTONE' | 'LIST' | 'SKILL' | 'SEASONAL';
@@ -61,46 +67,28 @@ const CLUB_NAMES: Record<string, string> = {
   'WORLD': 'World Complete',
 };
 
-// Collector micro-stamp labels
-const MICRO_STAMPS: Record<string, string> = {
-  '5': 'CLB · 5',
-  '10': 'CLB · 10',
-  '20': 'CLB · 20',
-  '50': 'CLB · 50',
-  '100': 'CLB · 100',
-  '200': 'CLB · ELITE',
-  '300': 'CLB · LEGEND',
-  '400': 'CLB · SLAM',
-  'GBI': 'CLB · GBI',
-  'EU': 'CLB · EU',
-  'USA': 'CLB · USA',
-  'WORLD': 'CLB · WORLD',
-};
+// Tier-specific styling configuration
+interface TierStyle {
+  glowOpacity: number;
+  glowScale: number;
+  glowBlur: number;
+  pattern: 'laurel' | 'trophy' | 'starburst' | 'topographic' | 'diamond';
+}
 
-// Glow intensity by tier - boosted so all tiers pop
-// Base tier (Rookie → Century): matches previous Legendary/Grand Slam
-// High tier (Elite → Legendary): +1 step stronger
-// Top tier (Grand Slam): strongest premium glow
-const GLOW_INTENSITY: Record<string, { opacity: number; scale: number; blur: number }> = {
-  '5': { opacity: 0.14, scale: 2.6, blur: 6 },
-  '10': { opacity: 0.14, scale: 2.6, blur: 6 },
-  '20': { opacity: 0.15, scale: 2.7, blur: 7 },
-  '50': { opacity: 0.15, scale: 2.7, blur: 7 },
-  '100': { opacity: 0.16, scale: 2.8, blur: 8 },
-  '200': { opacity: 0.18, scale: 3.0, blur: 9 },
-  '300': { opacity: 0.22, scale: 3.2, blur: 10 },
-  '400': { opacity: 0.26, scale: 3.5, blur: 12 },
-  'GBI': { opacity: 0.14, scale: 2.6, blur: 6 },
-  'EU': { opacity: 0.14, scale: 2.6, blur: 6 },
-  'USA': { opacity: 0.14, scale: 2.6, blur: 6 },
-  'WORLD': { opacity: 0.18, scale: 3.0, blur: 9 },
+const TIER_STYLES: Record<string, TierStyle> = {
+  '5':    { glowOpacity: 0.12, glowScale: 2.4, glowBlur: 6,  pattern: 'laurel' },
+  '10':   { glowOpacity: 0.14, glowScale: 2.5, glowBlur: 7,  pattern: 'laurel' },
+  '20':   { glowOpacity: 0.15, glowScale: 2.6, glowBlur: 8,  pattern: 'trophy' },
+  '50':   { glowOpacity: 0.16, glowScale: 2.7, glowBlur: 9,  pattern: 'trophy' },
+  '100':  { glowOpacity: 0.18, glowScale: 2.8, glowBlur: 10, pattern: 'starburst' },
+  '200':  { glowOpacity: 0.20, glowScale: 3.0, glowBlur: 11, pattern: 'starburst' },
+  '300':  { glowOpacity: 0.24, glowScale: 3.2, glowBlur: 12, pattern: 'diamond' },
+  '400':  { glowOpacity: 0.28, glowScale: 3.5, glowBlur: 14, pattern: 'diamond' },
+  'GBI':  { glowOpacity: 0.16, glowScale: 2.6, glowBlur: 8,  pattern: 'topographic' },
+  'EU':   { glowOpacity: 0.16, glowScale: 2.6, glowBlur: 8,  pattern: 'topographic' },
+  'USA':  { glowOpacity: 0.16, glowScale: 2.6, glowBlur: 8,  pattern: 'topographic' },
+  'WORLD':{ glowOpacity: 0.20, glowScale: 3.0, glowBlur: 10, pattern: 'topographic' },
 };
-
-/**
- * MILESTONE_THRESHOLDS - Derived from the single source of truth.
- * Used for next tier calculation.
- */
-const MILESTONE_THRESHOLDS: readonly number[] = ACHIEVEMENT_MILESTONES;
 
 /**
  * Get the tier accent color from CLBHOUZ_ACHIEVEMENT_PALETTE
@@ -121,33 +109,96 @@ function getTierAccentColor(tier: string): string {
 }
 
 /**
- * Get the background icon for regional tiers (replaces emblem line art)
+ * Get the background icon for regional tiers
  */
-function getRegionalBackgroundIcon(tier: string, accentColor: string): React.ReactNode | null {
-  const iconClass = "w-20 h-20";
-  const style = { color: accentColor, opacity: 0.08 };
-  
+function getRegionalIcon(tier: string): React.ReactNode | null {
+  const iconClass = "w-12 h-12";
   switch (tier) {
-    case 'WORLD':
-      return <GiWorld className={iconClass} style={style} />;
-    case 'GBI':
-      return <FaLandmarkDome className={iconClass} style={style} />;
-    case 'USA':
-      return <FaFlagUsa className={iconClass} style={style} />;
-    case 'EU':
-      return <GiEuropeanFlag className={iconClass} style={style} />;
-    default:
-      return null;
+    case 'WORLD': return <GiWorld className={iconClass} />;
+    case 'GBI': return <FaLandmarkDome className={iconClass} />;
+    case 'USA': return <FaFlagUsa className={iconClass} />;
+    case 'EU': return <GiEuropeanFlag className={iconClass} />;
+    default: return null;
   }
 }
 
 /**
- * Desaturate a hex color slightly for subtle glow
+ * SVG Pattern for watermark backgrounds
  */
-function desaturateColor(hex: string, amount: number = 0.2): string {
-  // Simple desaturation by mixing with grey
-  return hex; // Keep original for now - the low opacity handles subtlety
-}
+const WatermarkPattern: React.FC<{ pattern: TierStyle['pattern']; color: string; unlocked: boolean }> = ({ 
+  pattern, 
+  color,
+  unlocked 
+}) => {
+  const opacity = unlocked ? 0.06 : 0.03;
+  
+  switch (pattern) {
+    case 'laurel':
+      return (
+        <svg className="absolute right-1 top-1/2 -translate-y-1/2 w-14 h-14 pointer-events-none" viewBox="0 0 100 100">
+          <path
+            d="M50 10 C30 25, 20 50, 30 80 M50 10 C70 25, 80 50, 70 80"
+            fill="none"
+            stroke={color}
+            strokeWidth="3"
+            opacity={opacity}
+          />
+          <circle cx="50" cy="50" r="12" fill="none" stroke={color} strokeWidth="2" opacity={opacity} />
+        </svg>
+      );
+    case 'trophy':
+      return (
+        <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 pointer-events-none" viewBox="0 0 100 100">
+          <path
+            d="M30 20 L30 50 Q30 70 50 80 Q70 70 70 50 L70 20 M20 20 Q20 40 30 45 M80 20 Q80 40 70 45 M50 80 L50 95 M35 95 L65 95"
+            fill="none"
+            stroke={color}
+            strokeWidth="3"
+            opacity={opacity}
+          />
+        </svg>
+      );
+    case 'starburst':
+      return (
+        <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-14 h-14 pointer-events-none" viewBox="0 0 100 100">
+          {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
+            <line
+              key={angle}
+              x1="50"
+              y1="50"
+              x2={50 + 40 * Math.cos(angle * Math.PI / 180)}
+              y2={50 + 40 * Math.sin(angle * Math.PI / 180)}
+              stroke={color}
+              strokeWidth="2"
+              opacity={opacity}
+            />
+          ))}
+          <circle cx="50" cy="50" r="15" fill="none" stroke={color} strokeWidth="2" opacity={opacity} />
+        </svg>
+      );
+    case 'diamond':
+      return (
+        <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-14 h-14 pointer-events-none" viewBox="0 0 100 100">
+          <path
+            d="M50 10 L80 35 L50 90 L20 35 Z M20 35 L80 35"
+            fill="none"
+            stroke={color}
+            strokeWidth="2.5"
+            opacity={opacity}
+          />
+          <circle cx="50" cy="40" r="8" fill="none" stroke={color} strokeWidth="1.5" opacity={opacity * 0.8} />
+        </svg>
+      );
+    case 'topographic':
+      return (
+        <svg className="absolute right-1 top-1/2 -translate-y-1/2 w-14 h-14 pointer-events-none" viewBox="0 0 100 100">
+          <ellipse cx="50" cy="50" rx="40" ry="35" fill="none" stroke={color} strokeWidth="1.5" opacity={opacity} />
+          <ellipse cx="50" cy="50" rx="30" ry="25" fill="none" stroke={color} strokeWidth="1.5" opacity={opacity * 0.8} />
+          <ellipse cx="50" cy="50" rx="18" ry="14" fill="none" stroke={color} strokeWidth="1.5" opacity={opacity * 0.6} />
+        </svg>
+      );
+  }
+};
 
 export interface AchievementBadgeCardProps {
   tier: AchievementTier;
@@ -157,26 +208,19 @@ export interface AchievementBadgeCardProps {
   isPrimary?: boolean;
   unlockedAt?: string;
   remaining?: number;
-  compact?: boolean; // Deprecated - kept for backwards compatibility, ignored
+  compact?: boolean;
   isGhost?: boolean;
   status?: AchievementStatus;
-  // For progress to next tier (milestone cards)
   totalTop100Played?: number;
-  // For regional cards
   playedOnList?: number;
   totalOnList?: number;
   regionGlyph?: React.ReactNode;
+  /** Enables pulse animation for current target */
+  isCurrentTarget?: boolean;
 }
 
 /**
- * AchievementBadgeCard - Global Achievement & Milestone System
- * 
- * Collector / Rarity polish with:
- * - Trophy medallion with inner highlight/shadow (medal-like)
- * - Subtle rarity glow behind trophy (tier-weighted)
- * - Micro-stamp collector detail (bottom-right, engraved feel)
- * - Neutral glass base with corner accents
- * - Premium interaction polish (hover lift, glow tighten)
+ * AchievementBadgeCard - Premium Collector Card
  */
 export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   tier,
@@ -185,23 +229,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   unlocked,
   isPrimary = false,
   remaining,
-  compact = false,
   isGhost = false,
   status,
   totalTop100Played,
-  playedOnList,
-  totalOnList,
-  regionGlyph,
+  isCurrentTarget = false,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
-  const microStamp = MICRO_STAMPS[tier] || `CLB · ${tier}`;
-  const emblemSrc = getEmblemPath(tier);
-  const glowConfig = GLOW_INTENSITY[tier] || { opacity: 0.14, scale: 2.6, blur: 6 };
-  
-  // Get tier accent color
+  const tierStyle = TIER_STYLES[tier] || TIER_STYLES['5'];
   const tierAccentColor = getTierAccentColor(tier);
   const lockedColor = '#94a3b8';
   const accentColor = unlocked && !isGhost ? tierAccentColor : lockedColor;
@@ -211,221 +246,256 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   const isMilestone = !isNaN(threshold);
   const isRegional = !isMilestone;
   
-  // Derive status label
-  const statusLabel = status 
-    ? status === 'NEW' ? 'New' : status === 'UNLOCKED' ? 'Unlocked' : 'Locked'
-    : isGhost 
-      ? 'Next badge' 
-      : unlocked 
-        ? 'Unlocked' 
+  // Determine effective status
+  const effectiveStatus = status || (isGhost ? 'LOCKED' : unlocked ? 'UNLOCKED' : 'LOCKED');
+  const isNew = effectiveStatus === 'NEW';
+  
+  // Status label
+  const statusLabel = effectiveStatus === 'NEW' 
+    ? 'NEW' 
+    : effectiveStatus === 'UNLOCKED' 
+      ? 'Unlocked' 
+      : isGhost 
+        ? 'Next badge' 
         : remaining !== undefined 
           ? `${remaining} away` 
           : 'Locked';
 
-  // Calculate next tier progress for milestone cards
-  let nextTier: number | null = null;
-  let progressToNext = 0;
-  let remainingToNext = 0;
-  
-  if (isMilestone && unlocked && !isGhost && totalTop100Played !== undefined) {
-    const currentIndex = MILESTONE_THRESHOLDS.indexOf(threshold);
-    if (currentIndex >= 0 && currentIndex < MILESTONE_THRESHOLDS.length - 1) {
-      nextTier = MILESTONE_THRESHOLDS[currentIndex + 1];
-      remainingToNext = nextTier - totalTop100Played;
-      
-      if (remainingToNext > 0) {
-        const gapSize = nextTier - threshold;
-        const progressInGap = totalTop100Played - threshold;
-        progressToNext = gapSize > 0 ? Math.min(100, (progressInGap / gapSize) * 100) : 0;
-      } else {
-        nextTier = null;
-      }
-    }
-  }
+  // Animation variants
+  const cardVariants = {
+    initial: { scale: 1, y: 0 },
+    hover: unlocked && !isGhost ? { 
+      scale: 1.02, 
+      y: -3,
+      transition: { type: 'spring' as const, stiffness: 400, damping: 25 }
+    } : { scale: 1, y: 0 },
+  };
 
-  // For regional cards, calculate progress
-  let regionalProgress = 0;
-  if (isRegional && playedOnList !== undefined && totalOnList !== undefined && totalOnList > 0) {
-    regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
-  }
-
-  // Interaction states
-  const hoverLift = isHovered && unlocked && !isGhost ? 2 : 0;
-  const glowScale = isHovered && unlocked && !isGhost ? 0.9 : 1;
+  const glowVariants = {
+    initial: { opacity: tierStyle.glowOpacity, scale: tierStyle.glowScale },
+    hover: { 
+      opacity: tierStyle.glowOpacity * 1.4,
+      scale: tierStyle.glowScale * 0.9,
+      transition: { duration: 0.2 }
+    },
+  };
 
   return (
-    <div
+    <motion.div
       className={cn(
-        // Glass card container with SDS rounded corners
-        'rounded-sq-md flex flex-col justify-between transition-all duration-200 relative overflow-hidden',
-        // Fixed global size for ALL achievement badges site-wide
-        'min-w-[180px] h-[92px] px-3.5 py-3',
-        // Micro-interactions
-        'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:shadow-lg',
-        // Ghost styling
-        isGhost && 'border border-dashed'
+        'rounded-2xl flex flex-col justify-between relative overflow-hidden cursor-default select-none',
+        'min-w-[180px] h-[100px] px-4 py-3',
+        // Ghost styling - premium etched glass look
+        isGhost && 'border-2 border-dashed'
       )}
       style={{
-        // Glass base - adapts to light/dark themes via CSS variables
-        background: 'var(--achievement-card-bg, rgba(31, 36, 40, 0.04))',
-        border: `1px solid var(--achievement-card-border, rgba(31, 36, 40, 0.08))`,
+        background: isGhost 
+          ? 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 100%)'
+          : unlocked 
+            ? `linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)`
+            : 'linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.5) 100%)',
+        border: isGhost 
+          ? `2px dashed ${accentColor}30`
+          : `1px solid ${unlocked ? `${accentColor}25` : 'rgba(148, 163, 184, 0.15)'}`,
         backdropFilter: 'blur(12px)',
-        transform: `translateY(-${hoverLift + (isPrimary ? 2 : 0)}px)`,
-        opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
+        opacity: isGhost ? 0.75 : (!unlocked ? 0.85 : 1),
         boxShadow: unlocked && !isGhost 
-          ? `0 ${2 + hoverLift}px ${12 + hoverLift * 2}px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)`
-          : '0 1px 4px rgba(0, 0, 0, 0.03)',
+          ? `0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,0.9)`
+          : isGhost
+            ? 'none'
+            : '0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,0.5)',
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      variants={cardVariants}
+      initial="initial"
+      whileHover="hover"
     >
-      {/* Top edge inner highlight sheen - Apple-style premium feel */}
+      {/* Premium top highlight sheen */}
       <div 
         className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 20%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.5) 80%, transparent 100%)',
-          opacity: 0.7,
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 20%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.8) 80%, transparent 100%)',
+          opacity: unlocked && !isGhost ? 1 : 0.5,
         }}
       />
 
-      {/* Bottom-left corner accent - soft glassy blob */}
-      <div 
-        className="absolute bottom-0 left-0 w-16 h-16 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at bottom left, ${accentColor}${unlocked && !isGhost ? '20' : '10'} 0%, transparent 70%)`,
-          borderBottomLeftRadius: 'inherit',
-        }}
-      />
-
-      {/* Background emblem watermark - tier-colored at ~6% opacity */}
-      {/* For regional cards, use icons instead of emblem line art */}
-      {isRegional ? (
-        <div 
-          className="pointer-events-none select-none absolute inset-y-0 right-0 flex items-center justify-end pr-2 transition-transform duration-300"
-          style={{ transform: `translateX(${isHovered ? -2 : 0}px)` }}
-        >
-          {getRegionalBackgroundIcon(tier, accentColor)}
-        </div>
-      ) : emblemSrc && (
-        <img
-          src={emblemSrc}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 transition-transform duration-300"
-          style={{ 
-            opacity: 0.06,
-            filter: unlocked && !isGhost 
-              ? `brightness(0) saturate(100%)` 
-              : 'brightness(0)',
-            transform: `translateX(${16 + (isHovered ? -2 : 0)}px) scale(1.25)`,
-          }}
-        />
-      )}
-
-      {/* Ghost overlay */}
-      {isGhost && (
-        <div 
-          className="absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{ background: 'var(--achievement-ghost-overlay, rgba(255, 255, 255, 0.15))' }}
-        />
-      )}
-
-      {/* Micro-stamp collector detail - bottom right, engraved feel */}
+      {/* Corner accent glow */}
       {unlocked && !isGhost && (
-        <div 
-          className="absolute bottom-2 right-2.5 pointer-events-none select-none"
+        <motion.div 
+          className="absolute -bottom-4 -left-4 w-24 h-24 pointer-events-none"
           style={{
-            fontSize: '7px',
-            fontWeight: 600,
-            letterSpacing: '0.5px',
-            color: accentColor,
-            opacity: 0.12,
-            fontFamily: 'ui-monospace, SFMono-Regular, monospace',
+            background: `radial-gradient(ellipse at bottom left, ${accentColor}25 0%, transparent 60%)`,
           }}
+          variants={glowVariants}
+        />
+      )}
+
+      {/* Watermark pattern */}
+      {isMilestone ? (
+        <WatermarkPattern pattern={tierStyle.pattern} color={accentColor} unlocked={unlocked && !isGhost} />
+      ) : (
+        <div 
+          className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ color: accentColor, opacity: unlocked && !isGhost ? 0.08 : 0.04 }}
         >
-          {microStamp}
+          {getRegionalIcon(tier)}
         </div>
       )}
 
-      {/* Top row: Trophy icon + Title/Subtitle */}
-      <div className="flex items-start gap-2.5 relative z-10">
-        {/* Trophy medallion container with rarity glow */}
+      {/* Current target pulse */}
+      {isCurrentTarget && !unlocked && (
+        <motion.div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{ 
+            border: `2px solid ${accentColor}`,
+            opacity: 0.3,
+          }}
+          animate={{ 
+            opacity: [0.3, 0.6, 0.3],
+            scale: [1, 1.02, 1],
+          }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity, 
+            ease: 'easeInOut' 
+          }}
+        />
+      )}
+
+      {/* NEW badge chip */}
+      {isNew && (
+        <motion.div 
+          className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide"
+          style={{
+            background: `${accentColor}20`,
+            border: `1px solid ${accentColor}40`,
+            color: accentColor,
+          }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 500, delay: 0.2 }}
+        >
+          <Sparkles className="w-2.5 h-2.5" />
+          NEW
+        </motion.div>
+      )}
+
+      {/* Top row: Icon + Content */}
+      <div className="flex items-start gap-3 relative z-10">
+        {/* Trophy/Number medallion */}
         <div className="relative flex-shrink-0">
-          {/* Rarity glow - radial aura behind medallion - boosted for collectible feel */}
+          {/* Rarity glow aura */}
           {unlocked && !isGhost && (
-            <div 
-              className="absolute inset-0 pointer-events-none transition-transform duration-200"
+            <motion.div 
+              className="absolute inset-0 pointer-events-none"
               style={{
-                background: `radial-gradient(circle, ${accentColor} 0%, ${accentColor}80 30%, transparent 70%)`,
-                opacity: glowConfig.opacity * glowScale,
-                transform: `scale(${glowConfig.scale * glowScale})`,
-                filter: `blur(${glowConfig.blur}px)`,
+                background: `radial-gradient(circle, ${accentColor} 0%, ${accentColor}60 40%, transparent 70%)`,
+                filter: `blur(${tierStyle.glowBlur}px)`,
               }}
+              variants={glowVariants}
             />
           )}
           
-          {/* Medallion container - medal-like with inner highlight/shadow */}
+          {/* Medallion container */}
           <div 
-            className="w-8 h-8 rounded-full flex items-center justify-center relative overflow-hidden"
+            className="w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden"
             style={{ 
               backgroundColor: unlocked && !isGhost 
-                ? `${accentColor}10` 
-                : 'rgba(148, 163, 184, 0.06)',
-              border: `1px solid ${unlocked && !isGhost ? `${accentColor}18` : 'rgba(148, 163, 184, 0.10)'}`,
+                ? `${accentColor}12` 
+                : 'rgba(148, 163, 184, 0.08)',
+              border: `1.5px solid ${unlocked && !isGhost ? `${accentColor}25` : 'rgba(148, 163, 184, 0.12)'}`,
               boxShadow: unlocked && !isGhost
-                ? `inset 1px 1px 2px rgba(255,255,255,0.3), inset -1px -1px 2px ${accentColor}15`
-                : 'inset 0 1px 1px rgba(255,255,255,0.1)',
+                ? `inset 1px 1px 3px rgba(255,255,255,0.5), inset -1px -1px 2px ${accentColor}10, 0 2px 4px ${accentColor}15`
+                : 'inset 0 1px 2px rgba(255,255,255,0.3)',
             }}
           >
-            {/* Inner top-left highlight */}
+            {/* Inner highlight */}
             <div 
-              className="absolute top-0 left-0 w-3 h-3 pointer-events-none"
+              className="absolute top-0 left-0 w-4 h-4 pointer-events-none"
               style={{
-                background: 'radial-gradient(circle at top left, rgba(255,255,255,0.4) 0%, transparent 70%)',
+                background: 'radial-gradient(circle at top left, rgba(255,255,255,0.6) 0%, transparent 70%)',
               }}
             />
             
-            <Trophy 
-              className="w-3.5 h-3.5 relative z-10"
-              style={{ color: accentColor }} 
-            />
+            {/* Display number for milestones, icon for regional/locked */}
+            {isMilestone && unlocked && !isGhost ? (
+              <span 
+                className="text-base font-bold relative z-10"
+                style={{ color: accentColor }}
+              >
+                {threshold}
+              </span>
+            ) : unlocked && !isGhost ? (
+              <Trophy 
+                className="w-4 h-4 relative z-10"
+                style={{ color: accentColor }} 
+              />
+            ) : (
+              <Lock 
+                className="w-4 h-4 relative z-10"
+                style={{ color: lockedColor }} 
+              />
+            )}
           </div>
         </div>
         
+        {/* Text content */}
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* Tier label - smaller, tighter tracking */}
+          {/* Tier label */}
           <div 
-            className="font-semibold leading-tight truncate text-[11px] tracking-tight uppercase"
+            className="font-bold leading-tight truncate text-[11px] tracking-wide uppercase"
             style={{ color: accentColor }}
           >
             {tierLabel}
           </div>
-          {/* Club name - primary label, clearer */}
-          <div className="text-[12px] font-medium text-foreground/80 truncate mt-0.5">
+          {/* Club name / subtitle */}
+          <div 
+            className="text-[13px] font-medium truncate mt-0.5"
+            style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
+          >
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
       </div>
 
-      {/* Bottom row: Status chip - refined size and alignment */}
-      <div className="flex justify-end relative z-10">
-        <div 
-          className="inline-flex items-center px-2 py-[3px] rounded-full text-[9px] font-medium tracking-wide transition-all duration-200"
+      {/* Bottom row: Status chip */}
+      <div className="flex justify-between items-end relative z-10">
+        {/* Milestone number display for unlocked milestones */}
+        {isMilestone && unlocked && !isGhost && (
+          <div 
+            className="text-[10px] font-semibold uppercase tracking-widest"
+            style={{ color: `${accentColor}60` }}
+          >
+            {threshold} CLUB
+          </div>
+        )}
+        {(!isMilestone || !unlocked || isGhost) && <div />}
+        
+        <motion.div 
+          className={cn(
+            "inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-semibold tracking-wide",
+            isNew && "gap-1"
+          )}
           style={{
-            backgroundColor: unlocked && !isGhost 
-              ? `${accentColor}10` 
-              : 'rgba(148, 163, 184, 0.08)',
-            border: `1px solid ${unlocked && !isGhost 
-              ? `${accentColor}20` 
-              : 'rgba(148, 163, 184, 0.12)'}`,
+            backgroundColor: isNew 
+              ? `${accentColor}18`
+              : unlocked && !isGhost 
+                ? `${accentColor}10` 
+                : 'rgba(148, 163, 184, 0.08)',
+            border: `1px solid ${
+              isNew 
+                ? `${accentColor}35`
+                : unlocked && !isGhost 
+                  ? `${accentColor}20` 
+                  : 'rgba(148, 163, 184, 0.12)'
+            }`,
             color: unlocked && !isGhost ? accentColor : '#94a3b8',
           }}
+          whileHover={unlocked ? { scale: 1.05 } : {}}
         >
           {statusLabel}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
