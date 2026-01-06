@@ -17,6 +17,7 @@ import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { ACHIEVEMENT_MILESTONES } from '@/config/achievements';
 import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
+import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED' | 'NEW';
 export type AchievementType = 'MILESTONE' | 'LIST' | 'SKILL' | 'SEASONAL';
@@ -61,10 +62,18 @@ const CLUB_NAMES: Record<string, string> = {
   '200': 'Elite Club',
   '300': 'Legendary Club',
   '400': 'Grand Slam Club',
-  'GBI': 'GB&I Complete',
-  'EU': 'Europe Complete',
-  'USA': 'USA Complete',
-  'WORLD': 'World Complete',
+  'GBI': 'Great Britain & Ireland Top 100',
+  'EU': 'Continental Europe Top 100',
+  'USA': 'USA Top 100',
+  'WORLD': 'Worldwide Top 100',
+};
+
+// Region slug mapping for taglines
+const TIER_TO_REGION_SLUG: Record<string, string> = {
+  'GBI': 'gb-i',
+  'EU': 'europe',
+  'USA': 'usa',
+  'WORLD': 'global',
 };
 
 // Tier-specific styling configuration
@@ -459,24 +468,34 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         
         {/* Text content */}
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* Tier label */}
-          <div 
-            className={cn(
-              "font-bold leading-tight truncate tracking-wide uppercase",
-              compact ? "text-[9px]" : "text-[11px]"
-            )}
-            style={{ color: accentColor }}
-          >
-            {tierLabel}
-          </div>
-          {/* Club name / subtitle - hide in compact mode if space is tight */}
-          {!compact && (
+          {/* COMPACT MODE: Show club name only (no tier label to avoid truncation) */}
+          {compact ? (
             <div 
-              className="text-[13px] font-medium truncate mt-0.5"
+              className="text-[11px] font-semibold leading-tight line-clamp-1"
               style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
             >
-              {isMilestone ? clubName : subtitle}
+              {clubName}
             </div>
+          ) : (
+            <>
+              {/* FULL MODE: Club name as title */}
+              <div 
+                className="text-[13px] font-semibold leading-tight truncate"
+                style={{ color: unlocked && !isGhost ? 'var(--quest-text-primary, #1F2428)' : 'var(--quest-text-tertiary, #97A1AA)' }}
+              >
+                {clubName}
+              </div>
+              {/* Witty tagline as subtitle */}
+              <div 
+                className="text-[10px] leading-tight mt-0.5 line-clamp-2"
+                style={{ color: unlocked && !isGhost ? `${accentColor}90` : 'var(--quest-text-tertiary, #97A1AA)' }}
+              >
+                {isMilestone 
+                  ? (MILESTONE_TAGLINES[threshold] || subtitle)
+                  : (REGION_TAGLINES[TIER_TO_REGION_SLUG[tier]] || subtitle)
+                }
+              </div>
+            </>
           )}
         </div>
       </div>
