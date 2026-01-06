@@ -5,7 +5,7 @@ import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import { useSwipeable } from "react-swipeable";
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, GripVertical } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { toast } from "sonner";
@@ -530,11 +530,21 @@ const TopTenSlot: React.FC<{
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
       className={`shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] relative ${
-        isOwnProfile ? 'cursor-grab active:cursor-grabbing touch-manipulation' : ''
+        isOwnProfile ? 'touch-manipulation' : ''
       }`}
     >
+      {/* Drag Handle - only show for own profile */}
+      {isOwnProfile && (
+        <div 
+          {...listeners}
+          className="absolute top-3 left-12 z-30 pt-0.5 cursor-grab active:cursor-grabbing"
+        >
+          <div className="w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+            <GripVertical className="h-4 w-4 text-white/80 hover:text-white transition-colors" />
+          </div>
+        </div>
+      )}
       <div className={`w-[calc(100vw/2.6)] md:w-full aspect-[4/5] relative overflow-hidden ${getCardShadow(index)} ${
         isDragging ? 'scale-[1.02] shadow-lg' : ''
       }`}>
