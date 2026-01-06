@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
-import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import { getReviewOverlayTheme, type ExtractedReviewData } from '@/lib/postHelpers';
@@ -39,23 +39,6 @@ const SoundwaveAnimation: React.FC = () => (
       />
     ))}
   </div>
-);
-
-/** Golf flag icon for review mode */
-const GolfFlagIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className, style }) => (
-  <svg 
-    className={className} 
-    style={style}
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth={2}
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-  >
-    <path d="M4 21V4" />
-    <path d="M4 4l12 4-12 4" />
-  </svg>
 );
 
 interface GolfCourseInfo {
@@ -164,9 +147,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       navigate(path);
     }
   }, [navigate, onViewProfile, user.id]);
-
-
-  // Get initials for avatar fallback
   const initials = user?.name
     ?.split(' ')
     .slice(0, 2)
@@ -274,40 +254,73 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     </div>
   );
 
-  // Review mode content (collapsed only - no expansion)
+  // Get initials for avatar fallback
+  const userInitials = user?.name
+    ?.split(' ')
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase() || '?';
+
+  // Review mode content - premium design with avatar, name, and CTA button
   const reviewContent = reviewData && (
-    <button
-      type="button"
-      onClick={handleToggle}
-      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-transparent active:bg-transparent"
-    >
-      {/* Golf flag icon with tier color background */}
-      <div 
-        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border"
-        style={{
-          backgroundColor: isOutstanding ? 'rgba(210, 180, 97, 0.15)' : 'rgba(100, 116, 139, 0.12)',
-          borderColor: isOutstanding ? 'rgba(210, 180, 97, 0.4)' : 'rgba(100, 116, 139, 0.35)',
-        }}
-      >
-        <GolfFlagIcon 
-          className="w-5 h-5" 
-          style={{ color: isOutstanding ? '#D2B461' : '#94A3B8' }}
-        />
-      </div>
-      
-      {/* Text content */}
-      <div className="flex-1 min-w-0 flex items-center gap-2">
-        <span className="text-sm font-medium text-white truncate">
-          Rated this course
-        </span>
+    <div className="flex flex-col gap-2.5 p-3">
+      {/* Top row: Avatar + Name + "Rated this course" + Tier pill */}
+      <div className="flex items-center gap-2.5">
+        {/* Avatar */}
+        <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-white/10">
+          {user?.avatar ? (
+            <img 
+              src={user.avatar} 
+              alt={user.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm">
+              {userInitials}
+            </div>
+          )}
+        </div>
         
-        {/* Rating badge inline */}
-        <RatingPill score={reviewData.rating} className="text-[9px] py-0.5 px-1.5 flex-shrink-0" />
+        {/* Name + "Rated this course" + pill */}
+        <div className="flex-1 min-w-0">
+          <div className="text-white font-semibold text-sm truncate">
+            {user?.name || user?.username || 'Golfer'}
+          </div>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-white/70 text-xs">
+              Rated this course
+            </span>
+            <RatingPill 
+              score={reviewData.rating} 
+              showRatingInPill
+              className="text-[8px] py-0.5 px-1.5 flex-shrink-0" 
+            />
+          </div>
+        </div>
       </div>
       
-      {/* Arrow icon indicating navigation */}
-      <ChevronRight className="w-4 h-4 text-white/50 flex-shrink-0" />
-    </button>
+      {/* Bottom row: "Read full review" CTA button */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onReviewTap?.();
+        }}
+        className={cn(
+          "w-full rounded-full py-2.5 px-4",
+          "flex items-center justify-center gap-2",
+          "font-semibold text-sm",
+          "transition-all duration-200",
+          isOutstanding 
+            ? "bg-[#D2B461] text-black hover:bg-[#E5D084]"
+            : "bg-white/15 text-white hover:bg-white/25"
+        )}
+      >
+        <span>Read full review</span>
+        <ChevronRight className="w-4 h-4" />
+      </button>
+    </div>
   );
 
   // Regular mode collapsed content
@@ -393,8 +406,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         onTouchEnd={handleTouchEnd}
         className={cn(
           'fixed left-4 z-50',
-          'max-w-[75vw] min-w-[200px]',
-          'pointer-events-auto'
+          'pointer-events-auto',
+          // Review mode: wider card shape, Regular mode: pill shape
+          isReview 
+            ? 'w-[calc(100vw-32px-88px)] max-w-[360px]' 
+            : 'max-w-[75vw] min-w-[200px]'
         )}
         style={{
           bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
@@ -404,10 +420,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           layout
           transition={{ layout: { duration: 0.22, ease: [0.19, 1, 0.22, 1] } }}
           className={cn(
-            'rounded-sq-lg overflow-hidden',
-            'bg-black/50 backdrop-blur-xl',
+            'overflow-hidden',
+            'backdrop-blur-xl',
             'border',
-            'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]'
+            'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]',
+            // Review mode: rounded card, Regular mode: squircle pill
+            isReview ? 'rounded-xl' : 'rounded-sq-lg',
+            // Background tint based on mode
+            isReview && isOutstanding 
+              ? 'bg-[rgba(210,180,97,0.08)]' 
+              : 'bg-black/50'
           )}
           style={{ borderColor }}
         >

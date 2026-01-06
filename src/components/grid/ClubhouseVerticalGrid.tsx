@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -179,6 +180,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
   focusPostId,
 }) => {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const queryClient = useQueryClient();
@@ -1117,10 +1119,8 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         // Handle review capsule tap - navigate to course reviews
         const handleReviewTap = () => {
           if (reviewData?.courseId) {
-            // Deep linking to course reviews tab (focusReviewId deferred to separate ticket)
-            console.log('[ClubhouseGrid] Navigate to course:', `/courses/${reviewData.courseId}?tab=reviews`);
-            // TODO: Implement navigation when deep linking is ready
-            // navigate(`/courses/${reviewData.courseId}?tab=reviews`);
+            // Navigate to course reviews tab
+            navigate(`/courses/${reviewData.courseId}?tab=reviews`);
           }
         };
         
