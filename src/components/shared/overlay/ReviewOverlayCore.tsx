@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 export type ReviewOverlayVariant = 'fullscreen' | 'tile';
 
@@ -13,6 +14,12 @@ export interface ReviewOverlayCoreProps {
   variant: ReviewOverlayVariant;
   /** Show "Preview" badge (fullscreen only) */
   showPreviewBadge?: boolean;
+  /** User info for bottom panel (tile variant) */
+  user?: {
+    name?: string;
+    username?: string;
+    avatar?: string;
+  };
   className?: string;
 }
 
@@ -22,7 +29,7 @@ export interface ReviewOverlayCoreProps {
  * 
  * Variants:
  * - fullscreen: Premium glass panel with two-column layout
- * - tile: Compact sizing for grid thumbnails
+ * - tile: Scaled-down version matching fullscreen layout exactly (top + bottom panels)
  * 
  * Theme:
  * - Uses Slate for Fair → Excellent (0-8.9)
@@ -34,28 +41,37 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   rating,
   variant,
   showPreviewBadge = false,
+  user,
   className,
 }) => {
   const isFullscreen = variant === 'fullscreen';
   const theme = getReviewOverlayTheme(rating);
   const isOutstanding = rating >= 9.0;
 
+  // User initials for avatar fallback
+  const initials = (user?.name || user?.username || 'G')
+    .split(' ')
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+
   return (
     <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
-      {/* Tile variant - Compact Premium Glass Panel */}
+      {/* Tile variant - Exact match of fullscreen layout, scaled down */}
       {variant === 'tile' && (
         <>
           {/* Top gradient for legibility */}
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 via-black/25 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
           {/* Bottom gradient for legibility */}
-          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
           
-          {/* Top glass panel - scaled for tile size */}
+          {/* TOP PANEL - Course info + Rating (matches fullscreen top panel) */}
           <div
             className={cn(
-              "absolute top-1.5 left-1.5 right-1.5 z-10",
-              "rounded-lg p-1.5 backdrop-blur-md border",
-              "shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+              "absolute top-2 left-2 right-2 z-10",
+              "rounded-lg backdrop-blur-xl border",
+              "shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]"
             )}
             style={{
               backgroundColor: isOutstanding
@@ -63,45 +79,73 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 : 'rgba(0, 0, 0, 0.5)',
               borderColor: isOutstanding
                 ? 'rgba(210, 180, 97, 0.3)'
-                : 'rgba(255, 255, 255, 0.12)',
+                : 'rgba(255, 255, 255, 0.08)',
+              padding: '8px',
             }}
           >
-            <div className="flex items-start justify-between gap-1.5">
+            {/* Two-column: Left (course info) / Right (rating) */}
+            <div className="flex justify-between items-start gap-2">
               {/* Left: Course name + location */}
-              <div className="flex-1 min-w-0">
-                <div className="text-white font-bold text-[10px] leading-tight line-clamp-1">
+              <div className="flex-1 min-w-0 space-y-0.5">
+                <div className="text-white font-bold text-[11px] leading-tight line-clamp-1 drop-shadow-md">
                   {courseName}
                 </div>
                 {courseLocation && (
-                  <div className="text-white/60 text-[8px] mt-0.5 line-clamp-1">
+                  <div className="text-white/60 text-[9px] line-clamp-1">
                     {courseLocation}
                   </div>
                 )}
               </div>
               
               {/* Right: Rating + pill (vertical stack) */}
-              <div className="flex-shrink-0 flex flex-col items-end">
+              <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
                 <span 
-                  className="font-bold text-sm leading-none tabular-nums"
+                  className="text-xl font-bold tabular-nums leading-none drop-shadow-lg"
                   style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
-                <RatingPill score={rating} className="text-[6px] py-0 px-1 mt-0.5" />
+                <RatingPill score={rating} className="text-[6px] py-0 px-1" />
               </div>
-            </div>
-            
-            {/* "From a review" label */}
-            <div className="text-[7px] text-white/40 font-medium uppercase tracking-wide mt-1">
-              From a review
             </div>
           </div>
           
-          {/* Optional: "REVIEW" badge bottom-left (subtle) */}
-          <div className="absolute bottom-1.5 left-1.5 z-10">
-            <span className="text-[7px] text-white/40 font-bold uppercase tracking-wide px-1 py-0.5 bg-black/30 rounded">
-              Review
-            </span>
+          {/* BOTTOM PANEL - User info (matches ReviewBottomPanel) */}
+          <div
+            className={cn(
+              "absolute bottom-2 left-2 z-10",
+              "rounded-lg backdrop-blur-xl border",
+              "shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]",
+              "max-w-[70%]"
+            )}
+            style={{
+              backgroundColor: isOutstanding
+                ? 'rgba(210, 180, 97, 0.08)'
+                : 'rgba(0, 0, 0, 0.5)',
+              borderColor: isOutstanding
+                ? 'rgba(210, 180, 97, 0.3)'
+                : 'rgba(255, 255, 255, 0.08)',
+              padding: '6px 8px',
+            }}
+          >
+            <div className="flex items-center gap-1.5">
+              <SquircleAvatar
+                size={20}
+                src={user?.avatar}
+                alt={user?.name || user?.username || 'Golfer'}
+                fallback={initials}
+                hideRing
+              />
+              <div className="flex-1 min-w-0">
+                <div className="text-white font-semibold text-[9px] truncate leading-tight">
+                  {user?.name || user?.username || 'Golfer'}
+                </div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-white/60 text-[7px]">Rated</span>
+                  <RatingPill score={rating} className="text-[5px] py-0 px-0.5" />
+                </div>
+              </div>
+            </div>
           </div>
         </>
       )}
