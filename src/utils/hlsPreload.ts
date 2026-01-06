@@ -19,18 +19,9 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
       cache: 'force-cache', // Use cache if available
     });
     
-    if (!manifestResponse.ok) {
-      console.warn('[HLSPreload] Manifest fetch failed:', manifestResponse.status);
-      return;
-    }
+    if (!manifestResponse.ok) return;
     
     const manifestText = await manifestResponse.text();
-    const manifestTime = performance.now();
-    
-    console.log('[HLSPreload] Manifest loaded', {
-      url: hlsUrl.slice(-40),
-      time: (manifestTime - startTime).toFixed(0) + 'ms',
-    });
     
     // Parse manifest to find segment URLs
     const lines = manifestText.split('\n');
@@ -44,7 +35,6 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
       const variantLine = lines.find(line => line.endsWith('.m3u8') && !line.startsWith('#'));
       if (variantLine) {
         const variantUrl = new URL(variantLine.trim(), hlsUrl).href;
-        console.log('[HLSPreload] Found variant playlist, fetching...', variantLine.slice(-30));
         
         // Fetch variant playlist
         const variantResponse = await fetch(variantUrl, {
@@ -76,8 +66,8 @@ export const preloadHlsManifest = async (hlsUrl: string): Promise<void> => {
     const segmentsToPreload = segmentLines.slice(0, 2);
     await preloadSegments(segmentsToPreload, hlsUrl, startTime);
     
-  } catch (e) {
-    console.error('[HLSPreload] Failed:', e);
+  } catch {
+    // Silently ignore preload failures
   }
 };
 

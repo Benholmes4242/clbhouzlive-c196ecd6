@@ -35,7 +35,7 @@ import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 import { useVerticalFeedLogic } from './hooks/useVerticalFeedLogic';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
-import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
+
 import { logFirstCardRender } from '@/utils/bootTimeline';
 
 import { ClubhouseMusicPlayer } from '@/components/clubhouse/ClubhouseMusicPlayer';
@@ -234,9 +234,6 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
       });
     });
 
-    if (posts.length > 0) {
-      logClubhouseFiltering(posts.length, filtered.length);
-    }
     
     return filtered;
   }, [posts, isPortrait]);
