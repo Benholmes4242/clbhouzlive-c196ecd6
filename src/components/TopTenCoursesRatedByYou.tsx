@@ -534,17 +534,6 @@ const TopTenSlot: React.FC<{
         isOwnProfile ? 'touch-manipulation' : ''
       }`}
     >
-      {/* Drag Handle - only show for own profile */}
-      {isOwnProfile && (
-        <div 
-          {...listeners}
-          className="absolute top-3 left-12 z-30 cursor-grab active:cursor-grabbing touch-none"
-        >
-          <div className="w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
-            <GripVertical className="h-4 w-4 text-white" />
-          </div>
-        </div>
-      )}
       <div className={`w-[calc(100vw/2.6)] md:w-full aspect-[4/5] relative overflow-hidden ${getCardShadow(index)} ${
         isDragging ? 'scale-[1.02] shadow-lg' : ''
       }`}>
@@ -597,8 +586,20 @@ const TopTenSlot: React.FC<{
           disableClick={isOwnProfile && isDragging} // Disable course click when dragging
         />
         
-        {/* Premium Rank Badge - Top Left (matching Top 10 Rated position) */}
-        <div className="absolute top-3 left-3 z-20">
+        {/* Drag Handle - only show for own profile, positioned inside card on left */}
+        {isOwnProfile && (
+          <div 
+            {...listeners}
+            className="absolute top-3 left-3 z-30 cursor-grab active:cursor-grabbing touch-none"
+          >
+            <div className="w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
+              <GripVertical className="h-4 w-4 text-white" />
+            </div>
+          </div>
+        )}
+        
+        {/* Premium Rank Badge - positioned after drag handle when editing, or left when viewing */}
+        <div className={`absolute top-3 z-20 ${isOwnProfile ? 'left-12' : 'left-3'}`}>
           <div className={`
             w-8 h-8 rounded-full flex items-center justify-center
             ${getRankBadgeGradient(index, true)}
