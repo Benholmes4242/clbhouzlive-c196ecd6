@@ -40,6 +40,15 @@ export function useCourseRatingsRealtime() {
               queryKey: ['user-course-ratings-breakdown', userId], 
               exact: false 
             });
+            // Invalidate Course History queries so rating changes reflect immediately
+            queryClient.invalidateQueries({ 
+              queryKey: ['user-course-activity', userId], 
+              exact: false 
+            });
+            queryClient.invalidateQueries({ 
+              queryKey: ['user-played-courses-full', userId], 
+              exact: false 
+            });
             // Refetch even if the query is currently inactive (e.g. user updates a rating on a course page,
             // then navigates back to profile). Our app often uses refetchOnMount=false for perf.
             void queryClient.refetchQueries({ 
@@ -47,10 +56,29 @@ export function useCourseRatingsRealtime() {
               exact: false,
               type: 'all',
             });
+            void queryClient.refetchQueries({ 
+              queryKey: ['user-course-activity', userId], 
+              exact: false,
+              type: 'all',
+            });
+            void queryClient.refetchQueries({ 
+              queryKey: ['user-played-courses-full', userId], 
+              exact: false,
+              type: 'all',
+            });
           }
           // Also invalidate with fuzzy match for any active breakdown queries
           queryClient.invalidateQueries({ 
             queryKey: ['user-course-ratings-breakdown'], 
+            exact: false 
+          });
+          // Invalidate all course activity queries (for any user viewing profiles)
+          queryClient.invalidateQueries({ 
+            queryKey: ['user-course-activity'], 
+            exact: false 
+          });
+          queryClient.invalidateQueries({ 
+            queryKey: ['user-played-courses-full'], 
             exact: false 
           });
           

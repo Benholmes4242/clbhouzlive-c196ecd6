@@ -81,6 +81,10 @@ const CourseRatingSystem = ({
       // Invalidate Top 10 carousel ratings so updated scores show immediately
       queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
       
+      // Invalidate Course History queries so rating changes reflect immediately
+      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'], exact: false });
+      
       // Force refetch community aggregates
       await queryClient.refetchQueries({ 
         queryKey: ['course-rating-aggregates', courseId] 
