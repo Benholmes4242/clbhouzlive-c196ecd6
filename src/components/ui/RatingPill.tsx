@@ -8,6 +8,8 @@ interface RatingPillProps {
   tier?: RatingTier;
   /** Optional override label */
   label?: string;
+  /** Show rating number inside pill (e.g., "VERY GOOD · 7.3") */
+  showRatingInPill?: boolean;
   /** Extra classes */
   className?: string;
 }
@@ -20,9 +22,10 @@ interface RatingPillProps {
  * 
  * @example
  * <RatingPill score={8.5} />
+ * <RatingPill score={8.5} showRatingInPill />
  * <RatingPill tier="EXCELLENT" label="Custom Label" />
  */
-export function RatingPill({ score, tier, label, className }: RatingPillProps) {
+export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {
   // Get theme from score or tier (for label only)
   const theme = tier 
     ? getRatingTheme(
@@ -36,6 +39,7 @@ export function RatingPill({ score, tier, label, className }: RatingPillProps) {
     : getRatingTheme(score ?? 0);
 
   const displayLabel = label ?? theme.label;
+  const ratingValue = score ?? (tier === 'OUTSTANDING' ? 9.5 : tier === 'EXCELLENT' ? 8.5 : 7);
   
   // Determine if Outstanding (gold) or standard (slate)
   const isOutstanding = theme.key === 'OUTSTANDING';
@@ -78,6 +82,12 @@ export function RatingPill({ score, tier, label, className }: RatingPillProps) {
       data-transitioning={isTransitioning}
     >
       {displayedLabel.toUpperCase()}
+      {showRatingInPill && score !== undefined && (
+        <>
+          <span className="mx-1 opacity-60">·</span>
+          <span>{score === 10 ? '10' : score.toFixed(1)}</span>
+        </>
+      )}
     </span>
   );
 }

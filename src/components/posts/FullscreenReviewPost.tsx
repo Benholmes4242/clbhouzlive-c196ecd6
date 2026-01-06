@@ -194,42 +194,52 @@ export function FullscreenReviewPost({
         </div>
       )}
       
-      {/* Top gradient - lighter + shorter for cleaner media display */}
-      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 via-black/10 to-transparent pointer-events-none z-[5]" />
+      {/* Top gradient - lighter for premium look (40% opacity) */}
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/40 via-black/20 to-transparent pointer-events-none z-[5]" />
       
-      {/* Bottom gradient - softer fade, less muddy */}
+      {/* Bottom gradient - softer fade */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
-      {/* Top-left: Course info + Preview badge stacked - positioned below status bar */}
-      <div className="absolute top-20 left-4 right-20 z-20">
-        <h2 className="text-white text-lg font-semibold leading-tight drop-shadow-md line-clamp-2">
-          {courseName}
-        </h2>
-        {heroSubtitle && (
-          <p className="text-white/80 text-sm mt-0.5 drop-shadow-sm">
-            {heroSubtitle}
-          </p>
-        )}
-        {/* Preview pill under location */}
+      {/* Top-left: Course info + Preview badge - with safe area padding */}
+      <div 
+        className="absolute left-4 right-24 z-20"
+        style={{
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
+        }}
+      >
+        {/* Preview badge - above course name */}
         {mode === 'preview' && (
-          <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-white/80 text-[10px] font-medium tracking-wide">
+          <span className="inline-block mb-2 px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 backdrop-blur-sm text-blue-200 text-[10px] font-semibold tracking-wide uppercase">
             Preview
           </span>
         )}
+        <h2 className="text-white text-lg sm:text-xl font-bold leading-tight drop-shadow-md line-clamp-2">
+          {courseName}
+        </h2>
+        {heroSubtitle && (
+          <p className="text-white/70 text-sm mt-1 drop-shadow-sm">
+            {heroSubtitle}
+          </p>
+        )}
       </div>
       
-      {/* Top-right: Rating + tier - centered stack for alignment */}
+      {/* Top-right: Rating + tier - centered stack with safe area */}
       <Sheet>
         <SheetTrigger asChild>
-          <button className="absolute top-20 right-4 z-20 flex flex-col items-center text-center gap-1 max-w-[100px]">
+          <button 
+            className="absolute right-4 z-20 flex flex-col items-center text-center gap-1.5"
+            style={{
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
+            }}
+          >
             <span 
-              className="text-2xl sm:text-3xl font-bold tabular-nums drop-shadow-lg"
-              style={{ color: isOutstanding ? theme.pillText : '#FFFFFF' }}
+              className="text-5xl sm:text-6xl font-bold tabular-nums drop-shadow-lg"
+              style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
             >
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            <RatingPill score={rating} className="text-[9px] sm:text-[10px] py-0.5 px-1.5 sm:px-2" />
-            <span className="text-white/60 text-[10px] font-medium tracking-wide uppercase whitespace-nowrap">
+            <RatingPill score={rating} showRatingInPill className="text-[9px] sm:text-[10px] py-0.5 px-2" />
+            <span className="text-white/50 text-[10px] font-medium tracking-wider uppercase whitespace-nowrap">
               From a review
             </span>
           </button>
