@@ -75,12 +75,18 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
       {/* Fullscreen variant - Premium Glass Panel */}
       {isFullscreen && (
         <div 
-          className="absolute left-4 right-4 z-20 top-14"
+          className={cn(
+            "absolute left-4 right-4 z-20 top-14",
+            "rounded-xl backdrop-blur-xl border",
+            "shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]",
+            isOutstanding 
+              ? "bg-[rgba(210,180,97,0.08)]" 
+              : "bg-black/50"
+          )}
           style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            borderRadius: '16px',
+            borderColor: isOutstanding 
+              ? 'rgba(210, 180, 97, 0.3)' 
+              : 'rgba(255, 255, 255, 0.08)',
             padding: '16px',
           }}
         >
