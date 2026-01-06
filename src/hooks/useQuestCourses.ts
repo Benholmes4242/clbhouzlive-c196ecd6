@@ -115,7 +115,8 @@ export function useQuestCourses() {
       }
 
       // Deduplicate courses for the flat list (for totalPlayed and recently played)
-      const courseMap = new Map<string, QuestCourse>();
+      // Store raw ISO date for proper sorting, format display date separately
+      const courseMap = new Map<string, QuestCourse & { rawDate?: string }>();
       
       for (const m of memberships || []) {
         const rating = ratingsMap.get(m.course_id);
@@ -123,7 +124,7 @@ export function useQuestCourses() {
         const isPlayed = isRated;
         const listSlug = (m.list as any)?.slug || 'global';
         const region = listToRegion[listSlug] || 'Worldwide';
-        const dateAdded = rating?.created_at;
+        const rawDate = rating?.created_at;
 
         if (!courseMap.has(m.course_id)) {
           courseMap.set(m.course_id, {
@@ -135,9 +136,10 @@ export function useQuestCourses() {
             isPlayed,
             isRated,
             isWishlist: shortlistSet.has(m.course_id) && !isPlayed,
-            dateAdded: dateAdded ? new Date(dateAdded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
+            dateAdded: rawDate ? new Date(rawDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
             rating: rating?.rating,
             imageUrl: (m.course as any)?.thumbnail_image || undefined,
+            rawDate, // Keep raw ISO date for sorting
           });
         }
       }
@@ -188,10 +190,12 @@ export function useQuestCourses() {
 
   const totalPlayed = courses.filter(c => c.isRated).length;
   const recentlyPlayed = courses
-    .filter(c => c.isRated && c.dateAdded)
+    .filter(c => c.isRated && (c as any).rawDate)
     .sort((a, b) => {
-      if (!a.dateAdded || !b.dateAdded) return 0;
-      return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
+      const aDate = (a as any).rawDate;
+      const bDate = (b as any).rawDate;
+      if (!aDate || !bDate) return 0;
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
     })
     .slice(0, 10);
 
