@@ -23,6 +23,8 @@ import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { PreviewCTAButtons } from '@/components/ratings/PreviewCTAButtons';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 // Track if modal is being unmounted
 let isUnmounting = false;
@@ -1643,6 +1645,9 @@ type RatingConfirmationViewProps = {
 function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useSupabaseSession();
+  const { data: userProfile } = useUserProfile(user?.id);
+  
   const {
     mode,
     courseName,
@@ -1792,7 +1797,12 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         >
           {/* Bottom panel - always visible */}
           <ReviewBottomPanel
-            user={{ id: 'me', name: 'You' }}
+            user={{ 
+              id: user?.id || 'me', 
+              name: userProfile?.display_name || userProfile?.username || 'You',
+              username: userProfile?.username || undefined,
+              avatar: userProfile?.profile_photo_url || undefined,
+            }}
             courseId={courseId}
             rating={userRating}
             bottomOffsetPx={80}
