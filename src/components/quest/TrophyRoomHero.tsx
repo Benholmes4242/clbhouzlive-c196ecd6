@@ -222,9 +222,9 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         onClick={onContinueJourney}
         className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all overflow-hidden"
         style={{
-          background: 'hsl(var(--slate-900))',
+          background: 'var(--surface-slate)',
           color: '#FFFFFF',
-          boxShadow: '0 4px 16px hsla(var(--slate-900), 0.25)',
+          boxShadow: '0 4px 16px rgba(58, 63, 70, 0.25)',
         }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

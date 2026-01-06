@@ -91,7 +91,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             onClick={() => setFilter('milestones')}
             className="px-3 py-1 text-xs font-semibold rounded-full transition-all"
             style={{
-              background: filter === 'milestones' ? 'hsl(var(--slate-900))' : 'transparent',
+              background: filter === 'milestones' ? 'var(--surface-slate)' : 'transparent',
               color: filter === 'milestones' ? '#FFFFFF' : 'var(--quest-text-secondary)',
             }}
           >
@@ -101,7 +101,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             onClick={() => setFilter('regions')}
             className="px-3 py-1 text-xs font-semibold rounded-full transition-all"
             style={{
-              background: filter === 'regions' ? 'hsl(var(--slate-900))' : 'transparent',
+              background: filter === 'regions' ? 'var(--surface-slate)' : 'transparent',
               color: filter === 'regions' ? '#FFFFFF' : 'var(--quest-text-secondary)',
             }}
           >
