@@ -1,5 +1,6 @@
 import React from 'react';
-import { Video, Image, MapPin, Sparkles, Check } from 'lucide-react';
+import { Video, Image, MapPin, Sparkles } from 'lucide-react';
+import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
 import {
   Drawer,
   DrawerContent,
@@ -59,42 +60,51 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
               <button
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl",
-                  "transition-all duration-200",
-                  isActive 
-                    ? "bg-slate-100 dark:bg-slate-800" 
-                    : "hover:bg-muted/50"
-                )}
+                className="w-full flex items-center gap-3 p-2.5 rounded-xl transition-all"
+                style={{
+                  background: isActive 
+                    ? 'var(--cm-surface-slate)' 
+                    : 'var(--cm-surface-alt)',
+                  border: isActive 
+                    ? 'none' 
+                    : '1px solid var(--cm-border-subtle)',
+                  boxShadow: isActive 
+                    ? '0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.1)' 
+                    : 'none',
+                }}
               >
-                {/* Icon container with slate styling */}
-                <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center",
-                  "transition-colors duration-200",
-                  isActive 
-                    ? "bg-slate-200 dark:bg-slate-700" 
-                    : "bg-muted/50"
-                )}>
-                  <Icon className={cn(
-                    "w-5 h-5 transition-colors duration-200",
-                    isActive ? "text-slate-700 dark:text-slate-200" : "text-muted-foreground"
-                  )} />
+                {/* Icon container matching MomentAudienceSheet */}
+                <div 
+                  className="w-9 h-9 rounded-full flex items-center justify-center"
+                  style={{ 
+                    background: isActive ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-card)',
+                    color: isActive ? 'white' : 'var(--cm-icon-primary)',
+                  }}
+                >
+                  <Icon className="w-5 h-5" />
                 </div>
                 
                 {/* Label and description */}
                 <div className="flex-1 text-left">
-                  <div className={cn(
-                    "font-medium text-sm",
-                    isActive ? "text-foreground" : "text-foreground"
-                  )}>
+                  <p 
+                    className="font-medium text-[13px]"
+                    style={{ color: isActive ? 'white' : 'var(--cm-text-primary)' }}
+                  >
                     {option.label}
-                  </div>
-                  <div className="text-xs text-muted-foreground">{option.description}</div>
+                  </p>
+                  <p 
+                    className="text-[11px] mt-0.5"
+                    style={{ color: isActive ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
+                  >
+                    {option.description}
+                  </p>
                 </div>
                 
                 {/* Active indicator checkmark */}
                 {isActive && (
-                  <Check className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  <div className="opacity-100">
+                    <AnimatedCheck />
+                  </div>
                 )}
               </button>
             );
