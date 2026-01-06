@@ -41,9 +41,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
 
   return (
     <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Leaderboard</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Leaderboard</h2>
       
-      {/* KEEP CARD wrapper for Leaderboard */}
       <motion.div
         className="rounded-2xl p-4 bg-white border border-slate-200/60"
         style={{
