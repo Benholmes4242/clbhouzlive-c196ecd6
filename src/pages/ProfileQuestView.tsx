@@ -255,7 +255,7 @@ const ProfileQuestView: React.FC = () => {
 
         {/* Section 4: Journey Map (Milestone Ladder with Mastery Track) */}
         <section>
-          <h2 className="quest-section-title mb-3 px-1">Journey Map</h2>
+          {/* Note: MilestoneLadder has its own header, so no duplicate here */}
           {showJourneyHint && (
             <p
               className="text-xs px-1 mb-2 transition-opacity duration-500"
@@ -377,7 +377,7 @@ const ProfileQuestView: React.FC = () => {
                       : 'var(--quest-text-secondary)',
                   }}
                 >
-                  {selectedClub.isUnlocked ? '✓ Unlocked' : `${selectedClub.remaining} more to unlock`}
+                  {selectedClub.isUnlocked ? '✓ Earned' : `${selectedClub.remaining} more to earn`}
                 </div>
               </div>
             </>
