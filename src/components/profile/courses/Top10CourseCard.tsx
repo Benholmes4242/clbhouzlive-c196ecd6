@@ -63,10 +63,11 @@ const getRankingBadgeStyle = (position: number): { bg: string; text: string; sha
         shadow: '0 2px 6px rgba(184, 132, 90, 0.35)'
       };
     default:
+      // Slate grey (matches Fair rating pill style)
       return { 
-        bg: 'linear-gradient(145deg, #475569 0%, #334155 100%)', 
-        text: '#fff',
-        shadow: '0 1px 4px rgba(0,0,0,0.15)'
+        bg: '#f1f5f9', 
+        text: '#475569',
+        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
       };
   }
 };
