@@ -162,13 +162,24 @@ const ProfileQuestView: React.FC = () => {
       dateAdded: course.dateAdded,
     }));
 
-  // Handle milestone click from ladder
-  const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean }) => {
-    setAchievementData({
-      type: 'milestone',
-      threshold: milestone.threshold,
-      totalPlayed,
-    });
+  // Handle milestone click from ladder (includes both milestones and regional from Mastery Track)
+  const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean; type?: string; regionSlug?: string; played?: number; total?: number }) => {
+    // Check if this is a regional achievement from Mastery Track
+    if (milestone.type === 'list_completion' && milestone.regionSlug) {
+      setAchievementData({
+        type: 'regional',
+        listSlug: milestone.regionSlug as 'gb-i' | 'europe' | 'usa' | 'global',
+        played: milestone.played ?? 0,
+        total: milestone.total ?? 100,
+      });
+    } else {
+      // Regular milestone
+      setAchievementData({
+        type: 'milestone',
+        threshold: milestone.threshold,
+        totalPlayed,
+      });
+    }
   };
 
   // Handle badge click from trophy case

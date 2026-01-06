@@ -42,7 +42,7 @@ interface RegionCompletionData {
 
 interface MilestoneLadderProps {
   totalPlayed: number;
-  onMilestoneClick?: (milestone: { threshold: number; name: string; isUnlocked: boolean }) => void;
+  onMilestoneClick?: (milestone: { threshold: number; name: string; isUnlocked: boolean; type?: string; regionSlug?: string; played?: number; total?: number }) => void;
   /** Regional list completion data for the Mastery Track */
   regionCompletions?: RegionCompletionData[];
 }

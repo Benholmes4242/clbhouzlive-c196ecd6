@@ -302,11 +302,11 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <motion.div
       className={cn(
-        'rounded-2xl flex flex-col justify-between relative overflow-hidden cursor-default select-none',
-        // Mini size for Trophy Case (3-across grid)
+        'rounded-2xl relative overflow-hidden cursor-default select-none',
+        // Mini size for Trophy Case (3-across grid) - use flex-col with centered content
         compact 
-          ? 'min-w-0 h-[72px] px-2.5 py-2'
-          : 'min-w-[180px] h-[88px] px-4 py-2.5',
+          ? 'min-w-0 h-[88px] px-2 py-2 flex flex-col items-center justify-start'
+          : 'min-w-[180px] h-[88px] px-4 py-2.5 flex flex-col justify-between',
         // Ghost styling - premium etched glass look
         isGhost && 'border-2 border-dashed'
       )}
@@ -403,8 +403,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         </motion.div>
       )}
 
-      {/* Top row: Icon + Content */}
-      <div className={cn("flex items-start relative z-10", compact ? "gap-2" : "gap-3")}>
+      {/* Top row: Icon + Content - in compact mode, center the medallion */}
+      <div className={cn("relative z-10", compact ? "flex flex-col items-center" : "flex items-start gap-3")}>
         {/* Trophy/Number medallion */}
         <div className="relative flex-shrink-0">
           {/* Rarity glow aura */}
@@ -449,22 +449,17 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             {/* In compact mode for locked cards, show number/trophy instead of lock (lock goes to bottom right) */}
             {isMilestone ? (
               <span 
-                className={cn("font-bold relative z-10", compact ? "text-xs" : "text-base")}
+                className={cn("font-bold relative z-10", compact ? "text-sm" : "text-base")}
                 style={{ color: unlocked && !isGhost ? accentColor : lockedColor }}
               >
                 {threshold}
               </span>
             ) : unlocked && !isGhost ? (
-              <Trophy 
-                className={cn("relative z-10", compact ? "w-3 h-3" : "w-4 h-4")}
-                style={{ color: accentColor }} 
-              />
+              // Regional unlocked: no icon (just the glyph background)
+              null
             ) : compact ? (
-              // Compact locked regional: show trophy placeholder (lock at bottom right)
-              <Trophy 
-                className="relative z-10 w-3 h-3"
-                style={{ color: lockedColor }} 
-              />
+              // Compact locked regional: no icon (lock at bottom right)
+              null
             ) : (
               <Lock 
                 className="relative z-10 w-4 h-4"
@@ -474,41 +469,41 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           </div>
         </div>
         
-        {/* Text content */}
-        <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* COMPACT MODE: Show club name only (no tier label to avoid truncation) */}
-          {compact ? (
+        {/* Text content - in compact mode, show nothing here (title goes below medallion) */}
+        {!compact && (
+          <div className="flex-1 min-w-0 overflow-hidden text-left">
+            {/* FULL MODE: Club name as title - colored by tier */}
             <div 
-              className="text-[11px] font-semibold leading-tight line-clamp-1"
+              className="text-[13px] font-semibold leading-tight truncate"
               style={{ color: unlocked && !isGhost ? accentColor : 'var(--quest-text-tertiary, #97A1AA)' }}
             >
               {clubName}
             </div>
-          ) : (
-            <>
-              {/* FULL MODE: Club name as title - colored by tier */}
+            {/* Witty tagline as subtitle - only shown when showSubtext is true */}
+            {showSubtext && (
               <div 
-                className="text-[13px] font-semibold leading-tight truncate"
-                style={{ color: unlocked && !isGhost ? accentColor : 'var(--quest-text-tertiary, #97A1AA)' }}
+                className="text-[10px] leading-tight mt-0.5 line-clamp-2"
+                style={{ color: unlocked && !isGhost ? `${accentColor}90` : 'var(--quest-text-tertiary, #97A1AA)' }}
               >
-                {clubName}
+                {isMilestone 
+                  ? (MILESTONE_TAGLINES[threshold] || subtitle)
+                  : (REGION_TAGLINES[TIER_TO_REGION_SLUG[tier]] || subtitle)
+                }
               </div>
-              {/* Witty tagline as subtitle - only shown when showSubtext is true */}
-              {showSubtext && (
-                <div 
-                  className="text-[10px] leading-tight mt-0.5 line-clamp-2"
-                  style={{ color: unlocked && !isGhost ? `${accentColor}90` : 'var(--quest-text-tertiary, #97A1AA)' }}
-                >
-                  {isMilestone 
-                    ? (MILESTONE_TAGLINES[threshold] || subtitle)
-                    : (REGION_TAGLINES[TIER_TO_REGION_SLUG[tier]] || subtitle)
-                  }
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* COMPACT MODE: Title below medallion to avoid truncation */}
+      {compact && (
+        <div 
+          className="text-[10px] font-semibold leading-tight line-clamp-2 text-center mt-1"
+          style={{ color: unlocked && !isGhost ? accentColor : 'var(--quest-text-tertiary, #97A1AA)' }}
+        >
+          {clubName}
+        </div>
+      )}
 
       {/* Bottom row: Status chip - hidden in compact mode */}
       {!compact && (
