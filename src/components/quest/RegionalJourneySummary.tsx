@@ -105,18 +105,24 @@ const RegionRow: React.FC<{
   );
 };
 
+// Map region IDs to their Top 100 page routes
+const REGION_ROUTES: Record<string, string> = {
+  'gb-i': '/top100/gb-i',
+  'europe': '/top100/europe',
+  'usa': '/top100/usa',
+  'global': '/top100/global',
+};
+
 export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
   regions,
-  onRegionClick,
 }) => {
   const navigate = useNavigate();
 
+  // Navigate directly to the Top 100 page for that region
   const handleRegionClick = (region: RegionProgress) => {
-    if (onRegionClick) {
-      onRegionClick(region);
-    } else {
-      // Default: navigate to Top 100 list filtered to that region
-      navigate(`/top100?tab=my-progress&region=${region.id}`);
+    const route = REGION_ROUTES[region.id];
+    if (route) {
+      navigate(route);
     }
   };
 

@@ -79,7 +79,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
       <div className="flex items-center justify-between mb-4 px-1">
         <h2 className="quest-section-title">Trophy Case</h2>
         
-        {/* Filter toggle */}
+        {/* Filter toggle - Global Slate active pill */}
         <div 
           className="flex rounded-full p-0.5"
           style={{ 
@@ -91,7 +91,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             onClick={() => setFilter('milestones')}
             className="px-3 py-1 text-xs font-semibold rounded-full transition-all"
             style={{
-              background: filter === 'milestones' ? 'var(--quest-text-primary)' : 'transparent',
+              background: filter === 'milestones' ? 'hsl(var(--slate-900))' : 'transparent',
               color: filter === 'milestones' ? '#FFFFFF' : 'var(--quest-text-secondary)',
             }}
           >
@@ -101,7 +101,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             onClick={() => setFilter('regions')}
             className="px-3 py-1 text-xs font-semibold rounded-full transition-all"
             style={{
-              background: filter === 'regions' ? 'var(--quest-text-primary)' : 'transparent',
+              background: filter === 'regions' ? 'hsl(var(--slate-900))' : 'transparent',
               color: filter === 'regions' ? '#FFFFFF' : 'var(--quest-text-secondary)',
             }}
           >
@@ -138,7 +138,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
           ) : (
             <motion.div
               key={filter}
-              className="grid grid-cols-2 gap-3"
+              className="grid grid-cols-3 gap-2"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -146,34 +146,33 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
             >
               {showMilestones ? (
                 <>
-                  {/* Milestones grid */}
-                  {unlockedMilestones.map((m, index) => {
-                    const isLatest = m.threshold === latestMilestone?.threshold;
-                    return (
-                      <motion.div
-                        key={m.threshold}
-                        className={isLatest ? 'col-span-2' : ''}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.05 }}
-                        onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
-                      >
-                        <AchievementBadgeCard
-                          tier={String(m.threshold) as AchievementTier}
-                          title={m.name}
-                          subtitle={m.tierName}
-                          unlocked={true}
-                          status="UNLOCKED"
-                          totalTop100Played={totalPlayed}
-                          threshold={m.threshold}
-                        />
-                      </motion.div>
-                    );
-                  })}
+                  {/* Milestones mini-grid */}
+                  {unlockedMilestones.map((m, index) => (
+                    <motion.div
+                      key={m.threshold}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.03 }}
+                      onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
+                    >
+                      <AchievementBadgeCard
+                        tier={String(m.threshold) as AchievementTier}
+                        title={m.name}
+                        subtitle={m.tierName}
+                        unlocked={true}
+                        status="UNLOCKED"
+                        totalTop100Played={totalPlayed}
+                        threshold={m.threshold}
+                        compact={true}
+                      />
+                    </motion.div>
+                  ))}
                   {/* Show next locked milestone as ghost */}
                   {nextMilestone && (
-                    <div 
-                      className="col-span-2"
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: unlockedMilestones.length * 0.03 }}
                       onClick={() => onBadgeClick?.({ type: 'milestone', id: String(nextMilestone.threshold), threshold: nextMilestone.threshold })}
                     >
                       <AchievementBadgeCard
@@ -185,23 +184,22 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                         remaining={nextMilestone.threshold - totalPlayed}
                         totalTop100Played={totalPlayed}
                         threshold={nextMilestone.threshold}
+                        compact={true}
                       />
-                    </div>
+                    </motion.div>
                   )}
                 </>
               ) : (
                 <>
-                  {/* Regions grid */}
+                  {/* Regions mini-grid */}
                   {regions.map((r, index) => {
-                    const isLatest = r.id === latestRegion?.id;
                     const tier = REGION_TIER_MAP[r.id] || 'GBI';
                     return (
                       <motion.div
                         key={r.id}
-                        className={isLatest && r.isUnlocked ? 'col-span-2' : ''}
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.05 }}
+                        transition={{ delay: index * 0.03 }}
                         onClick={() => onBadgeClick?.({ type: 'region', id: r.id })}
                       >
                         <AchievementBadgeCard
@@ -213,6 +211,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                           status={r.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
                           playedOnList={r.played}
                           totalOnList={r.total}
+                          compact={true}
                         />
                       </motion.div>
                     );
