@@ -114,7 +114,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
             >
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            <RatingPill score={rating} showRatingInPill className="text-[9px] sm:text-[10px] py-0.5 px-2" />
+            <RatingPill score={rating} className="text-[9px] sm:text-[10px] py-0.5 px-2" />
             <span className="text-[10px] font-medium text-white/50 tracking-wider uppercase">
               From a review
             </span>
