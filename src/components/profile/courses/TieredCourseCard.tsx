@@ -101,8 +101,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
 
           {/* Content - flexible column */}
           <div className="flex-1 py-2.5 px-3 flex flex-col justify-center min-w-0">
-            {/* Course name - allow 2 lines, never truncate */}
-            <div className="font-semibold text-sm text-foreground leading-tight line-clamp-2">
+            {/* Course name - single line, wrap to 2 only if needed */}
+            <div className="font-semibold text-sm text-foreground leading-tight line-clamp-2 break-words">
               {course.name}
             </div>
             <div className="text-xs text-muted-foreground truncate mt-0.5">
@@ -120,7 +120,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           </div>
 
           {/* Rating column - fixed width, bottom-right aligned with date */}
-          <div className="flex flex-col items-end justify-end pb-2.5 pr-3 pl-2 flex-shrink-0 min-w-[72px]">
+          <div className="flex flex-col items-center justify-end pb-2.5 pr-3 pl-2 flex-shrink-0 min-w-[72px]">
             {isRated && course.rating_value ? (
               <>
                 <span className="text-sm font-semibold text-foreground mb-0.5">
@@ -220,8 +220,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
 
         {/* Content - flexible column */}
         <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
-          {/* Course name - allow 2 lines */}
-          <div className="font-medium text-[13px] text-foreground leading-tight line-clamp-2">
+          {/* Course name - single line, wrap to 2 only if needed */}
+          <div className="font-medium text-[13px] text-foreground leading-tight line-clamp-2 break-words">
             {course.name}
           </div>
           <div className="text-[11px] text-muted-foreground truncate mt-0.5">
@@ -238,7 +238,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         </div>
 
         {/* Rating column - fixed width, bottom-right aligned with date */}
-        <div className="flex flex-col items-end justify-end pb-2 pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
+        <div className="flex flex-col items-center justify-end pb-2 pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
           {course.rating_value && (
             <>
               <span className="text-sm font-semibold text-foreground mb-0.5">
