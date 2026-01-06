@@ -20,6 +20,7 @@ import { useReviewVideoUpload, getFileKey, type ReviewVideoDraft } from '@/hooks
 import { useShareReview } from '@/hooks/useShareReview';
 import { FullscreenReviewPost, type ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
+import { PreviewCTAButtons } from '@/components/ratings/PreviewCTAButtons';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -1787,75 +1788,24 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           reviewText={reviewText}
           media={previewMedia}
           onBack={onBack}
-          dotsBottomOffset={shareState === 'shared' ? 168 : 108}
+          dotsBottomOffset={80}
         >
-          {shareState === 'idle' && (
-            <ReviewBottomPanel
-              user={{ id: 'me', name: 'You' }}
-              courseId={courseId}
-              rating={userRating}
-              bottomOffsetPx={168}
-            />
-          )}
-        </FullscreenReviewPost>
-
-      </div>
-
-      {/* Bottom sticky CTA bar - softer gradient, pointer-events-none allows swipe gestures through */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent pt-12 px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
-        <div className="pointer-events-auto flex flex-col gap-3">
-          {/* Primary CTA row */}
-          <div className="flex gap-3">
-            {/* Share button with state machine */}
-            <button
-              type="button"
-              onClick={handleShare}
-              disabled={shareState !== 'idle'}
-              className={cn(
-                "inline-flex flex-1 items-center justify-center gap-2 rounded-2xl h-12 px-4 text-sm font-medium transition-colors",
-                shareState === 'shared'
-                  ? "bg-emerald-500/90 text-white"
-                  : "bg-white text-slate-900 hover:bg-white/90 active:bg-white/80",
-                shareState === 'posting' && "opacity-70 cursor-not-allowed"
-              )}
-            >
-              {shareState === 'posting' && (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Sharing…
-                </>
-              )}
-              {shareState === 'shared' && (
-                <>
-                  <Check className="h-4 w-4" />
-                  Shared
-                </>
-              )}
-              {shareState === 'idle' && 'Share to Clubhouse + Profile'}
-            </button>
-
-            {/* Back to course / Not now */}
-            <button
-              type="button"
-              onClick={handleBackToCourse}
-              className="inline-flex items-center justify-center rounded-2xl border border-white/30 bg-white/10 backdrop-blur-sm h-12 px-6 text-sm font-medium text-white hover:bg-white/20 active:bg-white/25 transition-colors"
-            >
-              {shareState === 'shared' ? 'Done' : 'Not now'}
-            </button>
-          </div>
+          {/* Bottom panel - always visible */}
+          <ReviewBottomPanel
+            user={{ id: 'me', name: 'You' }}
+            courseId={courseId}
+            rating={userRating}
+            bottomOffsetPx={80}
+          />
           
-          {/* Secondary CTA after shared */}
-          {shareState === 'shared' && (
-            <button
-              type="button"
-              onClick={handleViewInClubhouse}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white h-12 px-4 text-sm font-medium text-slate-900 hover:bg-white/90 active:bg-white/80 transition-colors"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View in Clubhouse
-            </button>
-          )}
-        </div>
+          {/* CTA buttons - vertical stack on right */}
+          <PreviewCTAButtons
+            shareState={shareState}
+            onShare={handleShare}
+            onNotNow={handleBackToCourse}
+            onViewInClubhouse={handleViewInClubhouse}
+          />
+        </FullscreenReviewPost>
       </div>
     </div>
   );
