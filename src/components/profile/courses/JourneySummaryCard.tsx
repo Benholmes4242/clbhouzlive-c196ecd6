@@ -1,5 +1,5 @@
 /**
- * JourneySummaryCard - Premium hero card for Course Journey stats
+ * JourneySummaryCard - Premium hero card for Course Legacy stats
  * 
  * Shows: Courses Played (primary), Countries, Average Rating
  * No milestone logic - milestones only apply to Top 100 section
@@ -15,6 +15,7 @@ interface JourneySummaryCardProps {
   countriesPlayed: number;
   avgRating: number | null;
   isOwnProfile: boolean;
+  displayName?: string;
   className?: string;
 }
 
@@ -23,6 +24,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   countriesPlayed,
   avgRating,
   isOwnProfile,
+  displayName,
   className,
 }) => {
   const prefersReducedMotion = useReducedMotion();
@@ -41,12 +43,12 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-1">
-              {isOwnProfile ? 'Start your course journey' : 'No courses played yet'}
+              {isOwnProfile ? "Start building your legacy" : "No courses played yet"}
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs">
               {isOwnProfile 
-                ? 'Play and rate your first course to unlock your journey stats.'
-                : 'This golfer hasn\'t logged any courses yet.'}
+                ? "Play and rate your first course to start your legacy."
+                : "This golfer hasn't logged any courses yet."}
             </p>
           </div>
         </div>
@@ -77,10 +79,13 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       />
 
       <div className="relative z-10 flex flex-col items-center text-center">
-        {/* Header */}
-        <h3 className="text-sm font-medium text-muted-foreground mb-5">
-          {isOwnProfile ? 'Your Course Journey' : 'Course Journey'}
+        {/* Header - Course Legacy */}
+        <h3 className="text-sm font-medium text-muted-foreground mb-1">
+          {isOwnProfile ? "Your Course Legacy" : `${displayName || "Their"}'s Course Legacy`}
         </h3>
+        <p className="text-xs text-muted-foreground/70 mb-5">
+          Every course you've experienced
+        </p>
 
         {/* Main stat - Courses Played with AnimatedNumber */}
         <div className="flex flex-col items-center mb-6">
