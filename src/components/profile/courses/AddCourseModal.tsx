@@ -191,10 +191,13 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       className="max-h-[85vh]"
     >
       {/* Header with close button */}
-      <div className="flex items-center justify-between px-5 pb-3">
-        <h2 id="add-course-title" className="text-lg font-semibold text-foreground">
-          Top 10 Courses
-        </h2>
+      <div className="flex justify-between px-5 pb-3">
+        <div>
+          <h2 id="add-course-title" className="text-lg font-semibold text-foreground">
+            Your Personal Top 10
+          </h2>
+          <p className="text-sm text-muted-foreground">The very best you've played</p>
+        </div>
         <button
           onClick={onClose}
           className="p-2 -mr-2 rounded-full hover:bg-muted/50 transition-colors"
