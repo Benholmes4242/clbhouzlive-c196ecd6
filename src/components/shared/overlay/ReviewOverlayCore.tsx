@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { RatingPill } from '@/components/ui/RatingPill';
+import { getReviewOverlayTheme } from '@/lib/postHelpers';
 
 export type ReviewOverlayVariant = 'fullscreen' | 'tile';
 
@@ -22,6 +23,10 @@ export interface ReviewOverlayCoreProps {
  * Variants:
  * - fullscreen: Larger text, more spacing, optional preview badge
  * - tile: Compact sizing for grid thumbnails
+ * 
+ * Theme:
+ * - Uses Slate for Fair → Excellent (0-8.9)
+ * - Uses Gold for Outstanding (9.0+)
  */
 export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   courseName,
@@ -32,6 +37,8 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
   className,
 }) => {
   const isFullscreen = variant === 'fullscreen';
+  const theme = getReviewOverlayTheme(rating);
+  const isOutstanding = rating >= 9.0;
   
   // Typography + spacing based on variant
   const courseNameClass = isFullscreen 
@@ -91,7 +98,10 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
         rightPadding,
         isFullscreen ? "max-w-[100px]" : ""
       )}>
-        <span className={cn("text-white drop-shadow-lg", ratingClass)}>
+        <span 
+          className={cn("drop-shadow-lg", ratingClass)}
+          style={{ color: isOutstanding ? theme.pillText : '#FFFFFF' }}
+        >
           {rating === 10 ? '10' : rating.toFixed(1)}
         </span>
         <RatingPill score={rating} className={pillClass} />
