@@ -5,7 +5,9 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Target, Trophy, Share2, Compass, ChevronRight } from 'lucide-react';
+import { Target, Trophy, Share2, Compass, Award } from 'lucide-react';
+import { MILESTONE_TIER_META } from '@/config/achievements';
+import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 
 interface NextTargetCardProps {
   totalPlayed: number;
@@ -49,6 +51,16 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
   const progressPercent = nextMilestone
     ? (totalPlayed / nextMilestone.threshold) * 100
     : 100;
+  
+  // Get tier-themed color for progress bar
+  const tierColor = nextMilestone 
+    ? getRingColorForThreshold(nextMilestone.threshold)
+    : 'var(--quest-accent-green)';
+  
+  // Get tier name for context
+  const tierMeta = nextMilestone 
+    ? MILESTONE_TIER_META.find(m => m.threshold === nextMilestone.threshold)
+    : undefined;
 
   // Show recently unlocked celebration
   if (recentlyUnlocked) {
@@ -133,31 +145,54 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
       {/* Milestone progress */}
       {nextMilestone && (
         <div className="mb-4">
-          <div className="flex items-baseline justify-between mb-2">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              {/* Small badge icon */}
+              <div 
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ 
+                  background: `${tierColor}15`,
+                  border: `1px solid ${tierColor}30`,
+                }}
+              >
+                <Award className="w-3.5 h-3.5" style={{ color: tierColor }} />
+              </div>
+              <div>
+                <span
+                  className="text-lg font-bold block leading-tight"
+                  style={{ color: 'var(--quest-text-primary)' }}
+                >
+                  {nextMilestone.name}
+                </span>
+                {tierMeta && (
+                  <span 
+                    className="text-[10px] font-medium uppercase tracking-wider"
+                    style={{ color: tierColor }}
+                  >
+                    {tierMeta.tierName}
+                  </span>
+                )}
+              </div>
+            </div>
             <span
-              className="text-lg font-bold"
-              style={{ color: 'var(--quest-text-primary)' }}
-            >
-              {nextMilestone.name}
-            </span>
-            <span
-              className="text-sm"
-              style={{ color: 'var(--quest-accent-green)' }}
+              className="text-sm font-medium"
+              style={{ color: tierColor }}
             >
               {remaining} to go
             </span>
           </div>
           
-          {/* Progress bar */}
+          {/* Progress bar - tier themed */}
           <div
-            className="h-2 rounded-full overflow-hidden"
+            className="h-2.5 rounded-full overflow-hidden"
             style={{ background: 'var(--quest-track)' }}
           >
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${Math.min(progressPercent, 100)}%`,
-                background: 'linear-gradient(90deg, var(--quest-accent-green), var(--quest-accent-gold))',
+                background: `linear-gradient(90deg, ${tierColor}90, ${tierColor})`,
+                boxShadow: `0 0 8px ${tierColor}40`,
               }}
             />
           </div>

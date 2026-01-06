@@ -218,8 +218,8 @@ const ProfileQuestView: React.FC = () => {
         </div>
       </div>
 
-      {/* Content with premium spacing */}
-      <div className="relative px-4 pb-32 space-y-10">
+      {/* Content with consistent vertical rhythm (6 = 24px) */}
+      <div className="relative px-4 pb-32 space-y-6">
         {/* Section 1: Hero - Overall Progress */}
         <QuestHero
           totalPlayed={totalPlayed}
@@ -267,6 +267,12 @@ const ProfileQuestView: React.FC = () => {
           <MilestoneLadder
             totalPlayed={totalPlayed}
             onMilestoneClick={handleMilestoneClick}
+            regionCompletions={regionProgress.map(r => ({
+              slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
+              name: r.name,
+              played: r.played,
+              total: r.total,
+            }))}
           />
         </section>
 
@@ -377,7 +383,7 @@ const ProfileQuestView: React.FC = () => {
                       : 'var(--quest-text-secondary)',
                   }}
                 >
-                  {selectedClub.isUnlocked ? '✓ Unlocked' : `${selectedClub.remaining} more to unlock`}
+                  {selectedClub.isUnlocked ? '✓ Earned' : `${selectedClub.remaining} more to earn`}
                 </div>
               </div>
             </>
