@@ -4,7 +4,7 @@
  */
 
 // Master switch for all media debug logging
-export const DEBUG_MEDIA = false; // DISABLED - Music is working
+export const DEBUG_MEDIA = true; // ENABLED for carousel video debugging
 
 // Granular flags (only apply if DEBUG_MEDIA is true)
 export const DEBUG_HLS_PLAYER = DEBUG_MEDIA;
