@@ -203,7 +203,7 @@ export function FullscreenReviewPost({
       {/* Premium Top Overlay Panel - Matches CreatorCapsule review styling */}
       <div 
         className={cn(
-          "absolute left-4 right-4 z-20 top-14",
+          "absolute left-4 right-4 z-20 top-[66px]",
           "rounded-xl backdrop-blur-xl border",
           "shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]",
           isOutstanding 
