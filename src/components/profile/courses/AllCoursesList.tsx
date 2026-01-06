@@ -151,7 +151,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <h3 className="text-base font-semibold text-foreground mb-3">Complete Journey</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">Course History</h3>
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-18 bg-muted/50 rounded-xl animate-pulse" />
@@ -162,7 +162,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   }
 
   // Compute owner name for subtitle
-  const ownerName = isOwnProfile ? 'Your' : displayName ? `${displayName}'s` : "This player's";
+  const firstName = displayName?.split(' ')[0];
+  const ownerSubtitle = isOwnProfile ? 'Your full course history' : `${firstName || "Their"}'s full course history`;
 
   return (
     <div ref={sectionRef} className="py-4">
@@ -171,10 +172,10 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-base font-semibold text-foreground">
-            Complete Journey
+            Course History
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {ownerName} full course history
+            {ownerSubtitle}
           </p>
         </div>
       </div>

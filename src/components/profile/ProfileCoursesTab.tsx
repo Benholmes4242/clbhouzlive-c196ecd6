@@ -77,16 +77,17 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
     <div className="pb-8">
       <ScrollToTopGlass />
 
-      {/* Section 1: Journey Summary Card */}
+      {/* Section 1: Course Legacy Summary Card */}
       <JourneySummaryCard
         coursesPlayed={totalCoursesPlayed}
         countriesPlayed={countriesPlayed}
         avgRating={avgRating || null}
         isOwnProfile={isOwnProfile}
+        displayName={displayName}
       />
 
-      {/* Section 2: Top 10 Rated Courses Carousel (Crown Jewel) */}
-      {/* Generous 28px spacing from Journey to Top 10 */}
+      {/* Section 2: Personal Top 10 Carousel (Crown Jewel) */}
+      {/* Generous 28px spacing from Legacy to Top 10 */}
       <div className="mt-7">
         <FavouritesCarousel 
           userId={userId} 
@@ -105,7 +106,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         />
       </div>
 
-      {/* Section 4: All Courses Played */}
+      {/* Section 4: Course History */}
       {/* Medium 24px spacing for context reset */}
       <div className="mt-6">
         <AllCoursesList 

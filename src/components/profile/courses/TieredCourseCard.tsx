@@ -119,10 +119,15 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             )}
           </div>
 
-          {/* Rating - fixed width column on right */}
-          <div className="flex items-center pr-3 pl-2 flex-shrink-0">
+          {/* Rating column - fixed width, stacked layout (rating number above pill) */}
+          <div className="flex flex-col items-end justify-center pr-3 pl-2 flex-shrink-0 min-w-[72px]">
             {isRated && course.rating_value ? (
-              <RatingPill score={course.rating_value} className="text-[11px] px-2.5 py-1" />
+              <>
+                <span className="text-sm font-semibold text-foreground mb-0.5">
+                  {course.rating_value.toFixed(1)}
+                </span>
+                <RatingPill score={course.rating_value} className="text-[10px] px-2 py-0.5" />
+              </>
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
@@ -232,10 +237,15 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           )}
         </div>
 
-        {/* Rating - fixed column */}
-        <div className="flex items-center pr-2.5 pl-2 flex-shrink-0">
+        {/* Rating column - fixed width, stacked layout (rating number above pill) */}
+        <div className="flex flex-col items-end justify-center pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
           {course.rating_value && (
-            <RatingPill score={course.rating_value} className="text-[10px] px-2 py-0.5" />
+            <>
+              <span className="text-sm font-semibold text-foreground mb-0.5">
+                {course.rating_value.toFixed(1)}
+              </span>
+              <RatingPill score={course.rating_value} className="text-[9px] px-1.5 py-0.5" />
+            </>
           )}
         </div>
       </div>
