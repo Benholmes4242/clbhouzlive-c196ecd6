@@ -3,17 +3,26 @@
  * Trophy Room aesthetic with animated background, tier chip, Continue Journey CTA
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Sparkles, ChevronDown, Award } from 'lucide-react';
+import { Trophy, Sparkles, ChevronDown, Award, MapPin } from 'lucide-react';
 import { CLUB_STEPS } from '@/lib/top100Club';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
+
+interface RegionProgress {
+  id: string;
+  name: string;
+  shortName: string;
+  played: number;
+  total: number;
+}
 
 interface TrophyRoomHeroProps {
   totalPlayed: number;
   target?: number;
   hasPremiumAccent?: boolean;
   onContinueJourney?: () => void;
+  regionProgress?: RegionProgress[];
 }
 
 export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
@@ -21,6 +30,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   target = 100,
   hasPremiumAccent = false,
   onContinueJourney,
+  regionProgress = [],
 }) => {
   const progressPercent = Math.min((totalPlayed / target) * 100, 100);
   const isComplete = totalPlayed >= target;
@@ -35,6 +45,26 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   // Next milestone info
   const nextThreshold = nextMilestone?.threshold || 0;
   const remaining = nextThreshold - totalPlayed;
+
+  // Find closest region (smallest remaining where remaining > 0)
+  const closestRegion = useMemo(() => {
+    const inProgress = regionProgress
+      .filter(r => r.played < r.total && r.total > 0)
+      .map(r => ({ ...r, remaining: r.total - r.played }));
+    
+    if (inProgress.length === 0) {
+      // Check if all completed
+      const allCompleted = regionProgress.every(r => r.played >= r.total && r.total > 0);
+      return allCompleted && regionProgress.length > 0 ? { allCompleted: true } : null;
+    }
+    
+    // Find the one with smallest remaining
+    const closest = inProgress.reduce((prev, curr) => 
+      curr.remaining < prev.remaining ? curr : prev
+    );
+    
+    return { ...closest, allCompleted: false };
+  }, [regionProgress]);
 
   return (
     <motion.section 
@@ -207,7 +237,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
       {/* Next milestone teaser */}
       {nextMilestone && (
         <motion.p
-          className="text-xs mb-6"
+          className="text-xs mb-2"
           style={{ color: 'var(--quest-text-tertiary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -216,6 +246,36 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
           Next milestone: <span className="font-semibold" style={{ color: 'var(--quest-text-secondary)' }}>{nextMilestone.threshold} Club</span> ({remaining} to go)
         </motion.p>
       )}
+
+      {/* Closest region teaser */}
+      {closestRegion && (
+        <motion.p
+          className="text-xs mb-6 flex items-center justify-center gap-1.5"
+          style={{ color: 'var(--quest-text-tertiary)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.85 }}
+        >
+        {closestRegion.allCompleted ? (
+            <>
+              <span>All regions completed</span>
+              <span>🏆</span>
+            </>
+          ) : 'name' in closestRegion ? (
+            <>
+              <MapPin className="w-3 h-3" />
+              <span>Closest region:</span>
+              <span className="font-semibold" style={{ color: 'var(--quest-text-secondary)' }}>
+                {closestRegion.name}
+              </span>
+              <span>({closestRegion.remaining} to go)</span>
+            </>
+          ) : null}
+        </motion.p>
+      )}
+      
+      {/* Spacer if no next milestone but has region */}
+      {!nextMilestone && !closestRegion && <div className="mb-6" />}
 
       {/* Continue Journey CTA - Global Slate with shimmer */}
       <motion.button

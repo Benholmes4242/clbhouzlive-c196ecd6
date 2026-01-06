@@ -106,12 +106,22 @@ export const BadgeDetailSheet: React.FC<BadgeDetailSheetProps> = ({
 
   if (!badgeData) return null;
 
-  const handleExploreCourses = () => {
+  // Region route mapping
+  const REGION_ROUTES: Record<string, string> = {
+    'gb-i': '/top100/gb-i',
+    'europe': '/top100/europe',
+    'usa': '/top100/usa',
+    'global': '/top100/global',
+  };
+
+  const handleViewList = () => {
     onClose();
-    if (badgeData.type === 'region') {
-      // Navigate to explore with region filter
-      navigate(`/explore?region=${badgeId}`);
+    if (badgeData.type === 'region' && badgeId) {
+      // Navigate to region's Top 100 page
+      const route = REGION_ROUTES[badgeId] || '/top100/global';
+      navigate(route);
     } else {
+      // Navigate to explore for milestones
       navigate('/explore');
     }
   };
@@ -313,14 +323,14 @@ export const BadgeDetailSheet: React.FC<BadgeDetailSheetProps> = ({
           {/* CTA */}
           <div className="px-4">
             <Button
-              onClick={handleExploreCourses}
+              onClick={handleViewList}
               className="w-full py-6 rounded-xl font-semibold text-base"
               style={{
                 background: 'var(--quest-text-primary)',
                 color: '#FFFFFF',
               }}
             >
-              <span>Explore Courses</span>
+              <span>{badgeData.type === 'region' ? 'View List' : 'Explore Courses'}</span>
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
