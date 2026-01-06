@@ -28,22 +28,20 @@ export function formatCourseLocation(course: Course | null | undefined): string 
 
 /**
  * Formats the course location in short format for overlays.
- * Uses region + country (matches Clubhouse feed format).
- * 
- * Example: "Asia" or "Britain & Ireland"
+ * Prefer the broadest label (country), falling back to region/sub_country.
+ *
+ * Examples: "Asia", "Britain & Ireland"
  */
 export function formatCourseLocationShort(course: Course | null | undefined): string {
   if (!course) return '';
-  
-  // Prefer region, then country - matches Clubhouse format
-  const region = course.region;
-  const country = course.country;
-  
-  // If region and country are the same (e.g., "Asia"), just use one
-  if (region && country && region !== country) {
-    return `${region}, ${country}`.replace(/^, |, $/g, '');
-  }
-  
-  // Fallback to region or country
-  return region || country || '';
+
+  const country = (course.country ?? '').trim();
+  if (country) return country;
+
+  const region = (course.region ?? '').trim();
+  if (region) return region;
+
+  const subCountry = (course.sub_country ?? '').trim();
+  return subCountry;
 }
+
