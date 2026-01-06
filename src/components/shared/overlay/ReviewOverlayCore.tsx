@@ -79,12 +79,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
       {isFullscreen && (
         <>
           {/* Top-left: Course name + location + optional preview badge */}
-          <div 
-            className="absolute left-4 right-20 z-20"
-            style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
-            }}
-          >
+          <div className="absolute left-4 right-20 z-20 top-16">
             {/* Preview pill - above course name */}
             {showPreviewBadge && (
               <span className="inline-block mb-2 px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 backdrop-blur-sm text-blue-200 text-[10px] font-semibold tracking-wide uppercase">
@@ -102,12 +97,7 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
           </div>
           
           {/* Top-right: Rating + tier + "From a review" - centered stack */}
-          <div 
-            className="absolute right-4 z-20 flex flex-col items-center text-center gap-1.5"
-            style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
-            }}
-          >
+          <div className="absolute right-4 z-20 top-16 flex flex-col items-center text-center gap-1.5">
             <span 
               className="text-5xl sm:text-6xl font-bold tabular-nums drop-shadow-lg"
               style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
