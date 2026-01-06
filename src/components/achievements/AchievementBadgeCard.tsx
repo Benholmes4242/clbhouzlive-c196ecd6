@@ -547,15 +547,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         </div>
       )}
 
-      {/* Compact mode: "X CLUB" label at bottom left for unlocked milestones */}
-      {compact && unlocked && !isGhost && isMilestone && (
-        <div 
-          className="absolute bottom-1.5 left-2 z-10 text-[8px] font-semibold uppercase tracking-widest"
-          style={{ color: `${accentColor}60` }}
-        >
-          {threshold} CLUB
-        </div>
-      )}
 
       {/* Compact mode: Lock indicator at bottom right for locked cards */}
       {compact && !unlocked && !isGhost && (
