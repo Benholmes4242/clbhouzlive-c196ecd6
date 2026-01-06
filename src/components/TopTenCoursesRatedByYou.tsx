@@ -538,10 +538,10 @@ const TopTenSlot: React.FC<{
       {isOwnProfile && (
         <div 
           {...listeners}
-          className="absolute top-3 left-12 z-30 pt-0.5 cursor-grab active:cursor-grabbing"
+          className="absolute top-3 left-12 z-30 cursor-grab active:cursor-grabbing touch-none"
         >
-          <div className="w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-            <GripVertical className="h-4 w-4 text-white/80 hover:text-white transition-colors" />
+          <div className="w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
+            <GripVertical className="h-4 w-4 text-white" />
           </div>
         </div>
       )}
