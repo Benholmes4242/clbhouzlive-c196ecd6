@@ -43,22 +43,24 @@ export interface ReviewOverlayTheme extends RatingTheme {
 }
 
 // Slate theme for non-outstanding ratings (on dark backgrounds)
+// Must match CreatorCapsule exactly: bg-black/50, border-white/8
 const slateOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   pillBg: 'rgba(100, 116, 139, 0.12)',
   pillBorder: 'rgba(100, 116, 139, 0.45)',
   pillText: '#CBD5E1', // slate-300 - light text on dark
-  containerBg: 'rgba(0, 0, 0, 0.5)',
-  containerBorder: 'rgba(255, 255, 255, 0.1)',
+  containerBg: 'rgba(0, 0, 0, 0.5)', // black/50 - matches CreatorCapsule
+  containerBorder: 'rgba(255, 255, 255, 0.08)', // white/8 - matches CreatorCapsule
   overlayText: '#FFFFFF',
 };
 
 // Gold theme for outstanding ratings (on dark backgrounds)
+// Must match CreatorCapsule exactly: bg-[rgba(210,180,97,0.08)], border-[rgba(210,180,97,0.3)]
 const goldOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   pillBg: 'rgba(210, 180, 97, 0.15)',
   pillBorder: 'rgba(210, 180, 97, 0.5)',
   pillText: '#D2B461', // gold accent
-  containerBg: 'rgba(0, 0, 0, 0.5)',
-  containerBorder: 'rgba(210, 180, 97, 0.3)',
+  containerBg: 'rgba(210, 180, 97, 0.08)', // matches CreatorCapsule outstanding
+  containerBorder: 'rgba(210, 180, 97, 0.3)', // matches CreatorCapsule outstanding
   overlayText: '#FFFFFF',
 };
 

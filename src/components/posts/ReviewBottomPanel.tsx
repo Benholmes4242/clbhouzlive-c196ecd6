@@ -64,7 +64,11 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
       style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + ${bottomOffsetPx}px)` }}
     >
       <div
-        className={cn('overflow-hidden rounded-xl backdrop-blur-xl border shadow-lg')}
+        className={cn(
+          'overflow-hidden rounded-xl backdrop-blur-xl border',
+          // Match CreatorCapsule shadow exactly
+          'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]'
+        )}
         style={{
           backgroundColor: theme.containerBg,
           borderColor: theme.containerBorder,
