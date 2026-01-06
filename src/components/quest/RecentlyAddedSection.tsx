@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Trophy, ChevronRight } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface RecentCourse {
@@ -65,20 +65,13 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4 px-1">
+      <div className="mb-4 px-1">
         <h2
           className="text-sm font-semibold uppercase tracking-wider"
           style={{ color: 'var(--quest-text-secondary)' }}
         >
           Recently Added
         </h2>
-        <button
-          onClick={() => navigate('/profile?tab=courses')}
-          className="text-xs font-medium flex items-center gap-1"
-          style={{ color: 'var(--quest-accent-green)' }}
-        >
-          See all <ChevronRight className="w-3 h-3" />
-        </button>
       </div>
 
       <div
