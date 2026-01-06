@@ -5,7 +5,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Sparkles, ChevronDown, Award, MapPin } from 'lucide-react';
+import { Trophy, Sparkles, ChevronDown, Award } from 'lucide-react';
 import { CLUB_STEPS } from '@/lib/top100Club';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 
@@ -46,25 +46,6 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
   const nextThreshold = nextMilestone?.threshold || 0;
   const remaining = nextThreshold - totalPlayed;
 
-  // Find closest region (smallest remaining where remaining > 0)
-  const closestRegion = useMemo(() => {
-    const inProgress = regionProgress
-      .filter(r => r.played < r.total && r.total > 0)
-      .map(r => ({ ...r, remaining: r.total - r.played }));
-    
-    if (inProgress.length === 0) {
-      // Check if all completed
-      const allCompleted = regionProgress.every(r => r.played >= r.total && r.total > 0);
-      return allCompleted && regionProgress.length > 0 ? { allCompleted: true } : null;
-    }
-    
-    // Find the one with smallest remaining
-    const closest = inProgress.reduce((prev, curr) => 
-      curr.remaining < prev.remaining ? curr : prev
-    );
-    
-    return { ...closest, allCompleted: false };
-  }, [regionProgress]);
 
   return (
     <motion.section 
@@ -247,35 +228,9 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         </motion.p>
       )}
 
-      {/* Closest region teaser */}
-      {closestRegion && (
-        <motion.p
-          className="text-xs mb-6 flex items-center justify-center gap-1.5"
-          style={{ color: 'var(--quest-text-tertiary)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.85 }}
-        >
-        {closestRegion.allCompleted ? (
-            <>
-              <span>All regions completed</span>
-              <span>🏆</span>
-            </>
-          ) : 'name' in closestRegion ? (
-            <>
-              <MapPin className="w-3 h-3" />
-              <span>Closest region:</span>
-              <span className="font-semibold" style={{ color: 'var(--quest-text-secondary)' }}>
-                {closestRegion.name}
-              </span>
-              <span>({closestRegion.remaining} to go)</span>
-            </>
-          ) : null}
-        </motion.p>
-      )}
       
-      {/* Spacer if no next milestone but has region */}
-      {!nextMilestone && !closestRegion && <div className="mb-6" />}
+      {/* Spacer if no next milestone */}
+      {!nextMilestone && <div className="mb-4" />}
 
       {/* Continue Journey CTA - Global Slate with shimmer */}
       <motion.button
