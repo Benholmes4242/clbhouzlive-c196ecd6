@@ -84,6 +84,7 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // COURSE RATING THEMES (Fair → Outstanding)
+// NEW COLOR SYSTEM (Jan 2026): Slate for Fair→Excellent, Gold for Outstanding only
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
@@ -91,7 +92,7 @@ export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTAND
 export interface RatingTheme {
   key: RatingTier;
   label: string;
-  accent: string;    // Pure accent color from palette
+  accent: string;    // Pure accent color (slate or gold)
   bgLight: string;   // Card/badge gradient start
   bgDark: string;    // Card/badge gradient end
   // CSS class equivalents for Tailwind usage
@@ -101,68 +102,57 @@ export interface RatingTheme {
   barFillClass: string;
 }
 
-// Build rating themes from palette (FAIR tier uses RESPECTABLE color)
-const rFair        = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE);
-const rGood        = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD);
-const rVeryGood    = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD);
-const rExcellent   = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT);
-const rOutstanding = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING);
+// NEW: Slate/Gold color system - no more green progression for ratings
+const RATING_SLATE = '#64748B';  // slate-500
+const RATING_GOLD = '#D2B461';   // trophy gold
+
+// All non-outstanding tiers use slate styling
+const slateTheme = {
+  accent: RATING_SLATE,
+  bgLight: '#F1F5F9',  // slate-100
+  bgDark: '#E2E8F0',   // slate-200
+  bgClass: 'bg-slate-100',
+  borderClass: 'border-slate-200',
+  textClass: 'text-slate-600',
+  barFillClass: 'bg-slate-500',
+};
+
+// Outstanding uses gold styling
+const goldTheme = {
+  accent: RATING_GOLD,
+  bgLight: '#FEF9E7',
+  bgDark: '#FDF3CD',
+  bgClass: 'bg-[#C9A94A]/15',
+  borderClass: 'border-[#C9A94A]/40',
+  textClass: 'text-[#8B7635]',
+  barFillClass: 'bg-[#D2B461]',
+};
 
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
-    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
-    bgLight: rFair.bgLight,
-    bgDark: rFair.bgDark,
-    bgClass: `bg-[${rFair.bgLight}]`,
-    borderClass: 'border-slate-900',
-    textClass: 'text-slate-900',
-    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE}]`,
+    ...slateTheme,
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD,
-    bgLight: rGood.bgLight,
-    bgDark: rGood.bgDark,
-    bgClass: `bg-[${rGood.bgLight}]`,
-    borderClass: 'border-slate-900',
-    textClass: 'text-slate-900',
-    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD}]`,
+    ...slateTheme,
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD,
-    bgLight: rVeryGood.bgLight,
-    bgDark: rVeryGood.bgDark,
-    bgClass: `bg-[${rVeryGood.bgLight}]`,
-    borderClass: 'border-slate-900',
-    textClass: 'text-slate-900',
-    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD}]`,
+    ...slateTheme,
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT,
-    bgLight: rExcellent.bgLight,
-    bgDark: rExcellent.bgDark,
-    bgClass: `bg-[${rExcellent.bgLight}]`,
-    borderClass: 'border-slate-900',
-    textClass: 'text-slate-900',
-    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT}]`,
+    ...slateTheme,
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
     label: 'Outstanding',
-    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING,
-    bgLight: rOutstanding.bgLight,
-    bgDark: rOutstanding.bgDark,
-    bgClass: `bg-[${rOutstanding.bgLight}]`,
-    borderClass: 'border-slate-900',
-    textClass: 'text-slate-900',
-    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING}]`,
+    ...goldTheme,
   },
 };
 

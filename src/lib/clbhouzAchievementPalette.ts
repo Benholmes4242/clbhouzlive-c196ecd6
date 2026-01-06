@@ -123,29 +123,21 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// RATING TIER MAPPING (5 Steps - Fair → Outstanding)
+// RATING COLOR SYSTEM (Jan 2026) - Slate + Gold only
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 /**
- * Maps the 5 rating tiers to palette colors:
+ * NEW RATING COLOR SYSTEM:
+ * - Fair → Excellent: All use SLATE (#64748B)
+ * - Outstanding: Uses GOLD (#D2B461)
  * 
- * Tier        | Palette Key   | Hex
- * ------------|---------------|----------
- * Fair        | RESPECTABLE   | #C1CFA1
- * Good        | GOOD          | #88B67B
- * Very Good   | VERY_GOOD     | #5B9E55
- * Excellent   | EXCELLENT     | #3F7F41
- * Outstanding | OUTSTANDING   | #D2B461
+ * The old green progression (RESPECTABLE, GOOD, VERY_GOOD, EXCELLENT) 
+ * is NO LONGER used for rating bars/pills.
  */
-export const RATING_PALETTE_MAP = {
-  FAIR:        'RESPECTABLE', // Uses RESPECTABLE color but labeled "Fair"
-  GOOD:        'GOOD',
-  VERY_GOOD:   'VERY_GOOD',
-  EXCELLENT:   'EXCELLENT',
-  OUTSTANDING: 'OUTSTANDING',
+export const RATING_COLORS = {
+  SLATE: '#64748B',      // Used for Fair, Good, Very Good, Excellent
+  GOLD: '#D2B461',       // Used for Outstanding only
 } as const;
-
-export type RatingPaletteKey = keyof typeof RATING_PALETTE_MAP;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // EMPTY STATE THEME

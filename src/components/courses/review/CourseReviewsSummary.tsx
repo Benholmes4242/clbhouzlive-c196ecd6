@@ -172,7 +172,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Design
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.design} mode="neutral" />
+                  <RatingBar value={categoryAverages.design} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.design)}
                   </span>
@@ -187,7 +187,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Condition
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.condition} mode="neutral" />
+                  <RatingBar value={categoryAverages.condition} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.condition)}
                   </span>
@@ -202,7 +202,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Clubhouse
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.clubhouse} mode="neutral" />
+                  <RatingBar value={categoryAverages.clubhouse} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.clubhouse)}
                   </span>
@@ -217,7 +217,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Facilities
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.facilities} mode="neutral" />
+                  <RatingBar value={categoryAverages.facilities} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.facilities)}
                   </span>
