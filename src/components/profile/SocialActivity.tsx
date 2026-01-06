@@ -108,11 +108,16 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           selectedPost.categories?.includes('review') || 
           !!selectedPost.source_review_id;
 
-        // Format location for review posts
+        // Format location for review posts - use short format matching Clubhouse
         const formatLocation = (course?: ActivityPost['course']) => {
           if (!course) return '';
-          const parts = [course.sub_country || course.region, course.country].filter(Boolean);
-          return parts.join(', ');
+          // Use region + country format, matching Clubhouse overlay style
+          const region = course.region;
+          const country = course.country;
+          if (region && country && region !== country) {
+            return `${region}, ${country}`;
+          }
+          return region || country || '';
         };
 
         // Review post: use FullscreenReviewPost
