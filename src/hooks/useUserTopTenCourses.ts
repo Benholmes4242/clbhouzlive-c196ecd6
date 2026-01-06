@@ -110,20 +110,20 @@ export function useUserTopTenCourses(userId: string | undefined) {
   });
 
   const reorderMutation = useMutation({
-    mutationFn: async (newOrder: { course_id: string; position: number }[]) => {
+    mutationFn: async (updates: { course_id: string; position: number }[]) => {
       if (!userId) throw new Error('No user ID');
 
-      // Update all positions in a transaction-like manner
-      const updates = newOrder.map(({ course_id, position }) =>
-        supabase
-          .from('user_top_ten_courses')
-          .update({ position, updated_at: new Date().toISOString() })
-          .eq('user_id', userId)
-          .eq('course_id', course_id)
-      );
+      // Sort by position and extract course IDs in order
+      const courseIds = [...updates]
+        .sort((a, b) => a.position - b.position)
+        .map((u) => u.course_id);
 
-      const results = await Promise.all(updates);
-      const error = results.find(r => r.error)?.error;
+      // Call RPC to reorder atomically (avoids unique constraint violations)
+      const { error } = await supabase.rpc('reorder_top_ten_courses', {
+        p_user_id: userId,
+        p_course_ids: courseIds,
+      });
+
       if (error) throw error;
     },
     onSuccess: invalidateTopTenQueries,
