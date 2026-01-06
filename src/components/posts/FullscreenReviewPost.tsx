@@ -200,13 +200,8 @@ export function FullscreenReviewPost({
       {/* Bottom gradient - softer fade */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
-      {/* Top-left: Course info + Preview badge - with safe area padding */}
-      <div 
-        className="absolute left-4 right-24 z-20"
-        style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
-        }}
-      >
+      {/* Top-left: Course info + Preview badge - below header */}
+      <div className="absolute left-4 right-24 z-20 top-16">
         {/* Preview badge - above course name */}
         {mode === 'preview' && (
           <span className="inline-block mb-2 px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 backdrop-blur-sm text-blue-200 text-[10px] font-semibold tracking-wide uppercase">
@@ -223,15 +218,10 @@ export function FullscreenReviewPost({
         )}
       </div>
       
-      {/* Top-right: Rating + tier - centered stack with safe area */}
+      {/* Top-right: Rating + tier - centered stack below header */}
       <Sheet>
         <SheetTrigger asChild>
-          <button 
-            className="absolute right-4 z-20 flex flex-col items-center text-center gap-1.5"
-            style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)',
-            }}
-          >
+          <button className="absolute right-4 z-20 top-16 flex flex-col items-center text-center gap-1.5">
             <span 
               className="text-5xl sm:text-6xl font-bold tabular-nums drop-shadow-lg"
               style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
