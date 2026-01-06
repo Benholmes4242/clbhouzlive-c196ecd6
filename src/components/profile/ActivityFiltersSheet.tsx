@@ -60,21 +60,24 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
               <button
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all"
+                className="w-full flex items-center gap-3 p-2.5 rounded-xl transition-all"
                 style={{
                   background: isActive 
                     ? 'var(--cm-surface-slate)' 
-                    : 'transparent',
+                    : 'var(--cm-surface-alt)',
+                  border: isActive 
+                    ? 'none' 
+                    : '1px solid var(--cm-border-subtle)',
                   boxShadow: isActive 
                     ? '0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.1)' 
                     : 'none',
                 }}
               >
-                {/* Icon container */}
+                {/* Icon container matching MomentAudienceSheet */}
                 <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  className="w-9 h-9 rounded-full flex items-center justify-center"
                   style={{ 
-                    background: isActive ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-alt)',
+                    background: isActive ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-card)',
                     color: isActive ? 'white' : 'var(--cm-icon-primary)',
                   }}
                 >
@@ -83,23 +86,25 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
                 
                 {/* Label and description */}
                 <div className="flex-1 text-left">
-                  <div 
-                    className="font-medium text-sm"
+                  <p 
+                    className="font-medium text-[13px]"
                     style={{ color: isActive ? 'white' : 'var(--cm-text-primary)' }}
                   >
                     {option.label}
-                  </div>
-                  <div 
-                    className="text-xs"
+                  </p>
+                  <p 
+                    className="text-[11px] mt-0.5"
                     style={{ color: isActive ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
                   >
                     {option.description}
-                  </div>
+                  </p>
                 </div>
                 
                 {/* Active indicator checkmark */}
                 {isActive && (
-                  <AnimatedCheck />
+                  <div className="opacity-100">
+                    <AnimatedCheck />
+                  </div>
                 )}
               </button>
             );
