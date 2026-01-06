@@ -103,6 +103,9 @@ export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTh
 /**
  * Extract review data from a post for use in review-mode components.
  * Returns null if the post is not a review post.
+ * 
+ * SINGLE SOURCE OF TRUTH for review data extraction.
+ * Use this everywhere: Clubhouse, Profile Activity, Preview.
  */
 export interface ExtractedReviewData {
   courseId: string;
@@ -116,19 +119,60 @@ export interface ExtractedReviewData {
 export function extractReviewData(post: any): ExtractedReviewData | null {
   if (!isReviewPost(post)) return null;
   
+  // Handle rating from multiple possible fields
   const rating = post.reviewRating ?? post.rating ?? 0;
   const tierData = getScoreTier(rating);
   
+  // Handle course data from multiple possible locations
+  const course = post.course || post.golfCourse || {};
+  const courseId = post.course_id || post.courseId || course.id || '';
+  const courseName = post.courseName || course.name || 'Golf Course';
+  
+  // Handle location - use SHORT format (region, country) consistently
+  let courseLocation: string | undefined;
+  const region = course.region || '';
+  const country = course.country || '';
+  
+  if (region && country && region !== country) {
+    courseLocation = `${region}, ${country}`;
+  } else {
+    courseLocation = country || region || undefined;
+  }
+  
+  // Handle source review ID from multiple possible fields
+  const sourceReviewId = post.source_review_id || post.sourceReviewId || post.id || '';
+  
   return {
-    courseId: post.course_id || post.courseId || post.golfCourse?.id || '',
-    courseName: post.courseName || post.golfCourse?.name || 'Golf Course',
-    courseLocation: post.courseLocation || 
-      (post.golfCourse 
-        ? `${post.golfCourse.region || ''}, ${post.golfCourse.country || ''}`.replace(/^, |, $/g, '')
-        : undefined
-      ),
+    courseId,
+    courseName,
+    courseLocation,
     rating,
     tierLabel: tierData?.label || 'FAIR',
-    sourceReviewId: post.source_review_id || post.sourceReviewId || '',
+    sourceReviewId,
+  };
+}
+
+/**
+ * Extract user data from post object, handling field name variations.
+ * Supports both 'user' and 'actor' parent objects.
+ * 
+ * SINGLE SOURCE OF TRUTH for user data extraction.
+ * Use this everywhere for consistent user display.
+ */
+export interface ExtractedUserData {
+  id: string;
+  name: string;
+  username?: string;
+  avatar?: string;
+}
+
+export function extractUserData(post: any): ExtractedUserData {
+  const user = post.user || post.actor || {};
+  
+  return {
+    id: user.id || post.created_by || post.user_id || '',
+    name: user.display_name || user.name || user.username || 'Golfer',
+    username: user.username,
+    avatar: user.profile_photo_url || user.avatar_url || user.avatar,
   };
 }

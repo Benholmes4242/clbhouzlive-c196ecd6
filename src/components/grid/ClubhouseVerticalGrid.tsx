@@ -44,6 +44,7 @@ import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
+import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
 
 interface ClubhouseVerticalGridProps {
   posts: ExploreContentItem[];
@@ -1101,20 +1102,9 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         const currentAudioMode = currentStudioEdits?.audioMode || 'original';
         const showMusicTrack = currentAudioMode === 'music_only' && currentMusicData?.title;
         
-        // Detect review posts
-        const isReviewPost = currentPost.categories?.includes('review') && (currentPost as any).sourceReviewId;
-        
-        // Extract review data if this is a review post
-        const reviewData = isReviewPost ? {
-          courseId: currentPost.golfCourse?.id || '',
-          courseName: (currentPost as any).courseName || currentPost.golfCourse?.name || 'Golf Course',
-          courseLocation: currentPost.golfCourse 
-            ? `${currentPost.golfCourse.region || ''}, ${currentPost.golfCourse.country || ''}`.replace(/^, |, $/g, '')
-            : undefined,
-          rating: (currentPost as any).reviewRating ?? 0,
-          tierLabel: 'EXCELLENT', // Will be computed by theme function
-          sourceReviewId: (currentPost as any).sourceReviewId || '',
-        } : undefined;
+        // Detect review posts and extract data using unified helper
+        const isReview = isReviewPost(currentPost);
+        const reviewData = extractReviewData(currentPost);
         
         // Handle review capsule tap - navigate to course reviews
         const handleReviewTap = () => {
@@ -1148,7 +1138,7 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
             onFollow={handleFollowToggle}
             onMusicTap={() => setGlobalMute(!isGloballyMuted)}
             // Review mode props
-            isReview={isReviewPost}
+            isReview={isReview}
             reviewData={reviewData}
             onReviewTap={handleReviewTap}
           />
