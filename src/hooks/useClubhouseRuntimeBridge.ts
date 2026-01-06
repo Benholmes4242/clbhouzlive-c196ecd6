@@ -56,7 +56,7 @@ export function useClubhouseRuntimeBridge({
     
     for (let i = start; i <= end; i++) {
       const post = posts[i];
-      if (!post || post.type !== 'video') continue;
+      if (!post) continue;
       
       const videoEl = videoRefs.current[post.id];
       const cardEl = itemRefs.current[i];
@@ -106,7 +106,8 @@ export function useClubhouseRuntimeBridge({
     if (!posts.length) return;
     
     const currentPost = posts[currentIndex];
-    if (!currentPost || currentPost.type !== 'video') {
+    const currentVideoEl = currentPost ? videoRefs.current[currentPost.id] : null;
+    if (!currentPost || !currentVideoEl) {
       if (prevCenterIdRef.current) {
         MediaRuntime.setCandidateState(prevCenterIdRef.current, { visible: false, ratio: 0 });
         prevCenterIdRef.current = null;
@@ -151,12 +152,15 @@ export function useClubhouseRuntimeBridge({
     
     const prevPost = posts[currentIndex - 1];
     const nextPost = posts[currentIndex + 1];
-    
-    if (prevPost?.type === 'video') {
-      MediaRuntime.prewarmCandidate(prevPost.id);
+
+    const hasVideo = (post?: ClubhousePost) =>
+      !!post && (post.type === 'video' || post.media?.some((m) => m?.media_type === 'video'));
+
+    if (hasVideo(prevPost)) {
+      MediaRuntime.prewarmCandidate(prevPost!.id);
     }
-    if (nextPost?.type === 'video') {
-      MediaRuntime.prewarmCandidate(nextPost.id);
+    if (hasVideo(nextPost)) {
+      MediaRuntime.prewarmCandidate(nextPost!.id);
     }
   }, [posts, currentIndex]);
   
@@ -166,9 +170,12 @@ export function useClubhouseRuntimeBridge({
     MediaRuntime.setUIState({ isScrolling });
     
     // On scroll settle, trigger playback
-    if (!isScrolling && posts[currentIndex]?.type === 'video') {
+    if (!isScrolling && posts[currentIndex]) {
       const centerId = posts[currentIndex].id;
-      MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
+      const centerVideoEl = videoRefs.current[centerId];
+      if (centerVideoEl) {
+        MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
+      }
     }
   }, [posts, currentIndex]);
   
