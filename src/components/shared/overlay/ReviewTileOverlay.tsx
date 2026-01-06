@@ -6,18 +6,25 @@ interface ReviewTileOverlayProps {
   courseName: string;
   courseLocation?: string;
   rating: number;
+  /** User info for bottom panel */
+  user?: {
+    name?: string;
+    username?: string;
+    avatar?: string;
+  };
   className?: string;
 }
 
 /**
  * Compact review overlay for grid tiles
- * Shows course name, location, rating pill, and "From a review" label
+ * Shows top panel (course + rating) and bottom panel (user info)
  * Uses shared ReviewOverlayCore for consistency with fullscreen view
  */
 export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
   courseName,
   courseLocation,
   rating,
+  user,
   className,
 }) => {
   return (
@@ -25,6 +32,7 @@ export const ReviewTileOverlay: React.FC<ReviewTileOverlayProps> = ({
       courseName={courseName}
       courseLocation={courseLocation}
       rating={rating}
+      user={user}
       variant="tile"
       className={className}
     />

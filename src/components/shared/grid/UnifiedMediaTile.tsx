@@ -291,6 +291,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           courseName={item.courseName}
           courseLocation={item.courseLocation}
           rating={item.reviewRating}
+          user={item.creator ? {
+            name: item.creator.name,
+            username: item.creator.username,
+            avatar: item.creator.avatar,
+          } : undefined}
         />
       ) : (
         /* Unified overlay system for non-review posts */
