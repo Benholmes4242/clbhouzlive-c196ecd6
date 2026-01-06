@@ -1,12 +1,16 @@
 /**
- * MilestoneUnlockSheet - Quiet celebration for milestone unlocks
- * Shows once per milestone, stores seen state locally
+ * MilestoneUnlockSheet - Premium celebration for milestone unlocks
+ * Phase 2: Enhanced with bigger badge, confetti, and stronger "earned" feeling
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Trophy, Share2, ChevronRight } from 'lucide-react';
+import { Trophy, Share2, ChevronRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Confetti from 'react-confetti';
+import { ACHIEVEMENT_MILESTONES, MILESTONE_TIER_META } from '@/config/achievements';
+import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 
 interface MilestoneUnlockSheetProps {
   totalPlayed: number;
@@ -18,17 +22,28 @@ interface Milestone {
   name: string;
   threshold: number;
   description: string;
+  tierName: string;
+  accentColor: string;
 }
 
-const MILESTONES: Milestone[] = [
-  { id: '5-club', name: '5 Club', threshold: 5, description: 'You have played 5 Top 100 courses' },
-  { id: '10-club', name: '10 Club', threshold: 10, description: 'You have played 10 Top 100 courses' },
-  { id: '20-club', name: '20 Club', threshold: 20, description: 'You have played 20 Top 100 courses' },
-  { id: '50-club', name: '50 Club', threshold: 50, description: 'You have played 50 Top 100 courses' },
-  { id: '100-club', name: 'Century Club', threshold: 100, description: 'You have completed the Top 100 Quest' },
-];
-
 const STORAGE_KEY = 'quest-milestones-seen';
+
+// Build milestones from single source of truth
+const MILESTONES: Milestone[] = MILESTONE_TIER_META.map(meta => {
+  const paletteKey = MILESTONE_PALETTE_MAP[meta.threshold];
+  const accentColor = paletteKey ? CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey] : '#D2B461';
+  
+  return {
+    id: `${meta.threshold}-club`,
+    name: `${meta.threshold} Club`,
+    threshold: meta.threshold,
+    description: meta.threshold === 100 
+      ? 'You have completed the Top 100 Quest'
+      : `You have played ${meta.threshold} Top 100 courses`,
+    tierName: meta.tierName,
+    accentColor,
+  };
+});
 
 function getSeenMilestones(): Set<string> {
   try {
@@ -55,6 +70,13 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
 }) => {
   const [unlockedMilestone, setUnlockedMilestone] = useState<Milestone | null>(null);
   const [progress, setProgress] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    // Get window size for confetti
+    setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+  }, []);
 
   useEffect(() => {
     // Find newly unlocked milestone
@@ -63,8 +85,13 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
     for (const milestone of MILESTONES) {
       if (totalPlayed >= milestone.threshold && !seen.has(milestone.id)) {
         setUnlockedMilestone(milestone);
-        // Animate progress bar
-        setTimeout(() => setProgress(100), 100);
+        // Animate progress bar and confetti
+        setTimeout(() => {
+          setProgress(100);
+          setShowConfetti(true);
+        }, 300);
+        // Stop confetti after 3 seconds
+        setTimeout(() => setShowConfetti(false), 3500);
         break;
       }
     }
@@ -76,6 +103,7 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
     }
     setUnlockedMilestone(null);
     setProgress(0);
+    setShowConfetti(false);
   }, [unlockedMilestone]);
 
   const handleShare = useCallback(() => {
@@ -85,102 +113,206 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
 
   if (!unlockedMilestone) return null;
 
+  const accentColor = unlockedMilestone.accentColor;
+
   return (
     <Sheet open={!!unlockedMilestone} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-t"
+        className="rounded-t-3xl border-t overflow-hidden"
         style={{
-          background: 'var(--dgp-bg-surface)',
-          borderColor: 'var(--dgp-glass-stroke)',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%)',
+          borderColor: 'var(--quest-stroke)',
         }}
       >
-        <div className="py-6 text-center">
-          {/* Icon with glow */}
-          <div className="flex justify-center mb-6">
-            <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center"
+        {/* Confetti inside modal */}
+        {showConfetti && (
+          <Confetti
+            width={windowSize.width}
+            height={400}
+            recycle={false}
+            numberOfPieces={150}
+            gravity={0.3}
+            colors={[accentColor, '#D2B461', '#88B67B', '#5B9E55', '#F7931E']}
+            style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+          />
+        )}
+
+        <div className="py-8 text-center relative">
+          {/* Background glow */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse at 50% 30%, ${accentColor}15 0%, transparent 60%)`,
+            }}
+          />
+
+          {/* Trophy icon with premium glow */}
+          <motion.div 
+            className="flex justify-center mb-6 relative"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, delay: 0.1 }}
+          >
+            {/* Outer glow ring */}
+            <motion.div
+              className="absolute inset-0 m-auto w-32 h-32 rounded-3xl"
               style={{
-                background: 'rgba(200, 176, 106, 0.15)',
-                border: '1px solid var(--dgp-accent-gold)',
-                boxShadow: '0 0 40px rgba(200, 176, 106, 0.3)',
+                background: `radial-gradient(circle, ${accentColor}30 0%, transparent 60%)`,
+                filter: 'blur(16px)',
+              }}
+              animate={{
+                opacity: [0.5, 0.8, 0.5],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            
+            <div
+              className="relative w-24 h-24 rounded-3xl flex items-center justify-center"
+              style={{
+                background: `linear-gradient(145deg, ${accentColor}20 0%, ${accentColor}10 100%)`,
+                border: `2px solid ${accentColor}40`,
+                boxShadow: `
+                  0 8px 32px ${accentColor}30,
+                  inset 0 2px 4px rgba(255, 255, 255, 0.8),
+                  inset 0 -2px 4px ${accentColor}15
+                `,
               }}
             >
-              <Trophy className="w-10 h-10" style={{ color: 'var(--dgp-accent-gold)' }} />
+              <Trophy className="w-12 h-12" style={{ color: accentColor }} />
+              
+              {/* Sparkle decoration */}
+              <motion.div
+                className="absolute -top-2 -right-2"
+                animate={{ rotate: [0, 15, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Sparkles className="w-6 h-6" style={{ color: accentColor }} />
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Title */}
-          <p
-            className="text-xs font-semibold uppercase tracking-wider mb-2"
-            style={{ color: 'var(--dgp-accent-gold)' }}
+          {/* Title section */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
           >
-            Milestone Unlocked
-          </p>
-          <h2
-            className="text-2xl font-bold mb-2"
-            style={{ color: 'var(--dgp-text-primary)' }}
-          >
-            {unlockedMilestone.name}
-          </h2>
-          <p
-            className="text-sm mb-6"
-            style={{ color: 'var(--dgp-text-secondary)' }}
-          >
-            {unlockedMilestone.description}
-          </p>
+            <p
+              className="text-xs font-bold uppercase tracking-widest mb-2"
+              style={{ color: accentColor }}
+            >
+              Milestone Unlocked
+            </p>
+            <h2
+              className="text-3xl font-bold mb-1"
+              style={{ color: 'var(--quest-text-primary)' }}
+            >
+              {unlockedMilestone.name}
+            </h2>
+            <p
+              className="text-sm font-medium mb-1"
+              style={{ color: 'var(--quest-text-secondary)' }}
+            >
+              {unlockedMilestone.tierName}
+            </p>
+            <p
+              className="text-sm mb-6"
+              style={{ color: 'var(--quest-text-tertiary)' }}
+            >
+              {unlockedMilestone.description}
+            </p>
+          </motion.div>
 
           {/* Progress bar animation */}
-          <div className="px-8 mb-8">
+          <motion.div 
+            className="px-8 mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
             <div
-              className="h-2 rounded-full overflow-hidden"
-              style={{ background: 'var(--dgp-glass-surface)' }}
+              className="h-3 rounded-full overflow-hidden"
+              style={{ 
+                background: 'var(--quest-track)',
+                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.08)',
+              }}
             >
-              <div
-                className="h-full rounded-full transition-all duration-1000 ease-out"
+              <motion.div
+                className="h-full rounded-full"
                 style={{
-                  width: `${progress}%`,
-                  background: 'var(--dgp-accent-gold)',
+                  background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}CC 100%)`,
+                  boxShadow: `0 0 12px ${accentColor}50`,
                 }}
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
               />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
+              <span className="text-xs font-medium" style={{ color: 'var(--quest-text-tertiary)' }}>
                 Progress
               </span>
-              <span className="text-xs font-medium" style={{ color: 'var(--dgp-text-primary)' }}>
+              <span className="text-xs font-bold" style={{ color: accentColor }}>
                 {totalPlayed} / {unlockedMilestone.threshold}
               </span>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Achievement badge */}
+          <motion.div
+            className="flex justify-center mb-8"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7, type: 'spring' }}
+          >
+            <div
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold"
+              style={{
+                background: `${accentColor}15`,
+                border: `1.5px solid ${accentColor}35`,
+                color: accentColor,
+              }}
+            >
+              <Trophy className="w-4 h-4" />
+              Achievement Earned
+            </div>
+          </motion.div>
 
           {/* Actions */}
-          <div className="flex gap-3 px-4">
+          <motion.div 
+            className="flex gap-3 px-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 h-12"
               onClick={handleShare}
               style={{
-                background: 'var(--dgp-glass-surface)',
-                borderColor: 'var(--dgp-glass-stroke)',
-                color: 'var(--dgp-text-primary)',
+                background: 'var(--quest-card)',
+                borderColor: 'var(--quest-stroke)',
+                color: 'var(--quest-text-primary)',
               }}
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
             <Button
-              className="flex-1"
+              className="flex-1 h-12 font-semibold"
               onClick={handleClose}
               style={{
-                background: 'var(--dgp-accent-gold)',
+                background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}DD 100%)`,
                 color: '#000',
+                boxShadow: `0 4px 12px ${accentColor}40`,
               }}
             >
               Continue
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
-          </div>
+          </motion.div>
         </div>
       </SheetContent>
     </Sheet>
