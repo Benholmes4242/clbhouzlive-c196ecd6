@@ -499,6 +499,9 @@ const PostPlayRatingModal = ({
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       
+      // Invalidate Top 10 carousel ratings so updated scores show immediately
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
+      
       // Force refetch for BOTH user rating AND community aggregates
       await queryClient.refetchQueries({ 
         queryKey: ['user-course-rating', course?.id, userId] 

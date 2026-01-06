@@ -78,6 +78,9 @@ const CourseRatingSystem = ({
       queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
       
+      // Invalidate Top 10 carousel ratings so updated scores show immediately
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
+      
       // Force refetch community aggregates
       await queryClient.refetchQueries({ 
         queryKey: ['course-rating-aggregates', courseId] 

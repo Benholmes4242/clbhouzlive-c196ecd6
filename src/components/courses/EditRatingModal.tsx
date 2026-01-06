@@ -96,6 +96,9 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-reviews-detailed', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
       
+      // Invalidate Top 10 carousel ratings so updated scores show immediately
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
+      
       // Force refetch community aggregates to update card ratings immediately
       await queryClient.refetchQueries({ 
         queryKey: ['course-rating-aggregates', courseId] 
@@ -150,6 +153,9 @@ const EditRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
+      
+      // Invalidate Top 10 carousel ratings so updated scores show immediately
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
       
       // Force refetch community aggregates
       await queryClient.refetchQueries({ 
