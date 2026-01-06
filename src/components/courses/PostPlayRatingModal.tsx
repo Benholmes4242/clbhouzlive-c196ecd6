@@ -9,7 +9,7 @@ import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
-import { formatCourseLocation } from '@/utils/courseLocation';
+import { formatCourseLocation, formatCourseLocationShort } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
@@ -1513,7 +1513,7 @@ const PostPlayRatingModal = ({
               communityScore={null}
               submittedMedia={existingMediaItems}
               heroImageUrl={course?.thumbnail_image || null}
-              heroSubtitle={course ? formatCourseLocation(course) : ''}
+              heroSubtitle={course ? formatCourseLocationShort(course) : ''}
               onBack={handleClose}
               onShareReview={async () => {
                 if (!submittedRatingId && !existingRating?.id) {
@@ -1778,7 +1778,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
       {/* Fullscreen Preview - takes most of the screen */}
       <div className="flex-1 relative overflow-hidden">
         <FullscreenReviewPost
-          mode="preview"
+          mode="live"
           courseId={courseId}
           courseName={courseName}
           heroSubtitle={heroSubtitle}
