@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { IoFilter } from 'react-icons/io5';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
 import ActivityFiltersSheet, { ActivityFilters } from './ActivityFiltersSheet';
+import ActivityFilterToolbar from './activity/ActivityFilterToolbar';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
@@ -95,15 +95,11 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         className="mb-6"
       />
 
-      {/* Filter button row - aligned with tabs (44px height, vertically centered) */}
-      <div className="h-[44px] flex items-center justify-end px-4 -mt-[44px]">
-        <button 
-          onClick={() => setFiltersOpen(true)}
-          className="p-2 hover:bg-muted/50 transition-colors rounded-sq-sm focus:outline-none focus-visible:outline-none"
-        >
-          <IoFilter className="w-5 h-5 text-foreground" />
-        </button>
-      </div>
+      {/* Activity Filter Toolbar - dedicated row for filter controls */}
+      <ActivityFilterToolbar
+        activeFilter={filters.type}
+        onOpenFilters={() => setFiltersOpen(true)}
+      />
 
       {/* Activity Grid V2 - PP → L layout with cursor pagination */}
       <div className="px-0 pb-16">
