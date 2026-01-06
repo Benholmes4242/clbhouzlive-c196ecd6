@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from "react";
-import { useUserTopTen } from "@/hooks/useUserTopTen";
+import { useUserTopTenCourses, TopTenCourse } from "@/hooks/useUserTopTenCourses";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
@@ -25,11 +26,12 @@ import {
   SortableContext,
   useSortable,
   rectSortingStrategy,
+  arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 type Props = {
-  onOpenModal?: () => void; // optional CTA to edit
+  onOpenModal?: () => void;
   isOwnProfile?: boolean;
   userId?: string;
   userDisplayName?: string;
@@ -41,10 +43,24 @@ export default function TopTenCoursesRatedByYou({
   userId,
   userDisplayName,
 }: Props) {
-  const { topTen, loading, canEdit, moveCourse, addCourseAtIndex, removeCourse } = useUserTopTen(userId);
+  const { user } = useSupabaseSession();
+  const { 
+    topTen, 
+    isLoading, 
+    addCourse, 
+    removeCourse, 
+    reorderTopTen,
+    isAdding,
+    isRemoving,
+    isReordering 
+  } = useUserTopTenCourses(userId);
+  
+  // Check if current user can edit this Top 10 list
+  const canEdit = user?.id === userId && isOwnProfile;
+  
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
-  const [courseToRemove, setCourseToRemove] = useState<{ course: any; index: number } | null>(null);
+  const [courseToRemove, setCourseToRemove] = useState<{ course: TopTenCourse; index: number } | null>(null);
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
   const [searchSlotIndex, setSearchSlotIndex] = useState<number | undefined>(undefined);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -139,34 +155,49 @@ export default function TopTenCoursesRatedByYou({
     })
   );
 
-  // Create sortable items
-  const items = useMemo(() => topTen.map((_, i) => `slot-${i}`), [topTen]);
+  // Create sortable items from actual courses (not fixed 10 slots)
+  const items = useMemo(() => topTen.map(c => c.course_id), [topTen]);
+  
+  // Pad to 10 slots for display
+  const displaySlots = useMemo(() => {
+    const slots: (TopTenCourse | undefined)[] = [...topTen];
+    while (slots.length < 10) {
+      slots.push(undefined);
+    }
+    return slots;
+  }, [topTen]);
 
   const onDragStart = (e: DragStartEvent) => {
-    if (String(e.active.id).startsWith("slot-")) {
-      const idx = parseInt(String(e.active.id).replace("slot-", ""), 10);
-      setActiveIndex(Number.isFinite(idx) ? idx : null);
-    }
+    const courseId = String(e.active.id);
+    const idx = topTen.findIndex(c => c.course_id === courseId);
+    setActiveIndex(idx >= 0 ? idx : null);
   };
 
   const onDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
     setActiveIndex(null);
     
-    if (!over) return;
+    if (!over || active.id === over.id) return;
 
-    // Only handle reordering within the TopTen bar
-    if (String(active.id).startsWith("slot-") && String(over.id).startsWith("slot-")) {
-      const from = parseInt(String(active.id).replace("slot-", ""), 10);
-      const to = parseInt(String(over.id).replace("slot-", ""), 10);
-      if (Number.isFinite(from) && Number.isFinite(to) && from !== to && canEdit) {
-        moveCourse(from, to);
-      }
-    }
+    const oldIndex = topTen.findIndex(c => c.course_id === active.id);
+    const newIndex = topTen.findIndex(c => c.course_id === over.id);
+    
+    if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+    
+    if (!canEdit) return;
+
+    // Reorder array and call mutation
+    const reordered = arrayMove(topTen, oldIndex, newIndex);
+    const updates = reordered.map((course, idx) => ({
+      course_id: course.course_id,
+      position: idx + 1,
+    }));
+    
+    reorderTopTen(updates);
   };
 
   // Handle remove course
-  const handleRemoveCourse = useCallback((course: any, index: number) => {
+  const handleRemoveCourse = useCallback((course: TopTenCourse, index: number) => {
     setCourseToRemove({ course, index });
     setRemoveModalOpen(true);
   }, []);
@@ -175,7 +206,7 @@ export default function TopTenCoursesRatedByYou({
     if (!courseToRemove) return;
     
     try {
-      removeCourse(courseToRemove.index);
+      removeCourse(courseToRemove.course.course_id);
       toast.success('Removed from your Top 10');
     } catch (error) {
       toast.error('Could not remove course. Try again.');
@@ -194,15 +225,15 @@ export default function TopTenCoursesRatedByYou({
   // Handle course selection from sheet
   const handleCourseSelected = useCallback((course: any) => {
     if (searchSlotIndex !== undefined) {
-      addCourseAtIndex(course, searchSlotIndex);
-      toast.success(`Added ${course.name} to position ${searchSlotIndex + 1}`);
+      addCourse(course.id);
+      toast.success(`Added ${course.name} to your Top 10`);
     }
     setSearchSheetOpen(false);
     setSearchSlotIndex(undefined);
-  }, [searchSlotIndex, addCourseAtIndex]);
+  }, [searchSlotIndex, addCourse]);
 
   const existingCourseIds = useMemo(() => 
-    topTen.filter(Boolean).map(c => c.id), 
+    topTen.map(c => c.course_id), 
     [topTen]
   );
 
@@ -218,11 +249,11 @@ export default function TopTenCoursesRatedByYou({
         scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
       }
     },
-    trackMouse: false, // Only track touch events
-    preventScrollOnSwipe: false, // Allow normal scroll behavior
+    trackMouse: false,
+    preventScrollOnSwipe: false,
   });
   
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="w-full">
         <div className="space-y-1 mb-5">
@@ -239,7 +270,7 @@ export default function TopTenCoursesRatedByYou({
     );
   }
 
-  const filled = topTen.filter(Boolean).length;
+  const filled = topTen.length;
   const hasAnyCourses = filled > 0;
 
   return (
@@ -304,10 +335,10 @@ export default function TopTenCoursesRatedByYou({
                   touch-pan-x
                 "
               >
-                {topTen.map((course, index) => (
+                {displaySlots.map((course, index) => (
                   <TopTenSlot 
-                    key={`slot-${index}`}
-                    id={`slot-${index}`}
+                    key={course ? course.course_id : `empty-${index}`}
+                    id={course?.course_id || `empty-${index}`}
                     index={index} 
                     course={course} 
                     userId={userId}
@@ -370,18 +401,18 @@ export default function TopTenCoursesRatedByYou({
 const TopTenSlot: React.FC<{
   id: string;
   index: number;
-  course?: any;
+  course?: TopTenCourse;
   userId?: string;
   isOwnProfile?: boolean;
   onOpenModal?: () => void;
   onOpenSearch?: () => void;
-  onRemoveCourse?: (course: any, index: number) => void;
+  onRemoveCourse?: (course: TopTenCourse, index: number) => void;
   activeIndex?: number | null;
 }> = ({ id, index, course, userId, isOwnProfile, onOpenModal, onOpenSearch, onRemoveCourse, activeIndex }) => {
   
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
-    disabled: !isOwnProfile
+    disabled: !isOwnProfile || !course // Only allow dragging filled slots
   });
 
   const handleRemoveClick = useCallback((e: React.MouseEvent) => {
@@ -432,8 +463,6 @@ const TopTenSlot: React.FC<{
     // Empty slot with inline search
     return (
       <div 
-        ref={setNodeRef}
-        style={style}
         className="shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] relative"
       >
         <div className={`w-[calc(100vw/2.6)] md:w-full aspect-[4/5] relative overflow-hidden ${getCardShadow(index)} bg-card border border-border`}>
@@ -534,7 +563,7 @@ const TopTenSlot: React.FC<{
         
         <CourseCard
           course={{
-            id: course.id,
+            id: course.course_id,
             name: course.name,
             country: course.country,
             sub_country: course.sub_country,
@@ -580,7 +609,7 @@ const TopTenSlot: React.FC<{
 };
 
 // Ghost card for drag overlay
-const GhostCard: React.FC<{ course: any; index: number; userId?: string }> = ({ course, index, userId }) => {
+const GhostCard: React.FC<{ course: TopTenCourse; index: number; userId?: string }> = ({ course, index, userId }) => {
   const isTopThree = index < 3;
   
   const getTopAccentGradient = (position: number) => {
@@ -613,7 +642,7 @@ const GhostCard: React.FC<{ course: any; index: number; userId?: string }> = ({ 
       
       <CourseCard
         course={{
-          id: course.id,
+          id: course.course_id,
           name: course.name,
           country: course.country,
           sub_country: course.sub_country,
