@@ -217,6 +217,8 @@ export interface AchievementBadgeCardProps {
   regionGlyph?: React.ReactNode;
   /** Enables pulse animation for current target */
   isCurrentTarget?: boolean;
+  /** For showing "Requires X courses" in locked ghost cards */
+  threshold?: number;
 }
 
 /**
@@ -233,6 +235,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   status,
   totalTop100Played,
   isCurrentTarget = false,
+  threshold: propThreshold,
 }) => {
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
@@ -242,23 +245,25 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   const accentColor = unlocked && !isGhost ? tierAccentColor : lockedColor;
   
   // Determine if this is a milestone (numeric) or regional card
-  const threshold = parseInt(tier, 10);
-  const isMilestone = !isNaN(threshold);
+  const parsedThreshold = parseInt(tier, 10);
+  const isMilestone = !isNaN(parsedThreshold);
   const isRegional = !isMilestone;
+  // Use prop threshold or parsed threshold
+  const threshold = propThreshold ?? parsedThreshold;
   
   // Determine effective status
   const effectiveStatus = status || (isGhost ? 'LOCKED' : unlocked ? 'UNLOCKED' : 'LOCKED');
   const isNew = effectiveStatus === 'NEW';
   
-  // Status label
+  // Status label - use "Earned" for unlocked, "Requires X" for locked with remaining
   const statusLabel = effectiveStatus === 'NEW' 
     ? 'NEW' 
     : effectiveStatus === 'UNLOCKED' 
-      ? 'Unlocked' 
-      : isGhost 
-        ? 'Next badge' 
+      ? '✓ Earned' 
+      : isGhost && remaining !== undefined
+        ? `Requires ${threshold} courses`
         : remaining !== undefined 
-          ? `${remaining} away` 
+          ? `${remaining} to go` 
           : 'Locked';
 
   // Animation variants
@@ -284,7 +289,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     <motion.div
       className={cn(
         'rounded-2xl flex flex-col justify-between relative overflow-hidden cursor-default select-none',
-        'min-w-[180px] h-[100px] px-4 py-3',
+        'min-w-[180px] h-[88px] px-4 py-2.5',
         // Ghost styling - premium etched glass look
         isGhost && 'border-2 border-dashed'
       )}
@@ -296,13 +301,17 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             : 'linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.5) 100%)',
         border: isGhost 
           ? `2px dashed ${accentColor}30`
-          : `1px solid ${unlocked ? `${accentColor}25` : 'rgba(148, 163, 184, 0.15)'}`,
+          : unlocked
+            ? `1px solid ${accentColor}25`
+            : `1px solid rgba(148, 163, 184, 0.15)`,
+        // Top edge accent for unlocked cards
+        borderTop: unlocked && !isGhost ? `2px solid ${accentColor}50` : undefined,
         backdropFilter: 'blur(12px)',
-        opacity: isGhost ? 0.75 : (!unlocked ? 0.85 : 1),
+        opacity: isGhost ? 0.85 : (!unlocked ? 0.9 : 1),
         boxShadow: unlocked && !isGhost 
-          ? `0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,0.9)`
+          ? `0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px ${accentColor}08`
           : isGhost
-            ? 'none'
+            ? 'inset 0 1px 2px rgba(255,255,255,0.3)'
             : '0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,0.5)',
       }}
       variants={cardVariants}

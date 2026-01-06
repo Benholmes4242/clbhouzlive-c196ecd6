@@ -29,7 +29,7 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
   return (
     <div className="overflow-x-auto -mx-4 px-4 scrollbar-thin">
       <div className="flex items-stretch gap-4 pb-3">
-        {/* Unlocked milestones */}
+        {/* Unlocked milestones with tier accent */}
         {unlockedMilestones.map((m, index) => (
           <div 
             key={m.threshold}
@@ -45,6 +45,7 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
               unlocked={true}
               status="UNLOCKED"
               totalTop100Played={totalPlayed}
+              threshold={m.threshold}
             />
           </div>
         ))}
@@ -60,6 +61,7 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
               isGhost={true}
               remaining={nextMilestone.threshold - totalPlayed}
               totalTop100Played={totalPlayed}
+              threshold={nextMilestone.threshold}
             />
           </div>
         )}

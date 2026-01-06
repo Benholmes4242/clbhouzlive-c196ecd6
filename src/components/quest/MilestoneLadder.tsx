@@ -171,21 +171,22 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
 
       {/* Milestone card */}
       <div className="flex-1 mb-4" onClick={onClick}>
-        <AchievementBadgeCard
-          tier={isRegional && milestone.regionSlug 
-            ? REGION_TO_TIER[milestone.regionSlug] 
-            : String(milestone.threshold) as AchievementTier}
-          title={milestone.name}
-          subtitle={milestone.tierName}
-          unlocked={milestone.isUnlocked}
-          isGhost={!milestone.isUnlocked && !isCurrent}
-          status={milestone.isUnlocked ? 'UNLOCKED' : isCurrent ? undefined : 'LOCKED'}
-          remaining={!milestone.isUnlocked && !isRegional ? remaining : undefined}
-          totalTop100Played={totalPlayed}
-          isCurrentTarget={isCurrent}
-          playedOnList={milestone.played}
-          totalOnList={milestone.total}
-        />
+          <AchievementBadgeCard
+            tier={isRegional && milestone.regionSlug 
+              ? REGION_TO_TIER[milestone.regionSlug] 
+              : String(milestone.threshold) as AchievementTier}
+            title={milestone.name}
+            subtitle={milestone.tierName}
+            unlocked={milestone.isUnlocked}
+            isGhost={!milestone.isUnlocked && !isCurrent}
+            status={milestone.isUnlocked ? 'UNLOCKED' : isCurrent ? undefined : 'LOCKED'}
+            remaining={!milestone.isUnlocked && !isRegional ? remaining : undefined}
+            totalTop100Played={totalPlayed}
+            isCurrentTarget={isCurrent}
+            playedOnList={milestone.played}
+            totalOnList={milestone.total}
+            threshold={milestone.threshold}
+          />
       </div>
     </motion.div>
   );
@@ -266,16 +267,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
 
   return (
-    <section>
-      <motion.h2
-        className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
-        style={{ color: 'var(--quest-text-secondary)' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        Journey Map
-      </motion.h2>
-
+    <div className="relative">
       <div className="relative pl-2">
         {/* Background path line */}
         <div
@@ -300,40 +292,46 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         {/* Mastery Track Section - Regional Completions */}
         {regionMilestones.length > 0 && (
           <>
-            {/* Mastery Track divider */}
+            {/* Mastery Track divider - distinct visual identity */}
             <motion.div 
-              className="flex items-center gap-3 my-6 px-1"
+              className="flex items-center gap-3 my-8 px-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="flex items-center gap-2">
+              <div 
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(210, 180, 97, 0.15) 0%, rgba(210, 180, 97, 0.05) 100%)',
+                  border: '1px solid rgba(210, 180, 97, 0.25)',
+                }}
+              >
                 <Crown className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
                 <span 
-                  className="text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--quest-text-secondary)' }}
+                  className="text-xs font-bold uppercase tracking-wider"
+                  style={{ color: 'var(--quest-accent-gold)' }}
                 >
                   Mastery Track
                 </span>
               </div>
               <div 
                 className="flex-1 h-px" 
-                style={{ background: 'linear-gradient(90deg, var(--quest-stroke) 0%, transparent 100%)' }}
+                style={{ background: 'linear-gradient(90deg, rgba(210, 180, 97, 0.3) 0%, transparent 100%)' }}
               />
             </motion.div>
 
-            {/* Mastery Track description */}
-            {!coreComplete && (
-              <motion.p
-                className="text-xs mb-4 px-1"
-                style={{ color: 'var(--quest-text-tertiary)' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                Complete the 400 Club to unlock the Mastery Track
-              </motion.p>
-            )}
+            {/* Mastery Track subtitle */}
+            <motion.p
+              className="text-xs mb-4 px-1"
+              style={{ color: 'var(--quest-text-tertiary)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {coreComplete 
+                ? 'Complete each regional Top 100 list' 
+                : 'Complete the 400 Club to unlock regional mastery'}
+            </motion.p>
 
             <div className="space-y-0">
               {regionMilestones.map((milestone, index) => (
@@ -351,7 +349,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           </>
         )}
       </div>
-    </section>
+    </div>
   );
 };
 
