@@ -1,18 +1,19 @@
 /**
- * ProfileQuestView - Unified Quest Page
+ * ProfileQuestView - Unified Quest Page (Phase 3: Cinematic Mode)
  * 
- * Single page with clean narrative:
- * 1. Overall progress (Top 100 courses played)
- * 2. Milestones earned (quick recognition)
+ * Trophy Room aesthetic with:
+ * 1. Trophy Room Hero (animated, tier chip, Continue Journey CTA)
+ * 2. Trophy Case (2-row grid with Milestones/Regions toggle)
  * 3. Next target (forward momentum)
- * 4. Journey Map = Milestone ladder only (5→400 Club)
+ * 4. Journey Map = Milestone ladder (5→400 Club) + Mastery Track chapter
  * 5. Journey Summary = Regional list progress (GB&I / Europe / USA / Worldwide)
  * 6. Recently Added (grounded in real activity)
+ * 7. Badge Detail Sheet (tap any badge for cinematic detail)
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -21,15 +22,17 @@ import { useQuestCourses } from '@/hooks/useQuestCourses';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
 import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
 import { QuestIntroOverlay } from '@/components/profile-v2/QuestIntroOverlay';
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 
-// New modular Quest components
-import { QuestHero } from '@/components/quest/QuestHero';
-import { MilestonesEarnedRow } from '@/components/quest/MilestonesEarnedRow';
+// Phase 3 Cinematic components
+import { TrophyRoomHero } from '@/components/quest/TrophyRoomHero';
+import { TrophyCase } from '@/components/quest/TrophyCase';
+import { BadgeDetailSheet } from '@/components/quest/BadgeDetailSheet';
+
+// Existing Quest components
 import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
 import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
@@ -50,6 +53,9 @@ const ProfileQuestView: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { recentlyPlayed, isLoading: questLoading } = useQuestCourses();
+  
+  // Ref for scrolling to journey map
+  const journeyMapRef = useRef<HTMLDivElement>(null);
   
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
   const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
@@ -89,7 +95,12 @@ const ProfileQuestView: React.FC = () => {
   }, [progressData?.lists]);
 
   const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
-  const [selectedClub, setSelectedClub] = useState<MilestoneClub | null>(null);
+  
+  // Badge detail sheet state
+  const [badgeDetail, setBadgeDetail] = useState<{
+    type: 'milestone' | 'region';
+    id: string;
+  } | null>(null);
 
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
@@ -152,15 +163,24 @@ const ProfileQuestView: React.FC = () => {
       dateAdded: course.dateAdded,
     }));
 
-  // Handle milestone click
+  // Handle milestone click from ladder
   const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean }) => {
-    const club = milestoneClubs.find((c) => c.threshold === milestone.threshold);
-    if (club) setSelectedClub(club);
+    setBadgeDetail({ type: 'milestone', id: String(milestone.threshold) });
+  };
+
+  // Handle badge click from trophy case
+  const handleBadgeClick = (badge: { type: 'milestone' | 'region'; id: string }) => {
+    setBadgeDetail(badge);
   };
 
   // Handle region click
   const handleRegionClick = (region: RegionProgress) => {
     setSelectedRegion(region);
+  };
+
+  // Continue Journey scroll handler
+  const handleContinueJourney = () => {
+    journeyMapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   if (isLoading) {
@@ -222,18 +242,20 @@ const ProfileQuestView: React.FC = () => {
 
       {/* Content with consistent vertical rhythm (6 = 24px) */}
       <div className="relative px-4 pb-32 space-y-6">
-        {/* Section 1: Hero - Overall Progress */}
-        <QuestHero
+        {/* Section 1: Trophy Room Hero */}
+        <TrophyRoomHero
           totalPlayed={totalPlayed}
           target={100}
           hasPremiumAccent={rewards.hasPremiumAccent}
+          onContinueJourney={handleContinueJourney}
         />
 
-        {/* Section 2: Milestones Earned Row */}
-        <section>
-          <h2 className="quest-section-title mb-3 px-1">Milestones Earned</h2>
-          <MilestonesEarnedRow totalPlayed={totalPlayed} />
-        </section>
+        {/* Section 2: Trophy Case (replaces Milestones Earned Row) */}
+        <TrophyCase
+          totalPlayed={totalPlayed}
+          regionProgress={regionProgress}
+          onBadgeClick={handleBadgeClick}
+        />
 
         {/* Section Divider */}
         <div className="quest-section-divider" />
@@ -256,7 +278,7 @@ const ProfileQuestView: React.FC = () => {
         <div className="quest-section-divider" />
 
         {/* Section 4: Journey Map (Milestone Ladder with Mastery Track) */}
-        <section>
+        <section ref={journeyMapRef}>
           <h2 className="quest-section-title mb-3 px-1">Journey Map</h2>
           {showJourneyHint && (
             <p
@@ -306,92 +328,15 @@ const ProfileQuestView: React.FC = () => {
         onClose={() => setSelectedRegion(null)}
       />
 
-      {/* Milestone Club Sheet - Light theme */}
-      <Sheet open={!!selectedClub} onOpenChange={() => setSelectedClub(null)}>
-        <SheetContent
-          side="bottom"
-          className="rounded-t-3xl border-t"
-          style={{
-            background: 'var(--quest-card)',
-            borderColor: 'var(--quest-stroke)',
-          }}
-        >
-          {selectedClub && (
-            <>
-              <SheetHeader className="text-center pb-4">
-                <div className="flex justify-center mb-4">
-                  <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                    style={{
-                      background: selectedClub.isUnlocked 
-                        ? 'rgba(210, 180, 97, 0.12)' 
-                        : 'var(--quest-pill-inactive)',
-                      border: selectedClub.isUnlocked 
-                        ? '1px solid rgba(210, 180, 97, 0.3)' 
-                        : '1px solid var(--quest-stroke)',
-                      boxShadow: selectedClub.isUnlocked ? '0 0 20px rgba(210, 180, 97, 0.2)' : 'var(--quest-shadow-sm)',
-                    }}
-                  >
-                    <Trophy
-                      className="w-6 h-6"
-                      style={{ color: selectedClub.isUnlocked ? 'var(--quest-accent-gold)' : 'var(--quest-text-tertiary)' }}
-                    />
-                  </div>
-                </div>
-                <SheetTitle style={{ color: 'var(--quest-text-primary)' }}>
-                  {selectedClub.name}
-                </SheetTitle>
-              </SheetHeader>
-              <div className="text-center space-y-4 pb-8">
-                <p style={{ color: 'var(--quest-text-secondary)' }}>
-                  {selectedClub.description}
-                </p>
-                
-                {/* Progress */}
-                <div className="px-8">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm" style={{ color: 'var(--quest-text-tertiary)' }}>
-                      Progress
-                    </span>
-                    <span className="text-sm font-medium" style={{ color: 'var(--quest-text-primary)' }}>
-                      {totalPlayed} / {selectedClub.threshold}
-                    </span>
-                  </div>
-                  <div
-                    className="h-2 rounded-full overflow-hidden"
-                    style={{ background: 'var(--quest-track)' }}
-                  >
-                    <div
-                      className="h-full rounded-full transition-all"
-                      style={{
-                        width: `${Math.min((totalPlayed / selectedClub.threshold) * 100, 100)}%`,
-                        background: 'var(--quest-accent-gold)',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm"
-                  style={{
-                    background: selectedClub.isUnlocked
-                      ? 'rgba(210, 180, 97, 0.18)'
-                      : 'var(--quest-chip-bg)',
-                    border: selectedClub.isUnlocked
-                      ? '1px solid rgba(210, 180, 97, 0.35)'
-                      : '1px solid var(--quest-chip-stroke)',
-                    color: selectedClub.isUnlocked
-                      ? 'var(--quest-accent-gold)'
-                      : 'var(--quest-text-secondary)',
-                  }}
-                >
-                  {selectedClub.isUnlocked ? '✓ Earned' : `${selectedClub.remaining} more to earn`}
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
+      {/* Badge Detail Sheet */}
+      <BadgeDetailSheet
+        open={!!badgeDetail}
+        onClose={() => setBadgeDetail(null)}
+        badgeType={badgeDetail?.type || null}
+        badgeId={badgeDetail?.id || null}
+        totalPlayed={totalPlayed}
+        regionProgress={regionProgress}
+      />
 
       {/* Milestone Unlock Sheet */}
       <MilestoneUnlockSheet totalPlayed={totalPlayed} />
