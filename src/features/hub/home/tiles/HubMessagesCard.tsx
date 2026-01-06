@@ -1,6 +1,7 @@
 /**
- * HubMessagesCard - Messages section (replaces Nearby Golfers)
- * Shows conversations with empty state, links to messages list
+ * HubMessagesCard - Messages section (Fixed Height ~120px)
+ * Shows max 2 message previews OR empty state
+ * No internal scrolling
  */
 
 import React from 'react';
@@ -35,6 +36,8 @@ export function HubMessagesCard() {
   
   const conversations = MOCK_CONVERSATIONS;
   const isEmpty = conversations.length === 0;
+  // Only show max 2 messages
+  const displayConversations = conversations.slice(0, 2);
 
   return (
     <Tile 
@@ -43,7 +46,7 @@ export function HubMessagesCard() {
           <h3>Messages</h3>
           <button
             onClick={(e) => { e.stopPropagation(); navigateFromHub('/hub/messages'); }}
-            className="text-[15px] font-medium transition"
+            className="text-[14px] font-medium transition"
             style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-body)', padding: 0 }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
@@ -53,31 +56,32 @@ export function HubMessagesCard() {
         </div>
       }
     >
-      <div className="h-full overflow-y-auto" data-hub-scroll-container="true">
+      {/* Fixed height content area - NO SCROLLING */}
+      <div className="h-full flex items-center justify-center">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6">
+          <div className="flex flex-col items-center justify-center text-center px-3">
             <div 
-              className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+              className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
               style={{ background: 'var(--hub-glass-bg-input)' }}
             >
-              <MessageCircle className="w-6 h-6" style={{ color: 'var(--hub-text-dim)' }} />
+              <MessageCircle className="w-5 h-5" style={{ color: 'var(--hub-text-dim)' }} />
             </div>
             <h4 
-              className="text-[15px] font-semibold mb-1"
+              className="text-[14px] font-semibold mb-0.5"
               style={{ color: 'var(--hub-text)' }}
             >
               No messages yet
             </h4>
             <p 
-              className="text-[13px] leading-relaxed"
+              className="text-[12px] leading-snug"
               style={{ color: 'var(--hub-text-muted)' }}
             >
               When you play games or follow golfers, chats will appear here.
             </p>
           </div>
         ) : (
-          <div className="space-y-1">
-            {conversations.slice(0, 5).map(conv => (
+          <div className="w-full space-y-1">
+            {displayConversations.map(conv => (
               <button
                 key={conv.id}
                 className="w-full flex items-center gap-3 p-2 rounded-xl transition"
@@ -87,27 +91,27 @@ export function HubMessagesCard() {
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 <SquircleAvatar
-                  size={42}
+                  size={38}
                   src={conv.avatarUrl}
                   alt={conv.name}
                   fallback={conv.name.charAt(0).toUpperCase()}
                 />
                 <div className="flex-1 min-w-0 text-left">
                   <div 
-                    className="text-[14px] font-semibold truncate"
+                    className="text-[13px] font-semibold truncate"
                     style={{ color: 'var(--hub-text)' }}
                   >
                     {conv.name}
                   </div>
                   <div 
-                    className="text-[13px] truncate"
+                    className="text-[12px] truncate"
                     style={{ color: 'var(--hub-text-sub)' }}
                   >
                     {conv.lastMessage}
                   </div>
                 </div>
                 <span 
-                  className="text-[12px] shrink-0"
+                  className="text-[11px] shrink-0"
                   style={{ color: 'var(--hub-text-muted)' }}
                 >
                   {timeAgo(conv.timestamp)}
