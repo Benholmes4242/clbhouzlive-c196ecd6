@@ -116,7 +116,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
                 We're finalising connections with official handicap authorities. 
-                Once live, your handicap will update automatically across clbhouse.
+                Once live, your handicap will update automatically across clbhouz.
               </p>
             </section>
 
@@ -186,7 +186,7 @@ const ProfileHandicapView: React.FC<ProfileHandicapViewProps> = ({
             </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
                 We're finalising connections with official handicap authorities. 
-                Once live, your handicap will update automatically across clbhouse.
+                Once live, your handicap will update automatically across clbhouz.
             </p>
           </section>
 
