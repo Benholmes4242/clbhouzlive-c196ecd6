@@ -361,7 +361,7 @@ class MediaRuntimeCore {
           
           const playerRef = (currentNode.videoElement as any).__hlsPlayerRef;
           if (playerRef?.detach && playerRef?.attach) {
-            console.log(`[MediaRuntime] Regenerating HLS source for ${id.slice(0, 8)}`);
+            
             playerRef.detach();
             
             // Wait for cleanup to complete (requestAnimationFrame is too short for HLS.js async setup)
@@ -386,7 +386,7 @@ class MediaRuntimeCore {
               // Timeout after 3 seconds if no metadata loaded
               const timeout = setTimeout(() => {
                 video.removeEventListener('loadedmetadata', onLoadedMetadata);
-                console.warn(`[MediaRuntime] Regeneration timeout for ${id.slice(0, 8)} - proceeding anyway`);
+                
                 resolve();
               }, 3000);
             });
@@ -658,12 +658,6 @@ class MediaRuntimeCore {
     // Get IDs of visible candidates
     const visibleIds = new Set(candidates.map(c => c.id));
     
-    if (import.meta.env.DEV) {
-      console.log('[MediaRuntime] evaluateBestCandidate', {
-        visibleCount: candidates.length,
-        currentActiveCount: this.state.activeMediaIds.size,
-      });
-    }
     
     // Grid video concurrency: allow up to MAX_CONCURRENT_GRID_VIDEOS (3)
     const gridVideosPlaying = Array.from(this.state.activeMediaIds).filter(id => {
@@ -743,13 +737,6 @@ class MediaRuntimeCore {
         }
       }
       
-      if (import.meta.env.DEV) {
-        const finalGridCount = Array.from(this.state.activeMediaIds).filter(id => {
-          const media = this.registry.get(id);
-          return media?.surface === 'grid';
-        }).length;
-        console.log('[MediaRuntime] Grid videos playing:', finalGridCount, '/', MAX_CONCURRENT_GRID_VIDEOS);
-      }
     }
     
     // For non-grid surfaces (clubhouse, fullscreen), allow concurrent play
@@ -806,9 +793,6 @@ class MediaRuntimeCore {
         }
         this.warmPool.delete(evictId);
         
-        if (import.meta.env.DEV) {
-          console.log('[MediaRuntime] Evicted from warm pool:', evictId.slice(0, 8));
-        }
       }
     }
   }
@@ -826,9 +810,6 @@ class MediaRuntimeCore {
       playerRef.attach?.();
       this.warmPool.add(id);
       
-      if (import.meta.env.DEV) {
-        console.log('[MediaRuntime] Prewarmed:', id.slice(0, 8));
-      }
     }
   }
   

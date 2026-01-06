@@ -374,15 +374,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         } else {
           // Node not yet registered (common on first mount). Play directly;
           // MediaRuntime can take over once registration completes.
-          safePlay(video).catch((err) => {
-            console.warn('[HLSPlayer] Direct autoplay failed:', err);
-          });
+          safePlay(video).catch(() => {});
         }
       } else {
-        // Standalone mode: Handle autoplay directly (hero videos, modals, etc.)
-        safePlay(video).catch((err) => {
-          console.warn('[HLSPlayer] Standalone autoplay failed:', err);
-        });
+        safePlay(video).catch(() => {});
       }
     };
 
@@ -524,42 +519,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       const useHlsJs = !canPlayNatively && src.includes('.m3u8');
       
-      console.log('[HLSPlayer] PLAYBACK_PATH', {
-        mediaId: mediaId?.slice(0, 8),
-        canPlayNatively,
-        forceHlsJs: FORCE_HLS_JS,
-        isIOS,
-        isM3u8: src.includes('.m3u8'),
-        path: useHlsJs ? 'HLS.js' : 'NATIVE',
-      });
       
       if (!useHlsJs) {
-        // Native playback - add timing logs
-        console.log('[HLSPlayer] NATIVE_START', { mediaId: mediaId?.slice(0, 8) });
+        // Native playback
         video.src = src;
         
-        // Track native loading events
-        const nativeLoadStart = performance.now();
-        const onLoadedData = () => {
-          console.log('[HLSPlayer] NATIVE_LOADED_DATA', {
-            mediaId: mediaId?.slice(0, 8),
-            timeMs: (performance.now() - nativeLoadStart).toFixed(0),
-            readyState: video.readyState,
-            duration: video.duration?.toFixed(2),
-          });
-        };
-        video.addEventListener('loadeddata', onLoadedData, { once: true });
         
         // Native HLS error handler for consistent retry/overlay behavior
         const onNativeError = () => {
           // Skip if stale setup
           if (myGen !== setupGenRef.current) return;
           
-          console.error('[HLSPlayer] NATIVE_ERROR', {
-            mediaId: mediaId?.slice(0, 8),
-            error: video.error?.code,
-            message: video.error?.message,
-          });
           
           logVideoTelemetry('hls_fatal_error', {
             videoId: telemetryVideoId,
@@ -570,7 +540,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           
           // Attempt MP4 fallback if available
           if (mp4FallbackUrl && !triedMp4Fallback) {
-            console.warn('[HLSPlayer] 🔁 Native failed, attempting MP4 fallback');
             logVideoTelemetry('mp4_fallback_attempted', {
               videoId: telemetryVideoId,
               mp4FallbackUrl: mp4FallbackUrl?.slice(-60)
@@ -628,7 +597,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         const Hls = await loadHlsJs();
         
         if (!Hls || !Hls.isSupported() || !mountedRef.current) {
-          console.error('[HLSPlayer] HLS.js not supported');
           setHasError(true);
           return;
         }
@@ -653,7 +621,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         });
         
         hls.on(Hls.Events.ERROR, async (_, data) => {
-          console.error('[HLSPlayer] HLS error:', data.type, data.details);
+          if (!data.fatal) return;
 
           if (!data.fatal) return;
 
@@ -679,9 +647,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             return;
           }
 
-          // Attempt MP4 fallback if available and not already tried
           if (mp4FallbackUrl && !triedMp4Fallback) {
-            console.warn('[HLSPlayer] 🔁 Attempting MP4 fallback');
             
             logVideoTelemetry('mp4_fallback_attempted', {
               videoId: telemetryVideoId,
@@ -711,8 +677,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               const played = await safePlay(videoEl);
 
               if (played) {
-                console.info('[HLSPlayer] ✅ MP4 fallback playback started');
-                // Clear overlay/error state in case they were set
                 setHasError(false);
                 setShowUnavailable(false);
                 setLastError(null);
@@ -720,8 +684,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
                 return;
               }
 
-              // MP4 failed → propagate fatal
-              console.error('[HLSPlayer] ❌ MP4 fallback failed');
+              // MP4 failed
               logVideoTelemetry('mp4_fallback_failed', {
                 videoId: telemetryVideoId,
                 reason: 'safePlay_returned_false'
@@ -734,7 +697,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               return;
 
             } catch (err) {
-              console.error('[HLSPlayer] ❌ MP4 fallback exception', err);
               logVideoTelemetry('mp4_fallback_failed', {
                 videoId: telemetryVideoId,
                 reason: err instanceof Error ? err.message : 'unknown_exception'
@@ -791,14 +753,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         // Log quality level switches
         hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
           const level = hls.levels?.[data.level];
-          console.log('[HLSPlayer] LEVEL_SWITCHED', {
-            mediaId: mediaId?.slice(0, 8),
-            level: data.level,
-            width: level?.width,
-            height: level?.height,
-            bitrateKbps: level?.bitrate ? Math.round(level.bitrate / 1000) : 'N/A',
-            timestamp: performance.now().toFixed(1),
-          });
           
           // RUM: Record quality change
           if (mediaId && level?.bitrate) {
@@ -810,24 +764,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           }
         });
         
-        // Fragment loading/loaded logs removed for cleaner console
-        // Only log slow segments (>1000ms load time)
-        hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
-          const stats = data.frag.stats;
-          const loadingStart = stats?.loading?.start || 0;
-          const loadingEnd = stats?.loading?.end || 0;
-          const timeToLoad = loadingEnd - loadingStart;
-          
-          if (timeToLoad > 1000) {
-            console.warn('[HLSPlayer] SLOW_FRAG_LOAD', {
-              mediaId: mediaId?.slice(0, 8),
-              segmentNumber: data.frag.sn,
-              loadTimeMs: timeToLoad.toFixed(0),
-            });
-          }
-        });
-        
-        // BUFFER_APPENDED log removed - too verbose
         
         // Bail if stale after async HLS.js load
         if (myGen !== setupGenRef.current) {
@@ -1053,7 +989,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Set timeout to prevent infinite spinner (only in paused-video mode)
     if (!shouldUsePoster) {
       firstFrameTimeoutRef.current = setTimeout(() => {
-        console.warn(`[HLSPlayer] First frame timeout for ${mediaId?.slice(0, 8)} after ${FIRST_FRAME_TIMEOUT_MS}ms`);
         markError();
       }, FIRST_FRAME_TIMEOUT_MS);
     }
@@ -1201,11 +1136,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     const video = e.currentTarget;
-    console.error('[HLSPlayer] Error:', {
-      code: video.error?.code,
-      message: video.error?.message,
-      src: video.currentSrc,
-    });
     
     setHasError(true);
     setIsPosterVisible(true);
