@@ -42,7 +42,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   const filterOptions: FilterOption[] = [
     { key: 'all', label: 'All' },
     { key: 'top100', label: 'Top 100', count: counts.top100 },
-    { key: 'highest-rated', label: 'Highest' },
+    { key: 'highest-rated', label: 'Rating' },
     { key: 'recently-played', label: 'Recent' },
   ];
 
