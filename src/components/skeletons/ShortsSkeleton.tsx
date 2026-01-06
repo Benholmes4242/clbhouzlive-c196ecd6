@@ -2,8 +2,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export const ShortsSkeleton = () => {
   return (
-    <div className="w-full h-screen bg-background relative">
-      <Skeleton className="absolute inset-0 bg-surface-alt" />
+    <div className="w-full h-screen bg-[var(--bg-page)] relative">
+      <Skeleton className="absolute inset-0 bg-slate-100" />
       
       {/* Bottom overlay */}
       <div className="absolute bottom-20 left-4 right-4 space-y-3">

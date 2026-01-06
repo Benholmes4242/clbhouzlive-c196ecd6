@@ -218,7 +218,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   };
 
   return (
-    <div className={cn("min-h-screen", className)}>
+    <div className={cn("min-h-screen bg-[var(--bg-page)]", className)}>
       {/* Sticky Command Center: Search + Sort + Pills */}
       <div ref={searchContainerRef} className="sticky top-0 z-30 bg-[var(--bg-page)]">
         <DiscoverCommandCenter

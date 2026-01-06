@@ -336,13 +336,10 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     return <VideosSectionPage />;
   }
 
-  // Bluey-grey background color matching profile page divider
-  const BG_COLOR = '#f8fafc'; // slate-50
-
   return (
-    <div className={cn("min-h-screen pb-20", className)} style={{ background: BG_COLOR }}>
+    <div className={cn("min-h-screen pb-20 bg-[var(--bg-page)]", className)}>
       {/* Sticky Command Center: Search + Sort + Pills */}
-      <div className="sticky top-0 z-30" style={{ background: BG_COLOR }}>
+      <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
         <DiscoverCommandCenter
           searchPlaceholder="Search videos, creators, courses..."
           searchValue={searchQuery}
