@@ -250,15 +250,17 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   const effectiveStatus = status || (isGhost ? 'LOCKED' : unlocked ? 'UNLOCKED' : 'LOCKED');
   const isNew = effectiveStatus === 'NEW';
   
-  // Status label
+  // Status label - use "Earned" instead of "Unlocked" for premium feel
   const statusLabel = effectiveStatus === 'NEW' 
     ? 'NEW' 
     : effectiveStatus === 'UNLOCKED' 
-      ? 'Unlocked' 
+      ? '✓ Earned' 
       : isGhost 
-        ? 'Next badge' 
+        ? remaining !== undefined 
+          ? `${remaining} to go`
+          : 'Next badge' 
         : remaining !== undefined 
-          ? `${remaining} away` 
+          ? `Requires ${threshold}` 
           : 'Locked';
 
   // Animation variants
