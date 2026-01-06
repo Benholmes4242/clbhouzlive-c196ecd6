@@ -119,8 +119,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             )}
           </div>
 
-          {/* Rating column - fixed width, stacked layout (rating number above pill) */}
-          <div className="flex flex-col items-end justify-center pr-3 pl-2 flex-shrink-0 min-w-[72px]">
+          {/* Rating column - fixed width, bottom-right aligned with date */}
+          <div className="flex flex-col items-end justify-end pb-2.5 pr-3 pl-2 flex-shrink-0 min-w-[72px]">
             {isRated && course.rating_value ? (
               <>
                 <span className="text-sm font-semibold text-foreground mb-0.5">
@@ -237,8 +237,8 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           )}
         </div>
 
-        {/* Rating column - fixed width, stacked layout (rating number above pill) */}
-        <div className="flex flex-col items-end justify-center pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
+        {/* Rating column - fixed width, bottom-right aligned with date */}
+        <div className="flex flex-col items-end justify-end pb-2 pr-2.5 pl-2 flex-shrink-0 min-w-[68px]">
           {course.rating_value && (
             <>
               <span className="text-sm font-semibold text-foreground mb-0.5">
