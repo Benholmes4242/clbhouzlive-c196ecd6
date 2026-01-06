@@ -21,7 +21,7 @@ export interface ReviewOverlayCoreProps {
  * Used by: FullscreenReviewPost, ReviewTileOverlay (grid), Profile fullscreen
  * 
  * Variants:
- * - fullscreen: Larger text, more spacing, optional preview badge
+ * - fullscreen: Premium glass panel with two-column layout
  * - tile: Compact sizing for grid thumbnails
  * 
  * Theme:
@@ -42,15 +42,12 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
 
   return (
     <div className={cn("absolute inset-0 pointer-events-none z-10", className)}>
-      {/* Top gradient - lighter for premium look (40% opacity, not 80%) */}
-      <div className={cn(
-        "absolute inset-x-0 top-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent",
-        isFullscreen ? "h-40" : "h-16"
-      )} />
-      
       {/* Tile variant layout */}
       {variant === 'tile' && (
         <>
+          {/* Top gradient for tile */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+          
           {/* Top-left: Course name only (truncated) */}
           <div className="absolute top-2 left-2 right-2 z-10">
             <div className="text-white font-bold text-xs leading-tight line-clamp-1 drop-shadow-md">
@@ -75,41 +72,62 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
         </>
       )}
       
-      {/* Fullscreen variant layout */}
+      {/* Fullscreen variant - Premium Glass Panel */}
       {isFullscreen && (
-        <>
-          {/* Top-left: Course name + location + optional preview badge */}
-          <div className="absolute left-4 right-20 z-20 top-16">
-            {/* Preview pill - above course name */}
-            {showPreviewBadge && (
-              <span className="inline-block mb-2 px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/40 backdrop-blur-sm text-blue-200 text-[10px] font-semibold tracking-wide uppercase">
-                Preview
+        <div 
+          className="absolute left-4 right-4 z-20 top-14"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderRadius: '16px',
+            padding: '16px',
+          }}
+        >
+          {/* Two-column grid: Left (course info) / Right (rating) */}
+          <div className="flex justify-between items-start gap-4">
+            {/* Left Stack - Course Identity */}
+            <div className="flex-1 min-w-0 space-y-1">
+              {/* Course Name - largest, bold */}
+              <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
+                {courseName}
+              </h2>
+              
+              {/* Location - smaller, muted */}
+              {courseLocation && (
+                <p className="text-white/60 text-sm drop-shadow-sm">
+                  {courseLocation}
+                </p>
+              )}
+              
+              {/* Preview pill - under location */}
+              {showPreviewBadge && (
+                <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
+                  Preview
+                </span>
+              )}
+            </div>
+            
+            {/* Right Stack - Rating (center-aligned vertical stack) */}
+            <div className="flex flex-col items-center text-center gap-1 flex-shrink-0">
+              {/* Numeric Rating - large anchor */}
+              <span 
+                className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none"
+                style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+              >
+                {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
-            )}
-            <p className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
-              {courseName}
-            </p>
-            {courseLocation && (
-              <p className="text-white/70 text-sm mt-1 drop-shadow-sm">
-                {courseLocation}
-              </p>
-            )}
+              
+              {/* Tier Badge */}
+              <RatingPill score={rating} className="text-[9px] py-0.5 px-2" />
+              
+              {/* "FROM A REVIEW" label */}
+              <span className="text-[9px] font-medium text-white/40 tracking-wider uppercase mt-0.5">
+                From a review
+              </span>
+            </div>
           </div>
-          
-          {/* Top-right: Rating + tier + "From a review" - centered stack */}
-          <div className="absolute right-4 z-20 top-16 flex flex-col items-center text-center gap-1.5">
-            <span 
-              className="text-5xl sm:text-6xl font-bold tabular-nums drop-shadow-lg"
-              style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
-            >
-              {rating === 10 ? '10' : rating.toFixed(1)}
-            </span>
-            <RatingPill score={rating} className="text-[9px] sm:text-[10px] py-0.5 px-2" />
-            <span className="text-[10px] font-medium text-white/50 tracking-wider uppercase">
-              From a review
-            </span>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
