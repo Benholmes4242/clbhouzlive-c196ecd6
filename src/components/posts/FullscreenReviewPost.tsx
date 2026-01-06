@@ -297,12 +297,34 @@ export function FullscreenReviewPost({
         </div>
       )}
       
+      {/* Navigation arrows - matching Clubhouse feed styling */}
+      {hasMultipleMedia && !hideCarouselArrows && (
+        <>
+          {currentIndex > 0 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+              aria-label="Previous media"
+            >
+              <ChevronLeft className="w-6 h-6 text-white" />
+            </button>
+          )}
+          {currentIndex < sortedMedia.length - 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); goToNext(); }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
+              aria-label="Next media"
+            >
+              <ChevronRight className="w-6 h-6 text-white" />
+            </button>
+          )}
+        </>
+      )}
+      
       {/* Render children (e.g., Clubhouse action bar) - z-30 to sit above gradients */}
       <div className="pointer-events-auto z-30">
         {children}
       </div>
-      
-      {/* Navigation arrows removed - handled by ClubhouseVerticalGrid */}
     </div>
   );
 }
