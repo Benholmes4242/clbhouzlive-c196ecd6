@@ -35,7 +35,7 @@ const RegionRow: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="w-full text-left py-4 transition-all hover:bg-black/[0.02] -mx-3 px-3 rounded-xl group"
+      className="w-full text-left py-4 transition-all hover:bg-slate-100/50 rounded-lg group"
     >
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-2.5">
@@ -128,37 +128,23 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
 
   return (
     <section>
-      <h2 className="quest-section-title mb-3 px-1">
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">
         Regional Progress
       </h2>
 
-      <div 
-        className="quest-card quest-card-interactive rounded-2xl p-4"
-        style={{
-          background: 'var(--quest-card)',
-          border: '1px solid var(--quest-stroke)',
-          boxShadow: 'var(--quest-shadow)',
-        }}
-      >
-        <div className="space-y-1">
-          {regions.map((region, index) => (
-            <React.Fragment key={region.id}>
-              <RegionRow
-                region={region}
-                onClick={() => handleRegionClick(region)}
-              />
-              {index < regions.length - 1 && (
-                <div 
-                  className="mx-3" 
-                  style={{ 
-                    height: '1px', 
-                    background: 'var(--quest-hairline)' 
-                  }} 
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+      {/* No card wrapper - rows sit on bg-slate-50 with dividers */}
+      <div className="space-y-0">
+        {regions.map((region, index) => (
+          <React.Fragment key={region.id}>
+            <RegionRow
+              region={region}
+              onClick={() => handleRegionClick(region)}
+            />
+            {index < regions.length - 1 && (
+              <div className="mx-0 h-px bg-slate-200/60" />
+            )}
+          </React.Fragment>
+        ))}
       </div>
     </section>
   );

@@ -210,36 +210,22 @@ const ProfileQuestView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="quest-theme-light min-h-screen">
+      <PageRoot className="min-h-screen bg-slate-50">
         <div className="flex items-center justify-center min-h-screen">
-          <div
-            className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
-            style={{ borderColor: 'var(--quest-accent-gold)', borderTopColor: 'transparent' }}
-          />
+          <div className="w-8 h-8 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
         </div>
       </PageRoot>
     );
   }
 
   return (
-    <PageRoot className="quest-theme-light min-h-screen">
-      {/* Premium background with depth */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          background: rewards.hasBackgroundTexture
-            ? 'radial-gradient(ellipse at 50% 0%, rgba(210, 180, 97, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(110, 146, 119, 0.06) 0%, transparent 40%)'
-            : 'radial-gradient(ellipse at 50% 0%, rgba(31, 36, 40, 0.02) 0%, transparent 50%)',
-        }}
-      />
-
+    <PageRoot className="min-h-screen bg-slate-50">
       {/* Header - Back CTA top left, centered title + subtitle */}
       <div className="relative safe-top px-4 pt-4">
         {/* Back link */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-sm transition-all hover:opacity-70 hover:-translate-x-0.5 mb-5"
-          style={{ color: 'var(--quest-text-secondary)' }}
+          className="flex items-center gap-1.5 text-sm text-slate-500 transition-all hover:opacity-70 hover:-translate-x-0.5 mb-5"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="font-medium">Back</span>
@@ -247,48 +233,40 @@ const ProfileQuestView: React.FC = () => {
 
         {/* Centered title + subtitle with premium typography */}
         <div className="text-center mb-4">
-          <h1
-            className="text-3xl font-bold tracking-tight mb-1.5"
-            style={{ 
-              color: 'var(--quest-text-primary)',
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <h1 className="text-3xl font-bold tracking-tight mb-1.5 text-slate-900" style={{ letterSpacing: '-0.02em' }}>
             Top 100 Journey
           </h1>
-          <p
-            className="text-sm font-medium"
-            style={{ color: 'var(--quest-text-tertiary)' }}
-          >
+          <p className="text-sm font-medium text-slate-500">
             Your journey across the world's greatest courses
           </p>
         </div>
       </div>
 
-      {/* Content with consistent vertical rhythm (6 = 24px) */}
-      <div className="relative px-4 pb-32 space-y-6">
-        {/* Section 1: Trophy Room Hero */}
-        <TrophyRoomHero
-          totalPlayed={totalPlayed}
-          target={100}
-          hasPremiumAccent={rewards.hasPremiumAccent}
-          onContinueJourney={handleContinueJourney}
-          regionProgress={regionProgress}
-        />
+      {/* Content with consistent vertical rhythm */}
+      <div className="relative pb-32">
+        {/* Section 1: Trophy Room Hero - NO CARD, section band */}
+        <div className="px-4 py-6">
+          <TrophyRoomHero
+            totalPlayed={totalPlayed}
+            target={100}
+            hasPremiumAccent={rewards.hasPremiumAccent}
+            onContinueJourney={handleContinueJourney}
+            regionProgress={regionProgress}
+          />
+        </div>
 
-        {/* Section 2: Trophy Case (replaces Milestones Earned Row) */}
-        <TrophyCase
-          totalPlayed={totalPlayed}
-          regionProgress={regionProgress}
-          onBadgeClick={handleBadgeClick}
-        />
+        {/* Section 2: Trophy Case - NO CARD, section band with divider */}
+        <div className="border-t border-slate-200/60 px-4 py-5">
+          <TrophyCase
+            totalPlayed={totalPlayed}
+            regionProgress={regionProgress}
+            onBadgeClick={handleBadgeClick}
+          />
+        </div>
 
-        {/* Section Divider */}
-        <div className="quest-section-divider" />
-
-        {/* Section 3: Next Target Card */}
-        <section>
-          <h2 className="quest-section-title mb-3 px-1">Next Target</h2>
+        {/* Section 3: Next Target Card - KEEP CARD */}
+        <div className="px-4 py-5 border-t border-slate-200/60">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Next Target</h2>
           <NextTargetCard
             totalPlayed={totalPlayed}
             nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
@@ -298,19 +276,13 @@ const ProfileQuestView: React.FC = () => {
             showHint={onboarding.shouldShowTargetHint}
             onHintDismiss={onboarding.markTargetHintSeen}
           />
-        </section>
+        </div>
 
-        {/* Section Divider */}
-        <div className="quest-section-divider" />
-
-        {/* Section 4: Journey Map (Milestone Ladder with Mastery Track) */}
-        <section ref={journeyMapRef}>
-          <h2 className="quest-section-title mb-3 px-1">Journey Map</h2>
+        {/* Section 4: Journey Map - KEEP CARD */}
+        <div className="px-4 py-5 border-t border-slate-200/60" ref={journeyMapRef}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Journey Map</h2>
           {showJourneyHint && (
-            <p
-              className="text-xs px-1 mb-2 transition-opacity duration-500"
-              style={{ color: 'var(--quest-text-tertiary)' }}
-            >
+            <p className="text-xs px-1 mb-2 text-slate-400 transition-opacity duration-500">
               Your journey unfolds here
             </p>
           )}
@@ -324,27 +296,30 @@ const ProfileQuestView: React.FC = () => {
               total: r.total,
             }))}
           />
-        </section>
+        </div>
 
-        {/* Section Divider */}
-        <div className="quest-section-divider" />
+        {/* Section 5: Regional Progress - NO CARD, section band */}
+        <div className="px-4 py-5 border-t border-slate-200/60">
+          <RegionalJourneySummary regions={regionProgress} />
+        </div>
 
-        {/* Section 5: Journey Summary (Regional Lists) - taps navigate to Top 100 pages */}
-        <RegionalJourneySummary
-          regions={regionProgress}
-        />
+        {/* Section 6: Momentum - NO CARD, section band */}
+        <div className="px-4 py-5 border-t border-slate-200/60">
+          <MomentumCard recentlyPlayed={recentCourses} />
+        </div>
 
-        {/* Section 6: Momentum */}
-        <MomentumCard recentlyPlayed={recentCourses} />
+        {/* Section 7: Leaderboard - KEEP CARD */}
+        <div className="px-4 py-5 border-t border-slate-200/60">
+          <LeaderboardCard userId={user?.id} />
+        </div>
 
-        {/* Section 7: Leaderboard */}
-        <LeaderboardCard userId={user?.id} />
-
-        {/* Section 8: Recently Added */}
-        <RecentlyAddedSection
-          courses={recentCourses}
-          hasGoldTrim={rewards.hasGoldTrim}
-        />
+        {/* Section 8: Recently Added - NO CARD, section band */}
+        <div className="px-4 py-5 border-t border-slate-200/60">
+          <RecentlyAddedSection
+            courses={recentCourses}
+            hasGoldTrim={rewards.hasGoldTrim}
+          />
+        </div>
       </div>
 
       {/* Region List Sheet */}
