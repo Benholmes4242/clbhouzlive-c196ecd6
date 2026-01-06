@@ -153,13 +153,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   usePausedVideo,
   customLoadingComponent,
 }, ref) => {
-  console.log('[HLSPlayer] Render with props:', {
-    src: src?.substring(src.lastIndexOf('/') + 1) || 'unknown',
-    autoplay,
-    muted,
-    mediaId: mediaId?.slice(0, 20),
-    managedByMediaRuntime,
-  });
 
   // ============ Paused Video Mode (Permanent) ============
   // Paused video mode is now the default behavior
@@ -278,11 +271,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   useImperativeHandle(ref, () => ({
     play: async () => {
       const video = videoRef.current;
-      console.log('[HLSPlayer] play() called via ref, video exists:', !!video, 'paused:', video?.paused);
       if (!video) return false;
-      const result = await safePlay(video);
-      console.log('[HLSPlayer] safePlay result:', result);
-      return result;
+      return await safePlay(video);
     },
     pause: () => {
       videoRef.current?.pause();
@@ -1035,11 +1025,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     const video = videoRef.current;
-    console.log('[HLSPlayer] Video loaded (loadeddata):', {
-      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
-      readyState: video?.readyState,
-      duration: video?.duration,
-      mediaId: mediaId?.slice(0, 20),
+    logDebug('LOADED_DATA', { 
+      mediaId: mediaId?.slice(0, 8),
+      readyState: video?.readyState
     });
     
     setIsReady(true);
@@ -1077,10 +1065,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     const video = videoRef.current;
-    console.log('[HLSPlayer] ▶️ Video started playing (play event):', {
-      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
-      mediaId: mediaId?.slice(0, 20),
-    });
+    logDebug('PLAY', { mediaId: mediaId?.slice(0, 8) });
     
     setIsPlaying(true);
     setHasError(false);
@@ -1122,10 +1107,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     const video = videoRef.current;
-    console.log('[HLSPlayer] ⏸️ Video paused:', {
-      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
-      mediaId: mediaId?.slice(0, 20),
-    });
+    logDebug('PAUSE', { mediaId: mediaId?.slice(0, 8) });
     
     setIsPlaying(false);
 
@@ -1165,10 +1147,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const video = e.currentTarget;
     
-    console.error('[HLSPlayer] ❌ Video error:', {
-      src: video?.currentSrc?.substring(video?.currentSrc.lastIndexOf('/') + 1) || 'unknown',
-      error: video.error,
-      mediaId: mediaId?.slice(0, 20),
+    logDebug('ERROR', { 
+      mediaId: mediaId?.slice(0, 8),
+      error: video.error?.message
     });
     
     setHasError(true);
