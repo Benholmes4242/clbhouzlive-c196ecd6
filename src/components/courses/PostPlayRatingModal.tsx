@@ -1798,14 +1798,13 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           {/* Bottom panel - always visible */}
           <ReviewBottomPanel
             user={{ 
-              id: user?.id || 'me', 
-              name: userProfile?.display_name || userProfile?.username || user?.user_metadata?.full_name || 'You',
-              username: userProfile?.username || user?.user_metadata?.username || undefined,
-              avatar: userProfile?.profile_photo_url || user?.user_metadata?.avatar_url || undefined,
+              id: userProfile?.id || user?.id || 'me', 
+              name: userProfile?.display_name || userProfile?.username || user?.user_metadata?.full_name || user?.user_metadata?.name || 'You',
+              username: userProfile?.username || user?.user_metadata?.username,
+              avatar: userProfile?.profile_photo_url ?? user?.user_metadata?.avatar_url,
             }}
             courseId={courseId}
             rating={userRating}
-            bottomOffsetPx={80}
           />
           
           {/* CTA buttons - vertical stack on right */}
