@@ -51,37 +51,41 @@ const RegionRow: React.FC<{
             {region.name}
           </span>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center">
+          {/* Fixed-width container for pill to keep alignment consistent */}
+          <div className="w-[90px] flex justify-end">
+            <span
+              className="text-xs font-medium px-2.5 py-1 rounded-full transition-all whitespace-nowrap"
+              style={{
+                background: isComplete
+                  ? 'rgba(210, 180, 97, 0.15)'
+                  : region.played > 0
+                  ? 'rgba(247, 147, 30, 0.12)'
+                  : 'var(--quest-pill-inactive)',
+                border: isComplete
+                  ? '1px solid rgba(210, 180, 97, 0.3)'
+                  : region.played > 0
+                  ? '1px solid rgba(247, 147, 30, 0.2)'
+                  : '1px solid var(--quest-stroke)',
+                color: isComplete
+                  ? '#B8A053'
+                  : region.played > 0
+                  ? '#C97A1A'
+                  : 'var(--quest-text-tertiary)',
+              }}
+            >
+              {isComplete ? '✓ Complete' : region.played > 0 ? 'In progress' : 'Not started'}
+            </span>
+          </div>
+          {/* Fixed-width container for counter to accommodate 100/100 */}
           <span
-            className="text-xs font-medium px-2.5 py-1 rounded-full transition-all"
-            style={{
-              background: isComplete
-                ? 'rgba(210, 180, 97, 0.15)'
-                : region.played > 0
-                ? 'rgba(247, 147, 30, 0.12)'
-                : 'var(--quest-pill-inactive)',
-              border: isComplete
-                ? '1px solid rgba(210, 180, 97, 0.3)'
-                : region.played > 0
-                ? '1px solid rgba(247, 147, 30, 0.2)'
-                : '1px solid var(--quest-stroke)',
-              color: isComplete
-                ? '#B8A053'
-                : region.played > 0
-                ? '#C97A1A'
-                : 'var(--quest-text-tertiary)',
-            }}
-          >
-            {isComplete ? '✓ Complete' : region.played > 0 ? 'In progress' : 'Not started'}
-          </span>
-          <span
-            className="text-sm font-medium tabular-nums"
+            className="w-[60px] text-right text-sm font-medium tabular-nums"
             style={{ color: 'var(--quest-text-secondary)' }}
           >
             {region.played}/{region.total}
           </span>
           <ChevronRight 
-            className="w-4 h-4 transition-transform group-hover:translate-x-0.5" 
+            className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" 
             style={{ color: 'var(--quest-text-tertiary)' }} 
           />
         </div>
