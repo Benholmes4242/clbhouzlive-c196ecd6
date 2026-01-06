@@ -44,10 +44,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
       <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Leaderboard</h2>
       
       <motion.div
-        className="rounded-2xl p-4 bg-white border border-slate-200/60"
-        style={{
-          boxShadow: '0 6px 18px rgba(0, 0, 0, 0.08)',
-        }}
+        className="py-2"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}

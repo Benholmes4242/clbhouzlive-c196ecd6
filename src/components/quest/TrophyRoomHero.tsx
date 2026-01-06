@@ -54,32 +54,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      {/* Animated background shimmer */}
-      <motion.div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at 30% 20%, rgba(210, 180, 97, 0.08) 0%, transparent 40%), radial-gradient(ellipse at 70% 80%, rgba(110, 146, 119, 0.06) 0%, transparent 40%)',
-        }}
-        animate={{
-          opacity: [0.6, 1, 0.6],
-        }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      
-      {/* Subtle gradient sweep animation */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)',
-          backgroundSize: '200% 200%',
-        }}
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-      />
-
-      {/* Current tier chip */}
+      {/* Trophy icon with subtle glow - no gradient backgrounds */}
       <motion.div
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
         style={{
