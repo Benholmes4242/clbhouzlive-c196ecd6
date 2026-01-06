@@ -103,14 +103,14 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      {/* Connecting line */}
+      {/* Connecting line - constrained to node column only, hidden behind cards via z-index */}
       {!isLast && (
         <div
-          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)]"
+          className="absolute left-5 top-12 w-0.5 h-[calc(100%-8px)] z-0"
           style={{
             background: milestone.isUnlocked
               ? `linear-gradient(to bottom, ${accentColor}80, rgba(31, 36, 40, 0.12))`
-              : 'rgba(31, 36, 40, 0.12)',
+              : 'rgba(31, 36, 40, 0.08)',
           }}
         />
       )}
@@ -169,8 +169,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         )}
       </motion.button>
 
-      {/* Milestone card */}
-      <div className="flex-1 mb-4" onClick={onClick}>
+      {/* Milestone card - z-10 ensures it covers the connector line */}
+      <div className="flex-1 mb-4 relative z-10" onClick={onClick}>
           <AchievementBadgeCard
             tier={isRegional && milestone.regionSlug 
               ? REGION_TO_TIER[milestone.regionSlug] 

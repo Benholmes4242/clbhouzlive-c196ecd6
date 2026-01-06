@@ -6,7 +6,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Trophy, Share2, ChevronRight, Sparkles } from 'lucide-react';
+import { Trophy, Share2, ChevronRight, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Confetti from 'react-confetti';
 import { ACHIEVEMENT_MILESTONES, MILESTONE_TIER_META } from '@/config/achievements';
@@ -16,6 +16,8 @@ interface MilestoneUnlockSheetProps {
   totalPlayed: number;
   onShare?: () => void;
 }
+
+const SNOOZE_STORAGE_KEY = 'quest-milestone-snooze-until';
 
 interface Milestone {
   id: string;
@@ -64,6 +66,26 @@ function markMilestoneSeen(id: string) {
   }
 }
 
+function isSnoozeActive(): boolean {
+  try {
+    const snoozeUntil = localStorage.getItem(SNOOZE_STORAGE_KEY);
+    if (!snoozeUntil) return false;
+    return Date.now() < parseInt(snoozeUntil, 10);
+  } catch {
+    return false;
+  }
+}
+
+function activateSnooze(): void {
+  try {
+    // Snooze for 7 days
+    const snoozeUntil = Date.now() + (7 * 24 * 60 * 60 * 1000);
+    localStorage.setItem(SNOOZE_STORAGE_KEY, snoozeUntil.toString());
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   totalPlayed,
   onShare,
@@ -79,6 +101,9 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   }, []);
 
   useEffect(() => {
+    // Check if snoozed - don't show unlocks
+    if (isSnoozeActive()) return;
+    
     // Find newly unlocked milestone
     const seen = getSeenMilestones();
     
@@ -98,6 +123,16 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
   }, [totalPlayed]);
 
   const handleClose = useCallback(() => {
+    if (unlockedMilestone) {
+      markMilestoneSeen(unlockedMilestone.id);
+    }
+    setUnlockedMilestone(null);
+    setProgress(0);
+    setShowConfetti(false);
+  }, [unlockedMilestone]);
+
+  const handleNotNow = useCallback(() => {
+    activateSnooze();
     if (unlockedMilestone) {
       markMilestoneSeen(unlockedMilestone.id);
     }
@@ -137,6 +172,16 @@ export const MilestoneUnlockSheet: React.FC<MilestoneUnlockSheetProps> = ({
             style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
           />
         )}
+
+        {/* Not now button - top left */}
+        <button
+          onClick={handleNotNow}
+          className="absolute top-4 left-4 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors hover:bg-black/5 z-20"
+          style={{ color: 'var(--quest-text-tertiary)' }}
+        >
+          <X className="w-3.5 h-3.5" />
+          Not now
+        </button>
 
         <div className="py-8 text-center relative">
           {/* Background glow */}

@@ -193,7 +193,7 @@ export function useQuestCourses() {
       if (!a.dateAdded || !b.dateAdded) return 0;
       return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
     })
-    .slice(0, 5);
+    .slice(0, 10);
 
   // Toggle wishlist (shortlist) - unchanged
   const toggleWishlistMutation = useMutation({
