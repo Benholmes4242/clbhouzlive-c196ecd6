@@ -8,7 +8,7 @@
  *   A) Rated courses → Add immediately
  *   B) Unrated courses → Prompt to rate first
  */
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
@@ -19,6 +19,24 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 interface AddCourseModalProps {
   userId: string;
@@ -70,6 +88,121 @@ const getPositionBadgeStyle = (position: number): { bg: string; text: string; sh
   }
 };
 
+// Sortable list item component
+interface SortableItemProps {
+  course: any;
+  index: number;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
+  onRemove: (courseId: string) => void;
+  isRemoving: boolean;
+  isReordering: boolean;
+  totalItems: number;
+}
+
+const SortableManageItem: React.FC<SortableItemProps> = ({
+  course,
+  index,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  isRemoving,
+  isReordering,
+  totalItems,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: course.course_id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  const position = index + 1;
+  const badgeStyle = getPositionBadgeStyle(position);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50 ${
+        isDragging ? 'shadow-lg' : ''
+      }`}
+    >
+      {/* Drag handle - centered vertically */}
+      <div 
+        {...attributes}
+        {...listeners}
+        className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none"
+      >
+        <GripVertical className="w-5 h-5 text-muted-foreground/50" />
+      </div>
+
+      {/* Position badge - gold/silver/bronze/slate */}
+      <div 
+        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+        style={{
+          background: badgeStyle.bg,
+          boxShadow: badgeStyle.shadow,
+        }}
+      >
+        <span 
+          className="text-xs font-bold"
+          style={{ color: badgeStyle.text }}
+        >
+          #{position}
+        </span>
+      </div>
+
+      {/* Course info */}
+      <div className="flex-1 min-w-0">
+        <div className="font-medium truncate text-sm">{course.name}</div>
+        <div className="text-xs text-muted-foreground truncate">
+          {course.sub_country || course.country}
+        </div>
+      </div>
+
+      {/* Reorder buttons */}
+      <div className="flex flex-col gap-0.5">
+        <button
+          onClick={() => onMoveUp(index)}
+          disabled={index === 0 || isReordering}
+          className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Move up"
+        >
+          <ChevronUp className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <button
+          onClick={() => onMoveDown(index)}
+          disabled={index === totalItems - 1 || isReordering}
+          className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Move down"
+        >
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* Remove button */}
+      <button
+        onClick={() => onRemove(course.course_id)}
+        disabled={isRemoving}
+        className="p-2 rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50"
+        aria-label="Remove from Top 10"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
+
 export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   userId,
   onClose,
@@ -83,6 +216,33 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   
   const { data: userActivity = [] } = useUserCourseActivity(userId);
   const { addCourse, removeCourse, reorderTopTen, topTen, isRemoving, isReordering } = useUserTopTenCourses(userId);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = topTen.findIndex((c) => c.course_id === active.id);
+      const newIndex = topTen.findIndex((c) => c.course_id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newOrder = arrayMove(topTen, oldIndex, newIndex);
+        reorderTopTen(newOrder.map((c, i) => ({ course_id: c.course_id, position: i + 1 })));
+      }
+    }
+  }, [topTen, reorderTopTen]);
 
   // Get all played course IDs (not already in Top 10)
   const playedCourseIds = useMemo(() => {
@@ -259,78 +419,33 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
               <p className="text-sm mt-1">Switch to "Add Course" to get started.</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {topTen.map((course, index) => {
-                const position = index + 1;
-                const badgeStyle = getPositionBadgeStyle(position);
-                
-                return (
-                  <div
-                    key={course.course_id}
-                    className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-border/50"
-                  >
-                    {/* Drag handle - centered vertically */}
-                    <div className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none">
-                      <GripVertical className="w-5 h-5 text-muted-foreground/50" />
-                    </div>
-
-                    {/* Position badge - gold/silver/bronze/slate */}
-                    <div 
-                      className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{
-                        background: badgeStyle.bg,
-                        boxShadow: badgeStyle.shadow,
-                      }}
-                    >
-                      <span 
-                        className="text-xs font-bold"
-                        style={{ color: badgeStyle.text }}
-                      >
-                        #{position}
-                      </span>
-                    </div>
-
-                    {/* Course info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate text-sm">{course.name}</div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {course.sub_country || course.country}
-                      </div>
-                    </div>
-
-                    {/* Reorder buttons */}
-                    <div className="flex flex-col gap-0.5">
-                      <button
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0 || isReordering}
-                        className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-                        aria-label="Move up"
-                      >
-                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                      </button>
-                      <button
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === topTen.length - 1 || isReordering}
-                        className="p-1 rounded hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-                        aria-label="Move down"
-                      >
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                      </button>
-                    </div>
-
-                    {/* Remove button */}
-                    <button
-                      onClick={() => handleRemoveCourse(course.course_id)}
-                      disabled={isRemoving}
-                      className="p-2 rounded-lg hover:bg-destructive/10 text-destructive/70 hover:text-destructive transition-colors disabled:opacity-50"
-                      aria-label="Remove from Top 10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext
+                items={topTen.map(c => c.course_id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {topTen.map((course, index) => (
+                    <SortableManageItem
+                      key={course.course_id}
+                      course={course}
+                      index={index}
+                      onMoveUp={handleMoveUp}
+                      onMoveDown={handleMoveDown}
+                      onRemove={handleRemoveCourse}
+                      isRemoving={isRemoving}
+                      isReordering={isReordering}
+                      totalItems={topTen.length}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )
         ) : (
           /* Add courses tab */
