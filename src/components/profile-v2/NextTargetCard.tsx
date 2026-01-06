@@ -67,11 +67,11 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
     return (
       <div
         className={cn(
-          'p-5 rounded-2xl bg-white border border-slate-200/60',
+          'py-2',
           className
         )}
         style={{
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), 0 0 20px rgba(210, 180, 97, 0.15)',
+          boxShadow: '0 0 20px rgba(210, 180, 97, 0.15)',
         }}
       >
         <div className="flex items-center gap-3 mb-3">
@@ -120,12 +120,9 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
   return (
     <div
       className={cn(
-        'p-5 rounded-2xl bg-white border border-slate-200/60',
+        'py-2',
         className
       )}
-      style={{
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
-      }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">

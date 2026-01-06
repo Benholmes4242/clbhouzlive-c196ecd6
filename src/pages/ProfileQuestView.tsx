@@ -242,10 +242,10 @@ const ProfileQuestView: React.FC = () => {
         </div>
       </div>
 
-      {/* Content with consistent vertical rhythm */}
+      {/* Content with alternating background bands like Course Details */}
       <div className="relative pb-32">
-        {/* Section 1: Trophy Room Hero - NO CARD, section band */}
-        <div className="px-4 py-6">
+        {/* Section 1: Trophy Room Hero - bg-slate-50 (page default) */}
+        <section className="px-4 py-6 bg-slate-50">
           <TrophyRoomHero
             totalPlayed={totalPlayed}
             target={100}
@@ -253,19 +253,20 @@ const ProfileQuestView: React.FC = () => {
             onContinueJourney={handleContinueJourney}
             regionProgress={regionProgress}
           />
-        </div>
+        </section>
 
-        {/* Section 2: Trophy Case - NO CARD, section band with divider */}
-        <div className="border-t border-slate-200/60 px-4 py-5">
+        {/* Section 2: Trophy Case - bg-white band */}
+        <section className="px-4 py-5 bg-white border-y border-slate-200/60">
           <TrophyCase
             totalPlayed={totalPlayed}
             regionProgress={regionProgress}
             onBadgeClick={handleBadgeClick}
           />
-        </div>
+        </section>
 
-        {/* Section 3: Next Target Card - KEEP CARD */}
-        <div className="px-4 py-5 border-t border-slate-200/60">
+        {/* Section 3: Next Target - bg-slate-50 */}
+        <section className="px-4 py-5 bg-slate-50">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Next Target</h2>
           <NextTargetCard
             totalPlayed={totalPlayed}
             nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
@@ -275,10 +276,10 @@ const ProfileQuestView: React.FC = () => {
             showHint={onboarding.shouldShowTargetHint}
             onHintDismiss={onboarding.markTargetHintSeen}
           />
-        </div>
+        </section>
 
-        {/* Section 4: Journey Map - KEEP CARD */}
-        <div className="px-4 py-5 border-t border-slate-200/60" ref={journeyMapRef}>
+        {/* Section 4: Journey Map - bg-slate-50 */}
+        <section className="px-4 py-5 bg-slate-50 border-t border-slate-200/60" ref={journeyMapRef}>
           <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Journey Map</h2>
           {showJourneyHint && (
             <p className="text-xs mb-2 text-slate-400 transition-opacity duration-500">
@@ -295,30 +296,30 @@ const ProfileQuestView: React.FC = () => {
               total: r.total,
             }))}
           />
-        </div>
+        </section>
 
-        {/* Section 5: Regional Progress - NO CARD, section band */}
-        <div className="px-4 py-5 border-t border-slate-200/60">
+        {/* Section 5: Regional Progress - bg-white band */}
+        <section className="px-4 py-5 bg-white border-y border-slate-200/60">
           <RegionalJourneySummary regions={regionProgress} />
-        </div>
+        </section>
 
-        {/* Section 6: Momentum - NO CARD, section band */}
-        <div className="px-4 py-5 border-t border-slate-200/60">
+        {/* Section 6: Momentum - bg-slate-100 band */}
+        <section className="px-4 py-5 bg-slate-100">
           <MomentumCard recentlyPlayed={recentCourses} />
-        </div>
+        </section>
 
-        {/* Section 7: Leaderboard - KEEP CARD (has own header) */}
-        <div className="px-4 py-5 border-t border-slate-200/60">
+        {/* Section 7: Leaderboard - bg-slate-50 */}
+        <section className="px-4 py-5 bg-slate-50 border-t border-slate-200/60">
           <LeaderboardCard userId={user?.id} />
-        </div>
+        </section>
 
-        {/* Section 8: Recently Added - NO CARD, section band */}
-        <div className="px-4 py-5 border-t border-slate-200/60">
+        {/* Section 8: Recently Added - bg-white band */}
+        <section className="px-4 py-5 bg-white border-y border-slate-200/60">
           <RecentlyAddedSection
             courses={recentCourses}
             hasGoldTrim={rewards.hasGoldTrim}
           />
-        </div>
+        </section>
       </div>
 
       {/* Region List Sheet */}
