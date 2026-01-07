@@ -4,7 +4,7 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
 import PhotosGrid from '@/components/discover/PhotosGrid';
-import ShortsGrid from '@/components/discover/ShortsGrid';
+import WatchGridV2 from '@/components/discover/WatchGridV2';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
@@ -575,15 +575,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         
         <div className="h-4" /> {/* 16px gap: Suggested Golfers → Grid */}
         
-        {/* Feed Grid with course clustering */}
-        <ShortsGrid 
-          items={clusteredGridContent || []} 
-          onOpen={onMediaClick}
-          isLoading={loading}
-          hasMore={hasMore}
-          onLoadMore={loadMore}
-          onLike={handleLikeToggle}
-          onAuthorClick={handleAuthorClick}
+        {/* Feed Grid - uses new WatchGridV2 with ActivityGrid layout */}
+        <WatchGridV2 
+          onMediaClick={(item, index) => {
+            // Find original item for compatibility with existing onMediaClick
+            const originalItem = content?.find(c => c.id === item.postId);
+            if (originalItem) onMediaClick(originalItem);
+          }}
         />
       </div>
     );
