@@ -10,7 +10,6 @@
  * Smooth content switching when tapping different avatars
  */
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import './PlayerPreviewSheet.css';
@@ -156,10 +155,6 @@ export function PlayerPreviewSheet({
 
   if (!isOpen || !player) return null;
 
-  // Render outside any Hub/scroll/layout stacking contexts.
-  const portalTarget = typeof document !== 'undefined' ? document.body : null;
-  if (!portalTarget) return null;
-
   const handleViewProfile = () => {
     if (player.user_id) {
       onViewProfile(player.user_id);
@@ -191,7 +186,7 @@ export function PlayerPreviewSheet({
       ? `translateY(${translateY}px)` 
       : undefined;
 
-  return createPortal(
+  return (
     <>
       {/* Backdrop - tap to dismiss */}
       <div 
@@ -359,7 +354,6 @@ export function PlayerPreviewSheet({
           )}
         </div>
       </div>
-     </>,
-     portalTarget
-   );
+    </>
+  );
 }
