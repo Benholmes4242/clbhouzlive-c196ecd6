@@ -14,9 +14,7 @@ import { useChromeState } from '@/hooks/useChromeState';
 // Hub components - fixed layout versions
 import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
 import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
-import { HubGamesPreview } from '../home/tiles/HubGamesPreview';
-import { HubEchoCompact } from '../home/tiles/HubEchoCompact';
-import { HubGolfLifeCompact } from '../home/tiles/HubGolfLifeCompact';
+import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import { HubActionDock } from '../home/tiles/HubActionDock';
 
 import '../home/hubThemeLight.css';
@@ -188,29 +186,20 @@ export function HubHomePage() {
           style={{
             paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
             paddingBottom: 'max(calc(env(safe-area-inset-bottom, 0px) + 90px), 102px)', // Dock height
-            overflow: 'hidden', // NO SCROLL
+            overflow: 'hidden', // NO SCROLL - Hub page itself does not scroll
           }}
         >
-          {/* Zone 1: Header - Fixed 72px */}
+          {/* Zone 1: Header - Fixed ~80px */}
           <HubHeaderToday />
 
-          {/* Zone 2: Messages - Fixed 120px */}
-          <div className="h-[120px] shrink-0">
+          {/* Zone 2: Messages - Fixed ~110px, no internal scroll */}
+          <div className="h-[110px] shrink-0">
             <HubMessagesCard />
           </div>
 
-          {/* Zone 3: Games Preview - Flex grow to fill available space */}
-          <div className="mt-3 flex-1 min-h-[140px]">
-            <HubGamesPreview />
-          </div>
-
-          {/* Zone 4: Echo + Golf Life - Side by side, Fixed 140px */}
-          <div 
-            className="mt-3 h-[140px] shrink-0 grid gap-3"
-            style={{ gridTemplateColumns: '1fr 1fr' }}
-          >
-            <HubEchoCompact />
-            <HubGolfLifeCompact />
+          {/* Zone 3: Games - Primary section, flex-1 with internal scroll */}
+          <div className="mt-3 flex-1 min-h-[180px]">
+            <YourGamesTile />
           </div>
         </div>
 
