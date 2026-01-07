@@ -17,7 +17,7 @@ import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
 
 // ============ Types ============
 
-export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero';
+export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero' | 'videos';
 export type PlaybackReason = 'autoplay' | 'user' | 'resume';
 export type ErrorType = 'transient' | 'hls_fatal' | 'decode_unsupported';
 
@@ -89,6 +89,7 @@ const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'grid': 1,           // Only 1 grid video (from autoplay pattern)
   'fullscreen': 1,     // Only 1 fullscreen
   'clubhouse': 1,      // Only 1 clubhouse
+  'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
 };
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
@@ -98,6 +99,7 @@ const SURFACE_PRIORITY: Record<MediaSurface, number> = {
   'fullscreen': 2,     // High - fullscreen modal
   'hero': 3,           // Medium-high - hero video at top
   'grid': 4,           // Medium - grid videos
+  'videos': 5,         // Medium-low - videos page (long-form)
 };
 
 // ============ Singleton Runtime ============
