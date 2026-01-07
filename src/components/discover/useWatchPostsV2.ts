@@ -85,8 +85,10 @@ export function useWatchPostsV2() {
 
       if (error) throw error;
 
-      // Get unique actor IDs
-      const actorIds = [...new Set(postsData?.map(p => p.actor_id).filter(Boolean))] as string[];
+      // Get unique actor IDs - use actor_id first, fall back to user_id
+      const actorIds = [...new Set(
+        postsData?.map(p => p.actor_id || p.user_id).filter(Boolean)
+      )] as string[];
 
       // Fetch user profiles for all actors
       const { data: profiles } = await supabase
@@ -97,10 +99,10 @@ export function useWatchPostsV2() {
       // Create a map for quick lookup
       const profileMap = new Map(profiles?.map(p => [p.id, p]) ?? []);
 
-      // Attach user data to posts
+      // Attach user data to posts - check both actor_id and user_id
       const postsWithUsers = (postsData || []).map(post => ({
         ...post,
-        user: post.actor_id ? profileMap.get(post.actor_id) : null
+        user: profileMap.get(post.actor_id || post.user_id || '') || null
       }));
 
       // Filter posts that have valid media

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActivityGridV2 } from '@/components/profile/activity/v2';
 import { useWatchPostsV2 } from './useWatchPostsV2';
@@ -28,6 +28,21 @@ export function WatchGridV2({ onMediaClick }: WatchGridV2Props) {
     fetchNextPage,
     isFetchingNextPage,
   } = useWatchPostsV2();
+
+  // Debug: Log creator data
+  useEffect(() => {
+    if (items.length > 0) {
+      console.log('[WatchGridV2] First 3 items with creator data:', 
+        items.slice(0, 3).map(item => ({
+          postId: item.postId.slice(0, 8),
+          hasCreator: !!item.creator,
+          creatorName: item.creator?.name,
+          creatorAvatar: item.creator?.avatar?.slice(0, 50),
+          creatorUsername: item.creator?.username
+        }))
+      );
+    }
+  }, [items]);
 
   // Default click handler navigates to shorts player
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
