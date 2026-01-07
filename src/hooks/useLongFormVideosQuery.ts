@@ -60,8 +60,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
       post_likes(count),
       post_views(count)
     `)
-    .eq('post_media.media_type', 'video')
-    .eq('visibility', 'anyone');
+    .eq('post_media.media_type', 'video');
 
   // Only apply creator filter if specified
   if (creatorUserId) {

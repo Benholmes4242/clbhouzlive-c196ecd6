@@ -41,7 +41,9 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
       const startRange = pageParam as number;
-      const endRange = startRange + PAGE_SIZE - 1;
+      // Fetch 3x PAGE_SIZE to ensure we get enough horizontal videos after filtering
+      const fetchSize = PAGE_SIZE * 3;
+      const endRange = startRange + fetchSize - 1;
 
       console.log('[useInfiniteLongFormVideos] 🔍 FETCHING PAGE:', {
         section,
@@ -82,8 +84,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           post_likes(count),
           post_views(count)
         `)
-        .eq('post_media.media_type', 'video')
-        .eq('visibility', 'anyone');
+        .eq('post_media.media_type', 'video');
 
       // Only apply following filter for following section
       if (section === 'following') {
@@ -159,8 +160,9 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
-      const nextCursor = hasMore ? endRange + 1 : startRange;
+      // hasMore based on whether we found enough horizontal videos
+      const hasMore = horizontalVideos.length >= PAGE_SIZE;
+      const nextCursor = hasMore ? startRange + fetchSize : startRange;
 
       console.log('[useInfiniteLongFormVideos] ✅ PAGE COMPLETE:', {
         section,
