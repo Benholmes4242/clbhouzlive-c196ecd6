@@ -37,6 +37,12 @@ const Top100Hub = () => {
   
   const [activeTab, setActiveTab] = useState<ValidTab>(safeTab);
   
+  // Scroll to top on tab switch
+  const handleTabChange = (tab: ValidTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  };
+  
   // View mode state for toggle highlight
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   
@@ -111,7 +117,7 @@ const Top100Hub = () => {
           </div>
 
           {/* Tabs: Courses | My Progress | Leaderboard - matches Golf Courses page exactly */}
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+          <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
               <TabsTrigger 
                 value="courses" 

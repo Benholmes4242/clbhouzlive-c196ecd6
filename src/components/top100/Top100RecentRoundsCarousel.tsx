@@ -99,10 +99,10 @@ export function Top100RecentRoundsCarousel({
   }
 
   return (
-    <section className={cn("w-full", className)}>
-      {/* Section header */}
-      <div className="mb-3 px-2.5">
-        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+    <section className={cn("w-full px-4", className)}>
+      {/* Section header - mb-4 */}
+      <div className="mb-4">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
           Recent Top 100 rounds
         </h3>
       </div>

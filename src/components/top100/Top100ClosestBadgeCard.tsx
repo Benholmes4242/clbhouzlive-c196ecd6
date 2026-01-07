@@ -55,20 +55,21 @@ export function Top100ClosestBadgeCard({
   const progressPercent = Math.min(100, (progress / target) * 100);
 
   return (
-    <section>
-      <div className="mb-3 flex items-center justify-between px-2.5">
-        <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+    <section className="px-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
           Closest Badge
         </h2>
         <span className="text-xs font-medium text-muted-foreground tabular-nums">
           <AnimatedNumber value={totalTop100Played} minCh={1} /> courses logged
         </span>
       </div>
-      {/* Single badge card - lighter padding (E2) */}
+      {/* KEEP as card - stronger shadow for focal CTA */}
       <div 
         className={cn(
-          "mx-2.5 rounded-sq-md border bg-card/60 p-3.5 relative overflow-hidden",
-          "hover:bg-card/80 transition-colors cursor-pointer"
+          "rounded-2xl border bg-white p-4 relative overflow-hidden",
+          "hover:bg-slate-50 transition-colors cursor-pointer",
+          "shadow-md"
         )}
         style={{ borderColor: `${accentColor}30` }}
         onClick={() => onOpenDetail?.(closest)}
@@ -123,14 +124,14 @@ export function Top100ClosestBadgeCard({
               />
             </div>
 
-            {/* CTA - underline on hover (item 8) */}
+            {/* CTA - high contrast */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenDetail?.(closest);
               }}
-              className="mt-3 text-xs font-medium underline-offset-2 hover:underline"
+              className="mt-3 text-xs font-semibold underline-offset-2 hover:underline"
               style={{ color: accentColor }}
             >
               See requirements →

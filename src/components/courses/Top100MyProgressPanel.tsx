@@ -61,7 +61,10 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const isOwnProfile = !userId || userId === session?.user?.id;
   const prevTotalRef = useRef<number | null>(null);
 
-  // Unified achievement sheet state - single controller for both milestone and regional
+  // Scroll to top on mount (required behavior - always start at top)
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
   const [achievementSheetData, setAchievementSheetData] = useState<AchievementData | null>(null);
   const [isAchievementSheetOpen, setIsAchievementSheetOpen] = useState(false);
 
@@ -214,13 +217,12 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   }
 
   return (
-    <div className="w-full max-w-full pb-8">
+    <div className="w-full max-w-full pb-10">
       {/* ============================================
-          SECTION 1: PAGE HEADER & HERO CONTEXT
+          SECTION A: HERO / IDENTITY - section band, no card
+          Background: bg-slate-50, pt-8 pb-10
           ============================================ */}
-      
-      {/* 1.1 Hero: User Identity & Total Progress (A2, A3) */}
-      <div className="pt-4 pb-6">
+      <section className="bg-slate-50 pt-8 pb-10">
         <Top100ProgressHero
           displayName={displayName}
           avatarUrl={avatarUrl}
@@ -231,84 +233,86 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           lastRoundAt={lastPlayedDate}
           isOwnProfile={isOwnProfile}
         />
-      </div>
-
-      {/* 1.2 Supporting Stats Row with icons (A4) - use year-scoped regions count */}
-      <div className="mb-5">
-        <Top100YearSummary summary={yearSummary} regionsCount={yearRegionsCount} />
-      </div>
-
-      {/* ============================================
-          SECTION 1.5: PROGRESS TIMELINE & STREAK (H, I)
-          ============================================ */}
-      
-      {/* H) Progress Timeline - year-scoped data */}
-      <div className="mb-5">
-        <Top100ProgressTimeline
-          rounds={data.year_rounds ?? []}
-          year={new Date().getFullYear()}
-          onViewAll={() => navigate('/rounds?filter=top100')}
-        />
-      </div>
-
-      {/* I) Logging Streak Module - uses all_rounds_for_streak (last 18 months) */}
-      <div className="mb-5">
-        <Top100LoggingStreak
-          rounds={data.all_rounds_for_streak ?? data.recent_rounds}
-          onLogRound={() => navigate('/courses?action=log')}
-        />
-      </div>
+        
+        {/* B) Stats Row - KEEP as card, p-5, gap-6 - mt-6 from hero */}
+        <div className="mt-6 px-4">
+          <Top100YearSummary summary={yearSummary} regionsCount={yearRegionsCount} />
+        </div>
+      </section>
 
       {/* ============================================
-          SECTION 2: ACHIEVEMENTS (CELEBRATION LAYER)
+          SECTION C: MOMENTUM (2026 Progress + Streak)
+          Combined section - bg-white, px-4 py-6
           ============================================ */}
-      
-      {/* 2.1 Milestone Achievements - Snap Carousel (C1, C2, C3) */}
-      <div className="mb-4">
-        <Top100MilestonesCarousel 
-          totalPlayed={data.totalTop100Played} 
-          onMilestoneClick={(milestone) => openMilestoneSheet(milestone.threshold)}
-        />
-      </div>
+      <section className="bg-white px-4 py-6 border-t border-slate-200/60">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+          Momentum
+        </h3>
+        <div className="space-y-4">
+          {/* H) Progress Timeline */}
+          <Top100ProgressTimeline
+            rounds={data.year_rounds ?? []}
+            year={new Date().getFullYear()}
+            onViewAll={() => navigate('/rounds?filter=top100')}
+          />
 
-      {/* 2.2 Next achievement line - interactive (C4) */}
-      {data?.next_milestone && (() => {
-        const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
-        return (
-          <div className="flex justify-center mb-4 mt-2">
+          {/* I) Logging Streak */}
+          <Top100LoggingStreak
+            rounds={data.all_rounds_for_streak ?? data.recent_rounds}
+            onLogRound={() => navigate('/courses?action=log')}
+          />
+        </div>
+      </section>
+
+      {/* ============================================
+          SECTION D: ACHIEVEMENTS (CELEBRATION LAYER)
+          Divider above, mt-10
+          ============================================ */}
+      <section className="mt-10 border-t border-slate-200/60 pt-6">
+        {/* D.1 Milestone Achievements Carousel */}
+        <div className="mb-5">
+          <Top100MilestonesCarousel 
+            totalPlayed={data.totalTop100Played} 
+            onMilestoneClick={(milestone) => openMilestoneSheet(milestone.threshold)}
+          />
+        </div>
+
+        {/* D.2 Next achievement line - interactive */}
+        {data?.next_milestone && (() => {
+          const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
+          return (
+            <div className="flex justify-center mb-4 mt-5 px-4">
               <button
-              type="button"
-              onClick={() => openMilestoneSheet(data.next_milestone!.threshold)}
-              className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-muted/50 active:scale-[0.98] transition-all"
-            >
-              {/* Tightened copy (item 6) */}
-              <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
-                <span className="font-semibold">
-                  {data.next_milestone.remaining} more to{' '}
-                </span>
-                <span className="font-semibold" style={{ color: nextTierColor }}>
-                  {data.next_milestone.tierName}
-                </span>
-              </p>
-              {/* Micro progress bar */}
-              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
-                />
-              </div>
-            </button>
-          </div>
-        );
-      })()}
+                type="button"
+                onClick={() => openMilestoneSheet(data.next_milestone!.threshold)}
+                className="w-full max-w-sm bg-white border border-slate-200/60 rounded-full py-2 px-4 flex flex-col gap-1.5 hover:bg-slate-50 active:scale-[0.98] transition-all"
+              >
+                <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
+                  <span className="font-semibold">
+                    {data.next_milestone.remaining} more to{' '}
+                  </span>
+                  <span className="font-semibold" style={{ color: nextTierColor }}>
+                    {data.next_milestone.tierName}
+                  </span>
+                </p>
+                {/* Micro progress bar */}
+                <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
+                  />
+                </div>
+              </button>
+            </div>
+          );
+        })()}
+      </section>
 
       {/* ============================================
           SECTION 3: SOCIAL CONTEXT (SECONDARY)
           ============================================ */}
-      
-      {/* 3.1 Friends Chasing the Top 100 */}
       {isOwnProfile && topFriends.length > 0 && (
-        <div className="mb-6 opacity-95">
+        <div className="mt-8 px-4 opacity-95">
           <Top100FriendsActivityCard
             friends={topFriends}
             friendMessage={friendMessage}
@@ -318,31 +322,33 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       )}
 
       {/* ============================================
-          SECTION 4: JOURNEY BY REGION (D1-D4)
+          SECTION E: YOUR JOURNEY BY REGION
+          NO card - flat rows on bg-slate-50
           ============================================ */}
-      
-      <div className="mb-6">
+      <section className="mt-10 bg-slate-50 py-6">
         <Top100RegionProgressGrid
           lists={data.lists}
           isOwnProfile={isOwnProfile}
           displayName={displayName}
         />
-      </div>
+      </section>
 
       {/* ============================================
-          SECTION 5: COMPLETIONS & CLOSEST BADGE (E1, E2)
+          SECTION F: LIST COMPLETIONS (SECONDARY)
+          Lighter visual emphasis, mt-10
           ============================================ */}
-      
-      {/* 5.1 Top 100 List Completions */}
-      <div className="mb-4">
+      <section className="mt-10 opacity-90">
         <Top100ListCompletionsRow 
           lists={data.lists} 
           onCardClick={openRegionalSheet}
         />
-      </div>
+      </section>
 
-      {/* 5.2 Closest Badge - Merged module (E1) */}
-      <div className="mb-4">
+      {/* ============================================
+          SECTION G: CLOSEST BADGE (KEY CTA)
+          KEEP as card, my-10, stronger shadow
+          ============================================ */}
+      <div className="my-10">
         <Top100ClosestBadgeCard 
           totalTop100Played={data.totalTop100Played} 
           onOpenDetail={(milestone) => openMilestoneSheet(milestone.threshold)}
@@ -350,17 +356,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* ============================================
-          SECTION 6: RECENT ACTIVITY (MEMORY LAYER)
+          SECTION H: RECENT TOP 100 ROUNDS
+          Divider above, pt-8
           ============================================ */}
-      
-      {/* 6.1 Recent Top 100 Rounds - Swipe Carousel (F1-F3) - tighter spacing (item 10) */}
-      <div className="-mx-4 sm:mx-0 mb-3">
+      <section className="border-t border-slate-200/60 pt-8 -mx-4 sm:mx-0">
         <Top100RecentRoundsCarousel
           rounds={data.recent_rounds}
           isOwnProfile={isOwnProfile}
           onAddRound={() => navigate('/courses?action=log')}
         />
-      </div>
+      </section>
 
       {/* Unified Achievement Sheet - handles both milestone and regional */}
       <UnifiedAchievementSheet
