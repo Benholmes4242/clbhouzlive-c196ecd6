@@ -68,6 +68,16 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
       const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
 
+      console.log('[useInfiniteLongFormVideos] 🔍 FETCHING PAGE:', {
+        section,
+        pageParam,
+        startRange,
+        endRange,
+        pageSize: PAGE_SIZE,
+        durationThreshold: VIDEO_DURATION_THRESHOLD_SECONDS,
+        usingRealData: !ENABLE_MOCK_VIDEOS
+      });
+
       // For 'following' section, return empty if no followed creators
       if (section === 'following' && followedCreatorIds.length === 0) {
         return { items: [], nextCursor: startRange, hasMore: false };
@@ -152,6 +162,14 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
       const { data: postsData, error } = await baseQuery;
 
+      console.log('[useInfiniteLongFormVideos] 📊 RAW QUERY RESULT:', {
+        section,
+        pageParam,
+        postsReturned: postsData?.length || 0,
+        firstPostDuration: postsData?.[0]?.post_media?.[0]?.duration_seconds,
+        error: error?.message
+      });
+
       if (error) throw error;
 
       // Fetch profiles for creators
@@ -197,6 +215,13 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
       const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
+
+      console.log('[useInfiniteLongFormVideos] ✅ PAGE COMPLETE:', {
+        section,
+        itemsReturned: items.length,
+        hasMore,
+        nextCursor
+      });
 
       return { items, nextCursor, hasMore };
     },
