@@ -210,10 +210,10 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   });
 
   const realItems = query.data?.pages.flatMap((page) => page.items) ?? [];
-  const pagesLoaded = query.data?.pages.length ?? 0;
+  const pagesLoaded = query.data?.pages.length ?? 1; // Default to 1 for initial load
   
   // Inject mock videos when flag is enabled (for UI testing)
-  // Apply same pagination logic - only show PAGE_SIZE * pagesLoaded mocks
+  // Apply same pagination logic - show PAGE_SIZE * pagesLoaded total items
   let allItems = realItems;
   let mockHasMore = false;
   
@@ -223,12 +223,26 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     const seenIds = new Set(realItems.map(v => v.id));
     const uniqueMocks = mockVideos.filter(v => !seenIds.has(v.id));
     
-    // Paginate mocks the same way - only show up to PAGE_SIZE * pagesLoaded
-    const maxMocksToShow = Math.max(0, (PAGE_SIZE * pagesLoaded) - realItems.length);
-    const paginatedMocks = uniqueMocks.slice(0, maxMocksToShow);
+    // Calculate total items to show based on pages loaded
+    const totalItemsToShow = PAGE_SIZE * pagesLoaded;
+    
+    // How many mocks should we show to fill up to totalItemsToShow?
+    const mocksToShow = Math.max(0, totalItemsToShow - realItems.length);
+    const paginatedMocks = uniqueMocks.slice(0, mocksToShow);
     
     allItems = [...realItems, ...paginatedMocks];
-    mockHasMore = paginatedMocks.length < uniqueMocks.length;
+    
+    // There are more mocks if we haven't shown all of them yet
+    mockHasMore = mocksToShow < uniqueMocks.length;
+    
+    console.log('[useInfiniteLongFormVideos] Mock pagination:', {
+      pagesLoaded,
+      totalItemsToShow,
+      realItemsCount: realItems.length,
+      mocksToShow,
+      mocksTotalAvailable: uniqueMocks.length,
+      mockHasMore
+    });
   }
   
   // Has more if real data has more OR mocks have more to show
