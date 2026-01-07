@@ -18,7 +18,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
 
   return (
     <section
-      className="relative rounded-3xl px-4 pt-3 pb-5 overflow-hidden flex flex-col min-h-0 h-full"
+      className="relative rounded-3xl px-4 pt-3 pb-4 overflow-hidden flex flex-col min-h-0 h-full"
       style={{
         background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
