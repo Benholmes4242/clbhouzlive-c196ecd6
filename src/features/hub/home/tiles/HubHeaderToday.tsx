@@ -58,7 +58,7 @@ export function HubHeaderToday() {
   }, [nextGame]);
 
   return (
-    <div className="h-[68px] flex flex-col justify-center px-1">
+    <div className="h-[72px] flex flex-col justify-center px-1 pb-[10px]">
       <h1 
         className="text-[23px] font-medium leading-tight truncate tracking-[0.01em] flex items-center gap-2"
         style={{ color: 'var(--hub-text)' }}
