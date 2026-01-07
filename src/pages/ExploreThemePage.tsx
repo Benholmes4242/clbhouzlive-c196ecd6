@@ -32,7 +32,7 @@ const ExploreThemePage: React.FC = () => {
 
   if (error || !data?.theme) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[var(--bg-page)]">
         <div className="px-5 py-4">
           <button
             onClick={() => navigate(-1)}
@@ -57,9 +57,9 @@ const ExploreThemePage: React.FC = () => {
   const icon = theme.icon ? THEME_ICONS[theme.icon] : <Sparkles className="w-6 h-6" />;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-[var(--bg-page)] pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border/40">
+      <div className="sticky top-0 z-20 bg-[var(--bg-page)]/95 backdrop-blur-sm border-b border-border/40">
         <div className="px-5 py-4 flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
@@ -75,7 +75,7 @@ const ExploreThemePage: React.FC = () => {
 
       {/* Hero Section */}
       <div className={cn("relative h-48 bg-gradient-to-br", gradient)}>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-page)] via-[var(--bg-page)]/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">

@@ -85,7 +85,7 @@ const CourseReviewsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[var(--bg-page)] text-foreground">
       <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
         {/* Back + title */}
         <div className="mb-4 flex items-center gap-2">

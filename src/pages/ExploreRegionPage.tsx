@@ -54,7 +54,7 @@ const ExploreRegionPage: React.FC = () => {
 
   if (error || !data?.region) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[var(--bg-page)]">
         <div className="px-5 py-4">
           <button
             onClick={() => navigate(-1)}
@@ -79,9 +79,9 @@ const ExploreRegionPage: React.FC = () => {
   const allCourses = courses.slice(0, 30);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-[var(--bg-page)] pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border/40">
+      <div className="sticky top-0 z-20 bg-[var(--bg-page)]/95 backdrop-blur-sm border-b border-border/40">
         <div className="px-5 py-4 flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
@@ -104,7 +104,7 @@ const ExploreRegionPage: React.FC = () => {
             className="absolute inset-0 w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-page)] via-[var(--bg-page)]/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <h2 className="text-2xl font-serif text-foreground">{region.title}</h2>
           {region.subtitle && (

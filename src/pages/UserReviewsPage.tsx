@@ -35,7 +35,7 @@ const UserReviewsPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background px-4 py-3 pb-28">
+    <div className="min-h-screen bg-[var(--bg-page)] px-4 py-3 pb-28">
       {/* Header */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <button
