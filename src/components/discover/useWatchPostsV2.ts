@@ -35,11 +35,11 @@ export function useWatchPostsV2() {
         .from('posts')
         .select(`
           *,
-          user:user_profiles!posts_actor_id_fkey(id, display_name, username, profile_photo_url),
+          user:users!posts_actor_id_fkey(id, display_name, username, profile_photo_url),
           media:post_media!inner(*),
           course:golf_courses(id, name, city, sub_country, country)
         `)
-        .eq('visibility', 'anyone')
+        .eq('visibility', 'anyone' as any) // 'anyone' = public visibility
         .is('deleted_at', null)
         .eq('media.media_type', 'video')
         .lte('media.duration_seconds', 240)
