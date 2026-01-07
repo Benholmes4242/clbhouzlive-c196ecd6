@@ -57,7 +57,7 @@ export function HubMessagesCard() {
       }
     >
       {/* Fixed height content area - NO SCROLLING */}
-      <div className="h-full flex items-center justify-center">
+      <div className="h-full flex items-center justify-center py-2">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
             <div 

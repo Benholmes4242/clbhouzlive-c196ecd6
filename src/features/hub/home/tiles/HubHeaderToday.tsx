@@ -59,14 +59,14 @@ export function HubHeaderToday() {
   return (
     <div className="h-[68px] flex flex-col justify-center px-1">
       <h1 
-        className="text-[23px] font-semibold leading-tight truncate tracking-[0.01em]"
+        className="text-[23px] font-medium leading-tight truncate tracking-[0.01em]"
         style={{ color: 'var(--hub-text)' }}
       >
         {greeting}, {firstName}
       </h1>
       <p 
-        className="text-[14px] mt-0.5 truncate"
-        style={{ color: 'var(--hub-text-sub)', opacity: 0.85 }}
+        className="text-[14px] mt-1.5 truncate"
+        style={{ color: 'var(--hub-text-sub)', opacity: 0.7 }}
       >
         {subline}
       </p>
