@@ -46,10 +46,10 @@ export function HubMessagesCard() {
           <h3>Messages</h3>
           <button
             onClick={(e) => { e.stopPropagation(); navigateFromHub('/hub/messages'); }}
-            className="text-[14px] font-medium transition"
-            style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-body)', padding: 0 }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            className="text-[14px] font-normal transition"
+            style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-muted)', padding: 0 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
           >
             See all →
           </button>
