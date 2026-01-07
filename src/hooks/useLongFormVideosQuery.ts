@@ -82,7 +82,8 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
   }
 
   // Fetch more to filter for horizontal
-  query = query.order('created_at', { ascending: false }).limit(limit * 3);
+  const overfetch = Math.min(limit * 10, 200);
+  query = query.order('created_at', { ascending: false }).limit(overfetch);
 
   console.log(`[useLongFormVideosQuery] 🔍 SIMPLE QUERY for ${section}`);
 
@@ -157,7 +158,7 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
   } = options;
 
   const queryKey = [
-    'videos-simple',
+    'videos-simple-v2',
     section,
     limit,
     followedCreatorIds.join(','),
