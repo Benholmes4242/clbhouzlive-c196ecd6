@@ -7,7 +7,7 @@
  * 
  * No clutter. No redundancy. No UI shouting.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { haptic } from '@/utils/haptics';
 import { FLAGS } from '@/config/flags';
 import { PlayerPreviewSheet, PlayerPreviewData } from './PlayerPreviewSheet';
+import { usePlayerCache } from '../hooks/usePlayerCache';
 import './GameRow.css';
 
 // Mock players for testing 4/4 full game UI (behind MOCK_FULL_GAME_PLAYERS flag)
@@ -152,6 +153,14 @@ export function GameRow({
   // Player preview sheet state
   const [previewPlayer, setPreviewPlayer] = useState<PlayerPreviewData | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewState, setPreviewState] = useState<'loading' | 'loaded' | 'error'>('loaded');
+  const [contentKey, setContentKey] = useState<string>('');
+  
+  // Track current preview user to handle race conditions
+  const currentPreviewUserIdRef = useRef<string | null>(null);
+  
+  // Player cache for instant previews
+  const { getCached, setCache } = usePlayerCache();
 
   // Sync with external control
   React.useEffect(() => {
@@ -166,20 +175,71 @@ export function GameRow({
     onToggleExpand?.();
   };
 
-  // Handle avatar tap - open preview sheet
-  const handleAvatarTap = (player: PlayerPreviewData, e: React.MouseEvent) => {
+  // Handle avatar tap - open preview sheet with caching + smooth switching
+  const handleAvatarTap = useCallback((player: PlayerPreviewData, e: React.MouseEvent) => {
     e.stopPropagation();
     haptic('light');
-    setPreviewPlayer(player);
-    setIsPreviewOpen(true);
-  };
+    
+    const userId = player.user_id;
+    if (!userId) return;
+    
+    // Update current preview user ref (for race condition handling)
+    currentPreviewUserIdRef.current = userId;
+    
+    // Check cache first
+    const cached = getCached(userId);
+    
+    if (cached) {
+      // Instant display from cache
+      setPreviewPlayer(cached);
+      setPreviewState('loaded');
+      setContentKey(userId); // Trigger crossfade
+      setIsPreviewOpen(true);
+    } else {
+      // Show skeleton immediately, use available data
+      setPreviewPlayer(player);
+      setPreviewState('loading');
+      setContentKey(userId);
+      setIsPreviewOpen(true);
+      
+      // Simulate data fetch (in real app, this would be an API call)
+      // For now, we use the participant data directly since it has everything
+      setTimeout(() => {
+        // Only update if this is still the current preview
+        if (currentPreviewUserIdRef.current === userId) {
+          setCache(userId, player);
+          setPreviewPlayer(player);
+          setPreviewState('loaded');
+        }
+      }, 150); // Small delay to show skeleton briefly for visual feedback
+    }
+  }, [getCached, setCache]);
 
   // Handle view profile from preview sheet
-  const handleViewProfile = (userId: string) => {
+  const handleViewProfile = useCallback((userId: string) => {
     setIsPreviewOpen(false);
-    // Navigate to user profile
+    currentPreviewUserIdRef.current = null;
     navigate(`/profile/${userId}`);
-  };
+  }, [navigate]);
+
+  // Handle preview sheet close
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    currentPreviewUserIdRef.current = null;
+  }, []);
+
+  // Handle retry for error state
+  const handleRetry = useCallback(() => {
+    if (previewPlayer?.user_id) {
+      setPreviewState('loading');
+      // Re-fetch logic would go here
+      setTimeout(() => {
+        if (currentPreviewUserIdRef.current === previewPlayer.user_id) {
+          setPreviewState('loaded');
+        }
+      }, 300);
+    }
+  }, [previewPlayer]);
 
   // Derived data
   const dateTimeStr = formatDateTime(game.start_time);
@@ -396,8 +456,11 @@ export function GameRow({
       <PlayerPreviewSheet
         player={previewPlayer}
         isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
+        onClose={handleClosePreview}
         onViewProfile={handleViewProfile}
+        state={previewState}
+        onRetry={handleRetry}
+        contentKey={contentKey}
       />
     </article>
   );

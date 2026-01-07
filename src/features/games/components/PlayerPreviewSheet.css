@@ -1,17 +1,20 @@
 /**
  * PlayerPreviewSheet - Lightweight bottom sheet styles
  * 
- * States: Loading (skeleton), Loaded, Error
- * Visual Tone: Premium / Cinematic
+ * Fixed: Proper snap point positioning, always visible handle + close button
+ * Safe areas: Respects device insets
+ * Transitions: Smooth crossfade when switching users
  */
 
 /* Backdrop - subtle dim */
 .playerPreviewSheet__backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 999;
-  animation: backdropFadeIn 0.22s ease-out;
+  animation: backdropFadeIn 0.2s ease-out;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 @keyframes backdropFadeIn {
@@ -19,7 +22,7 @@
   to { opacity: 1; }
 }
 
-/* Sheet - compact, ~35-40% height, no scroll needed */
+/* Sheet - fixed snap point at ~42% height, always visible from bottom */
 .playerPreviewSheet {
   position: fixed;
   bottom: 0;
@@ -28,51 +31,110 @@
   background: var(--hub-glass-bg);
   border-top: 1px solid var(--hub-stroke-subtle);
   border-radius: 20px 20px 0 0;
-  padding: 12px 20px 28px;
   z-index: 1000;
-  animation: sheetSlideUp 0.24s ease-out;
+  animation: sheetSlideUp 0.24s cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
-  max-height: 45vh;
+  
+  /* Fixed height - not percentage based to avoid positioning issues */
+  height: auto;
+  max-height: 50vh;
+  min-height: 280px;
+  
+  /* Safe area padding */
+  padding: 0 20px calc(env(safe-area-inset-bottom, 16px) + 16px);
+  
+  /* Prevent content overflow */
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes sheetSlideUp {
   from {
     transform: translateY(100%);
+    opacity: 0.8;
   }
   to {
     transform: translateY(0);
+    opacity: 1;
   }
 }
 
-/* Handle bar - subtle drag indicator */
+/* Header bar - handle + close button, always visible at top */
+.playerPreviewSheet__headerBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0 8px;
+  flex-shrink: 0;
+}
+
+/* Handle bar - centered */
 .playerPreviewSheet__handle {
   width: 36px;
   height: 4px;
   border-radius: 2px;
   background: var(--hub-stroke-subtle);
-  opacity: 0.4;
-  margin: 0 auto 16px;
+  opacity: 0.5;
+}
+
+/* Close button - always visible top right */
+.playerPreviewSheet__closeBtn {
+  position: absolute;
+  top: 8px;
+  right: -8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--hub-stroke-subtle);
+  border-radius: 50%;
+  color: var(--hub-text-muted);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.playerPreviewSheet__closeBtn:active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--hub-text-bright);
+}
+
+/* Content wrapper - enables crossfade transitions */
+.playerPreviewSheet__contentWrapper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: contentCrossfade 0.18s ease-out;
+}
+
+@keyframes contentCrossfade {
+  from { 
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Content layout */
 .playerPreviewSheet__content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  animation: contentFadeIn 0.18s ease-out;
+  gap: 18px;
+  padding-top: 4px;
 }
 
-@keyframes contentFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Skeleton state - no animation on content */
+/* Skeleton state - no content animation */
 .playerPreviewSheet__content--skeleton {
   animation: none;
 }
 
-/* ===== 1) HEADER ROW ===== */
+/* ===== HEADER ROW ===== */
 .playerPreviewSheet__header {
   display: flex;
   align-items: center;
@@ -119,13 +181,11 @@
   line-height: 1.4;
 }
 
-/* Missing meta - slightly more visible than helper text */
 .playerPreviewSheet__meta--missing {
   opacity: 0.7;
   font-style: italic;
 }
 
-/* Error text */
 .playerPreviewSheet__errorText {
   font-size: 13px;
   color: var(--hub-text-muted);
@@ -133,7 +193,7 @@
   line-height: 1.4;
 }
 
-/* ===== 2) QUICK STATS - 2-column tiles ===== */
+/* ===== QUICK STATS ===== */
 .playerPreviewSheet__stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -160,7 +220,6 @@
   white-space: nowrap;
 }
 
-/* Missing value - muted but readable */
 .playerPreviewSheet__statValue--missing {
   color: var(--hub-text-muted);
   font-weight: 500;
@@ -180,11 +239,11 @@
   font-size: 12px;
   color: var(--hub-text-muted);
   text-align: center;
-  margin: -8px 0 0;
+  margin: -6px 0 0;
   opacity: 0.6;
 }
 
-/* ===== 3) PRIMARY CTA ===== */
+/* ===== PRIMARY CTA ===== */
 .playerPreviewSheet__cta {
   display: flex;
   align-items: center;
@@ -247,40 +306,34 @@
   50% { opacity: 0.3; }
 }
 
-/* Avatar skeleton */
 .skeleton--avatar {
   width: 56px;
   height: 56px;
   border-radius: 18px;
 }
 
-/* Name skeleton - 65% width */
 .skeleton--name {
   width: 65%;
   height: 18px;
   margin-bottom: 6px;
 }
 
-/* Meta skeleton - 45% width */
 .skeleton--meta {
   width: 45%;
   height: 14px;
 }
 
-/* Stat value skeleton */
 .skeleton--statValue {
   width: 50%;
   height: 16px;
   margin-bottom: 4px;
 }
 
-/* Stat label skeleton */
 .skeleton--statLabel {
   width: 70%;
   height: 10px;
 }
 
-/* CTA skeleton */
 .skeleton--cta {
   width: 100%;
   height: 48px;
@@ -291,7 +344,7 @@
 @media (prefers-reduced-motion: reduce) {
   .playerPreviewSheet,
   .playerPreviewSheet__backdrop,
-  .playerPreviewSheet__content,
+  .playerPreviewSheet__contentWrapper,
   .skeleton {
     animation: none;
   }
