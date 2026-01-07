@@ -178,7 +178,6 @@ export function useLiveClubhouseProfiles() {
             .from('posts')
             .select('user_id')
             .gte('created_at', sevenDaysAgo.toISOString())
-            .is('deleted_at', null)
             .order('created_at', { ascending: false })
             .limit(100);
           
@@ -260,7 +259,6 @@ export function useLiveClubhouseProfiles() {
           .from('posts')
           .select('user_id, created_at')
           .in('user_id', allProfileIds)
-          .is('deleted_at', null)
           .order('created_at', { ascending: false });
 
         // Group by user_id and take the first (latest) post for each user
