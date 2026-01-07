@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Bot, Camera, User } from 'lucide-react';
+import { Plus, Bot, Camera, User, Home } from 'lucide-react';
 import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,7 @@ interface HubNavItem {
 }
 
 const hubNavItems: HubNavItem[] = [
+  { id: 'home', label: 'Home', icon: Home, path: '/clubhouse', external: true },
   { id: 'game', label: 'Game', icon: Plus, path: '/hub/create-game' },
   { id: 'echo', label: 'Echo', icon: Bot, path: '/hub/echo' },
   { id: 'moment', label: 'Moment', icon: Camera, path: '/create-moment' },
@@ -44,11 +45,12 @@ export function HubActionDock() {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[10000] bottom-nav-fixed"
+      className="fixed bottom-0 left-0 right-0 z-[10000] bottom-nav-fixed border-t border-slate-200/60"
       style={{ 
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        background: 'hsl(var(--background))',
-        borderTop: '1px solid hsl(var(--border))',
+        background: 'rgba(248, 250, 252, 0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
       }}
     >
       <nav className="w-full h-[55px] flex items-center justify-around">
