@@ -4,6 +4,7 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { useUserProfile } from './useUserProfile';
 import { useQuery } from '@tanstack/react-query';
 import { useDiscoveryExclusions } from './useDiscoveryExclusions';
+import { getMockSocialUsers } from '@/mocks/mockSocialUsers';
 
 export type TabKey = 'suggested' | 'home_club' | 'verified';
 
@@ -22,6 +23,23 @@ interface GolferProfile {
   isVerified: boolean;
   friendStatus: 'none' | 'pending' | 'friends';
   createdAt?: string;
+}
+
+function getMockGolferProfiles(): GolferProfile[] {
+  return getMockSocialUsers().map((m) => ({
+    id: m.id,
+    displayName: m.display_name,
+    username: m.username,
+    profileImage: m.avatar_url || '',
+    homeClub: m.home_club || undefined,
+    primaryClubId: undefined,
+    handicap: null,
+    followersCount: m.follower_count,
+    totalTop100Played: Math.floor(Math.random() * 30),
+    isVerified: Math.random() > 0.8,
+    friendStatus: m.is_friend ? 'friends' : (Math.random() > 0.7 ? 'pending' : 'none'),
+    createdAt: new Date().toISOString(),
+  }));
 }
 
 // Helper to fetch Top 100 counts for a list of user IDs
@@ -245,8 +263,12 @@ export function useGolfersDiscovery() {
     const isSearching = searchQuery.trim().length > 0;
     const rawGolfers = isSearching ? searchResults || [] : filteredData?.golfers || [];
     
+    // Inject mock users for testing
+    const mockGolfers = getMockGolferProfiles();
+    const allGolfers = [...rawGolfers, ...mockGolfers];
+    
     // Filter out excluded users
-    let filtered = rawGolfers.filter(g => !excludedIds.has(g.id));
+    let filtered = allGolfers.filter(g => !excludedIds.has(g.id));
     
     // For suggested tab, apply ranking: same home club first, then verified, then by created_at
     if (activeTab === 'suggested' && !isSearching) {
