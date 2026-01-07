@@ -59,12 +59,12 @@ export function HubMessagesCard() {
       {/* Fixed height content area - NO SCROLLING */}
       <div className="h-full flex items-center justify-center">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center text-center px-3">
+          <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
             <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
+              className="w-9 h-9 rounded-full flex items-center justify-center mb-1.5"
               style={{ background: 'var(--hub-glass-bg-input)' }}
             >
-              <MessageCircle className="w-5 h-5" style={{ color: 'var(--hub-text-dim)' }} />
+              <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
             </div>
             <h4 
               className="text-[14px] font-semibold mb-0.5"
@@ -74,7 +74,7 @@ export function HubMessagesCard() {
             </h4>
             <p 
               className="text-[12px] leading-snug"
-              style={{ color: 'var(--hub-text-muted)' }}
+              style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
             >
               When you play games or follow golfers, chats will appear here.
             </p>

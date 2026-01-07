@@ -17,6 +17,19 @@
   animation: gameRowIn 0.22s var(--hub-anim-ease-out) forwards;
 }
 
+/* Next game subtle highlight - left accent line */
+.gameRow--next::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2.5px;
+  border-radius: 2px;
+  background: var(--hub-primary-bg, hsl(142, 71%, 45%));
+  opacity: 0.10;
+}
+
 .gameRow::after {
   content: '';
   position: absolute;
@@ -71,23 +84,24 @@
 }
 
 .gameRow__courseName {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--hub-text-bright);
   line-height: 1.3;
 }
 
 .gameRow__timeLine {
-  margin-top: 4px;
+  margin-top: 3px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .gameRow__metaLine {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--hub-text-muted);
   line-height: 1.4;
+  opacity: 0.85;
 }
 
 .gameRow__right {
@@ -111,6 +125,7 @@
 /* Chevron */
 .gameRow__chevron {
   color: var(--hub-text-sub);
+  opacity: 0.5;
   transition: transform var(--hub-anim-default) ease-out;
   flex-shrink: 0;
 }
@@ -128,8 +143,8 @@
 
 /* Details panel */
 .gameRow__details {
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--hub-stroke-subtle);
   display: flex;
   flex-direction: column;

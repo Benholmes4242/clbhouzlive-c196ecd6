@@ -189,11 +189,11 @@ export function HubHomePage() {
             overflow: 'hidden', // NO SCROLL - Hub page itself does not scroll
           }}
         >
-          {/* Zone 1: Header - Fixed ~80px */}
+          {/* Zone 1: Header - Fixed ~68px */}
           <HubHeaderToday />
 
-          {/* Zone 2: Messages - Fixed ~110px, no internal scroll */}
-          <div className="h-[110px] shrink-0">
+          {/* Zone 2: Messages - Fixed ~110px, no internal scroll, tight to header */}
+          <div className="h-[110px] shrink-0 -mt-1">
             <HubMessagesCard />
           </div>
 
