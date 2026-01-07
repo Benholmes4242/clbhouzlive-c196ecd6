@@ -182,9 +182,10 @@ export function YourGamesTile() {
               border: 'none',
               color: 'var(--hub-text-muted)',
               padding: 0,
+              opacity: 0.85,
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--hub-text-sub)'; e.currentTarget.style.opacity = '1'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hub-text-muted)'; e.currentTarget.style.opacity = '0.85'; }}
             aria-label="Create a Game"
           >
             Create a Game +
@@ -269,15 +270,19 @@ export function YourGamesTile() {
           )}
           
           {!isLoading && !isError && games.length === 0 && (
-            <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
-              No games yet.{' '}
-              <button 
-                onClick={openCreateGame}
-                className="underline underline-offset-2"
-                style={{ color: 'var(--hub-accent-orange)' }}
+            <div className="flex flex-col items-center justify-center h-full text-center py-6">
+              <h4 
+                className="text-[14px] font-semibold mb-1"
+                style={{ color: 'var(--hub-text)' }}
               >
-                Create one
-              </button>
+                No games planned yet
+              </h4>
+              <p 
+                className="text-[12px] leading-snug max-w-[220px]"
+                style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
+              >
+                Create a game and start organising your next round.
+              </p>
             </div>
           )}
 

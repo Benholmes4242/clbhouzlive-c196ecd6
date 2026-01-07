@@ -1,5 +1,5 @@
 /**
- * HubHeaderToday - Dynamic "Today" Header (Fixed Height ~72-80px)
+ * HubHeaderToday - Dynamic "Today" Header (Fixed Height ~60px)
  * Shows personalized greeting + next game info
  * Truncates course names to prevent wrapping
  */
@@ -43,21 +43,21 @@ export function HubHeaderToday() {
     return upcoming[0] || null;
   }, [gamesData]);
 
-  // Build the subline - compact format: "Playing {course} · {date}"
+  // Build the subline - "What's up next · {course} · {date}" or empty state
   const subline = React.useMemo(() => {
     if (!nextGame) {
-      return "No games planned — fancy one this week?";
+      return "What's up next · No games planned yet";
     }
 
     const gameDate = new Date(nextGame.start_time);
-    const courseName = nextGame.course_name || 'a course';
+    const courseName = nextGame.course_name || 'TBD';
     const formattedDate = format(gameDate, 'MMM d');
     
-    return `Playing ${courseName} · ${formattedDate}`;
+    return `What's up next · ${courseName} · ${formattedDate}`;
   }, [nextGame]);
 
   return (
-    <div className="h-[68px] flex flex-col justify-center px-1">
+    <div className="h-[60px] flex flex-col justify-center px-1 mb-[-2px]">
       <h1 
         className="text-[23px] font-medium leading-tight truncate tracking-[0.01em]"
         style={{ color: 'var(--hub-text)' }}
@@ -65,8 +65,8 @@ export function HubHeaderToday() {
         {greeting}, {firstName}
       </h1>
       <p 
-        className="text-[14px] mt-1.5 truncate"
-        style={{ color: 'var(--hub-text-sub)', opacity: 0.7 }}
+        className="text-[13px] mt-2.5 truncate tracking-[0.02em]"
+        style={{ color: 'var(--hub-text-sub)', opacity: 0.75 }}
       >
         {subline}
       </p>
