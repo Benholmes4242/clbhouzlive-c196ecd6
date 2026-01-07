@@ -41,7 +41,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
       const startRange = pageParam as number;
-      const endRange = startRange + PAGE_SIZE * 2 - 1; // Fetch extra to filter
+      const endRange = startRange + PAGE_SIZE - 1;
 
       console.log('[useInfiniteLongFormVideos] 🔍 FETCHING PAGE:', {
         section,
@@ -159,7 +159,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      const hasMore = items.length === PAGE_SIZE;
+      const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
 
       console.log('[useInfiniteLongFormVideos] ✅ PAGE COMPLETE:', {
