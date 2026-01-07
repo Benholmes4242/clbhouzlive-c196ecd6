@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Bot, Camera, User, Home } from 'lucide-react';
+import { Plus, Bot, Camera, User } from 'lucide-react';
+import { HomeIcon } from '@heroicons/react/24/outline';
 import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -19,7 +20,7 @@ interface HubNavItem {
 }
 
 const hubNavItems: HubNavItem[] = [
-  { id: 'home', label: 'Home', icon: Home, path: '/clubhouse', external: true },
+  { id: 'home', label: 'Home', icon: HomeIcon, path: '/clubhouse', external: true },
   { id: 'game', label: 'Game', icon: Plus, path: '/hub/create-game' },
   { id: 'echo', label: 'Echo', icon: Bot, path: '/hub/echo' },
   { id: 'moment', label: 'Moment', icon: Camera, path: '/create-moment' },
