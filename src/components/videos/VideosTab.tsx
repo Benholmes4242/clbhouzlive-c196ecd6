@@ -169,34 +169,33 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
 
   // Fetch videos using React Query with caching
-  // Recommended + Following load immediately, Trending + Courses lazy-load
+  // All sections load with limit 20 to fill the UI
   const { videos: recommendedVideosRaw } = useLongFormVideosQuery({
     section: 'recommended',
-    limit: 10,
+    limit: 20,
     category: categoryFilter,
     getBoostScore: memoizedBoostScore,
   });
 
-  // ⚠️ TESTING: Increased limit from 5 to 20 for trending
   const { videos: trendingVideosRaw } = useLongFormVideosQuery({
     section: 'trending',
-    limit: 20, // TESTING: was 5
+    limit: 20,
     category: categoryFilter,
-    enabled: trendingTriggered, // Lazy load
+    enabled: trendingTriggered,
   });
 
   const { videos: followedVideosRaw } = useLongFormVideosQuery({
     section: 'following',
-    limit: 5,
+    limit: 20,
     followedCreatorIds: followedIds,
     category: categoryFilter,
   });
 
   const { videos: coursesVideosRaw } = useLongFormVideosQuery({
     section: 'courses',
-    limit: 5,
+    limit: 20,
     category: categoryFilter,
-    enabled: coursesTriggered, // Lazy load
+    enabled: coursesTriggered,
   });
 
   // Hard de-dupe: each video can appear in only ONE section across the entire page
@@ -366,7 +365,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       <VideoSection
         title="Recommended for you"
         subtitle="Based on what you watch"
-        videos={recommendedVideos.slice(0, 3)}
+        videos={recommendedVideos.slice(0, 10)}
         onViewAll={() => handleViewAll('recommended')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
@@ -398,7 +397,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       {/* Module 3: From creators you follow (loads immediately) */}
       <VideoSection
         title="From creators you follow"
-        videos={followedVideos.slice(0, 3)}
+        videos={followedVideos.slice(0, 10)}
         onViewAll={() => handleViewAll('following')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
@@ -415,7 +414,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         <VideoSection
           title="Courses & destinations"
           subtitle="Course vlogs and bucket-list rounds"
-          videos={coursesVideos.slice(0, 2)}
+          videos={coursesVideos.slice(0, 10)}
           onViewAll={() => handleViewAll('courses')}
           onVideoClick={handleVideoClick}
           onCreatorClick={handleCreatorClick}
