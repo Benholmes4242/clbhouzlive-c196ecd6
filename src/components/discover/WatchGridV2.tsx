@@ -69,6 +69,7 @@ export function WatchGridV2({ onMediaClick }: WatchGridV2Props) {
           playThreshold: 0.6,
           pauseThreshold: 0.2,
           showLikes: false,
+          showCreator: true,
         }}
       />
       
