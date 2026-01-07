@@ -113,10 +113,11 @@
   color: var(--hub-status-ok-text);
 }
 
+/* Full → Brand orange (not grey - grey reads as disabled) */
 .gameStatusPill--full {
-  background: rgba(255, 255, 255, 0.04);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
-  color: var(--hub-text-muted);
+  background: rgba(251, 146, 60, 0.12);
+  border: 0.5px solid rgba(251, 146, 60, 0.25);
+  color: hsl(27, 96%, 61%);
 }
 
 .gameStatusPill--almost {

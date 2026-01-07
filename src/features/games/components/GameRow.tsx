@@ -7,14 +7,16 @@
  * 
  * No clutter. No redundancy. No UI shouting.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
 import { SecondaryButton, DestructiveButton } from '@/features/hub/components/HubButtons';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { haptic } from '@/utils/haptics';
 import { FLAGS } from '@/config/flags';
+import { PlayerPreviewSheet, PlayerPreviewData } from './PlayerPreviewSheet';
 import './GameRow.css';
 
 // Mock players for testing 4/4 full game UI (behind MOCK_FULL_GAME_PLAYERS flag)
@@ -144,7 +146,12 @@ export function GameRow({
   requestState = 'idle',
   pendingRequestCount = 0,
 }: GameRowProps) {
-  const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
+  const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  
+  // Player preview sheet state
+  const [previewPlayer, setPreviewPlayer] = useState<PlayerPreviewData | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Sync with external control
   React.useEffect(() => {
@@ -157,6 +164,21 @@ export function GameRow({
     const nextExpanded = !isExpanded;
     setIsExpanded(nextExpanded);
     onToggleExpand?.();
+  };
+
+  // Handle avatar tap - open preview sheet
+  const handleAvatarTap = (player: PlayerPreviewData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    haptic('light');
+    setPreviewPlayer(player);
+    setIsPreviewOpen(true);
+  };
+
+  // Handle view profile from preview sheet
+  const handleViewProfile = (userId: string) => {
+    setIsPreviewOpen(false);
+    // Navigate to user profile
+    navigate(`/profile/${userId}`);
   };
 
   // Derived data
@@ -272,9 +294,13 @@ export function GameRow({
       {/* Expanded details panel - avatar-led storytelling */}
       {showDetails && (
         <div className="gameRow__details">
-          {/* Host section - avatar-led, no "HOST" label */}
+          {/* Host section - avatar-led, no "HOST" label, tappable */}
           {host && (
-            <div className="miniProfileRow miniProfileRow--host">
+            <button 
+              className="miniProfileRow miniProfileRow--host"
+              onClick={(e) => handleAvatarTap(host, e)}
+              type="button"
+            >
               <div className="miniProfileRow__avatar">
                 <SquircleAvatar
                   size={44}
@@ -291,27 +317,32 @@ export function GameRow({
                   <div className="miniProfileRow__subtitle">{hostMeta}</div>
                 )}
               </div>
-            </div>
+            </button>
           )}
 
-          {/* Players row - avatar stack (only if there are members) */}
+          {/* Players row - avatar stack, show up to 4, tappable */}
           {members.length > 0 && (
             <div className="gameRow__players">
-              <span className="gameRow__playersLabel">Players</span>
               <div className="gameRow__avatarStack">
-                {members.slice(0, 3).map((member, idx) => (
-                  <div key={member.user_id || idx} className="gameRow__stackedAvatar">
+                {members.slice(0, 4).map((member, idx) => (
+                  <button 
+                    key={member.user_id || idx} 
+                    className="gameRow__stackedAvatar"
+                    onClick={(e) => handleAvatarTap(member, e)}
+                    type="button"
+                    aria-label={`View ${member.display_name || 'player'} profile`}
+                  >
                     <SquircleAvatar
                       size={28}
                       src={member.profile_photo_url}
                       alt={member.display_name || 'Player'}
                       fallback={(member.display_name || 'P').charAt(0).toUpperCase()}
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
-              {members.length > 3 && (
-                <span className="gameRow__moreCount">+{members.length - 3}</span>
+              {members.length > 4 && (
+                <span className="gameRow__moreCount">+{members.length - 4}</span>
               )}
             </div>
           )}
@@ -360,6 +391,14 @@ export function GameRow({
           )}
         </div>
       )}
+
+      {/* Player preview sheet */}
+      <PlayerPreviewSheet
+        player={previewPlayer}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        onViewProfile={handleViewProfile}
+      />
     </article>
   );
 }
