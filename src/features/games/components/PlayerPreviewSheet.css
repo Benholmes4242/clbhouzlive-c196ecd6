@@ -1,20 +1,30 @@
 /**
- * PlayerPreviewSheet - Lightweight bottom sheet styles
+ * PlayerPreviewSheet - Bottom sheet styles
  * 
- * Fixed: Proper snap point positioning, always visible handle + close button
- * Safe areas: Respects device insets
- * Transitions: Smooth crossfade when switching users
+ * V1 Snap Points: Height-based (40-48% depending on device)
+ * Safe areas: Respected with clamping
+ * Transitions: Crossfade on content switch
  */
 
-/* Backdrop - subtle dim */
+/* CSS Custom Properties for safe area */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+/* Backdrop - subtle dim with blur */
 .playerPreviewSheet__backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   z-index: 999;
-  animation: backdropFadeIn 0.2s ease-out;
+  animation: backdropFadeIn 0.2s ease-out forwards;
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
+}
+
+.playerPreviewSheet__backdrop--out {
+  animation: backdropFadeOut 0.18s ease-out forwards;
 }
 
 @keyframes backdropFadeIn {
@@ -22,7 +32,12 @@
   to { opacity: 1; }
 }
 
-/* Sheet - fixed snap point at ~42% height, always visible from bottom */
+@keyframes backdropFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Sheet - dynamic height based on snap point */
 .playerPreviewSheet {
   position: fixed;
   bottom: 0;
@@ -32,44 +47,53 @@
   border-top: 1px solid var(--hub-stroke-subtle);
   border-radius: 20px 20px 0 0;
   z-index: 1000;
-  animation: sheetSlideUp 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+  animation: sheetSlideUp 0.26s cubic-bezier(0.32, 0.72, 0, 1) forwards;
   will-change: transform;
   
-  /* Fixed height - not percentage based to avoid positioning issues */
-  height: auto;
-  max-height: 50vh;
-  min-height: 280px;
-  
-  /* Safe area padding */
-  padding: 0 20px calc(env(safe-area-inset-bottom, 16px) + 16px);
-  
-  /* Prevent content overflow */
+  /* Flexbox for proper content flow */
   display: flex;
   flex-direction: column;
+  
+  /* Base padding (bottom handled via inline style for safe area) */
+  padding: 0 20px 16px;
+  
+  /* Prevent over-scroll */
+  overscroll-behavior: contain;
+}
+
+.playerPreviewSheet--out {
+  animation: sheetSlideDown 0.2s ease-in forwards;
 }
 
 @keyframes sheetSlideUp {
   from {
     transform: translateY(100%);
-    opacity: 0.8;
   }
   to {
     transform: translateY(0);
-    opacity: 1;
   }
 }
 
-/* Header bar - handle + close button, always visible at top */
+@keyframes sheetSlideDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Header bar - handle + close button, always at top */
 .playerPreviewSheet__headerBar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 0 8px;
+  padding: 12px 0 10px;
   flex-shrink: 0;
 }
 
-/* Handle bar - centered */
+/* Handle bar - centered, always visible */
 .playerPreviewSheet__handle {
   width: 36px;
   height: 4px;
@@ -93,27 +117,28 @@
   border-radius: 50%;
   color: var(--hub-text-muted);
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background 0.14s ease, color 0.14s ease, transform 0.14s ease;
 }
 
 .playerPreviewSheet__closeBtn:active {
   background: rgba(255, 255, 255, 0.12);
   color: var(--hub-text-bright);
+  transform: scale(0.92);
 }
 
-/* Content wrapper - enables crossfade transitions */
+/* Content wrapper - crossfade on user switch */
 .playerPreviewSheet__contentWrapper {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  animation: contentCrossfade 0.18s ease-out;
+  display: flex;
+  flex-direction: column;
+  animation: contentCrossfadeIn 0.16s ease-out forwards;
 }
 
-@keyframes contentCrossfade {
+@keyframes contentCrossfadeIn {
   from { 
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
   to { 
     opacity: 1;
@@ -125,11 +150,10 @@
 .playerPreviewSheet__content {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding-top: 4px;
+  gap: 16px;
+  flex: 1;
 }
 
-/* Skeleton state - no content animation */
 .playerPreviewSheet__content--skeleton {
   animation: none;
 }
@@ -157,7 +181,7 @@
   pointer-events: none;
 }
 
-/* Header info - name + meta */
+/* Header info */
 .playerPreviewSheet__headerInfo {
   flex: 1;
   min-width: 0;
@@ -190,7 +214,6 @@
   font-size: 13px;
   color: var(--hub-text-muted);
   margin: 3px 0 0;
-  line-height: 1.4;
 }
 
 /* ===== QUICK STATS ===== */
@@ -234,16 +257,16 @@
   opacity: 0.7;
 }
 
-/* ===== SELF PROFILE HINT ===== */
+/* ===== HINT ===== */
 .playerPreviewSheet__hint {
   font-size: 12px;
   color: var(--hub-text-muted);
   text-align: center;
-  margin: -6px 0 0;
+  margin: -4px 0 0;
   opacity: 0.6;
 }
 
-/* ===== PRIMARY CTA ===== */
+/* ===== CTA ===== */
 .playerPreviewSheet__cta {
   display: flex;
   align-items: center;
@@ -251,6 +274,7 @@
   gap: 6px;
   width: 100%;
   padding: 14px 16px;
+  margin-top: auto;
   font-size: 14px;
   font-weight: 500;
   color: var(--hub-text-sub);
@@ -274,7 +298,7 @@
 
 /* ===== ERROR STATE ===== */
 .playerPreviewSheet__content--error {
-  gap: 16px;
+  gap: 14px;
 }
 
 .playerPreviewSheet__retryBtn {
@@ -287,14 +311,13 @@
   cursor: pointer;
   text-align: center;
   opacity: 0.8;
-  transition: opacity 0.14s ease;
 }
 
 .playerPreviewSheet__retryBtn:active {
   opacity: 1;
 }
 
-/* ===== SKELETON PLACEHOLDERS ===== */
+/* ===== SKELETONS ===== */
 .skeleton {
   background: rgba(255, 255, 255, 0.06);
   border-radius: 6px;
@@ -338,12 +361,15 @@
   width: 100%;
   height: 48px;
   border-radius: 12px;
+  margin-top: auto;
 }
 
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   .playerPreviewSheet,
+  .playerPreviewSheet--out,
   .playerPreviewSheet__backdrop,
+  .playerPreviewSheet__backdrop--out,
   .playerPreviewSheet__contentWrapper,
   .skeleton {
     animation: none;

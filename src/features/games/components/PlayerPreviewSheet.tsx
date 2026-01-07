@@ -1,11 +1,15 @@
 /**
  * PlayerPreviewSheet - Lightweight bottom sheet for player preview
  * 
- * Fixed positioning: Proper snap point (~42% height), safe areas respected
- * Close affordances: Swipe down, tap outside, X button always visible
- * Smooth switching: Content crossfades when switching users
+ * V1 Snap Points (height buckets):
+ * - Small phones (<700px): 48%
+ * - Standard (700-820px): 44%
+ * - Large (>820px): 40%
+ * 
+ * Always opens with handle visible, respects safe areas
+ * Smooth content switching when tapping different avatars
  */
-import React from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import './PlayerPreviewSheet.css';
@@ -34,6 +38,31 @@ interface PlayerPreviewSheetProps {
   contentKey?: string;
 }
 
+/**
+ * Calculate snap point based on device height
+ * Small phones: 48%, Standard: 44%, Large: 40%
+ */
+function getSnapHeight(windowHeight: number): number {
+  if (windowHeight < 700) {
+    return 0.48; // Small phones
+  } else if (windowHeight <= 820) {
+    return 0.44; // Standard phones
+  } else {
+    return 0.40; // Large phones
+  }
+}
+
+/**
+ * Get safe area insets
+ */
+function getSafeAreaInsets() {
+  const style = getComputedStyle(document.documentElement);
+  return {
+    top: parseInt(style.getPropertyValue('--sat') || '0', 10) || 0,
+    bottom: parseInt(style.getPropertyValue('--sab') || '0', 10) || 0,
+  };
+}
+
 export function PlayerPreviewSheet({
   player,
   isOpen,
@@ -44,16 +73,48 @@ export function PlayerPreviewSheet({
   isCurrentUser = false,
   contentKey,
 }: PlayerPreviewSheetProps) {
+  // Calculate snap height based on window size
+  const [windowHeight, setWindowHeight] = useState(() => 
+    typeof window !== 'undefined' ? window.innerHeight : 800
+  );
+  
   // Handle swipe down to dismiss
-  const [touchStart, setTouchStart] = React.useState<number | null>(null);
-  const [translateY, setTranslateY] = React.useState(0);
-  const sheetRef = React.useRef<HTMLDivElement>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [translateY, setTranslateY] = useState(0);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  // Update window height on resize
+  useEffect(() => {
+    const handleResize = () => setWindowHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calculate sheet height
+  const sheetConfig = useMemo(() => {
+    const snapRatio = getSnapHeight(windowHeight);
+    const safeArea = getSafeAreaInsets();
+    const snapHeight = Math.round(windowHeight * snapRatio);
+    
+    // Clamp: ensure sheet top is never above safeAreaTop + 8px
+    const maxSheetHeight = windowHeight - safeArea.top - 8;
+    const clampedHeight = Math.min(snapHeight, maxSheetHeight);
+    
+    // Minimum height to fit content
+    const minHeight = 280;
+    const finalHeight = Math.max(clampedHeight, minHeight);
+    
+    return {
+      height: finalHeight,
+      bottomPadding: safeArea.bottom + 12,
+    };
+  }, [windowHeight]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setTouchStart(e.touches[0].clientY);
-  };
+  }, []);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (touchStart === null) return;
     const currentY = e.touches[0].clientY;
     const diff = currentY - touchStart;
@@ -61,22 +122,36 @@ export function PlayerPreviewSheet({
     if (diff > 0) {
       setTranslateY(diff);
     }
-  };
+  }, [touchStart]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     if (translateY > 60) {
-      onClose();
+      // Animate out then close
+      setIsAnimatingOut(true);
+      setTimeout(() => {
+        onClose();
+        setIsAnimatingOut(false);
+      }, 200);
     }
     setTranslateY(0);
     setTouchStart(null);
-  };
+  }, [translateY, onClose]);
 
-  // Reset translate when closed
-  React.useEffect(() => {
+  // Reset state when closed
+  useEffect(() => {
     if (!isOpen) {
       setTranslateY(0);
+      setIsAnimatingOut(false);
     }
   }, [isOpen]);
+
+  const handleClose = useCallback(() => {
+    setIsAnimatingOut(true);
+    setTimeout(() => {
+      onClose();
+      setIsAnimatingOut(false);
+    }, 180);
+  }, [onClose]);
 
   if (!isOpen || !player) return null;
 
@@ -104,19 +179,25 @@ export function PlayerPreviewSheet({
 
   const metaIsMissing = !hasHandicap && !hasClub;
 
+  // Calculate transform for swipe + animate out
+  const sheetTransform = isAnimatingOut 
+    ? 'translateY(100%)' 
+    : translateY > 0 
+      ? `translateY(${translateY}px)` 
+      : undefined;
+
   return (
     <>
       {/* Backdrop - tap to dismiss */}
       <div 
-        className="playerPreviewSheet__backdrop"
-        onClick={onClose}
+        className={`playerPreviewSheet__backdrop ${isAnimatingOut ? 'playerPreviewSheet__backdrop--out' : ''}`}
+        onClick={handleClose}
         aria-hidden="true"
       />
       
-      {/* Sheet - fixed height snap point */}
+      {/* Sheet - fixed snap height */}
       <div 
-        ref={sheetRef}
-        className="playerPreviewSheet"
+        className={`playerPreviewSheet ${isAnimatingOut ? 'playerPreviewSheet--out' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={`${player.display_name || 'Player'} preview`}
@@ -124,23 +205,25 @@ export function PlayerPreviewSheet({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{ 
-          transform: translateY > 0 ? `translateY(${translateY}px)` : undefined,
-          opacity: translateY > 0 ? Math.max(0.5, 1 - translateY / 200) : 1,
+          height: sheetConfig.height,
+          paddingBottom: sheetConfig.bottomPadding,
+          transform: sheetTransform,
+          opacity: translateY > 0 ? Math.max(0.6, 1 - translateY / 200) : 1,
         }}
       >
-        {/* Header bar with handle and close button */}
+        {/* Header bar with handle and close button - always visible */}
         <div className="playerPreviewSheet__headerBar">
           <div className="playerPreviewSheet__handle" />
           <button 
             className="playerPreviewSheet__closeBtn"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close preview"
           >
             <X size={18} strokeWidth={2} />
           </button>
         </div>
 
-        {/* Content wrapper with key for transitions */}
+        {/* Content wrapper with key for crossfade transitions */}
         <div 
           key={contentKey || player.user_id || 'default'} 
           className="playerPreviewSheet__contentWrapper"
