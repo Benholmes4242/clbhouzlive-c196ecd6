@@ -14,6 +14,7 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import type { SocialUser } from '@/hooks/useSocialLists';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 export type ListMode = 'followers' | 'following' | 'friends';
 
@@ -288,7 +289,9 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
   );
 
   const handleRowClick = () => {
-    navigate(`/users/${user.id}`);
+    // Use proper profile path based on user type (creator_only goes to /creator/:id)
+    const profilePath = getProfilePathById(user.id, user.creatorOnly, user.username);
+    navigate(profilePath);
   };
 
   const handleFollowToggle = async (e: React.MouseEvent) => {

@@ -10,6 +10,7 @@ type UserProfileRow = {
   profile_photo_url: string | null;
   home_club: string | null;
   eg_handicap_index: number | null;
+  creator_only: boolean | null;
 };
 
 export type SocialUser = {
@@ -19,6 +20,7 @@ export type SocialUser = {
   avatarUrl: string | null;
   homeClub: string | null;
   handicapIndex: number | null;
+  creatorOnly: boolean;
 };
 
 type PageResult = {
@@ -40,6 +42,7 @@ function toSocialUser(profile: UserProfileRow): SocialUser {
     avatarUrl: profile.profile_photo_url,
     homeClub: profile.home_club,
     handicapIndex: profile.eg_handicap_index,
+    creatorOnly: profile.creator_only ?? false,
   };
 }
 
@@ -48,7 +51,7 @@ async function fetchProfilesByIds(ids: string[]): Promise<Map<string, UserProfil
 
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
+    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, creator_only')
     .in('id', ids)
     .is('deleted_at', null);
 
