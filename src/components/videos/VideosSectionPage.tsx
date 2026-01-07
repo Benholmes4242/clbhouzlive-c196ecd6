@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,8 +7,21 @@ import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useMediaAutoplay } from '@/media';
 import { runtimeUserTap } from '@/media';
+import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
+
+export type VideoCategory = 'all' | 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
+
+const VIDEO_PILLS: { value: VideoCategory; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'funny', label: 'Funny' },
+  { value: 'challenge', label: 'Challenge' },
+  { value: 'course-vlog', label: 'Course Vlog' },
+  { value: 'tips-coaching', label: 'Tips & Coaching' },
+  { value: 'review', label: 'Review' },
+  { value: 'other', label: 'Other' },
+];
 
 const SECTION_TITLES: Record<SectionType, string> = {
   recommended: 'Recommended for you',
@@ -24,6 +37,9 @@ const SECTION_DESCRIPTIONS: Record<SectionType, string> = {
   courses: 'Videos featuring golf courses',
 };
 
+// Local storage key for sort preference
+const VIDEOS_SECTION_SORT_KEY = 'videos-section-sort-option';
+
 /**
  * VideosSectionPage - Full section page with infinite scroll
  * 
@@ -34,19 +50,27 @@ const SECTION_DESCRIPTIONS: Record<SectionType, string> = {
  * - /discover?main=videos&section=courses
  */
 export const VideosSectionPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   
   const section = (searchParams.get('section') || 'recommended') as SectionType;
-  const category = searchParams.get('category') || undefined;
+  const categoryParam = (searchParams.get('category') || 'all') as VideoCategory;
+  const category = categoryParam !== 'all' ? categoryParam : undefined;
+
+  // Command center state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState<SortOption>(() => {
+    const saved = localStorage.getItem(VIDEOS_SECTION_SORT_KEY);
+    return (saved as SortOption) || 'newest';
+  });
 
   // Get followed user IDs for following section
   const { followedIds } = useFollowedUsers();
 
   // Infinite query for videos
   const {
-    items,
+    items: rawItems,
     isLoading,
     isError,
     error,
@@ -58,6 +82,44 @@ export const VideosSectionPage: React.FC = () => {
     followedCreatorIds: followedIds,
     category,
   });
+
+  // Client-side search filter
+  const items = useMemo(() => {
+    if (!searchQuery.trim()) return rawItems;
+    
+    const query = searchQuery.toLowerCase();
+    return rawItems.filter(v => {
+      const titleMatch = (v.title || '').toLowerCase().includes(query);
+      const creatorMatch = (v.creatorName || '').toLowerCase().includes(query);
+      const courseMatch = (v.golfCourseName || '').toLowerCase().includes(query);
+      return titleMatch || creatorMatch || courseMatch;
+    });
+  }, [rawItems, searchQuery]);
+
+  // Handle category selection - update URL
+  const handleCategorySelect = (categoryKey: string) => {
+    const newCategory = categoryKey as VideoCategory;
+    const newParams = new URLSearchParams(searchParams);
+    if (newCategory === 'all') {
+      newParams.delete('category');
+    } else {
+      newParams.set('category', newCategory);
+    }
+    setSearchParams(newParams);
+  };
+
+  // Handle sort change with persistence
+  const handleSortChange = (sort: SortOption) => {
+    setSortOption(sort);
+    localStorage.setItem(VIDEOS_SECTION_SORT_KEY, sort);
+  };
+
+  // Build pills for command center
+  const pills: Pill[] = VIDEO_PILLS.map(p => ({
+    key: p.value,
+    label: p.label,
+    selected: categoryParam === p.value,
+  }));
 
   // Autoplay setup (same as Videos tab)
   const { registerMedia, playingIds } = useMediaAutoplay({
@@ -187,10 +249,11 @@ export const VideosSectionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header - matches Videos tab style */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="flex items-center gap-3 px-4 py-3">
+    <div className="min-h-screen bg-[var(--bg-page)] pb-20">
+      {/* Sticky Header with back button and section title */}
+      <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+        {/* Back button row */}
+        <div className="flex items-center gap-3 px-4 py-2 border-b border-border">
           <button
             onClick={handleBack}
             className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
@@ -202,6 +265,17 @@ export const VideosSectionPage: React.FC = () => {
             <p className="text-xs text-muted-foreground">{SECTION_DESCRIPTIONS[section]}</p>
           </div>
         </div>
+        
+        {/* Command Center: Search + Sort + Pills */}
+        <DiscoverCommandCenter
+          searchPlaceholder="Search videos, creators, courses..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortValue={sortOption}
+          onSortChange={handleSortChange}
+          pills={pills}
+          onPillSelect={handleCategorySelect}
+        />
       </div>
 
       {/* Video feed */}
