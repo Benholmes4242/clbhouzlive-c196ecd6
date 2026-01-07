@@ -193,7 +193,7 @@ export function HubHomePage() {
           <HubHeaderToday />
 
           {/* Zone 2: Messages - Fixed ~198px, no internal scroll */}
-          <div className="h-[198px] shrink-0 mt-3">
+          <div className="h-[198px] shrink-0">
             <HubMessagesCard />
           </div>
 
