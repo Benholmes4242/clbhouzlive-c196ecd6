@@ -85,68 +85,27 @@ export function useWatchPostsV2() {
 
       if (error) throw error;
 
-      console.log('[useWatchPostsV2] Raw posts fetched:', {
-        count: postsData?.length,
-        firstPost: postsData?.[0] ? {
-          id: postsData[0].id,
-          actor_id: postsData[0].actor_id,
-          user_id: postsData[0].user_id,
-          hasActorId: !!postsData[0].actor_id,
-          hasUserId: !!postsData[0].user_id
-        } : null
-      });
 
-      // Get unique actor IDs - use actor_id first, fall back to user_id
-      const actorIds = [...new Set(
-        postsData?.map(p => p.actor_id || p.user_id).filter(Boolean)
+      // Get unique user IDs - use user_id (always references user_profiles)
+      // actor_id may reference business accounts which don't exist in user_profiles
+      const userIds = [...new Set(
+        postsData?.map(p => p.user_id).filter(Boolean)
       )] as string[];
 
-      console.log('[useWatchPostsV2] Actor IDs to fetch:', {
-        count: actorIds.length,
-        ids: actorIds.slice(0, 3)
-      });
-
-      // Fetch user profiles for all actors
-      const { data: profiles, error: profileError } = await supabase
+      // Fetch user profiles
+      const { data: profiles } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
-        .in('id', actorIds);
-
-      console.log('[useWatchPostsV2] Profiles fetched:', {
-        count: profiles?.length,
-        profileError,
-        firstProfile: profiles?.[0],
-        actorIdsCount: actorIds.length
-      });
+        .in('id', userIds);
 
       // Create a map for quick lookup
       const profileMap = new Map(profiles?.map(p => [p.id, p]) ?? []);
 
-      console.log('[useWatchPostsV2] Profile map created:', {
-        mapSize: profileMap.size,
-        sampleLookup: actorIds[0] ? {
-          actorId: actorIds[0],
-          found: profileMap.has(actorIds[0]),
-          profile: profileMap.get(actorIds[0])
-        } : null
-      });
-
-      // Attach user data to posts - check both actor_id and user_id
+      // Attach user data to posts using user_id
       const postsWithUsers = (postsData || []).map(post => ({
         ...post,
-        user: profileMap.get(post.actor_id || post.user_id || '') || null
+        user: profileMap.get(post.user_id || '') || null
       }));
-
-      console.log('[useWatchPostsV2] Posts with users:', {
-        total: postsWithUsers.length,
-        withUser: postsWithUsers.filter(p => p.user).length,
-        withoutUser: postsWithUsers.filter(p => !p.user).length,
-        firstPost: postsWithUsers[0] ? {
-          id: postsWithUsers[0].id,
-          hasUser: !!postsWithUsers[0].user,
-          user: postsWithUsers[0].user
-        } : null
-      });
 
       // Filter posts that have valid media
       const activityPosts = postsWithUsers.filter(
