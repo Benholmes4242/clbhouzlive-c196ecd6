@@ -67,8 +67,8 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
   const currentMonth = format(new Date(), 'MMMM');
 
   return (
-    // Inline section on page background - no card
-    <section className="px-2.5">
+    // Inline section - no card wrapper
+    <section>
       <div className="flex items-center justify-between">
         {/* Streak display */}
         <div className="flex items-center gap-3">

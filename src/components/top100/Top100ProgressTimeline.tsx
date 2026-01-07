@@ -84,8 +84,8 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
 
   return (
     <>
-      {/* Section rendered directly on page background - no card */}
-      <section className="px-2.5">
+      {/* Section rendered directly - no card wrapper */}
+      <section>
         {/* Header - dynamic year label */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

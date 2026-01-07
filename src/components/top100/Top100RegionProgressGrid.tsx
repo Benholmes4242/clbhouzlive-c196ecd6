@@ -120,14 +120,15 @@ export function Top100RegionProgressGrid({
 
   return (
     <>
-      <section className="w-full">
-        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3 px-2.5">
+      <section className="w-full px-4">
+        {/* Section header - mb-4 */}
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
           {label}
         </h3>
 
-        {/* Region cards - tappable for drilldown (D4) */}
-        <div className="space-y-1.5">
-          {lists.map((list) => {
+        {/* Region rows - flat on bg-slate-50, py-4 each, dividers */}
+        <div>
+          {lists.map((list, index) => {
             const progressPercent =
               list.total > 0 ? (list.played / list.total) * 100 : 0;
             const remainingPercent = Math.round(100 - progressPercent);
@@ -135,12 +136,12 @@ export function Top100RegionProgressGrid({
             const regionColors = getRegionColors(list.listSlug);
 
             return (
-              <button
-                key={list.listSlug}
-                type="button"
-                onClick={() => handleCardClick(list.listSlug)}
-                className="w-full rounded-sq-sm border border-border/40 bg-card/60 px-3 py-2.5 text-left hover:bg-muted/30 transition-all duration-200 flex items-center justify-between gap-3 group"
-              >
+              <React.Fragment key={list.listSlug}>
+                <button
+                  type="button"
+                  onClick={() => handleCardClick(list.listSlug)}
+                  className="w-full py-4 text-left hover:bg-slate-100/50 transition-all duration-200 flex items-center justify-between gap-3 group"
+                >
                 {/* Left side: region-tinted icon container + names */}
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div 
@@ -184,9 +185,13 @@ export function Top100RegionProgressGrid({
                 {/* Chevron hint */}
                 <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors flex-shrink-0" />
               </button>
-            );
-          })}
-        </div>
+              {index < lists.length - 1 && (
+                <div className="h-px bg-slate-200/60" />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
       </section>
     </>
   );

@@ -30,8 +30,8 @@ function StatItem({
   
   return (
     <div className="text-center flex flex-col items-center gap-1">
-      {/* Slightly increased icon opacity (item 2) */}
-      <Icon className="w-3.5 h-3.5 text-muted-foreground/70" />
+      {/* Icon - slightly reduced opacity */}
+      <Icon className="w-3.5 h-3.5 text-muted-foreground/60" />
       <p className="text-sm font-semibold leading-tight text-foreground">
         {value}
       </p>
@@ -59,10 +59,10 @@ export function Top100YearSummary({
   if (!summary) return null;
 
   return (
-    <section className="px-2.5">
-      {/* Supporting stats row - lighter visual weight, with icons (A4) */}
-      <div className="bg-muted/40 border border-border/40 rounded-sq-md p-4 min-h-[72px]">
-        <div className="grid grid-cols-4 gap-3">
+    <section>
+      {/* Stats Row - KEEP as card, p-5 internal padding, gap-6 between columns */}
+      <div className="bg-white border border-slate-200/60 rounded-2xl p-5 min-h-[72px]">
+        <div className="grid grid-cols-4 gap-6">
           <StatItem 
             icon={Calendar}
             value={String(summary.year)}
