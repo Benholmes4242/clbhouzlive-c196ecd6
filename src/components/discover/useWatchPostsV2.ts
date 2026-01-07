@@ -78,7 +78,6 @@ export function useWatchPostsV2() {
           )
         `)
         .eq('visibility', 'anyone')
-        .is('deleted_at', null)
         .eq('post_media.media_type', 'video')
         .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
