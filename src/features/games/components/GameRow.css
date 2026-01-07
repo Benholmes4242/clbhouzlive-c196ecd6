@@ -1,20 +1,20 @@
 /**
  * GameRow - Unified game card styles
- * Based on Your Games layout (master design)
+ * Based on "North Star" design spec - cinematic, premium feel
  */
 
 /* Row animations */
 .gameRow {
-  padding: 12px 16px 14px;
+  padding: 16px 16px 18px; /* +4-6px vertical padding for premium feel */
   cursor: pointer;
   position: relative;
   border-radius: 16px;
   transition:
-    background-color var(--hub-anim-fast) ease-out,
-    transform var(--hub-anim-fast) ease-out;
+    background-color 0.14s ease-out,
+    transform 0.14s ease-out;
   opacity: 0;
   transform: translateY(6px);
-  animation: gameRowIn 0.22s var(--hub-anim-ease-out) forwards;
+  animation: gameRowIn 0.22s ease-out forwards;
 }
 
 /* Next game subtle highlight - left accent line */
@@ -22,28 +22,34 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 8px;
-  bottom: 8px;
+  top: 10px;
+  bottom: 10px;
   width: 2.5px;
   border-radius: 2px;
   background: var(--hub-primary-bg, hsl(142, 71%, 45%));
-  opacity: 0.10;
+  opacity: 0.12;
 }
 
+/* Subtle separator between cards */
 .gameRow::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%;
+  width: 60%;
   height: 0.5px;
   background: var(--hub-stroke-subtle);
+  opacity: 0.6;
 }
 
+/* Expanded state - subtle background lift */
 .gameRow--expanded {
-  background: rgba(255, 255, 255, 0.03);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.gameRow--expanded::after {
+  opacity: 0;
 }
 
 /* Search mode variant - no cursor on non-expandable */
@@ -58,18 +64,22 @@
   }
 }
 
-.gameRow:hover {
-  background: var(--hub-glass-bg-hover);
+/* Subtle tap feedback - quiet acknowledgement, no bounce */
+.gameRow:active {
+  background: rgba(255, 255, 255, 0.02);
+  transform: scale(0.995);
 }
 
-.gameRow:active {
-  transform: scale(0.99);
+@media (hover: hover) {
+  .gameRow:hover {
+    background: rgba(255, 255, 255, 0.015);
+  }
 }
 
 /* Header layout */
 .gameRow__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -83,75 +93,82 @@
   min-width: 0;
 }
 
+/* Course name - hero text, semibold, 1 line max */
 .gameRow__courseName {
   font-size: 15px;
   font-weight: 600;
   color: var(--hub-text-bright);
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* Date/time line - calm metadata */
 .gameRow__timeLine {
-  margin-top: 3px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  margin-top: 4px;
 }
 
 .gameRow__metaLine {
   font-size: 12px;
   color: var(--hub-text-muted);
   line-height: 1.4;
-  opacity: 0.85;
+  letter-spacing: 0.01em; /* +1% letter spacing */
+  opacity: 0.75;
 }
 
+/* Right side - status & affordance */
 .gameRow__right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
+  padding-top: 2px;
 }
 
 .gameRow__statusGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: transform var(--hub-anim-default) ease-out;
+  gap: 6px;
+  transition: transform 0.22s ease-out;
 }
 
 .gameRow__statusGroup--lifted {
   transform: translateY(-1px);
 }
 
-/* Chevron */
+/* Chevron - smaller, reduced contrast */
 .gameRow__chevron {
   color: var(--hub-text-sub);
-  opacity: 0.5;
-  transition: transform var(--hub-anim-default) ease-out;
+  opacity: 0.35;
+  transition: transform 0.24s ease-out, opacity 0.14s ease-out;
   flex-shrink: 0;
 }
 
 .gameRow__chevron--expanded {
   transform: rotate(180deg);
+  opacity: 0.5;
 }
 
 /* Request to Join action (Search mode) */
 .gameRow__requestAction {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
   gap: 8px;
 }
 
-/* Details panel */
+/* ===== EXPANDED PANEL ===== */
+/* Reveal panel - spacing over dividers */
 .gameRow__details {
-  margin-top: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--hub-stroke-subtle);
+  margin-top: 14px;
+  padding-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   opacity: 0;
   transform: translateY(4px);
-  animation: detailsFadeIn 0.22s ease forwards;
+  animation: detailsFadeIn 0.2s ease forwards;
+  animation-delay: 40ms; /* Layered reveal effect */
 }
 
 @keyframes detailsFadeIn {
@@ -164,15 +181,12 @@
 .gameRow__section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
+/* Remove shouting section titles */
 .gameRow__sectionTitle {
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--hub-text-muted);
+  display: none; /* Remove "HOST" / "MEMBERS" labels */
 }
 
 .gameRow__sectionCount {
@@ -181,27 +195,161 @@
   color: var(--hub-text-sub);
 }
 
+/* Actions - minimal, text-only */
 .gameRow__actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+/* ===== HOST SECTION (Avatar-led) ===== */
+.gameRow__host {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gameRow__hostAvatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Subtle ring around host avatar */
+.gameRow__hostAvatar::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.gameRow__hostInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.gameRow__hostName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hub-text-bright);
+  line-height: 1.3;
+}
+
+/* Role + HCP meta line */
+.gameRow__hostMeta {
+  font-size: 12px;
+  color: var(--hub-text-muted);
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+/* ===== PLAYERS ROW (Avatar stack) ===== */
+.gameRow__players {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.gameRow__playersLabel {
+  font-size: 12px;
+  color: var(--hub-text-muted);
+  opacity: 0.6;
+  margin-right: 4px;
+}
+
+.gameRow__avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.gameRow__avatarStack > * {
+  margin-left: -6px;
+}
+
+.gameRow__avatarStack > *:first-child {
+  margin-left: 0;
+}
+
+.gameRow__stackedAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 2px solid var(--hub-glass-bg);
+  overflow: hidden;
+}
+
+.gameRow__stackedAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gameRow__moreCount {
+  font-size: 11px;
+  color: var(--hub-text-muted);
+  opacity: 0.6;
+  margin-left: 6px;
+}
+
+/* ===== VIEW GAME ACTION ===== */
+.gameRow__viewAction {
   margin-top: 8px;
 }
 
-/* Mini profile row styles (for host/member avatars) */
+.gameRow__viewLink {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hub-text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.14s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gameRow__viewLink:hover {
+  color: var(--hub-text-sub);
+}
+
+.gameRow__viewLink::after {
+  content: '→';
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* ===== MINI PROFILE ROW (Refined) ===== */
 .miniProfileRow {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 6px 0;
+  gap: 12px;
+  padding: 4px 0;
 }
 
 .miniProfileRow__avatar {
-  width: 36px;
-  height: 36px;
-  /* Allow Squircle clipping to show; do not force circle */
-  border-radius: 0;
+  width: 44px;
+  height: 44px;
   overflow: visible;
   flex-shrink: 0;
+  position: relative;
+}
+
+/* Subtle shadow on host avatar */
+.miniProfileRow--host .miniProfileRow__avatar::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
 }
 
 .miniProfileRow__avatar img {
@@ -227,29 +375,45 @@
   min-width: 0;
 }
 
+/* Name - medium weight, clean */
 .miniProfileRow__name {
   font-size: 14px;
   font-weight: 500;
   color: var(--hub-text-bright);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  line-height: 1.3;
 }
 
-.miniProfileRow__badge {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  background: var(--hub-primary-bg);
-  color: var(--hub-primary-text);
-  border: 1px solid var(--hub-primary-border);
-}
-
+/* Role + HCP on single line */
 .miniProfileRow__subtitle {
   font-size: 12px;
   color: var(--hub-text-muted);
   margin-top: 2px;
+  opacity: 0.7;
+}
+
+/* Remove badge - role is in subtitle now */
+.miniProfileRow__badge {
+  display: none;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .gameRow,
+  .gameRow__details,
+  .gameRow__chevron,
+  .gameRow__statusGroup {
+    animation: none;
+    transition: none;
+  }
+  
+  .gameRow {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .gameRow__details {
+    opacity: 1;
+    transform: none;
+    animation-delay: 0ms;
+  }
 }

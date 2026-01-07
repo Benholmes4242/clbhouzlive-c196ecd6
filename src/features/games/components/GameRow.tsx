@@ -1,19 +1,19 @@
 /**
  * GameRow - Unified game card component
  * 
- * Master layout from "Your Games" - reused across:
- * - Your Games page (full functionality)
- * - Hub YourGamesTile (read-only, swipe-to-hide)
- * - Search Games page (anonymous, request-to-join)
+ * North Star Design:
+ * - Collapsed: "Scan my week in half a second"
+ * - Expanded: "Immediately understand who, what, when — feel in control"
+ * 
+ * No clutter. No redundancy. No UI shouting.
  */
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
 import { SecondaryButton, DestructiveButton } from '@/features/hub/components/HubButtons';
-import { MiniProfileRow } from '@/features/nearby/components/your-games/MiniProfileRow';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { haptic } from '@/utils/haptics';
-import { formatExpires } from '@/lib/formatExpires';
 import './GameRow.css';
 
 export type GameRowMode = 'yourGames' | 'hub' | 'search';
@@ -60,6 +60,7 @@ export interface GameRowProps {
   onCancelGame?: () => void;
   onLeaveGame?: () => void;
   onHideFromHub?: () => void;
+  onViewGame?: () => void;
 
   // Visual flags
   anonymous?: boolean;
@@ -77,6 +78,18 @@ export interface GameRowProps {
   pendingRequestCount?: number;
 }
 
+/**
+ * Format date/time with · separators for clean metadata display
+ * "Sun · Apr 19 · 13:00"
+ */
+function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  const weekday = date.toLocaleDateString(undefined, { weekday: 'short' });
+  const monthDay = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const time = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return `${weekday} · ${monthDay} · ${time}`;
+}
+
 export function GameRow({
   mode,
   game,
@@ -90,6 +103,7 @@ export function GameRow({
   onCancelGame,
   onLeaveGame,
   onHideFromHub,
+  onViewGame,
   anonymous = false,
   readOnly = false,
   isNextGame = false,
@@ -115,18 +129,7 @@ export function GameRow({
 
   // Derived data
   const filled = Math.max(0, game.slots_total - game.slots_open);
-  const start = new Date(game.start_time);
-  const dateStr = start.toLocaleDateString(undefined, { 
-    weekday: 'short', 
-    month: 'short', 
-    day: 'numeric' 
-  });
-  const timeStr = start.toLocaleTimeString(undefined, { 
-    hour: 'numeric', 
-    minute: '2-digit' 
-  });
-  
-  const expiryLabel = formatExpires(game.expires_at);
+  const dateTimeStr = formatDateTime(game.start_time);
 
   // Extract host and members from participants
   const host = anonymous ? null : game.participants?.find(p => p.user_id === game.host_user_id);
@@ -139,6 +142,12 @@ export function GameRow({
   const showActions = showDetails && !readOnly;
   const showRequestButton = mode === 'search' && !!onRequestToJoin;
 
+  // Build host meta line: "Host · HCP 4"
+  const hostMeta = host ? [
+    'Host',
+    host.eg_handicap_index != null ? `HCP ${host.eg_handicap_index}` : null
+  ].filter(Boolean).join(' · ') : null;
+
   return (
     <article
       className={cn(
@@ -149,7 +158,7 @@ export function GameRow({
       )}
       data-game-id={game.id}
       style={{ animationDelay: `${index * 40}ms` }}
-      aria-label={`${game.course_name}, ${dateStr}, ${timeStr}`}
+      aria-label={`${game.course_name}, ${dateTimeStr}`}
     >
       {/* Header / Collapsed row */}
       <div 
@@ -157,16 +166,18 @@ export function GameRow({
         onClick={canExpand ? handleToggle : undefined}
       >
         <div className="gameRow__titleBlock">
+          {/* Course name - hero text */}
           <div className="gameRow__courseName">{game.course_name || 'Golf Game'}</div>
+          {/* Date/time - calm metadata with · separators */}
           <div className="gameRow__timeLine">
-            <span className="gameRow__metaLine">{dateStr} • {timeStr}</span>
+            <span className="gameRow__metaLine">{dateTimeStr}</span>
           </div>
-          {/* Pending request hint (Hosting mode) */}
+          {/* Pending request hint (Hosting mode - only on yourGames page) */}
           {mode === 'yourGames' && isHost && pendingRequestCount > 0 && (
-            <div className="text-xs mt-1 opacity-70">
+            <div className="text-xs mt-1.5 opacity-60" style={{ color: 'var(--hub-text-muted)' }}>
               {pendingRequestCount === 1
-                ? '1 player waiting for approval'
-                : `${pendingRequestCount} players waiting for approval`}
+                ? '1 player waiting'
+                : `${pendingRequestCount} players waiting`}
             </div>
           )}
         </div>
@@ -176,13 +187,6 @@ export function GameRow({
             'gameRow__statusGroup',
             isExpanded && 'gameRow__statusGroup--lifted'
           )}>
-            {/* Pending requests indicator (Hosting mode) */}
-            {mode === 'yourGames' && isHost && pendingRequestCount > 0 && (
-              <span className="text-xs font-medium text-white/70 mr-2">
-                Requests · {pendingRequestCount}
-              </span>
-            )}
-            
             <GameStatusPill
               filled={filled}
               total={game.slots_total}
@@ -193,7 +197,8 @@ export function GameRow({
                   'gameRow__chevron',
                   isExpanded && 'gameRow__chevron--expanded'
                 )}
-                size={16}
+                size={14}
+                strokeWidth={1.5}
                 aria-hidden="true"
               />
             )}
@@ -220,54 +225,83 @@ export function GameRow({
         </div>
       )}
 
-      {/* Expanded details panel */}
+      {/* Expanded details panel - avatar-led storytelling */}
       {showDetails && (
         <div className="gameRow__details">
-          {/* Host section */}
+          {/* Host section - avatar-led, no "HOST" label */}
           {host && (
-            <section className="gameRow__section">
-              <h3 className="gameRow__sectionTitle">Host</h3>
-              <MiniProfileRow
-                avatarUrl={host.profile_photo_url}
-                name={host.display_name || (host.user_id ? 'Unknown' : 'Guest')}
-                subtitle={host.eg_handicap_index ? `HCP ${host.eg_handicap_index}` : undefined}
-                badgeLabel="Host"
-              />
-            </section>
-          )}
-
-          {/* Members section */}
-          {members.length > 0 && (
-            <section className="gameRow__section">
-              <h3 className="gameRow__sectionTitle">
-                Members <span className="gameRow__sectionCount">{members.length}</span>
-              </h3>
-              {members.map((member, idx) => (
-                <MiniProfileRow
-                  key={member.user_id || idx}
-                  avatarUrl={member.profile_photo_url}
-                  name={member.display_name || (member.user_id ? 'Unknown' : 'Guest')}
-                  subtitle={member.eg_handicap_index ? `HCP ${member.eg_handicap_index}` : undefined}
+            <div className="miniProfileRow miniProfileRow--host">
+              <div className="miniProfileRow__avatar">
+                <SquircleAvatar
+                  size={44}
+                  src={host.profile_photo_url}
+                  alt={host.display_name || 'Host'}
+                  fallback={(host.display_name || 'H').charAt(0).toUpperCase()}
                 />
-              ))}
-            </section>
+              </div>
+              <div className="miniProfileRow__info">
+                <div className="miniProfileRow__name">
+                  {host.display_name || 'Unknown'}
+                </div>
+                {hostMeta && (
+                  <div className="miniProfileRow__subtitle">{hostMeta}</div>
+                )}
+              </div>
+            </div>
           )}
 
-          {/* Actions */}
-          {showActions && (
+          {/* Players row - avatar stack (only if there are members) */}
+          {members.length > 0 && (
+            <div className="gameRow__players">
+              <span className="gameRow__playersLabel">Players</span>
+              <div className="gameRow__avatarStack">
+                {members.slice(0, 3).map((member, idx) => (
+                  <div key={member.user_id || idx} className="gameRow__stackedAvatar">
+                    <SquircleAvatar
+                      size={28}
+                      src={member.profile_photo_url}
+                      alt={member.display_name || 'Player'}
+                      fallback={(member.display_name || 'P').charAt(0).toUpperCase()}
+                    />
+                  </div>
+                ))}
+              </div>
+              {members.length > 3 && (
+                <span className="gameRow__moreCount">+{members.length - 3}</span>
+              )}
+            </div>
+          )}
+
+          {/* View game action - minimal text button */}
+          {mode === 'hub' && (
+            <div className="gameRow__viewAction">
+              <button 
+                className="gameRow__viewLink"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewGame?.();
+                }}
+              >
+                View game
+              </button>
+            </div>
+          )}
+
+          {/* Actions for yourGames mode */}
+          {showActions && mode === 'yourGames' && (
             <div className="gameRow__actions">
               {isHost && (
                 <>
-                  {onViewRequests && (
+                  {onViewRequests && pendingRequestCount > 0 && (
                     <SecondaryButton
                       onClick={() => onViewRequests()}
-                      label={pendingRequestCount > 0 ? `Requests (${pendingRequestCount})` : 'Requests'}
+                      label={`Requests (${pendingRequestCount})`}
                     />
                   )}
                   {onCancelGame && (
                     <DestructiveButton
                       onClick={() => onCancelGame()}
-                      label="Cancel Game"
+                      label="Cancel"
                     />
                   )}
                 </>
@@ -275,7 +309,7 @@ export function GameRow({
               {isJoined && !isHost && onLeaveGame && (
                 <DestructiveButton
                   onClick={() => onLeaveGame()}
-                  label="Leave Game"
+                  label="Leave"
                 />
               )}
             </div>
