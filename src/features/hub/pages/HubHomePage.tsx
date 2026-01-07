@@ -184,9 +184,9 @@ export function HubHomePage() {
         <div 
           className="w-full h-full flex flex-col px-3.5"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
+            paddingTop: 'env(safe-area-inset-top, 0px)',
             paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 67px)', // 55px nav + 12px gap
-            overflow: 'hidden', // NO SCROLL - Hub page itself does not scroll
+            overflow: 'hidden',
           }}
         >
           {/* Zone 1: Header - Fixed ~68px */}
