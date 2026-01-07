@@ -10,12 +10,6 @@ export const CLUBHOUSE_VERTICAL_ONLY = true; // Vertical 9:16±7% only, full-ble
 export const USE_SAFE_AUTOPLAY_V2 = true;
 export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 
-/**
- * Hub Feature Flag
- * 
- * Phase 5: Hub is now always enabled for all users (production launch)
- */
-const HUB_ENABLED = true;
 
 /**
  * Top 100 Mock Players Flag
@@ -33,7 +27,6 @@ export const FEATURE_FLAGS = {
   CLUBHOUSE_VERTICAL_ONLY,
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,
   VIDEO_PROGRESS_SYNC_V1: USE_VIDEO_PROGRESS_SYNC_V1,
-  HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;
 

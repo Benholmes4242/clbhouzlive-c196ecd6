@@ -4,11 +4,9 @@ import {
   HomeIcon,
   CameraIcon, 
   MapPinIcon, 
-  UserIcon,
   Squares2X2Icon, // Hub icon
   TrophyIcon // Tour Hub icon
 } from '@heroicons/react/24/outline';
-import { FEATURE_FLAGS } from '@/config/featureFlags';
 
 // Base tabs (always visible)
 const baseTabs = [
@@ -19,9 +17,7 @@ const baseTabs = [
   { id: 'courses', label: 'Courses', icon: MapPinIcon, path: '/courses' },
 ];
 
-// Conditional last tab based on Hub feature flag
-const lastTab = FEATURE_FLAGS.HUB
-  ? { id: 'hub', label: 'Hub', icon: Squares2X2Icon, path: '/hub' }
-  : { id: 'profile', label: 'Hub', icon: UserIcon, path: '/profile' };
+// Hub tab - always enabled
+const hubTab = { id: 'hub', label: 'Hub', icon: Squares2X2Icon, path: '/hub' };
 
-export const navigationTabs = [...baseTabs, lastTab];
+export const navigationTabs = [...baseTabs, hubTab];
