@@ -177,9 +177,10 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     getBoostScore: memoizedBoostScore,
   });
 
+  // ⚠️ TESTING: Increased limit from 5 to 20 for trending
   const { videos: trendingVideosRaw } = useLongFormVideosQuery({
     section: 'trending',
-    limit: 5,
+    limit: 20, // TESTING: was 5
     category: categoryFilter,
     enabled: trendingTriggered, // Lazy load
   });
@@ -377,11 +378,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       />
 
       {/* Module 2: Trending this week (lazy loaded) */}
+      {/* ⚠️ TESTING: Increased slice from 2 to 10 */}
       <div ref={trendingRef}>
         <VideoSection
           title="Trending this week"
           subtitle="Popular with golfers right now"
-          videos={trendingVideos.slice(0, 2)}
+          videos={trendingVideos.slice(0, 10)}
           onViewAll={() => handleViewAll('trending')}
           onVideoClick={handleVideoClick}
           onCreatorClick={handleCreatorClick}
