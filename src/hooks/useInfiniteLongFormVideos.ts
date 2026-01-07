@@ -14,11 +14,9 @@ const PAGE_SIZE = 10;  // Load 10 videos per page for faster loads
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
-type PageParam = { cursor: number; realTotal: number | null };
-
 interface LongFormVideosPage {
   items: LongFormVideo[];
-  nextCursor: PageParam;
+  nextCursor: number;
   hasMore: boolean;
 }
 
@@ -64,34 +62,16 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
   const query = useInfiniteQuery({
     queryKey: ['long-form-videos-infinite', section, followedCreatorIds.join(','), category || ''],
-    initialPageParam: { cursor: 0, realTotal: null } satisfies PageParam,
-
-    queryFn: async ({ pageParam = { cursor: 0, realTotal: null } }): Promise<LongFormVideosPage> => {
-      const { cursor, realTotal: carriedRealTotal } = pageParam as PageParam;
-      const startRange = cursor;
+    initialPageParam: 0,
+    
+    queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
+      const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
-      const mockTotal = ENABLE_MOCK_VIDEOS ? getMockVideosForSection(section).length : 0;
-      let realTotal = carriedRealTotal;
 
       // For 'following' section, return empty if no followed creators
-      // (but still allow pagination to advance when mock videos are enabled)
       if (section === 'following' && followedCreatorIds.length === 0) {
-        if (!ENABLE_MOCK_VIDEOS) {
-          return { items: [], nextCursor: { cursor: startRange, realTotal: 0 }, hasMore: false };
-        }
-
-        realTotal = 0;
-        const hasMore = (endRange + 1) < (realTotal + mockTotal);
-        return { items: [], nextCursor: { cursor: endRange + 1, realTotal }, hasMore };
+        return { items: [], nextCursor: startRange, hasMore: false };
       }
-
-      // If we already know we've exhausted real data, don't query again—just advance pagination for mocks
-      if (realTotal !== null && startRange >= realTotal) {
-        const hasMore = (endRange + 1) < (realTotal + mockTotal);
-        return { items: [], nextCursor: { cursor: endRange + 1, realTotal }, hasMore };
-      }
-
-      // For 'courses' section, first get post IDs with golf_club tags
 
       // For 'courses' section, first get post IDs with golf_club tags
       let coursePostIds: string[] | null = null;
@@ -105,7 +85,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         coursePostIds = courseTaggedPosts?.map(t => t.post_id) || [];
         
         if (coursePostIds.length === 0) {
-          return { items: [], nextCursor: { cursor: startRange, realTotal: 0 }, hasMore: false };
+          return { items: [], nextCursor: startRange, hasMore: false };
         }
       }
 
@@ -215,10 +195,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      const fetchedCount = postsData?.length ?? 0;
-      const newRealTotal = fetchedCount < PAGE_SIZE ? startRange + fetchedCount : null;
-      const hasMore = fetchedCount === PAGE_SIZE;
-      const nextCursor: PageParam = { cursor: endRange + 1, realTotal: newRealTotal ?? carriedRealTotal };
+      const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
+      const nextCursor = hasMore ? endRange + 1 : startRange;
 
       return { items, nextCursor, hasMore };
     },
@@ -232,10 +210,10 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   });
 
   const realItems = query.data?.pages.flatMap((page) => page.items) ?? [];
-  const pagesLoaded = query.data?.pages.length ?? 1; // Default to 1 for initial load
+  const pagesLoaded = query.data?.pages.length ?? 0;
   
   // Inject mock videos when flag is enabled (for UI testing)
-  // Apply same pagination logic - show PAGE_SIZE * pagesLoaded total items
+  // Apply same pagination logic - only show PAGE_SIZE * pagesLoaded mocks
   let allItems = realItems;
   let mockHasMore = false;
   
@@ -245,26 +223,12 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     const seenIds = new Set(realItems.map(v => v.id));
     const uniqueMocks = mockVideos.filter(v => !seenIds.has(v.id));
     
-    // Calculate total items to show based on pages loaded
-    const totalItemsToShow = PAGE_SIZE * pagesLoaded;
-    
-    // How many mocks should we show to fill up to totalItemsToShow?
-    const mocksToShow = Math.max(0, totalItemsToShow - realItems.length);
-    const paginatedMocks = uniqueMocks.slice(0, mocksToShow);
+    // Paginate mocks the same way - only show up to PAGE_SIZE * pagesLoaded
+    const maxMocksToShow = Math.max(0, (PAGE_SIZE * pagesLoaded) - realItems.length);
+    const paginatedMocks = uniqueMocks.slice(0, maxMocksToShow);
     
     allItems = [...realItems, ...paginatedMocks];
-    
-    // There are more mocks if we haven't shown all of them yet
-    mockHasMore = mocksToShow < uniqueMocks.length;
-    
-    console.log('[useInfiniteLongFormVideos] Mock pagination:', {
-      pagesLoaded,
-      totalItemsToShow,
-      realItemsCount: realItems.length,
-      mocksToShow,
-      mocksTotalAvailable: uniqueMocks.length,
-      mockHasMore
-    });
+    mockHasMore = paginatedMocks.length < uniqueMocks.length;
   }
   
   // Has more if real data has more OR mocks have more to show
