@@ -80,14 +80,12 @@ export function usePaginatedFollowers(userId: string | undefined) {
 
       const { from, to } = buildRange(pageParam as number);
 
-      // NOTE: Avoid FK-join syntax here; this project doesn't expose a
-      // relationship between user_follows -> user_profiles in PostgREST schema cache.
-      const { data: followRows, error, count } = await supabase
+      // Fetch ALL followers first (no range) to combine with mock users for client-side pagination
+      const { data: followRows, error } = await supabase
         .from('user_follows')
-        .select('follower_id', { count: 'exact' })
+        .select('follower_id')
         .eq('following_id', userId)
-        .order('created_at', { ascending: false })
-        .range(from, to);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -103,7 +101,7 @@ export function usePaginatedFollowers(userId: string | undefined) {
       const mockUsers = getMockSocialUsersMapped();
       const allUsers = [...realUsers, ...mockUsers];
 
-      const total = (count ?? realUsers.length) + mockUsers.length;
+      const total = allUsers.length;
       const hasMore = to + 1 < total;
 
       // Paginate from combined list
