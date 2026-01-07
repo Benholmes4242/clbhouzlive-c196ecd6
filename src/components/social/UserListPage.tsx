@@ -99,7 +99,9 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
             {title}
             {displayTotal > 0 && (
-              <span className="text-muted-foreground ml-1">({displayTotal})</span>
+              <span className="text-[10px] text-muted-foreground/50 ml-1 align-middle">
+                {displayTotal}
+              </span>
             )}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
@@ -298,10 +300,11 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
             {user.displayName}
           </p>
 
-          {/* Row 2: Home club */}
-          <p className="text-sm text-muted-foreground truncate">{clubLine}</p>
+          {/* Row 2: Username */}
+          <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
 
-          {/* Row 3: Buttons (only show for non-self users) */}
+          {/* Row 3: Home club */}
+          <p className="text-sm text-muted-foreground truncate">{clubLine}</p>
           {!isSelf && currentUserId && !relationshipLoading && (
             <div
               className="grid grid-cols-2 gap-2 pt-2"
