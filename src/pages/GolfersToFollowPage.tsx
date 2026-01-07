@@ -15,6 +15,7 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 // Tab trigger class matching Courses page exactly
 const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]";
@@ -313,7 +314,7 @@ const GolfersToFollowPage = () => {
                 return (
                   <button
                     key={golfer.id}
-                    onClick={() => navigate(`/users/${golfer.id}`)}
+                    onClick={() => navigate(getProfilePathById(golfer.id, golfer.creatorOnly, golfer.username))}
                     className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-start gap-3">

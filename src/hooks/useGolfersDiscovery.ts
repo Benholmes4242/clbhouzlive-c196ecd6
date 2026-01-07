@@ -22,6 +22,7 @@ interface GolferProfile {
   isVerified: boolean;
   friendStatus: 'none' | 'pending' | 'friends';
   createdAt?: string;
+  creatorOnly: boolean;
 }
 
 // Helper to fetch Top 100 counts for a list of user IDs
@@ -127,7 +128,7 @@ export function useGolfersDiscovery() {
       
       let baseQuery = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at')
+        .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at, creator_only')
         .neq('id', user!.id)
         .is('deleted_at', null)
         .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`);
@@ -170,6 +171,7 @@ export function useGolfersDiscovery() {
         isVerified: profile.is_verified_golfer || false,
         friendStatus: friendStatuses.get(profile.id) || 'none',
         createdAt: profile.created_at,
+        creatorOnly: profile.creator_only ?? false,
       }));
     },
   });
@@ -182,7 +184,7 @@ export function useGolfersDiscovery() {
     queryFn: async () => {
       let query = supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at', { count: 'exact' })
+        .select('id, display_name, username, profile_photo_url, home_club, primary_club_id, eg_handicap_index, is_verified_golfer, created_at, creator_only', { count: 'exact' })
         .neq('id', user!.id)
         .is('deleted_at', null);
 
@@ -230,6 +232,7 @@ export function useGolfersDiscovery() {
         isVerified: profile.is_verified_golfer || false,
         friendStatus: friendStatuses.get(profile.id) || 'none',
         createdAt: profile.created_at,
+        creatorOnly: profile.creator_only ?? false,
       }));
 
       return {
