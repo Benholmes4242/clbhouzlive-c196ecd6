@@ -196,61 +196,68 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     category: categoryFilter,
   });
 
-  // Hard de-dupe: each video can appear in only ONE section across the entire page
-  // Priority order: Continue Watching → Following → Recommended → Trending → Courses
+  // Avoid re-showing Continue Watching videos in the sections below.
   const { recommendedVideos, followedVideos, trendingVideos, coursesVideos } = useMemo(() => {
-    const seen = new Set<string>();
-    
-    // First, add Continue Watching IDs (highest priority - they won't appear elsewhere)
-    continueWatchingVideos.forEach(v => {
-      if (v?.id) seen.add(v.id);
+    const continueWatchingIds = new Set<string>();
+
+    // Exclude Continue Watching IDs (so they don't appear again elsewhere)
+    continueWatchingVideos.forEach((v) => {
+      if (v?.id) continueWatchingIds.add(v.id);
     });
-    
-    const dedupe = <T extends { id: string }>(videos: T[]): T[] => 
-      videos.filter(v => v?.id && !seen.has(v.id) && (seen.add(v.id), true));
-    
+
+    const excludeContinueWatching = <T extends { id: string }>(videos: T[]): T[] =>
+      videos.filter((v) => v?.id && !continueWatchingIds.has(v.id));
+
     // Client-side search filter (comprehensive - matches Watch page implementation)
     const searchFilter = <T extends Record<string, any>>(videos: T[]): T[] => {
       if (!searchQuery || !searchQuery.trim()) return videos;
-      
+
       const query = searchQuery.toLowerCase();
-      return videos.filter(v => {
+      return videos.filter((v) => {
         // Video content fields
         const titleMatch = (v.title || '').toLowerCase().includes(query);
         const captionMatch = (v.caption || '').toLowerCase().includes(query);
         const descriptionMatch = (v.description || '').toLowerCase().includes(query);
-        
+
         // Creator fields (flat structure - videos tab specific)
         const creatorNameMatch = (v.creatorName || '').toLowerCase().includes(query);
         const creatorUsernameMatch = (v.creatorUsername || '').toLowerCase().includes(query);
-        
+
         // User/creator fields (nested structure - polymorphic support)
         const userNameMatch = (v.user?.name || '').toLowerCase().includes(query);
         const userUsernameMatch = (v.user?.username || '').toLowerCase().includes(query);
         const nestedCreatorNameMatch = (v.creator?.name || '').toLowerCase().includes(query);
         const nestedCreatorUsernameMatch = (v.creator?.username || '').toLowerCase().includes(query);
-        
+
         // Business profile name
         const businessMatch = (v.business?.name || '').toLowerCase().includes(query);
-        
+
         // Golf course name (both camelCase and snake_case)
         const courseMatch = (v.golfCourse?.name || '').toLowerCase().includes(query);
         const golfCourseMatch = (v.golf_course?.name || '').toLowerCase().includes(query);
-        
-        return titleMatch || captionMatch || descriptionMatch ||
-               creatorNameMatch || creatorUsernameMatch ||
-               userNameMatch || userUsernameMatch ||
-               nestedCreatorNameMatch || nestedCreatorUsernameMatch ||
-               businessMatch || courseMatch || golfCourseMatch;
+
+        return (
+          titleMatch ||
+          captionMatch ||
+          descriptionMatch ||
+          creatorNameMatch ||
+          creatorUsernameMatch ||
+          userNameMatch ||
+          userUsernameMatch ||
+          nestedCreatorNameMatch ||
+          nestedCreatorUsernameMatch ||
+          businessMatch ||
+          courseMatch ||
+          golfCourseMatch
+        );
       });
     };
-    
-    // Process in priority order (after Continue Watching)
-    const followed = searchFilter(dedupe(followedVideosRaw));
-    const recommended = searchFilter(dedupe(recommendedVideosRaw));
-    const trending = searchFilter(dedupe(trendingVideosRaw));
-    const courses = searchFilter(dedupe(coursesVideosRaw));
-    
+
+    const followed = searchFilter(excludeContinueWatching(followedVideosRaw));
+    const recommended = searchFilter(excludeContinueWatching(recommendedVideosRaw));
+    const trending = searchFilter(excludeContinueWatching(trendingVideosRaw));
+    const courses = searchFilter(excludeContinueWatching(coursesVideosRaw));
+
     return {
       followedVideos: followed,
       recommendedVideos: recommended,
