@@ -10,6 +10,10 @@ import {
   MOCK_COURSES_VIDEOS 
 } from '@/mocks/mockLongFormVideos';
 
+// ⚠️ TESTING ONLY - Set to false for production
+// When true, ignores 7-day recency filter and shows ALL videos in Trending
+const TESTING_MODE_FILL_TRENDING = true;
+
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
   limit?: number;
@@ -122,9 +126,16 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
   if (!creatorUserId && !searchQuery) {
     switch (section) {
       case 'trending':
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        query = query.gte('created_at', sevenDaysAgo.toISOString());
+        // TESTING MODE: Skip recency filter to get all videos
+        if (TESTING_MODE_FILL_TRENDING) {
+          console.log('[Trending] 🧪 TESTING MODE: Showing ALL videos (no 7-day filter)');
+        } else {
+          // NORMAL MODE: Last 7 days
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          query = query.gte('created_at', sevenDaysAgo.toISOString());
+          console.log('[Trending] Using normal 7-day filter');
+        }
         break;
         
       case 'following':
@@ -138,10 +149,25 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
   }
 
   const needsScoreSort = section === 'trending' || section === 'recommended' || sort === 'popular';
-  const fetchLimit = needsScoreSort ? Math.min(limit * 2, 20) : limit; // Reduced overfetch
+  // TESTING MODE: Increase fetch limit for trending
+  const fetchLimit = (section === 'trending' && TESTING_MODE_FILL_TRENDING) 
+    ? 50 
+    : (needsScoreSort ? Math.min(limit * 2, 20) : limit);
   query = query.order('created_at', { ascending: false }).limit(fetchLimit);
 
+  console.log(`[useLongFormVideosQuery] 🔍 QUERY for ${section}:`, {
+    durationThreshold: VIDEO_DURATION_THRESHOLD_SECONDS,
+    fetchLimit,
+    testingMode: TESTING_MODE_FILL_TRENDING && section === 'trending',
+  });
+
   const { data, error: queryError } = await query;
+
+  console.log(`[useLongFormVideosQuery] 📊 RAW RESULT for ${section}:`, {
+    videosReturned: data?.length || 0,
+    error: queryError?.message,
+    firstVideoDuration: data?.[0]?.post_media?.[0]?.duration_seconds,
+  });
 
   if (queryError) throw queryError;
   if (!data || data.length === 0) return [];
