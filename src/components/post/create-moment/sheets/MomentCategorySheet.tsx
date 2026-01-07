@@ -213,7 +213,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           className="absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[75vh] flex flex-col"
           style={{ 
-            background: 'var(--cm-surface-sheet)',
+            background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
           }}
           onClick={(e) => e.stopPropagation()}
@@ -381,7 +381,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
           <div 
             className="absolute bottom-0 left-0 right-0 px-4 pt-3 pb-4"
             style={{ 
-              background: 'linear-gradient(to top, var(--cm-surface-sheet) 80%, transparent)',
+              background: 'linear-gradient(to top, var(--cm-surface-card) 80%, transparent)',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 16px)',
             }}
           >

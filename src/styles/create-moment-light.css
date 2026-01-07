@@ -12,13 +12,12 @@
   /* Surfaces - matching Quest page */
   --cm-surface-card: #ffffff;           /* white - main panels */
   --cm-surface-alt: #f8fafc;            /* slate-50 - media stage background */
-  --cm-surface-sheet: #f8fafc;          /* slate-50 - bottom sheet backgrounds */
   --cm-surface-slate: #334155;          /* slate-700 - primary buttons */
   
-  /* Inputs - white background for search bars */
-  --cm-surface-input: #ffffff;          /* white - search bars */
-  --cm-surface-input-hover: #f8fafc;    /* slate-50 */
-  --cm-surface-input-focus: #ffffff;    /* white */
+  /* Inputs */
+  --cm-surface-input: #f1f5f9;          /* slate-100 */
+  --cm-surface-input-hover: #e2e8f0;    /* slate-200 */
+  --cm-surface-input-focus: #e2e8f0;    /* slate-200 */
   
   /* Borders - matching Quest page border-slate-200/60 */
   --cm-border: #cbd5e1;                 /* slate-300 */

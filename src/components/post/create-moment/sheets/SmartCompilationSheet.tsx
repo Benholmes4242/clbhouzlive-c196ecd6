@@ -246,7 +246,7 @@ export default function SmartCompilationSheet({
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           className="absolute bottom-0 left-0 right-0 rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col"
           style={{ 
-            background: 'var(--cm-surface-sheet)',
+            background: 'var(--cm-surface-card)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
           }}
           onClick={(e) => e.stopPropagation()}
@@ -437,7 +437,7 @@ export default function SmartCompilationSheet({
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
                         className="relative w-full max-h-[60vh] rounded-t-2xl overflow-hidden"
-                        style={{ background: 'var(--cm-surface-sheet)' }}
+                        style={{ background: 'var(--cm-surface-card)' }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--cm-border-subtle)' }}>
