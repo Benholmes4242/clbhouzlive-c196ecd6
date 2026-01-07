@@ -62,7 +62,7 @@ export function HubHeaderToday() {
         className="text-[24px] font-bold leading-tight truncate"
         style={{ color: 'var(--hub-text)' }}
       >
-        {greeting}, {firstName} 👋
+        {greeting}, {firstName}
       </h1>
       <p 
         className="text-[14px] mt-0.5 truncate"
