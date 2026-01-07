@@ -3,8 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFollowers } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
-import { SocialListPageShell } from '@/components/profile/social/SocialListPageShell';
-import { SocialUserRow } from '@/components/profile/social/SocialUserRow';
+import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Loader2 } from 'lucide-react';
 
@@ -14,7 +13,7 @@ const FollowersListPage = () => {
 
   // Fetch profile user by username
   const { data: profileUser, isLoading: profileLoading } = useUserByUsername(username);
-  
+
   // Fetch followers with pagination
   const {
     data,
@@ -24,15 +23,16 @@ const FollowersListPage = () => {
     fetchNextPage,
   } = usePaginatedFollowers(profileUser?.id);
 
-  const followers = data?.pages.flatMap(page => page.users) ?? [];
-  
+  const followers = data?.pages.flatMap((page) => page.users) ?? [];
+  const totalCount = data?.pages[0] ? (data.pages.reduce((acc, p) => acc + p.users.length, 0)) : 0;
+
   // Track list view
   useEffect(() => {
     if (profileUser?.id) {
       analyticsEvents.social.listViewed({
-        type: "followers",
+        type: 'followers',
         profileUserId: profileUser.id,
-        from: "profile_stats",
+        from: 'profile_stats',
       });
     }
   }, [profileUser?.id]);
@@ -54,50 +54,20 @@ const FollowersListPage = () => {
   }
 
   return (
-    <SocialListPageShell
+    <UserListPage
+      mode="followers"
       title="Followers"
       subtitle={`People who follow @${profileUser.username}`}
-      count={followers.length}
+      searchPlaceholder="Search followers by name or club"
+      emptyText="No followers yet."
+      users={followers}
+      totalCount={totalCount}
+      isLoading={followersLoading}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
       backPath={`/profile/${profileUser.username}`}
-    >
-      {followersLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      )}
-
-      {!followersLoading && followers.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
-          <p className="text-muted-foreground text-center">No followers yet.</p>
-        </div>
-      )}
-
-      {!followersLoading && followers.length > 0 && (
-        <>
-          <div className="divide-y divide-border">
-            {followers.map((user) => (
-              <SocialUserRow
-                key={user.id}
-                user={user}
-                currentUserId={currentUser?.id || null}
-              />
-            ))}
-          </div>
-
-          {hasNextPage && (
-            <div className="flex justify-center py-6">
-              <button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                className="px-4 py-2 rounded-sq-xs bg-background border border-border text-sm font-medium disabled:opacity-50 transition-opacity"
-              >
-                {isFetchingNextPage ? 'Loading more…' : 'Load more'}
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </SocialListPageShell>
+    />
   );
 };
 
