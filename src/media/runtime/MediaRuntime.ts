@@ -17,7 +17,7 @@ import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
 
 // ============ Types ============
 
-export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse';
+export type MediaSurface = 'grid' | 'fullscreen' | 'clubhouse' | 'hero';
 export type PlaybackReason = 'autoplay' | 'user' | 'resume';
 export type ErrorType = 'transient' | 'hls_fatal' | 'decode_unsupported';
 
@@ -83,15 +83,21 @@ const MAX_RETRIES = 1;
 const PLAY_RETRY_MAX = 3; // Max retries for requestPlay with backoff
 const PLAY_RETRY_BASE_DELAY = 100; // Base delay for exponential backoff
 // Concurrent video limits by surface
-// Limit grid videos to 3 for optimal CPU/memory performance across all devices
-const MAX_CONCURRENT_GRID_VIDEOS = 3;
+// Hero + Grid can play simultaneously (1 each), fullscreen/clubhouse is exclusive
+const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
+  'hero': 1,           // Only 1 hero video
+  'grid': 1,           // Only 1 grid video (from autoplay pattern)
+  'fullscreen': 1,     // Only 1 fullscreen
+  'clubhouse': 1,      // Only 1 clubhouse
+};
 const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
 
 // Surface priority (lower = higher priority)
 const SURFACE_PRIORITY: Record<MediaSurface, number> = {
   'clubhouse': 1,      // Highest - fullscreen feed
   'fullscreen': 2,     // High - fullscreen modal
-  'grid': 3,           // Medium - grid videos
+  'hero': 3,           // Medium-high - hero video at top
+  'grid': 4,           // Medium - grid videos
 };
 
 // ============ Singleton Runtime ============
@@ -702,7 +708,7 @@ class MediaRuntimeCore {
           return media?.surface === 'grid';
         }).length;
         
-        if (currentGridCount >= MAX_CONCURRENT_GRID_VIDEOS) {
+        if (currentGridCount >= MAX_CONCURRENT_PER_SURFACE['grid']) {
           // At limit - need to pause lowest priority if new one is higher
           const activeGridNodes = Array.from(this.state.activeMediaIds)
             .map(id => this.registry.get(id))

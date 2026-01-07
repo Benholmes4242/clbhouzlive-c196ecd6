@@ -96,10 +96,10 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   const hasPreloadedRef = useRef(false);
   const registeredIdRef = useRef<string | null>(null);
 
-  // MediaRuntime integration - use autoplay hook for high-priority hero video
+  // MediaRuntime integration - hero gets its own surface for independent playback
   const { registerMedia } = useMediaAutoplay({
     mode: 'grid',
-    surface: 'grid', // Use 'grid' surface since hero is on discover page
+    surface: 'hero', // Hero has its own surface - can play alongside grid videos
     startThreshold: 0.3, // Hero should start playing when 30% visible
     stopThreshold: 0.1,
   });
