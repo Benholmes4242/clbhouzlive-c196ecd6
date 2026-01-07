@@ -36,7 +36,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   const { section, followedCreatorIds = [] } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-simple', section, followedCreatorIds.join(',')],
+    queryKey: ['videos-infinite-simple-v2', section, followedCreatorIds.join(',')],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
@@ -160,9 +160,9 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      // hasMore based on whether we found enough horizontal videos
-      const hasMore = horizontalVideos.length >= PAGE_SIZE;
-      const nextCursor = hasMore ? startRange + fetchSize : startRange;
+      // hasMore based on whether the underlying query still has rows (not how many horizontals were in this batch)
+      const hasMore = (postsData?.length ?? 0) === fetchSize;
+      const nextCursor = hasMore ? endRange + 1 : startRange;
 
       console.log('[useInfiniteLongFormVideos] ✅ PAGE COMPLETE:', {
         section,
