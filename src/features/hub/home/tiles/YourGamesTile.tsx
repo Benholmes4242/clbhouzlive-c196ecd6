@@ -138,6 +138,13 @@ export function YourGamesTile() {
     return combined;
   }, [data]);
 
+  // Determine the next upcoming game (for subtle highlight)
+  const nextGameId = React.useMemo(() => {
+    const now = new Date();
+    const upcoming = games.find(g => new Date(g.start_time) > now);
+    return upcoming?.id ?? null;
+  }, [games]);
+
   const handleExpandedChange = React.useCallback(
     (gameId: string) => {
       setExpandedId(prev => prev === gameId ? null : gameId);
@@ -186,18 +193,18 @@ export function YourGamesTile() {
       }
       footer={
         <div className="mt-auto">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
             <button
               onClick={openSearchGames}
-              className="text-[15px] font-medium transition"
+              className="text-[14px] font-normal transition"
               style={{
                 background: 'transparent',
                 border: 'none',
-                color: 'var(--hub-text-body)',
+                color: 'var(--hub-text-muted)',
                 padding: 0,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
               aria-label="Search Games"
             >
               ← Search Games
@@ -205,15 +212,15 @@ export function YourGamesTile() {
             <button
               ref={viewAllRef}
               onClick={openYourGames}
-              className="text-[15px] font-medium transition"
+              className="text-[14px] font-normal transition"
               style={{
                 background: 'transparent',
                 border: 'none',
-                color: 'var(--hub-text-body)',
+                color: 'var(--hub-text-muted)',
                 padding: 0,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
               aria-label="View all your games"
               disabled={!hasAny && isLoading}
             >
@@ -287,6 +294,7 @@ export function YourGamesTile() {
                 onToggleExpand={() => handleExpandedChange(g.id)}
                 onHideFromHub={() => handleHideFromHub(g.id)}
                 index={i}
+                isNextGame={g.id === nextGameId}
               />
             </div>
           ))}

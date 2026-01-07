@@ -64,6 +64,7 @@ export interface GameRowProps {
   // Visual flags
   anonymous?: boolean;
   readOnly?: boolean;
+  isNextGame?: boolean; // Subtle highlight for chronologically nearest upcoming game
   
   // Animation
   index?: number;
@@ -91,6 +92,7 @@ export function GameRow({
   onHideFromHub,
   anonymous = false,
   readOnly = false,
+  isNextGame = false,
   index = 0,
   isRequesting = false,
   requestState = 'idle',
@@ -142,7 +144,8 @@ export function GameRow({
       className={cn(
         'gameRow',
         isExpanded && 'gameRow--expanded',
-        mode === 'search' && 'gameRow--search'
+        mode === 'search' && 'gameRow--search',
+        isNextGame && 'gameRow--next'
       )}
       data-game-id={game.id}
       style={{ animationDelay: `${index * 40}ms` }}
@@ -157,7 +160,6 @@ export function GameRow({
           <div className="gameRow__courseName">{game.course_name || 'Golf Game'}</div>
           <div className="gameRow__timeLine">
             <span className="gameRow__metaLine">{dateStr} • {timeStr}</span>
-            <span className="gameRow__metaLine">{expiryLabel}</span>
           </div>
           {/* Pending request hint (Hosting mode) */}
           {mode === 'yourGames' && isHost && pendingRequestCount > 0 && (
