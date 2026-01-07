@@ -53,6 +53,8 @@ export interface ActivityGridV2Config {
   pauseThreshold: number;
   /** Show like count on tiles */
   showLikes?: boolean;
+  /** Show creator name and avatar on tiles */
+  showCreator?: boolean;
 }
 
 export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
@@ -64,4 +66,5 @@ export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
   playThreshold: 0.6,    // Start playing at 60% visible
   pauseThreshold: 0.2,   // Stop playing at 20% visible (hysteresis)
   showLikes: true,       // Show likes by default
+  showCreator: false,    // Hide creator by default (profile grid shows own posts)
 };
