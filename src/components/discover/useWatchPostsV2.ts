@@ -30,27 +30,83 @@ export function useWatchPostsV2() {
       const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
 
-      // Fetch posts with video media under 4 minutes
+      // Fetch posts with video media under 4 minutes (matching Activity grid pattern)
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
-          *,
-          user:users!posts_actor_id_fkey(id, display_name, username, profile_photo_url),
-          media:post_media!inner(*),
-          course:golf_courses(id, name, city, sub_country, country)
+          id,
+          content,
+          created_at,
+          user_id,
+          actor_type,
+          actor_id,
+          course_id,
+          badges,
+          categories,
+          source_review_id,
+          post_media (
+            id,
+            media_type,
+            media_url,
+            poster_url,
+            aspect_ratio,
+            width,
+            height,
+            duration_seconds,
+            filter_id,
+            studio_edits
+          ),
+          post_tags (
+            id,
+            tagged_entity_id,
+            start_index,
+            end_index,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
+          ),
+          course:golf_courses!course_id (
+            id,
+            name,
+            country,
+            sub_country,
+            region
+          )
         `)
-        .eq('visibility', 'anyone' as any) // 'anyone' = public visibility
+        .eq('visibility', 'anyone')
         .is('deleted_at', null)
-        .eq('media.media_type', 'video')
-        .lte('media.duration_seconds', 240)
+        .eq('post_media.media_type', 'video')
+        .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
         .range(startRange, endRange);
 
       if (error) throw error;
 
+      // Get unique actor IDs
+      const actorIds = [...new Set(postsData?.map(p => p.actor_id).filter(Boolean))] as string[];
+
+      // Fetch user profiles for all actors
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', actorIds);
+
+      // Create a map for quick lookup
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) ?? []);
+
+      // Attach user data to posts
+      const postsWithUsers = (postsData || []).map(post => ({
+        ...post,
+        user: post.actor_id ? profileMap.get(post.actor_id) : null
+      }));
+
       // Filter posts that have valid media
-      const activityPosts = (postsData || []).filter(
-        (post) => post.media && post.media.length > 0
+      const activityPosts = postsWithUsers.filter(
+        (post) => post.post_media && post.post_media.length > 0
       );
 
       // Convert to UnifiedMediaItem using existing adapter
