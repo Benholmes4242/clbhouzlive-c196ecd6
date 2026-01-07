@@ -10,7 +10,7 @@ import {
   MOCK_COURSES_VIDEOS 
 } from '@/mocks/mockLongFormVideos';
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 10;  // Load 10 videos per page for faster loads
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
