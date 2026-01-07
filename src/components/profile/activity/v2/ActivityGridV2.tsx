@@ -97,6 +97,22 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
     return flat;
   }, [layoutBlocks]);
 
+  // Calculate which indices should be autoplay candidates
+  // Pattern: First card (index 0) + every 3rd card (3, 6, 9, 12...)
+  const autoplayIndices = useMemo(() => {
+    const indices = new Set<number>();
+    
+    // First card always can autoplay
+    indices.add(0);
+    
+    // Every 3rd card after that (3, 6, 9, 12...)
+    for (let i = 3; i < flatItems.length; i += 3) {
+      indices.add(i);
+    }
+    
+    return indices;
+  }, [flatItems.length]);
+
   // Lazy loading
   const { visibleIndices, registerTile } = useLazyTiles({
     totalItems: flatItems.length,
@@ -264,8 +280,12 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
                 aria-label={`View ${item.type} post${item.creator?.name ? ` from ${item.creator.name}` : ''}`}
               >
                 <UnifiedMediaTile
-                  item={item}
-                config={{
+                  item={{
+                    ...item,
+                    // Override isAutoplayCandidate based on pattern (first + every 3rd)
+                    isAutoplayCandidate: autoplayIndices.has(flatIndex) && item.type === 'video',
+                  }}
+                  config={{
                     showCreator: config.showCreator ?? false,
                     showLikes: config.showLikes ?? true,
                     infiniteScroll: true,
