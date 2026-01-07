@@ -3,6 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
+// ⚠️ TESTING ONLY - Set to false for production
+// When true, ignores 7-day recency filter and shows ALL landscape videos in Trending
+const TESTING_MODE_FILL_TRENDING = true;
+
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
   limit?: number;
@@ -188,10 +192,16 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       if (!creatorUserId && !searchQuery) {
         switch (section) {
           case 'trending':
-            // Last 7 days
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            query = query.gte('created_at', sevenDaysAgo.toISOString());
+            // TESTING MODE: Skip recency filter to get all videos
+            if (TESTING_MODE_FILL_TRENDING) {
+              console.log('[Trending] 🧪 TESTING MODE: Showing ALL videos (no 7-day filter)');
+            } else {
+              // NORMAL MODE: Last 7 days
+              const sevenDaysAgo = new Date();
+              sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+              query = query.gte('created_at', sevenDaysAgo.toISOString());
+              console.log('[Trending] Using normal 7-day filter');
+            }
             break;
             
           case 'following':
