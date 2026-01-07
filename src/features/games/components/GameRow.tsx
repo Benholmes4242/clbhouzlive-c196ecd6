@@ -14,7 +14,39 @@ import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
 import { SecondaryButton, DestructiveButton } from '@/features/hub/components/HubButtons';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { haptic } from '@/utils/haptics';
+import { FLAGS } from '@/config/flags';
 import './GameRow.css';
+
+// Mock players for testing 4/4 full game UI (behind MOCK_FULL_GAME_PLAYERS flag)
+const MOCK_PLAYERS: Participant[] = [
+  {
+    user_id: 'mock-player-1',
+    username: 'georgewilson',
+    display_name: 'George Wilson',
+    profile_photo_url: 'https://i.pravatar.cc/150?u=georgewilson',
+    home_club: 'Royal County Down',
+    eg_handicap_index: 8.2,
+    role: 'player',
+  },
+  {
+    user_id: 'mock-player-2',
+    username: 'sarahconnor',
+    display_name: 'Sarah Connor',
+    profile_photo_url: 'https://i.pravatar.cc/150?u=sarahconnor',
+    home_club: 'Portrush',
+    eg_handicap_index: 12.5,
+    role: 'player',
+  },
+  {
+    user_id: 'mock-player-3',
+    username: 'jamesmurphy',
+    display_name: 'James Murphy',
+    profile_photo_url: 'https://i.pravatar.cc/150?u=jamesmurphy',
+    home_club: 'Ardglass Golf Club',
+    eg_handicap_index: 5.1,
+    role: 'player',
+  },
+];
 
 export type GameRowMode = 'yourGames' | 'hub' | 'search';
 
@@ -128,12 +160,24 @@ export function GameRow({
   };
 
   // Derived data
-  const filled = Math.max(0, game.slots_total - game.slots_open);
   const dateTimeStr = formatDateTime(game.start_time);
 
   // Extract host and members from participants
   const host = anonymous ? null : game.participants?.find(p => p.user_id === game.host_user_id);
-  const members = anonymous ? [] : (game.participants?.filter(p => p.user_id !== game.host_user_id) || []);
+  let members = anonymous ? [] : (game.participants?.filter(p => p.user_id !== game.host_user_id) || []);
+
+  // TEST: Inject mock players for Ardglass game to test 4/4 full game UI
+  const isArdglassGame = game.course_name?.toLowerCase().includes('ardglass');
+  const shouldInjectMockPlayers = FLAGS.MOCK_FULL_GAME_PLAYERS && isArdglassGame && !anonymous;
+  
+  if (shouldInjectMockPlayers) {
+    members = [...members, ...MOCK_PLAYERS];
+  }
+  
+  // Calculate filled slots (with mock players if applicable)
+  const filled = shouldInjectMockPlayers 
+    ? game.slots_total // Show as full when mocking
+    : Math.max(0, game.slots_total - game.slots_open);
 
   // Show details panel only if expanded and not anonymous
   const showDetails = isExpanded && !anonymous;
