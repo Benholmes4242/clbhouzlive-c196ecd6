@@ -6,6 +6,7 @@ export const FLAGS = {
   FRIEND_COURSES_MOCK_ENABLED: false, // mock friends data for testing
   LOCATION_BROADCAST_ENABLED: false, // gates GPS + Supabase writes for Nearby beacon
   TOP100_MOCK_FRIENDS_ENABLED: false, // inject 10 mock Top 100 friends for testing
+  MOCK_SOCIAL_USERS_ENABLED: true, // inject 60 mock users for infinite scroll testing
 } as const;
 
 export type FeatureFlags = typeof FLAGS;
