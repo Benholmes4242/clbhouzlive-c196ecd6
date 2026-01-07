@@ -12,6 +12,10 @@ import {
 
 const PAGE_SIZE = 10;  // Load 10 videos per page for faster loads
 
+// ⚠️ TESTING ONLY - Set to false for production
+// When true, ignores 7-day recency filter and shows ALL videos in Trending
+const TESTING_MODE_FILL_TRENDING = true;
+
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
 interface LongFormVideosPage {
@@ -75,6 +79,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         endRange,
         pageSize: PAGE_SIZE,
         durationThreshold: VIDEO_DURATION_THRESHOLD_SECONDS,
+        testingMode: section === 'trending' ? TESTING_MODE_FILL_TRENDING : false,
         usingRealData: !ENABLE_MOCK_VIDEOS
       });
 
@@ -132,9 +137,16 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
       // Apply section-specific filters
       if (section === 'trending') {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        baseQuery = baseQuery.gte('created_at', sevenDaysAgo.toISOString());
+        // TESTING MODE: Skip recency filter to get all videos
+        if (TESTING_MODE_FILL_TRENDING) {
+          console.log('[useInfiniteLongFormVideos] 🧪 TESTING: Showing ALL trending videos (no 7-day filter)');
+        } else {
+          // NORMAL MODE: Last 7 days
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          baseQuery = baseQuery.gte('created_at', sevenDaysAgo.toISOString());
+          console.log('[useInfiniteLongFormVideos] NORMAL: Using 7-day filter for trending');
+        }
       } else if (section === 'following') {
         baseQuery = baseQuery.in('user_id', followedCreatorIds);
       } else if (section === 'courses' && coursePostIds) {
