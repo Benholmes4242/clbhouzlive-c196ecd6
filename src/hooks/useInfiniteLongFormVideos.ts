@@ -14,9 +14,11 @@ const PAGE_SIZE = 10;  // Load 10 videos per page for faster loads
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
+type PageParam = { cursor: number; realTotal: number | null };
+
 interface LongFormVideosPage {
   items: LongFormVideo[];
-  nextCursor: number;
+  nextCursor: PageParam;
   hasMore: boolean;
 }
 
@@ -62,16 +64,34 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
   const query = useInfiniteQuery({
     queryKey: ['long-form-videos-infinite', section, followedCreatorIds.join(','), category || ''],
-    initialPageParam: 0,
-    
-    queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
-      const startRange = pageParam as number;
+    initialPageParam: { cursor: 0, realTotal: null } satisfies PageParam,
+
+    queryFn: async ({ pageParam = { cursor: 0, realTotal: null } }): Promise<LongFormVideosPage> => {
+      const { cursor, realTotal: carriedRealTotal } = pageParam as PageParam;
+      const startRange = cursor;
       const endRange = startRange + PAGE_SIZE - 1;
+      const mockTotal = ENABLE_MOCK_VIDEOS ? getMockVideosForSection(section).length : 0;
+      let realTotal = carriedRealTotal;
 
       // For 'following' section, return empty if no followed creators
+      // (but still allow pagination to advance when mock videos are enabled)
       if (section === 'following' && followedCreatorIds.length === 0) {
-        return { items: [], nextCursor: startRange, hasMore: false };
+        if (!ENABLE_MOCK_VIDEOS) {
+          return { items: [], nextCursor: { cursor: startRange, realTotal: 0 }, hasMore: false };
+        }
+
+        realTotal = 0;
+        const hasMore = (endRange + 1) < (realTotal + mockTotal);
+        return { items: [], nextCursor: { cursor: endRange + 1, realTotal }, hasMore };
       }
+
+      // If we already know we've exhausted real data, don't query again—just advance pagination for mocks
+      if (realTotal !== null && startRange >= realTotal) {
+        const hasMore = (endRange + 1) < (realTotal + mockTotal);
+        return { items: [], nextCursor: { cursor: endRange + 1, realTotal }, hasMore };
+      }
+
+      // For 'courses' section, first get post IDs with golf_club tags
 
       // For 'courses' section, first get post IDs with golf_club tags
       let coursePostIds: string[] | null = null;
