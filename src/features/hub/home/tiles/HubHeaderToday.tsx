@@ -1,5 +1,5 @@
 /**
- * HubHeaderToday - Dynamic "Today" Header (Fixed Height ~72-80px)
+ * HubHeaderToday - Dynamic "Today" Header (Fixed Height ~60px)
  * Shows personalized greeting + next game info
  * Truncates course names to prevent wrapping
  */
@@ -9,7 +9,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { format } from 'date-fns';
-import { MdOutlineWavingHand } from 'react-icons/md';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -58,16 +57,15 @@ export function HubHeaderToday() {
   }, [nextGame]);
 
   return (
-    <div className="h-[68px] flex flex-col justify-center px-1">
+    <div className="h-[60px] flex flex-col justify-center px-1 mb-[-2px]">
       <h1 
-        className="text-[23px] font-medium leading-tight truncate tracking-[0.01em] flex items-center gap-2"
+        className="text-[23px] font-medium leading-tight truncate tracking-[0.01em]"
         style={{ color: 'var(--hub-text)' }}
       >
         {greeting}, {firstName}
-        <MdOutlineWavingHand className="w-5 h-5 inline-block" style={{ color: 'var(--hub-text)' }} />
       </h1>
       <p 
-        className="text-[13px] mt-2 truncate tracking-[0.02em]"
+        className="text-[13px] mt-2.5 truncate tracking-[0.02em]"
         style={{ color: 'var(--hub-text-sub)', opacity: 0.75 }}
       >
         {subline}

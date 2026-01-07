@@ -57,12 +57,12 @@ export function HubMessagesCard() {
       }
     >
       {/* Fixed height content area - NO SCROLLING */}
-      <div className="h-full flex items-center justify-center py-2">
+      <div className="h-full flex items-center justify-center pt-3 pb-2">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
+          <div className="flex flex-col items-center justify-center text-center px-3 mt-1">
             <div 
               className="w-9 h-9 rounded-full flex items-center justify-center mb-2"
-              style={{ background: 'var(--hub-glass-bg-input)', opacity: 0.7 }}
+              style={{ background: 'var(--hub-glass-bg-input)', opacity: 0.6 }}
             >
               <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
             </div>
@@ -73,7 +73,7 @@ export function HubMessagesCard() {
               Your clubhouse chats live here
             </h4>
             <p 
-              className="text-[12px] leading-snug max-w-[240px]"
+              className="text-[12px] leading-relaxed max-w-[240px]"
               style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
             >
               Game chats, invites, and golfer conversations — all in one place.
