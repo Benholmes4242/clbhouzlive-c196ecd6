@@ -1,13 +1,14 @@
 /**
  * PlayerPreviewSheet - Lightweight bottom sheet for player preview
  * 
- * Purpose: Quick identity preview without navigation
- * Single tap = quick peek, explicit CTA = full profile
+ * States:
+ * - Loading: Skeleton placeholders, opens instantly
+ * - Loaded: Full content with name, stats, CTA
+ * - Error: "Couldn't load details" with retry
  * 
- * Layout:
- * 1) Handle + Header (avatar left, name + meta right)
- * 2) Quick Stats (2-column tiles: Handicap, Home Club)
- * 3) Primary CTA: "View profile →"
+ * Fallbacks:
+ * - Missing handicap/club handled gracefully
+ * - "Details not set yet" when both missing
  */
 import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -23,11 +24,19 @@ export interface PlayerPreviewData {
   role?: 'host' | 'player';
 }
 
+type SheetState = 'loading' | 'loaded' | 'error';
+
 interface PlayerPreviewSheetProps {
   player: PlayerPreviewData | null;
   isOpen: boolean;
   onClose: () => void;
   onViewProfile: (userId: string) => void;
+  /** Optional: Set to 'loading' while fetching, 'error' on failure */
+  state?: SheetState;
+  /** Optional: Retry callback for error state */
+  onRetry?: () => void;
+  /** Optional: Is this the current user viewing their own profile? */
+  isCurrentUser?: boolean;
 }
 
 export function PlayerPreviewSheet({
@@ -35,11 +44,13 @@ export function PlayerPreviewSheet({
   isOpen,
   onClose,
   onViewProfile,
+  state = 'loaded',
+  onRetry,
+  isCurrentUser = false,
 }: PlayerPreviewSheetProps) {
   // Handle swipe down to dismiss
   const [touchStart, setTouchStart] = React.useState<number | null>(null);
   const [translateY, setTranslateY] = React.useState(0);
-  const sheetRef = React.useRef<HTMLDivElement>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.touches[0].clientY);
@@ -77,17 +88,23 @@ export function PlayerPreviewSheet({
     }
   };
 
-  // Build meta line: "HCP 4 · Ardglass GC"
-  const metaParts: string[] = [];
-  if (player.eg_handicap_index != null) {
-    metaParts.push(`HCP ${player.eg_handicap_index}`);
+  // Build meta line with fallbacks
+  const hasHandicap = player.eg_handicap_index != null;
+  const hasClub = !!player.home_club;
+  
+  let metaLine: string;
+  if (hasHandicap && hasClub) {
+    const shortClub = player.home_club!.replace(/Golf Club$/i, 'GC').trim();
+    metaLine = `HCP ${player.eg_handicap_index} · ${shortClub}`;
+  } else if (hasHandicap) {
+    metaLine = `HCP ${player.eg_handicap_index}`;
+  } else if (hasClub) {
+    metaLine = player.home_club!.replace(/Golf Club$/i, 'GC').trim();
+  } else {
+    metaLine = 'Details not set yet';
   }
-  if (player.home_club) {
-    // Shorten "Golf Club" to "GC" if present
-    const shortClub = player.home_club.replace(/Golf Club$/i, 'GC').trim();
-    metaParts.push(shortClub);
-  }
-  const metaLine = metaParts.join(' · ');
+
+  const metaIsMissing = !hasHandicap && !hasClub;
 
   return (
     <>
@@ -100,7 +117,6 @@ export function PlayerPreviewSheet({
       
       {/* Sheet */}
       <div 
-        ref={sheetRef}
         className="playerPreviewSheet"
         role="dialog"
         aria-modal="true"
@@ -113,55 +129,140 @@ export function PlayerPreviewSheet({
         {/* Handle bar */}
         <div className="playerPreviewSheet__handle" />
 
-        <div className="playerPreviewSheet__content">
-          {/* 1) Header Row: Avatar left, Info right */}
-          <div className="playerPreviewSheet__header">
-            <div className="playerPreviewSheet__avatar">
-              <SquircleAvatar
-                size={56}
-                src={player.profile_photo_url}
-                alt={player.display_name || 'Player'}
-                fallback={(player.display_name || 'P').charAt(0).toUpperCase()}
-              />
+        {/* Loading State - Skeleton */}
+        {state === 'loading' && (
+          <div className="playerPreviewSheet__content playerPreviewSheet__content--skeleton">
+            {/* Header skeleton */}
+            <div className="playerPreviewSheet__header">
+              <div className="playerPreviewSheet__avatar">
+                <div className="skeleton skeleton--avatar" />
+              </div>
+              <div className="playerPreviewSheet__headerInfo">
+                <div className="skeleton skeleton--name" />
+                <div className="skeleton skeleton--meta" />
+              </div>
             </div>
-            
-            <div className="playerPreviewSheet__headerInfo">
-              <h3 className="playerPreviewSheet__name">
-                {player.display_name || 'Unknown Player'}
-              </h3>
-              {metaLine && (
-                <p className="playerPreviewSheet__meta">{metaLine}</p>
-              )}
-            </div>
-          </div>
 
-          {/* 2) Quick Stats - 2-column tiles */}
-          <div className="playerPreviewSheet__stats">
-            <div className="playerPreviewSheet__statTile">
-              <span className="playerPreviewSheet__statValue">
-                {player.eg_handicap_index != null ? player.eg_handicap_index : '—'}
-              </span>
-              <span className="playerPreviewSheet__statLabel">Handicap</span>
+            {/* Stats skeleton */}
+            <div className="playerPreviewSheet__stats">
+              <div className="playerPreviewSheet__statTile">
+                <div className="skeleton skeleton--statValue" />
+                <div className="skeleton skeleton--statLabel" />
+              </div>
+              <div className="playerPreviewSheet__statTile">
+                <div className="skeleton skeleton--statValue" />
+                <div className="skeleton skeleton--statLabel" />
+              </div>
             </div>
-            <div className="playerPreviewSheet__statTile">
-              <span className="playerPreviewSheet__statValue">
-                {player.home_club 
-                  ? player.home_club.replace(/Golf Club$/i, 'GC').trim() 
-                  : 'Not set'}
-              </span>
-              <span className="playerPreviewSheet__statLabel">Home club</span>
-            </div>
-          </div>
 
-          {/* 3) Primary CTA */}
-          <button
-            className="playerPreviewSheet__cta"
-            onClick={handleViewProfile}
-            aria-label={`View profile for ${player.display_name || 'player'}`}
-          >
-            View profile
-          </button>
-        </div>
+            {/* CTA skeleton */}
+            <div className="skeleton skeleton--cta" />
+          </div>
+        )}
+
+        {/* Error State */}
+        {state === 'error' && (
+          <div className="playerPreviewSheet__content playerPreviewSheet__content--error">
+            {/* Show avatar if we have it */}
+            <div className="playerPreviewSheet__header">
+              <div className="playerPreviewSheet__avatar">
+                <SquircleAvatar
+                  size={56}
+                  src={player.profile_photo_url}
+                  alt={player.display_name || 'Player'}
+                  fallback={(player.display_name || 'P').charAt(0).toUpperCase()}
+                />
+              </div>
+              <div className="playerPreviewSheet__headerInfo">
+                <h3 className="playerPreviewSheet__name">
+                  {player.display_name || 'Unknown Player'}
+                </h3>
+                <p className="playerPreviewSheet__errorText">Couldn't load details</p>
+              </div>
+            </div>
+
+            {/* Retry action */}
+            {onRetry && (
+              <button 
+                className="playerPreviewSheet__retryBtn"
+                onClick={onRetry}
+              >
+                Tap to try again
+              </button>
+            )}
+
+            {/* Still show View profile if we have userId */}
+            {player.user_id && (
+              <button
+                className="playerPreviewSheet__cta"
+                onClick={handleViewProfile}
+                aria-label={`View profile for ${player.display_name || 'player'}`}
+              >
+                View profile
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Loaded State - Full content */}
+        {state === 'loaded' && (
+          <div className="playerPreviewSheet__content">
+            {/* 1) Header Row: Avatar left, Info right */}
+            <div className="playerPreviewSheet__header">
+              <div className="playerPreviewSheet__avatar">
+                <SquircleAvatar
+                  size={56}
+                  src={player.profile_photo_url}
+                  alt={player.display_name || 'Player'}
+                  fallback={(player.display_name || 'P').charAt(0).toUpperCase()}
+                />
+              </div>
+              
+              <div className="playerPreviewSheet__headerInfo">
+                <h3 className="playerPreviewSheet__name">
+                  {player.display_name || 'Unknown Player'}
+                </h3>
+                <p className={`playerPreviewSheet__meta ${metaIsMissing ? 'playerPreviewSheet__meta--missing' : ''}`}>
+                  {metaLine}
+                </p>
+              </div>
+            </div>
+
+            {/* 2) Quick Stats - 2-column tiles */}
+            <div className="playerPreviewSheet__stats">
+              <div className="playerPreviewSheet__statTile">
+                <span className={`playerPreviewSheet__statValue ${!hasHandicap ? 'playerPreviewSheet__statValue--missing' : ''}`}>
+                  {hasHandicap ? player.eg_handicap_index : '—'}
+                </span>
+                <span className="playerPreviewSheet__statLabel">Handicap</span>
+              </div>
+              <div className="playerPreviewSheet__statTile">
+                <span className={`playerPreviewSheet__statValue ${!hasClub ? 'playerPreviewSheet__statValue--missing' : ''}`}>
+                  {hasClub 
+                    ? player.home_club!.replace(/Golf Club$/i, 'GC').trim() 
+                    : 'Not set'}
+                </span>
+                <span className="playerPreviewSheet__statLabel">Home club</span>
+              </div>
+            </div>
+
+            {/* Optional: Self profile hint */}
+            {isCurrentUser && (!hasHandicap || !hasClub) && (
+              <p className="playerPreviewSheet__hint">
+                Add handicap and home club in your profile.
+              </p>
+            )}
+
+            {/* 3) Primary CTA */}
+            <button
+              className="playerPreviewSheet__cta"
+              onClick={handleViewProfile}
+              aria-label={`View profile for ${player.display_name || 'player'}`}
+            >
+              View profile
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

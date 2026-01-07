@@ -1,11 +1,8 @@
 /**
  * PlayerPreviewSheet - Lightweight bottom sheet styles
  * 
+ * States: Loading (skeleton), Loaded, Error
  * Visual Tone: Premium / Cinematic
- * - Whitespace over dividers
- * - Muted text for metadata
- * - No heavy icons
- * - This is a peek, not a card feed
  */
 
 /* Backdrop - subtle dim */
@@ -62,6 +59,17 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  animation: contentFadeIn 0.18s ease-out;
+}
+
+@keyframes contentFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Skeleton state - no animation on content */
+.playerPreviewSheet__content--skeleton {
+  animation: none;
 }
 
 /* ===== 1) HEADER ROW ===== */
@@ -111,6 +119,20 @@
   line-height: 1.4;
 }
 
+/* Missing meta - slightly more visible than helper text */
+.playerPreviewSheet__meta--missing {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Error text */
+.playerPreviewSheet__errorText {
+  font-size: 13px;
+  color: var(--hub-text-muted);
+  margin: 3px 0 0;
+  line-height: 1.4;
+}
+
 /* ===== 2) QUICK STATS - 2-column tiles ===== */
 .playerPreviewSheet__stats {
   display: grid;
@@ -138,6 +160,12 @@
   white-space: nowrap;
 }
 
+/* Missing value - muted but readable */
+.playerPreviewSheet__statValue--missing {
+  color: var(--hub-text-muted);
+  font-weight: 500;
+}
+
 .playerPreviewSheet__statLabel {
   font-size: 11px;
   font-weight: 500;
@@ -145,6 +173,15 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   opacity: 0.7;
+}
+
+/* ===== SELF PROFILE HINT ===== */
+.playerPreviewSheet__hint {
+  font-size: 12px;
+  color: var(--hub-text-muted);
+  text-align: center;
+  margin: -8px 0 0;
+  opacity: 0.6;
 }
 
 /* ===== 3) PRIMARY CTA ===== */
@@ -176,10 +213,90 @@
   color: var(--hub-text-bright);
 }
 
+/* ===== ERROR STATE ===== */
+.playerPreviewSheet__content--error {
+  gap: 16px;
+}
+
+.playerPreviewSheet__retryBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hub-text-sub);
+  background: none;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  text-align: center;
+  opacity: 0.8;
+  transition: opacity 0.14s ease;
+}
+
+.playerPreviewSheet__retryBtn:active {
+  opacity: 1;
+}
+
+/* ===== SKELETON PLACEHOLDERS ===== */
+.skeleton {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+/* Avatar skeleton */
+.skeleton--avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+}
+
+/* Name skeleton - 65% width */
+.skeleton--name {
+  width: 65%;
+  height: 18px;
+  margin-bottom: 6px;
+}
+
+/* Meta skeleton - 45% width */
+.skeleton--meta {
+  width: 45%;
+  height: 14px;
+}
+
+/* Stat value skeleton */
+.skeleton--statValue {
+  width: 50%;
+  height: 16px;
+  margin-bottom: 4px;
+}
+
+/* Stat label skeleton */
+.skeleton--statLabel {
+  width: 70%;
+  height: 10px;
+}
+
+/* CTA skeleton */
+.skeleton--cta {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+}
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   .playerPreviewSheet,
-  .playerPreviewSheet__backdrop {
+  .playerPreviewSheet__backdrop,
+  .playerPreviewSheet__content,
+  .skeleton {
     animation: none;
+  }
+  
+  .skeleton {
+    opacity: 0.5;
   }
 }
