@@ -265,7 +265,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   // Review mode content - premium design with avatar, name, and CTA button
   const reviewContent = reviewData && (
     <div className="flex flex-col gap-2.5 p-3">
-      {/* Top row: Avatar + Name + "Rated this course" + Tier pill */}
+      {/* Top row: Avatar + Name + "Rated this course" */}
       <div className="flex items-center gap-2.5">
         {/* Avatar - squircle shape matching regular mode */}
         <SquircleAvatar
@@ -276,43 +276,49 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           hideRing
         />
         
-        {/* Name + "Rated this course" + pill */}
+        {/* Name + "Rated this course" */}
         <div className="flex-1 min-w-0">
           <div className="text-white font-semibold text-sm truncate">
             {user?.name || user?.username || 'Golfer'}
           </div>
-          <div className="flex items-center gap-1.5 mt-0.5">
+          <div className="mt-0.5">
             <span className="text-white/70 text-xs">
               Rated this course
             </span>
-            <RatingPill 
-              score={reviewData.rating} 
-              className="text-[8px] py-0.5 px-1.5 flex-shrink-0" 
-            />
           </div>
         </div>
       </div>
       
-      {/* Bottom row: "Read full review" CTA button */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onReviewTap?.();
-        }}
-        className={cn(
-          "w-full rounded-full py-2.5 px-4",
-          "flex items-center justify-center gap-2",
-          "font-semibold text-sm",
-          "transition-all duration-200",
-          isOutstanding 
-            ? "bg-[#D2B461] text-black hover:bg-[#E5D084]"
-            : "bg-white/15 text-white hover:bg-white/25"
-        )}
-      >
-        <span>Read full review</span>
-        <ChevronRight className="w-4 h-4" />
-      </button>
+      {/* Bottom row: Rating Pill + CTA inline */}
+      <div className="flex items-center gap-2">
+        {/* Rating Pill - left side */}
+        <RatingPill 
+          score={reviewData.rating} 
+          className="text-[8px] py-0.5 px-1.5 flex-shrink-0" 
+        />
+        
+        {/* CTA - refined: reduced radius, softer shadow */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onReviewTap?.();
+          }}
+          className={cn(
+            "flex-1 rounded-lg py-2 px-3",
+            "flex items-center justify-center gap-1.5",
+            "font-semibold text-sm",
+            "transition-colors duration-200",
+            "shadow-sm",
+            isOutstanding 
+              ? "bg-[#D2B461] text-black hover:bg-[#E5D084]"
+              : "bg-white/12 text-white hover:bg-white/20"
+          )}
+        >
+          <span>Read full review</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 
@@ -414,17 +420,20 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           transition={{ layout: { duration: 0.22, ease: [0.19, 1, 0.22, 1] } }}
           className={cn(
             'overflow-hidden',
-            'backdrop-blur-xl',
             'border',
-            'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]',
+            // Enhanced frosted glass: increased blur, softer shadow
+            'backdrop-blur-2xl',
+            'shadow-[0_6px_24px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]',
             // Review mode: rounded card, Regular mode: squircle pill
             isReview ? 'rounded-xl' : 'rounded-sq-lg',
-            // Background tint based on mode
+            // Background tint based on mode - slightly reduced opacity
             isReview && isOutstanding 
-              ? 'bg-[rgba(210,180,97,0.08)]' 
-              : 'bg-black/50'
+              ? 'bg-[rgba(210,180,97,0.06)]' 
+              : 'bg-black/40'
           )}
-          style={{ borderColor }}
+          style={{ borderColor: isReview && isOutstanding 
+            ? 'rgba(210, 180, 97, 0.25)' 
+            : 'rgba(255, 255, 255, 0.06)' }}
         >
           {/* Collapsed State - mode-dependent */}
           {isReview ? reviewContent : regularCollapsedContent}
