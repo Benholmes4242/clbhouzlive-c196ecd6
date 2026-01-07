@@ -192,13 +192,13 @@ export function HubHomePage() {
           {/* Zone 1: Header - Fixed ~68px */}
           <HubHeaderToday />
 
-          {/* Zone 2: Messages - Fixed ~198px, no internal scroll */}
-          <div className="h-[198px] shrink-0">
+          {/* Zone 2: Messages - Fixed ~198px, 10px gap above */}
+          <div className="mt-[10px] h-[198px] shrink-0">
             <HubMessagesCard />
           </div>
 
-          {/* Zone 3: Games - Primary section, flex-1 with internal scroll, 10px gap to nav */}
-          <div className="mt-2 mb-[10px] flex-1 min-h-[180px]">
+          {/* Zone 3: Games - Primary section, flex-1 with internal scroll, 10px gaps */}
+          <div className="mt-[10px] mb-[10px] flex-1 min-h-[180px]">
             <YourGamesTile />
           </div>
         </div>
