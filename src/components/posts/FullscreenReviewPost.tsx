@@ -270,34 +270,18 @@ export function FullscreenReviewPost({
         }}
       >
         <Sheet>
-          {/* ROW 1: Course Name + Rating Number (top-aligned) */}
+          {/* ROW 1: Course Name + Rating (top-aligned) */}
           <div className="flex justify-between items-start gap-4">
-            {/* Left: Course Name */}
-            <h2 className="flex-1 min-w-0 text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
-              {courseName}
-            </h2>
-            
-            {/* Right: Rating Number (tappable to open sheet) */}
-            <SheetTrigger asChild>
-              <button 
-                className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none flex-shrink-0"
-                style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
-              >
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </button>
-            </SheetTrigger>
-          </div>
-          
-          {/* ROW 2: Location + Rating Descriptor Badge */}
-          <div className="flex justify-between items-start gap-4 mt-1.5">
-            {/* Left: Location + Preview badge */}
+            {/* Left: Course Name + Location stacked */}
             <div className="flex-1 min-w-0">
+              <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
+                {courseName}
+              </h2>
               {heroSubtitle && (
-                <p className="text-white/60 text-sm drop-shadow-sm">
+                <p className="text-white/60 text-sm drop-shadow-sm mt-0.5">
                   {heroSubtitle}
                 </p>
               )}
-              
               {mode === 'preview' && (
                 <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
                   Preview
@@ -305,10 +289,18 @@ export function FullscreenReviewPost({
               )}
             </div>
             
-            {/* Right: Rating Descriptor Badge (right-aligned under rating number) */}
-            <div className="flex-shrink-0">
-              <RatingPill score={rating} className="text-[8px] py-0.5 px-2 opacity-80" />
-            </div>
+            {/* Right: Rating Number + Badge (centered stack) */}
+            <SheetTrigger asChild>
+              <button className="flex flex-col items-center gap-0.5 flex-shrink-0">
+                <span 
+                  className="text-3xl sm:text-4xl font-bold tabular-nums drop-shadow-lg leading-none"
+                  style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+                >
+                  {rating === 10 ? '10' : rating.toFixed(1)}
+                </span>
+                <RatingPill score={rating} className="text-[8px] py-0.5 px-2 opacity-80" />
+              </button>
+            </SheetTrigger>
           </div>
           
           {/* Sheet Content (review details) */}
