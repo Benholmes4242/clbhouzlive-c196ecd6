@@ -314,7 +314,12 @@ const GolfersToFollowPage = () => {
                           )}
                         </div>
 
-                        {/* Row 2: Home club */}
+                        {/* Row 2: Username */}
+                        <p className="text-xs text-muted-foreground truncate">
+                          @{golfer.username}
+                        </p>
+
+                        {/* Row 3: Home club */}
                         <p className="text-sm text-muted-foreground truncate">
                           {clubLine}
                         </p>
