@@ -52,7 +52,7 @@ export function HubActionDock() {
         background: 'rgba(248, 250, 252, 0.97)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.06), 0 -1px 8px rgba(0, 0, 0, 0.03)',
+        boxShadow: '0 -1px 12px rgba(0, 0, 0, 0.04), 0 -4px 24px rgba(0, 0, 0, 0.02)',
       }}
     >
       <nav className="w-full h-[55px] flex items-center justify-around">
