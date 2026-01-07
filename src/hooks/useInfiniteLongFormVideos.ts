@@ -105,7 +105,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         coursePostIds = courseTaggedPosts?.map(t => t.post_id) || [];
         
         if (coursePostIds.length === 0) {
-          return { items: [], nextCursor: startRange, hasMore: false };
+          return { items: [], nextCursor: { cursor: startRange, realTotal: 0 }, hasMore: false };
         }
       }
 
@@ -215,8 +215,10 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
-      const nextCursor = hasMore ? endRange + 1 : startRange;
+      const fetchedCount = postsData?.length ?? 0;
+      const newRealTotal = fetchedCount < PAGE_SIZE ? startRange + fetchedCount : null;
+      const hasMore = fetchedCount === PAGE_SIZE;
+      const nextCursor: PageParam = { cursor: endRange + 1, realTotal: newRealTotal ?? carriedRealTotal };
 
       return { items, nextCursor, hasMore };
     },
