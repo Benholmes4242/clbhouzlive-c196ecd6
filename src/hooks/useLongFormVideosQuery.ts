@@ -109,7 +109,9 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
     `)
     .eq('post_media.media_type', 'video')
     .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
-    .not('post_media.duration_seconds', 'is', null);
+    .not('post_media.duration_seconds', 'is', null)
+    .eq('visibility', 'anyone')
+    .is('deleted_at', null);
 
   if (filteredPostIds !== null) {
     query = query.in('id', filteredPostIds);
