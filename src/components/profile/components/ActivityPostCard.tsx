@@ -129,7 +129,6 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
                     <Star className="w-3 h-3 text-amber-400" fill="currentColor" />
                     <span className="text-white text-xs font-bold">{rating.toFixed(1)}</span>
                   </div>
-                  <span className="text-white/60 text-[9px] drop-shadow-md">From a review</span>
                 </div>
               )}
             </>
