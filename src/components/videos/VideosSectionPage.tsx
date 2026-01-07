@@ -142,49 +142,94 @@ export const VideosSectionPage: React.FC = () => {
   useEffect(() => { isFetchingRef.current = isFetchingNextPage; }, [isFetchingNextPage]);
   useEffect(() => { onLoadMoreRef.current = fetchNextPage; }, [fetchNextPage]);
 
-  // Infinite scroll observer
+  // Infinite scroll observer - proven pattern
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (!hasMore || !fetchNextPage) return;
+    if (!hasMore || !fetchNextPage) {
+      console.log('[VideosSectionPage] Infinite scroll not setup:', { hasMore, hasFetchNextPage: !!fetchNextPage });
+      return;
+    }
+    
+    console.log('[VideosSectionPage] Setting up infinite scroll observer');
     
     const timeoutId = setTimeout(() => {
       const container = containerRef.current;
-      if (!container) return;
+      if (!container) {
+        console.log('[VideosSectionPage] Container ref not found');
+        return;
+      }
+      
+      // Remove existing sentinel if any
+      if (sentinelRef.current) {
+        sentinelRef.current.remove();
+      }
       
       // Create sentinel element
       const sentinel = document.createElement('div');
       sentinel.style.height = '1px';
       sentinel.style.width = '100%';
       sentinel.dataset.infiniteScrollSentinel = 'true';
+      sentinel.style.backgroundColor = 'transparent';
+      sentinelRef.current = sentinel;
       
+      // Append to container
       container.appendChild(sentinel);
+      console.log('[VideosSectionPage] Sentinel appended to container');
       
+      // Disconnect existing observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      
+      // Create observer
       const observer = new IntersectionObserver(
         (entries) => {
           const entry = entries[0];
           
+          console.log('[VideosSectionPage] Sentinel intersection:', {
+            isIntersecting: entry.isIntersecting,
+            hasMore: hasMoreRef.current,
+            isFetching: isFetchingRef.current,
+            loading: loadingRef.current
+          });
+          
           if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current && !isFetchingRef.current) {
+            console.log('[VideosSectionPage] ✅ Triggering fetchNextPage');
             loadingRef.current = true;
             onLoadMoreRef.current?.();
+            
+            // Reset loading flag after delay
             setTimeout(() => {
               loadingRef.current = false;
             }, 1000);
           }
         },
         {
+          root: null,
           rootMargin: '800px',
           threshold: 0
         }
       );
       
+      observerRef.current = observer;
       observer.observe(sentinel);
-      
-      return () => {
-        observer.disconnect();
-        sentinel.remove();
-      };
+      console.log('[VideosSectionPage] Observer attached to sentinel');
     }, 100);
     
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      if (sentinelRef.current) {
+        sentinelRef.current.remove();
+        sentinelRef.current = null;
+      }
+      console.log('[VideosSectionPage] Cleanup complete');
+    };
   }, [hasMore, fetchNextPage]);
 
   const handleVideoClick = (id: string) => {
