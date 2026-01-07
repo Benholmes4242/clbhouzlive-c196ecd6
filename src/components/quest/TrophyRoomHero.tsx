@@ -49,7 +49,7 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
 
   return (
     <motion.section 
-      className="relative text-center py-10 px-6"
+      className="relative text-center"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -156,9 +156,9 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         Top 100 Courses Played
       </motion.p>
 
-      {/* Progress bar */}
+      {/* Progress bar → next milestone text: mt-3 */}
       <motion.div 
-        className="max-w-[220px] mx-auto mb-6"
+        className="max-w-[220px] mx-auto"
         initial={{ opacity: 0, scaleX: 0.8 }}
         animate={{ opacity: 1, scaleX: 1 }}
         transition={{ delay: 0.6 }}
@@ -185,10 +185,10 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         </div>
       </motion.div>
 
-      {/* Next milestone teaser */}
+      {/* Next milestone teaser - mt-3 from progress bar */}
       {nextMilestone && (
         <motion.p
-          className="text-xs mb-2"
+          className="text-xs mt-3"
           style={{ color: 'var(--quest-text-tertiary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -198,14 +198,11 @@ export const TrophyRoomHero: React.FC<TrophyRoomHeroProps> = ({
         </motion.p>
       )}
 
-      
-      {/* Spacer if no next milestone */}
-      {!nextMilestone && <div className="mb-4" />}
 
-      {/* Continue Journey CTA - Global Slate with shimmer */}
+      {/* Continue Journey CTA - mt-4 from next milestone text */}
       <motion.button
         onClick={onContinueJourney}
-        className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all overflow-hidden"
+        className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all overflow-hidden mt-4"
         style={{
           background: 'var(--surface-slate)',
           color: '#FFFFFF',

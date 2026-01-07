@@ -41,14 +41,16 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
 
   return (
     <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Leaderboard</h2>
+      {/* Section header - mb-4 */}
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Leaderboard</h2>
       
-      <motion.div
-        className="py-2"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+      {/* KEEP as card - competitive feel */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
         {/* Top 3 list */}
         <div className="space-y-2 mb-4">
           {top3.map((entry, index) => {
@@ -174,7 +176,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId }) => {
           <ChevronRight className="w-4 h-4" />
         </button>
         */}
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 };

@@ -76,10 +76,11 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4 px-1">
+      {/* Section header with inline toggle - mb-4 */}
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Trophy Case</h2>
         
-        {/* Filter toggle - pill style matching Course Details */}
+        {/* Filter toggle - inline with header, no extra spacing */}
         <div className="flex rounded-full p-0.5 bg-slate-100 border border-slate-200/60">
           <button
             onClick={() => setFilter('milestones')}
@@ -104,8 +105,8 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
         </div>
       </div>
 
-      {/* Trophy cabinet container - no card wrapper, badges sit on bg-slate-50 */}
-      <div className="py-2">
+      {/* Badge grid - gap-3 row spacing */}
+      <div>
         <AnimatePresence mode="wait">
           {!hasItems ? (
             <motion.div
@@ -125,7 +126,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
           ) : (
             <motion.div
               key={filter}
-              className="grid grid-cols-3 gap-2"
+              className="grid grid-cols-3 gap-3"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

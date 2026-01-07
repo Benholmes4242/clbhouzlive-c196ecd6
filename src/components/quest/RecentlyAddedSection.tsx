@@ -64,14 +64,13 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
 
   return (
     <section>
-      <div className="mb-3 px-1">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-          Recently Added
-        </h2>
-      </div>
+      {/* Section header - mb-4 */}
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+        Recently Added
+      </h2>
 
-      {/* No card wrapper - rows sit on bg-slate-50 with dividers */}
-      <div className="space-y-0">
+      {/* Rows - py-3 each, border-b dividers, no divider after last */}
+      <div>
         {courses.map((course, index) => (
           <React.Fragment key={course.id}>
             <RecentCourseRow

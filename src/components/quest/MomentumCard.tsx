@@ -95,11 +95,11 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
 
   return (
     <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">Momentum</h2>
+      {/* Section header - mb-4 */}
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Momentum</h2>
       
-      {/* No card wrapper - content sits on bg-slate-50 */}
+      {/* Icon + stat rows - gap-3 */}
       <motion.div
-        className="py-2"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -160,12 +160,12 @@ export const MomentumCard: React.FC<MomentumCardProps> = ({
               </div>
             </div>
 
-            {/* Encouragement */}
+            {/* Encouragement copy - mt-2 */}
             <p 
-              className="text-xs pt-1"
+              className="text-xs mt-2"
               style={{ color: 'var(--quest-text-tertiary)' }}
             >
-              Keep building your Journey.
+              Keep building your journey.
             </p>
           </div>
         ) : (

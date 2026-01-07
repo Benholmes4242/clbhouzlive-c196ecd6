@@ -242,10 +242,10 @@ const ProfileQuestView: React.FC = () => {
         </div>
       </div>
 
-      {/* Content with alternating background bands like Course Details */}
-      <div className="relative pb-32">
-        {/* Section 1: Trophy Room Hero - bg-slate-50 (page default) */}
-        <section className="px-4 py-6 bg-slate-50">
+      {/* Content - sections separated by space, not cards */}
+      <div className="relative pb-10">
+        {/* Section 1: Trophy Room Hero - on page bg, no card */}
+        <section className="px-4 pt-6 mb-10">
           <TrophyRoomHero
             totalPlayed={totalPlayed}
             target={100}
@@ -255,8 +255,8 @@ const ProfileQuestView: React.FC = () => {
           />
         </section>
 
-        {/* Section 2: Trophy Case - bg-white band */}
-        <section className="px-4 py-5 bg-white border-y border-slate-200/60">
+        {/* Section 2: Trophy Case - on page bg, no card */}
+        <section className="px-4 mb-10">
           <TrophyCase
             totalPlayed={totalPlayed}
             regionProgress={regionProgress}
@@ -264,57 +264,61 @@ const ProfileQuestView: React.FC = () => {
           />
         </section>
 
-        {/* Section 3: Next Target - bg-slate-50 */}
-        <section className="px-4 py-5 bg-slate-50">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Next Target</h2>
-          <NextTargetCard
-            totalPlayed={totalPlayed}
-            nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
-            suggestedRegion={suggestedRegion}
-            suggestedFocus={nextMilestone?.name}
-            onShare={() => {/* Share placeholder */}}
-            showHint={onboarding.shouldShowTargetHint}
-            onHintDismiss={onboarding.markTargetHintSeen}
-          />
+        {/* Section 3: Next Target - KEEP as card */}
+        <section className="px-4 mb-10">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Next Target</h2>
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+            <NextTargetCard
+              totalPlayed={totalPlayed}
+              nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
+              suggestedRegion={suggestedRegion}
+              suggestedFocus={nextMilestone?.name}
+              onShare={() => {/* Share placeholder */}}
+              showHint={onboarding.shouldShowTargetHint}
+              onHintDismiss={onboarding.markTargetHintSeen}
+            />
+          </div>
         </section>
 
-        {/* Section 4: Journey Map - bg-slate-50 */}
-        <section className="px-4 py-5 bg-slate-50 border-t border-slate-200/60" ref={journeyMapRef}>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Journey Map</h2>
+        {/* Section 4: Journey Map - KEEP as card */}
+        <section className="px-4 mb-12" ref={journeyMapRef}>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">Journey Map</h2>
           {showJourneyHint && (
             <p className="text-xs mb-2 text-slate-400 transition-opacity duration-500">
               Your journey unfolds here
             </p>
           )}
-          <MilestoneLadder
-            totalPlayed={totalPlayed}
-            onMilestoneClick={handleMilestoneClick}
-            regionCompletions={regionProgress.map(r => ({
-              slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
-              name: r.name,
-              played: r.played,
-              total: r.total,
-            }))}
-          />
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/60">
+            <MilestoneLadder
+              totalPlayed={totalPlayed}
+              onMilestoneClick={handleMilestoneClick}
+              regionCompletions={regionProgress.map(r => ({
+                slug: r.id as 'gb-i' | 'europe' | 'usa' | 'global',
+                name: r.name,
+                played: r.played,
+                total: r.total,
+              }))}
+            />
+          </div>
         </section>
 
-        {/* Section 5: Regional Progress - bg-white band */}
-        <section className="px-4 py-5 bg-white border-y border-slate-200/60">
+        {/* Section 5: Regional Progress - NO card, section band */}
+        <section className="px-4 mb-12">
           <RegionalJourneySummary regions={regionProgress} />
         </section>
 
-        {/* Section 6: Momentum - bg-slate-100 band */}
-        <section className="px-4 py-5 bg-slate-100">
+        {/* Section 6: Momentum - NO card, section band */}
+        <section className="px-4 mb-12">
           <MomentumCard recentlyPlayed={recentCourses} />
         </section>
 
-        {/* Section 7: Leaderboard - bg-slate-50 */}
-        <section className="px-4 py-5 bg-slate-50 border-t border-slate-200/60">
+        {/* Section 7: Leaderboard - KEEP as card */}
+        <section className="px-4 mb-12">
           <LeaderboardCard userId={user?.id} />
         </section>
 
-        {/* Section 8: Recently Added - bg-white band */}
-        <section className="px-4 py-5 bg-white border-y border-slate-200/60">
+        {/* Section 8: Recently Added - NO card, section band */}
+        <section className="px-4 pb-10">
           <RecentlyAddedSection
             courses={recentCourses}
             hasGoldTrim={rewards.hasGoldTrim}

@@ -35,7 +35,7 @@ const RegionRow: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="w-full text-left py-4 transition-all hover:bg-slate-100/50 rounded-lg group"
+      className="w-full text-left py-4 transition-all hover:bg-slate-50/80 group"
     >
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-2.5">
@@ -132,12 +132,13 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
 
   return (
     <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3 px-1">
+      {/* Section header - mb-4 */}
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
         Regional Progress
       </h2>
 
-      {/* No card wrapper - rows sit on bg-slate-50 with dividers */}
-      <div className="space-y-0">
+      {/* Region rows - py-4 each, border-b dividers */}
+      <div>
         {regions.map((region, index) => (
           <React.Fragment key={region.id}>
             <RegionRow
@@ -145,7 +146,7 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
               onClick={() => handleRegionClick(region)}
             />
             {index < regions.length - 1 && (
-              <div className="mx-0 h-px bg-slate-200/60" />
+              <div className="h-px bg-slate-200/60" />
             )}
           </React.Fragment>
         ))}
