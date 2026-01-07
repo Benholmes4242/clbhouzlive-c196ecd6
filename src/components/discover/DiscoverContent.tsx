@@ -358,8 +358,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     if (!content || content.length === 0) return null;
     
     const LANDSCAPE_THRESHOLD = 1.25;
-    const MIN_DURATION = 15;
-    const MAX_DURATION = 180;
+    const MIN_DURATION = 1; // Has duration (not 0)
+    const MAX_DURATION = 240; // Match Watch grid (<4 min)
     
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);

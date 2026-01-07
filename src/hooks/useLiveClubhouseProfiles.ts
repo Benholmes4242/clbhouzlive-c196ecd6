@@ -139,16 +139,21 @@ export function useLiveClubhouseProfiles() {
         (followers?.data ?? []).forEach(r => knownIds.add(r.follower_id));
       }
 
-      // Target 24 real profiles
+      // Target 24 real profiles with improved mix:
+      // 50% network, 20% active creators, 15% popular, 15% suggested
       const targetRealProfiles = 24;
-      const targetKnown = Math.ceil(targetRealProfiles * 0.6); // ~14 known
-      const targetSuggested = Math.ceil(targetRealProfiles * 0.4); // ~10 suggested
+      const targetKnown = Math.ceil(targetRealProfiles * 0.50); // ~12 known
+      const targetActive = Math.ceil(targetRealProfiles * 0.20); // ~5 active
+      const targetPopular = Math.ceil(targetRealProfiles * 0.15); // ~4 popular
+      const targetSuggested = Math.ceil(targetRealProfiles * 0.15); // ~4 suggested
       
-      let knownProfiles: any[] = [];
+      // Calculate date for "active" check (posted in last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       
-      // Fetch known and suggested profiles in parallel
-      const [knownProfilesResult, suggestedProfilesResult] = await Promise.all([
-        // Fetch known profiles
+      // Fetch all profile categories in parallel
+      const [knownProfilesResult, activeCreatorsResult, popularCreatorsResult, suggestedProfilesResult] = await Promise.all([
+        // 1. Fetch known profiles (following/followers)
         (async () => {
           if (knownIds.size === 0 || targetKnown === 0) return [];
           
@@ -164,7 +169,61 @@ export function useLiveClubhouseProfiles() {
           return profiles || [];
         })(),
         
-        // Fetch suggested profiles
+        // 2. Fetch active creators (posted in last 7 days)
+        (async () => {
+          const excludeIds = [...knownIds, ...(user ? [user.id] : []), ...mutedIds];
+          
+          // Get users who have posted recently
+          const { data: recentPosters } = await supabase
+            .from('posts')
+            .select('user_id')
+            .gte('created_at', sevenDaysAgo.toISOString())
+            .is('deleted_at', null)
+            .order('created_at', { ascending: false })
+            .limit(100);
+          
+          if (!recentPosters || recentPosters.length === 0) return [];
+          
+          // Get unique poster IDs excluding known users
+          const posterIds = [...new Set(recentPosters.map(p => p.user_id))]
+            .filter(id => id && !excludeIds.includes(id))
+            .slice(0, targetActive * 2); // Fetch extra to account for filtering
+          
+          if (posterIds.length === 0) return [];
+          
+          const { data: profiles } = await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, home_club, is_verified_golfer, eg_handicap_index, show_handicap')
+            .in('id', posterIds)
+            .eq('is_public', true)
+            .not('profile_photo_url', 'is', null)
+            .not('display_name', 'is', null)
+            .limit(targetActive);
+
+          return profiles || [];
+        })(),
+        
+        // 3. Fetch popular creators (most followers - using verified as proxy)
+        (async () => {
+          const excludeIds = [...knownIds, ...(user ? [user.id] : []), ...mutedIds];
+          
+          let query = supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, home_club, is_verified_golfer, eg_handicap_index, show_handicap')
+            .eq('is_public', true)
+            .eq('is_verified_golfer', true) // Verified users as proxy for "popular"
+            .not('profile_photo_url', 'is', null)
+            .not('display_name', 'is', null);
+
+          if (excludeIds.length > 0) {
+            query = query.not('id', 'in', `(${excludeIds.join(',')})`);
+          }
+
+          const { data: profiles } = await query.limit(targetPopular);
+          return profiles || [];
+        })(),
+        
+        // 4. Fetch suggested profiles (fallback - newest users)
         (async () => {
           const excludeIds = [...knownIds, ...(user ? [user.id] : []), ...mutedIds];
           
@@ -188,7 +247,12 @@ export function useLiveClubhouseProfiles() {
       ]);
 
       // Batch fetch latest posts for all profiles in ONE query
-      const allProfileIds = [...knownProfilesResult.map(p => p.id), ...suggestedProfilesResult.map(p => p.id)];
+      const allProfileIds = [
+        ...knownProfilesResult.map(p => p.id),
+        ...activeCreatorsResult.map(p => p.id),
+        ...popularCreatorsResult.map(p => p.id),
+        ...suggestedProfilesResult.map(p => p.id)
+      ];
       
       const latestPostsMap: Record<string, string> = {};
       if (allProfileIds.length > 0) {
@@ -196,6 +260,7 @@ export function useLiveClubhouseProfiles() {
           .from('posts')
           .select('user_id, created_at')
           .in('user_id', allProfileIds)
+          .is('deleted_at', null)
           .order('created_at', { ascending: false });
 
         // Group by user_id and take the first (latest) post for each user
@@ -208,25 +273,48 @@ export function useLiveClubhouseProfiles() {
         }
       }
 
-      // Enrich profiles with latest_post_at
-      knownProfiles = knownProfilesResult.map(profile => ({
+      // Enrich all profiles with latest_post_at
+      const enrichProfile = (profile: any) => ({
         ...profile,
         latest_post_at: latestPostsMap[profile.id] || null,
-      }));
+      });
 
-      let suggestedProfiles = suggestedProfilesResult.map(profile => ({
-        ...profile,
-        latest_post_at: latestPostsMap[profile.id] || null,
-      }));
+      const knownProfiles = knownProfilesResult.map(enrichProfile);
+      const activeProfiles = activeCreatorsResult.map(enrichProfile);
+      const popularProfiles = popularCreatorsResult.map(enrichProfile);
+      const suggestedProfiles = suggestedProfilesResult.map(enrichProfile);
 
-      // Interleave known and suggested
+      // Combine all categories, removing duplicates
+      const seenIds = new Set<string>();
       const interleaved: any[] = [];
-      const k = [...knownProfiles];
-      const s = [...suggestedProfiles];
+      
+      // Helper to add profiles avoiding duplicates
+      const addProfiles = (profiles: any[], max: number) => {
+        let added = 0;
+        for (const profile of profiles) {
+          if (added >= max) break;
+          if (!seenIds.has(profile.id)) {
+            seenIds.add(profile.id);
+            interleaved.push(profile);
+            added++;
+          }
+        }
+      };
 
-      while (interleaved.length < targetRealProfiles && (k.length || s.length)) {
-        if (k.length) interleaved.push(k.shift()!);
-        if (s.length && interleaved.length < targetRealProfiles) interleaved.push(s.shift()!);
+      // Add in priority order: network → active → popular → suggested
+      addProfiles(knownProfiles, targetKnown);
+      addProfiles(activeProfiles, targetActive);
+      addProfiles(popularProfiles, targetPopular);
+      addProfiles(suggestedProfiles, targetSuggested);
+
+      if (import.meta.env.DEV) {
+        console.log('[useLiveClubhouseProfiles] Enhanced mix:', {
+          network: knownProfilesResult.length,
+          active: activeCreatorsResult.length,
+          popular: popularCreatorsResult.length,
+          suggested: suggestedProfilesResult.length,
+          total: interleaved.length
+        });
       }
 
       return interleaved.filter(profile => !NotInterested.isHidden(profile.id));

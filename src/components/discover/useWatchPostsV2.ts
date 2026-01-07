@@ -12,13 +12,14 @@ interface WatchPostsPage {
 }
 
 /**
- * Fetches posts for Watch page:
- * - All users
+ * Fetches posts for Watch page with hybrid recency+engagement scoring:
+ * - All users (excludes soft-deleted posts)
  * - Videos only
  * - Under 4 minutes (240 seconds)
  * - Both portrait and landscape orientations
  * - Public visibility
  * - Cursor-based pagination
+ * - Hybrid scoring: recent content stays visible, popular content rises
  */
 export function useWatchPostsV2() {
   const query = useInfiniteQuery({
@@ -30,7 +31,7 @@ export function useWatchPostsV2() {
       const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
 
-      // Fetch posts with video media under 4 minutes (matching Activity grid pattern)
+      // Fetch posts with video media under 4 minutes + engagement metrics
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -75,9 +76,13 @@ export function useWatchPostsV2() {
             country,
             sub_country,
             region
-          )
+          ),
+          post_likes(count),
+          post_views(count),
+          post_comments(count)
         `)
         .eq('visibility', 'anyone')
+        .is('deleted_at', null) // Filter soft-deleted posts
         .eq('post_media.media_type', 'video')
         .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
@@ -112,8 +117,47 @@ export function useWatchPostsV2() {
         (post) => post.post_media && post.post_media.length > 0
       );
 
+      // Apply hybrid scoring: recency + engagement
+      const now = Date.now();
+      const postsWithScores = activityPosts.map(post => {
+        // Calculate age in hours
+        const ageMs = now - new Date(post.created_at).getTime();
+        const ageHours = ageMs / (1000 * 60 * 60);
+        
+        // Get engagement metrics (with fallbacks)
+        const likes = (post as any).post_likes?.[0]?.count || 0;
+        const views = (post as any).post_views?.[0]?.count || 0;
+        const comments = (post as any).post_comments?.[0]?.count || 0;
+        
+        // CONSERVATIVE hybrid score
+        // Recency: 1000 base - (2 points per hour) → fresh content has high score
+        // Engagement: Small boost for popular videos
+        const recencyScore = Math.max(0, 1000 - (ageHours * 2));
+        const engagementScore = (likes * 3) + (views / 20) + (comments * 5);
+        
+        const totalScore = recencyScore + engagementScore;
+        
+        return {
+          ...post,
+          _hybridScore: totalScore,
+        };
+      });
+
+      // Sort by hybrid score (highest first)
+      const sortedPosts = postsWithScores.sort((a, b) => b._hybridScore - a._hybridScore);
+
+      if (import.meta.env.DEV && sortedPosts.length > 0) {
+        console.log('[useWatchPostsV2] Hybrid scoring applied:', {
+          totalPosts: sortedPosts.length,
+          sampleScores: sortedPosts.slice(0, 3).map(p => ({
+            postId: p.id.slice(0, 8),
+            score: p._hybridScore.toFixed(0),
+          }))
+        });
+      }
+
       // Convert to UnifiedMediaItem using existing adapter
-      const items = activityPosts
+      const items = sortedPosts
         .map((post, index) => activityPostToUnified(post as any, startRange + index))
         .filter((item): item is UnifiedMediaItem => item !== null);
 
