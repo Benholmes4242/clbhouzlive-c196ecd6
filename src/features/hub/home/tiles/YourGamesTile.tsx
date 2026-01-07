@@ -182,9 +182,10 @@ export function YourGamesTile() {
               border: 'none',
               color: 'var(--hub-text-muted)',
               padding: 0,
+              opacity: 0.85,
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--hub-text-sub)'; e.currentTarget.style.opacity = '1'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hub-text-muted)'; e.currentTarget.style.opacity = '0.85'; }}
             aria-label="Create a Game"
           >
             Create a Game +
