@@ -168,23 +168,32 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
             padding: '16px',
           }}
         >
-          {/* Two-column grid: Left (course info) / Right (rating) */}
+          {/* ROW 1: Course Name + Rating Number (top-aligned) */}
           <div className="flex justify-between items-start gap-4">
-            {/* Left Stack - Course Identity */}
-            <div className="flex-1 min-w-0 space-y-1">
-              {/* Course Name - largest, bold */}
-              <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
-                {courseName}
-              </h2>
-              
-              {/* Location - smaller, muted */}
+            {/* Left: Course Name */}
+            <h2 className="flex-1 min-w-0 text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
+              {courseName}
+            </h2>
+            
+            {/* Right: Rating Number */}
+            <span 
+              className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none flex-shrink-0"
+              style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+            >
+              {rating === 10 ? '10' : rating.toFixed(1)}
+            </span>
+          </div>
+          
+          {/* ROW 2: Location + Rating Descriptor Badge */}
+          <div className="flex justify-between items-start gap-4 mt-1.5">
+            {/* Left: Location + Preview badge */}
+            <div className="flex-1 min-w-0">
               {courseLocation && (
                 <p className="text-white/60 text-sm drop-shadow-sm">
                   {courseLocation}
                 </p>
               )}
               
-              {/* Preview pill - under location */}
               {showPreviewBadge && (
                 <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
                   Preview
@@ -192,23 +201,9 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
               )}
             </div>
             
-            {/* Right Stack - Rating (center-aligned vertical stack) */}
-            <div className="flex flex-col items-center text-center gap-1 flex-shrink-0">
-              {/* Numeric Rating - large anchor */}
-              <span 
-                className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none"
-                style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
-              >
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </span>
-              
-              {/* Tier Badge */}
-              <RatingPill score={rating} className="text-[9px] py-0.5 px-2" />
-              
-              {/* "FROM A REVIEW" label */}
-              <span className="text-[9px] font-medium text-white/40 tracking-wider uppercase mt-0.5">
-                From a review
-              </span>
+            {/* Right: Rating Descriptor Badge (right-aligned under rating number) */}
+            <div className="flex-shrink-0">
+              <RatingPill score={rating} className="text-[8px] py-0.5 px-2 opacity-80" />
             </div>
           </div>
         </div>
