@@ -60,7 +60,7 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           className="absolute bottom-0 left-0 right-0 rounded-t-2xl flex flex-col max-h-[85vh]"
           style={{ 
-            background: 'var(--cm-surface-card)',
+            background: 'var(--cm-surface-sheet)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
           }}
           onClick={(e) => e.stopPropagation()}
