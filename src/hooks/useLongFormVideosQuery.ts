@@ -1,29 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
-import { ENABLE_MOCK_VIDEOS } from '@/lib/featureFlags';
-import { 
-  MOCK_RECOMMENDED_VIDEOS, 
-  MOCK_TRENDING_VIDEOS, 
-  MOCK_FOLLOWING_VIDEOS, 
-  MOCK_COURSES_VIDEOS 
-} from '@/mocks/mockLongFormVideos';
-
-// ⚠️ TESTING ONLY - Set to false for production
-// When true, ignores 7-day recency filter and shows ALL videos in Trending
-const TESTING_MODE_FILL_TRENDING = true;
 
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
   limit?: number;
   followedCreatorIds?: string[];
   creatorUserId?: string;
-  sort?: 'latest' | 'popular';
   searchQuery?: string;
-  category?: string;
-  getBoostScore?: (creatorId: string, category?: string) => number;
-  enabled?: boolean; // For lazy loading
+  category?: string; // Kept for compatibility, ignored
+  sort?: string; // Kept for compatibility, ignored
+  getBoostScore?: (creatorId: string, category?: string) => number; // Kept for compatibility, ignored
+  enabled?: boolean;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -37,51 +25,16 @@ const formatDuration = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-const calculateScore = (views: number, likes: number): number => {
-  return (views || 0) + ((likes || 0) * 25);
-};
-
-async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): Promise<LongFormVideo[]> {
+async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): Promise<LongFormVideo[]> {
   const { 
     section = 'all', 
-    limit = 10, 
+    limit = 20, 
     followedCreatorIds = [], 
     creatorUserId, 
-    sort = 'latest',
     searchQuery,
-    category,
-    getBoostScore,
   } = options;
 
-  // Determine if we need category or courses filtering
-  const needsCategoryFilter = category && category !== 'all';
-  const needsCoursesFilter = section === 'courses' && !creatorUserId && !searchQuery;
-
-  let filteredPostIds: string[] | null = null;
-
-  if (needsCategoryFilter) {
-    const { data: taggedPosts, error: tagError } = await supabase
-      .from('post_tags')
-      .select(`post_id, taggable_entities!inner(entity_type, slug)`)
-      .eq('taggable_entities.entity_type', 'video_category')
-      .eq('taggable_entities.slug', category);
-
-    if (tagError) throw tagError;
-    filteredPostIds = taggedPosts?.map(t => t.post_id) || [];
-    
-    if (filteredPostIds.length === 0) return [];
-  } else if (needsCoursesFilter) {
-    const { data: courseTaggedPosts, error: courseTagError } = await supabase
-      .from('post_tags')
-      .select(`post_id, taggable_entities!inner(entity_type)`)
-      .eq('taggable_entities.entity_type', 'golf_club');
-
-    if (courseTagError) throw courseTagError;
-    filteredPostIds = courseTaggedPosts?.map(t => t.post_id) || [];
-    
-    if (filteredPostIds.length === 0) return [];
-  }
-
+  // Simple query - all videos, only filter for horizontal
   let query = supabase
     .from('posts')
     .select(`
@@ -94,8 +47,8 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
         media_url,
         duration_seconds,
         poster_url,
-        filter_id,
-        studio_edits
+        width,
+        height
       ),
       post_tags(
         taggable_entities(
@@ -108,101 +61,69 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
       post_views(count)
     `)
     .eq('post_media.media_type', 'video')
-    .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
-    .not('post_media.duration_seconds', 'is', null)
     .eq('visibility', 'anyone');
 
-  if (filteredPostIds !== null) {
-    query = query.in('id', filteredPostIds);
-  }
-
+  // Only apply creator filter if specified
   if (creatorUserId) {
     query = query.eq('user_id', creatorUserId);
   }
 
+  // Only apply search filter if specified
   if (searchQuery && searchQuery.trim()) {
     query = query.ilike('content', `%${searchQuery.trim()}%`);
   }
 
-  if (!creatorUserId && !searchQuery) {
-    switch (section) {
-      case 'trending':
-        // TESTING MODE: Skip recency filter to get all videos
-        if (TESTING_MODE_FILL_TRENDING) {
-          console.log('[Trending] 🧪 TESTING MODE: Showing ALL videos (no 7-day filter)');
-        } else {
-          // NORMAL MODE: Last 7 days
-          const sevenDaysAgo = new Date();
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-          query = query.gte('created_at', sevenDaysAgo.toISOString());
-          console.log('[Trending] Using normal 7-day filter');
-        }
-        break;
-        
-      case 'following':
-        if (followedCreatorIds.length > 0) {
-          query = query.in('user_id', followedCreatorIds);
-        } else {
-          return [];
-        }
-        break;
+  // Only apply following filter for following section
+  if (section === 'following' && !creatorUserId && !searchQuery) {
+    if (followedCreatorIds.length > 0) {
+      query = query.in('user_id', followedCreatorIds);
+    } else {
+      return [];
     }
   }
 
-  const needsScoreSort = section === 'trending' || section === 'recommended' || sort === 'popular';
-  // TESTING MODE: Increase fetch limit for trending
-  const fetchLimit = (section === 'trending' && TESTING_MODE_FILL_TRENDING) 
-    ? 50 
-    : (needsScoreSort ? Math.min(limit * 2, 20) : limit);
-  query = query.order('created_at', { ascending: false }).limit(fetchLimit);
+  // Fetch more to filter for horizontal
+  query = query.order('created_at', { ascending: false }).limit(limit * 3);
 
-  console.log(`[useLongFormVideosQuery] 🔍 QUERY for ${section}:`, {
-    durationThreshold: VIDEO_DURATION_THRESHOLD_SECONDS,
-    fetchLimit,
-    testingMode: TESTING_MODE_FILL_TRENDING && section === 'trending',
-  });
+  console.log(`[useLongFormVideosQuery] 🔍 SIMPLE QUERY for ${section}`);
 
   const { data, error: queryError } = await query;
 
   console.log(`[useLongFormVideosQuery] 📊 RAW RESULT for ${section}:`, {
     videosReturned: data?.length || 0,
     error: queryError?.message,
-    firstVideoDuration: data?.[0]?.post_media?.[0]?.duration_seconds,
   });
 
   if (queryError) throw queryError;
   if (!data || data.length === 0) return [];
 
-  // Fetch profiles separately since posts has no FK to user_profiles
-  const userIds = [...new Set(data.map((post: any) => post.user_id))];
+  // Filter for horizontal videos only (width > height)
+  const horizontalVideos = data.filter((post: any) => {
+    const media = post.post_media?.[0];
+    if (!media) return false;
+    const width = media.width || 0;
+    const height = media.height || 0;
+    return width > height;
+  });
+
+  console.log(`[useLongFormVideosQuery] 🎬 After horizontal filter: ${horizontalVideos.length} of ${data.length}`);
+
+  // Fetch profiles
+  const userIds = [...new Set(horizontalVideos.map((post: any) => post.user_id))];
   const { data: profiles } = await supabase
     .from('user_profiles')
     .select('id, display_name, username, profile_photo_url')
     .in('id', userIds);
 
-  // Create profile map for quick lookup
-  const profileMap = new Map(
-    (profiles || []).map((p: any) => [p.id, p])
-  );
+  const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
-  type VideoWithScore = { video: LongFormVideo; score: number };
-  
-  const videosWithScores: VideoWithScore[] = data.map((post: any) => {
+  const videos: LongFormVideo[] = horizontalVideos.slice(0, limit).map((post: any) => {
     const media = post.post_media?.[0];
     const user = profileMap.get(post.user_id);
-
-    const golfTag = post.post_tags?.find(
-      (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
-    );
-
-    // Get counts from aggregated relations
+    const golfTag = post.post_tags?.find((tag: any) => tag.taggable_entities?.entity_type === 'golf_club');
     const views = post.post_views?.[0]?.count || 0;
-    const likes = post.post_likes?.[0]?.count || 0;
-    const baseScore = calculateScore(views, likes);
-    const boostScore = getBoostScore ? getBoostScore(post.user_id, category) : 0;
-    const score = baseScore + boostScore;
 
-    const video: LongFormVideo = {
+    return {
       id: post.id,
       title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
       creatorUserId: post.user_id,
@@ -218,104 +139,54 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
       golfCourseName: golfTag?.taggable_entities?.name,
       isTrending: section === 'trending',
     };
-
-    return { video, score };
   });
 
-  let sortedVideos = videosWithScores;
-  if (needsScoreSort) {
-    sortedVideos = [...videosWithScores].sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      return new Date(b.video.createdAt || 0).getTime() - new Date(a.video.createdAt || 0).getTime();
-    });
-  }
-
-  return sortedVideos.slice(0, limit).map(v => v.video);
+  return videos;
 }
 
 /**
- * React Query version of useLongFormVideos with caching + deduplication
- * 
- * Features:
- * - 5 min staleTime (won't refetch if data is fresh)
- * - 30 min gcTime (keeps data in cache)
- * - Query key based on all filter params
- * - enabled prop for lazy loading
- * - ENABLE_MOCK_VIDEOS flag injects 25 mock videos per section for UI testing
+ * Simple query hook for videos - only filters for horizontal videos
  */
 export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) => {
   const { 
     section = 'all', 
-    limit = 10, 
+    limit = 20, 
     followedCreatorIds = [], 
     creatorUserId, 
-    sort = 'latest',
     searchQuery,
-    category,
-    getBoostScore,
     enabled = true,
   } = options;
 
-  // Stable query key - don't include getBoostScore (function)
   const queryKey = [
-    'long-form-videos-v2',
+    'videos-simple',
     section,
     limit,
     followedCreatorIds.join(','),
     creatorUserId || '',
-    sort,
     searchQuery || '',
-    category || '',
   ];
 
   const query = useQuery({
     queryKey,
-    queryFn: () => fetchLongFormVideos({
+    queryFn: () => fetchVideos({
       section,
       limit,
       followedCreatorIds,
       creatorUserId,
-      sort,
       searchQuery,
-      category,
-      getBoostScore,
     }),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     enabled,
     refetchOnWindowFocus: false,
   });
 
-  // Inject mock videos when flag is enabled (for UI testing)
-  let videos = query.data || [];
-  if (ENABLE_MOCK_VIDEOS && !creatorUserId && !searchQuery) {
-    const mockVideos = getMockVideosForSection(section);
-    // Combine real + mock, respecting limit
-    videos = [...videos, ...mockVideos].slice(0, limit);
-  }
-
   return {
-    videos,
+    videos: query.data || [],
     isLoading: query.isLoading,
     error: query.error,
     refetch: query.refetch,
   };
 };
-
-// Helper to get mock videos for a section
-function getMockVideosForSection(section: string): LongFormVideo[] {
-  switch (section) {
-    case 'recommended':
-      return MOCK_RECOMMENDED_VIDEOS;
-    case 'trending':
-      return MOCK_TRENDING_VIDEOS;
-    case 'following':
-      return MOCK_FOLLOWING_VIDEOS;
-    case 'courses':
-      return MOCK_COURSES_VIDEOS;
-    default:
-      return MOCK_RECOMMENDED_VIDEOS;
-  }
-}
 
 export default useLongFormVideosQuery;

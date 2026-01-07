@@ -1,20 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
-import { ENABLE_MOCK_VIDEOS } from '@/lib/featureFlags';
-import { 
-  MOCK_RECOMMENDED_VIDEOS, 
-  MOCK_TRENDING_VIDEOS, 
-  MOCK_FOLLOWING_VIDEOS, 
-  MOCK_COURSES_VIDEOS 
-} from '@/mocks/mockLongFormVideos';
 
-const PAGE_SIZE = 10;  // Load 10 videos per page for faster loads
-
-// ⚠️ TESTING ONLY - Set to false for production
-// When true, ignores 7-day recency filter and shows ALL videos in Trending
-const TESTING_MODE_FILL_TRENDING = true;
+const PAGE_SIZE = 10;
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
@@ -27,23 +15,7 @@ interface LongFormVideosPage {
 interface UseInfiniteLongFormVideosOptions {
   section: SectionType;
   followedCreatorIds?: string[];
-  category?: string;
-}
-
-// Helper to get mock videos for a section
-function getMockVideosForSection(section: SectionType): LongFormVideo[] {
-  switch (section) {
-    case 'recommended':
-      return MOCK_RECOMMENDED_VIDEOS;
-    case 'trending':
-      return MOCK_TRENDING_VIDEOS;
-    case 'following':
-      return MOCK_FOLLOWING_VIDEOS;
-    case 'courses':
-      return MOCK_COURSES_VIDEOS;
-    default:
-      return MOCK_RECOMMENDED_VIDEOS;
-  }
+  category?: string; // Kept for compatibility, ignored
 }
 
 const formatDuration = (seconds: number): string => {
@@ -58,29 +30,24 @@ const formatDuration = (seconds: number): string => {
 };
 
 /**
- * Infinite scroll hook for long-form videos (≥4 minutes)
- * Used by VideosSectionPage for "View All" pages
+ * Simple infinite scroll hook - only filters for horizontal videos
  */
 export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOptions) {
-  const { section, followedCreatorIds = [], category } = options;
+  const { section, followedCreatorIds = [] } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['long-form-videos-infinite', section, followedCreatorIds.join(','), category || ''],
+    queryKey: ['videos-infinite-simple', section, followedCreatorIds.join(',')],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
       const startRange = pageParam as number;
-      const endRange = startRange + PAGE_SIZE - 1;
+      const endRange = startRange + PAGE_SIZE * 2 - 1; // Fetch extra to filter
 
       console.log('[useInfiniteLongFormVideos] 🔍 FETCHING PAGE:', {
         section,
         pageParam,
         startRange,
         endRange,
-        pageSize: PAGE_SIZE,
-        durationThreshold: VIDEO_DURATION_THRESHOLD_SECONDS,
-        testingMode: section === 'trending' ? TESTING_MODE_FILL_TRENDING : false,
-        usingRealData: !ENABLE_MOCK_VIDEOS
       });
 
       // For 'following' section, return empty if no followed creators
@@ -88,23 +55,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         return { items: [], nextCursor: startRange, hasMore: false };
       }
 
-      // For 'courses' section, first get post IDs with golf_club tags
-      let coursePostIds: string[] | null = null;
-      if (section === 'courses') {
-        const { data: courseTaggedPosts, error: courseTagError } = await supabase
-          .from('post_tags')
-          .select(`post_id, taggable_entities!inner(entity_type)`)
-          .eq('taggable_entities.entity_type', 'golf_club');
-
-        if (courseTagError) throw courseTagError;
-        coursePostIds = courseTaggedPosts?.map(t => t.post_id) || [];
-        
-        if (coursePostIds.length === 0) {
-          return { items: [], nextCursor: startRange, hasMore: false };
-        }
-      }
-
-      // Base query - videos ≥4 minutes
+      // Simple query - all videos
       let baseQuery = supabase
         .from('posts')
         .select(`
@@ -118,8 +69,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
             media_url,
             duration_seconds,
             poster_url,
-            filter_id,
-            studio_edits
+            width,
+            height
           ),
           post_tags(
             taggable_entities(
@@ -132,42 +83,13 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           post_views(count)
         `)
         .eq('post_media.media_type', 'video')
-        .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
-        .not('post_media.duration_seconds', 'is', null);
+        .eq('visibility', 'anyone');
 
-      // Apply section-specific filters
-      if (section === 'trending') {
-        // TESTING MODE: Skip recency filter to get all videos
-        if (TESTING_MODE_FILL_TRENDING) {
-          console.log('[useInfiniteLongFormVideos] 🧪 TESTING: Showing ALL trending videos (no 7-day filter)');
-        } else {
-          // NORMAL MODE: Last 7 days
-          const sevenDaysAgo = new Date();
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-          baseQuery = baseQuery.gte('created_at', sevenDaysAgo.toISOString());
-          console.log('[useInfiniteLongFormVideos] NORMAL: Using 7-day filter for trending');
-        }
-      } else if (section === 'following') {
+      // Only apply following filter for following section
+      if (section === 'following') {
         baseQuery = baseQuery.in('user_id', followedCreatorIds);
-      } else if (section === 'courses' && coursePostIds) {
-        baseQuery = baseQuery.in('id', coursePostIds);
       }
 
-      // Apply category filter if provided
-      if (category && category !== 'all') {
-        const { data: categoryPosts } = await supabase
-          .from('post_tags')
-          .select(`post_id, taggable_entities!inner(entity_type, slug)`)
-          .eq('taggable_entities.entity_type', 'video_category')
-          .eq('taggable_entities.slug', category);
-        
-        if (categoryPosts && categoryPosts.length > 0) {
-          const categoryPostIds = categoryPosts.map(t => t.post_id);
-          baseQuery = baseQuery.in('id', categoryPostIds);
-        }
-      }
-
-      // Order and paginate
       baseQuery = baseQuery
         .order('created_at', { ascending: false })
         .range(startRange, endRange);
@@ -176,16 +98,28 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
       console.log('[useInfiniteLongFormVideos] 📊 RAW QUERY RESULT:', {
         section,
-        pageParam,
         postsReturned: postsData?.length || 0,
-        firstPostDuration: postsData?.[0]?.post_media?.[0]?.duration_seconds,
-        error: error?.message
+        error: error?.message,
       });
 
       if (error) throw error;
 
+      // Filter for horizontal videos only (width > height)
+      const horizontalVideos = (postsData || []).filter((post: any) => {
+        const media = post.post_media?.[0];
+        if (!media) return false;
+        const width = media.width || 0;
+        const height = media.height || 0;
+        return width > height;
+      });
+
+      console.log(`[useInfiniteLongFormVideos] 🎬 After horizontal filter: ${horizontalVideos.length}`);
+
+      // Take only PAGE_SIZE items
+      const pageVideos = horizontalVideos.slice(0, PAGE_SIZE);
+
       // Fetch profiles for creators
-      const userIds = [...new Set(postsData?.map(p => p.user_id).filter(Boolean))] as string[];
+      const userIds = [...new Set(pageVideos.map((p: any) => p.user_id).filter(Boolean))] as string[];
       
       const { data: profiles } = await supabase
         .from('user_profiles')
@@ -195,7 +129,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
       const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
       // Transform to LongFormVideo format
-      const items: LongFormVideo[] = (postsData || []).map((post: any) => {
+      const items: LongFormVideo[] = pageVideos.map((post: any) => {
         const media = post.post_media?.[0];
         const user = profileMap.get(post.user_id);
         
@@ -225,7 +159,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
+      const hasMore = items.length === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
 
       console.log('[useInfiniteLongFormVideos] ✅ PAGE COMPLETE:', {
@@ -242,43 +176,18 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
       return lastPage.hasMore ? lastPage.nextCursor : undefined;
     },
     
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000,   // 30 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
-  const realItems = query.data?.pages.flatMap((page) => page.items) ?? [];
-  const pagesLoaded = query.data?.pages.length ?? 0;
-  
-  // Inject mock videos when flag is enabled (for UI testing)
-  // Apply same pagination logic - only show PAGE_SIZE * pagesLoaded mocks
-  let allItems = realItems;
-  let mockHasMore = false;
-  
-  if (ENABLE_MOCK_VIDEOS) {
-    const mockVideos = getMockVideosForSection(section);
-    // De-dupe by id
-    const seenIds = new Set(realItems.map(v => v.id));
-    const uniqueMocks = mockVideos.filter(v => !seenIds.has(v.id));
-    
-    // Paginate mocks the same way - only show up to PAGE_SIZE * pagesLoaded
-    const maxMocksToShow = Math.max(0, (PAGE_SIZE * pagesLoaded) - realItems.length);
-    const paginatedMocks = uniqueMocks.slice(0, maxMocksToShow);
-    
-    allItems = [...realItems, ...paginatedMocks];
-    mockHasMore = paginatedMocks.length < uniqueMocks.length;
-  }
-  
-  // Has more if real data has more OR mocks have more to show
-  const hasMore = ENABLE_MOCK_VIDEOS 
-    ? (query.hasNextPage ?? false) || mockHasMore
-    : (query.hasNextPage ?? false);
+  const allItems = query.data?.pages.flatMap((page) => page.items) ?? [];
 
   return {
     items: allItems,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
-    hasMore,
+    hasMore: query.hasNextPage ?? false,
     fetchNextPage: query.fetchNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
   };
