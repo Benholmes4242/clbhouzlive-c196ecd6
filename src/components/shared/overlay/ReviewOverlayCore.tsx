@@ -70,26 +70,24 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
           <div
             className={cn(
               "absolute top-2 left-2 right-2 z-10",
-              "rounded-lg border",
-              // Enhanced frosted glass
-              "backdrop-blur-2xl",
-              "shadow-[0_4px_16px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.03)]"
+              "rounded-lg backdrop-blur-xl border",
+              "shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]"
             )}
             style={{
               backgroundColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.06)'
-                : 'rgba(0, 0, 0, 0.40)',
+                ? 'rgba(210, 180, 97, 0.08)'
+                : 'rgba(0, 0, 0, 0.5)',
               borderColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.25)'
-                : 'rgba(255, 255, 255, 0.06)',
-              padding: '6px 8px',
+                ? 'rgba(210, 180, 97, 0.3)'
+                : 'rgba(255, 255, 255, 0.08)',
+              padding: '8px',
             }}
           >
-            {/* Two-column: Left (course info) / Right (rating number only) */}
+            {/* Two-column: Left (course info) / Right (rating) */}
             <div className="flex justify-between items-start gap-2">
-              {/* Left: Course name + location + de-emphasised pill */}
+              {/* Left: Course name + location */}
               <div className="flex-1 min-w-0 space-y-0.5">
-                <div className="text-white font-bold text-[11px] leading-tight line-clamp-1">
+                <div className="text-white font-bold text-[11px] leading-tight line-clamp-1 drop-shadow-md">
                   {courseName}
                 </div>
                 {courseLocation && (
@@ -97,17 +95,18 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                     {courseLocation}
                   </div>
                 )}
-                {/* Tier pill - de-emphasised */}
-                <RatingPill score={rating} className="text-[5px] py-0 px-0.5 opacity-70 mt-0.5" />
               </div>
               
-              {/* Right: Rating number only - top-aligned */}
-              <span 
-                className="text-xl font-bold tabular-nums leading-none tracking-tight flex-shrink-0"
-                style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
-              >
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </span>
+              {/* Right: Rating + pill (vertical stack) */}
+              <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
+                <span 
+                  className="text-xl font-bold tabular-nums leading-none drop-shadow-lg"
+                  style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+                >
+                  {rating === 10 ? '10' : rating.toFixed(1)}
+                </span>
+                <RatingPill score={rating} className="text-[6px] py-0 px-1" />
+              </div>
             </div>
           </div>
           
@@ -115,20 +114,18 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
           <div
             className={cn(
               "absolute bottom-2 left-2 z-10",
-              "rounded-lg border",
-              // Enhanced frosted glass
-              "backdrop-blur-2xl",
-              "shadow-[0_4px_16px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.03)]",
+              "rounded-lg backdrop-blur-xl border",
+              "shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]",
               "max-w-[70%]"
             )}
             style={{
               backgroundColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.06)'
-                : 'rgba(0, 0, 0, 0.40)',
+                ? 'rgba(210, 180, 97, 0.08)'
+                : 'rgba(0, 0, 0, 0.5)',
               borderColor: isOutstanding
-                ? 'rgba(210, 180, 97, 0.25)'
-                : 'rgba(255, 255, 255, 0.06)',
-              padding: '5px 8px',
+                ? 'rgba(210, 180, 97, 0.3)'
+                : 'rgba(255, 255, 255, 0.08)',
+              padding: '6px 8px',
             }}
           >
             <div className="flex items-center gap-1.5">
@@ -143,7 +140,6 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
                 <div className="text-white font-semibold text-[9px] truncate leading-tight">
                   {user?.name || user?.username || 'Golfer'}
                 </div>
-                {/* Rating pill inline with "Rated" text */}
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="text-white/60 text-[7px]">Rated</span>
                   <RatingPill score={rating} className="text-[5px] py-0 px-0.5" />
@@ -159,62 +155,59 @@ export const ReviewOverlayCore: React.FC<ReviewOverlayCoreProps> = ({
         <div 
           className={cn(
             "absolute left-4 right-4 z-20 top-14",
-            "rounded-xl border",
-            // Enhanced frosted glass: increased blur, reduced opacity
-            "backdrop-blur-2xl",
-            "shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)]",
+            "rounded-xl backdrop-blur-xl border",
+            "shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]",
             isOutstanding 
-              ? "bg-[rgba(210,180,97,0.06)]" 
-              : "bg-black/40"
+              ? "bg-[rgba(210,180,97,0.08)]" 
+              : "bg-black/50"
           )}
           style={{
             borderColor: isOutstanding 
-              ? 'rgba(210, 180, 97, 0.25)' 
-              : 'rgba(255, 255, 255, 0.06)',
-            // Reduced padding for ~20% height reduction
-            padding: '12px 16px',
+              ? 'rgba(210, 180, 97, 0.3)' 
+              : 'rgba(255, 255, 255, 0.08)',
+            padding: '16px',
           }}
         >
           {/* Two-column grid: Left (course info) / Right (rating) */}
           <div className="flex justify-between items-start gap-4">
             {/* Left Stack - Course Identity */}
-            <div className="flex-1 min-w-0 space-y-0.5">
+            <div className="flex-1 min-w-0 space-y-1">
               {/* Course Name - largest, bold */}
-              <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2">
+              <h2 className="text-white font-bold text-lg sm:text-xl leading-tight line-clamp-2 drop-shadow-md">
                 {courseName}
               </h2>
               
               {/* Location - smaller, muted */}
               {courseLocation && (
-                <p className="text-white/60 text-sm leading-snug">
+                <p className="text-white/60 text-sm drop-shadow-sm">
                   {courseLocation}
                 </p>
               )}
               
-              {/* Tier Badge - de-emphasised, under course name */}
-              <div className="pt-1">
-                <RatingPill 
-                  score={rating} 
-                  className="text-[8px] py-0.5 px-1.5 opacity-75" 
-                />
-              </div>
-              
-              {/* Preview pill - under tier badge */}
+              {/* Preview pill - under location */}
               {showPreviewBadge && (
-                <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-white/10 border border-white/15 text-white/60 text-[10px] font-medium tracking-wide uppercase">
+                <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-[10px] font-medium tracking-wide uppercase">
                   Preview
                 </span>
               )}
             </div>
             
-            {/* Right: Rating Number - top-aligned with course name */}
-            <div className="flex-shrink-0">
-              {/* Numeric Rating - luxury watch numerals style */}
+            {/* Right Stack - Rating (center-aligned vertical stack) */}
+            <div className="flex flex-col items-center text-center gap-1 flex-shrink-0">
+              {/* Numeric Rating - large anchor */}
               <span 
-                className="text-4xl sm:text-5xl font-bold tabular-nums leading-none tracking-tight"
+                className="text-4xl sm:text-5xl font-bold tabular-nums drop-shadow-lg leading-none"
                 style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
+              </span>
+              
+              {/* Tier Badge */}
+              <RatingPill score={rating} className="text-[9px] py-0.5 px-2" />
+              
+              {/* "FROM A REVIEW" label */}
+              <span className="text-[9px] font-medium text-white/40 tracking-wider uppercase mt-0.5">
+                From a review
               </span>
             </div>
           </div>
