@@ -296,10 +296,10 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           ))}
         </div>
 
-        {/* Mastery Track Section - Separate chapter with no connecting line */}
+        {/* Mastery Track Section - Separate chapter, NO vertical connector line */}
         {regionMilestones.length > 0 && (
           <motion.div 
-            className="relative mt-8 pt-6 bg-slate-50"
+            className="relative mt-8 pt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
