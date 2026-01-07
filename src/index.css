@@ -564,12 +564,17 @@ html, body, #root {
 }
 
 /* CRITICAL: Global header must always be flush to viewport top - no gaps allowed */
-/* Ensure page containers with headers have no top spacing */
-.page-with-header,
-.min-h-screen,
-[class*="min-h-screen"] {
+/* Ensure page containers with headers have no top spacing UNLESS they have the header offset class */
+.page-with-header:not(.compact-header-offset):not(.compact-header-offset-no-safe),
+.min-h-screen:not(.compact-header-offset):not(.compact-header-offset-no-safe),
+[class*="min-h-screen"]:not(.compact-header-offset):not(.compact-header-offset-no-safe) {
   margin: 0 !important;
-  padding-top: 0 !important;
+}
+
+/* page-root elements with compact-header-offset need their padding preserved */
+.page-root.compact-header-offset,
+.page-root.compact-header-offset-no-safe {
+  /* padding-top is set by the offset class - do not override */
 }
 
 /* Ensure all headers respect safe-area but stay anchored to viewport top */
