@@ -210,20 +210,30 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   });
 
   const realItems = query.data?.pages.flatMap((page) => page.items) ?? [];
+  const pagesLoaded = query.data?.pages.length ?? 0;
   
   // Inject mock videos when flag is enabled (for UI testing)
+  // Apply same pagination logic - only show PAGE_SIZE * pagesLoaded mocks
   let allItems = realItems;
+  let mockHasMore = false;
+  
   if (ENABLE_MOCK_VIDEOS) {
     const mockVideos = getMockVideosForSection(section);
-    // Combine real + mock, de-dupe by id
+    // De-dupe by id
     const seenIds = new Set(realItems.map(v => v.id));
     const uniqueMocks = mockVideos.filter(v => !seenIds.has(v.id));
-    allItems = [...realItems, ...uniqueMocks];
+    
+    // Paginate mocks the same way - only show up to PAGE_SIZE * pagesLoaded
+    const maxMocksToShow = Math.max(0, (PAGE_SIZE * pagesLoaded) - realItems.length);
+    const paginatedMocks = uniqueMocks.slice(0, maxMocksToShow);
+    
+    allItems = [...realItems, ...paginatedMocks];
+    mockHasMore = paginatedMocks.length < uniqueMocks.length;
   }
   
-  // With mock videos, we always have more to show (mock provides 25)
+  // Has more if real data has more OR mocks have more to show
   const hasMore = ENABLE_MOCK_VIDEOS 
-    ? allItems.length < 100 // Cap at 100 for mock mode
+    ? (query.hasNextPage ?? false) || mockHasMore
     : (query.hasNextPage ?? false);
 
   return {
