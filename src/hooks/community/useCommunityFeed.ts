@@ -6,6 +6,9 @@ import { isValidImageUrl } from '@/hooks/explore/urlValidation';
 export type CommunityMediaFilter = 'all' | 'shorts' | 'videos' | 'photos';
 export type CommunitySortOption = 'newest' | 'most-liked' | 'most-discussed' | 'friends-first';
 
+// Match section pages - 10 per load
+const PAGE_SIZE = 10;
+
 export interface CommunityContentItem extends ExploreContentItem {
   relationshipType: 'friend' | 'following';
   createdAt: string;
@@ -14,7 +17,6 @@ export interface CommunityContentItem extends ExploreContentItem {
 }
 
 interface UseCommunityFeedOptions {
-  pageSize?: number;
   mediaFilter?: CommunityMediaFilter;
   sortOption?: CommunitySortOption;
 }
@@ -35,7 +37,6 @@ interface UseCommunityFeedOptions {
  * - Friends first: friends sorted by newest, then followed sorted by newest
  */
 export function useCommunityFeed({
-  pageSize = 20,
   mediaFilter = 'all',
   sortOption = 'newest',
 }: UseCommunityFeedOptions = {}) {
@@ -83,24 +84,33 @@ export function useCommunityFeed({
 
       setCommunityCount({ friends: friendIds.size, following: followedIds.size });
 
+      console.log('[useCommunityFeed] 🔍 QUERY:', {
+        pageSize: PAGE_SIZE,
+        offset: nextOffset,
+        communityIdsCount: communityIds.size,
+        mediaFilter,
+        sortOption
+      });
+
       if (communityIds.size === 0) {
+        console.log('[useCommunityFeed] 📊 RESULT: No community members found');
         setItems([]);
         setHasMore(false);
         setLoading(false);
         return;
       }
 
-      // Build query
+      // Build query with aggregated counts
       let query = supabase
         .from('posts')
         .select(`
           id, content, created_at, user_id, badges,
-          post_media (id, media_type, media_url, duration_seconds, width, height)
+          post_media (id, media_type, media_url, duration_seconds, width, height),
+          post_likes (count),
+          post_comments (count)
         `)
-        .in('user_id', Array.from(communityIds));
-
-      // Apply media type filter
-      // Note: We'll filter on duration client-side for shorts since post_media is a relation
+        .in('user_id', Array.from(communityIds))
+        .eq('visibility', 'anyone'); // ✅ Only public posts
 
       // Apply sort order
       switch (sortOption) {
@@ -117,9 +127,14 @@ export function useCommunityFeed({
           break;
       }
 
-      // Fetch more items than needed for client-side filtering
-      const fetchSize = pageSize * 2;
-      const { data: posts, error } = await query.range(nextOffset, nextOffset + fetchSize - 1);
+      // Fetch exact PAGE_SIZE (no overfetch)
+      const { data: posts, error } = await query.range(nextOffset, nextOffset + PAGE_SIZE - 1);
+
+      console.log('[useCommunityFeed] 📊 RESULT:', {
+        postsReturned: posts?.length || 0,
+        hasMore: (posts?.length || 0) === PAGE_SIZE,
+        error: error?.message
+      });
 
       if (error) throw error;
 
@@ -130,30 +145,7 @@ export function useCommunityFeed({
         .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
 
-      // Get like counts
-      const postIds = (posts ?? []).map(p => p.id);
-      const { data: likeCounts } = await supabase
-        .from('post_likes')
-        .select('post_id')
-        .in('post_id', postIds);
-      
-      const likeMap = new Map<string, number>();
-      (likeCounts ?? []).forEach((l: { post_id: string }) => {
-        likeMap.set(l.post_id, (likeMap.get(l.post_id) || 0) + 1);
-      });
-
-      // Get comment counts
-      const { data: commentCounts } = await supabase
-        .from('post_comments')
-        .select('post_id')
-        .in('post_id', postIds);
-      
-      const commentMap = new Map<string, number>();
-      (commentCounts ?? []).forEach((c: { post_id: string }) => {
-        commentMap.set(c.post_id, (commentMap.get(c.post_id) || 0) + 1);
-      });
-
-      // Map and filter posts
+      // Map and filter posts - use aggregated counts from query
       let mappedItems = (posts ?? [])
         .map((post): CommunityContentItem | null => {
           const m = post.post_media?.[0];
@@ -179,6 +171,10 @@ export function useCommunityFeed({
           const userProfile = profiles?.find(p => p.id === post.user_id);
           const isFriend = friendIds.has(post.user_id);
 
+          // ✅ Use aggregated counts from main query (no N+1)
+          const likeCount = (post.post_likes as any)?.[0]?.count ?? 0;
+          const commentCount = (post.post_comments as any)?.[0]?.count ?? 0;
+
           return {
             id: post.id,
             type: kind,
@@ -193,13 +189,13 @@ export function useCommunityFeed({
               avatar: userProfile?.profile_photo_url || undefined,
             },
             title: post.content || '',
-            likes: likeMap.get(post.id) || 0,
-            comments: commentMap.get(post.id) || 0,
+            likes: likeCount,
+            comments: commentCount,
             shares: 0,
             isFollowing: true,
             relationshipType: isFriend ? 'friend' : 'following',
-            likeCount: likeMap.get(post.id) || 0,
-            commentCount: commentMap.get(post.id) || 0,
+            likeCount,
+            commentCount,
             badges: post.badges || [],
           };
         })
@@ -212,18 +208,18 @@ export function useCommunityFeed({
         mappedItems = [...friendPosts, ...followedPosts];
       }
 
-      // Trim to pageSize
-      const finalItems = mappedItems.slice(0, pageSize);
+      // ✅ hasMore based on PAGE_SIZE
+      const newHasMore = (posts?.length || 0) === PAGE_SIZE;
 
-      setItems(prev => reset ? finalItems : [...prev, ...finalItems]);
-      setHasMore(finalItems.length === pageSize);
-      setOffset(nextOffset + fetchSize);
+      setItems(prev => reset ? mappedItems : [...prev, ...mappedItems]);
+      setHasMore(newHasMore);
+      setOffset(nextOffset + PAGE_SIZE);
       setLoading(false);
     } catch (error) {
-      console.error('Error loading community feed:', error);
+      console.error('[useCommunityFeed] ❌ Error loading community feed:', error);
       setLoading(false);
     }
-  }, [offset, pageSize, mediaFilter, sortOption]);
+  }, [offset, mediaFilter, sortOption]);
 
   // Reload when filters change
   useEffect(() => {
@@ -231,6 +227,7 @@ export function useCommunityFeed({
     setOffset(0);
     setHasMore(true);
     load(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaFilter, sortOption]);
 
   return {
