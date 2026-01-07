@@ -169,31 +169,31 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
 
   // Fetch videos using React Query with caching
-  // All sections load with limit 20 to fill the UI
+  // Each section shows max 5 videos to keep the page compact
   const { videos: recommendedVideosRaw } = useLongFormVideosQuery({
     section: 'recommended',
-    limit: 20,
+    limit: 5,
     category: categoryFilter,
     getBoostScore: memoizedBoostScore,
   });
 
   const { videos: trendingVideosRaw } = useLongFormVideosQuery({
     section: 'trending',
-    limit: 20,
+    limit: 5,
     category: categoryFilter,
     enabled: trendingTriggered,
   });
 
   const { videos: followedVideosRaw } = useLongFormVideosQuery({
     section: 'following',
-    limit: 20,
+    limit: 5,
     followedCreatorIds: followedIds,
     category: categoryFilter,
   });
 
   const { videos: coursesVideosRaw } = useLongFormVideosQuery({
     section: 'courses',
-    limit: 20,
+    limit: 5,
     category: categoryFilter,
     enabled: coursesTriggered,
   });
