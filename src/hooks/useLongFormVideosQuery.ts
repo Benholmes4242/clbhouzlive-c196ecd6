@@ -2,6 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
+import { ENABLE_MOCK_VIDEOS } from '@/lib/featureFlags';
+import { 
+  MOCK_RECOMMENDED_VIDEOS, 
+  MOCK_TRENDING_VIDEOS, 
+  MOCK_FOLLOWING_VIDEOS, 
+  MOCK_COURSES_VIDEOS 
+} from '@/mocks/mockLongFormVideos';
 
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
@@ -207,6 +214,7 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
  * - 30 min gcTime (keeps data in cache)
  * - Query key based on all filter params
  * - enabled prop for lazy loading
+ * - ENABLE_MOCK_VIDEOS flag injects 25 mock videos per section for UI testing
  */
 export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) => {
   const { 
@@ -251,12 +259,36 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
     refetchOnWindowFocus: false,
   });
 
+  // Inject mock videos when flag is enabled (for UI testing)
+  let videos = query.data || [];
+  if (ENABLE_MOCK_VIDEOS && !creatorUserId && !searchQuery) {
+    const mockVideos = getMockVideosForSection(section);
+    // Combine real + mock, respecting limit
+    videos = [...videos, ...mockVideos].slice(0, limit);
+  }
+
   return {
-    videos: query.data || [],
+    videos,
     isLoading: query.isLoading,
     error: query.error,
     refetch: query.refetch,
   };
 };
+
+// Helper to get mock videos for a section
+function getMockVideosForSection(section: string): LongFormVideo[] {
+  switch (section) {
+    case 'recommended':
+      return MOCK_RECOMMENDED_VIDEOS;
+    case 'trending':
+      return MOCK_TRENDING_VIDEOS;
+    case 'following':
+      return MOCK_FOLLOWING_VIDEOS;
+    case 'courses':
+      return MOCK_COURSES_VIDEOS;
+    default:
+      return MOCK_RECOMMENDED_VIDEOS;
+  }
+}
 
 export default useLongFormVideosQuery;
