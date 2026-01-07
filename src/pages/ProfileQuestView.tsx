@@ -59,6 +59,11 @@ const ProfileQuestView: React.FC = () => {
   // Ref for scrolling to journey map
   const journeyMapRef = useRef<HTMLDivElement>(null);
   
+  // Scroll to top on mount - immediate, no animation
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+  
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
   const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
   const isLoading = questLoading || progressLoading;
