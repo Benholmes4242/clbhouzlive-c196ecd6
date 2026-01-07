@@ -82,7 +82,6 @@ export function useWatchPostsV2() {
           post_comments(count)
         `)
         .eq('visibility', 'anyone')
-        .is('deleted_at', null) // Filter soft-deleted posts
         .eq('post_media.media_type', 'video')
         .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
