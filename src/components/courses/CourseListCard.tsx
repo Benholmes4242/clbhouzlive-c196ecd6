@@ -95,7 +95,7 @@ export const CourseListCard: React.FC<CourseListCardProps> = ({
       </div>
 
       {/* Meta area - white bar */}
-      <div className="px-4 py-3 bg-background space-y-0.5">
+      <div className="px-4 py-3 bg-white space-y-0.5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-foreground truncate">

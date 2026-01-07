@@ -419,7 +419,7 @@ export function CoursesLeaderboardView() {
         </div>
 
         {/* Sort pills - sticky */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-2 -mx-4 px-4">
+        <div className="sticky top-0 z-10 bg-[var(--bg-page)]/95 backdrop-blur-sm py-2 -mx-4 px-4">
           <div className="overflow-x-auto pb-1 -mx-1 px-1">
             <div className="inline-flex rounded-sq-pill bg-muted/60 p-1 text-xs font-medium min-w-max">
               {SORT_OPTIONS.map((opt) => (

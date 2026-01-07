@@ -220,7 +220,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       </div>
 
       {/* Meta area - standardized padding */}
-      <div className={`${META_PADDING} bg-background`}>
+      <div className={`${META_PADDING} bg-white`}>
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0 space-y-1">
             {/* Course name */}

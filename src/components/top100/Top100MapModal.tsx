@@ -28,7 +28,7 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
         className="h-full p-0 overflow-hidden"
         hideCloseButton
       >
-        <div className="h-full flex flex-col bg-background">
+        <div className="h-full flex flex-col bg-[var(--bg-page)]">
           {/* Page header */}
           <header className="flex-shrink-0 px-5 pt-4 pb-3 md:px-8 md:pt-6 md:pb-4 border-b border-border/40">
             {/* Back link - matches Top100BackButton styling */}

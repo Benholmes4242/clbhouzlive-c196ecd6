@@ -390,7 +390,7 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background compact-header-offset">
+      <PageRoot className="min-h-screen bg-[var(--bg-page)] compact-header-offset">
         <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-4">
             <div className="h-[260px] bg-muted" />
@@ -410,7 +410,7 @@ const Top100List = () => {
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
   return (
-    <PageRoot className="min-h-screen bg-background compact-header-offset">
+    <PageRoot className="min-h-screen bg-[var(--bg-page)] compact-header-offset">
       <main>
         {/* 1. Full-bleed Hero + Progress Slab */}
         {listSummary && (
