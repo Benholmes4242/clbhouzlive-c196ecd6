@@ -83,11 +83,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   // Unified media autoplay with consistent thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({
-    mode: 'grid',
+    mode: 'videos',        // Isolated surface for Videos page (no conflict with Watch/Profile)
+    surface: 'videos',     // Use videos surface for MediaRuntime
     preloadMargin: 300,
     scrollSettleDelay: 200,
     startThreshold: 0.4,   // Play at 40% visible
-    stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
+    stopThreshold: 0.25,   // Pause at 25% visible (aligned with Watch/Profile)
   });
 
   // Track if first video has been preloaded

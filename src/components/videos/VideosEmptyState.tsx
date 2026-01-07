@@ -41,7 +41,7 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
     return (
       <div className="flex flex-col items-center justify-center py-6 px-4 bg-muted/20 rounded-lg border border-border/40">
         <p className="text-sm text-muted-foreground text-center">
-          We're new around here — and waiting for the community to upload more long-form videos. Check back soon.
+          We're new around here — and waiting for the community to upload more long-form videos (4+ minutes). Check back soon.
         </p>
         <Button
           variant="secondary"

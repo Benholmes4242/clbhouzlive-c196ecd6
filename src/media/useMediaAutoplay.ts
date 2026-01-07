@@ -29,8 +29,8 @@ export interface MediaAutoplayRegistration {
 }
 
 export interface UseMediaAutoplayOptions {
-  // Mode
-  mode?: 'grid' | 'feed';
+  // Mode: 'grid' for sparse grids (Watch/Profile), 'feed' for dense feeds, 'videos' for long-form YouTube-style
+  mode?: 'grid' | 'feed' | 'videos';
   
   // Surface for runtime (maps mode to surface)
   surface?: MediaSurface;

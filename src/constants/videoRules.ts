@@ -6,12 +6,12 @@
  */
 
 // Duration threshold in seconds
-export const VIDEO_DURATION_THRESHOLD_SECONDS = 180; // 3 minutes
+export const VIDEO_DURATION_THRESHOLD_SECONDS = 240; // 4 minutes
 
 /**
  * Video Classification:
- * - SHORT: duration < 3 minutes (180 seconds) → Watch tab ONLY
- * - LONG_FORM: duration ≥ 3 minutes (180 seconds) → Videos tab ONLY
+ * - SHORT: duration < 4 minutes (240 seconds) → Watch tab ONLY
+ * - LONG_FORM: duration ≥ 4 minutes (240 seconds) → Videos tab ONLY
  * 
  * NO CROSSOVER between tabs.
  */
