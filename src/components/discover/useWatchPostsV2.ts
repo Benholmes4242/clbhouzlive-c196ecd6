@@ -85,65 +85,23 @@ export function useWatchPostsV2() {
 
       if (error) throw error;
 
-      // Separate actor IDs by type
-      const userActorIds: string[] = [];
-      const businessActorIds: string[] = [];
-      
-      postsData?.forEach(p => {
-        if (p.actor_id) {
-          if (p.actor_type === 'business') {
-            businessActorIds.push(p.actor_id);
-          } else {
-            userActorIds.push(p.actor_id);
-          }
-        }
-      });
+      // Get unique actor IDs
+      const actorIds = [...new Set(postsData?.map(p => p.actor_id).filter(Boolean))] as string[];
 
-      // Fetch user profiles
-      const { data: userProfiles } = userActorIds.length > 0
-        ? await supabase
-            .from('user_profiles')
-            .select('id, display_name, username, profile_photo_url')
-            .in('id', [...new Set(userActorIds)])
-        : { data: [] };
+      // Fetch user profiles for all actors
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', actorIds);
 
-      // Fetch business accounts
-      const { data: businessAccounts } = businessActorIds.length > 0
-        ? await supabase
-            .from('business_accounts')
-            .select('id, name, slug, logo_url')
-            .in('id', [...new Set(businessActorIds)])
-        : { data: [] };
+      // Create a map for quick lookup
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) ?? []);
 
-      // Create lookup maps with proper typing
-      const userProfileMap = new Map<string, { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null }>(
-        (userProfiles || []).map(p => [p.id, p])
-      );
-      const businessAccountMap = new Map<string, { id: string; name: string; slug: string | null; logo_url: string | null }>(
-        (businessAccounts || []).map(b => [b.id, b])
-      );
-
-      // Attach user data to posts (normalize business accounts to user-like structure)
-      const postsWithUsers = (postsData || []).map(post => {
-        if (post.actor_type === 'business' && post.actor_id) {
-          const business = businessAccountMap.get(post.actor_id);
-          return {
-            ...post,
-            user: business ? {
-              id: business.id,
-              display_name: business.name,
-              username: business.slug,
-              profile_photo_url: business.logo_url,
-            } : null
-          };
-        } else if (post.actor_id) {
-          return {
-            ...post,
-            user: userProfileMap.get(post.actor_id) ?? null
-          };
-        }
-        return { ...post, user: null };
-      });
+      // Attach user data to posts
+      const postsWithUsers = (postsData || []).map(post => ({
+        ...post,
+        user: post.actor_id ? profileMap.get(post.actor_id) : null
+      }));
 
       // Filter posts that have valid media
       const activityPosts = postsWithUsers.filter(
@@ -154,11 +112,6 @@ export function useWatchPostsV2() {
       const items = activityPosts
         .map((post, index) => activityPostToUnified(post as any, startRange + index))
         .filter((item): item is UnifiedMediaItem => item !== null);
-
-      // Debug: log first item creator
-      if (items.length > 0) {
-        console.log('[WatchPostsV2] First item creator:', items[0].creator);
-      }
 
       const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
