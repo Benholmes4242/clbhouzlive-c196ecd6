@@ -1,98 +1,97 @@
 /**
- * HubActionDock - Persistent bottom action dock
- * 4 primary actions: Create Game, Ask Echo, Capture Moment, Profile
+ * HubActionDock - Bottom navigation bar for Hub
+ * Matches the site-wide bottom nav styling
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Bot, Camera, User } from 'lucide-react';
 import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
+import { cn } from '@/lib/utils';
 
-interface DockButtonProps {
-  icon: React.ReactNode;
+interface HubNavItem {
+  id: string;
   label: string;
-  onClick: () => void;
+  icon: React.ComponentType<{ className?: string }>;
+  path: string;
+  external?: boolean;
 }
 
-function DockButton({ icon, label, onClick }: DockButtonProps) {
-  const handleClick = () => {
-    haptic('light');
-    onClick();
-  };
-
-  return (
-    <button
-      onClick={handleClick}
-      className="flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-all active:scale-[0.95]"
-      style={{ background: 'transparent' }}
-    >
-      <div 
-        className="w-11 h-11 rounded-2xl flex items-center justify-center"
-        style={{ 
-          background: 'var(--hub-glass-bg)',
-          border: '1px solid var(--hub-stroke)',
-        }}
-      >
-        {icon}
-      </div>
-      <span 
-        className="text-[11px] font-medium"
-        style={{ color: 'var(--hub-text-sub)' }}
-      >
-        {label}
-      </span>
-    </button>
-  );
-}
+const hubNavItems: HubNavItem[] = [
+  { id: 'game', label: 'Game', icon: Plus, path: '/hub/create-game' },
+  { id: 'echo', label: 'Echo', icon: Bot, path: '/hub/echo' },
+  { id: 'moment', label: 'Moment', icon: Camera, path: '/create-moment' },
+  { id: 'profile', label: 'Profile', icon: User, path: '/profile', external: true },
+];
 
 export function HubActionDock() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { navigateFromHub, close } = useHub();
+
+  const handleItemClick = (item: HubNavItem) => {
+    haptic('light');
+    if (item.external) {
+      close();
+      navigate(item.path);
+    } else {
+      navigateFromHub(item.path);
+    }
+  };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[10000]"
+      className="fixed bottom-0 left-0 right-0 z-[10000] bottom-nav-fixed"
       style={{ 
-        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        background: 'hsl(var(--background))',
+        borderTop: '1px solid hsl(var(--border))',
       }}
     >
-      <div 
-        className="mx-3 rounded-3xl px-4 py-2"
-        style={{ 
-          background: 'rgba(250, 250, 251, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid var(--hub-stroke)',
-          boxShadow: '0 -4px 24px rgba(31, 36, 40, 0.08)',
-        }}
-      >
-        <div className="flex justify-around items-center">
-          <DockButton
-            icon={<Plus className="w-5 h-5" style={{ color: 'var(--hub-text)' }} />}
-            label="Game"
-            onClick={() => navigateFromHub('/hub/create-game')}
-          />
+      <nav className="w-full h-[55px] flex items-center justify-around">
+        {hubNavItems.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
           
-          <DockButton
-            icon={<Bot className="w-5 h-5" style={{ color: 'var(--hub-text)' }} />}
-            label="Echo"
-            onClick={() => navigateFromHub('/hub/echo')}
-          />
-          
-          <DockButton
-            icon={<Camera className="w-5 h-5" style={{ color: 'var(--hub-text)' }} />}
-            label="Moment"
-            onClick={() => navigateFromHub('/create-moment')}
-          />
-          
-          <DockButton
-            icon={<User className="w-5 h-5" style={{ color: 'var(--hub-text)' }} />}
-            label="Profile"
-            onClick={() => { close(); navigate('/profile'); }}
-          />
-        </div>
-      </div>
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleItemClick(item)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 flex-1 py-1",
+                "transition-transform duration-[120ms] ease-out",
+                "active:scale-95",
+                "focus:outline-none"
+              )}
+              aria-label={item.label}
+            >
+              <Icon 
+                className={cn(
+                  "h-[26px] w-[26px] transition-colors duration-300",
+                  "[stroke-width:1.5]",
+                  active 
+                    ? "text-slate-800 opacity-100" 
+                    : "text-slate-500 opacity-90"
+                )}
+              />
+              
+              <span 
+                className={cn(
+                  "text-[10px] leading-none transition-colors duration-300",
+                  active 
+                    ? "text-slate-800" 
+                    : "text-slate-500"
+                )}
+              >
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
