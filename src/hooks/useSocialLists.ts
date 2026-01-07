@@ -3,6 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 
 const PAGE_SIZE = 30;
 
+type UserProfileRow = {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  profile_photo_url: string | null;
+  home_club: string | null;
+  eg_handicap_index: number | null;
+};
+
 export type SocialUser = {
   id: string;
   username: string;
@@ -23,6 +32,31 @@ function buildRange(pageParam: number) {
   return { from, to };
 }
 
+function toSocialUser(profile: UserProfileRow): SocialUser {
+  return {
+    id: profile.id,
+    username: profile.username || '',
+    displayName: profile.display_name || profile.username || 'Golfer',
+    avatarUrl: profile.profile_photo_url,
+    homeClub: profile.home_club,
+    handicapIndex: profile.eg_handicap_index,
+  };
+}
+
+async function fetchProfilesByIds(ids: string[]): Promise<Map<string, UserProfileRow>> {
+  if (ids.length === 0) return new Map();
+
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
+    .in('id', ids)
+    .is('deleted_at', null);
+
+  if (error) throw error;
+
+  return new Map((data || []).map((p) => [p.id, p as UserProfileRow]));
+}
+
 // Followers of userId
 export function usePaginatedFollowers(userId: string | undefined) {
   return useInfiniteQuery<PageResult>({
@@ -34,39 +68,25 @@ export function usePaginatedFollowers(userId: string | undefined) {
 
       const { from, to } = buildRange(pageParam as number);
 
-      const { data, error, count } = await supabase
+      // NOTE: Avoid FK-join syntax here; this project doesn't expose a
+      // relationship between user_follows -> user_profiles in PostgREST schema cache.
+      const { data: followRows, error, count } = await supabase
         .from('user_follows')
-        .select(`
-          follower_id,
-          user_profiles!user_follows_follower_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url,
-            home_club,
-            handicap_index
-          )
-        `, { count: 'exact' })
+        .select('follower_id', { count: 'exact' })
         .eq('following_id', userId)
         .order('created_at', { ascending: false })
         .range(from, to);
 
       if (error) throw error;
 
-      const users: SocialUser[] = (data || [])
-        .map((row: any) => {
-          const profile = row.user_profiles;
-          if (!profile) return null;
-          return {
-            id: profile.id,
-            username: profile.username || '',
-            displayName: profile.display_name || profile.username || 'Golfer',
-            avatarUrl: profile.profile_photo_url,
-            homeClub: profile.home_club,
-            handicapIndex: profile.handicap_index,
-          };
-        })
-        .filter(Boolean) as SocialUser[];
+      const followerIds = (followRows || []).map((r: any) => r.follower_id).filter(Boolean) as string[];
+      if (followerIds.length === 0) return { users: [], hasMore: false };
+
+      const profilesById = await fetchProfilesByIds(followerIds);
+      const users = followerIds
+        .map((id) => profilesById.get(id))
+        .filter(Boolean)
+        .map((p) => toSocialUser(p!));
 
       const total = count ?? users.length;
       const hasMore = to + 1 < total;
@@ -90,39 +110,24 @@ export function usePaginatedFollowing(userId: string | undefined) {
 
       const { from, to } = buildRange(pageParam as number);
 
-      const { data, error, count } = await supabase
+      // NOTE: Avoid FK-join syntax here for the same reason as followers.
+      const { data: followRows, error, count } = await supabase
         .from('user_follows')
-        .select(`
-          following_id,
-          user_profiles!user_follows_following_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url,
-            home_club,
-            handicap_index
-          )
-        `, { count: 'exact' })
+        .select('following_id', { count: 'exact' })
         .eq('follower_id', userId)
         .order('created_at', { ascending: false })
         .range(from, to);
 
       if (error) throw error;
 
-      const users: SocialUser[] = (data || [])
-        .map((row: any) => {
-          const profile = row.user_profiles;
-          if (!profile) return null;
-          return {
-            id: profile.id,
-            username: profile.username || '',
-            displayName: profile.display_name || profile.username || 'Golfer',
-            avatarUrl: profile.profile_photo_url,
-            homeClub: profile.home_club,
-            handicapIndex: profile.handicap_index,
-          };
-        })
-        .filter(Boolean) as SocialUser[];
+      const followingIds = (followRows || []).map((r: any) => r.following_id).filter(Boolean) as string[];
+      if (followingIds.length === 0) return { users: [], hasMore: false };
+
+      const profilesById = await fetchProfilesByIds(followingIds);
+      const users = followingIds
+        .map((id) => profilesById.get(id))
+        .filter(Boolean)
+        .map((p) => toSocialUser(p!));
 
       const total = count ?? users.length;
       const hasMore = to + 1 < total;
@@ -146,29 +151,11 @@ export function usePaginatedFriends(userId: string | undefined) {
 
       const { from, to } = buildRange(pageParam as number);
 
-      // Fetch friendships where user is either party and status is accepted
-      const { data, error, count } = await supabase
+      // Fetch friendships where user is either party and status is accepted.
+      // NOTE: Avoid FK-join syntax here; it may not exist in PostgREST schema cache.
+      const { data: rows, error, count } = await supabase
         .from('user_friends')
-        .select(`
-          user_id,
-          friend_id,
-          user_profiles!user_friends_user_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url,
-            home_club,
-            handicap_index
-          ),
-          friend_profiles:user_profiles!user_friends_friend_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url,
-            home_club,
-            handicap_index
-          )
-        `, { count: 'exact' })
+        .select('user_id, friend_id', { count: 'exact' })
         .eq('status', 'accepted')
         .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
         .order('created_at', { ascending: false })
@@ -176,23 +163,17 @@ export function usePaginatedFriends(userId: string | undefined) {
 
       if (error) throw error;
 
-      const users: SocialUser[] = (data || [])
-        .map((row: any) => {
-          // If current user is user_id, friend is in friend_profiles
-          // If current user is friend_id, friend is in user_profiles
-          const profile = row.user_id === userId ? row.friend_profiles : row.user_profiles;
-          if (!profile) return null;
+      const friendIds = (rows || [])
+        .map((row: any) => (row.user_id === userId ? row.friend_id : row.user_id))
+        .filter(Boolean) as string[];
 
-          return {
-            id: profile.id,
-            username: profile.username || '',
-            displayName: profile.display_name || profile.username || 'Golfer',
-            avatarUrl: profile.profile_photo_url,
-            homeClub: profile.home_club,
-            handicapIndex: profile.handicap_index,
-          };
-        })
-        .filter(Boolean) as SocialUser[];
+      if (friendIds.length === 0) return { users: [], hasMore: false };
+
+      const profilesById = await fetchProfilesByIds(friendIds);
+      const users = friendIds
+        .map((id) => profilesById.get(id))
+        .filter(Boolean)
+        .map((p) => toSocialUser(p!));
 
       const total = count ?? users.length;
       const hasMore = to + 1 < total;
