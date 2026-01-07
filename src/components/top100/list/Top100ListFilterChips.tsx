@@ -78,7 +78,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200">
             {FILTER_OPTIONS.map((option) => {
               const isActive = activeFilter === option.value;
               return (
@@ -113,7 +113,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200">
             {availableSortOptions.map((option) => {
               const isActive = activeSort === option.value;
               // When Played/Unplayed: only rating_high is enabled
