@@ -51,6 +51,8 @@ export interface ActivityGridV2Config {
   playThreshold: number;
   /** Pause threshold (0-1) - stop playing at this visibility (hysteresis) */
   pauseThreshold: number;
+  /** Show like count on tiles */
+  showLikes?: boolean;
 }
 
 export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
@@ -61,4 +63,5 @@ export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
   maxAutoplay: 2,
   playThreshold: 0.6,    // Start playing at 60% visible
   pauseThreshold: 0.2,   // Stop playing at 20% visible (hysteresis)
+  showLikes: true,       // Show likes by default
 };

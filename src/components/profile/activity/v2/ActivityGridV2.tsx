@@ -265,9 +265,9 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
               >
                 <UnifiedMediaTile
                   item={item}
-                  config={{
+                config={{
                     showCreator: false,
-                    showLikes: true,
+                    showLikes: config.showLikes ?? true,
                     infiniteScroll: true,
                     autoplayEnabled: config.autoplayEnabled && !prefersReducedMotion,
                     surface: 'profile-activity',
