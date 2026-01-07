@@ -12,6 +12,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPostsV2 } from '@/components/profile/activity/v2';
+import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
@@ -114,6 +115,7 @@ const ProfilePageV2: React.FC = () => {
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
   const { data: top100Overview } = useTop100Overview(profileUserId);
   const { items: posts } = useActivityPostsV2(profileUserId);
+  const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
   // Determine if viewing own profile
@@ -189,7 +191,7 @@ const ProfilePageV2: React.FC = () => {
     fetchStats();
   }, [profile?.id, isPersonal]);
 
-  const postsCount = posts.length;
+  // postsCount now comes from usePersonalPostsCount (fetches total from DB)
   const unlockedAchievements = achievements || [];
 
   // Format handicap with 1 decimal place
@@ -553,7 +555,7 @@ const ProfilePageV2: React.FC = () => {
             <span className="text-sm text-slate-500">Posts</span>
             <AnimatedNumber 
               value={postsCount} 
-              isLoading={statsLoading}
+              isLoading={postsCountLoading}
               minCh={2}
               className="text-base font-semibold text-[#0F0F0F]"
             />
