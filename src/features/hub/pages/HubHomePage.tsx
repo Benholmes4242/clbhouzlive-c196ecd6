@@ -198,7 +198,7 @@ export function HubHomePage() {
           </div>
 
           {/* Zone 3: Games - Primary section, flex-1 with internal scroll */}
-          <div className="mt-3 flex-1 min-h-[180px]">
+          <div className="flex-1 min-h-[180px]">
             <YourGamesTile />
           </div>
         </div>
