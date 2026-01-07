@@ -172,7 +172,7 @@ export function CourseSearchSheet({
                 ? 'left-0 right-0 bottom-0 max-h-[80vh] rounded-t-2xl' 
                 : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] rounded-xl'
               }
-              bg-card border-t md:border border-border shadow-2xl
+              bg-white border-t md:border border-slate-200 shadow-2xl
               flex flex-col
             `}
             style={{
@@ -180,7 +180,7 @@ export function CourseSearchSheet({
             }}
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 flex items-center gap-3">
+            <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
               <div className="flex-1">
                 <input
                   ref={inputRef}
