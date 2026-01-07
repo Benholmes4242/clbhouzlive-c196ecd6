@@ -6,8 +6,8 @@
  */
 
 // Duration threshold in seconds
-// ⚠️ TEMPORARILY 10 for testing - change back to 240 when you have real long-form content!
-export const VIDEO_DURATION_THRESHOLD_SECONDS = 10; // 10 seconds (TESTING ONLY)
+// ⚠️ TEMPORARILY 60 for testing - change back to 240 when you have real long-form content!
+export const VIDEO_DURATION_THRESHOLD_SECONDS = 60; // 1 minute (TESTING ONLY)
 
 /**
  * Video Classification:
