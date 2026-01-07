@@ -147,8 +147,9 @@ export const VideosSectionPage: React.FC = () => {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!hasMore || !fetchNextPage) {
-      console.log('[VideosSectionPage] Infinite scroll not setup:', { hasMore, hasFetchNextPage: !!fetchNextPage });
+    // Don't setup observer until data has loaded
+    if (!hasMore || !fetchNextPage || isLoading) {
+      console.log('[VideosSectionPage] Infinite scroll not setup:', { hasMore, hasFetchNextPage: !!fetchNextPage, isLoading });
       return;
     }
     
@@ -230,7 +231,7 @@ export const VideosSectionPage: React.FC = () => {
       }
       console.log('[VideosSectionPage] Cleanup complete');
     };
-  }, [hasMore, fetchNextPage]);
+  }, [hasMore, fetchNextPage, isLoading]);
 
   const handleVideoClick = (id: string) => {
     runtimeUserTap(id);
