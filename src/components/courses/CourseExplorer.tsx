@@ -372,7 +372,7 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 transition-all duration-150 text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-white border border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 transition-all duration-150 text-base placeholder:text-[15px]"
         />
         {isFetching && searchTerm && (
           <div className="absolute right-10 top-1/2 -translate-y-1/2">
@@ -397,17 +397,17 @@ const CourseExplorer = () => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
               selectedRegion !== PRIMARY_REGIONS.ALL 
                 ? 'border-slate-300 text-foreground' 
-                : 'border-border/60'
+                : 'border-slate-200'
             }`}>
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                 <SelectValue placeholder="All Regions" />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
+            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm">
               {regionOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -424,14 +424,14 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-card justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
               selectedSubregion !== 'all' 
                 ? 'border-slate-300 text-foreground' 
-                : 'border-border/60'
+                : 'border-slate-200'
             }`}>
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
+            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm">
               <SelectItem value="all">All sub-regions</SelectItem>
               {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
                 <SelectItem key={s} value={normalizeLabel(s)}>
