@@ -181,7 +181,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     section: 'trending',
     limit: 5,
     category: categoryFilter,
-    enabled: trendingTriggered,
   });
 
   const { videos: followedVideosRaw } = useLongFormVideosQuery({
@@ -195,7 +194,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     section: 'courses',
     limit: 5,
     category: categoryFilter,
-    enabled: coursesTriggered,
   });
 
   // Hard de-dupe: each video can appear in only ONE section across the entire page
