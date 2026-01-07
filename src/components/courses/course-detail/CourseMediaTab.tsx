@@ -179,35 +179,37 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   // Loading state with proper skeleton placeholders
   if (isLoading) {
     return (
-      <div className="space-y-0">
-        {/* Header skeleton */}
-        <section className="px-4 pt-6 pb-6">
+      <div className="flex flex-col">
+        {/* Header skeleton - slate-50 */}
+        <section className="px-4 pt-6 pb-6 bg-slate-50">
           <div className="space-y-2">
-            <div className="h-3 w-24 bg-muted rounded animate-pulse" />
-            <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-            <div className="h-3 w-28 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+            <div className="h-3 w-28 bg-slate-200 rounded animate-pulse" />
           </div>
         </section>
-        {/* Filter skeleton */}
-        <div className="px-4 pt-4 pb-4 bg-muted/30">
-          <div className="h-3 w-20 bg-muted rounded animate-pulse mb-3" />
-          <div className="h-10 w-full bg-muted rounded-sq-md animate-pulse" />
-        </div>
-        {/* Grid skeleton - 2 tiles matching final aspect ratio */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-muted/30 pt-6">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square bg-muted animate-pulse" />
-          ))}
-        </div>
+        {/* Filter skeleton - slate-100 */}
+        <section className="px-4 pt-4 pb-4 bg-slate-100">
+          <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-3" />
+          <div className="h-10 w-full bg-slate-200 rounded-sq-md animate-pulse" />
+        </section>
+        {/* Grid skeleton - slate-50 */}
+        <section className="bg-slate-50">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-200">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="aspect-square bg-slate-100 animate-pulse" />
+            ))}
+          </div>
+        </section>
       </div>
     );
   }
 
-  // Error state
+  // Error state - slate-50 background
   if (isError) {
     return (
-      <div className="px-4 py-8">
-        <div className="rounded-sq-lg border border-border/60 bg-card px-4 py-6 text-center">
+      <section className="px-4 py-8 bg-slate-50">
+        <div className="rounded-sq-lg border border-slate-200 bg-white px-4 py-6 text-center">
           <p className="text-sm font-semibold text-foreground">Couldn't load media</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Something went wrong. Please try again.
@@ -215,12 +217,12 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => refetch()}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98] transition-all"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-slate-50 active:scale-[0.98] transition-all"
           >
             Tap to retry
           </button>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -304,21 +306,23 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   const hasAnyMedia = exploreItems.length > 0;
 
   return (
-    <div className="space-y-0">
-      {/* Summary Card - only show if media exists */}
+    <div className="flex flex-col">
+      {/* Summary Card - slate-50 background to match About tab pattern */}
       {hasAnyMedia && (
-        <CourseMediaSummaryCard
-          photoCount={summary.photoCount}
-          videoCount={summary.videoCount}
-          contributorsCount={contributors.length}
-          courseName={courseName}
-          onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
-        />
+        <section className="bg-slate-50">
+          <CourseMediaSummaryCard
+            photoCount={summary.photoCount}
+            videoCount={summary.videoCount}
+            contributorsCount={contributors.length}
+            courseName={courseName}
+            onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
+          />
+        </section>
       )}
 
-      {/* Sort/Filter Bar - only show if media exists */}
+      {/* Sort/Filter Bar - slate-100 background */}
       {hasAnyMedia && (
-        <div className="px-4 pt-8 pb-6 bg-muted/30">
+        <section className="px-4 pt-8 pb-6 bg-slate-100">
           <p className="mb-4 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
             Sort &amp; filter
           </p>
@@ -335,13 +339,13 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
               ))}
             </TabsList>
           </Tabs>
-        </div>
+        </section>
       )}
 
-      {/* Empty state - no media at all (on background, not in card) */}
+      {/* Empty state - no media at all (slate-50 background) */}
       {!hasAnyMedia && !isLoading && (
-        <div className="px-4 py-12 flex flex-col items-center text-center">
-          <div className="h-12 w-12 rounded-full bg-muted/60 flex items-center justify-center mb-4">
+        <section className="px-4 py-12 bg-slate-50 flex flex-col items-center text-center">
+          <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
             <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -361,12 +365,12 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
             </svg>
             Add a photo or video
           </button>
-        </div>
+        </section>
       )}
 
-      {/* Filtered empty state - has media but filter shows none */}
+      {/* Filtered empty state - has media but filter shows none (slate-50 background) */}
       {hasAnyMedia && filteredItems.length === 0 && !isLoading && (
-        <div className="px-4 py-8 flex flex-col items-center text-center">
+        <section className="px-4 py-8 bg-slate-50 flex flex-col items-center text-center">
           <p className="text-sm font-semibold text-foreground mb-1">
             {filterMode === 'photos' ? 'No photos yet' : 'No videos yet'}
           </p>
@@ -376,41 +380,43 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
           <button
             type="button"
             onClick={() => setFilterMode('most_recent')}
-            className="inline-flex items-center gap-1.5 rounded-sq-sm border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-1.5 rounded-sq-sm border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-slate-50 active:scale-[0.98] transition-all"
           >
             Clear filter
           </button>
-        </div>
+        </section>
       )}
 
-      {/* Square Media Grid - 2 columns mobile, 4 desktop with lazy loading */}
+      {/* Square Media Grid - 2 columns mobile, 4 desktop with lazy loading (slate-50 background) */}
       {filteredItems.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-muted/30">
-          {mediaItems.map((item, index) => {
-            const isVisible = visibleIndices.has(index);
-            
-            // Render placeholder for tiles not yet visible
-            if (!isVisible) {
+        <section className="bg-slate-50">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-200">
+            {mediaItems.map((item, index) => {
+              const isVisible = visibleIndices.has(index);
+              
+              // Render placeholder for tiles not yet visible
+              if (!isVisible) {
+                return (
+                  <LazyMediaGridItem
+                    key={`placeholder-${item.id}`}
+                    index={index}
+                    registerTile={registerTile}
+                  />
+                );
+              }
+              
               return (
-                <LazyMediaGridItem
-                  key={`placeholder-${item.id}`}
-                  index={index}
-                  registerTile={registerTile}
+                <MediaGridItem
+                  key={item.id}
+                  item={item}
+                  onClick={handleMediaClick}
+                  // Show overflow count on 4th tile (index 3) if there's more
+                  overflowCount={index === visibleCount - 1 && overflowCount > 0 ? overflowCount : undefined}
                 />
               );
-            }
-            
-            return (
-              <MediaGridItem
-                key={item.id}
-                item={item}
-                onClick={handleMediaClick}
-                // Show overflow count on 4th tile (index 3) if there's more
-                overflowCount={index === visibleCount - 1 && overflowCount > 0 ? overflowCount : undefined}
-              />
-            );
-          })}
-        </div>
+            })}
+          </div>
+        </section>
       )}
 
       {/* Phase 2 Fix #5: Single lightbox implementation only */}
