@@ -176,15 +176,15 @@ export function YourGamesTile() {
           </div>
           <button
             onClick={openCreateGame}
-            className="text-[15px] font-medium transition"
+            className="text-[14px] font-normal transition"
             style={{ 
               background: 'transparent',
               border: 'none',
-              color: 'var(--hub-text-body)',
+              color: 'var(--hub-text-muted)',
               padding: 0,
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
             aria-label="Create a Game"
           >
             Create a Game +
