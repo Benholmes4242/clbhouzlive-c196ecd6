@@ -197,8 +197,8 @@ export function HubHomePage() {
             <HubMessagesCard />
           </div>
 
-          {/* Zone 3: Games - Primary section, flex-1 with internal scroll */}
-          <div className="mt-2 flex-1 min-h-[180px]">
+          {/* Zone 3: Games - Primary section, flex-1 with internal scroll, 10px gap to nav */}
+          <div className="mt-2 mb-[10px] flex-1 min-h-[180px]">
             <YourGamesTile />
           </div>
         </div>
