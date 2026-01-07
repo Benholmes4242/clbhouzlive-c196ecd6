@@ -185,7 +185,7 @@ export function HubHomePage() {
           className="w-full h-full flex flex-col px-3.5"
           style={{
             paddingTop: 'env(safe-area-inset-top, 0px)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 79px)', // 55px nav + 12px gap + 12px buffer
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 65px)', // 55px nav + 10px gap
             overflow: 'hidden',
           }}
         >
