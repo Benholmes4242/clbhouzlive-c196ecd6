@@ -4,6 +4,9 @@ import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
 const PAGE_SIZE = 10;
 
+// PRODUCTION: 4 minutes minimum for long-form videos
+const VIDEO_DURATION_THRESHOLD_SECONDS = 240;
+
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
 interface LongFormVideosPage {
@@ -30,26 +33,25 @@ const formatDuration = (seconds: number): string => {
 };
 
 /**
- * Simple infinite scroll hook - only filters for horizontal videos
+ * Production infinite scroll hook for long-form videos (≥4 minutes, public visibility)
  */
 export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOptions) {
   const { section, followedCreatorIds = [] } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-simple-v2', section, followedCreatorIds.join(',')],
+    queryKey: ['videos-infinite-longform-v3', section, followedCreatorIds.join(',')],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
       const startRange = pageParam as number;
-      // Fetch 3x PAGE_SIZE to ensure we get enough horizontal videos after filtering
-      const fetchSize = PAGE_SIZE * 3;
-      const endRange = startRange + fetchSize - 1;
+      const endRange = startRange + PAGE_SIZE - 1;
 
       console.log('[useInfiniteLongFormVideos] 🔍 FETCHING PAGE:', {
         section,
         pageParam,
         startRange,
         endRange,
+        threshold: VIDEO_DURATION_THRESHOLD_SECONDS,
       });
 
       // For 'following' section, return empty if no followed creators
@@ -57,7 +59,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         return { items: [], nextCursor: startRange, hasMore: false };
       }
 
-      // Simple query - all videos
+      // Production query with proper filters
       let baseQuery = supabase
         .from('posts')
         .select(`
@@ -84,11 +86,21 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           post_likes(count),
           post_views(count)
         `)
-        .eq('post_media.media_type', 'video');
+        .eq('post_media.media_type', 'video')
+        .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
+        .not('post_media.duration_seconds', 'is', null)
+        .eq('visibility', 'anyone');
 
-      // Only apply following filter for following section
+      // Section-specific filters
       if (section === 'following') {
         baseQuery = baseQuery.in('user_id', followedCreatorIds);
+      }
+
+      // Trending: last 7 days only
+      if (section === 'trending') {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        baseQuery = baseQuery.gte('created_at', sevenDaysAgo.toISOString());
       }
 
       baseQuery = baseQuery
@@ -97,7 +109,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
       const { data: postsData, error } = await baseQuery;
 
-      console.log('[useInfiniteLongFormVideos] 📊 RAW QUERY RESULT:', {
+      console.log('[useInfiniteLongFormVideos] 📊 QUERY RESULT:', {
         section,
         postsReturned: postsData?.length || 0,
         error: error?.message,
@@ -105,22 +117,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
 
       if (error) throw error;
 
-      // Filter for horizontal videos only (width > height)
-      const horizontalVideos = (postsData || []).filter((post: any) => {
-        const media = post.post_media?.[0];
-        if (!media) return false;
-        const width = media.width || 0;
-        const height = media.height || 0;
-        return width > height;
-      });
-
-      console.log(`[useInfiniteLongFormVideos] 🎬 After horizontal filter: ${horizontalVideos.length}`);
-
-      // Take only PAGE_SIZE items
-      const pageVideos = horizontalVideos.slice(0, PAGE_SIZE);
-
       // Fetch profiles for creators
-      const userIds = [...new Set(pageVideos.map((p: any) => p.user_id).filter(Boolean))] as string[];
+      const userIds = [...new Set((postsData || []).map((p: any) => p.user_id).filter(Boolean))] as string[];
       
       const { data: profiles } = await supabase
         .from('user_profiles')
@@ -130,7 +128,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
       const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
       // Transform to LongFormVideo format
-      const items: LongFormVideo[] = pageVideos.map((post: any) => {
+      const items: LongFormVideo[] = (postsData || []).map((post: any) => {
         const media = post.post_media?.[0];
         const user = profileMap.get(post.user_id);
         
@@ -160,8 +158,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         };
       });
 
-      // hasMore based on whether the underlying query still has rows (not how many horizontals were in this batch)
-      const hasMore = (postsData?.length ?? 0) === fetchSize;
+      // hasMore based on PAGE_SIZE
+      const hasMore = (postsData?.length ?? 0) === PAGE_SIZE;
       const nextCursor = hasMore ? endRange + 1 : startRange;
 
       console.log('[useInfiniteLongFormVideos] ✅ PAGE COMPLETE:', {

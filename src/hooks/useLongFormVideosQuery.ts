@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
+// PRODUCTION: 4 minutes minimum for long-form videos
+const VIDEO_DURATION_THRESHOLD_SECONDS = 240;
+
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
   limit?: number;
@@ -34,7 +37,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
     searchQuery,
   } = options;
 
-  // Simple query - all videos, only filter for horizontal
+  // Production query with proper filters
   let query = supabase
     .from('posts')
     .select(`
@@ -60,7 +63,10 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
       post_likes(count),
       post_views(count)
     `)
-    .eq('post_media.media_type', 'video');
+    .eq('post_media.media_type', 'video')
+    .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
+    .not('post_media.duration_seconds', 'is', null)
+    .eq('visibility', 'anyone');
 
   // Only apply creator filter if specified
   if (creatorUserId) {
@@ -72,7 +78,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
     query = query.ilike('content', `%${searchQuery.trim()}%`);
   }
 
-  // Only apply following filter for following section
+  // Section-specific filters
   if (section === 'following' && !creatorUserId && !searchQuery) {
     if (followedCreatorIds.length > 0) {
       query = query.in('user_id', followedCreatorIds);
@@ -81,15 +87,22 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
     }
   }
 
-  // Fetch more to filter for horizontal
-  const overfetch = Math.min(limit * 10, 200);
+  // Trending: last 7 days only
+  if (section === 'trending') {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    query = query.gte('created_at', sevenDaysAgo.toISOString());
+  }
+
+  // Reasonable overfetch (2x limit, max 50)
+  const overfetch = Math.min(limit * 2, 50);
   query = query.order('created_at', { ascending: false }).limit(overfetch);
 
-  console.log(`[useLongFormVideosQuery] 🔍 SIMPLE QUERY for ${section}`);
+  console.log(`[useLongFormVideosQuery] 🔍 Query for ${section} (threshold: ${VIDEO_DURATION_THRESHOLD_SECONDS}s)`);
 
   const { data, error: queryError } = await query;
 
-  console.log(`[useLongFormVideosQuery] 📊 RAW RESULT for ${section}:`, {
+  console.log(`[useLongFormVideosQuery] 📊 Result for ${section}:`, {
     videosReturned: data?.length || 0,
     error: queryError?.message,
   });
@@ -97,19 +110,8 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
   if (queryError) throw queryError;
   if (!data || data.length === 0) return [];
 
-  // Filter for horizontal videos only (width > height)
-  const horizontalVideos = data.filter((post: any) => {
-    const media = post.post_media?.[0];
-    if (!media) return false;
-    const width = media.width || 0;
-    const height = media.height || 0;
-    return width > height;
-  });
-
-  console.log(`[useLongFormVideosQuery] 🎬 After horizontal filter: ${horizontalVideos.length} of ${data.length}`);
-
   // Fetch profiles
-  const userIds = [...new Set(horizontalVideos.map((post: any) => post.user_id))];
+  const userIds = [...new Set(data.map((post: any) => post.user_id))];
   const { data: profiles } = await supabase
     .from('user_profiles')
     .select('id, display_name, username, profile_photo_url')
@@ -117,7 +119,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
 
   const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
-  const videos: LongFormVideo[] = horizontalVideos.slice(0, limit).map((post: any) => {
+  const videos: LongFormVideo[] = data.slice(0, limit).map((post: any) => {
     const media = post.post_media?.[0];
     const user = profileMap.get(post.user_id);
     const golfTag = post.post_tags?.find((tag: any) => tag.taggable_entities?.entity_type === 'golf_club');
@@ -145,7 +147,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
 }
 
 /**
- * Simple query hook for videos - only filters for horizontal videos
+ * Production query hook for long-form videos (≥4 minutes, public visibility)
  */
 export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) => {
   const { 
@@ -158,7 +160,7 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
   } = options;
 
   const queryKey = [
-    'videos-simple-v2',
+    'videos-longform-v3',
     section,
     limit,
     followedCreatorIds.join(','),
