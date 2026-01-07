@@ -3,8 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFriends } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
-import { SocialListPageShell } from '@/components/profile/social/SocialListPageShell';
-import { SocialUserRow } from '@/components/profile/social/SocialUserRow';
+import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Loader2 } from 'lucide-react';
 
@@ -14,7 +13,7 @@ const FriendsListPage = () => {
 
   // Fetch profile user by username
   const { data: profileUser, isLoading: profileLoading } = useUserByUsername(username);
-  
+
   // Fetch friends with pagination
   const {
     data,
@@ -24,17 +23,18 @@ const FriendsListPage = () => {
     fetchNextPage,
   } = usePaginatedFriends(profileUser?.id);
 
-  const friends = data?.pages.flatMap(page => page.users) ?? [];
+  const friends = data?.pages.flatMap((page) => page.users) ?? [];
+  const totalCount = data?.pages[0] ? data.pages.reduce((acc, p) => acc + p.users.length, 0) : 0;
 
   const isOwnProfile = currentUser?.id === profileUser?.id;
-  
+
   // Track list view
   useEffect(() => {
     if (profileUser?.id) {
       analyticsEvents.social.listViewed({
-        type: "friends",
+        type: 'friends',
         profileUserId: profileUser.id,
-        from: "profile_stats",
+        from: 'profile_stats',
       });
     }
   }, [profileUser?.id]);
@@ -56,52 +56,20 @@ const FriendsListPage = () => {
   }
 
   return (
-    <SocialListPageShell
+    <UserListPage
+      mode="friends"
       title="Friends"
       subtitle={`Friends of @${profileUser.username}`}
-      count={friends.length}
+      searchPlaceholder="Search friends by name or club"
+      emptyText={isOwnProfile ? "You haven't added any friends yet." : "No friends yet."}
+      users={friends}
+      totalCount={totalCount}
+      isLoading={friendsLoading}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
       backPath={`/profile/${profileUser.username}`}
-    >
-      {friendsLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      )}
-
-      {!friendsLoading && friends.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
-          <p className="text-muted-foreground text-center">
-            {isOwnProfile ? "You haven't added any friends yet." : "No friends to show yet."}
-          </p>
-        </div>
-      )}
-
-      {!friendsLoading && friends.length > 0 && (
-        <>
-          <div className="divide-y divide-border">
-            {friends.map((user) => (
-              <SocialUserRow
-                key={user.id}
-                user={user}
-                currentUserId={currentUser?.id || null}
-              />
-            ))}
-          </div>
-
-          {hasNextPage && (
-            <div className="flex justify-center py-6">
-              <button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                className="px-4 py-2 rounded-sq-xs bg-background border border-border text-sm font-medium disabled:opacity-50 transition-opacity"
-              >
-                {isFetchingNextPage ? 'Loading more…' : 'Load more'}
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </SocialListPageShell>
+    />
   );
 };
 
