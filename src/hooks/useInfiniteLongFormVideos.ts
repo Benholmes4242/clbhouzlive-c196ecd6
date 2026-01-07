@@ -2,6 +2,13 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
+import { ENABLE_MOCK_VIDEOS } from '@/lib/featureFlags';
+import { 
+  MOCK_RECOMMENDED_VIDEOS, 
+  MOCK_TRENDING_VIDEOS, 
+  MOCK_FOLLOWING_VIDEOS, 
+  MOCK_COURSES_VIDEOS 
+} from '@/mocks/mockLongFormVideos';
 
 const PAGE_SIZE = 24;
 
@@ -17,6 +24,22 @@ interface UseInfiniteLongFormVideosOptions {
   section: SectionType;
   followedCreatorIds?: string[];
   category?: string;
+}
+
+// Helper to get mock videos for a section
+function getMockVideosForSection(section: SectionType): LongFormVideo[] {
+  switch (section) {
+    case 'recommended':
+      return MOCK_RECOMMENDED_VIDEOS;
+    case 'trending':
+      return MOCK_TRENDING_VIDEOS;
+    case 'following':
+      return MOCK_FOLLOWING_VIDEOS;
+    case 'courses':
+      return MOCK_COURSES_VIDEOS;
+    default:
+      return MOCK_RECOMMENDED_VIDEOS;
+  }
 }
 
 const formatDuration = (seconds: number): string => {
@@ -186,8 +209,22 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
     gcTime: 30 * 60 * 1000,   // 30 minutes
   });
 
-  const allItems = query.data?.pages.flatMap((page) => page.items) ?? [];
-  const hasMore = query.hasNextPage ?? false;
+  const realItems = query.data?.pages.flatMap((page) => page.items) ?? [];
+  
+  // Inject mock videos when flag is enabled (for UI testing)
+  let allItems = realItems;
+  if (ENABLE_MOCK_VIDEOS) {
+    const mockVideos = getMockVideosForSection(section);
+    // Combine real + mock, de-dupe by id
+    const seenIds = new Set(realItems.map(v => v.id));
+    const uniqueMocks = mockVideos.filter(v => !seenIds.has(v.id));
+    allItems = [...realItems, ...uniqueMocks];
+  }
+  
+  // With mock videos, we always have more to show (mock provides 25)
+  const hasMore = ENABLE_MOCK_VIDEOS 
+    ? allItems.length < 100 // Cap at 100 for mock mode
+    : (query.hasNextPage ?? false);
 
   return {
     items: allItems,
