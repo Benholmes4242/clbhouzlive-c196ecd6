@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Search, Check, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -152,50 +152,106 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             )}
           </div>
         ) : (
-          <>
-            {/* User list rows */}
-            <div className="divide-y divide-border/25">
-              {filteredUsers.map((socialUser) => (
-                <UserRowFlat
-                  key={socialUser.id}
-                  user={socialUser}
-                  currentUserId={user?.id}
-                  mode={mode}
-                />
-              ))}
-            </div>
-
-            {/* Load more */}
-            {hasNextPage && onLoadMore && !searchInput && (
-              <div className="mt-6 px-6">
-                <Button
-                  variant="secondary"
-                  onClick={onLoadMore}
-                  disabled={isFetchingNextPage}
-                  className="w-full max-w-[420px] mx-auto block rounded-xl"
-                >
-                  {isFetchingNextPage ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    'Load more'
-                  )}
-                </Button>
-              </div>
-            )}
-
-            {/* Status text */}
-            {displayTotal > 0 && !searchInput && (
-              <p className="mt-4 pb-6 text-center text-xs text-muted-foreground">
-                Showing {showingCount} of {displayTotal} {mode}
-              </p>
-            )}
-          </>
+          <InfiniteUserList
+            users={filteredUsers}
+            currentUserId={user?.id}
+            mode={mode}
+            hasNextPage={hasNextPage && !searchInput}
+            isFetchingNextPage={isFetchingNextPage}
+            onLoadMore={onLoadMore}
+            displayTotal={displayTotal}
+            showStatus={!searchInput}
+          />
         )}
       </div>
     </PageRoot>
+  );
+};
+
+// ============================================================================
+// InfiniteUserList - handles infinite scroll loading
+// ============================================================================
+
+interface InfiniteUserListProps {
+  users: SocialUser[];
+  currentUserId?: string;
+  mode: ListMode;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
+  displayTotal: number;
+  showStatus: boolean;
+}
+
+const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
+  users,
+  currentUserId,
+  mode,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
+  displayTotal,
+  showStatus,
+}) => {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadMoreLockRef = useRef(false);
+
+  // Intersection observer for infinite scroll
+  useEffect(() => {
+    if (!hasNextPage || !onLoadMore) return;
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting && !isFetchingNextPage && !loadMoreLockRef.current) {
+          loadMoreLockRef.current = true;
+          onLoadMore();
+          // Unlock after a short delay to prevent rapid-fire loads
+          setTimeout(() => {
+            loadMoreLockRef.current = false;
+          }, 500);
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
+
+  return (
+    <>
+      {/* User list rows */}
+      <div className="divide-y divide-border/25">
+        {users.map((socialUser) => (
+          <UserRowFlat
+            key={socialUser.id}
+            user={socialUser}
+            currentUserId={currentUserId}
+            mode={mode}
+          />
+        ))}
+      </div>
+
+      {/* Infinite scroll sentinel */}
+      {hasNextPage && (
+        <div ref={sentinelRef} className="flex justify-center py-6">
+          {isFetchingNextPage && (
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          )}
+        </div>
+      )}
+
+      {/* Status text */}
+      {showStatus && displayTotal > 0 && (
+        <p className="mt-2 pb-6 text-center text-xs text-muted-foreground">
+          Showing {users.length} of {displayTotal} {mode}
+        </p>
+      )}
+    </>
   );
 };
 
@@ -304,7 +360,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
           <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
 
           {/* Row 3: Home club */}
-          <p className="text-sm text-muted-foreground truncate">{clubLine}</p>
+          <p className="text-xs text-muted-foreground truncate">{clubLine}</p>
           {!isSelf && currentUserId && !relationshipLoading && (
             <div
               className="grid grid-cols-2 gap-2 pt-2"

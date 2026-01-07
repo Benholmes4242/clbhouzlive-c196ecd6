@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, ChevronLeft, Check, UserPlus, Info } from 'lucide-react';
+import { Search, ChevronLeft, Check, UserPlus, Info, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGolfersDiscovery, TabKey } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
@@ -57,6 +57,9 @@ const GolfersToFollowPage = () => {
   });
   const [actioningUserId, setActioningUserId] = useState<string | null>(null);
   const [friendRequestsSent, setFriendRequestsSent] = useState<Set<string>>(new Set());
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadMoreLockRef = useRef(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Apply debounced search query
   useEffect(() => {
@@ -128,14 +131,42 @@ const GolfersToFollowPage = () => {
     setSearchQuery('');
   };
 
-  const handleLoadNext = () => {
-    if (page < totalPages) {
+  const handleLoadNext = async () => {
+    if (page < totalPages && !isLoadingMore) {
+      setIsLoadingMore(true);
       setPage(page + 1);
+      // Small delay to allow state to update
+      setTimeout(() => setIsLoadingMore(false), 300);
     }
   };
 
   const showingCount = golfers.length;
   const hasMore = page < totalPages;
+
+  // Intersection observer for infinite scroll
+  useEffect(() => {
+    if (!hasMore || isSearching) return;
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting && !isLoadingMore && !loadMoreLockRef.current) {
+          loadMoreLockRef.current = true;
+          handleLoadNext();
+          setTimeout(() => {
+            loadMoreLockRef.current = false;
+          }, 500);
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isSearching, isLoadingMore, page, totalPages]);
 
   // Determine effective friend status (combining API data with optimistic updates)
   const getEffectiveFriendStatus = (golfer: typeof golfers[0]) => {
@@ -320,7 +351,7 @@ const GolfersToFollowPage = () => {
                         </p>
 
                         {/* Row 3: Home club */}
-                        <p className="text-sm text-muted-foreground truncate">
+                        <p className="text-xs text-muted-foreground truncate">
                           {clubLine}
                         </p>
 
@@ -389,16 +420,12 @@ const GolfersToFollowPage = () => {
               })}
             </div>
 
-            {/* Pagination - Load next 10 */}
+            {/* Infinite scroll sentinel */}
             {!isSearching && hasMore && (
-              <div className="mt-block px-6">
-                <Button
-                  variant="secondary"
-                  onClick={handleLoadNext}
-                  className="w-full max-w-[420px] mx-auto block rounded-xl"
-                >
-                  Load next 10 golfers
-                </Button>
+              <div ref={sentinelRef} className="flex justify-center py-6">
+                {isLoadingMore && (
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                )}
               </div>
             )}
 

@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 20;
 
 type UserProfileRow = {
   id: string;
