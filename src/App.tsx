@@ -430,7 +430,7 @@ function AppRoutes() {
         <Route path="/tourhub/rankings" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubRankingsPage /></Suspense>} />
         
         {/* Hub routes - only when NOT using background location */}
-        {!showHubOverlay && FEATURE_FLAGS.HUB && (
+        {!showHubOverlay && (
           <>
             <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
             <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
@@ -455,7 +455,7 @@ function AppRoutes() {
       </Routes>
 
       {/* Hub Overlays - rendered over origin page when background location exists */}
-      {showHubOverlay && FEATURE_FLAGS.HUB && (
+      {showHubOverlay && (
         <Routes>
           <Route path="/hub" element={<HubHomePage />} />
           <Route path="/hub/golfers" element={<HubGolfersPage />} />
