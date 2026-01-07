@@ -61,8 +61,8 @@ export function HubMessagesCard() {
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
             <div 
-              className="w-9 h-9 rounded-full flex items-center justify-center mb-2"
-              style={{ background: 'var(--hub-glass-bg-input)', opacity: 0.7 }}
+              className="w-9 h-9 rounded-full flex items-center justify-center mb-1.5"
+              style={{ background: 'var(--hub-glass-bg-input)' }}
             >
               <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
             </div>
@@ -70,13 +70,13 @@ export function HubMessagesCard() {
               className="text-[14px] font-semibold mb-0.5"
               style={{ color: 'var(--hub-text)' }}
             >
-              Your clubhouse chats live here
+              No messages yet
             </h4>
             <p 
-              className="text-[12px] leading-snug max-w-[240px]"
+              className="text-[12px] leading-snug"
               style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
             >
-              Game chats, invites, and golfer conversations — all in one place.
+              When you play games or follow golfers, chats will appear here.
             </p>
           </div>
         ) : (

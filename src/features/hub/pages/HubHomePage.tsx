@@ -185,7 +185,7 @@ export function HubHomePage() {
           className="w-full h-full flex flex-col px-3.5"
           style={{
             paddingTop: 'env(safe-area-inset-top, 0px)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 55px)', // 55px nav, tight 10px gap
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 79px)', // 55px nav + 12px gap + 12px buffer
             overflow: 'hidden',
           }}
         >
@@ -198,7 +198,7 @@ export function HubHomePage() {
           </div>
 
           {/* Zone 3: Games - Primary section, flex-1 with internal scroll */}
-          <div className="mt-2 mb-4 flex-1 min-h-[180px]">
+          <div className="mt-2 flex-1 min-h-[180px]">
             <YourGamesTile />
           </div>
         </div>

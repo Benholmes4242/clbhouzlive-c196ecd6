@@ -9,7 +9,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { format } from 'date-fns';
-import { MdOutlineWavingHand } from 'react-icons/md';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -44,31 +43,30 @@ export function HubHeaderToday() {
     return upcoming[0] || null;
   }, [gamesData]);
 
-  // Build the subline - "What's up next · {course} · {date}" or empty state
+  // Build the subline - compact format: "Playing {course} · {date}"
   const subline = React.useMemo(() => {
     if (!nextGame) {
-      return "What's up next · No games planned yet";
+      return "No games planned — fancy one this week?";
     }
 
     const gameDate = new Date(nextGame.start_time);
-    const courseName = nextGame.course_name || 'TBD';
+    const courseName = nextGame.course_name || 'a course';
     const formattedDate = format(gameDate, 'MMM d');
     
-    return `What's up next · ${courseName} · ${formattedDate}`;
+    return `Playing ${courseName} · ${formattedDate}`;
   }, [nextGame]);
 
   return (
     <div className="h-[68px] flex flex-col justify-center px-1">
       <h1 
-        className="text-[23px] font-medium leading-tight truncate tracking-[0.01em] flex items-center gap-2"
+        className="text-[23px] font-medium leading-tight truncate tracking-[0.01em]"
         style={{ color: 'var(--hub-text)' }}
       >
         {greeting}, {firstName}
-        <MdOutlineWavingHand className="w-5 h-5 inline-block" style={{ color: 'var(--hub-text)' }} />
       </h1>
       <p 
-        className="text-[13px] mt-2 truncate tracking-[0.02em]"
-        style={{ color: 'var(--hub-text-sub)', opacity: 0.75 }}
+        className="text-[14px] mt-1.5 truncate"
+        style={{ color: 'var(--hub-text-sub)', opacity: 0.7 }}
       >
         {subline}
       </p>
