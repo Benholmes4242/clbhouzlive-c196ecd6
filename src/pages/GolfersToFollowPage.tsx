@@ -317,8 +317,8 @@ const GolfersToFollowPage = () => {
                     className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      {/* Avatar with verified badge overlay */}
-                      <div className="relative shrink-0">
+                      {/* Avatar - no overlay */}
+                      <div className="shrink-0">
                         <SquircleAvatar
                           src={golfer.profileImage}
                           alt={golfer.displayName}
@@ -326,22 +326,17 @@ const GolfersToFollowPage = () => {
                           fallback={golfer.displayName?.charAt(0) || '?'}
                           ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
                         />
-                        {golfer.isVerified && (
-                          <div className="absolute -top-0.5 -right-0.5">
-                            <VerifiedBadge size="sm" />
-                          </div>
-                        )}
                       </div>
 
                       {/* Content area */}
                       <div className="flex-1 min-w-0">
-                        {/* Row 1: Name with inline verified tick */}
+                        {/* Row 1: Name with verified badge */}
                         <div className="flex items-center gap-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground truncate">
                             {golfer.displayName}
                           </p>
                           {golfer.isVerified && (
-                            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                            <VerifiedBadge size="sm" />
                           )}
                         </div>
 
