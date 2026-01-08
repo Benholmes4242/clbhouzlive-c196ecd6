@@ -91,6 +91,10 @@ export function HubGamesHubSheet({
     haptic('light');
     setActiveTab(tab);
     setHasScrolled(false);
+    // Clear focus when switching to discover to avoid unexpected re-highlights
+    if (tab === 'discover') {
+      setFocusedGameId(undefined);
+    }
     // Scroll content to top when switching tabs
     contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   };
@@ -295,6 +299,7 @@ export function HubGamesHubSheet({
               setJoinRequestsOpen(false);
               setActiveTab('discover');
             }}
+            focusGameId={joinRequestsFocusGameId}
           />
 
           <HubCreateGameSheet
