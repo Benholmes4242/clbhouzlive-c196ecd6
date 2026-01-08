@@ -10,6 +10,7 @@ import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { useHub } from '@/features/hub/useHub';
 import { HubHeader } from '@/features/hub/components/HubHeader';
 import { HubCreateGameSheet } from '@/features/hub/components/HubCreateGameSheet';
+import { HubSearchGamesSheet } from '@/features/hub/components/HubSearchGamesSheet';
 import '../home/hubThemeLight.css';
 
 export function HubYourGamesPage() {
@@ -19,6 +20,7 @@ export function HubYourGamesPage() {
   const [joinRequestsOpen, setJoinRequestsOpen] = useState(false);
   const [focusedGameId, setFocusedGameId] = useState<string | undefined>();
   const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
+  const [isSearchGamesSheetOpen, setIsSearchGamesSheetOpen] = useState(false);
 
   const { data: myRequests = [] } = useMyJoinRequests();
 
@@ -41,7 +43,7 @@ export function HubYourGamesPage() {
   };
 
   const handleFindGame = () => {
-    navigateFromHub('/hub/games');
+    setIsSearchGamesSheetOpen(true);
   };
 
   const handleViewGame = (gameId: string) => {
@@ -135,6 +137,11 @@ export function HubYourGamesPage() {
       <HubCreateGameSheet 
         isOpen={isCreateGameSheetOpen} 
         onClose={() => setIsCreateGameSheetOpen(false)} 
+      />
+      
+      <HubSearchGamesSheet
+        isOpen={isSearchGamesSheetOpen}
+        onClose={() => setIsSearchGamesSheetOpen(false)}
       />
     </div>
   );

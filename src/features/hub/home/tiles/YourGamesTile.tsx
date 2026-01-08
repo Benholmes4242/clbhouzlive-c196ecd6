@@ -15,6 +15,7 @@ import { devlog } from '@/utils/log';
 import { scrollChildIntoView } from '../utils/scroll';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import { HubCreateGameSheet } from '@/features/hub/components/HubCreateGameSheet';
+import { HubSearchGamesSheet } from '@/features/hub/components/HubSearchGamesSheet';
 import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
@@ -48,7 +49,7 @@ export function YourGamesTile() {
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
   const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
-  
+  const [isSearchGamesSheetOpen, setIsSearchGamesSheetOpen] = useState(false);
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -88,7 +89,7 @@ export function YourGamesTile() {
 
   const openSearchGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    navigateFromHub('/hub/games');
+    setIsSearchGamesSheetOpen(true);
   };
 
   const openYourGames = (e?: React.MouseEvent) => {
@@ -343,6 +344,11 @@ export function YourGamesTile() {
       <HubCreateGameSheet 
         isOpen={isCreateGameSheetOpen} 
         onClose={() => setIsCreateGameSheetOpen(false)} 
+      />
+      
+      <HubSearchGamesSheet
+        isOpen={isSearchGamesSheetOpen}
+        onClose={() => setIsSearchGamesSheetOpen(false)}
       />
     </Tile>
   );
