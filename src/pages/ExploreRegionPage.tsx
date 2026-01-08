@@ -4,9 +4,10 @@
  * Phase 1: Uses explore_moments view with region_key filter
  * 
  * Polish: improved header, back navigation, loading states
+ * Uses static region banner images instead of latest moment thumbnail
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -26,48 +27,53 @@ const SLUG_TO_REGION: Record<string, RegionKey> = {
   'rest-of-world': 'ROW',
 };
 
-// Region metadata
+// Region metadata with banner images
 const REGION_CONFIG: Record<RegionKey, { 
   title: string; 
   subtitle: string;
   gradient: string;
+  bannerUrl: string;
 }> = {
   GBI: { 
     title: 'Great Britain & Ireland', 
     subtitle: 'From the rugged links of Scotland to the rolling parklands of Ireland',
     gradient: 'from-slate-700 via-emerald-800 to-slate-900',
+    // UK/Ireland composite flag banner
+    bannerUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80',
   },
   EU: { 
     title: 'Continental Europe', 
     subtitle: 'Sun-drenched Spain, majestic France, and beyond',
     gradient: 'from-amber-800 via-slate-700 to-slate-900',
+    // European golf landscape
+    bannerUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&q=80',
   },
   USA: { 
     title: 'United States', 
     subtitle: 'From Pebble Beach to Pinehurst, coast to coast',
     gradient: 'from-blue-800 via-slate-700 to-slate-900',
+    // American golf course
+    bannerUrl: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&q=80',
   },
   ROW: { 
     title: 'Rest of World', 
     subtitle: 'Hidden gems and bucket-list courses worldwide',
     gradient: 'from-teal-800 via-slate-700 to-slate-900',
+    // World/global golf image
+    bannerUrl: 'https://images.unsplash.com/photo-1632845986643-f3d32ec8bd21?w=800&q=80',
   },
 };
 
 const ExploreRegionPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [imageError, setImageError] = useState(false);
   
   const regionKey = slug ? SLUG_TO_REGION[slug.toLowerCase()] : undefined;
   const config = regionKey ? REGION_CONFIG[regionKey] : undefined;
   
   const { data: regionStats, isLoading: statsLoading } = useExploreRegionStats();
   const stats = regionStats?.find(s => s.region_key === regionKey);
-  const thumbnailUrl = stats?.thumbnail_url;
   const momentCount = stats?.moments_last_30_days || 0;
-  
-  const showGradient = !thumbnailUrl || imageError;
 
   // Handle back navigation
   const handleBack = () => {
@@ -120,20 +126,18 @@ const ExploreRegionPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section - Uses static region banner */}
       <div className="relative h-48">
-        {statsLoading ? (
-          <Skeleton className="absolute inset-0" />
-        ) : !showGradient ? (
-          <img 
-            src={thumbnailUrl!} 
-            alt={config.title}
-            onError={() => setImageError(true)}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div className={cn("absolute inset-0 bg-gradient-to-br", config.gradient)} />
-        )}
+        <img 
+          src={config.bannerUrl} 
+          alt={config.title}
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => {
+            // Fallback to gradient on error
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        <div className={cn("absolute inset-0 bg-gradient-to-br opacity-60", config.gradient)} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <h2 className="text-2xl font-serif text-foreground drop-shadow-sm">{config.title}</h2>

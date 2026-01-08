@@ -51,7 +51,7 @@ const MomentTile: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 snap-start group"
+      className="flex-shrink-0 group"
     >
       <div className="relative w-28 md:w-32 aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm">
         {/* Background */}
@@ -122,11 +122,11 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
   if (isLoading) {
     return (
       <div className={cn("py-4", className)}>
-        <div className="px-5 mb-3 flex items-center justify-between">
+        <div className="px-4 mb-3 flex items-center justify-between">
           <Skeleton className="h-5 w-48" />
           <Skeleton className="h-4 w-16" />
         </div>
-        <div className="flex gap-2 overflow-x-auto px-5 pb-2 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
           {Array.from({ length: 6 }).map((_, i) => (
             <TileSkeleton key={i} />
           ))}
@@ -143,7 +143,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
   return (
     <div className={cn("py-4", className)}>
       {/* Header */}
-      <div className="px-5 mb-3 flex items-center justify-between">
+      <div className="px-4 mb-3 flex items-center justify-between">
         <h4 className="text-sm font-medium text-foreground">
           New this week in {regionTitle}
         </h4>
@@ -157,7 +157,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
       </div>
       
       {/* Carousel */}
-      <div className="flex gap-2 overflow-x-auto px-5 pb-2 scrollbar-hide snap-x snap-mandatory">
+      <div className="flex gap-2 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
         {moments.slice(0, 10).map((moment, index) => (
           <MomentTile
             key={moment.moment_id}
