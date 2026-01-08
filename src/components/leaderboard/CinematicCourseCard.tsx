@@ -84,8 +84,8 @@ export function CinematicCourseCard({
       )}
       style={{ animationDelay: `${listPosition * 50}ms` }}
     >
-      {/* Hero Image - wider aspect ratio (reduced height by ~40%) */}
-      <div className="relative w-full aspect-[3/2] overflow-hidden group">
+      {/* Hero Image - wider aspect ratio (reduced height by ~50%) */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden group">
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
