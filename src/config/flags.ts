@@ -16,7 +16,7 @@ export const FLAGS = {
    * Set via VITE_LEADERBOARD_MOCK_USERS_ENABLED env variable or hardcode here.
    * Default: true (for testing), set false for production.
    */
-  LEADERBOARD_MOCK_USERS_ENABLED: import.meta.env.VITE_LEADERBOARD_MOCK_USERS_ENABLED !== 'false', // Default true
+  LEADERBOARD_MOCK_USERS_ENABLED: false, // Disabled for production
 } as const;
 
 export type FeatureFlags = typeof FLAGS;
