@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ExploreHeroProps {
   className?: string;
   onExploreClick?: () => void;
+  onSearchClick?: () => void;
 }
 
 /**
@@ -15,10 +16,12 @@ interface ExploreHeroProps {
  * - Large, immersive image with parallax/video
  * - Editorial copy
  * - Staggered fade-in animations
+ * - "Start exploring" opens search sheet
  */
 export const ExploreHero: React.FC<ExploreHeroProps> = ({
   className,
   onExploreClick,
+  onSearchClick,
 }) => {
   const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -27,6 +30,15 @@ export const ExploreHero: React.FC<ExploreHeroProps> = ({
     const timer = setTimeout(() => setHasLoaded(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleExploreClick = () => {
+    // Prioritize search sheet if available
+    if (onSearchClick) {
+      onSearchClick();
+    } else if (onExploreClick) {
+      onExploreClick();
+    }
+  };
 
   return (
     <div className={cn("relative w-full overflow-hidden", className)}>
@@ -69,19 +81,18 @@ export const ExploreHero: React.FC<ExploreHeroProps> = ({
               Discover places worth the journey.
             </motion.p>
             
-            {/* Gentle CTA - fade up with 100ms delay after sub-headline */}
-            {onExploreClick && (
-              <motion.button
-                initial={{ opacity: 0, y: 6 }}
-                animate={hasLoaded ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, ease: 'easeOut', delay: 0.5 }}
-                onClick={onExploreClick}
-                className="mt-5 inline-flex items-center gap-1.5 text-sm text-white/90 hover:text-white transition-colors group"
-              >
-                <span>Start exploring</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
-              </motion.button>
-            )}
+            {/* CTA - opens search sheet */}
+            <motion.button
+              initial={{ opacity: 0, y: 6 }}
+              animate={hasLoaded ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.5 }}
+              onClick={handleExploreClick}
+              className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-sm text-white/90 hover:text-white transition-colors group"
+            >
+              <Search className="w-4 h-4" />
+              <span>Start exploring</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+            </motion.button>
           </div>
         </div>
       </div>
