@@ -116,9 +116,24 @@ function CountryBottomSheet({
   selectedCode,
   onSelect,
 }: CountryBottomSheetProps) {
+  // Handle outside interaction explicitly to prevent freeze
+  const handleClose = React.useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+    <Drawer 
+      open={open} 
+      onOpenChange={onOpenChange}
+      dismissible
+      modal
+    >
+      <DrawerContent 
+        className="max-h-[85vh]"
+        onPointerDownOutside={handleClose}
+        onInteractOutside={handleClose}
+        onEscapeKeyDown={handleClose}
+      >
         <DrawerHeader className="pb-2">
           <DrawerTitle className="text-center">Select Country</DrawerTitle>
         </DrawerHeader>
