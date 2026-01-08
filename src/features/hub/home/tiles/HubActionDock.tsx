@@ -1,7 +1,7 @@
 /**
  * HubActionDock - Bottom navigation bar for Hub
  * Matches the site-wide bottom nav styling
- * Echo opens as a sheet instead of navigating
+ * Echo and Create Game open as sheets instead of navigating
  */
 
 import React, { useState } from 'react';
@@ -12,6 +12,7 @@ import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
+import { HubCreateGameSheet } from '../../components/HubCreateGameSheet';
 
 interface HubNavItem {
   id: string;
@@ -24,7 +25,7 @@ interface HubNavItem {
 
 const hubNavItems: HubNavItem[] = [
   { id: 'home', label: 'Home', icon: HomeIcon, path: '/clubhouse', external: true },
-  { id: 'game', label: 'Game', icon: Plus, path: '/hub/create-game' },
+  { id: 'game', label: 'Game', icon: Plus, path: '/hub/create-game', isSheet: true },
   { id: 'echo', label: 'Echo', icon: Bot, path: '/hub/echo', isSheet: true },
   { id: 'moment', label: 'Moment', icon: Camera, path: '/create-moment' },
   { id: 'profile', label: 'Profile', icon: User, path: '/profile', external: true },
@@ -35,6 +36,7 @@ export function HubActionDock() {
   const location = useLocation();
   const { navigateFromHub, close } = useHub();
   const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
+  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
 
   const handleItemClick = (item: HubNavItem) => {
     haptic('light');
@@ -42,6 +44,12 @@ export function HubActionDock() {
     // Handle Echo as a sheet
     if (item.isSheet && item.id === 'echo') {
       setIsEchoSheetOpen(true);
+      return;
+    }
+    
+    // Handle Create Game as a sheet
+    if (item.isSheet && item.id === 'game') {
+      setIsCreateGameSheetOpen(true);
       return;
     }
     
@@ -113,6 +121,11 @@ export function HubActionDock() {
       <HubEchoSheet 
         isOpen={isEchoSheetOpen} 
         onClose={() => setIsEchoSheetOpen(false)} 
+      />
+      
+      <HubCreateGameSheet 
+        isOpen={isCreateGameSheetOpen} 
+        onClose={() => setIsCreateGameSheetOpen(false)} 
       />
     </>
   );

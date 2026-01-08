@@ -3,7 +3,7 @@
  * Full-width tile showing games user is hosting or joined
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
 import { scrollChildIntoView } from '../utils/scroll';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
+import { HubCreateGameSheet } from '@/features/hub/components/HubCreateGameSheet';
 import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
@@ -46,6 +47,7 @@ export function YourGamesTile() {
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
+  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
   
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
@@ -81,7 +83,7 @@ export function YourGamesTile() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    navigateFromHub('/hub/create-game');
+    setIsCreateGameSheetOpen(true);
   };
 
   const openSearchGames = (e?: React.MouseEvent) => {
@@ -337,6 +339,11 @@ export function YourGamesTile() {
         </ul>
       </div>
       </div>
+      
+      <HubCreateGameSheet 
+        isOpen={isCreateGameSheetOpen} 
+        onClose={() => setIsCreateGameSheetOpen(false)} 
+      />
     </Tile>
   );
 }

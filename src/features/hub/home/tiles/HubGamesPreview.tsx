@@ -4,7 +4,7 @@
  * NO scrolling - just preview cards
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
@@ -13,6 +13,7 @@ import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequest
 import { supabase } from '@/integrations/supabase/client';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Users, Clock } from 'lucide-react';
+import { HubCreateGameSheet } from '@/features/hub/components/HubCreateGameSheet';
 
 type GamePreview = {
   id: string;
@@ -102,6 +103,7 @@ function GameCard({ game, isPrimary = false, onClick }: GameCardProps) {
 export function HubGamesPreview() {
   const { navigateFromHub } = useHub();
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
+  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
   
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -148,7 +150,7 @@ export function HubGamesPreview() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    navigateFromHub('/hub/create-game');
+    setIsCreateGameSheetOpen(true);
   };
 
   const openYourGames = (e?: React.MouseEvent) => {
@@ -276,6 +278,11 @@ export function HubGamesPreview() {
           </button>
         )}
       </div>
+      
+      <HubCreateGameSheet 
+        isOpen={isCreateGameSheetOpen} 
+        onClose={() => setIsCreateGameSheetOpen(false)} 
+      />
     </Tile>
   );
 }
