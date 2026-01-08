@@ -61,7 +61,7 @@ const ScrollToTopGlass = () => {
     <div 
       className={`
         fixed
-        top-14
+        top-[120px]
         left-1/2
         -translate-x-1/2
         z-[39]
