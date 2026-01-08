@@ -159,15 +159,18 @@ export function AchievementBanner({
     return () => clearTimeout(timer);
   }, [sortedAchievements]);
 
-  // Dismiss on scroll
+  // Dismiss on scroll (safer cleanup pattern)
   useEffect(() => {
-    if (sortedAchievements.length === 0 || !visible) return;
+    if (!visible || sortedAchievements.length === 0) return;
 
-    const handleScroll = () => handleDismiss();
-    
-    window.addEventListener('scroll', handleScroll, { passive: true, once: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [sortedAchievements, visible]);
+    const onScroll = () => {
+      handleDismiss();
+      window.removeEventListener('scroll', onScroll);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [visible, sortedAchievements.length]);
 
   if (sortedAchievements.length === 0 || !visible) return null;
 
