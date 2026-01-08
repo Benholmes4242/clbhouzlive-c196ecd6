@@ -7,6 +7,105 @@
   gap: 16px;
 }
 
+/* V2.3: Discover Smart Empty State */
+.discoverEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  gap: 8px;
+}
+
+.discoverEmpty__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hub-glass-bg-subtle);
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text-dim);
+  margin-bottom: 8px;
+}
+
+.discoverEmpty__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--hub-text);
+  margin: 0;
+}
+
+.discoverEmpty__subtitle {
+  font-size: 14px;
+  color: var(--hub-text-sub);
+  margin: 0;
+  max-width: 260px;
+}
+
+.discoverEmpty__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 220px;
+}
+
+.discoverEmpty__primary {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #6E9277 0%, #89A78C 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(110, 146, 119, 0.25);
+}
+
+.discoverEmpty__primary:hover {
+  box-shadow: 0 4px 12px rgba(110, 146, 119, 0.35);
+  transform: translateY(-1px);
+}
+
+.discoverEmpty__primary:active {
+  transform: scale(0.97);
+}
+
+.discoverEmpty__secondary {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  background: var(--hub-glass-bg-subtle);
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.discoverEmpty__secondary:hover {
+  background: var(--hub-glass-bg-hover);
+  border-color: var(--hub-stroke);
+  color: var(--hub-text);
+}
+
+.discoverEmpty__secondary:active {
+  transform: scale(0.97);
+}
+
+/* V2.3: Results header */
+.resultsHeader {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--hub-text-muted);
+  padding: 0 2px;
+}
+
 /* Create Game Hero Card - Premium style */
 .createGameHero {
   display: flex;
@@ -418,7 +517,7 @@
   margin: 0 0 0 2px;
 }
 
-/* V2.2: Status Strip */
+/* V2.3: Status Strip - Enhanced with count + clear when */
 .statusStrip {
   display: flex;
   align-items: center;
@@ -427,6 +526,12 @@
   border-radius: 12px;
   background: var(--hub-glass-bg-subtle);
   border: 1px solid var(--hub-stroke-subtle);
+}
+
+.statusStrip__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .statusStrip__scope {
@@ -444,6 +549,37 @@
 .statusStrip__sub {
   font-size: 12px;
   color: var(--hub-text-dim);
+}
+
+.statusStrip__countPill {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 16px;
+  background: var(--hub-glass-bg);
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text-muted);
+}
+
+.statusStrip__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusStrip__clearWhen {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--hub-accent);
+  transition: all 0.15s;
+}
+
+.statusStrip__clearWhen:hover {
+  background: var(--hub-glass-bg-hover);
 }
 
 .statusStrip__filterBtn {
