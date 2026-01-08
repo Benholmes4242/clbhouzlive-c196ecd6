@@ -5,7 +5,10 @@
  * Premium default state with prompt chips
  * Keyboard-safe input bar
  * 
- * V1: Default state only, chat integration comes later
+ * V1 Behavior:
+ * - Chips fill input + focus (don't navigate)
+ * - No auto-focus on open (only when user interacts)
+ * - Input stays visible above keyboard
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -65,16 +68,18 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
     };
   }, [isOpen]);
 
-  // Clear input when sheet closes
+  // Clear input when sheet closes, set initial message when opening
   useEffect(() => {
     if (!isOpen) {
       setInput('');
+    } else if (initialMessage) {
+      setInput(initialMessage);
     }
-  }, [isOpen]);
+  }, [isOpen, initialMessage]);
 
-  // Focus input when sheet opens
+  // Only auto-focus if initialMessage is provided (intentional deep link)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !initialMessage) return;
     const timer = setTimeout(() => {
       try {
         inputRef.current?.focus({ preventScroll: true });
@@ -83,23 +88,32 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
       }
     }, 200);
     return () => clearTimeout(timer);
-  }, [isOpen]);
+  }, [isOpen, initialMessage]);
 
   // Prevent clicks inside sheet from closing
   const handleSheetClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
   }, []);
 
-  // Handle prompt chip click - fill input or send directly
+  // Handle prompt chip click - fill input and focus (stay in sheet)
   const handleChipClick = useCallback((prompt: string) => {
-    // Navigate to full Echo page with the message
-    onClose();
+    setInput(prompt);
+    // Focus the input after filling
     setTimeout(() => {
-      navigate(`/hub/echo?msg=${encodeURIComponent(prompt)}`);
-    }, 100);
-  }, [navigate, onClose]);
+      try {
+        inputRef.current?.focus({ preventScroll: true });
+      } catch {
+        inputRef.current?.focus();
+      }
+    }, 50);
+  }, []);
 
-  // Handle send
+  // Focus input when user taps it
+  const handleInputFocus = useCallback(() => {
+    // Input is already focused by native behavior
+  }, []);
+
+  // Handle send - navigate to full Echo page for actual chat
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
     if (!trimmed) return;
@@ -145,7 +159,6 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
             style={{ 
               height: '80vh',
               background: 'var(--hub-bg-start)',
-              paddingBottom: 'env(safe-area-inset-bottom)',
             }}
             onClick={handleSheetClick}
           >
@@ -168,7 +181,7 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                 }}
               >
                 <h2 
-                  className="text-[18px] font-semibold"
+                  className="text-[17px] font-semibold"
                   style={{ color: 'var(--hub-text)' }}
                 >
                   Echo
@@ -179,26 +192,26 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                   style={{ background: 'var(--hub-glass-bg)' }}
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5" style={{ color: 'var(--hub-text-sub)' }} />
+                  <X className="w-5 h-5" style={{ color: 'var(--hub-text-muted)' }} />
                 </button>
               </div>
             </div>
             
             {/* Content - default empty state, optically centered above input */}
-            <div className="flex-1 overflow-y-auto overscroll-contain flex flex-col">
+            <div className="flex-1 overflow-y-auto overscroll-contain flex flex-col min-h-0">
               {/* Empty State - centered with breathing room */}
-              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 -mt-12">
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 -mt-8">
                 {/* Icon - subtle watermark feel */}
                 <div className="mb-5">
                   <div 
-                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    className="w-14 h-14 rounded-full flex items-center justify-center"
                     style={{ 
                       background: 'var(--hub-glass-bg)',
-                      opacity: 0.5,
+                      opacity: 0.45,
                     }}
                   >
                     <Sparkles 
-                      className="w-8 h-8" 
+                      className="w-7 h-7" 
                       style={{ color: 'var(--hub-text-dim)' }} 
                     />
                   </div>
@@ -206,7 +219,7 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                 
                 {/* Title */}
                 <h3 
-                  className="text-[20px] font-semibold mb-2"
+                  className="text-[19px] font-semibold mb-2"
                   style={{ color: 'var(--hub-text)' }}
                 >
                   Ask Echo
@@ -217,38 +230,50 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                   className="text-[14px] leading-relaxed mb-6"
                   style={{ 
                     color: 'var(--hub-text-sub)',
-                    maxWidth: '280px',
+                    maxWidth: '260px',
                   }}
                 >
                   Tips, course info, rules, or just golf chat — right when you need it.
                 </p>
                 
-                {/* Prompt chips */}
-                <div className="flex flex-wrap justify-center gap-2 max-w-[320px]">
-                  {PROMPT_CHIPS.map((chip) => (
-                    <button
-                      key={chip}
-                      onClick={() => handleChipClick(chip)}
-                      className="px-3 py-1.5 rounded-full text-[13px] font-medium transition-all active:scale-[0.97]"
-                      style={{
-                        background: 'var(--hub-glass-bg)',
-                        border: '1px solid var(--hub-stroke)',
-                        color: 'var(--hub-text-body)',
-                      }}
-                    >
-                      {chip}
-                    </button>
-                  ))}
+                {/* Prompt chips section */}
+                <div className="w-full max-w-[300px]">
+                  {/* Label */}
+                  <p 
+                    className="text-[11px] uppercase tracking-wide mb-2.5"
+                    style={{ color: 'var(--hub-text-dim)' }}
+                  >
+                    Try one of these
+                  </p>
+                  
+                  {/* Chips */}
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {PROMPT_CHIPS.map((chip) => (
+                      <button
+                        key={chip}
+                        onClick={() => handleChipClick(chip)}
+                        className="px-3 py-1.5 rounded-full text-[13px] font-medium transition-all active:scale-[0.97]"
+                        style={{
+                          background: 'transparent',
+                          border: '1px solid var(--hub-stroke)',
+                          color: 'var(--hub-text-muted)',
+                        }}
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
             
             {/* Input Bar - anchored bottom, keyboard-safe */}
             <div 
-              className="flex-shrink-0 px-4 pt-3 pb-3"
+              className="flex-shrink-0 px-4 pt-3"
               style={{ 
                 background: 'var(--hub-bg-start)',
                 borderTop: '1px solid var(--hub-glass-border)',
+                paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
               }}
             >
               <div
@@ -264,6 +289,7 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  onFocus={handleInputFocus}
                   placeholder="Ask Echo..."
                   className="flex-1 bg-transparent border-none outline-none text-[15px]"
                   style={{ 
@@ -272,6 +298,7 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                   }}
                   autoComplete="off"
                   autoCorrect="off"
+                  enterKeyHint="send"
                 />
                 
                 <button
