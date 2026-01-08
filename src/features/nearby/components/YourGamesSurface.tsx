@@ -24,6 +24,7 @@ interface YourGamesSurfaceProps {
   onOpenJoinRequests?: (focusGameId?: string) => void;
   onOpenSearchGames?: () => void;
   focusId?: string;
+  onFocusConsumed?: () => void;
 }
 
 export function YourGamesSurface({
@@ -32,6 +33,7 @@ export function YourGamesSurface({
   onOpenJoinRequests,
   onOpenSearchGames,
   focusId,
+  onFocusConsumed,
 }: YourGamesSurfaceProps) {
   const { data, isLoading } = useUserGames();
   useUserGamesRealtime();
@@ -55,12 +57,18 @@ export function YourGamesSurface({
   useEffect(() => {
     if (!focusId || !listRef.current || isLoading) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const timer = setTimeout(() => {
       const el = listRef.current?.querySelector<HTMLElement>(`[data-game-id="${focusId}"]`);
       if (!el) return;
 
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.scrollIntoView({ block: 'center', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       el.classList.add('sheet-focus-highlight');
+      
+      // Clear focus after highlight to prevent re-triggers on realtime updates
+      onFocusConsumed?.();
+      
       const highlightTimer = setTimeout(() => {
         el.classList.remove('sheet-focus-highlight');
       }, 1400);
@@ -69,7 +77,7 @@ export function YourGamesSurface({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [focusId, isLoading, hostedGames, joinedGames]);
+  }, [focusId, isLoading, hostedGames, joinedGames, onFocusConsumed]);
 
   // Map UserGame to GameData format
   const toGameData = (g: UserGame): GameData => ({
