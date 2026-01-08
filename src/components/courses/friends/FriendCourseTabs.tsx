@@ -61,7 +61,7 @@ const FriendCourseTabs: React.FC<FriendCourseTabsProps> = ({
           {isLoadingTop100 ? (
             <div className="text-center py-8">Loading Top 100 courses...</div>
           ) : friendTop100Courses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 sm:gap-6">
               {friendTop100Courses.map((userCourse) => (
                 <CourseCard 
                   key={userCourse.id} 
@@ -90,7 +90,7 @@ const FriendCourseTabs: React.FC<FriendCourseTabsProps> = ({
             {friendName}'s Recent Activity (Last 30 Days)
           </h3>
           {recentCourses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 sm:gap-6">
               {recentCourses.map((userCourse) => (
                 <CourseCard 
                   key={`${userCourse.id}-recent`} 

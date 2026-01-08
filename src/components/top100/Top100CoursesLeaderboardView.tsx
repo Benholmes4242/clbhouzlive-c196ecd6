@@ -206,7 +206,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
 
       {/* Course Cards - Full bleed on mobile */}
       <div className="-mx-4 sm:mx-0">
-        <section className="space-y-3">
+        <section className="sm:space-y-3">
           {paginatedCourses.map((course, index) => {
             const tags = getCourseTags(course, filters);
             const trophies = getCourseTrophies(course, index);
