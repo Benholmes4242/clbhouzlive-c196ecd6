@@ -49,11 +49,12 @@ export function HubGamesHubSheet({
   );
 
   // Reset to initial tab when sheet opens
-  // Reset state when sheet opens, apply initial focus if provided
+  // Reset state when sheet opens, apply initial focus only for 'yours' tab
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab);
-      setFocusedGameId(initialFocusGameId);
+      // Only set focus when opening to 'yours' tab to avoid mystery focus
+      setFocusedGameId(initialTab === 'yours' ? initialFocusGameId : undefined);
     }
   }, [isOpen, initialTab, initialFocusGameId]);
 
@@ -268,6 +269,7 @@ export function HubGamesHubSheet({
                     onOpenJoinRequests={handleOpenJoinRequests}
                     onOpenSearchGames={() => handleTabChange('discover')}
                     focusId={focusedGameId}
+                    onFocusConsumed={() => setFocusedGameId(undefined)}
                   />
                 </div>
               )}

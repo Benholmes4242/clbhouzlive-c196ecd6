@@ -188,6 +188,7 @@ export function HubYourGamesSheet({ isOpen, onClose }: HubYourGamesSheetProps) {
                   }}
                   onOpenSearchGames={() => setSearchGamesOpen(true)}
                   focusId={focusedGameId}
+                  onFocusConsumed={() => setFocusedGameId(undefined)}
                 />
               </div>
             </div>
