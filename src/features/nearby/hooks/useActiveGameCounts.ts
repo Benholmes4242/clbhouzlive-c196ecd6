@@ -8,29 +8,27 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+export type ActiveGameCountMap = Record<string, number>;
+
 export interface UseActiveGameCountsResult {
-  counts: Record<string, number>;
+  counts: ActiveGameCountMap;
   isLoading: boolean;
   isError: boolean;
 }
 
-type ActiveGameCountMap = Record<string, number>;
-
 export function useActiveGameCounts(courseIds: string[]): UseActiveGameCountsResult {
-  // NEVER mutate incoming props (courseIds.sort() mutates)
   const key = useMemo(() => courseIds.slice().sort().join(','), [courseIds]);
 
   const query = useQuery<ActiveGameCountMap>({
     queryKey: ['active-game-counts', key],
     enabled: courseIds.length > 0,
-    staleTime: 30_000, // 30s cache
-    gcTime: 60_000, // keep cache 1 min
+    staleTime: 30_000,
+    gcTime: 60_000,
     queryFn: async (): Promise<ActiveGameCountMap> => {
       if (courseIds.length === 0) return {};
 
       const now = new Date().toISOString();
 
-      // Upcoming games with open slots
       const { data, error } = await supabase
         .from('games')
         .select('course_id')
