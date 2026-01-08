@@ -238,8 +238,8 @@ export function PlayersLeaderboardView() {
         </div>
       )}
 
-      {/* Segmented Control - sticky */}
-      <div className="sticky top-0 z-10 bg-[var(--bg-page)]/95 backdrop-blur-sm py-3 px-4">
+      {/* Segmented Control */}
+      <div className="py-3 px-4">
         <LeaderboardSegmentedControl
           value={segment}
           onChange={setSegment}
