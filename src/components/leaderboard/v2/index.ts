@@ -9,6 +9,8 @@ export { LeaderboardRivalsSection, type RivalPlayer } from './LeaderboardRivalsS
 export { LeaderboardPlayerCard, type LeaderboardPlayerEntry } from './LeaderboardPlayerCard';
 export { LeaderboardRegionSelector, REGIONS, type LeaderboardRegion } from './LeaderboardRegionSelector';
 export { RivalPreviewSheet } from './RivalPreviewSheet';
+export { PlayersFromFilter } from './PlayersFromFilter';
+export { NearbyEmptyState } from './NearbyEmptyState';
 export {
   LeaderboardHeroSkeleton,
   LeaderboardStatusSkeleton,
