@@ -36,6 +36,8 @@ import {
   TimeRangeFilter,
   AchievementBanner,
   useAchievementDetection,
+  RankHistorySheet,
+  MOCK_MILESTONES,
   type ArenaMode,
   type LeaderboardRegion,
   type LeaderboardPlayerEntry,
@@ -89,6 +91,7 @@ export function PlayersLeaderboardViewV2() {
   const [isFilterTransitioning, setIsFilterTransitioning] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
   const [dismissedAchievements, setDismissedAchievements] = useState(false);
+  const [historySheetOpen, setHistorySheetOpen] = useState(false);
 
   // Get current user ID
   useEffect(() => {
@@ -510,6 +513,7 @@ export function PlayersLeaderboardViewV2() {
           <LeaderboardYourStatus
             user={userStatus}
             onViewRivals={scrollToUser}
+            onViewHistory={() => setHistorySheetOpen(true)}
             rivalsDisabled={rivalsDisabled}
             rivalsDisabledReason={rivalsDisabledReason}
           />
@@ -713,6 +717,13 @@ export function PlayersLeaderboardViewV2() {
         open={rivalSheetOpen}
         onOpenChange={setRivalSheetOpen}
         player={selectedRival}
+      />
+
+      {/* Rank History Sheet */}
+      <RankHistorySheet
+        open={historySheetOpen}
+        onOpenChange={setHistorySheetOpen}
+        milestones={MOCK_MILESTONES} // TODO: Replace with real data from user's rank history
       />
     </div>
   );

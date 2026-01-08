@@ -13,6 +13,7 @@ export { PlayersFromFilter } from './PlayersFromFilter';
 export { NearbyEmptyState } from './NearbyEmptyState';
 export { TimeRangeFilter } from './TimeRangeFilter';
 export { AchievementBanner, useAchievementDetection, type AchievementType } from './AchievementBanner';
+export { RankHistorySheet, type RankMilestone, MOCK_MILESTONES } from './RankHistorySheet';
 export {
   LeaderboardHeroSkeleton,
   LeaderboardStatusSkeleton,

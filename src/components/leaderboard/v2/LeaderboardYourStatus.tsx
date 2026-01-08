@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Target } from 'lucide-react';
+import { Plus, Target, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
@@ -26,6 +26,7 @@ export interface LeaderboardUserStatus {
 interface LeaderboardYourStatusProps {
   user: LeaderboardUserStatus;
   onViewRivals?: () => void;
+  onViewHistory?: () => void;
   rivalsDisabled?: boolean;
   rivalsDisabledReason?: string;
   className?: string;
@@ -34,6 +35,7 @@ interface LeaderboardYourStatusProps {
 export function LeaderboardYourStatus({ 
   user, 
   onViewRivals,
+  onViewHistory,
   rivalsDisabled = false,
   rivalsDisabledReason,
   className 
@@ -188,7 +190,15 @@ export function LeaderboardYourStatus({
           )}
         >
           <Target className="w-4 h-4" />
-          View Rivals
+          Rivals
+        </motion.button>
+        <motion.button
+          onClick={onViewHistory}
+          whileTap={{ scale: 0.98 }}
+          className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors border-r border-border/40"
+        >
+          <History className="w-4 h-4" />
+          History
         </motion.button>
         <motion.button
           onClick={() => navigate('/discover?tab=explore')}
@@ -196,7 +206,7 @@ export function LeaderboardYourStatus({
           className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Log a Course
+          Log
         </motion.button>
       </div>
     </div>
