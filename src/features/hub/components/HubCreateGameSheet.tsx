@@ -165,7 +165,7 @@ export const HubCreateGameSheet: React.FC<HubCreateGameSheetProps> = ({
             >
               <CreateGameSurface
                 ref={surfaceRef}
-                prefilledClub={resolvedPrefill}
+                prefilledClub={resolvedPrefill ?? undefined}
                 onSubmit={handleCreate}
                 hideSubmitButton
                 bottomPadding={0}
