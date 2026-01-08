@@ -7,7 +7,7 @@
  */
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Search, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchGamesSurface } from '@/features/nearby/components/SearchGamesSurface';
 import { YourGamesSurface } from '@/features/nearby/components/YourGamesSurface';
@@ -41,6 +41,11 @@ export function HubGamesHubSheet({
   const [joinRequestsFocusGameId, setJoinRequestsFocusGameId] = useState<string | undefined>();
   const [createGameOpen, setCreateGameOpen] = useState(false);
   const [focusedGameId, setFocusedGameId] = useState<string | undefined>();
+  // V2.4: Discover meta for hub header hint
+  const [discoverMeta, setDiscoverMeta] = useState<{ resultsCount: number; startingSoonCount: number } | null>(null);
+  // V2.4: FAB long-press menu state
+  const [fabMenuOpen, setFabMenuOpen] = useState(false);
+  const fabTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: myRequests = [] } = useMyJoinRequests();
   const pendingCount = useMemo(
@@ -104,6 +109,7 @@ export function HubGamesHubSheet({
   };
 
   const handleOpenCreate = () => {
+    setFabMenuOpen(false);
     setCreateGameOpen(true);
   };
 
@@ -119,6 +125,51 @@ export function HubGamesHubSheet({
     // Scroll to top so focus animation is visible
     contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   };
+
+  // V2.4: FAB long-press handlers
+  const handleFabPointerDown = () => {
+    fabTimerRef.current = setTimeout(() => {
+      haptic('medium');
+      setFabMenuOpen(true);
+    }, 420);
+  };
+
+  const handleFabPointerUp = () => {
+    if (fabTimerRef.current) {
+      clearTimeout(fabTimerRef.current);
+      fabTimerRef.current = null;
+    }
+  };
+
+  const handleFabClick = () => {
+    if (!fabMenuOpen) {
+      handleOpenCreate();
+    }
+  };
+
+  const handleFabMenuAction = (action: 'create' | 'discover' | 'yours') => {
+    haptic('light');
+    setFabMenuOpen(false);
+    switch (action) {
+      case 'create':
+        setCreateGameOpen(true);
+        break;
+      case 'discover':
+        handleTabChange('discover');
+        break;
+      case 'yours':
+        handleTabChange('yours');
+        break;
+    }
+  };
+
+  // V2.4: Compute hub header hint text
+  const hubHintText = useMemo(() => {
+    if (activeTab !== 'discover' || !discoverMeta) return null;
+    if (discoverMeta.startingSoonCount > 0) return 'Starting soon near you';
+    if (discoverMeta.resultsCount > 0) return 'New games available';
+    return null;
+  }, [activeTab, discoverMeta]);
 
   if (typeof document === 'undefined') return null;
 
@@ -170,12 +221,23 @@ export function HubGamesHubSheet({
                   borderBottom: hasScrolled ? 'none' : '1px solid var(--hub-glass-border)',
                 }}
               >
-                <h2
-                  className="text-[18px] font-semibold"
-                  style={{ color: 'var(--hub-text)' }}
-                >
-                  Games
-                </h2>
+                <div className="flex flex-col gap-0.5">
+                  <h2
+                    className="text-[18px] font-semibold"
+                    style={{ color: 'var(--hub-text)' }}
+                  >
+                    Games
+                  </h2>
+                  {/* V2.4: Hub header hint */}
+                  {hubHintText && (
+                    <span 
+                      className="text-[12px] font-medium"
+                      style={{ color: 'var(--hub-text-dim)', opacity: 0.8 }}
+                    >
+                      {hubHintText}
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-3">
                   {/* Join Requests button (visible when on Yours tab) */}
@@ -260,6 +322,7 @@ export function HubGamesHubSheet({
                 <SearchGamesSurface
                   bottomPadding={24}
                   onOpenCreate={handleOpenCreate}
+                  onMeta={setDiscoverMeta}
                 />
               ) : (
                 <div className="pt-2">
@@ -275,25 +338,95 @@ export function HubGamesHubSheet({
               )}
             </div>
 
-            {/* Floating Create Game FAB */}
-            <motion.button
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 25 }}
-              onClick={handleOpenCreate}
-              className="absolute z-20 flex items-center justify-center shadow-lg rounded-full h-14 min-w-14 px-4 gap-2 md:px-5"
+            {/* Floating Create Game FAB + V2.4 long-press menu */}
+            <div
+              className="absolute z-20"
               style={{
                 bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
                 right: 20,
-                background: 'linear-gradient(135deg, #6E9277 0%, #89A78C 100%)',
-                boxShadow: '0 4px 16px rgba(110, 146, 119, 0.4)',
               }}
-              aria-label="Create a game"
             >
-              <Plus className="w-6 h-6 text-white" />
-              <span className="hidden md:inline text-white font-semibold text-sm">Create</span>
-            </motion.button>
+              {/* FAB Menu (V2.4) */}
+              <AnimatePresence>
+                {fabMenuOpen && (
+                  <>
+                    {/* Click outside to close */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0"
+                      onClick={() => setFabMenuOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute bottom-16 right-0 rounded-xl overflow-hidden"
+                      style={{
+                        background: 'var(--hub-glass-bg)',
+                        border: '1px solid var(--hub-glass-border)',
+                        backdropFilter: 'blur(20px)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+                        minWidth: 160,
+                      }}
+                    >
+                      <button
+                        onClick={() => handleFabMenuAction('create')}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors"
+                        style={{ color: 'var(--hub-text)', borderBottom: '1px solid var(--hub-stroke-subtle)' }}
+                      >
+                        <Plus size={16} />
+                        Create a game
+                      </button>
+                      <button
+                        onClick={() => handleFabMenuAction('discover')}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors"
+                        style={{ color: 'var(--hub-text-sub)', borderBottom: '1px solid var(--hub-stroke-subtle)' }}
+                      >
+                        <Search size={16} />
+                        Find a game
+                      </button>
+                      <button
+                        onClick={() => handleFabMenuAction('yours')}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors"
+                        style={{ color: 'var(--hub-text-sub)' }}
+                      >
+                        <Calendar size={16} />
+                        Your games
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+
+              {/* FAB Button */}
+              <motion.button
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 25 }}
+                onClick={handleFabClick}
+                onPointerDown={handleFabPointerDown}
+                onPointerUp={handleFabPointerUp}
+                onPointerLeave={handleFabPointerUp}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  haptic('medium');
+                  setFabMenuOpen(true);
+                }}
+                className="flex items-center justify-center shadow-lg rounded-full h-14 min-w-14 px-4 gap-2 md:px-5"
+                style={{
+                  background: 'linear-gradient(135deg, #6E9277 0%, #89A78C 100%)',
+                  boxShadow: '0 4px 16px rgba(110, 146, 119, 0.4)',
+                }}
+                aria-label="Create a game"
+              >
+                <Plus className="w-6 h-6 text-white" />
+                <span className="hidden md:inline text-white font-semibold text-sm">Create</span>
+              </motion.button>
+            </div>
           </motion.div>
 
           {/* Nested sheets */}

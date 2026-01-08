@@ -4,10 +4,10 @@
  * Can be rendered in a sheet or standalone page
  */
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
-import { Search, MapPin, Calendar, ArrowUpDown, Plus } from 'lucide-react';
+import { Search, MapPin, Calendar, ArrowUpDown, Plus, Clock } from 'lucide-react';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
 import { useGameFilters } from '../hooks/useGameFilters';
 import { useGamesQuery } from '../hooks/useGamesQuery';
@@ -16,11 +16,14 @@ import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './Fi
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { addDays } from 'date-fns';
+import { addDays, formatDistanceToNowStrict } from 'date-fns';
 import '@/features/games/components/GameRow.css';
 import '@/features/nearby/components/your-games/YourGames.css';
 import '../GamesTab.css';
 import '../SearchGames.css';
+
+// V2.4: Constant for "starting soon" window
+const STARTING_SOON_HOURS = 6;
 
 type Game = {
   id: string;
@@ -36,6 +39,8 @@ interface SearchGamesSurfaceProps {
   bottomPadding?: number;
   /** Callback to open Create Game sheet */
   onOpenCreate?: () => void;
+  /** V2.4: Callback to report discover metadata for hub header */
+  onMeta?: (meta: { resultsCount: number; startingSoonCount: number }) => void;
 }
 
 function CreateGameHero({ onOpen }: { onOpen: () => void }) {
@@ -262,6 +267,7 @@ function FiltersRow({
 }
 
 // V2.3: Status strip with results count + clear when action
+// V2.4: Added count pill pulse animation
 function StatusStrip({ 
   selectedClub, 
   distanceKm, 
@@ -277,6 +283,19 @@ function StatusStrip({
   onOpenWhen: () => void;
   onClearWhen: () => void;
 }) {
+  const [pulse, setPulse] = useState(false);
+  const prevCountRef = useRef(resultsCount);
+  
+  // V2.4: Pulse animation when results count changes
+  useEffect(() => {
+    if (prevCountRef.current !== resultsCount) {
+      setPulse(true);
+      const t = setTimeout(() => setPulse(false), 180);
+      prevCountRef.current = resultsCount;
+      return () => clearTimeout(t);
+    }
+  }, [resultsCount]);
+
   const scopeText = selectedClub 
     ? `At ${selectedClub.name}`
     : distanceKm 
@@ -293,7 +312,7 @@ function StatusStrip({
           <span className="statusStrip__main">{scopeText}</span>
           {subText && <span className="statusStrip__sub">{subText}</span>}
         </div>
-        <span className="statusStrip__countPill">{countLabel}</span>
+        <span className={cn("statusStrip__countPill", pulse && "statusStrip__countPill--pulse")}>{countLabel}</span>
       </div>
       <div className="statusStrip__right">
         {hasWhen && (
@@ -305,6 +324,60 @@ function StatusStrip({
           <Calendar size={14} />
           When
         </button>
+      </div>
+    </div>
+  );
+}
+
+// V2.4: Starting Soon horizontal carousel strip
+function StartingSoonStrip({ 
+  games, 
+  onFocusGame 
+}: { 
+  games: Game[]; 
+  onFocusGame: (gameId: string) => void;
+}) {
+  if (games.length === 0) return null;
+  
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+
+  return (
+    <div className="startingSoonStrip">
+      <div className="startingSoonStrip__header">
+        <Clock size={14} />
+        <span>Starting soon</span>
+      </div>
+      <div className="startingSoonStrip__carousel">
+        {games.map((game) => {
+          const startDate = new Date(game.start_time);
+          const timeLabel = formatDistanceToNowStrict(startDate, { addSuffix: false });
+          const spotsLeft = game.slots_open;
+          
+          return (
+            <button
+              key={game.id}
+              className="startingSoonCard"
+              onClick={() => {
+                haptic('light');
+                onFocusGame(game.id);
+              }}
+            >
+              <span className="startingSoonCard__course">
+                {game.course_name || 'Golf game'}
+              </span>
+              <div className="startingSoonCard__meta">
+                <span className="startingSoonCard__time">in {timeLabel}</span>
+                {spotsLeft > 0 && (
+                  <span className="startingSoonCard__spots">
+                    {spotsLeft} {spotsLeft === 1 ? 'spot' : 'spots'}
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -467,12 +540,28 @@ function ResultsHeader({ count }: { count: number }) {
   );
 }
 
-export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGamesSurfaceProps) {
+export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate, onMeta }: SearchGamesSurfaceProps) {
   const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(null);
   const [searchMode, setSearchMode] = useState<'clubs' | 'people'>('clubs');
   const [quickTime, setQuickTime] = useState<QuickTimeOption | null>(null);
+  const [focusGameId, setFocusGameId] = useState<string | undefined>();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const filters = useGameFilters();
   const { data: games, isLoading } = useGamesQuery(selectedClub?.id);
+
+  // V2.4: Compute "starting soon" games (within next 6 hours)
+  const startingSoonGames = useMemo(() => {
+    const now = new Date();
+    const cutoff = new Date(now.getTime() + STARTING_SOON_HOURS * 60 * 60 * 1000);
+    
+    return (games || [])
+      .filter(g => {
+        const t = new Date(g.start_time);
+        return t > now && t <= cutoff;
+      })
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+      .slice(0, 8);
+  }, [games]);
 
   // Handle quick time selection - maps to existing when filter
   const handleQuickTimeSelect = (option: QuickTimeOption | null) => {
@@ -532,10 +621,35 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
   const resultsCount = games?.length ?? 0;
   const hasWhen = !!filters.when;
 
+  // V2.4: Report meta to parent for hub header hint
+  useEffect(() => {
+    onMeta?.({ resultsCount, startingSoonCount: startingSoonGames.length });
+  }, [resultsCount, startingSoonGames.length, onMeta]);
+
   const handleClearWhen = () => {
     haptic('light');
     setQuickTime(null);
     filters.setWhen(null);
+  };
+
+  // V2.4: Focus to game row in list
+  const handleFocusGame = (gameId: string) => {
+    setFocusGameId(gameId);
+    // Scroll to row and highlight
+    setTimeout(() => {
+      const el = resultsRef.current?.querySelector<HTMLElement>(`[data-game-id="${gameId}"]`);
+      if (el) {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollIntoView({ block: 'center', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+        el.classList.add('sheet-focus-highlight');
+        setTimeout(() => {
+          el.classList.remove('sheet-focus-highlight');
+          setFocusGameId(undefined);
+        }, 1400);
+      } else {
+        setFocusGameId(undefined);
+      }
+    }, 100);
   };
 
   return (
@@ -557,6 +671,12 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
       <SuggestedTimesChips 
         activeOption={quickTime} 
         onSelect={handleQuickTimeSelect} 
+      />
+      
+      {/* V2.4: Starting soon strip */}
+      <StartingSoonStrip 
+        games={startingSoonGames} 
+        onFocusGame={handleFocusGame} 
       />
       
       <FindAGame 
@@ -581,10 +701,10 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
           onClearWhen={handleClearWhen}
         />
       ) : (
-        <>
+        <div ref={resultsRef}>
           <ResultsHeader count={resultsCount} />
           <GamesList games={games || []} />
-        </>
+        </div>
       )}
     </div>
   );
