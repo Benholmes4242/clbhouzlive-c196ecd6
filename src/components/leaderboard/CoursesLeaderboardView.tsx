@@ -29,8 +29,8 @@ const MAX_COURSES = 100;
 const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'most_played', label: 'Most Played' },
   { value: 'highest_rated', label: 'Highest Rated' },
-  { value: 'rising', label: 'Trending' },
-  { value: 'friends', label: 'Friends' },
+  { value: 'rising', label: 'Trending Courses' },
+  { value: 'friends', label: 'Friends Played' },
 ];
 
 export function CoursesLeaderboardView() {
