@@ -20,17 +20,19 @@ import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/D
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 
-export type VideoCategory = 'all' | 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
+// Dynamic category type from definitions
+export type VideoCategory = string;
 
-const VIDEO_PILLS: { value: VideoCategory; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'funny', label: 'Funny' },
-  { value: 'challenge', label: 'Challenge' },
-  { value: 'course-vlog', label: 'Course Vlog' },
-  { value: 'tips-coaching', label: 'Tips & Coaching' },
-  { value: 'review', label: 'Review' },
-  { value: 'other', label: 'Other' },
+// Build video pills dynamically from MOMENT_CATEGORIES
+const VIDEO_PILLS = [
+  { value: 'all', label: 'All', icon: undefined as React.ElementType | undefined },
+  ...getDiscoverCategories().map(cat => ({
+    value: cat.id,
+    label: cat.label,
+    icon: cat.icon,
+  })),
 ];
 
 // Local storage keys
@@ -158,11 +160,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     localStorage.setItem(VIDEOS_SORT_KEY, sort);
   };
 
-  // Build pills for command center
+  // Build pills for command center with icons
   const pills: Pill[] = VIDEO_PILLS.map(p => ({
     key: p.value,
     label: p.label,
     selected: categoryParam === p.value,
+    icon: p.icon ? React.createElement(p.icon, { className: 'h-4 w-4' }) : undefined,
   }));
 
   // Category filter - undefined when 'all' (not the string 'all')
