@@ -359,15 +359,15 @@ export function CoursesLeaderboardView() {
         </div>
 
         {/* Sort Tabs - Underline style matching main page tabs */}
-        <div className="overflow-x-auto px-4">
-          <div className="inline-flex gap-0 min-w-max">
+        <div className="px-4">
+          <div className="flex justify-center gap-0">
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => handleSortChange(opt.value)}
                 className={cn(
-                  'relative px-3 py-2.5 text-sm font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out',
+                  'relative flex-1 max-w-[100px] px-2 py-2.5 text-sm font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out',
                   'after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out',
                   sort === opt.value
                     ? 'text-foreground after:w-full after:opacity-[0.85]'
