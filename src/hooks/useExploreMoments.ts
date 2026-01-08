@@ -1,11 +1,12 @@
 /**
  * useExploreMoments - Hook for fetching explore moments from unified view
  * 
- * Provides infinite scroll pagination for the Discover grid and region feeds.
+ * Phase 2: Adds trending support, caching, and prefetch
  */
 
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useEffect } from 'react';
 
 export type RegionKey = 'GBI' | 'EU' | 'USA' | 'ROW';
 
@@ -25,11 +26,26 @@ export interface ExploreMoment {
   region_key: RegionKey | null;
 }
 
+export interface TrendingMoment extends ExploreMoment {
+  likes_count: number;
+  comments_count: number;
+  shares_count: number;
+  trend_score: number;
+}
+
 export interface RegionStats {
   region_key: RegionKey;
   moments_last_30_days: number;
   thumbnail_url: string | null;
 }
+
+// Cache TTLs (in milliseconds)
+const CACHE_TTL = {
+  regionStats: 15 * 60 * 1000,    // 15 minutes
+  trending: 10 * 60 * 1000,       // 10 minutes
+  discover: 5 * 60 * 1000,        // 5 minutes
+  search: 2 * 60 * 1000,          // 2 minutes
+};
 
 const PAGE_SIZE = 20;
 
@@ -70,84 +86,92 @@ export function useInfiniteExploreMoments(regionKey?: RegionKey) {
     },
     initialPageParam: null as { created_at: string; moment_id: string } | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: CACHE_TTL.discover,
   });
 }
 
 /**
- * Fetch region counts (rolling 30 days)
+ * Fetch trending moments using RPC (last 7 days weighted by engagement)
  */
-export function useRegionCounts() {
+export function useTrendingMoments(limit = 40, regionKey?: RegionKey) {
   return useQuery({
-    queryKey: ['explore-region-counts'],
+    queryKey: ['explore-trending', regionKey, limit],
     queryFn: async () => {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
       const { data, error } = await supabase
-        .from('explore_moments')
-        .select('region_key')
-        .gte('created_at', thirtyDaysAgo.toISOString());
+        .rpc('rpc_explore_trending', {
+          p_limit: limit,
+          p_region_key: regionKey || null,
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Trending RPC error:', error);
+        // Fallback to latest if RPC fails
+        const fallbackQuery = supabase
+          .from('explore_moments')
+          .select('*')
+          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: false })
+          .limit(limit);
 
-      // Count by region
-      const counts: Record<RegionKey, number> = {
-        GBI: 0,
-        EU: 0,
-        USA: 0,
-        ROW: 0,
-      };
-
-      (data || []).forEach(item => {
-        if (item.region_key && counts[item.region_key as RegionKey] !== undefined) {
-          counts[item.region_key as RegionKey]++;
+        if (regionKey) {
+          fallbackQuery.eq('region_key', regionKey);
         }
-      });
 
-      return counts;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-}
-
-/**
- * Fetch region thumbnail (most recent moment or fallback to top course)
- */
-export function useRegionThumbnail(regionKey: RegionKey) {
-  return useQuery({
-    queryKey: ['explore-region-thumbnail', regionKey],
-    queryFn: async () => {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      // Try to get most recent moment thumbnail
-      const { data: recentMoment } = await supabase
-        .from('explore_moments')
-        .select('thumbnail_url')
-        .eq('region_key', regionKey)
-        .gte('created_at', thirtyDaysAgo.toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (recentMoment?.thumbnail_url) {
-        return recentMoment.thumbnail_url;
+        const { data: fallbackData } = await fallbackQuery;
+        return (fallbackData || []).map(m => ({
+          ...m,
+          likes_count: 0,
+          comments_count: 0,
+          shares_count: 0,
+          trend_score: 0,
+        })) as TrendingMoment[];
       }
 
-      // Fallback to top-ranked course thumbnail
-      const { data: topCourse } = await supabase
-        .from('golf_courses')
-        .select('thumbnail_image')
-        .eq('region_key', regionKey)
-        .not('thumbnail_image', 'is', null)
-        .order('global_rank', { ascending: true, nullsFirst: false })
-        .limit(1)
-        .maybeSingle();
-
-      return topCourse?.thumbnail_image || null;
+      return (data || []) as TrendingMoment[];
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TTL.trending,
+  });
+}
+
+/**
+ * Fetch "New this week" moments for a specific region
+ * Uses trending RPC with limit 10, falls back to latest
+ */
+export function useNewThisWeekByRegion(regionKey: RegionKey) {
+  return useQuery({
+    queryKey: ['explore-new-this-week', regionKey],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('rpc_explore_trending', {
+          p_limit: 12,
+          p_region_key: regionKey,
+        });
+
+      if (error) {
+        // Fallback to latest
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const { data: fallbackData } = await supabase
+          .from('explore_moments')
+          .select('*')
+          .eq('region_key', regionKey)
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(12);
+
+        return (fallbackData || []).map(m => ({
+          ...m,
+          likes_count: 0,
+          comments_count: 0,
+          shares_count: 0,
+          trend_score: 0,
+        })) as TrendingMoment[];
+      }
+
+      return (data || []) as TrendingMoment[];
+    },
+    staleTime: CACHE_TTL.trending,
   });
 }
 
@@ -208,6 +232,96 @@ export function useExploreRegionStats() {
 
       return stats;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE_TTL.regionStats,
   });
+}
+
+/**
+ * Prefetch hook - call on Explore mount to warm cache
+ */
+export function useExplorePrefetch() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Prefetch region stats
+    queryClient.prefetchQuery({
+      queryKey: ['explore-region-stats'],
+      queryFn: async () => {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const regions: RegionKey[] = ['GBI', 'EU', 'USA', 'ROW'];
+        const stats: RegionStats[] = [];
+
+        for (const regionKey of regions) {
+          const { count } = await supabase
+            .from('explore_moments')
+            .select('*', { count: 'exact', head: true })
+            .eq('region_key', regionKey)
+            .gte('created_at', thirtyDaysAgo.toISOString());
+
+          let thumbnailUrl: string | null = null;
+          const { data: recentMoment } = await supabase
+            .from('explore_moments')
+            .select('thumbnail_url')
+            .eq('region_key', regionKey)
+            .gte('created_at', thirtyDaysAgo.toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (recentMoment?.thumbnail_url) {
+            thumbnailUrl = recentMoment.thumbnail_url;
+          } else {
+            const { data: topCourse } = await supabase
+              .from('golf_courses')
+              .select('thumbnail_image')
+              .eq('region_key', regionKey)
+              .not('thumbnail_image', 'is', null)
+              .order('global_rank', { ascending: true, nullsFirst: false })
+              .limit(1)
+              .maybeSingle();
+            thumbnailUrl = topCourse?.thumbnail_image || null;
+          }
+
+          stats.push({
+            region_key: regionKey,
+            moments_last_30_days: count || 0,
+            thumbnail_url: thumbnailUrl,
+          });
+        }
+        return stats;
+      },
+      staleTime: CACHE_TTL.regionStats,
+    });
+
+    // Prefetch global trending (in background)
+    queryClient.prefetchQuery({
+      queryKey: ['explore-trending', undefined, 40],
+      queryFn: async () => {
+        const { data } = await supabase.rpc('rpc_explore_trending', {
+          p_limit: 40,
+          p_region_key: null,
+        });
+        return (data || []) as TrendingMoment[];
+      },
+      staleTime: CACHE_TTL.trending,
+    });
+
+    // Prefetch "new this week" for each region
+    const regions: RegionKey[] = ['GBI', 'EU', 'USA', 'ROW'];
+    regions.forEach(regionKey => {
+      queryClient.prefetchQuery({
+        queryKey: ['explore-new-this-week', regionKey],
+        queryFn: async () => {
+          const { data } = await supabase.rpc('rpc_explore_trending', {
+            p_limit: 12,
+            p_region_key: regionKey,
+          });
+          return (data || []) as TrendingMoment[];
+        },
+        staleTime: CACHE_TTL.trending,
+      });
+    });
+  }, [queryClient]);
 }
