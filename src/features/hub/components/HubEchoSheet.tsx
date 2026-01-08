@@ -1,17 +1,17 @@
 /**
  * HubEchoSheet - Bottom sheet for Echo AI chat
  * 
- * V2: Uses shared EchoChatSurface with real AI wiring
- * - No navigation to external pages
- * - Real AI responses via useEchoConversation
- * - Empty state → Chat thread transition
+ * V3: Always shows composer at bottom, uses real AI wiring
+ * Layout: Header (fixed) + Body (flex:1) + Composer (anchored bottom)
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkles, Send, StopCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { EchoChatSurface, EchoChatSurfaceRef } from '@/features/echo/components/EchoChatSurface';
+import { cn } from '@/lib/utils';
+import { useEchoConversation } from '@/features/echo/hooks/useEchoConversation';
+import type { EchoMessage } from '@/features/echo/state/echoTypes';
 import '../home/hubThemeLight.css';
 
 interface HubEchoSheetProps {
@@ -35,10 +35,19 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
 }) => {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
-  const chatSurfaceRef = useRef<EchoChatSurfaceRef>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const [chatStarted, setChatStarted] = useState(false);
-  const [pendingMessage, setPendingMessage] = useState('');
+  const [input, setInput] = useState('');
+  
+  // Use the real Echo conversation hook
+  const {
+    messages,
+    sendMessage,
+    isStreaming,
+    streamingContent,
+    abortStream,
+  } = useEchoConversation({ resetOnMount: true });
 
   // Complete scroll-lock: save position on open, restore on close
   useEffect(() => {
@@ -64,43 +73,61 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
     };
   }, [isOpen]);
 
-  // Reset state when sheet closes
+  // Reset input when sheet closes
   useEffect(() => {
     if (!isOpen) {
-      setChatStarted(false);
-      setPendingMessage('');
+      setInput('');
     }
   }, [isOpen]);
 
   // Handle initial message on open
   useEffect(() => {
     if (isOpen && initialMessage) {
-      setPendingMessage(initialMessage);
-      // Auto-focus when there's an initial message
+      setInput(initialMessage);
       setTimeout(() => {
-        chatSurfaceRef.current?.focus();
+        inputRef.current?.focus({ preventScroll: true });
       }, 200);
     }
   }, [isOpen, initialMessage]);
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    if (messages.length > 0 || isStreaming) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isStreaming, streamingContent]);
 
   // Prevent clicks inside sheet from closing
   const handleSheetClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
   }, []);
 
-  // Handle prompt chip click - send message immediately
+  // Handle prompt chip click - fill input and focus
   const handleChipClick = useCallback((prompt: string) => {
-    setChatStarted(true);
-    // Small delay to let the chat surface mount
+    setInput(prompt);
     setTimeout(() => {
-      chatSurfaceRef.current?.sendMessage(prompt);
+      inputRef.current?.focus({ preventScroll: true });
     }, 50);
   }, []);
 
-  // Callback when chat becomes active
-  const handleChatStarted = useCallback(() => {
-    setChatStarted(true);
-  }, []);
+  // Handle send
+  const handleSend = useCallback(() => {
+    const trimmed = input.trim();
+    if (!trimmed || isStreaming) return;
+    
+    sendMessage(trimmed);
+    setInput('');
+  }, [input, isStreaming, sendMessage]);
+
+  // Handle enter key
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  }, [handleSend]);
+
+  const hasMessages = messages.length > 0 || isStreaming;
 
   if (typeof document === 'undefined') return null;
 
@@ -132,9 +159,9 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
             }}
             onClick={handleSheetClick}
           >
-            {/* Header - always visible, sticky */}
+            {/* Header - always visible */}
             <div 
-              className="flex-shrink-0 sticky top-0 z-10"
+              className="flex-shrink-0"
               style={{ background: 'var(--hub-bg-start)' }}
             >
               {/* Drag handle */}
@@ -167,11 +194,14 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
               </div>
             </div>
             
-            {/* Content */}
-            {!chatStarted && !pendingMessage ? (
-              /* Empty State - centered with breathing room */
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <div className="flex flex-col items-center justify-center text-center px-6 py-12 min-h-full -mt-8">
+            {/* Body - flex:1, scrollable */}
+            <div 
+              className="flex-1 overflow-y-auto overscroll-contain min-h-0"
+              style={{ paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
+            >
+              {!hasMessages ? (
+                /* Empty State */
+                <div className="flex flex-col items-center justify-center text-center px-6 pt-8 pb-4" style={{ minHeight: 'calc(100% - 72px)' }}>
                   {/* Icon - subtle watermark feel */}
                   <div className="mb-5">
                     <div 
@@ -236,16 +266,115 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                     </div>
                   </div>
                 </div>
+              ) : (
+                /* Chat Messages */
+                <div className="px-4 py-4 space-y-4">
+                  {messages.map((msg) => (
+                    <MessageBubble key={msg.id} message={msg} />
+                  ))}
+                  
+                  {/* Streaming indicator with partial content */}
+                  {isStreaming && (
+                    <div className="flex gap-3 justify-start">
+                      <div 
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'var(--hub-glass-bg)' }}
+                      >
+                        <Sparkles className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                      </div>
+                      <div
+                        className="max-w-[80%] rounded-2xl rounded-bl-md px-4 py-3 text-[14px] leading-relaxed"
+                        style={{ 
+                          background: 'var(--hub-glass-bg)',
+                          color: 'var(--hub-text)',
+                        }}
+                      >
+                        {streamingContent ? (
+                          <div className="whitespace-pre-wrap">
+                            {streamingContent}
+                            <span className="inline-block w-1.5 h-4 ml-0.5 bg-current opacity-60 animate-pulse" />
+                          </div>
+                        ) : (
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 rounded-full bg-current opacity-40 animate-pulse" />
+                            <span className="w-2 h-2 rounded-full bg-current opacity-40 animate-pulse" style={{ animationDelay: '0.15s' }} />
+                            <span className="w-2 h-2 rounded-full bg-current opacity-40 animate-pulse" style={{ animationDelay: '0.3s' }} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Scroll anchor */}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </div>
+            
+            {/* Composer - ALWAYS visible, anchored to bottom */}
+            <div 
+              className="flex-shrink-0 absolute bottom-0 left-0 right-0 px-4 pt-3"
+              style={{ 
+                background: 'var(--hub-bg-start)',
+                borderTop: '1px solid var(--hub-glass-border)',
+                paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+              }}
+            >
+              <div
+                className="flex items-center gap-2 rounded-full px-4 py-2"
+                style={{
+                  background: 'var(--hub-glass-bg)',
+                  border: '1px solid var(--hub-stroke)',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                }}
+              >
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Ask Echo..."
+                  disabled={isStreaming}
+                  className="flex-1 bg-transparent border-none outline-none text-[15px]"
+                  style={{ 
+                    color: 'var(--hub-text)',
+                    caretColor: 'var(--hub-text-sub)',
+                  }}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  enterKeyHint="send"
+                />
+                
+                {isStreaming ? (
+                  <button
+                    type="button"
+                    onClick={abortStream}
+                    className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-[0.94]"
+                    style={{ background: 'hsl(var(--destructive))' }}
+                    aria-label="Stop"
+                  >
+                    <StopCircle className="w-5 h-5 text-white" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSend}
+                    disabled={!input.trim()}
+                    className={cn(
+                      "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0",
+                      "transition-all active:scale-[0.94]",
+                      input.trim() ? "opacity-100" : "opacity-40"
+                    )}
+                    style={{
+                      background: 'var(--hub-primary-bg, #1a1a1a)',
+                    }}
+                    aria-label="Send"
+                  >
+                    <Send className="w-4 h-4 text-white" />
+                  </button>
+                )}
               </div>
-            ) : (
-              /* Chat Surface - real AI wiring */
-              <EchoChatSurface
-                ref={chatSurfaceRef}
-                initialMessage={pendingMessage}
-                onChatStarted={handleChatStarted}
-                hubTheme
-              />
-            )}
+            </div>
           </motion.div>
         </>
       )}
@@ -253,3 +382,51 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
     document.body
   );
 };
+
+// Message bubble component
+function MessageBubble({ message }: { message: EchoMessage }) {
+  const isUser = message.role === 'user';
+  
+  return (
+    <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
+      {!isUser && (
+        <div 
+          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ background: 'var(--hub-glass-bg)' }}
+        >
+          <Sparkles className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+        </div>
+      )}
+      
+      <div
+        className={cn(
+          "max-w-[80%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed",
+          isUser ? "rounded-br-md" : "rounded-bl-md"
+        )}
+        style={{
+          background: isUser ? 'var(--hub-primary-bg, #1a1a1a)' : 'var(--hub-glass-bg)',
+          color: isUser ? 'white' : 'var(--hub-text)',
+        }}
+      >
+        <div className="whitespace-pre-wrap">{message.content}</div>
+        {message.meta?.error && (
+          <div className="mt-2 text-xs text-red-500">
+            Error: {message.meta.error}
+          </div>
+        )}
+      </div>
+      
+      {isUser && (
+        <div 
+          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ background: 'var(--hub-glass-bg)' }}
+        >
+          <div 
+            className="w-4 h-4 rounded-full"
+            style={{ background: 'var(--hub-text-dim)' }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
