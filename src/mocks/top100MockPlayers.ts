@@ -11,9 +11,26 @@ export interface Top100MockPlayer {
   previous_rank: number | null;
   country: string | null;
   country_code: string | null;
+  // Required for leaderboard compatibility
+  is_friend: boolean;
+  lists_completed: string[];
+  milestone_label: string | null;
 }
 
-export const TOP100_MOCK_PLAYERS: Top100MockPlayer[] = [
+// Raw data without leaderboard compat fields
+interface RawMockPlayer {
+  user_id: string;
+  display_name: string;
+  home_club: string | null;
+  avatar_url: string | null;
+  total_top100_played: number;
+  rank: number;
+  previous_rank: number | null;
+  country: string | null;
+  country_code: string | null;
+}
+
+const RAW_MOCK_PLAYERS: RawMockPlayer[] = [
   {
     user_id: 'mock-1',
     display_name: 'Sophia Carter',
@@ -345,3 +362,11 @@ export const TOP100_MOCK_PLAYERS: Top100MockPlayer[] = [
     country_code: 'JP',
   },
 ];
+
+// Transform raw data to include leaderboard compatibility fields
+export const TOP100_MOCK_PLAYERS: Top100MockPlayer[] = RAW_MOCK_PLAYERS.map(player => ({
+  ...player,
+  is_friend: false,
+  lists_completed: [],
+  milestone_label: null,
+}));
