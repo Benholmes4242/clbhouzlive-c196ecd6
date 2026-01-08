@@ -248,8 +248,8 @@ export function CoursesLeaderboardView() {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Cinematic Hero */}
-      <div className="px-4">
+      {/* Cinematic Hero - Full bleed */}
+      <div>
         <CourseLeaderboardHero course={featuredCourse} />
       </div>
 
@@ -349,7 +349,7 @@ export function CoursesLeaderboardView() {
       )}
 
       {/* Course Rankings Section */}
-      <section className="space-y-4 px-4">
+      <section className="space-y-4">
         {/* Section Header */}
         <div>
           <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
