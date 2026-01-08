@@ -49,6 +49,7 @@ import {
 import { PlayersFromFilter, type PlayersFromValue, getCountryName, ALL_COUNTRIES } from './v2/PlayersFromFilter';
 import { NearbyEmptyState } from './v2/NearbyEmptyState';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 // Map arena mode to scope
 const ARENA_TO_SCOPE: Record<ArenaMode, LeaderboardScope> = {
@@ -729,6 +730,9 @@ export function PlayersLeaderboardViewV2() {
         milestones={milestones}
         isLoading={milestonesLoading}
       />
+
+      {/* Scroll to top button */}
+      <ScrollToTopGlass />
     </div>
   );
 }
