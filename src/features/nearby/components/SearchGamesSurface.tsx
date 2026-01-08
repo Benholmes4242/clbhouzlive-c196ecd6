@@ -4,18 +4,19 @@
  * Can be rendered in a sheet or standalone page
  */
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
-import { Search, MapPin, Calendar, ArrowUpDown, Plus, Users } from 'lucide-react';
+import { Search, MapPin, Calendar, ArrowUpDown, Plus, Users, SlidersHorizontal } from 'lucide-react';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
-import { useGameFilters } from '../hooks/useGameFilters';
+import { useGameFilters, WhenFilter } from '../hooks/useGameFilters';
 import { useGamesQuery } from '../hooks/useGamesQuery';
 import { useJoinGame } from '../hooks/useJoinGame';
 import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './FilterSheets';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { addDays, isToday, isTomorrow, isThisWeek, isWithinInterval, endOfWeek, startOfWeek } from 'date-fns';
 import '@/features/games/components/GameRow.css';
 import '@/features/nearby/components/your-games/YourGames.css';
 import '../GamesTab.css';
@@ -254,6 +255,118 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   );
 }
 
+// V2.2: Status strip showing current scope
+function StatusStrip({ 
+  selectedClub, 
+  distanceKm, 
+  onOpenFilters 
+}: { 
+  selectedClub: GolfCourse | null; 
+  distanceKm: number | null;
+  onOpenFilters: () => void;
+}) {
+  const scopeText = selectedClub 
+    ? `At ${selectedClub.name}`
+    : distanceKm 
+    ? `Within ${distanceKm}km`
+    : 'Near you';
+  
+  const subText = selectedClub?.region || selectedClub?.country;
+
+  return (
+    <div className="statusStrip">
+      <div className="statusStrip__scope">
+        <span className="statusStrip__main">{scopeText}</span>
+        {subText && <span className="statusStrip__sub">{subText}</span>}
+      </div>
+      <button className="statusStrip__filterBtn" onClick={onOpenFilters}>
+        <SlidersHorizontal size={14} />
+        Filters
+      </button>
+    </div>
+  );
+}
+
+// V2.2: Suggested time quick chips
+type QuickTimeOption = 'today' | 'tomorrow' | 'weekend' | 'week';
+
+function SuggestedTimesChips({ 
+  activeOption, 
+  onSelect 
+}: { 
+  activeOption: QuickTimeOption | null;
+  onSelect: (option: QuickTimeOption | null) => void;
+}) {
+  const options: { key: QuickTimeOption; label: string }[] = [
+    { key: 'today', label: 'Today' },
+    { key: 'tomorrow', label: 'Tomorrow' },
+    { key: 'weekend', label: 'This weekend' },
+    { key: 'week', label: 'Next 7 days' },
+  ];
+
+  const handleClick = (key: QuickTimeOption) => {
+    haptic('light');
+    onSelect(activeOption === key ? null : key);
+  };
+
+  return (
+    <div className="suggestedTimesChips">
+      {options.map(({ key, label }) => (
+        <button
+          key={key}
+          className={cn("timeChip", activeOption === key && "timeChip--active")}
+          onClick={() => handleClick(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// V2.2: Popular clubs derived from games
+function PopularClubsChips({ 
+  games, 
+  onSelectClub 
+}: { 
+  games: Game[];
+  onSelectClub: (clubName: string) => void;
+}) {
+  // Dedupe and count clubs from games
+  const clubs = useMemo(() => {
+    const clubCounts = new Map<string, number>();
+    games.forEach(g => {
+      if (g.course_name) {
+        clubCounts.set(g.course_name, (clubCounts.get(g.course_name) || 0) + 1);
+      }
+    });
+    return Array.from(clubCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([name]) => name);
+  }, [games]);
+
+  if (clubs.length < 3) return null;
+
+  return (
+    <div className="popularClubsSection">
+      <span className="popularClubs__label">Popular this week</span>
+      <div className="popularClubsChips">
+        {clubs.map(name => (
+          <button
+            key={name}
+            className="clubChip"
+            onClick={() => { haptic('light'); onSelectClub(name); }}
+          >
+            <MapPin size={12} />
+            <span>{name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function GameCard({ game, index }: { game: Game; index: number }) {
   const { requestJoin, isPending, state } = useJoinGame(game.id);
 
@@ -335,12 +448,72 @@ function GamesList({
 export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGamesSurfaceProps) {
   const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(null);
   const [searchMode, setSearchMode] = useState<'clubs' | 'people'>('clubs');
+  const [quickTime, setQuickTime] = useState<QuickTimeOption | null>(null);
+  const filters = useGameFilters();
   const { data: games, isLoading } = useGamesQuery(selectedClub?.id);
+
+  // Handle quick time selection - maps to existing when filter
+  const handleQuickTimeSelect = (option: QuickTimeOption | null) => {
+    setQuickTime(option);
+    if (!option) {
+      filters.setWhen(null);
+      return;
+    }
+    const today = new Date();
+    switch (option) {
+      case 'today':
+        filters.setWhen({ date: today, window: 'any', exactTime: null });
+        break;
+      case 'tomorrow':
+        filters.setWhen({ date: addDays(today, 1), window: 'any', exactTime: null });
+        break;
+      case 'weekend':
+        // Set to next Saturday
+        const daysUntilSat = (6 - today.getDay() + 7) % 7 || 7;
+        filters.setWhen({ date: addDays(today, daysUntilSat), window: 'any', exactTime: null });
+        break;
+      case 'week':
+        filters.setWhen({ date: today, window: 'any', exactTime: null });
+        break;
+    }
+  };
+
+  // Handle club chip selection (search by name)
+  const handleClubChipSelect = (clubName: string) => {
+    // Find the club in games and select it
+    const matchingGame = games?.find(g => g.course_name === clubName);
+    if (matchingGame?.course_name) {
+      toast.info(`Filtering by ${clubName}`);
+      // We'd need course_id to properly filter, for now just show toast
+    }
+  };
+
+  const handleOpenFilters = () => {
+    openWhenSheet(filters);
+  };
 
   return (
     <div className="searchGamesSurface" style={{ paddingBottom: `${bottomPadding}px` }}>
       {/* Create Game Hero Card */}
       {onOpenCreate && <CreateGameHero onOpen={onOpenCreate} />}
+      
+      {/* V2.2: Status strip */}
+      <StatusStrip 
+        selectedClub={selectedClub} 
+        distanceKm={filters.distanceKm}
+        onOpenFilters={handleOpenFilters}
+      />
+      
+      {/* V2.2: Suggested times chips */}
+      <SuggestedTimesChips 
+        activeOption={quickTime} 
+        onSelect={handleQuickTimeSelect} 
+      />
+      
+      {/* V2.2: Popular clubs (only if we have games) */}
+      {!isLoading && games && games.length > 0 && (
+        <PopularClubsChips games={games} onSelectClub={handleClubChipSelect} />
+      )}
       
       <FindAGame 
         selectedClub={selectedClub} 

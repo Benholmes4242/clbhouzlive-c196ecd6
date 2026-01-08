@@ -119,3 +119,85 @@
   font-size: 13px;
   margin-bottom: 14px;
 }
+
+/* V2.2: Next Game "At a glance" Strip */
+.nextGameStrip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--hub-glass-bg-elevated) 0%, var(--hub-glass-bg) 100%);
+  border: 1px solid var(--hub-stroke);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+}
+
+.nextGameStrip:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.nextGameStrip:active {
+  transform: scale(0.98);
+}
+
+.nextGameStrip__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6E9277 0%, #89A78C 100%);
+  color: white;
+  flex-shrink: 0;
+}
+
+.nextGameStrip__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nextGameStrip__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--hub-text-muted);
+}
+
+.nextGameStrip__course {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--hub-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nextGameStrip__time {
+  font-size: 13px;
+  color: var(--hub-text-sub);
+}
+
+.nextGameStrip__chevron {
+  color: var(--hub-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.nextGameStrip:hover .nextGameStrip__chevron {
+  transform: translateX(2px);
+}

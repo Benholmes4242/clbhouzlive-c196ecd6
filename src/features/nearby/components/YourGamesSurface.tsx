@@ -3,7 +3,7 @@
  * Reusable surface containing all Your Games logic/UI
  * Used inside HubYourGamesSheet
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { EmptyJoinedState } from './your-games/EmptyJoinedState';
 import { Segmented, SegmentItem } from './Segmented';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
@@ -14,6 +14,8 @@ import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { haptic } from '@/utils/haptics';
+import { Calendar, ChevronRight } from 'lucide-react';
+import { format, formatDistanceToNow, isPast } from 'date-fns';
 import '@/features/games/components/GameRow.css';
 import './your-games/YourGames.css';
 import './your-games/YourGamesSurface.css';
@@ -25,6 +27,36 @@ interface YourGamesSurfaceProps {
   onOpenSearchGames?: () => void;
   focusId?: string;
   onFocusConsumed?: () => void;
+}
+
+// V2.2: "At a glance" strip showing next upcoming game
+function NextGameStrip({ 
+  game, 
+  onView 
+}: { 
+  game: UserGame; 
+  onView: () => void;
+}) {
+  const startDate = new Date(game.start_time);
+  const timeLabel = isPast(startDate) 
+    ? 'Started' 
+    : formatDistanceToNow(startDate, { addSuffix: true });
+  const dateStr = format(startDate, 'EEE, MMM d');
+  const timeStr = format(startDate, 'h:mm a');
+
+  return (
+    <button className="nextGameStrip" onClick={() => { haptic('light'); onView(); }}>
+      <div className="nextGameStrip__icon">
+        <Calendar size={18} />
+      </div>
+      <div className="nextGameStrip__content">
+        <span className="nextGameStrip__label">Next up</span>
+        <span className="nextGameStrip__course">{game.course_name || 'Golf game'}</span>
+        <span className="nextGameStrip__time">{dateStr} • {timeStr} ({timeLabel})</span>
+      </div>
+      <ChevronRight size={18} className="nextGameStrip__chevron" />
+    </button>
+  );
 }
 
 export function YourGamesSurface({
@@ -47,6 +79,15 @@ export function YourGamesSurface({
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+
+  // V2.2: Compute next upcoming game (soonest from all games)
+  const nextUpcomingGame = useMemo(() => {
+    const allGames = [...hostedGames, ...joinedGames];
+    const upcoming = allGames
+      .filter(g => new Date(g.start_time) > new Date())
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+    return upcoming[0] || null;
+  }, [hostedGames, joinedGames]);
 
   // Scroll to top when switching tabs
   useEffect(() => {
@@ -154,8 +195,31 @@ export function YourGamesSurface({
     );
   }
 
+  // Handle focusing the next game from strip
+  const handleViewNextGame = () => {
+    if (!nextUpcomingGame) return;
+    // Determine which tab the game is in
+    const isHosted = hostedGames.some(g => g.id === nextUpcomingGame.id);
+    setActiveTab(isHosted ? 'hosting' : 'joined');
+    setExpandedId(nextUpcomingGame.id);
+    // Use existing focus pattern
+    setTimeout(() => {
+      const el = listRef.current?.querySelector<HTMLElement>(`[data-game-id="${nextUpcomingGame.id}"]`);
+      if (el) {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        el.classList.add('sheet-focus-highlight');
+        setTimeout(() => el.classList.remove('sheet-focus-highlight'), 1400);
+      }
+    }, 100);
+  };
+
   return (
     <div ref={listRef} className="px-5" style={{ paddingBottom: bottomPadding }}>
+      {/* V2.2: "At a glance" strip */}
+      {nextUpcomingGame && (
+        <NextGameStrip game={nextUpcomingGame} onView={handleViewNextGame} />
+      )}
+
       {/* Segmented tabs */}
       <div className="yourGames__toggleRow yourGamesSurface__tabs">
         <Segmented

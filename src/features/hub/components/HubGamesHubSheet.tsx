@@ -282,7 +282,7 @@ export function HubGamesHubSheet({
               exit={{ scale: 0, opacity: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 25 }}
               onClick={handleOpenCreate}
-              className="absolute z-20 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+              className="absolute z-20 flex items-center justify-center shadow-lg rounded-full h-14 min-w-14 px-4 gap-2 md:px-5"
               style={{
                 bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
                 right: 20,
@@ -292,6 +292,7 @@ export function HubGamesHubSheet({
               aria-label="Create a game"
             >
               <Plus className="w-6 h-6 text-white" />
+              <span className="hidden md:inline text-white font-semibold text-sm">Create</span>
             </motion.button>
           </motion.div>
 
