@@ -142,16 +142,17 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
   });
 }
 
-// Shorts filter pills - dynamically built from ALL categories (excluding 'other')
+// Shorts filter pills - dynamically built from discover-enabled categories (excluding 'other')
+// Uses Lucide icons instead of emojis for consistency with Videos and Community pages
+import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
+
 const SHORTS_PILLS = [
-  { key: 'all', label: 'All', emoji: undefined as string | undefined },
-  ...MOMENT_CATEGORIES
-    .filter((cat) => cat.id !== 'other')
-    .map((cat) => ({
-      key: cat.id,
-      label: cat.label,
-      emoji: cat.emoji,
-    })),
+  { key: 'all', label: 'All', icon: undefined as React.ComponentType<{ className?: string }> | undefined },
+  ...getDiscoverCategories().map((cat) => ({
+    key: cat.id,
+    label: cat.label,
+    icon: cat.icon,
+  })),
 ];
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
@@ -179,17 +180,16 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Use external search query if provided, otherwise use local
   const searchQuery = externalSearchQuery || watchSearchQuery;
   
-  // Convert pills to DiscoverCommandCenter format
-  const watchPills: Pill[] = SHORTS_PILLS.map((pill) => ({
-    key: pill.key,
-    label: pill.label,
-    selected: watchActiveFilter === pill.key,
-    icon: pill.emoji ? (
-      <span aria-hidden="true" className="text-[14px] leading-none">
-        {pill.emoji}
-      </span>
-    ) : undefined,
-  }));
+  // Convert pills to DiscoverCommandCenter format with Lucide icons
+  const watchPills: Pill[] = SHORTS_PILLS.map((pill) => {
+    const IconComponent = pill.icon;
+    return {
+      key: pill.key,
+      label: pill.label,
+      selected: watchActiveFilter === pill.key,
+      icon: IconComponent ? <IconComponent className="h-4 w-4" /> : undefined,
+    };
+  });
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
