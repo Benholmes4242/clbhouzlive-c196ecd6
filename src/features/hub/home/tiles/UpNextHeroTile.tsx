@@ -1,11 +1,11 @@
 /**
- * UpNextHeroTile - Dynamic "What's Up Next" Hero Section
- * Shows course image + game details OR empty state CTAs
+ * UpNextHeroTile - "What's Up Next" Hero Card
+ * Full-width course image with overlay, matches Golf OS mock
  */
 
 import React, { useState, useCallback } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-import { Calendar, MapPin, Users, ChevronRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useNextUserGame } from '../hooks/useNextUserGame';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { haptic } from '@/utils/haptics';
@@ -17,7 +17,7 @@ function formatGameDate(isoDate: string): string {
   const date = new Date(isoDate);
   if (isToday(date)) return `Today · ${format(date, 'h:mm a')}`;
   if (isTomorrow(date)) return `Tomorrow · ${format(date, 'h:mm a')}`;
-  return format(date, "EEE, MMM d · h:mm a");
+  return format(date, "EEE · h:mm a");
 }
 
 export function UpNextHeroTile() {
@@ -36,18 +36,6 @@ export function UpNextHeroTile() {
     setGamesHubOpen(true);
   };
 
-  const openFindGame = () => {
-    haptic('light');
-    setGamesHubInitialTab('discover');
-    setGamesHubOpen(true);
-  };
-
-  const openCreateGame = () => {
-    haptic('light');
-    setGamesHubInitialTab('yours');
-    setGamesHubOpen(true);
-  };
-
   // Determine hero image URL
   const heroImageUrl = React.useMemo(() => {
     if (imageError) return FALLBACK_HERO;
@@ -59,9 +47,9 @@ export function UpNextHeroTile() {
   if (isLoading) {
     return (
       <div 
-        className="relative rounded-3xl overflow-hidden"
+        className="relative rounded-[26px] overflow-hidden"
         style={{
-          minHeight: '170px',
+          height: '150px',
           background: 'var(--hub-skeleton-base)',
         }}
       >
@@ -70,170 +58,67 @@ export function UpNextHeroTile() {
     );
   }
 
-  // Empty state - no upcoming game
+  // Empty state - no upcoming game (will be handled by parent layout)
   if (!nextGame) {
-    return (
-      <>
-        <div 
-          className="relative rounded-3xl overflow-hidden cursor-pointer group"
-          style={{
-            minHeight: '170px',
-            background: 'linear-gradient(135deg, var(--hub-glass-bg) 0%, var(--hub-surface) 100%)',
-            border: '1px solid var(--hub-stroke)',
-            boxShadow: 'var(--hub-shadow-tile)',
-          }}
-        >
-          {/* Subtle pattern overlay */}
-          <div 
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
-            }}
-          />
-
-          {/* Content */}
-          <div className="relative z-10 flex flex-col items-center justify-center h-full py-8 px-6 text-center">
-            <h3 
-              className="text-[18px] font-semibold mb-1"
-              style={{ color: 'var(--hub-text)' }}
-            >
-              Begin your journey
-            </h3>
-            <p 
-              className="text-[13px] mb-5 max-w-[260px]"
-              style={{ color: 'var(--hub-text-sub)' }}
-            >
-              Find a game nearby or create one and invite friends
-            </p>
-
-            {/* CTA buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={openFindGame}
-                className="px-5 py-2.5 rounded-2xl text-[14px] font-medium transition-all"
-                style={{
-                  background: 'var(--hub-primary-bg)',
-                  color: 'var(--hub-primary-text)',
-                  border: '1px solid var(--hub-primary-border)',
-                }}
-              >
-                Find a Game
-              </button>
-              <button
-                onClick={openCreateGame}
-                className="px-5 py-2.5 rounded-2xl text-[14px] font-medium transition-all"
-                style={{
-                  background: 'var(--hub-secondary-bg)',
-                  color: 'var(--hub-secondary-text)',
-                  border: '1px solid var(--hub-secondary-border)',
-                }}
-              >
-                Create Game
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <HubGamesHubSheet
-          isOpen={gamesHubOpen}
-          onClose={() => setGamesHubOpen(false)}
-          initialTab={gamesHubInitialTab}
-        />
-      </>
-    );
+    return null;
   }
 
   // With upcoming game - show hero with course image
   const courseName = nextGame.course?.name || nextGame.courseName || 'Course TBD';
-  const courseLocation = nextGame.course 
-    ? [nextGame.course.region, nextGame.course.country].filter(Boolean).join(', ')
-    : null;
-  const slotsLabel = `${nextGame.slotsTotal - nextGame.slotsOpen}/${nextGame.slotsTotal} players`;
 
   return (
     <>
-      <div 
-        className="relative rounded-3xl overflow-hidden cursor-pointer group"
+      <button 
+        className="relative w-full rounded-[26px] overflow-hidden text-left transition-transform active:scale-[0.98]"
         style={{
-          minHeight: '170px',
-          border: '1px solid var(--hub-stroke)',
-          boxShadow: 'var(--hub-shadow-tile)',
+          height: '150px',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
         }}
         onClick={openViewGame}
       >
-        {/* Background image with fade-in */}
-        <div className="absolute inset-0">
-          <img
-            src={heroImageUrl}
-            alt={courseName}
-            className="w-full h-full object-cover transition-opacity duration-500"
-            style={{ opacity: imageLoaded ? 1 : 0 }}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            loading="eager"
+        {/* Background image */}
+        <img
+          src={heroImageUrl}
+          alt={courseName}
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500"
+          style={{ opacity: imageLoaded ? 1 : 0 }}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          loading="eager"
+        />
+        
+        {/* Placeholder while loading */}
+        {!imageLoaded && (
+          <div 
+            className="absolute inset-0 animate-pulse"
+            style={{ background: 'var(--hub-skeleton-base)' }}
           />
-          {/* Placeholder while loading */}
-          {!imageLoaded && (
-            <div 
-              className="absolute inset-0 animate-pulse"
-              style={{ background: 'var(--hub-skeleton-base)' }}
-            />
-          )}
-        </div>
+        )}
 
-        {/* Gradient overlay for text legibility */}
+        {/* Gradient overlay for text legibility - from left side */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.15) 100%)',
+            background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)',
           }}
         />
 
         {/* Content overlay */}
-        <div className="relative z-10 flex flex-col justify-end h-full p-5">
-          {/* What's up next label */}
-          <span 
-            className="text-[11px] font-medium uppercase tracking-wider mb-1"
-            style={{ color: 'rgba(255,255,255,0.7)' }}
-          >
-            What's up next
-          </span>
-
-          {/* Course name */}
-          <h3 
-            className="text-[22px] font-semibold leading-tight mb-1 line-clamp-1"
-            style={{ color: '#fff' }}
-          >
-            {courseName}
-          </h3>
-
-          {/* Meta row - date, location, slots */}
-          <div className="flex items-center gap-4 text-[13px] flex-wrap" style={{ color: 'rgba(255,255,255,0.85)' }}>
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
-              {formatGameDate(nextGame.startTimeISO)}
-            </span>
-            {courseLocation && (
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5" />
-                {courseLocation}
-              </span>
-            )}
-            <span className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5" />
-              {slotsLabel}
-            </span>
-          </div>
-
-          {/* View game arrow indicator */}
-          <div 
-            className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronRight className="w-6 h-6 text-white" />
+        <div className="absolute left-4 top-4 right-4 text-white">
+          {/* Location pin + Course name */}
+          <div className="flex items-start gap-2">
+            <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <div>
+              <div className="text-[22px] font-extrabold leading-tight line-clamp-1">
+                {courseName}
+              </div>
+              <div className="text-[15px] font-medium mt-1 opacity-95">
+                {formatGameDate(nextGame.startTimeISO)}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </button>
 
       <HubGamesHubSheet
         isOpen={gamesHubOpen}

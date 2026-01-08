@@ -1,140 +1,85 @@
 /**
- * HubMessagesCard - Messages section (Fixed Height ~120px)
- * Shows max 2 message previews OR empty state
- * No internal scrolling
- * Opens HubMessagesSheet instead of navigating
+ * HubMessagesCard - Compact Messages Tile
+ * Shorter height, cleaner layout matching Golf OS mock
  */
 
 import React, { useState } from 'react';
-import { Tile } from '../components/Tile';
-import { MessageCircle } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MessageSquare } from 'lucide-react';
 import { HubMessagesSheet } from '../../components/HubMessagesSheet';
+import { haptic } from '@/utils/haptics';
 
-// Mock data for v1 - will be replaced with real data later
-const MOCK_CONVERSATIONS: Array<{
-  id: string;
-  name: string;
-  avatarUrl?: string;
-  lastMessage: string;
-  timestamp: string;
-}> = [];
-
-function timeAgo(timestamp: string): string {
-  const ms = Date.now() - new Date(timestamp).getTime();
-  const m = Math.floor(ms / 60000);
-  if (m < 1) return 'now';
-  if (m < 60) return `${m}m`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d`;
-  return `${Math.floor(d / 7)}w`;
-}
+// Mock data - will be replaced with real data later
+const MOCK_MESSAGE_COUNT = 3;
+const MOCK_SUBTITLE = "Home messages tara messages";
 
 export function HubMessagesCard() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   
-  const conversations = MOCK_CONVERSATIONS;
-  const isEmpty = conversations.length === 0;
-  // Only show max 2 messages
-  const displayConversations = conversations.slice(0, 2);
+  const messageCount = MOCK_MESSAGE_COUNT;
+  const hasMessages = messageCount > 0;
 
-  const openSheet = () => setIsSheetOpen(true);
+  const openSheet = () => {
+    haptic('light');
+    setIsSheetOpen(true);
+  };
+  
   const closeSheet = () => setIsSheetOpen(false);
 
   return (
     <>
-      {/* Entire card is tappable to open sheet */}
-      <div 
+      <button 
         onClick={openSheet}
-        className="cursor-pointer"
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openSheet(); }}
+        className="w-full rounded-[22px] p-4 text-left transition-all active:scale-[0.98]"
+        style={{
+          background: 'var(--hub-glass-bg)',
+          border: '1px solid var(--hub-stroke)',
+          boxShadow: 'var(--hub-shadow-tile)',
+        }}
       >
-        <Tile 
-          title={
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-              <h3>Messages</h3>
-              <span
-                className="text-[14px] font-normal transition"
-                style={{ color: 'var(--hub-text-muted)' }}
-              >
-                See all →
-              </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Icon bubble */}
+            <div 
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--hub-glass-bg-input)' }}
+            >
+              <MessageSquare 
+                className="w-5 h-5" 
+                style={{ color: 'var(--hub-text-dim)' }} 
+              />
             </div>
-          }
-        >
-        {/* Fixed height content area - NO SCROLLING */}
-        <div className="h-full flex items-center justify-center py-2">
-          {isEmpty ? (
-            <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
+            
+            <div>
               <div 
-                className="w-9 h-9 rounded-full flex items-center justify-center mb-2"
-                style={{ background: 'var(--hub-glass-bg-input)', opacity: 0.7 }}
-              >
-                <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
-              </div>
-              <h4 
-                className="text-[14px] font-semibold mb-0.5"
+                className="text-[17px] font-semibold"
                 style={{ color: 'var(--hub-text)' }}
               >
-                Your conversations will live here
-              </h4>
-              <p 
-                className="text-[12px] leading-snug max-w-[240px]"
-                style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
+                Messages
+              </div>
+              <div 
+                className="text-[13px] mt-0.5"
+                style={{ color: 'var(--hub-text-muted)' }}
               >
-                Game chats, invites, and messages with golfers — all in one place.
-              </p>
+                {MOCK_SUBTITLE}
+              </div>
             </div>
-          ) : (
-            <div className="w-full space-y-1">
-              {displayConversations.map(conv => (
-                <button
-                  key={conv.id}
-                  className="w-full flex items-center gap-3 p-2 rounded-xl transition"
-                  style={{ background: 'transparent' }}
-                  onClick={() => openSheet()}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <SquircleAvatar
-                    size={38}
-                    src={conv.avatarUrl}
-                    alt={conv.name}
-                    fallback={conv.name.charAt(0).toUpperCase()}
-                  />
-                  <div className="flex-1 min-w-0 text-left">
-                    <div 
-                      className="text-[13px] font-semibold truncate"
-                      style={{ color: 'var(--hub-text)' }}
-                    >
-                      {conv.name}
-                    </div>
-                    <div 
-                      className="text-[12px] truncate"
-                      style={{ color: 'var(--hub-text-sub)' }}
-                    >
-                      {conv.lastMessage}
-                    </div>
-                  </div>
-                  <span 
-                    className="text-[11px] shrink-0"
-                    style={{ color: 'var(--hub-text-muted)' }}
-                  >
-                    {timeAgo(conv.timestamp)}
-                  </span>
-                </button>
-              ))}
+          </div>
+          
+          {/* Message count badge */}
+          {hasMessages && (
+            <div 
+              className="h-7 min-w-[28px] px-2.5 rounded-full flex items-center justify-center text-[14px] font-semibold"
+              style={{
+                background: 'var(--hub-glass-bg-input)',
+                color: 'var(--hub-text)',
+              }}
+            >
+              {messageCount}
             </div>
           )}
         </div>
-        </Tile>
-      </div>
+      </button>
       
-      {/* Messages Bottom Sheet */}
       <HubMessagesSheet isOpen={isSheetOpen} onClose={closeSheet} />
     </>
   );

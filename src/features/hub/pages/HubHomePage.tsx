@@ -1,6 +1,6 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Premium Apple/Strava-inspired hub with dynamic hero tile
+ * Matches the Golf OS Dashboard mock 1:1
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -14,8 +14,11 @@ import { useChromeState } from '@/hooks/useChromeState';
 import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
 import { UpNextHeroTile } from '../home/tiles/UpNextHeroTile';
 import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
-import { YourGamesTile } from '../home/tiles/YourGamesTile';
-import { HubActionDock } from '../home/tiles/HubActionDock';
+import { ActiveGamesNearYouTile } from '../home/tiles/ActiveGamesNearYouTile';
+import { CreateGameSquareTile } from '../home/tiles/CreateGameSquareTile';
+import { CreateGameGradientCTA } from '../home/tiles/CreateGameGradientCTA';
+import { HubProgressTile } from '../home/tiles/HubProgressTile';
+import { HubFloatingDock } from '../home/tiles/HubFloatingDock';
 
 import '../home/hubThemeLight.css';
 
@@ -185,33 +188,44 @@ export function HubHomePage() {
           className="w-full h-full overflow-y-auto"
           style={{
             paddingTop: 'env(safe-area-inset-top, 0px)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)',
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div className="px-3.5 pb-4">
-            {/* Zone 1: Header - Greeting */}
+          <div className="px-5 pb-4">
+            {/* Zone 1: Header - Greeting + Right Button */}
             <HubHeaderToday />
 
             {/* Zone 2: What's Up Next Hero Tile */}
-            <div className="mt-2">
+            <div className="mt-4">
               <UpNextHeroTile />
             </div>
 
             {/* Zone 3: Messages Card */}
-            <div className="mt-3">
+            <div className="mt-4">
               <HubMessagesCard />
             </div>
 
-            {/* Zone 4: Games Tile */}
-            <div className="mt-3" style={{ minHeight: '220px' }}>
-              <YourGamesTile />
+            {/* Zone 4: 2-up Grid - Active Games + Create Game Square */}
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <ActiveGamesNearYouTile />
+              <CreateGameSquareTile />
+            </div>
+
+            {/* Zone 5: Full-width Create Game Gradient CTA */}
+            <div className="mt-4">
+              <CreateGameGradientCTA />
+            </div>
+
+            {/* Zone 6: Progress Tile */}
+            <div className="mt-4">
+              <HubProgressTile />
             </div>
           </div>
         </div>
 
-        {/* Action Dock - Fixed at bottom */}
-        <HubActionDock />
+        {/* Floating Dock - Fixed at bottom */}
+        <HubFloatingDock />
       </div>
     </div>
   );
