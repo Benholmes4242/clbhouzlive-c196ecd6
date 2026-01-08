@@ -9289,6 +9289,13 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_season_recap: {
+        Args: {
+          scope_param?: Database["public"]["Enums"]["leaderboard_scope"]
+          season_key_param: string
+        }
+        Returns: Json
+      }
       get_top100_course_insights: {
         Args: { target_course_id: string; target_user_id: string }
         Returns: Json
@@ -9501,6 +9508,12 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      insert_leaderboard_milestones: {
+        Args: { milestones: Json }
+        Returns: {
+          inserted_count: number
+        }[]
       }
       invite_golfer_from_discover: {
         Args: { p_user_id: string }
