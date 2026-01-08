@@ -23,12 +23,14 @@ interface HubGamesHubSheetProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: TabValue;
+  initialFocusGameId?: string;
 }
 
 export function HubGamesHubSheet({ 
   isOpen, 
   onClose, 
-  initialTab = 'discover' 
+  initialTab = 'discover',
+  initialFocusGameId,
 }: HubGamesHubSheetProps) {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
@@ -47,12 +49,13 @@ export function HubGamesHubSheet({
   );
 
   // Reset to initial tab when sheet opens
+  // Reset state when sheet opens, apply initial focus if provided
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab);
-      setFocusedGameId(undefined);
+      setFocusedGameId(initialFocusGameId);
     }
-  }, [isOpen, initialTab]);
+  }, [isOpen, initialTab, initialFocusGameId]);
 
   // Standardized scroll-lock: #root approach
   useEffect(() => {
