@@ -269,19 +269,51 @@ export function YourGamesTile() {
           )}
           
           {!isLoading && !isError && games.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center py-6">
+            <div className="flex flex-col items-center justify-center h-full text-center py-8 px-4">
               <h4 
-                className="text-[14px] font-semibold mb-1"
+                className="text-[15px] font-semibold"
                 style={{ color: 'var(--hub-text)' }}
               >
                 No games planned yet
               </h4>
               <p 
-                className="text-[12px] leading-snug max-w-[220px]"
-                style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
+                className="text-[13px] leading-relaxed mt-2 max-w-[240px]"
+                style={{ color: 'var(--hub-text-sub)' }}
               >
-                Create a game and start organising your next round.
+                That's okay — most rounds start with an idea.
               </p>
+              
+              {/* Subtle text CTAs */}
+              <div className="flex flex-col items-center gap-3 mt-5">
+                <button
+                  onClick={openCreateGame}
+                  className="text-[14px] font-medium transition-colors"
+                  style={{ 
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--hub-text-muted)',
+                    padding: 0,
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
+                >
+                  Create a game →
+                </button>
+                <button
+                  onClick={() => navigateFromHub('/explore')}
+                  className="text-[14px] font-normal transition-colors"
+                  style={{ 
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--hub-text-muted)',
+                    padding: 0,
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
+                >
+                  Explore courses →
+                </button>
+              </div>
             </div>
           )}
 
