@@ -1,0 +1,96 @@
+/* YourGamesSurface styling */
+
+.yourGamesSurface__tabs {
+  margin-bottom: 16px;
+}
+
+.yourGamesSurface__tabs .segmented {
+  background: var(--hub-glass-bg-button);
+  border: 1px solid var(--hub-stroke-subtle);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.yourGamesSurface__tabs .segmented__item {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  color: var(--hub-text-muted);
+  transition: all 0.2s ease;
+}
+
+.yourGamesSurface__tabs .segmented__item--active {
+  background: var(--hub-glass);
+  border: 1px solid var(--hub-stroke);
+  color: var(--hub-text-bright);
+}
+
+.yourGamesSurface__createRow {
+  margin-bottom: 16px;
+}
+
+.yourGamesSurface__createBtn {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: var(--hub-glass-bg-button);
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.yourGamesSurface__createBtn:hover {
+  background: var(--hub-glass);
+  border-color: var(--hub-stroke);
+}
+
+.yourGamesSurface__ctaBtn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: var(--hub-glass);
+  border: 1px solid var(--hub-stroke);
+  color: var(--hub-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yourGamesSurface__ctaBtn:hover {
+  background: var(--hub-glass-bg-elevated);
+}
+
+.yourGamesSurface__ctaBtn--secondary {
+  background: transparent;
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text-muted);
+}
+
+.yourGamesSurface__ctaBtn--secondary:hover {
+  color: var(--hub-text);
+  border-color: var(--hub-stroke);
+}
+
+.yourGamesSurface__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Empty state compact variant */
+.yourGamesEmpty--compact {
+  padding: 32px 16px;
+}
+
+.yourGamesEmpty--compact .yourGamesEmpty__title {
+  font-size: 16px;
+}
+
+.yourGamesEmpty--compact .yourGamesEmpty__body {
+  font-size: 13px;
+  margin-bottom: 16px;
+}
