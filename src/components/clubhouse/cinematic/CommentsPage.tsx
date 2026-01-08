@@ -255,12 +255,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 Author
               </span>
             )}
-            <span className={cn(
-              "text-[12px] flex-shrink-0",
-              isDark ? "text-white/45" : "text-muted-foreground/65"
-            )}>
-              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-            </span>
+                            <span className={cn(
+                              "text-[11px] flex-shrink-0 ml-1",
+                              isDark ? "text-white/35" : "text-muted-foreground/50"
+                            )}>
+                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                            </span>
           </div>
           
           {/* Comment body - proper spacing from name row */}
@@ -325,9 +325,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
               )}
             </AnimatePresence>
             <motion.div
-              animate={comment.has_liked ? { scale: [1, 1.15, 1] } : {}}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
+                              animate={comment.has_liked ? { scale: [1, 1.05, 1] } : {}}
+                              transition={{ duration: 0.15, ease: 'easeOut' }}
+                            >
               <Heart
                 className={cn(
                   "w-[18px] h-[18px] transition-colors",
@@ -759,6 +759,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [revealedCommentIds, setRevealedCommentIds] = useState<Set<string>>(new Set());
+  const [headerCompressed, setHeaderCompressed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -845,6 +846,25 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     } else {
       setListVisible(false);
     }
+  }, [isOpen]);
+
+  // Header compression on scroll - prioritizes conversation as user scrolls
+  useEffect(() => {
+    if (!isOpen) {
+      setHeaderCompressed(false);
+      return;
+    }
+    
+    const listEl = commentsListRef.current;
+    if (!listEl) return;
+    
+    const handleScroll = () => {
+      // Compress header after scrolling 40px into comments
+      setHeaderCompressed(listEl.scrollTop > 40);
+    };
+    
+    listEl.addEventListener('scroll', handleScroll, { passive: true });
+    return () => listEl.removeEventListener('scroll', handleScroll);
   }, [isOpen]);
 
   // Notification deep linking - expand parent, scroll to comment, highlight it (runs once per open)
@@ -1094,22 +1114,45 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 </button>
               </div>
 
-              {/* Post preview card - smart media scaling */}
+              {/* Post preview card - smart media scaling with scroll compression */}
               <motion.div 
                 initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.2 }}
-                className="px-4 pb-3"
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  scale: headerCompressed ? 0.92 : 1,
+                  marginTop: headerCompressed ? -8 : 0,
+                  marginBottom: headerCompressed ? -4 : 0,
+                }}
+                transition={{ 
+                  opacity: { delay: 0.15, duration: 0.2 },
+                  y: { delay: 0.15, duration: 0.2 },
+                  scale: { duration: 0.25, ease: 'easeOut' },
+                  marginTop: { duration: 0.25, ease: 'easeOut' },
+                  marginBottom: { duration: 0.25, ease: 'easeOut' },
+                }}
+                className="px-4 pb-3 origin-top"
               >
-                <div className={cn(
-                  "p-[14px] rounded-[18px] overflow-hidden",
-                  isDark ? "bg-white/5" : isGrey ? "bg-background/50" : "bg-muted/50"
-                )}>
+                <motion.div 
+                  className={cn(
+                    "p-[14px] rounded-[18px] overflow-hidden",
+                    isDark ? "bg-white/5" : isGrey ? "bg-background/50" : "bg-muted/50"
+                  )}
+                  animate={{
+                    opacity: headerCompressed ? 0.85 : 1,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
                   <div className="flex gap-3">
-                    {/* Left column: Media thumbnail with smart scaling */}
+                    {/* Left column: Media thumbnail with smart scaling + minimum height for cinematic feel */}
                     {videoThumbnail && (
-                      <div 
-                        className="relative flex-shrink-0 w-[96px] h-[130px] rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity"
+                      <motion.div 
+                        className="relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity"
+                        animate={{
+                          width: headerCompressed ? 70 : 100,
+                          height: headerCompressed ? 90 : 130,
+                        }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
                         onClick={onClose}
                       >
                         {/* Blurred background - generated from same image */}
@@ -1119,22 +1162,26 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                             backgroundImage: `url(${videoThumbnail})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
-                            filter: 'blur(20px) brightness(0.7)',
-                            transform: 'scale(1.2)',
+                            filter: 'blur(20px) brightness(0.65)',
+                            transform: 'scale(1.3)',
                           }}
                         />
-                        {/* Overlay for subtle darkening */}
-                        <div className={cn(
-                          "absolute inset-0",
-                          isDark ? "bg-black/20" : "bg-black/10"
-                        )} />
-                        {/* Actual image - fit, not fill */}
+                        {/* Vertical gradient overlay for premium blend - softens blur edges */}
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            background: isDark 
+                              ? 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.15) 100%)'
+                              : 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.08) 100%)',
+                          }}
+                        />
+                        {/* Actual image - fit, not fill, scales up to cinematic presence */}
                         <img
                           src={videoThumbnail}
                           alt="Post thumbnail"
                           className="relative w-full h-full object-contain"
                         />
-                      </div>
+                      </motion.div>
                     )}
                     
                     {/* Right column: Creator stack + caption */}
@@ -1168,14 +1215,27 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         </div>
                       </div>
 
-                      {/* Row 3: Caption - max 2 lines with ellipsis */}
+                      {/* Row 3: Caption - max 2 lines with subtle fade affordance */}
                       {cleanCaption && (
-                        <p className={cn(
-                          "mt-2.5 text-[14px] leading-[20px] line-clamp-2",
-                          isDark ? "text-white/70" : "text-foreground/70"
-                        )}>
-                          {cleanCaption}
-                        </p>
+                        <div className="relative mt-3">
+                          <p className={cn(
+                            "text-[14px] leading-[20px] line-clamp-2",
+                            isDark ? "text-white/70" : "text-foreground/70"
+                          )}>
+                            {cleanCaption}
+                          </p>
+                          {/* Subtle fade affordance when truncated */}
+                          {captionNeedsTruncation && (
+                            <div 
+                              className="absolute right-0 bottom-0 w-12 h-5 pointer-events-none"
+                              style={{
+                                background: isDark 
+                                  ? 'linear-gradient(to right, transparent, rgba(255,255,255,0.05))'
+                                  : 'linear-gradient(to right, transparent, rgba(0,0,0,0.03))',
+                              }}
+                            />
+                          )}
+                        </div>
                       )}
 
                       {/* Row 4: Golf Course Tag CTA */}
@@ -1193,7 +1253,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       />
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
             </motion.div>
 
@@ -1295,19 +1355,19 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         {/* Replies - thread rail layout with elegant vertical connector */}
                         {comment.replies.length > 0 && (
                           <div className="relative">
-                            {/* Thread connector line - aligned with reply avatars */}
+                            {/* Thread connector line - aligned with reply avatars, never competes visually */}
                             <div 
-                              className="absolute w-[1.5px] rounded-full"
+                              className="absolute w-[1px] rounded-full"
                               style={{ 
                                 // Align with center of reply avatars (28px avatar, so 14px center + 26px left padding)
                                 left: '39px',
-                                // Start below parent, end before last reply bottom
-                                top: '8px',
-                                bottom: '20px',
-                                // Elegant gradient that fades at both ends
+                                // Start below parent, terminate cleanly at last reply (no dangling line)
+                                top: '4px',
+                                bottom: visibleReplies.length > 0 ? '28px' : '20px',
+                                // Very subtle gradient - never competes with avatars
                                 background: isDark 
-                                  ? 'linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.08) 100%)'
-                                  : 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.06) 100%)',
+                                  ? 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 100%)'
+                                  : 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.07) 50%, rgba(0,0,0,0.03) 100%)',
                               }}
                             />
                             
@@ -1425,14 +1485,20 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
 
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  {/* Input pill - 44px height, 22px radius */}
-                  <div className={cn(
-                    "flex items-center gap-2 rounded-[22px] h-[44px] pl-4 pr-3",
-                    "transition-shadow duration-150",
-                    isDark 
-                      ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
-                      : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
-                  )}>
+                  {/* Input pill - expands subtly when typing for "you're participating" moment */}
+                  <motion.div 
+                    className={cn(
+                      "flex items-center gap-2 rounded-[22px] pl-4 pr-3",
+                      "transition-all duration-200",
+                      isDark 
+                        ? "bg-white/10 border border-white/15 focus-within:border-white/25 focus-within:bg-white/12" 
+                        : "bg-background border border-border/50 focus-within:border-border focus-within:shadow-sm"
+                    )}
+                    animate={{ 
+                      height: newComment.trim() ? 48 : 44,
+                    }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                  >
                     <input
                       ref={inputRef}
                       type="text"
@@ -1463,13 +1529,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     >
                       <Smile className="w-5 h-5" />
                     </motion.button>
-                  </div>
+                  </motion.div>
                 </div>
                 
-                {/* Send button - with micro-animation on send */}
+                {/* Send button - emphasis state when content present */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
-                  animate={isAddingComment ? { rotate: 45 } : { rotate: 0 }}
+                  animate={{ 
+                    rotate: isAddingComment ? 45 : 0,
+                    scale: newComment.trim() ? 1.02 : 1,
+                  }}
                   onClick={handleSubmitComment}
                   disabled={!newComment.trim() || isAddingComment}
                   className={cn(
@@ -1478,11 +1547,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     'transition-all duration-200',
                     newComment.trim() 
                       ? isDark 
-                        ? 'bg-white text-black hover:bg-white/90 shadow-lg shadow-white/10' 
-                        : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20'
+                        ? 'bg-white text-black hover:bg-white/90 shadow-lg shadow-white/15' 
+                        : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/25'
                       : isDark 
-                        ? 'bg-white/15 text-white/40' 
-                        : 'bg-muted text-muted-foreground/40',
+                        ? 'bg-white/12 text-white/35' 
+                        : 'bg-muted text-muted-foreground/35',
                     'disabled:cursor-not-allowed'
                   )}
                 >
