@@ -34,6 +34,13 @@ type Game = {
   host_user_id: string;
 };
 
+interface PrefillCourse {
+  id: string;
+  name: string;
+  region?: string;
+  country?: string;
+}
+
 interface SearchGamesSurfaceProps {
   /** Extra padding at bottom for sticky footer */
   bottomPadding?: number;
@@ -41,6 +48,8 @@ interface SearchGamesSurfaceProps {
   onOpenCreate?: () => void;
   /** V2.4: Callback to report discover metadata for hub header */
   onMeta?: (meta: { resultsCount: number; startingSoonCount: number }) => void;
+  /** V3: Pre-select a course (from leaderboard deep-link) */
+  prefillCourse?: PrefillCourse;
 }
 
 function CreateGameHero({ onOpen }: { onOpen: () => void }) {
@@ -540,8 +549,19 @@ function ResultsHeader({ count }: { count: number }) {
   );
 }
 
-export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate, onMeta }: SearchGamesSurfaceProps) {
-  const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(null);
+export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate, onMeta, prefillCourse }: SearchGamesSurfaceProps) {
+  // V3: Initialize selectedClub from prefillCourse if provided
+  const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(() => {
+    if (prefillCourse) {
+      return {
+        id: prefillCourse.id,
+        name: prefillCourse.name,
+        region: prefillCourse.region || null,
+        country: prefillCourse.country || null,
+      } as GolfCourse;
+    }
+    return null;
+  });
   const [searchMode, setSearchMode] = useState<'clubs' | 'people'>('clubs');
   const [quickTime, setQuickTime] = useState<QuickTimeOption | null>(null);
   const [focusGameId, setFocusGameId] = useState<string | undefined>();
