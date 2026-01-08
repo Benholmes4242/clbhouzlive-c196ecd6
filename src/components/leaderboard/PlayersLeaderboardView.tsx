@@ -13,8 +13,6 @@ import { LeaderboardPlayerRow } from './LeaderboardPlayerRow';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
-import { FLAGS } from '@/config/flags';
-import { getMockLeaderboardUsers, BENJAMIN_HOLMES_USER_ID } from '@/mocks/leaderboardMockUsers';
 import {
   USE_MOCK_LEADERBOARD_DATA,
   MOCK_CURRENT_USER_RANK,
@@ -120,36 +118,8 @@ export function PlayersLeaderboardView() {
   }, [segment, page]);
 
   // Real data logic
-  const rawEntries = data?.pages.flatMap(page => page.entries) || [];
+  const allEntries = data?.pages.flatMap(page => page.entries) || [];
   const currentUserEntry = data?.pages[0]?.current_user_entry;
-
-  // Check if current user is Benjamin Holmes (for 100-user mock injection)
-  const isBenjaminHolmes = currentUser?.id === BENJAMIN_HOLMES_USER_ID;
-
-  // Inject 100 mock users for Benjamin Holmes
-  const allEntries = useMemo(() => {
-    if (!FLAGS.LEADERBOARD_MOCK_USERS_ENABLED || !isBenjaminHolmes) {
-      return rawEntries;
-    }
-
-    // Get mock users and filter out any collisions
-    const existingIds = new Set(rawEntries.map((e: any) => e.user_id));
-    const leaderboardMocks = getMockLeaderboardUsers().filter(
-      mock => !existingIds.has(mock.user_id)
-    );
-
-    // Merge and sort by total_top100_played descending
-    const merged = [...rawEntries, ...leaderboardMocks].sort(
-      (a: any, b: any) => (b.total_top100_played ?? 0) - (a.total_top100_played ?? 0)
-    );
-
-    // Reassign ranks after merge
-    merged.forEach((entry: any, idx) => {
-      entry.rank = idx + 1;
-    });
-
-    return merged;
-  }, [rawEntries, isBenjaminHolmes]);
 
   // Find user's position (real data)
   const myIndex = currentUserEntry
