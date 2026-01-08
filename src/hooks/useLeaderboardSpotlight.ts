@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { subDays } from 'date-fns';
+import { FLAGS } from '@/config/flags';
+import { getMockSpotlightPlayers, BENJAMIN_HOLMES_USER_ID } from '@/mocks/leaderboardMockUsers';
 
 export type SpotlightType = 'most_played' | 'highest_rated' | 'fastest_riser';
 
@@ -17,6 +19,15 @@ export function useLeaderboardSpotlight() {
   return useQuery({
     queryKey: ['leaderboard-spotlight'],
     queryFn: async (): Promise<SpotlightPlayer[]> => {
+      // Check if current user is Benjamin Holmes for mock injection
+      const { data: { user } } = await supabase.auth.getUser();
+      const isBenjaminHolmes = user?.id === BENJAMIN_HOLMES_USER_ID;
+      
+      // If flag enabled and Benjamin Holmes, return mock spotlights
+      if (FLAGS.LEADERBOARD_MOCK_USERS_ENABLED && isBenjaminHolmes) {
+        return getMockSpotlightPlayers();
+      }
+
       const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
       const spotlights: SpotlightPlayer[] = [];
 
