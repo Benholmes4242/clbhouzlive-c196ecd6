@@ -10,6 +10,8 @@ import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/D
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { CategoryPills } from '@/components/shared/CategoryPills';
+import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
 
 interface CommunityFeedProps {
   onMediaClick: (item: any) => void;
@@ -18,6 +20,7 @@ interface CommunityFeedProps {
 // Local storage keys
 const FILTER_KEY = 'community-media-filter';
 const SORT_KEY = 'community-sort-option';
+const CATEGORY_KEY = 'community-category-filter';
 
 const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -37,7 +40,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Persist filter/sort in localStorage
+  // Persist filter/sort/category in localStorage
   const [mediaFilter, setMediaFilter] = useState<CommunityMediaFilter>(() => {
     const saved = localStorage.getItem(FILTER_KEY);
     return (saved as CommunityMediaFilter) || 'all';
@@ -47,11 +50,21 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     const saved = localStorage.getItem(SORT_KEY);
     return (saved as CommunitySortOption) || 'newest';
   });
+  
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    const saved = localStorage.getItem(CATEGORY_KEY);
+    return saved || 'all';
+  });
 
   const handleFilterChange = useCallback((key: string) => {
     const filter = key as CommunityMediaFilter;
     setMediaFilter(filter);
     localStorage.setItem(FILTER_KEY, filter);
+  }, []);
+  
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+    localStorage.setItem(CATEGORY_KEY, category);
   }, []);
 
   const handleSortChange = useCallback((sort: SortOption) => {
@@ -84,38 +97,68 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     loadMore,
   } = useCommunityFeed({ mediaFilter, sortOption });
 
-  // Apply client-side search filter (comprehensive - matches Watch page implementation)
+  // Apply client-side search + category filter (comprehensive - matches Watch page implementation)
   const items = useMemo(() => {
-    if (!searchQuery || !searchQuery.trim()) return rawItems;
+    let filtered = rawItems;
     
-    const query = searchQuery.toLowerCase();
-    return rawItems.filter(item => {
-      // Post content fields
-      const titleMatch = (item.title || '').toLowerCase().includes(query);
-      const captionMatch = ((item as any).caption || '').toLowerCase().includes(query);
-      const descriptionMatch = ((item as any).description || '').toLowerCase().includes(query);
+    // Apply category filter first
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(item => {
+        // Check structured categories array (from Create Moment)
+        const itemCategories = (item as any).categories;
+        if (itemCategories && Array.isArray(itemCategories) && itemCategories.length > 0) {
+          return itemCategories.some((cat: string) => 
+            cat.toLowerCase() === selectedCategory.toLowerCase()
+          );
+        }
+        return false;
+      });
+    }
+    
+    // Then apply search filter
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       
-      // User fields (legacy structure)
-      const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
-      const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
+      // Find matching category IDs from search query (for category label matching)
+      const matchingCategoryIds = MOMENT_CATEGORIES
+        .filter(cat => cat.label.toLowerCase().includes(query))
+        .map(cat => cat.id);
       
-      // Creator fields (polymorphic - new structure)
-      const creatorNameMatch = ((item as any).creator?.name || '').toLowerCase().includes(query);
-      const creatorUsernameMatch = ((item as any).creator?.username || '').toLowerCase().includes(query);
-      
-      // Business profile name
-      const businessMatch = ((item as any).business?.name || '').toLowerCase().includes(query);
-      
-      // Golf course name (both camelCase and snake_case)
-      const courseMatch = ((item as any).golfCourse?.name || '').toLowerCase().includes(query);
-      const golfCourseMatch = ((item as any).golf_course?.name || '').toLowerCase().includes(query);
-      
-      return titleMatch || captionMatch || descriptionMatch || 
-             userNameMatch || userUsernameMatch || 
-             creatorNameMatch || creatorUsernameMatch || 
-             businessMatch || courseMatch || golfCourseMatch;
-    });
-  }, [rawItems, searchQuery]);
+      filtered = filtered.filter(item => {
+        // Post content fields
+        const titleMatch = (item.title || '').toLowerCase().includes(query);
+        const captionMatch = ((item as any).caption || '').toLowerCase().includes(query);
+        const descriptionMatch = ((item as any).description || '').toLowerCase().includes(query);
+        
+        // User fields (legacy structure)
+        const userNameMatch = (item.user?.name || '').toLowerCase().includes(query);
+        const userUsernameMatch = (item.user?.username || '').toLowerCase().includes(query);
+        
+        // Creator fields (polymorphic - new structure)
+        const creatorNameMatch = ((item as any).creator?.name || '').toLowerCase().includes(query);
+        const creatorUsernameMatch = ((item as any).creator?.username || '').toLowerCase().includes(query);
+        
+        // Business profile name
+        const businessMatch = ((item as any).business?.name || '').toLowerCase().includes(query);
+        
+        // Golf course name (both camelCase and snake_case)
+        const courseMatch = ((item as any).golfCourse?.name || '').toLowerCase().includes(query);
+        const golfCourseMatch = ((item as any).golf_course?.name || '').toLowerCase().includes(query);
+        
+        // Category label matching - search "Golf Trip" finds posts tagged with golf-trip
+        const categoryLabelMatch = matchingCategoryIds.length > 0 && 
+          (item as any).categories?.some((cat: string) => matchingCategoryIds.includes(cat));
+        
+        return titleMatch || captionMatch || descriptionMatch || 
+               userNameMatch || userUsernameMatch || 
+               creatorNameMatch || creatorUsernameMatch || 
+               businessMatch || courseMatch || golfCourseMatch ||
+               categoryLabelMatch;
+      });
+    }
+    
+    return filtered;
+  }, [rawItems, searchQuery, selectedCategory]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasPreloadedFirst = useRef(false);
@@ -210,6 +253,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const handleClearFilter = useCallback(() => {
     setMediaFilter('all');
     localStorage.setItem(FILTER_KEY, 'all');
+    setSelectedCategory('all');
+    localStorage.setItem(CATEGORY_KEY, 'all');
   }, []);
 
   // Empty state: User has no community (no friends/follows)
@@ -227,6 +272,14 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             pills={pills}
             onPillSelect={handleFilterChange}
           />
+          {/* Category Pills */}
+          <div className="px-4 pb-2">
+            <CategoryPills
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              showIcons={true}
+            />
+          </div>
         </div>
         <CommunityEmptyState variant="no-community" />
       </div>
@@ -237,7 +290,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
     // Check if this is due to search or filter
     const isSearchEmpty = searchQuery && searchQuery.trim().length > 0;
-    const isFilteredEmpty = mediaFilter !== 'all';
+    const isFilteredEmpty = mediaFilter !== 'all' || selectedCategory !== 'all';
     
     return (
       <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
@@ -252,6 +305,14 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             pills={pills}
             onPillSelect={handleFilterChange}
           />
+          {/* Category Pills */}
+          <div className="px-4 pb-2">
+            <CategoryPills
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              showIcons={true}
+            />
+          </div>
         </div>
         {isSearchEmpty ? (
           <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -276,7 +337,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
   return (
     <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
-      {/* Sticky Command Center: Search + Sort + Pills + Subtitle */}
+      {/* Sticky Command Center: Search + Sort + Pills + Category Pills + Subtitle */}
       <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
         <DiscoverCommandCenter
           searchPlaceholder="Search posts..."
@@ -287,8 +348,16 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           pills={pills}
           onPillSelect={handleFilterChange}
         />
+        {/* Category Pills */}
+        <div className="px-4 pb-2">
+          <CategoryPills
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            showIcons={true}
+          />
+        </div>
         {/* Subtitle - tighter spacing: 8px below pills, styled as secondary subheader */}
-        <div className="px-4 -mt-2 pb-3">
+        <div className="px-4 -mt-1 pb-3">
           <p className="text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wide truncate">
             Posts from people you follow and play with
           </p>

@@ -14,6 +14,7 @@ export interface CommunityContentItem extends ExploreContentItem {
   createdAt: string;
   likeCount: number;
   commentCount: number;
+  categories?: string[]; // Category IDs from posts.categories[]
 }
 
 interface UseCommunityFeedOptions {
@@ -100,11 +101,11 @@ export function useCommunityFeed({
         return;
       }
 
-      // Build query with aggregated counts
+      // Build query with aggregated counts - include categories for filtering
       let query = supabase
         .from('posts')
         .select(`
-          id, content, created_at, user_id, badges,
+          id, content, created_at, user_id, badges, categories,
           post_media (id, media_type, media_url, duration_seconds, width, height),
           post_likes (count),
           post_comments (count)
@@ -197,6 +198,7 @@ export function useCommunityFeed({
             likeCount,
             commentCount,
             badges: post.badges || [],
+            categories: post.categories || [], // Include categories for client-side filtering
           };
         })
         .filter(Boolean) as CommunityContentItem[];
