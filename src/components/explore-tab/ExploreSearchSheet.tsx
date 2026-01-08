@@ -7,7 +7,7 @@
  */
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { cn } from '@/lib/utils';
+import { createPortal } from 'react-dom';
 import { X, Search, MapPin, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -34,20 +34,25 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
 }) => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
-  const scrollYRef = useRef(0);
+  const rootScrollTopRef = useRef(0);
   const [query, setQuery] = useState('');
   
   const { data: searchResults, isLoading } = useExploreSearch(query);
 
-  // Auto-focus input when sheet opens (with preventScroll)
+  // Auto-focus input when sheet opens (without scrolling the page behind)
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      // Small delay to ensure sheet animation has started
-      const timer = setTimeout(() => {
-        inputRef.current?.focus({ preventScroll: true });
-      }, 150);
-      return () => clearTimeout(timer);
-    }
+    if (!isOpen) return;
+    // Small delay to ensure sheet animation has started
+    const timer = setTimeout(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      try {
+        el.focus({ preventScroll: true });
+      } catch {
+        el.focus();
+      }
+    }, 150);
+    return () => clearTimeout(timer);
   }, [isOpen]);
 
   // Clear query when sheet closes
@@ -57,40 +62,42 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
     }
   }, [isOpen]);
 
-  // Proper body scroll lock that preserves scroll position
+  // Proper scroll lock for this app: #root is the scroll container (html/body are fixed in CSS)
   useEffect(() => {
+    const rootEl = document.getElementById('root');
+    if (!rootEl) return;
+
     if (isOpen) {
-      // Store current scroll position
-      scrollYRef.current = window.scrollY;
-      
-      // Lock body in place
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollYRef.current}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.style.width = '100%';
-      document.body.style.overflow = 'hidden';
+      rootScrollTopRef.current = rootEl.scrollTop;
+
+      // Freeze the #root scroll container in place
+      rootEl.style.position = 'fixed';
+      rootEl.style.top = `-${rootScrollTopRef.current}px`;
+      rootEl.style.left = '0';
+      rootEl.style.right = '0';
+      rootEl.style.width = '100%';
+      rootEl.style.overflowY = 'hidden';
     } else {
-      // Restore scroll position
-      const scrollY = scrollYRef.current;
-      
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-      
-      window.scrollTo(0, scrollY);
+      const scrollTop = rootScrollTopRef.current;
+
+      rootEl.style.position = '';
+      rootEl.style.top = '';
+      rootEl.style.left = '';
+      rootEl.style.right = '';
+      rootEl.style.width = '';
+      rootEl.style.overflowY = '';
+
+      // Restore the scroll position
+      rootEl.scrollTop = scrollTop;
     }
-    
+
     return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
+      rootEl.style.position = '';
+      rootEl.style.top = '';
+      rootEl.style.left = '';
+      rootEl.style.right = '';
+      rootEl.style.width = '';
+      rootEl.style.overflowY = '';
     };
   }, [isOpen]);
 
@@ -124,7 +131,9 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
   const courses = searchResults?.courses || [];
   const hasResults = courses.length > 0 || matchingRegions.length > 0;
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -288,7 +297,8 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 
