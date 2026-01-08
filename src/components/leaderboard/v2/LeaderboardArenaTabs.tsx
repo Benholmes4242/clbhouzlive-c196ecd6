@@ -1,6 +1,6 @@
 /**
- * LeaderboardArenaTabs - Competitive arena mode tabs with underline animation
- * Global Elite | Regional Wars | Friends League | Fast Climbers | Nearby Rivals
+ * LeaderboardArenaTabs - Competitive arena mode tabs
+ * Global Elite | Regional Wars | Friends League | Fast Climbers | Nearby
  */
 
 import React from 'react';
@@ -65,9 +65,9 @@ export function LeaderboardArenaTabs({
 
   return (
     <div className="w-full">
-      {/* Scrollable tabs with underline animation */}
+      {/* Scrollable tabs - reduced pill height */}
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-        <div className="inline-flex gap-2 pb-1 min-w-max">
+        <div className="inline-flex gap-1.5 pb-1 min-w-max">
           {ARENA_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeMode === tab.id;
@@ -80,11 +80,11 @@ export function LeaderboardArenaTabs({
                 disabled={isDisabled}
                 whileTap={!isDisabled ? { scale: 0.97 } : undefined}
                 className={cn(
-                  'relative flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium transition-colors',
+                  'relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
                   'whitespace-nowrap',
                   isActive
                     ? 'text-white'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
+                    : 'text-muted-foreground hover:text-foreground',
                   isDisabled && 'opacity-40 cursor-not-allowed'
                 )}
               >
@@ -92,12 +92,12 @@ export function LeaderboardArenaTabs({
                 {isActive && (
                   <motion.div
                     layoutId="arena-tab-bg"
-                    className="absolute inset-0 bg-surface-slate rounded-full shadow-sm"
+                    className="absolute inset-0 bg-surface-slate rounded-full"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                <span className="relative z-10 flex items-center gap-2">
-                  <Icon className="w-4 h-4" />
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{tab.label}</span>
                 </span>
               </motion.button>
@@ -115,7 +115,7 @@ export function LeaderboardArenaTabs({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.2 }}
-            className="text-xs text-muted-foreground mt-2.5 px-1"
+            className="text-xs text-muted-foreground mt-2 px-1"
           >
             {activeTab.description}
           </motion.p>

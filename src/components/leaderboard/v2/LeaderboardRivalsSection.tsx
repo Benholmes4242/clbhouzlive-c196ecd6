@@ -128,19 +128,19 @@ function RivalRow({
   );
 }
 
-// Connector line component
+// Connector line component - reduced opacity arrows
 function ConnectorLine({ direction }: { direction: 'up' | 'down' }) {
   return (
-    <div className="flex justify-center py-1 relative">
+    <div className="flex justify-center py-0.5 relative">
       <div className="flex flex-col items-center">
         {direction === 'up' && (
-          <svg width="12" height="16" viewBox="0 0 12 16" className="text-muted-foreground/30">
-            <path d="M6 16 L6 4 M2 8 L6 4 L10 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="12" height="14" viewBox="0 0 12 14" className="text-muted-foreground/20">
+            <path d="M6 14 L6 4 M2 7 L6 3 L10 7" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
         {direction === 'down' && (
-          <svg width="12" height="16" viewBox="0 0 12 16" className="text-muted-foreground/30">
-            <path d="M6 0 L6 12 M2 8 L6 12 L10 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="12" height="14" viewBox="0 0 12 14" className="text-muted-foreground/20">
+            <path d="M6 0 L6 10 M2 7 L6 11 L10 7" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
       </div>
@@ -234,15 +234,15 @@ export function LeaderboardRivalsSection({
         </div>
       </div>
 
-      {/* Motivational callout */}
+      {/* Motivational callout - reduced height */}
       {callout && (
         <motion.div 
-          className="mt-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20"
+          className="mt-2 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium text-center">
+          <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium text-center">
             {callout}
           </p>
         </motion.div>
