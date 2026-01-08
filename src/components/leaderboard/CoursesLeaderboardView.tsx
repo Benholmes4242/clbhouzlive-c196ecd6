@@ -360,8 +360,8 @@ export function CoursesLeaderboardView() {
           />
         )}
 
-        {/* Course Grid - 2 columns on mobile, cinematic cards */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        {/* Course Grid - 1 col mobile, 2 col tablet+, gallery feel */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {displayCourses.length === 0 ? (
             <div className="col-span-2 py-8">
               {sort === 'friends' ? (

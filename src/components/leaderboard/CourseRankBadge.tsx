@@ -42,10 +42,10 @@ export function CourseRankBadge({
       <span 
         className={cn(
           'inline-flex items-center text-[10px] font-medium',
-          'text-slate-700 bg-white/85 backdrop-blur-sm',
+          'text-slate-700 bg-white/90 backdrop-blur-md',
           'px-2 py-0.5 rounded-sq-xs',
-          'border border-slate-200/60',
-          'shadow-sm',
+          'border border-slate-300/70',
+          'shadow-[0_1px_3px_rgba(0,0,0,0.12)]',
           className
         )}
       >
@@ -54,15 +54,15 @@ export function CourseRankBadge({
     );
   }
 
-  // Default variant - "#3 Global" style
+  // Default variant - "#3 Global" style with strong legibility
   return (
     <span 
       className={cn(
         'inline-flex items-center text-[11px] font-semibold',
-        'text-slate-800 bg-white/90 backdrop-blur-sm',
+        'text-slate-800 bg-white/95 backdrop-blur-md',
         'px-2.5 py-1 rounded-sq-xs',
-        'border border-slate-200/50',
-        'shadow-sm',
+        'border border-slate-300/60',
+        'shadow-[0_2px_6px_rgba(0,0,0,0.1)]',
         className
       )}
     >

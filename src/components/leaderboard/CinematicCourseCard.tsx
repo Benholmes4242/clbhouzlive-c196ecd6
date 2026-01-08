@@ -96,8 +96,13 @@ export function CinematicCourseCard({
             }}
           />
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <span className="text-muted-foreground text-sm">No image</span>
+          <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+            <div className="text-center space-y-1.5">
+              <div className="w-10 h-10 mx-auto rounded-sq-sm bg-slate-200/60 flex items-center justify-center">
+                <Star className="w-5 h-5 text-slate-400" />
+              </div>
+              <span className="text-[11px] text-slate-400 font-medium">No image</span>
+            </div>
           </div>
         )}
 
