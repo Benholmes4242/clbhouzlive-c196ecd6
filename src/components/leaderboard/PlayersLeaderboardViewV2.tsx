@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useTop100Leaderboard, LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { useNearbyPlayers } from '@/hooks/useNearbyPlayers';
+import { useLeaderboardMilestones } from '@/hooks/useLeaderboardMilestones';
 import { FLAGS } from '@/config/flags';
 import { getMockLeaderboardV2Entries, mergeWithMockEntries } from '@/mocks/leaderboardV2MockGenerator';
 
@@ -37,7 +38,6 @@ import {
   AchievementBanner,
   useAchievementDetection,
   RankHistorySheet,
-  MOCK_MILESTONES,
   type ArenaMode,
   type LeaderboardRegion,
   type LeaderboardPlayerEntry,
@@ -142,6 +142,9 @@ export function PlayersLeaderboardViewV2() {
     timeRange: timeRange,
     pageSize: 500,
   });
+
+  // Fetch milestones for history sheet
+  const { data: milestones = [], isLoading: milestonesLoading } = useLeaderboardMilestones(currentUserId);
 
   // Nearby players hook
   const nearbyData = useNearbyPlayers(currentUserId);
@@ -723,7 +726,8 @@ export function PlayersLeaderboardViewV2() {
       <RankHistorySheet
         open={historySheetOpen}
         onOpenChange={setHistorySheetOpen}
-        milestones={MOCK_MILESTONES} // TODO: Replace with real data from user's rank history
+        milestones={milestones}
+        isLoading={milestonesLoading}
       />
     </div>
   );

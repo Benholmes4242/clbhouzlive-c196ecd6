@@ -3568,6 +3568,54 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_milestones: {
+        Row: {
+          created_at: string
+          dedupe_key: string
+          id: string
+          milestone_type: Database["public"]["Enums"]["milestone_type"]
+          percentile: number | null
+          rank_delta: number | null
+          rank_scope: Database["public"]["Enums"]["leaderboard_scope"]
+          rank_value: number
+          rivals_overtaken: number | null
+          season_id: string | null
+          season_key: string | null
+          time_range: Database["public"]["Enums"]["leaderboard_time_range"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          milestone_type: Database["public"]["Enums"]["milestone_type"]
+          percentile?: number | null
+          rank_delta?: number | null
+          rank_scope: Database["public"]["Enums"]["leaderboard_scope"]
+          rank_value: number
+          rivals_overtaken?: number | null
+          season_id?: string | null
+          season_key?: string | null
+          time_range: Database["public"]["Enums"]["leaderboard_time_range"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          milestone_type?: Database["public"]["Enums"]["milestone_type"]
+          percentile?: number | null
+          rank_delta?: number | null
+          rank_scope?: Database["public"]["Enums"]["leaderboard_scope"]
+          rank_value?: number
+          rivals_overtaken?: number | null
+          season_id?: string | null
+          season_key?: string | null
+          time_range?: Database["public"]["Enums"]["leaderboard_time_range"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       logos: {
         Row: {
           category: string
@@ -10431,6 +10479,20 @@ export type Database = {
         | "Asia"
         | "Africa"
         | "Oceania"
+      leaderboard_scope:
+        | "global"
+        | "gbi"
+        | "europe"
+        | "usa"
+        | "friends"
+        | "nearby"
+      leaderboard_time_range: "all_time" | "this_year" | "this_month"
+      milestone_type:
+        | "new_personal_best"
+        | "entered_rank_tier"
+        | "fast_climber"
+        | "top_percentile"
+        | "overtook_rivals"
       ping_format: "NINE" | "EIGHTEEN" | "RANGE" | "CASUAL"
       ping_response_state: "PENDING" | "ACCEPTED" | "DECLINED" | "EXPIRED"
       ping_status: "ACTIVE" | "MATCHING" | "CLOSED"
@@ -10600,6 +10662,22 @@ export const Constants = {
         "Asia",
         "Africa",
         "Oceania",
+      ],
+      leaderboard_scope: [
+        "global",
+        "gbi",
+        "europe",
+        "usa",
+        "friends",
+        "nearby",
+      ],
+      leaderboard_time_range: ["all_time", "this_year", "this_month"],
+      milestone_type: [
+        "new_personal_best",
+        "entered_rank_tier",
+        "fast_climber",
+        "top_percentile",
+        "overtook_rivals",
       ],
       ping_format: ["NINE", "EIGHTEEN", "RANGE", "CASUAL"],
       ping_response_state: ["PENDING", "ACCEPTED", "DECLINED", "EXPIRED"],
