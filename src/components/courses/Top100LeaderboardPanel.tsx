@@ -27,7 +27,7 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       {/* Tabs - sticky once scrolled */}
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <div className="sticky top-0 z-20 bg-[var(--bg-page)]/95 backdrop-blur-sm pb-2">
+        <div className="pb-2">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="players">Players</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
