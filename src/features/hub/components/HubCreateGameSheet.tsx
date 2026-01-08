@@ -8,7 +8,7 @@
  * Reuses CreateGameSurface for all form logic
  */
 
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,20 +17,20 @@ import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
 import { haptic } from '@/utils/haptics';
 import '../home/hubThemeLight.css';
 
-interface PrefillCourse {
+export interface PrefillCourse {
   id: string;
   name: string;
-  region?: string;
-  country?: string;
+  region?: string | null;
+  country?: string | null;
 }
 
-interface HubCreateGameSheetProps {
+export interface HubCreateGameSheetProps {
   isOpen: boolean;
   onClose: () => void;
   /** @deprecated use prefillCourse */
-  prefilledClub?: { id: string; name: string };
+  prefilledClub?: { id: string; name: string } | null;
   /** V3: prefill course from leaderboard deep-link */
-  prefillCourse?: PrefillCourse;
+  prefillCourse?: PrefillCourse | null;
 }
 
 export const HubCreateGameSheet: React.FC<HubCreateGameSheetProps> = ({
@@ -40,9 +40,11 @@ export const HubCreateGameSheet: React.FC<HubCreateGameSheetProps> = ({
   prefillCourse,
 }) => {
   // V3: Merge prefillCourse with legacy prefilledClub (prefer prefillCourse)
-  const resolvedPrefill = prefillCourse 
-    ? { id: prefillCourse.id, name: prefillCourse.name }
-    : prefilledClub;
+  const resolvedPrefill = useMemo(() => {
+    if (prefillCourse?.id) return { id: prefillCourse.id, name: prefillCourse.name };
+    if (prefilledClub?.id) return { id: prefilledClub.id, name: prefilledClub.name };
+    return null;
+  }, [prefillCourse, prefilledClub]);
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
   const surfaceRef = useRef<CreateGameSurfaceRef>(null);
