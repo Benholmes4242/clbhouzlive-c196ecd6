@@ -71,34 +71,23 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
       rootScrollTopRef.current = rootEl.scrollTop;
 
       // Freeze the #root scroll container in place
-      rootEl.style.position = 'fixed';
-      rootEl.style.top = `-${rootScrollTopRef.current}px`;
-      rootEl.style.left = '0';
-      rootEl.style.right = '0';
-      rootEl.style.width = '100%';
-      rootEl.style.overflowY = 'hidden';
-    } else {
-      const scrollTop = rootScrollTopRef.current;
-
-      rootEl.style.position = '';
-      rootEl.style.top = '';
-      rootEl.style.left = '';
-      rootEl.style.right = '';
-      rootEl.style.width = '';
-      rootEl.style.overflowY = '';
-
-      // Restore the scroll position
-      rootEl.scrollTop = scrollTop;
+      rootEl.style.overflow = 'hidden';
     }
 
     return () => {
-      rootEl.style.position = '';
-      rootEl.style.top = '';
-      rootEl.style.left = '';
-      rootEl.style.right = '';
-      rootEl.style.width = '';
-      rootEl.style.overflowY = '';
+      // Cleanup: ensure scroll is always restored
+      rootEl.style.overflow = '';
     };
+  }, [isOpen]);
+  
+  // Restore scroll on close (separate effect for cleanup ordering)
+  useEffect(() => {
+    if (!isOpen) {
+      const rootEl = document.getElementById('root');
+      if (rootEl) {
+        rootEl.style.overflow = '';
+      }
+    }
   }, [isOpen]);
 
   const handleCourseClick = useCallback((courseId: string) => {

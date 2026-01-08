@@ -117,7 +117,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     <div
       ref={tileRef}
       className={cn(
-        "group cursor-pointer bg-card border border-border/30 overflow-hidden",
+        "group cursor-pointer bg-white border border-border/30 overflow-hidden",
         className
       )}
       onClick={() => {
