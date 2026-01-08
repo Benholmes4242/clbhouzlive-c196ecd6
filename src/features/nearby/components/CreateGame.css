@@ -1,56 +1,221 @@
-/* Create Game Modal - now uses hubTheme.css tokens */
-:root {
-  /* Z-index layers */
-  --z-app: 0;
-  --z-toast: 900;
-  --z-modal-backdrop: 10000;
-  --z-modal: 10010;
-  --z-sheet-backdrop: 11000;
-  --z-sheet: 11010;
+/* Create Game Sheet - Hub-style polish */
+
+/* Section Labels - Compact uppercase */
+.sectionLabel {
+  color: var(--hub-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 6px 2px;
 }
 
-/* Utility Classes */
-* {
-  -webkit-tap-highlight-color: transparent;
+/* Helper Text */
+.helper {
+  color: var(--hub-text-dim);
+  font-size: 11px;
 }
 
-button {
-  touch-action: manipulation;
-}
-
-.u-row {
+/* ========== HERO: Golf Club Search ========== */
+.clubSearchBar {
   display: flex;
   align-items: center;
-}
-
-.u-gap8 {
-  gap: 8px;
-}
-
-.u-gap10 {
   gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--hub-glass-bg-input);
+  border: 1px solid var(--hub-stroke-subtle);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.u-ellipsis {
+.clubSearchBarHero {
+  border: 1.5px solid var(--hub-stroke);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.clubSearchBarHero:focus-within {
+  border-color: var(--hub-stroke-strong);
+  box-shadow: 0 0 0 3px rgba(110, 146, 119, 0.1);
+}
+
+.clubSearchBarError {
+  border-color: #ef4444 !important;
+}
+
+.clubSearchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: var(--hub-text);
+  letter-spacing: 0.1px;
+}
+
+.clubSearchInput::placeholder {
+  color: var(--hub-text-dim);
+}
+
+/* Selected Club Row */
+.selectedClubRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--hub-glass-bg);
+  border: 1.5px solid var(--hub-stroke);
+}
+
+.changeBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hub-accent);
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.changeBtn:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+/* Results Dropdown */
+.resultsSheet {
+  max-height: 280px;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: var(--hub-glass-bg);
+  border: 1px solid var(--hub-stroke-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.resultRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hub-stroke-subtle);
+  transition: background 0.1s;
+}
+
+.resultRow:last-child {
+  border-bottom: none;
+}
+
+.resultRow:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+.resultRow:active {
+  background: var(--hub-glass-bg);
+}
+
+.rMid {
+  flex: 1;
+  min-width: 0;
+}
+
+.rTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hub-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Section Labels */
-.sectionLabel {
-  color: var(--hub-text-muted);
-  font-size: 13px;
-  margin: 12px 2px 8px;
-}
-
-/* Helper Text */
-.helper {
-  color: var(--hub-text-sub);
+.rSub {
   font-size: 12px;
+  color: var(--hub-text-dim);
+  margin-top: 1px;
 }
 
-/* Primary Button */
+.hint {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--hub-text-dim);
+}
+
+/* Error Message */
+.errorMsg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+/* ========== Collapsible Tag Players ========== */
+.collapsibleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--hub-glass-bg-subtle);
+  border: 1px solid var(--hub-stroke-subtle);
+  transition: background 0.15s;
+}
+
+.collapsibleHeader:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+.collapsibleHeader:active {
+  transform: scale(0.99);
+}
+
+.tagCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #6E9277, #89A78C);
+  border-radius: 9px;
+}
+
+/* ========== Note Textarea ========== */
+.noteTextarea {
+  width: 100%;
+  min-height: 72px;
+  max-height: 120px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  background: var(--hub-glass-bg-input);
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text);
+  letter-spacing: 0.1px;
+  transition: border-color 0.15s;
+}
+
+.noteTextarea:focus {
+  outline: none;
+  border-color: var(--hub-stroke);
+}
+
+.noteTextarea::placeholder {
+  color: var(--hub-text-dim);
+}
+
+/* ========== Primary Button ========== */
 .btnPrimary {
   height: 52px;
   border-radius: 16px;
