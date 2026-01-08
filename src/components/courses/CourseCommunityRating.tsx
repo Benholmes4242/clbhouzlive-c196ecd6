@@ -4,7 +4,7 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 interface CourseCommunityRatingProps {
   rating: number;
   className?: string;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 /**
@@ -16,13 +16,17 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   className = '',
   size = 'md',
 }) => {
-  const sizeClasses = size === 'sm' 
-    ? 'h-3.5 w-3.5' 
-    : 'h-4 w-4';
+  const sizeClasses = {
+    sm: 'h-3.5 w-3.5',
+    md: 'h-4 w-4',
+    lg: 'h-[18px] w-[18px]',
+  }[size];
   
-  const textClasses = size === 'sm'
-    ? 'text-[11px]'
-    : 'text-xs';
+  const textClasses = {
+    sm: 'text-[11px]',
+    md: 'text-xs',
+    lg: 'text-[13px]',
+  }[size];
 
   return (
     <div className={`flex items-center gap-1 flex-shrink-0 ${className}`}>

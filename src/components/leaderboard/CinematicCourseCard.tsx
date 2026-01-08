@@ -157,7 +157,7 @@ export function CinematicCourseCard({
         {/* Rating Line - using CourseCommunityRating with clubhouse logo */}
         <div className="flex items-center gap-1.5 pt-0.5">
           {course.avg_rating ? (
-            <CourseCommunityRating rating={course.avg_rating} size="sm" />
+            <CourseCommunityRating rating={course.avg_rating} size="lg" />
           ) : (
             <span className="text-[13px] font-medium text-muted-foreground">—</span>
           )}
