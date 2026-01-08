@@ -1,10 +1,15 @@
 /**
  * useNearbyPlayers - Hook for finding players within 50 miles of user's home club
  * Falls back to same-country players when location isn't available
+ * 
+ * SOURCE OF TRUTH: Uses primary_club_id from user_profiles (same as Profile page)
+ * - primary_club_id is the canonical FK to golf_clubs.id
+ * - home_club_id is DEPRECATED and should not be used
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from './useUserProfile';
 
 const MILES_TO_KM = 1.60934;
 const DEFAULT_RADIUS_MILES = 50;
@@ -60,53 +65,32 @@ export interface UseNearbyPlayersResult {
 }
 
 export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult {
-  // First, get user's home club location
+  // Use the shared useUserProfile hook - single source of truth (same as Profile page)
+  const { data: userProfile, isLoading: loadingProfile } = useUserProfile(userId);
+
+  // Get club location from primary_club_id (canonical source)
   const { data: userClubData, isLoading: loadingUserClub } = useQuery({
-    queryKey: ['user-home-club-location', userId],
-    enabled: !!userId,
+    queryKey: ['user-home-club-location', userId, userProfile?.primary_club_id],
+    enabled: !!userId && !!userProfile?.primary_club_id,
     queryFn: async () => {
-      // Debug: Log the user ID being queried
-      console.log('[useNearbyPlayers] Fetching home club for userId:', userId);
+      const clubId = userProfile!.primary_club_id!;
       
-      const { data: profile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('home_club_id, home_club')
-        .eq('id', userId!)
-        .single();
-
-      // Debug: Log profile data
-      console.log('[useNearbyPlayers] Profile data:', profile, 'Error:', profileError);
-
-      if (!profile?.home_club_id) {
-        console.log('[useNearbyPlayers] No home_club_id found for user');
-        return null;
-      }
-
       const { data: club, error: clubError } = await supabase
         .from('golf_clubs')
         .select('latitude, longitude, country, name')
-        .eq('id', profile.home_club_id)
+        .eq('id', clubId)
         .single();
 
-      // Debug: Log club data
-      console.log('[useNearbyPlayers] Club data:', club, 'Error:', clubError);
-
-      if (!club) {
-        console.log('[useNearbyPlayers] No club found for home_club_id:', profile.home_club_id);
+      if (clubError || !club) {
         return null;
-      }
-
-      // Check if club has valid coordinates
-      if (!club.latitude || !club.longitude) {
-        console.log('[useNearbyPlayers] Club missing lat/lng:', club);
       }
 
       return {
         lat: club.latitude,
         lng: club.longitude,
         country: club.country,
-        clubName: club.name || profile.home_club,
-        clubId: profile.home_club_id,
+        clubName: club.name || userProfile!.home_club || '',
+        clubId: clubId,
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -132,7 +116,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
     staleTime: 2 * 60 * 1000,
   });
 
-  // Fetch club locations for all players who have home_club_id
+  // Fetch club locations for all players who have primary_club_id
   const { data: clubLocations } = useQuery({
     queryKey: ['club-locations-cache'],
     enabled: !!playersData && playersData.length > 0,
@@ -159,16 +143,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
 
   // Compute nearby players
   const result = (() => {
-    // Debug: Log the decision-making process
-    console.log('[useNearbyPlayers] Computing result:', {
-      userId,
-      hasPlayersData: !!playersData,
-      userClubData,
-      hasClubLocations: !!clubLocations,
-    });
-
     if (!userId || !playersData) {
-      console.log('[useNearbyPlayers] No userId or playersData, returning none');
       return {
         players: [],
         fallbackMode: 'none' as const,
@@ -177,7 +152,6 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
     }
 
     const hasValidLocation = userClubData?.lat && userClubData?.lng;
-    console.log('[useNearbyPlayers] hasValidLocation:', hasValidLocation);
 
     if (hasValidLocation && clubLocations) {
       // Calculate distances and filter
@@ -189,9 +163,9 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
       for (const player of playersData as any[]) {
         if (player.user_id === userId) continue; // Exclude self
 
-        // Try to get club location from cache
-        const clubLoc = player.home_club_id 
-          ? clubLocations.get(player.home_club_id)
+        // Try to get club location from cache using primary_club_id
+        const clubLoc = player.primary_club_id 
+          ? clubLocations.get(player.primary_club_id)
           : null;
 
         if (clubLoc?.lat && clubLoc?.lng) {
@@ -207,7 +181,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
             display_name: player.display_name || player.username || 'Anonymous',
             avatar_url: player.profile_photo_url,
             home_club: player.home_club,
-            home_club_id: player.home_club_id,
+            home_club_id: player.primary_club_id, // Use primary_club_id
             total_top100_played: player.top100_courses_played,
             rank: player.global_rank,
             distance_km: distance,
@@ -261,7 +235,6 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
 
     // Fallback: same country
     if (userClubData?.country) {
-      console.log('[useNearbyPlayers] Using country fallback for:', userClubData.country);
       const countryPlayers = (playersData as any[])
         .filter((p) => p.user_id !== userId)
         .map((player) => ({
@@ -269,7 +242,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
           display_name: player.display_name || player.username || 'Anonymous',
           avatar_url: player.profile_photo_url,
           home_club: player.home_club,
-          home_club_id: player.home_club_id,
+          home_club_id: player.primary_club_id, // Use primary_club_id
           total_top100_played: player.top100_courses_played,
           rank: player.global_rank,
           country: userClubData.country,
@@ -278,7 +251,6 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
         .slice(0, 50)
         .map((p, i) => ({ ...p, rank: i + 1 }));
 
-      console.log('[useNearbyPlayers] Found', countryPlayers.length, 'players in country');
       return {
         players: countryPlayers,
         fallbackMode: 'country' as const,
@@ -286,7 +258,6 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
       };
     }
 
-    console.log('[useNearbyPlayers] No valid location or country, returning none');
     return {
       players: [],
       fallbackMode: 'none' as const,
@@ -294,17 +265,9 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
     };
   })();
 
-  // Debug: Log final result
-  console.log('[useNearbyPlayers] Final result:', {
-    playerCount: result.players.length,
-    fallbackMode: result.fallbackMode,
-    radiusUsed: result.radiusUsed,
-    hasUserLocation: !!userClubData,
-  });
-
   return {
     players: result.players,
-    isLoading: loadingUserClub || loadingPlayers,
+    isLoading: loadingProfile || loadingUserClub || loadingPlayers,
     isError,
     userLocation: userClubData
       ? {
