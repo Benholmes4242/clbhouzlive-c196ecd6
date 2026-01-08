@@ -170,6 +170,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   const pillClasses = cn(
     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
     "transition-colors active:scale-[0.98]",
+    "focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0",
     isNonDefaultSort
       ? "bg-foreground/15 text-foreground border border-foreground/30"
       : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
