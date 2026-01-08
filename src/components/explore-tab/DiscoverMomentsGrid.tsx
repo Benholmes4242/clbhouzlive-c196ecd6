@@ -4,14 +4,17 @@
  * Data source: unified explore_moments view
  * Initial render: 20 items, then infinite scroll in batches of 20
  * Order: latest first (created_at desc)
+ * 
+ * Polish: skeleton tiles, video poster fallback, no duplicates
  */
 
-import React, { useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
-import { Play, MapPin } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DiscoverMomentsGridProps {
   regionKey?: RegionKey;
@@ -26,6 +29,75 @@ const GRADIENTS = [
   "from-amber-700 via-slate-600 to-slate-900",
   "from-teal-700 via-slate-600 to-slate-900",
 ];
+
+// Skeleton tile component
+const MomentTileSkeleton: React.FC = () => (
+  <div className="aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt">
+    <Skeleton className="w-full h-full" />
+  </div>
+);
+
+// Individual moment tile with image error handling
+const MomentTile: React.FC<{
+  moment: ExploreMoment;
+  index: number;
+  onClick: () => void;
+}> = ({ moment, index, onClick }) => {
+  const [imageError, setImageError] = useState(false);
+  const isVideo = moment.media_type === 'video';
+  const gradientIndex = index % GRADIENTS.length;
+  
+  // Use thumbnail_url, falling back to media_url for images, then gradient
+  const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
+  const showGradient = !imageUrl || imageError;
+
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left"
+    >
+      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm">
+        {/* Background image or gradient */}
+        {!showGradient ? (
+          <img 
+            src={imageUrl!} 
+            alt="Moment"
+            loading="lazy"
+            onError={() => setImageError(true)}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className={cn(
+            "absolute inset-0 bg-gradient-to-br",
+            GRADIENTS[gradientIndex]
+          )} />
+        )}
+        
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+        
+        {/* Bottom gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        
+        {/* Video indicator */}
+        {isVideo && (
+          <div className="absolute top-3 right-3">
+            <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-sm">
+              <Play className="w-4 h-4 text-white fill-white" />
+            </div>
+          </div>
+        )}
+        
+        {/* Source type badge */}
+        <div className="absolute top-3 left-3">
+          <div className="px-2 py-0.5 bg-black/50 backdrop-blur-sm rounded-full text-xs text-white/90 shadow-sm">
+            {moment.source_type === 'post' ? 'Post' : 'Review'}
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+};
 
 export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   regionKey,
@@ -59,9 +131,16 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Flatten all pages into single array
+  // Flatten all pages into single array, deduplicate by moment_id
   const moments = useMemo(() => {
-    return data?.pages.flatMap(page => page.moments) || [];
+    const allMoments = data?.pages.flatMap(page => page.moments) || [];
+    // Deduplicate to prevent any edge-case repeats
+    const seen = new Set<string>();
+    return allMoments.filter(m => {
+      if (seen.has(m.moment_id)) return false;
+      seen.add(m.moment_id);
+      return true;
+    });
   }, [data]);
 
   const handleMomentClick = useCallback((moment: ExploreMoment) => {
@@ -78,17 +157,17 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     }
   }, [navigate, onMomentClick]);
 
-  // Loading state
+  // Initial loading state with skeleton
   if (isLoading && moments.length === 0) {
     return (
       <div className={cn("py-6", className)}>
         <div className="px-5 mb-4">
-          <div className="h-6 w-40 bg-muted animate-pulse rounded" />
-          <div className="h-4 w-56 bg-muted animate-pulse rounded mt-2" />
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-56 mt-2" />
         </div>
         <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-[3/4] rounded-xl bg-muted animate-pulse" />
+            <MomentTileSkeleton key={i} />
           ))}
         </div>
       </div>
@@ -126,63 +205,27 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       
       {/* Grid */}
       <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-        {moments.map((moment, index) => {
-          const isVideo = moment.media_type === 'video';
-          const gradientIndex = index % GRADIENTS.length;
-
-          return (
-            <button
-              key={moment.moment_id}
-              onClick={() => handleMomentClick(moment)}
-              className="group text-left"
-            >
-              <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt">
-                {/* Background image or gradient */}
-                {moment.thumbnail_url ? (
-                  <img 
-                    src={moment.thumbnail_url} 
-                    alt="Moment"
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className={cn(
-                    "absolute inset-0 bg-gradient-to-br",
-                    GRADIENTS[gradientIndex]
-                  )} />
-                )}
-                
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                
-                {/* Bottom gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                {/* Video indicator */}
-                {isVideo && (
-                  <div className="absolute top-3 right-3">
-                    <div className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center">
-                      <Play className="w-4 h-4 text-white fill-white" />
-                    </div>
-                  </div>
-                )}
-                
-                {/* Source type badge */}
-                <div className="absolute top-3 left-3">
-                  <div className="px-2 py-0.5 bg-black/50 rounded-full text-xs text-white/80">
-                    {moment.source_type === 'post' ? 'Post' : 'Review'}
-                  </div>
-                </div>
-              </div>
-            </button>
-          );
-        })}
+        {moments.map((moment, index) => (
+          <MomentTile
+            key={moment.moment_id}
+            moment={moment}
+            index={index}
+            onClick={() => handleMomentClick(moment)}
+          />
+        ))}
+        
+        {/* Pagination skeleton tiles */}
+        {isFetchingNextPage && (
+          Array.from({ length: 4 }).map((_, i) => (
+            <MomentTileSkeleton key={`loading-${i}`} />
+          ))
+        )}
       </div>
 
       {/* Load more sentinel */}
-      <div ref={sentinelRef} className="h-20 flex items-center justify-center">
+      <div ref={sentinelRef} className="h-12 flex items-center justify-center">
         {isFetchingNextPage && (
-          <div className="w-6 h-6 border-2 border-muted border-t-primary rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
         )}
       </div>
     </div>
