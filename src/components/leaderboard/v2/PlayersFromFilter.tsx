@@ -4,7 +4,13 @@
  */
 
 import React, { useState } from 'react';
-import { Globe, MapPin, ChevronDown, Search, Check, X } from 'lucide-react';
+import { Globe, MapPin, ChevronDown, Search, Check, X, Info } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -203,9 +209,26 @@ export function PlayersFromFilter({
   return (
     <>
       <div className="space-y-1">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60 px-0.5">
-          Golfers based in
-        </p>
+        <div className="flex items-center gap-1.5 px-0.5">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+            Golfers based in
+          </p>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+                  <Info className="w-3 h-3" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[220px] text-center">
+                <p className="text-xs font-medium mb-1">How this works</p>
+                <p className="text-xs text-muted-foreground">
+                  Golfers are grouped by the country of their primary home club — not where they live.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -226,9 +249,9 @@ export function PlayersFromFilter({
               <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52">
-            <div className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
-              Filter golfers by home club country
+          <DropdownMenuContent align="start" className="w-56">
+            <div className="px-2 py-1.5 text-[10px] text-muted-foreground/70">
+              Based on each golfer's primary home club
             </div>
             <DropdownMenuItem
               onClick={() => onChange('worldwide')}
