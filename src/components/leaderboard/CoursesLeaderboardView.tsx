@@ -162,7 +162,7 @@ export function CoursesLeaderboardView() {
     ? mockData?.hasMore || visibleCount < totalCount
     : visibleCount < totalCount;
 
-  // Transform mock data to match real data shape
+  // Transform data to match CinematicCourseCard expected shape
   const displayCourses = USE_MOCK_COURSE_LEADERBOARD_DATA
     ? visibleCourses.map((c: any) => ({
         course_id: c.course_id,
@@ -176,7 +176,20 @@ export function CoursesLeaderboardView() {
         ratings_count: c.ratings_count,
         friends_count: c.friends_played_count_30d,
       }))
-    : visibleCourses;
+    : visibleCourses.map((c: any) => ({
+        course_id: c.course_id,
+        course_name: c.course_name,
+        thumbnail_image: c.thumbnail_url, // RPC returns thumbnail_url, card expects thumbnail_image
+        country: c.country,
+        sub_country: c.sub_country,
+        global_rank: c.global_rank,
+        regional_rank: c.regional_rank,
+        usa_rank: c.usa_rank,
+        avg_rating: c.avg_rating,
+        times_played: c.times_played,
+        ratings_count: c.times_played, // Use times_played as proxy for ratings_count
+        friends_count: c.friends_count,
+      }));
 
   // Reset pagination when sort changes
   const handleSortChange = useCallback((newSort: CourseSortOption) => {
