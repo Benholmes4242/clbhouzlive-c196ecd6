@@ -7,29 +7,80 @@
   gap: 16px;
 }
 
-/* Create Game Row - Sticky */
-.createGameRowSticky {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+/* Create Game Hero Card - Premium style */
+.createGameHero {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  margin: 0 -16px 0;
-  background: var(--hub-bg-start);
-  border-bottom: 1px solid var(--hub-stroke-subtle);
-  transition: transform 0.1s, background 0.15s;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--hub-glass-bg-elevated) 0%, var(--hub-glass-bg) 100%);
+  border: 1px solid var(--hub-stroke);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
 }
 
-.createGameRowSticky:hover {
-  background: var(--hub-glass-bg-hover);
+.createGameHero:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.createGameRowSticky:active {
-  transform: scale(0.99);
+.createGameHero:active {
+  transform: scale(0.98);
+}
+
+.createGameHero__content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.createGameHero__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6E9277 0%, #89A78C 100%);
+  box-shadow: 0 2px 8px rgba(110, 146, 119, 0.3);
+  flex-shrink: 0;
+}
+
+.createGameHero__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.createGameHero__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hub-text);
+  line-height: 1.3;
+}
+
+.createGameHero__subtitle {
+  font-size: 13px;
+  color: var(--hub-text-muted);
+  line-height: 1.4;
+}
+
+.createGameHero__chevron {
+  color: var(--hub-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.createGameHero:hover .createGameHero__chevron {
+  transform: translateX(2px);
 }
 
 /* Find Block */
