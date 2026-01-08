@@ -157,7 +157,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all ${className}`}
+      className={`w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-b sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all ${className}`}
     >
       {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
