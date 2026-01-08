@@ -9338,7 +9338,8 @@ export type Database = {
           global_rank: number
           home_club: string
           is_friend: boolean
-          last_activity_at: string
+          last_activity: string
+          primary_club_id: string
           profile_photo_url: string
           regional_rank: number
           top100_courses_played: number
