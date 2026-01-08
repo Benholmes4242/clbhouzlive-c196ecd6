@@ -411,7 +411,12 @@ export function PlayersLeaderboardViewV2() {
       return renderNearbyContent();
     }
     if (arenaMode === 'friends') {
-      return <LeaderboardEmptyState type="friends-no-friends" />;
+      // Show empty state if only self in list (no actual friends)
+      const hasOnlySelf = displayedEntries.length <= 1 && 
+        displayedEntries[0]?.user_id === currentUserId;
+      if (hasOnlySelf || displayedEntries.length === 0) {
+        return <LeaderboardEmptyState type="friends-no-friends" />;
+      }
     }
     if (arenaMode === 'climbers') {
       return <LeaderboardEmptyState type="rising-no-data" />;
@@ -447,6 +452,11 @@ export function PlayersLeaderboardViewV2() {
       />
     );
   };
+
+  // Check if Friends League should show empty state
+  const showFriendsEmpty = arenaMode === 'friends' && 
+    displayedEntries.length <= 1 && 
+    displayedEntries[0]?.user_id === currentUserId;
 
   return (
     <div className="w-full" ref={listRef}>
@@ -581,7 +591,7 @@ export function PlayersLeaderboardViewV2() {
             >
               <LeaderboardListSkeleton count={5} />
             </motion.div>
-          ) : displayedEntries.length === 0 ? (
+          ) : displayedEntries.length === 0 || showFriendsEmpty ? (
             <motion.div
               key="empty"
               initial={{ opacity: 0 }}
