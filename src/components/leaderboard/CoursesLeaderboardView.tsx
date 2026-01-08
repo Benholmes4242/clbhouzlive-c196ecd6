@@ -6,8 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 import { CourseLeaderboardHero } from './CourseLeaderboardHero';
-import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
-import { CourseCardModel } from '@/types/courseCard';
+import { CinematicCourseCard } from './CinematicCourseCard';
 import { CourseMomentumCallout } from './CourseMomentumCallout';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Star, ChevronRight } from 'lucide-react';
@@ -163,40 +162,33 @@ export function CoursesLeaderboardView() {
     ? mockData?.hasMore || visibleCount < totalCount
     : visibleCount < totalCount;
 
-  // Transform data to match UnifiedCourseCard CourseCardModel shape
-  const displayCourses: CourseCardModel[] = USE_MOCK_COURSE_LEADERBOARD_DATA
+  // Transform data to match CinematicCourseCard expected shape
+  const displayCourses = USE_MOCK_COURSE_LEADERBOARD_DATA
     ? visibleCourses.map((c: any) => ({
-        id: c.course_id,
-        name: c.course_name,
-        imageUrl: c.hero_image_url,
+        course_id: c.course_id,
+        course_name: c.course_name,
+        thumbnail_image: c.hero_image_url,
         country: c.region,
-        locationText: c.region,
-        communityRating: c.avg_rating,
-        ratingCount: c.ratings_count,
-        ranks: {
-          global: c.global_rank,
-          regional: c.regional_rank,
-        },
-        context: {
-          friendsPlayedCount: c.friends_played_count_30d,
-        },
+        global_rank: c.global_rank,
+        regional_rank: c.regional_rank,
+        avg_rating: c.avg_rating,
+        times_played: c.plays_count_total,
+        ratings_count: c.ratings_count,
+        friends_count: c.friends_played_count_30d,
       }))
     : visibleCourses.map((c: any) => ({
-        id: c.course_id,
-        name: c.course_name,
-        imageUrl: c.thumbnail_url,
+        course_id: c.course_id,
+        course_name: c.course_name,
+        thumbnail_image: c.thumbnail_url, // RPC returns thumbnail_url, card expects thumbnail_image
         country: c.country,
-        locationText: c.sub_country ? `${c.sub_country}, ${c.country}` : c.country,
-        communityRating: c.avg_rating,
-        ratingCount: c.times_played,
-        ranks: {
-          global: c.global_rank,
-          regional: c.regional_rank,
-          usa: c.usa_rank,
-        },
-        context: {
-          friendsPlayedCount: c.friends_count,
-        },
+        sub_country: c.sub_country,
+        global_rank: c.global_rank,
+        regional_rank: c.regional_rank,
+        usa_rank: c.usa_rank,
+        avg_rating: c.avg_rating,
+        times_played: c.times_played,
+        ratings_count: c.times_played, // Use times_played as proxy for ratings_count
+        friends_count: c.friends_count,
       }));
 
   // Reset pagination when sort changes
@@ -413,12 +405,11 @@ export function CoursesLeaderboardView() {
               )}
             </div>
           ) : (
-            displayCourses.map((course) => (
-              <UnifiedCourseCard
-                key={course.id}
+            displayCourses.map((course: any, idx: number) => (
+              <CinematicCourseCard
+                key={course.course_id}
                 course={course}
-                showRankBadges={true}
-                showRating={true}
+                listPosition={idx}
                 showFriendsContext={sort === 'friends'}
               />
             ))
