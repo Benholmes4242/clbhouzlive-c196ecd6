@@ -15,6 +15,9 @@ import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { TimeRangeFilter } from './v2/TimeRangeFilter';
 import { LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
+import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { useActiveGameCounts } from '@/features/nearby/hooks/useActiveGameCounts';
+import { track } from '@/utils/analytics';
 import {
   USE_MOCK_COURSE_LEADERBOARD_DATA,
   getMockCoursesPaginated,
@@ -47,6 +50,11 @@ export function CoursesLeaderboardView() {
   const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [dismissedCallout, setDismissedCallout] = useState(false);
+  
+  // V3: Games Hub sheet state for deep-link from leaderboard
+  const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [gamesHubPrefillCourse, setGamesHubPrefillCourse] = useState<{ id: string; name: string; country: string } | null>(null);
+  const [gamesHubAutoCreate, setGamesHubAutoCreate] = useState(false);
 
   // Real data hooks (disabled in mock mode)
   const { data, isLoading } = useTop100CourseLeaderboard({
@@ -214,6 +222,21 @@ export function CoursesLeaderboardView() {
         ratings_count: c.times_played, // Use times_played as proxy for ratings_count
         friends_count: c.friends_count,
       }));
+
+  // V3: Get course IDs for active game counts
+  const courseIds = useMemo(
+    () => displayCourses.map((c: any) => c.course_id).filter(Boolean),
+    [displayCourses]
+  );
+  const { data: activeGameCounts = {} } = useActiveGameCounts(courseIds);
+
+  // V3: Handler for "Create game at this course"
+  const handleCreateGameAtCourse = useCallback((course: { id: string; name: string; country: string }) => {
+    track('course_create_game_click', { course_id: course.id });
+    setGamesHubPrefillCourse(course);
+    setGamesHubAutoCreate(true);
+    setGamesHubOpen(true);
+  }, []);
 
   // Reset pagination when sort changes
   const handleSortChange = useCallback((newSort: CourseSortOption) => {
@@ -447,6 +470,8 @@ export function CoursesLeaderboardView() {
                 course={course}
                 listPosition={idx}
                 showFriendsContext={sort === 'friends'}
+                activeGamesCount={activeGameCounts[course.course_id] || 0}
+                onCreateGame={handleCreateGameAtCourse}
               />
             ))
           )}
@@ -472,6 +497,19 @@ export function CoursesLeaderboardView() {
           </div>
         )}
       </section>
+
+      {/* V3: Games Hub Sheet for deep-link from leaderboard */}
+      <HubGamesHubSheet
+        isOpen={gamesHubOpen}
+        onClose={() => {
+          setGamesHubOpen(false);
+          setGamesHubPrefillCourse(null);
+          setGamesHubAutoCreate(false);
+        }}
+        initialTab="discover"
+        prefillCourse={gamesHubPrefillCourse || undefined}
+        autoOpenCreate={gamesHubAutoCreate}
+      />
     </div>
   );
 }
