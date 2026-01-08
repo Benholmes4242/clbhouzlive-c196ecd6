@@ -1,11 +1,10 @@
 /**
  * HubEchoCompact - Compact Echo Card for side-by-side layout
- * Opens HubEchoSheet instead of navigating to page
+ * Opens HubEchoSheet - no navigation to pages
  */
 
 import React, { useState } from 'react';
 import { Tile } from '../components/Tile';
-import { useHub } from '@/features/hub/useHub';
 import { Send, Sparkles } from 'lucide-react';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
 
@@ -18,9 +17,9 @@ const SUGGESTIONS = [
 ];
 
 export function HubEchoCompact() {
-  const { navigateFromHub } = useHub();
   const [suggestionIdx, setSuggestionIdx] = React.useState(0);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [initialMessage, setInitialMessage] = useState('');
 
   // Rotate suggestions every 5 seconds
   React.useEffect(() => {
@@ -33,13 +32,19 @@ export function HubEchoCompact() {
     return () => clearInterval(interval);
   }, []);
 
-  const openSheet = () => setIsSheetOpen(true);
-  const closeSheet = () => setIsSheetOpen(false);
+  const openSheet = (msg = '') => {
+    setInitialMessage(msg);
+    setIsSheetOpen(true);
+  };
+  const closeSheet = () => {
+    setIsSheetOpen(false);
+    setInitialMessage('');
+  };
 
   return (
     <>
       <div 
-        onClick={openSheet}
+        onClick={() => openSheet()}
         className="cursor-pointer"
         role="button"
         tabIndex={0}
@@ -85,30 +90,26 @@ export function HubEchoCompact() {
               </div>
             </div>
 
-            {/* Single suggestion */}
+            {/* Single suggestion - tap opens sheet with message */}
             <p
-              className="mt-2 text-[12px] text-left leading-snug line-clamp-2"
+              className="mt-2 text-[12px] text-left leading-snug line-clamp-2 cursor-pointer"
               style={{ color: 'var(--hub-text-muted)' }}
+              onClick={(e) => { e.stopPropagation(); openSheet(SUGGESTIONS[suggestionIdx]); }}
             >
               "{SUGGESTIONS[suggestionIdx]}"
             </p>
 
-            {/* View history link */}
-            <button
-              onClick={(e) => { 
-                e.stopPropagation(); 
-                navigateFromHub('/hub/echo/history'); 
-              }}
-              className="mt-auto pt-2 text-[13px] font-medium self-end"
-              style={{ color: 'var(--hub-text-body)' }}
-            >
-              Chats →
-            </button>
+            {/* Removed history link for V1 - all in sheet */}
+            <div className="mt-auto pt-2" />
           </div>
         </Tile>
       </div>
       
-      <HubEchoSheet isOpen={isSheetOpen} onClose={closeSheet} />
+      <HubEchoSheet 
+        isOpen={isSheetOpen} 
+        onClose={closeSheet}
+        initialMessage={initialMessage}
+      />
     </>
   );
 }
