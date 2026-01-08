@@ -17,17 +17,32 @@ import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
 import { haptic } from '@/utils/haptics';
 import '../home/hubThemeLight.css';
 
+interface PrefillCourse {
+  id: string;
+  name: string;
+  region?: string;
+  country?: string;
+}
+
 interface HubCreateGameSheetProps {
   isOpen: boolean;
   onClose: () => void;
+  /** @deprecated use prefillCourse */
   prefilledClub?: { id: string; name: string };
+  /** V3: prefill course from leaderboard deep-link */
+  prefillCourse?: PrefillCourse;
 }
 
 export const HubCreateGameSheet: React.FC<HubCreateGameSheetProps> = ({
   isOpen,
   onClose,
   prefilledClub,
+  prefillCourse,
 }) => {
+  // V3: Merge prefillCourse with legacy prefilledClub (prefer prefillCourse)
+  const resolvedPrefill = prefillCourse 
+    ? { id: prefillCourse.id, name: prefillCourse.name }
+    : prefilledClub;
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
   const surfaceRef = useRef<CreateGameSurfaceRef>(null);
@@ -148,7 +163,7 @@ export const HubCreateGameSheet: React.FC<HubCreateGameSheetProps> = ({
             >
               <CreateGameSurface
                 ref={surfaceRef}
-                prefilledClub={prefilledClub}
+                prefilledClub={resolvedPrefill}
                 onSubmit={handleCreate}
                 hideSubmitButton
                 bottomPadding={0}

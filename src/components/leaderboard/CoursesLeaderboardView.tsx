@@ -228,7 +228,7 @@ export function CoursesLeaderboardView() {
     () => displayCourses.map((c: any) => c.course_id).filter(Boolean),
     [displayCourses]
   );
-  const { data: activeGameCounts = {} } = useActiveGameCounts(courseIds);
+  const { counts: activeGameCounts } = useActiveGameCounts(courseIds);
 
   // V3: Handler for "Create game at this course"
   const handleCreateGameAtCourse = useCallback((course: { id: string; name: string; country: string }) => {
