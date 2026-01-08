@@ -36,11 +36,12 @@ type LeaderboardRpcRow = {
   display_name: string | null;
   profile_photo_url: string | null;
   home_club: string | null;
+  primary_club_id: string | null;
   top100_courses_played: number;
   global_rank: number;
   regional_rank: number;
   is_friend: boolean;
-  last_activity_at: string | null;
+  last_activity: string | null;
 };
 
 export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
