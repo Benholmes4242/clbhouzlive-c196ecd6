@@ -146,17 +146,28 @@ export function AchievementBanner({
     (a, b) => ACHIEVEMENT_PRIORITY[a] - ACHIEVEMENT_PRIORITY[b]
   );
 
+  const handleDismiss = () => {
+    setVisible(false);
+    onDismiss?.();
+  };
+
   // Auto-dismiss after 8 seconds
   useEffect(() => {
     if (sortedAchievements.length === 0) return;
     
-    const timer = setTimeout(() => {
-      setVisible(false);
-      onDismiss?.();
-    }, 8000);
-
+    const timer = setTimeout(handleDismiss, 8000);
     return () => clearTimeout(timer);
-  }, [sortedAchievements, onDismiss]);
+  }, [sortedAchievements]);
+
+  // Dismiss on scroll
+  useEffect(() => {
+    if (sortedAchievements.length === 0 || !visible) return;
+
+    const handleScroll = () => handleDismiss();
+    
+    window.addEventListener('scroll', handleScroll, { passive: true, once: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [sortedAchievements, visible]);
 
   if (sortedAchievements.length === 0 || !visible) return null;
 

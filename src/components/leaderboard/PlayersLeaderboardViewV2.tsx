@@ -358,6 +358,9 @@ export function PlayersLeaderboardViewV2() {
     ? 'Rivals are available in Global, Regional, and Friends leagues.' 
     : undefined;
 
+  // Time range filter is relevant for Global, Regional, Climbers (not Friends/Nearby which use fixed contexts)
+  const showTimeRangeFilter = arenaMode === 'global' || arenaMode === 'regional' || arenaMode === 'climbers';
+  
   // Show Players From filter for these modes
   const showPlayersFromFilter = arenaMode === 'global' || arenaMode === 'regional' || arenaMode === 'climbers';
 
@@ -390,6 +393,7 @@ export function PlayersLeaderboardViewV2() {
   // Handle arena mode change
   const handleArenaModeChange = (mode: ArenaMode) => {
     setArenaMode(mode);
+    setDismissedAchievements(true); // Dismiss banner on tab switch
     // Reset region when leaving regional mode
     if (mode !== 'regional') {
       setRegion('worldwide');
@@ -404,6 +408,7 @@ export function PlayersLeaderboardViewV2() {
   const handlePlayersFromChange = (value: PlayersFromValue) => {
     setIsFilterTransitioning(true);
     setPlayersFrom(value);
+    setDismissedAchievements(true); // Dismiss banner on filter change
     // Short delay for visual feedback
     setTimeout(() => setIsFilterTransitioning(false), 300);
   };
@@ -557,7 +562,7 @@ export function PlayersLeaderboardViewV2() {
 
       {/* Filters row: Players From + Time Range (for applicable modes) */}
       <AnimatePresence mode="wait">
-        {showPlayersFromFilter && (
+        {(showPlayersFromFilter || showTimeRangeFilter) && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -565,15 +570,19 @@ export function PlayersLeaderboardViewV2() {
             transition={{ duration: 0.2 }}
             className="px-4 pb-2 flex flex-wrap gap-3"
           >
-            <PlayersFromFilter
-              value={playersFrom}
-              onChange={handlePlayersFromChange}
-              userCountry={currentUserProfile?.homeClubCountry}
-            />
-            <TimeRangeFilter
-              value={timeRange}
-              onChange={handleTimeRangeChange}
-            />
+            {showPlayersFromFilter && (
+              <PlayersFromFilter
+                value={playersFrom}
+                onChange={handlePlayersFromChange}
+                userCountry={currentUserProfile?.homeClubCountry}
+              />
+            )}
+            {showTimeRangeFilter && (
+              <TimeRangeFilter
+                value={timeRange}
+                onChange={handleTimeRangeChange}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
