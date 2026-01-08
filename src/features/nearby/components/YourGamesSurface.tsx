@@ -59,6 +59,22 @@ function NextGameStrip({
   );
 }
 
+// V2.3: Pending Requests Banner (urgency strip)
+function PendingRequestsBanner({
+  count,
+  onOpen,
+}: { 
+  count: number; 
+  onOpen: () => void;
+}) {
+  return (
+    <button className="pendingBanner" onClick={() => { haptic('light'); onOpen(); }}>
+      <span className="pendingBanner__text">Requests waiting</span>
+      <span className="pendingBanner__pill">{count}</span>
+    </button>
+  );
+}
+
 export function YourGamesSurface({
   bottomPadding = 0,
   onOpenCreate,
@@ -88,6 +104,12 @@ export function YourGamesSurface({
       .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
     return upcoming[0] || null;
   }, [hostedGames, joinedGames]);
+
+  // V2.3: Pending count for banner
+  const pendingCount = useMemo(
+    () => myRequests.filter(r => r.status === 'pending').length,
+    [myRequests]
+  );
 
   // Scroll to top when switching tabs
   useEffect(() => {
@@ -215,6 +237,14 @@ export function YourGamesSurface({
 
   return (
     <div ref={listRef} className="px-5" style={{ paddingBottom: bottomPadding }}>
+      {/* V2.3: Pending Requests Banner (urgency strip) - at top when there are pending requests */}
+      {pendingCount > 0 && onOpenJoinRequests && (
+        <PendingRequestsBanner
+          count={pendingCount}
+          onOpen={() => onOpenJoinRequests?.()}
+        />
+      )}
+
       {/* V2.2: "At a glance" strip */}
       {nextUpcomingGame && (
         <NextGameStrip game={nextUpcomingGame} onView={handleViewNextGame} />

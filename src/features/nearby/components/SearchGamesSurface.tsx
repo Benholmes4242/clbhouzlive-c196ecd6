@@ -261,15 +261,21 @@ function FiltersRow({
   );
 }
 
-// V2.2: Status strip showing current scope
+// V2.3: Status strip with results count + clear when action
 function StatusStrip({ 
   selectedClub, 
   distanceKm, 
-  filters
+  resultsCount,
+  hasWhen,
+  onOpenWhen,
+  onClearWhen,
 }: { 
   selectedClub: GolfCourse | null; 
   distanceKm: number | null;
-  filters: ReturnType<typeof useGameFilters>;
+  resultsCount: number;
+  hasWhen: boolean;
+  onOpenWhen: () => void;
+  onClearWhen: () => void;
 }) {
   const scopeText = selectedClub 
     ? `At ${selectedClub.name}`
@@ -278,17 +284,87 @@ function StatusStrip({
     : 'Near you';
   
   const subText = selectedClub?.region || selectedClub?.country;
+  const countLabel = resultsCount === 0 ? '0 games' : resultsCount === 1 ? '1 game' : `${resultsCount} games`;
 
   return (
     <div className="statusStrip">
-      <div className="statusStrip__scope">
-        <span className="statusStrip__main">{scopeText}</span>
-        {subText && <span className="statusStrip__sub">{subText}</span>}
+      <div className="statusStrip__left">
+        <div className="statusStrip__scope">
+          <span className="statusStrip__main">{scopeText}</span>
+          {subText && <span className="statusStrip__sub">{subText}</span>}
+        </div>
+        <span className="statusStrip__countPill">{countLabel}</span>
       </div>
-      <button className="statusStrip__filterBtn" onClick={() => openWhenSheet(filters)}>
-        <Calendar size={14} />
-        When
-      </button>
+      <div className="statusStrip__right">
+        {hasWhen && (
+          <button className="statusStrip__clearWhen" onClick={onClearWhen}>
+            Clear When
+          </button>
+        )}
+        <button className="statusStrip__filterBtn" onClick={onOpenWhen}>
+          <Calendar size={14} />
+          When
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// V2.3: Smart empty state that adapts to filters
+function DiscoverEmptyState({
+  selectedClub,
+  distanceKm,
+  hasTimeFilter,
+  hasQuickTime,
+  onCreate,
+  onClearWhen,
+}: {
+  selectedClub: GolfCourse | null;
+  distanceKm: number | null;
+  hasTimeFilter: boolean;
+  hasQuickTime: boolean;
+  onCreate: () => void;
+  onClearWhen: () => void;
+}) {
+  // Title based on scope
+  const title = selectedClub 
+    ? `No games at ${selectedClub.name}`
+    : distanceKm 
+    ? `No games within ${distanceKm}km`
+    : 'No games nearby';
+  
+  // Subtitle based on time filter status
+  const subtitle = hasQuickTime
+    ? 'Try removing the time filter or create one.'
+    : hasTimeFilter
+    ? 'Try a different time window or clear the filter.'
+    : 'Be the first to start one nearby.';
+  
+  const showClearWhen = hasTimeFilter || hasQuickTime;
+
+  return (
+    <div className="discoverEmpty">
+      <div className="discoverEmpty__icon">
+        <MapPin size={32} strokeWidth={1.5} />
+      </div>
+      <h2 className="discoverEmpty__title">{title}</h2>
+      <p className="discoverEmpty__subtitle">{subtitle}</p>
+      <div className="discoverEmpty__actions">
+        <button 
+          onClick={() => { haptic('light'); onCreate(); }}
+          className="discoverEmpty__primary"
+        >
+          Create a game
+        </button>
+        {showClearWhen && (
+          <button 
+            onClick={() => { haptic('light'); onClearWhen(); }}
+            className="discoverEmpty__secondary"
+          >
+            Clear When
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -360,51 +436,33 @@ function GameCard({ game, index }: { game: Game; index: number }) {
   );
 }
 
-function GamesList({ 
-  games, 
-  isLoading,
-  onOpenCreate 
-}: { 
-  games: Game[]; 
-  isLoading: boolean;
-  onOpenCreate?: () => void;
-}) {
-  if (isLoading) {
-    return (
-      <div className="list">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="gameRowSkeleton">
-            <div className="skeletonLine skeletonLine--wide" />
-            <div className="skeletonLine skeletonLine--narrow" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (!games || games.length === 0) {
-    return (
-      <div className="gamesEmptyHub">
-        <div className="gamesEmpty__icon">
-          <MapPin size={28} style={{ color: 'var(--hub-text-dim)', opacity: 0.6 }} strokeWidth={1.5} />
+function GamesListSkeleton() {
+  return (
+    <div className="list">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="gameRowSkeleton">
+          <div className="skeletonLine skeletonLine--wide" />
+          <div className="skeletonLine skeletonLine--narrow" />
         </div>
-        <h2 className="gamesEmpty__title">No games found</h2>
-        <p className="gamesEmpty__body">Be the first to start one nearby.</p>
-        {onOpenCreate && (
-          <button 
-            onClick={() => { haptic('light'); onOpenCreate(); }}
-            className="gamesEmpty__cta"
-          >
-            Create a game
-          </button>
-        )}
-      </div>
-    );
-  }
+      ))}
+    </div>
+  );
+}
 
+function GamesList({ games }: { games: Game[] }) {
   return (
     <div className="list">
       {games.map((g, index) => <GameCard key={g.id} game={g} index={index} />)}
+    </div>
+  );
+}
+
+// V2.3: Results count header
+function ResultsHeader({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <div className="resultsHeader">
+      <span>Showing {count} {count === 1 ? 'game' : 'games'}</span>
     </div>
   );
 }
@@ -440,22 +498,26 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
   };
 
   // Clear quickTime if user manually sets a different filter via When sheet
+  // Hardened: handles Date as object or string, plus quickTime in deps
   React.useEffect(() => {
     if (!filters.when) {
       setQuickTime(null);
       return;
     }
+    
+    // Type-safe date parsing (handles Date object or string)
+    const raw = filters.when?.date;
+    const filterDate = raw ? new Date(raw as any) : null;
+    if (!filterDate || Number.isNaN(filterDate.getTime())) {
+      setQuickTime(null);
+      return;
+    }
+    
     // Check if current filter matches any quick option
     const today = new Date();
     const tomorrow = addDays(today, 1);
     const daysUntilSat = (6 - today.getDay() + 7) % 7 || 7;
     const weekend = addDays(today, daysUntilSat);
-    
-    const filterDate = filters.when.date;
-    if (!filterDate) {
-      setQuickTime(null);
-      return;
-    }
     
     const isToday = filterDate.toDateString() === today.toDateString();
     const isTomorrow = filterDate.toDateString() === tomorrow.toDateString();
@@ -465,18 +527,30 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
     else if (isTomorrow && quickTime !== 'tomorrow') setQuickTime('tomorrow');
     else if (isWeekend && quickTime !== 'weekend') setQuickTime('weekend');
     else if (!isToday && !isTomorrow && !isWeekend) setQuickTime(null);
-  }, [filters.when]);
+  }, [filters.when, quickTime]);
+
+  const resultsCount = games?.length ?? 0;
+  const hasWhen = !!filters.when;
+
+  const handleClearWhen = () => {
+    haptic('light');
+    setQuickTime(null);
+    filters.setWhen(null);
+  };
 
   return (
     <div className="searchGamesSurface" style={{ paddingBottom: `${bottomPadding}px` }}>
       {/* Create Game Hero Card */}
       {onOpenCreate && <CreateGameHero onOpen={onOpenCreate} />}
       
-      {/* V2.2: Status strip */}
+      {/* V2.3: Status strip with results count */}
       <StatusStrip 
         selectedClub={selectedClub} 
         distanceKm={filters.distanceKm}
-        filters={filters}
+        resultsCount={resultsCount}
+        hasWhen={hasWhen}
+        onOpenWhen={() => openWhenSheet(filters)}
+        onClearWhen={handleClearWhen}
       />
       
       {/* V2.2: Suggested times chips */}
@@ -494,18 +568,24 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
       
       <FiltersRow selectedClub={selectedClub} filters={filters} />
       
-      <div className="scopedHeadingHub">
-        <span>{selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}</span>
-        {selectedClub?.region && (
-          <span className="scopedHeadingSub">{selectedClub.region}</span>
-        )}
-      </div>
-      
-      <GamesList 
-        games={games || []} 
-        isLoading={isLoading} 
-        onOpenCreate={onOpenCreate}
-      />
+      {/* V2.3: Results section with smart empty state */}
+      {isLoading ? (
+        <GamesListSkeleton />
+      ) : resultsCount === 0 && onOpenCreate ? (
+        <DiscoverEmptyState
+          selectedClub={selectedClub}
+          distanceKm={filters.distanceKm}
+          hasTimeFilter={hasWhen}
+          hasQuickTime={!!quickTime}
+          onCreate={onOpenCreate}
+          onClearWhen={handleClearWhen}
+        />
+      ) : (
+        <>
+          <ResultsHeader count={resultsCount} />
+          <GamesList games={games || []} />
+        </>
+      )}
     </div>
   );
 }
