@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { VideoFilter, FeedItemType } from '../types';
+import { FeedItemType } from '../types';
 import { FilterBar } from '../components/FilterBar';
 import { VideoCardWide } from '../components/VideoCardWide';
 import { VideoCardPair } from '../components/VideoCardPair';
@@ -12,9 +12,11 @@ import { ShortsCarousel } from '../components/ShortsCarousel';
  * REFACTORED: Removed useAutoplay hook dependency.
  * Autoplay is now controlled exclusively by MediaRuntime.
  * Components should register with useMediaAutoplay instead.
+ * 
+ * Updated: Now uses unified category filter system from categoryDefinitions.ts
  */
 export default function VideosPage() {
-  const [filter, setFilter] = useState<VideoFilter>('All');
+  const [filter, setFilter] = useState<string>('all');
   
   // Real data should be fetched here - mock data has been removed
   const feedItems: FeedItemType[] = [];

@@ -452,9 +452,15 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
       filtered = filtered.filter(item => item.id !== heroItem.id);
     }
 
-    // STEP 3: Apply search filter
+    // STEP 3: Apply search filter (with category label matching)
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
+      
+      // Find matching category IDs from search query (for category label matching)
+      const matchingCategoryIds = MOMENT_CATEGORIES
+        .filter(cat => cat.label.toLowerCase().includes(query))
+        .map(cat => cat.id);
+      
       filtered = filtered.filter(item => {
         // Video/post title and description fields
         const titleMatch = (item.title || '').toLowerCase().includes(query);
@@ -472,8 +478,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         // Golf course name
         const courseMatch = (item.golfCourse?.name || '').toLowerCase().includes(query);
         
+        // Category label matching - search "Golf Trip" finds posts tagged with golf-trip
+        const categoryLabelMatch = matchingCategoryIds.length > 0 && 
+          item.categories?.some(cat => matchingCategoryIds.includes(cat));
+        
         return titleMatch || descMatch || userNameMatch || userUsernameMatch || 
-               creatorNameMatch || creatorUsernameMatch || businessMatch || courseMatch;
+               creatorNameMatch || creatorUsernameMatch || businessMatch || courseMatch ||
+               categoryLabelMatch;
       });
     }
 
