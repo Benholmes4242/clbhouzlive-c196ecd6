@@ -11,8 +11,10 @@ import { CourseMomentumCallout } from './CourseMomentumCallout';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Star, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { TimeRangeFilter } from './v2/TimeRangeFilter';
+import { LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import {
   USE_MOCK_COURSE_LEADERBOARD_DATA,
   getMockCoursesPaginated,
@@ -33,24 +35,39 @@ const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'friends', label: 'Friends Played' },
 ];
 
+const TIME_RANGE_SUBTITLES: Record<LeaderboardTimeRange, string> = {
+  all_time: "The world's greatest golf courses",
+  this_year: "Top courses this year",
+  this_month: "Trending this month",
+};
+
 export function CoursesLeaderboardView() {
   const navigate = useNavigate();
   const [sort, setSort] = useState<CourseSortOption>('most_played');
+  const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [dismissedCallout, setDismissedCallout] = useState(false);
 
   // Real data hooks (disabled in mock mode)
   const { data, isLoading } = useTop100CourseLeaderboard({
     scope: 'worldwide',
-    timeRange: 'all_time',
+    timeRange,
     pageSize: 200,
   });
 
   const allCourses = data?.pages.flatMap(page => page.entries) || [];
 
+  // Compute date filter based on timeRange
+  const fromDate = useMemo(() => {
+    const now = new Date();
+    if (timeRange === 'this_month') return startOfMonth(now);
+    if (timeRange === 'this_year') return startOfYear(now);
+    return null;
+  }, [timeRange]);
+
   // Fetch recent Top 100 rounds by circle (people user follows)
   const { data: circleRecentRounds } = useQuery({
-    queryKey: ['circle-recent-top100-rounds'],
+    queryKey: ['circle-recent-top100-rounds', timeRange],
     enabled: !USE_MOCK_COURSE_LEADERBOARD_DATA,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -67,7 +84,7 @@ export function CoursesLeaderboardView() {
       if (followingIds.length === 0) return [];
       
       // Get ratings from circle members on any Top 100 list (global, regional, or USA)
-      const { data } = await supabase
+      let query = supabase
         .from('course_ratings')
         .select(`
           id,
@@ -90,7 +107,14 @@ export function CoursesLeaderboardView() {
           )
         `)
         .in('user_id', followingIds)
-        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null', { foreignTable: 'golf_courses' })
+        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null', { foreignTable: 'golf_courses' });
+      
+      // Apply time range filter
+      if (fromDate) {
+        query = query.gte('created_at', fromDate.toISOString());
+      }
+      
+      const { data } = await query
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -194,6 +218,13 @@ export function CoursesLeaderboardView() {
   // Reset pagination when sort changes
   const handleSortChange = useCallback((newSort: CourseSortOption) => {
     setSort(newSort);
+    setVisibleCount(PAGE_SIZE);
+    setDismissedCallout(false);
+  }, []);
+
+  // Reset pagination when time range changes
+  const handleTimeRangeChange = useCallback((newTimeRange: LeaderboardTimeRange) => {
+    setTimeRange(newTimeRange);
     setVisibleCount(PAGE_SIZE);
     setDismissedCallout(false);
   }, []);
@@ -354,7 +385,7 @@ export function CoursesLeaderboardView() {
         <div className="px-4">
           <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            The world's greatest golf courses
+            {TIME_RANGE_SUBTITLES[timeRange]}
           </p>
         </div>
 
@@ -378,6 +409,11 @@ export function CoursesLeaderboardView() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Time Range Filter */}
+        <div className="px-4">
+          <TimeRangeFilter value={timeRange} onChange={handleTimeRangeChange} />
         </div>
 
         {/* Momentum Callout (dismissible) */}
