@@ -34,16 +34,17 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
 }) => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollYRef = useRef(0);
   const [query, setQuery] = useState('');
   
   const { data: searchResults, isLoading } = useExploreSearch(query);
 
-  // Auto-focus input when sheet opens
+  // Auto-focus input when sheet opens (with preventScroll)
   useEffect(() => {
     if (isOpen && inputRef.current) {
       // Small delay to ensure sheet animation has started
       const timer = setTimeout(() => {
-        inputRef.current?.focus();
+        inputRef.current?.focus({ preventScroll: true });
       }, 150);
       return () => clearTimeout(timer);
     }
@@ -56,14 +57,39 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
     }
   }, [isOpen]);
 
-  // Prevent body scroll when sheet is open
+  // Proper body scroll lock that preserves scroll position
   useEffect(() => {
     if (isOpen) {
+      // Store current scroll position
+      scrollYRef.current = window.scrollY;
+      
+      // Lock body in place
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
+      // Restore scroll position
+      const scrollY = scrollYRef.current;
+      
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
+      
+      window.scrollTo(0, scrollY);
     }
+    
     return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
     };
   }, [isOpen]);
@@ -117,8 +143,8 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-            className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col"
+            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
+            className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col overscroll-contain"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
             {/* Header with handle and close button */}
@@ -144,7 +170,7 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search courses or regions..."
-                  className="w-full pl-10 pr-10 py-3 bg-surface-alt rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"
+                  className="w-full pl-10 pr-10 py-3 bg-surface-alt rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 focus:border-border/50 border border-transparent focus:border-muted-foreground/30 text-base transition-colors"
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
