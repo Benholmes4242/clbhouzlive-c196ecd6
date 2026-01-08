@@ -11,12 +11,11 @@
  * - Rival preview sheet
  */
 
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTop100Leaderboard, LeaderboardScope } from '@/hooks/useTop100Leaderboard';
-import { useAuth } from '@/providers/AuthUserProvider';
 
 import {
   LeaderboardHero,
@@ -57,7 +56,6 @@ const REGION_TO_SCOPE: Record<LeaderboardRegion, LeaderboardScope> = {
 
 export function PlayersLeaderboardViewV2() {
   const navigate = useNavigate();
-  const { user: currentAuthUser } = useAuth();
   const listRef = useRef<HTMLDivElement>(null);
 
   // UI state
@@ -65,6 +63,14 @@ export function PlayersLeaderboardViewV2() {
   const [region, setRegion] = useState<LeaderboardRegion>('worldwide');
   const [selectedRival, setSelectedRival] = useState<LeaderboardPlayerEntry | null>(null);
   const [rivalSheetOpen, setRivalSheetOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Get current user ID
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id || null);
+    });
+  }, []);
 
   // Determine effective scope
   const effectiveScope = useMemo(() => {
@@ -76,13 +82,13 @@ export function PlayersLeaderboardViewV2() {
 
   // Get current user profile
   const { data: currentUserProfile } = useQuery({
-    queryKey: ['current-user-profile', currentAuthUser?.id],
-    enabled: !!currentAuthUser?.id,
+    queryKey: ['current-user-profile', currentUserId],
+    enabled: !!currentUserId,
     queryFn: async () => {
       const { data } = await supabase
         .from('user_profiles')
         .select('id, display_name, profile_photo_url, home_club')
-        .eq('id', currentAuthUser!.id)
+        .eq('id', currentUserId!)
         .single();
       return data;
     },
