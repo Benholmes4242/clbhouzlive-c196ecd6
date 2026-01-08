@@ -41,16 +41,27 @@ export function JoinRequestsInboxSheet({
   const [activeTab, setActiveTab] = useState<TabValue>('pending');
   const { data: requests = [], isLoading } = useMyJoinRequests();
   const contentRef = useRef<HTMLDivElement>(null);
+  const didFocusRef = useRef(false);
 
-  // When focusGameId is passed, find the request and scroll/highlight it
+  // Reset focus tracking when sheet closes
   useEffect(() => {
-    if (!focusGameId || !open || isLoading || !contentRef.current) return;
+    if (!open) {
+      didFocusRef.current = false;
+    }
+  }, [open]);
+
+  // When focusGameId is passed, find the request and scroll/highlight it (once per open)
+  useEffect(() => {
+    if (!focusGameId || !open || isLoading || !contentRef.current || didFocusRef.current) return;
+    didFocusRef.current = true;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const timer = setTimeout(() => {
       const el = contentRef.current?.querySelector<HTMLElement>(`[data-game-id="${focusGameId}"]`);
       if (!el) return;
 
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.scrollIntoView({ block: 'center', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       el.classList.add('sheet-focus-highlight');
       const highlightTimer = setTimeout(() => {
         el.classList.remove('sheet-focus-highlight');
