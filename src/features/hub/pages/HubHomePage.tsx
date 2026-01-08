@@ -1,7 +1,6 @@
 /**
- * Hub Home Page - iPhone-Style Fixed Layout
- * NO VERTICAL SCROLLING - All content fits within viewport
- * Apple/Strava dashboard style
+ * Hub Home Page - Golf OS Dashboard
+ * Premium Apple/Strava-inspired hub with dynamic hero tile
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -11,8 +10,9 @@ import { useHub } from '../useHub';
 import { prefersReduced } from '@/lib/ui/motion';
 import { useChromeState } from '@/hooks/useChromeState';
 
-// Hub components - fixed layout versions
+// Hub components
 import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
+import { UpNextHeroTile } from '../home/tiles/UpNextHeroTile';
 import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import { HubActionDock } from '../home/tiles/HubActionDock';
@@ -178,28 +178,35 @@ export function HubHomePage() {
         <div className="hub-grabber" />
 
         {/* 
-          FIXED LAYOUT - NO SCROLL
-          Using flex with fixed heights for each zone
+          SCROLLABLE LAYOUT
+          Main content scrolls, dock is fixed
         */}
         <div 
-          className="w-full h-full flex flex-col px-3.5"
+          className="w-full h-full overflow-y-auto"
           style={{
             paddingTop: 'env(safe-area-inset-top, 0px)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 79px)', // 55px nav + 12px gap + 12px buffer
-            overflow: 'hidden',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
-          {/* Zone 1: Header - Fixed ~68px */}
-          <HubHeaderToday />
+          <div className="px-3.5 pb-4">
+            {/* Zone 1: Header - Greeting */}
+            <HubHeaderToday />
 
-          {/* Zone 2: Messages - Fixed ~198px, 10px gap above */}
-          <div className="mt-[10px] h-[198px] shrink-0">
-            <HubMessagesCard />
-          </div>
+            {/* Zone 2: What's Up Next Hero Tile */}
+            <div className="mt-2">
+              <UpNextHeroTile />
+            </div>
 
-          {/* Zone 3: Games - Primary section, flex-1 with internal scroll, 10px gaps */}
-          <div className="mt-[10px] mb-[10px] flex-1 min-h-[180px]">
-            <YourGamesTile />
+            {/* Zone 3: Messages Card */}
+            <div className="mt-3">
+              <HubMessagesCard />
+            </div>
+
+            {/* Zone 4: Games Tile */}
+            <div className="mt-3" style={{ minHeight: '220px' }}>
+              <YourGamesTile />
+            </div>
           </div>
         </div>
 
