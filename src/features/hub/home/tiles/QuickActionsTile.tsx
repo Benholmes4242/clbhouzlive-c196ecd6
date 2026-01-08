@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
+import { HubEchoSheet } from '../../components/HubEchoSheet';
 
 /* --- SF-style icons (inline SVGs) --- */
 const FlagIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -69,40 +70,48 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
 export function QuickActionsTile() {
   const navigate = useNavigate();
   const { navigateFromHub } = useHub();
+  const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
 
   const openProfile = () => navigate('/profile');
   const openCreateGame = () => navigateFromHub('/hub/create-game');
   const openSwing = () => navigateFromHub('/hub/swing');
-  const openEcho = () => navigateFromHub('/hub/echo');
+  const openEcho = () => setIsEchoSheetOpen(true);
 
   return (
-    <Tile title="Quick Actions" align="center">
-      <div className="h-full flex items-center justify-center">
-        <div className="hub-quick-actions grid grid-cols-2 gap-x-6 gap-y-3.5">
-          <QuickActionButton
-            label="Create Game"
-            Icon={FlagIcon}
-            onClick={openCreateGame}
-          />
-          <QuickActionButton
-            label="Ask Echo"
-            Icon={SparklesIcon}
-            onClick={openEcho}
-            iconSize="h-10 w-10"
-          />
-          <QuickActionButton
-            label="Swing Coach"
-            Icon={CameraIcon}
-            onClick={openSwing}
-          />
-          <QuickActionButton
-            label="Your Profile"
-            Icon={PersonIcon}
-            onClick={openProfile}
-            iconSize="h-9 w-9"
-          />
+    <>
+      <Tile title="Quick Actions" align="center">
+        <div className="h-full flex items-center justify-center">
+          <div className="hub-quick-actions grid grid-cols-2 gap-x-6 gap-y-3.5">
+            <QuickActionButton
+              label="Create Game"
+              Icon={FlagIcon}
+              onClick={openCreateGame}
+            />
+            <QuickActionButton
+              label="Ask Echo"
+              Icon={SparklesIcon}
+              onClick={openEcho}
+              iconSize="h-10 w-10"
+            />
+            <QuickActionButton
+              label="Swing Coach"
+              Icon={CameraIcon}
+              onClick={openSwing}
+            />
+            <QuickActionButton
+              label="Your Profile"
+              Icon={PersonIcon}
+              onClick={openProfile}
+              iconSize="h-9 w-9"
+            />
+          </div>
         </div>
-      </div>
-    </Tile>
+      </Tile>
+      
+      <HubEchoSheet 
+        isOpen={isEchoSheetOpen} 
+        onClose={() => setIsEchoSheetOpen(false)} 
+      />
+    </>
   );
 }
