@@ -34,8 +34,9 @@ interface VirtualizedCourseListProps {
   footer?: React.ReactNode;
 }
 
-// Card aspect ratio is 1.77/1 (6% taller than previous), so height = width / 1.77. With padding:
-const ITEM_HEIGHT = 300; // Mobile: accounts for aspect ratio + meta bar (6% taller)
+// Card height calculation for 16:9 image + meta bar (~80px)
+// Mobile: screen width / (16/9) + meta = ~56% of width + 80px
+const ITEM_HEIGHT = 280; // Mobile: 16:9 aspect + meta bar
 const ITEM_HEIGHT_SM = 260; // Desktop: slightly shorter
 const BUFFER_SIZE = 3; // Number of items to render above/below viewport
 
