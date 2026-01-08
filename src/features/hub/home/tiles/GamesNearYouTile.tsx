@@ -3,7 +3,7 @@
  * Content tile showing nearby games to join with inline scroll
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { formatDistanceToNow } from 'date-fns';
@@ -11,6 +11,7 @@ import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 import { TapButton } from '@/components/ui/TapButton';
 import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
+import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import '@/features/nearby/components/your-games/YourGames.css';
 import '../hubTileGames.css';
 
@@ -126,6 +127,7 @@ export function GamesNearYouTile({
   const { data: allGames = [], isLoading } = useGamesQuery();
   const [openGameId, setOpenGameId] = React.useState<string | null>(null);
   const listRef = React.useRef<HTMLDivElement | null>(null);
+  const [gamesHubOpen, setGamesHubOpen] = useState(false);
   
   const games = allGames.slice(0, limit);
   
@@ -173,12 +175,18 @@ export function GamesNearYouTile({
         {/* CTAs */}
         <button
           className="tile-link"
-          onClick={() => navigateFromHub('/hub/your-games')}
+          onClick={() => setGamesHubOpen(true)}
           aria-label="Your Games"
         >
           Your Games →
         </button>
       </div>
+      
+      <HubGamesHubSheet
+        isOpen={gamesHubOpen}
+        onClose={() => setGamesHubOpen(false)}
+        initialTab="yours"
+      />
     </Tile>
   );
 }
