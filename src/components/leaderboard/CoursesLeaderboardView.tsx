@@ -29,7 +29,7 @@ const MAX_COURSES = 100;
 const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'most_played', label: 'Most Played' },
   { value: 'highest_rated', label: 'Highest Rated' },
-  { value: 'rising', label: 'Rising This Month' },
+  { value: 'rising', label: 'Trending' },
   { value: 'friends', label: 'Friends' },
 ];
 
@@ -48,7 +48,7 @@ export function CoursesLeaderboardView() {
 
   const allCourses = data?.pages.flatMap(page => page.entries) || [];
 
-  // Fetch recent Top 100 rounds by friends (real)
+  // Fetch recent Top 100 rounds by friends (real) - ACTUALLY filtered to friends
   const { data: friendsRecentRounds } = useQuery({
     queryKey: ['friends-recent-top100-rounds'],
     enabled: !USE_MOCK_COURSE_LEADERBOARD_DATA,
@@ -56,6 +56,16 @@ export function CoursesLeaderboardView() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
       
+      // First get the user's friend IDs (people they follow)
+      const { data: followingRows } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
+      
+      const friendIds = (followingRows ?? []).map(r => r.following_id);
+      if (friendIds.length === 0) return [];
+      
+      // Then get ratings from those friends only
       const { data } = await supabase
         .from('course_ratings')
         .select(`
@@ -76,6 +86,7 @@ export function CoursesLeaderboardView() {
             profile_photo_url
           )
         `)
+        .in('user_id', friendIds)
         .not('golf_courses.global_rank', 'is', null)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -360,10 +371,10 @@ export function CoursesLeaderboardView() {
           />
         )}
 
-        {/* Course Grid - 1 col mobile, 2 col tablet+, gallery feel */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Course Grid - 1 col mobile, 2 col tablet, 3 col desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayCourses.length === 0 ? (
-            <div className="col-span-2 py-8">
+            <div className="col-span-full py-8">
               {sort === 'friends' ? (
                 <LeaderboardEmptyState type="courses-friends-no-friends" />
               ) : sort === 'rising' ? (

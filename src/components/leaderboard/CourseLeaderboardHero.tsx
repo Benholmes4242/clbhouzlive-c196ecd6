@@ -45,9 +45,7 @@ export function CourseLeaderboardHero({
   const displayCourse = course || defaultCourse;
 
   const handleClick = () => {
-    if (displayCourse.id !== 'cypress-point') {
-      navigate(`/courses/${displayCourse.id}`);
-    }
+    navigate(`/courses/${displayCourse.id}`);
   };
 
   return (
@@ -63,45 +61,44 @@ export function CourseLeaderboardHero({
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
       />
 
-      {/* Very subtle slate tint - light mode optimized, never "black" */}
-      <div className="absolute inset-0 bg-slate-600/15" />
-      
-      {/* Bottom gradient for text readability - warm slate, not dark */}
-      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-slate-700/50 via-slate-600/20 to-transparent" />
+      {/* Very subtle slate tint - light mode optimized, NO gradients */}
+      <div className="absolute inset-0 bg-slate-500/10" />
 
-      {/* Content overlay */}
-      <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-6">
-        {/* Label pill */}
-        <div className="mb-3">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase text-white/90 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-sq-pill border border-white/10">
-            <Trophy className="w-3 h-3" />
-            {label}
-          </span>
-        </div>
-
-        {/* Course name */}
-        <h2 className="text-xl sm:text-2xl font-semibold text-white leading-tight mb-1.5">
-          {displayCourse.name}
-        </h2>
-
-        {/* Location */}
-        <div className="flex items-center gap-1.5 text-white/80 text-sm mb-3">
-          <MapPin className="w-3.5 h-3.5" />
-          <span>{displayCourse.location}</span>
-        </div>
-
-        {/* Rank badges */}
-        <div className="flex items-center gap-2">
-          {displayCourse.globalRank && (
-            <span className="text-[11px] font-medium text-white/90 bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-sq-xs border border-white/10">
-              #{displayCourse.globalRank} Global
+      {/* Frosted glass panel for content - NO gradient overlays */}
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+        <div className="rounded-sq-sm border border-white/40 bg-white/75 backdrop-blur-md shadow-sm p-3.5 sm:p-4">
+          {/* Label pill */}
+          <div className="mb-2.5">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-wide uppercase text-slate-600 bg-slate-100/80 px-2.5 py-1 rounded-sq-pill border border-slate-200/60">
+              <Trophy className="w-3 h-3 text-amber-500" />
+              {label}
             </span>
-          )}
-          {displayCourse.regionalRank && displayCourse.region && (
-            <span className="text-[11px] font-medium text-white/90 bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-sq-xs border border-white/10">
-              #{displayCourse.regionalRank} {displayCourse.region}
-            </span>
-          )}
+          </div>
+
+          {/* Course name */}
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 leading-tight mb-1">
+            {displayCourse.name}
+          </h2>
+
+          {/* Location */}
+          <div className="flex items-center gap-1.5 text-slate-600 text-sm mb-3">
+            <MapPin className="w-3.5 h-3.5" />
+            <span>{displayCourse.location}</span>
+          </div>
+
+          {/* Rank badges */}
+          <div className="flex items-center gap-2">
+            {displayCourse.globalRank && (
+              <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-sq-xs border border-slate-200/80 shadow-sm">
+                #{displayCourse.globalRank} Global
+              </span>
+            )}
+            {displayCourse.regionalRank && displayCourse.region && (
+              <span className="text-[11px] font-medium text-slate-600 bg-slate-50 px-2.5 py-1 rounded-sq-xs border border-slate-200/60">
+                #{displayCourse.regionalRank} {displayCourse.region}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </button>
