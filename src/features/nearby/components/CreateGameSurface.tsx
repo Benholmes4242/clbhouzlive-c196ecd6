@@ -4,11 +4,11 @@
  * Can be rendered in a sheet or standalone page
  */
 
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { AlertCircle, Search, MapPin } from 'lucide-react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
+import { AlertCircle, Search, MapPin, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
-import { GameVisibilitySelector } from './GameVisibilitySelector';
+import { VisibilityPillSelector } from './VisibilityPillSelector';
 import type { GameVisibility } from '../types';
 import { format } from 'date-fns';
 import { TapButton } from '@/components/ui/TapButton';
@@ -23,6 +23,7 @@ export interface CreateGameSurfaceRef {
   submit: () => void;
   isValid: () => boolean;
   isSubmitting: boolean;
+  scrollToFirstError: () => void;
 }
 
 interface CreateGameSurfaceProps {
@@ -51,12 +52,18 @@ interface CreateGameSurfaceProps {
 interface ValidationErrors {
   slotsTotal?: string;
   startTime?: string;
+  course?: string;
 }
 
-const GAME_TYPES = [
-  { value: '9_holes', label: '9 holes' },
-  { value: '18_holes', label: '18 holes' },
-  { value: 'casual_golf', label: 'Casual golf' },
+// Separated: Holes options
+const HOLES_OPTIONS = [
+  { value: '9', label: '9 holes' },
+  { value: '18', label: '18 holes' },
+];
+
+// Separated: Format options  
+const FORMAT_OPTIONS = [
+  { value: 'casual', label: 'Casual' },
   { value: 'practice', label: 'Practice' },
 ];
 
@@ -69,7 +76,10 @@ const TIMING_OPTIONS = [
 
 export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurfaceProps>(
   ({ prefilledClub, onSubmit, bottomPadding = 120, hideSubmitButton = false, onSubmittingChange }, ref) => {
-    const [gameType, setGameType] = useState<string>('9_holes');
+    // Split game type into holes + format
+    const [holes, setHoles] = useState<string>('18');
+    const [gameFormat, setGameFormat] = useState<string>('casual');
+    
     const [courseId, setCourseId] = useState<string>('');
     const [courseName, setCourseName] = useState('');
     const [selectedClub, setSelectedClub] = useState<{ id: string; name: string } | null>(null);
@@ -81,11 +91,17 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
     const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-    const [courseError, setCourseError] = useState<string>('');
+    
+    // Collapsible tag players section
+    const [isTagPlayersExpanded, setIsTagPlayersExpanded] = useState(false);
     
     const [courseQuery, setCourseQuery] = useState('');
     const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
     const { courses, isLoading: isSearchingCourses } = useCourseSearch(courseQuery);
+
+    // Refs for scrolling to errors
+    const courseRef = useRef<HTMLDivElement>(null);
+    const timingRef = useRef<HTMLDivElement>(null);
 
     const currentPlayers = 1 + selectedUsers.length;
     const maxAvailableSlots = 4 - currentPlayers;
@@ -100,7 +116,7 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
 
     useEffect(() => {
       if (availableSlots > maxAvailableSlots) {
-        setAvailableSlots(Math.max(1, maxAvailableSlots));
+        setAvailableSlots(Math.max(0, maxAvailableSlots));
       }
     }, [currentPlayers, maxAvailableSlots, availableSlots]);
 
@@ -112,6 +128,11 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
       const errors: ValidationErrors = {};
       const now = new Date();
 
+      // Course is required
+      if (!courseId && !courseName) {
+        errors.course = 'Please select a golf club';
+      }
+
       if (timing === 'choose' && customDateTime) {
         if (customDateTime < now) {
           errors.startTime = 'Start time cannot be in the past';
@@ -122,11 +143,20 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
       return Object.keys(errors).length === 0;
     };
 
+    const scrollToFirstError = () => {
+      if (validationErrors.course && courseRef.current) {
+        courseRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (validationErrors.startTime && timingRef.current) {
+        timingRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
     const handleSubmit = async (e?: React.FormEvent) => {
       e?.preventDefault();
       
       if (!validateForm()) {
         haptic('heavy');
+        setTimeout(scrollToFirstError, 100);
         return;
       }
 
@@ -152,6 +182,9 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
           .filter(u => u.guest_name)
           .map(u => ({ guest_name: u.guest_name }));
 
+        // Combine holes + format into game_type
+        const gameType = `${holes}_holes_${gameFormat}`;
+
         await onSubmit({
           game_type: gameType,
           course_name: courseName || undefined,
@@ -167,7 +200,8 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
         });
         
         // Reset form
-        setGameType('9_holes');
+        setHoles('18');
+        setGameFormat('casual');
         setCourseId('');
         setCourseName('');
         setSelectedClub(null);
@@ -177,6 +211,7 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
         setCustomDateTime(null);
         setAvailableSlots(3);
         setSelectedUsers([]);
+        setIsTagPlayersExpanded(false);
       } catch (error) {
         console.error('Error creating beacon:', error);
       } finally {
@@ -189,6 +224,7 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
       submit: () => handleSubmit(),
       isValid: () => validateForm(),
       isSubmitting,
+      scrollToFirstError,
     }));
 
     const handleTimingChange = (value: string) => {
@@ -239,67 +275,42 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
       return null;
     };
 
+
     return (
       <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto" data-scroll-container>
-        <div className="px-4 pt-4 space-y-5" style={{ paddingBottom: `${bottomPadding}px` }}>
-          {/* Game Type */}
-          <div className="space-y-2">
-            <label className="sectionLabel">Game type</label>
-            <div className="grid grid-cols-2 gap-2">
-              {GAME_TYPES.map((type) => (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => {
-                    setGameType(type.value);
-                    haptic('light');
-                  }}
-                  className={cn(
-                    "px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                    "border",
-                    "active:scale-[0.97]",
-                    gameType === type.value
-                      ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)] shadow-sm"
-                      : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
-                  )}
-                  style={{ letterSpacing: '0.2px' }}
-                >
-                  {type.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Golf Course */}
-          <div className="space-y-2">
-            <label className="sectionLabel">Select a golf club</label>
+        <div className="px-4 pt-3 space-y-5" style={{ paddingBottom: `${bottomPadding}px` }}>
+          
+          {/* Golf Course - HERO SECTION */}
+          <div className="space-y-2" ref={courseRef}>
+            <label className="sectionLabel">Golf club</label>
             {selectedClub ? (
               <div className="selectedClubRow">
-                <span className="prefix">Hosting at</span>
-                <div 
-                  className="clubPill"
-                  style={{
-                    padding: '6px 10px 6px 14px',
-                    borderColor: 'rgba(255, 255, 255, 0.18)',
+                <MapPin className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                <span className="flex-1 font-medium text-sm" style={{ color: 'var(--hub-text)' }}>
+                  {selectedClub.name}
+                </span>
+                <TapButton 
+                  className="changeBtn" 
+                  onClick={() => {
+                    setSelectedClub(null);
+                    setCourseId('');
+                    setCourseName('');
+                    setValidationErrors(prev => ({ ...prev, course: undefined }));
+                    haptic('light');
                   }}
                 >
-                  <span className="clubName">{selectedClub.name}</span>
-                  <TapButton 
-                    className="x" 
-                    onClick={() => {
-                      setSelectedClub(null);
-                      setCourseId('');
-                      setCourseName('');
-                      setCourseError('');
-                    }}
-                  >
-                    ✕
-                  </TapButton>
-                </div>
+                  Change
+                </TapButton>
               </div>
             ) : (
               <>
-                <div className="clubSearchBar" onClick={() => setIsCourseDropdownOpen(true)}>
+                <div 
+                  className={cn(
+                    "clubSearchBar clubSearchBarHero",
+                    validationErrors.course && "clubSearchBarError"
+                  )} 
+                  onClick={() => setIsCourseDropdownOpen(true)}
+                >
                   <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                   <input
                     type="text"
@@ -308,6 +319,7 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
                     onChange={(e) => {
                       setCourseQuery(e.target.value);
                       setIsCourseDropdownOpen(true);
+                      setValidationErrors(prev => ({ ...prev, course: undefined }));
                     }}
                     onFocus={() => setIsCourseDropdownOpen(true)}
                     className="clubSearchInput"
@@ -330,12 +342,12 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
                             setCourseName(club.name);
                             setCourseQuery('');
                             setIsCourseDropdownOpen(false);
-                            setCourseError('');
+                            setValidationErrors(prev => ({ ...prev, course: undefined }));
                             haptic('light');
                           }}
                           className="resultRow"
                         >
-                          <MapPin className="w-5 h-5 text-white/60" />
+                          <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
                           <div className="rMid">
                             <div className="rTitle">{club.name}</div>
                             {club.region && <div className="rSub">{club.region}</div>}
@@ -349,27 +361,71 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
                 )}
               </>
             )}
-            {courseError && (
+            {validationErrors.course && (
               <div className="errorMsg">
-                <AlertCircle className="w-4 h-4" />
-                <span>{courseError}</span>
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>{validationErrors.course}</span>
               </div>
             )}
           </div>
 
-          {/* Tag Players */}
-          <div className="space-y-2">
-            <label className="sectionLabel">Tag players (optional)</label>
-            <UserSearchTypeahead
-              selectedUsers={selectedUsers}
-              onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
-              onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId && u.guest_name !== userId))}
-              maxUsers={3}
-            />
+          {/* Game Type - Split into Holes + Format */}
+          <div className="space-y-3">
+            {/* Holes Selection */}
+            <div className="space-y-2">
+              <label className="sectionLabel">Holes</label>
+              <div className="flex gap-2">
+                {HOLES_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setHoles(option.value);
+                      haptic('light');
+                    }}
+                    className={cn(
+                      "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                      "border active:scale-[0.97]",
+                      holes === option.value
+                        ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
+                        : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Format Selection */}
+            <div className="space-y-2">
+              <label className="sectionLabel">Format</label>
+              <div className="flex gap-2">
+                {FORMAT_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setGameFormat(option.value);
+                      haptic('light');
+                    }}
+                    className={cn(
+                      "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                      "border active:scale-[0.97]",
+                      gameFormat === option.value
+                        ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
+                        : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* When */}
-          <div className="space-y-2">
+          <div className="space-y-2" ref={timingRef}>
             <label className="sectionLabel">When</label>
             <div className="grid grid-cols-2 gap-2">
               {TIMING_OPTIONS.map((option) => (
@@ -378,14 +434,12 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
                   type="button"
                   onClick={() => handleTimingChange(option.value)}
                   className={cn(
-                    "px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                    "border",
-                    "active:scale-[0.97]",
+                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                    "border active:scale-[0.97]",
                     timing === option.value
                       ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
                       : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
                   )}
-                  style={{ letterSpacing: '0.2px' }}
                 >
                   {option.value === 'choose' && customDateTime ? getTimingDisplay() : option.label}
                 </button>
@@ -393,46 +447,99 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
             </div>
             {validationErrors.startTime && (
               <div className="errorMsg">
-                <AlertCircle className="w-4 h-4" />
+                <AlertCircle className="w-3.5 h-3.5" />
                 <span>{validationErrors.startTime}</span>
               </div>
             )}
           </div>
 
-          {/* Available Slots */}
+          {/* Players Needed */}
           <div className="space-y-2">
-            <label className="sectionLabel">Players needed</label>
-            <div className="flex gap-2">
-              {[1, 2, 3].filter(n => n <= maxAvailableSlots).map((slots) => (
-                <button
-                  key={slots}
-                  type="button"
-                  onClick={() => {
-                    setAvailableSlots(slots);
-                    haptic('light');
-                  }}
-                  disabled={slots > maxAvailableSlots}
-                  className={cn(
-                    "flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                    "border",
-                    "active:scale-[0.97]",
-                    availableSlots === slots
-                      ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
-                      : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]",
-                    slots > maxAvailableSlots && "opacity-40 cursor-not-allowed"
-                  )}
-                  style={{ letterSpacing: '0.2px' }}
-                >
-                  {slots}
-                </button>
-              ))}
+            <div className="flex items-baseline justify-between">
+              <label className="sectionLabel" style={{ margin: 0 }}>Players needed</label>
+              <span className="helper">How many more?</span>
             </div>
+            {maxAvailableSlots <= 0 ? (
+              <div 
+                className="px-4 py-3 rounded-xl text-sm font-medium text-center"
+                style={{ 
+                  background: 'var(--hub-glass-bg-subtle)',
+                  border: '1px solid var(--hub-stroke-subtle)',
+                  color: 'var(--hub-text-sub)',
+                }}
+              >
+                Full party
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                {[1, 2, 3].filter(n => n <= maxAvailableSlots).map((slots) => (
+                  <button
+                    key={slots}
+                    type="button"
+                    onClick={() => {
+                      setAvailableSlots(slots);
+                      haptic('light');
+                    }}
+                    className={cn(
+                      "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                      "border active:scale-[0.97]",
+                      availableSlots === slots
+                        ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
+                        : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
+                    )}
+                  >
+                    {slots}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Visibility */}
+          {/* Tag Players - Collapsible */}
           <div className="space-y-2">
-            <label className="sectionLabel">Who can see this game</label>
-            <GameVisibilitySelector
+            <button
+              type="button"
+              onClick={() => {
+                setIsTagPlayersExpanded(!isTagPlayersExpanded);
+                haptic('light');
+              }}
+              className="collapsibleHeader"
+            >
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                <span className="text-sm font-medium" style={{ color: 'var(--hub-text)' }}>
+                  Invite players
+                </span>
+                {selectedUsers.length > 0 && (
+                  <span className="tagCount">{selectedUsers.length}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: 'var(--hub-text-dim)' }}>Optional</span>
+                {isTagPlayersExpanded ? (
+                  <ChevronUp className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                ) : (
+                  <ChevronDown className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                )}
+              </div>
+            </button>
+            
+            {isTagPlayersExpanded && (
+              <div className="pt-2">
+                <UserSearchTypeahead
+                  selectedUsers={selectedUsers}
+                  onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
+                  onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId && u.guest_name !== userId))}
+                  maxUsers={3}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Visibility - Pill Selector */}
+          <div className="space-y-2">
+            <label className="sectionLabel">Visibility</label>
+            <VisibilityPillSelector
               value={visibility}
               onChange={(val) => {
                 setVisibility(val);
@@ -441,21 +548,14 @@ export const CreateGameSurface = forwardRef<CreateGameSurfaceRef, CreateGameSurf
             />
           </div>
 
-          {/* Note */}
+          {/* Note - Compact */}
           <div className="space-y-2">
-            <label className="sectionLabel">Note (optional)</label>
+            <label className="sectionLabel">Note</label>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="We are looking for a fourth player, casual round, money match - who's in?"
-              className="w-full px-4 py-3 rounded-xl text-sm resize-none"
-              style={{
-                minHeight: '100px',
-                background: 'var(--hub-glass-bg-input)',
-                border: '1px solid var(--hub-stroke-subtle)',
-                color: 'var(--hub-text)',
-                letterSpacing: '0.2px',
-              }}
+              placeholder="Add a message for players…"
+              className="noteTextarea"
               data-keyboard-aware
             />
           </div>

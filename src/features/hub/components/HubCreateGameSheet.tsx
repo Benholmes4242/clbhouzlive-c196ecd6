@@ -158,26 +158,35 @@ export const HubCreateGameSheet: React.FC<HubCreateGameSheetProps> = ({
 
             {/* Sticky Footer - Create button */}
             <div 
-              className="absolute bottom-0 left-0 right-0 z-20 border-t"
+              className="absolute bottom-0 left-0 right-0 z-20"
               style={{ 
                 background: 'var(--hub-bg-start)',
-                borderColor: 'var(--hub-glass-border)',
+                borderTop: '1px solid var(--hub-glass-border)',
                 padding: '12px 16px',
                 paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+                boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.04)',
               }}
             >
               <button
                 type="button"
                 onClick={handleSubmitClick}
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-xl text-base font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-60"
+                className="w-full py-3.5 rounded-xl text-[15px] font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{
-                  background: 'linear-gradient(to bottom right, #6E9277, #89A78C)',
+                  background: 'linear-gradient(135deg, #6E9277 0%, #89A78C 100%)',
                   color: 'white',
                   letterSpacing: '0.3px',
+                  boxShadow: '0 2px 8px rgba(110, 146, 119, 0.3)',
                 }}
               >
-                {isSubmitting ? 'Creating...' : 'Create game'}
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create game'
+                )}
               </button>
             </div>
           </motion.div>
