@@ -52,7 +52,7 @@ export function CourseLeaderboardHero({
     <button
       type="button"
       onClick={handleClick}
-      className="relative w-full aspect-[16/10] sm:aspect-[2.2/1] rounded-sq-md overflow-hidden group cursor-pointer"
+      className="relative w-full aspect-[16/10] sm:aspect-[2.2/1] overflow-hidden group cursor-pointer"
     >
       {/* Background Image */}
       <img
