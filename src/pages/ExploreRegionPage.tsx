@@ -2,14 +2,17 @@
  * ExploreRegionPage - Shows moments grid filtered by region
  * 
  * Phase 1: Uses explore_moments view with region_key filter
+ * 
+ * Polish: improved header, back navigation, loading states
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RegionKey, useExploreRegionStats } from '@/hooks/useExploreMoments';
 import { DiscoverMomentsGrid } from '@/components/explore-tab/DiscoverMomentsGrid';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Map slug to region_key
 const SLUG_TO_REGION: Record<string, RegionKey> = {
@@ -54,23 +57,36 @@ const REGION_CONFIG: Record<RegionKey, {
 const ExploreRegionPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const [imageError, setImageError] = useState(false);
   
   const regionKey = slug ? SLUG_TO_REGION[slug.toLowerCase()] : undefined;
   const config = regionKey ? REGION_CONFIG[regionKey] : undefined;
   
-  const { data: regionStats } = useExploreRegionStats();
+  const { data: regionStats, isLoading: statsLoading } = useExploreRegionStats();
   const stats = regionStats?.find(s => s.region_key === regionKey);
   const thumbnailUrl = stats?.thumbnail_url;
   const momentCount = stats?.moments_last_30_days || 0;
+  
+  const showGradient = !thumbnailUrl || imageError;
+
+  // Handle back navigation
+  const handleBack = () => {
+    // Try to go back, but if there's no history, go to explore
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/discover/explore');
+    }
+  };
 
   // Invalid region
   if (!regionKey || !config) {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)]">
+      <div className="min-h-screen bg-background">
         <div className="px-5 py-4">
           <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            onClick={handleBack}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
@@ -87,13 +103,14 @@ const ExploreRegionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-[var(--bg-page)]/95 backdrop-blur-sm border-b border-border/40">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border/40">
         <div className="px-5 py-4 flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="p-1.5 -ml-1.5 rounded-full hover:bg-surface-alt transition-colors"
+            aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
@@ -105,24 +122,30 @@ const ExploreRegionPage: React.FC = () => {
 
       {/* Hero Section */}
       <div className="relative h-48">
-        {thumbnailUrl ? (
+        {statsLoading ? (
+          <Skeleton className="absolute inset-0" />
+        ) : !showGradient ? (
           <img 
-            src={thumbnailUrl} 
+            src={thumbnailUrl!} 
             alt={config.title}
+            onError={() => setImageError(true)}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className={cn("absolute inset-0 bg-gradient-to-br", config.gradient)} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-page)] via-[var(--bg-page)]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h2 className="text-2xl font-serif text-foreground">{config.title}</h2>
+          <h2 className="text-2xl font-serif text-foreground drop-shadow-sm">{config.title}</h2>
           <p className="mt-1 text-sm text-muted-foreground max-w-md">{config.subtitle}</p>
           <div className="mt-2 text-xs text-muted-foreground">
-            {momentCount > 0 
-              ? `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
-              : 'Be the first to share a moment'
-            }
+            {statsLoading ? (
+              <Skeleton className="h-3 w-28" />
+            ) : momentCount > 0 ? (
+              `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
+            ) : (
+              'Be the first to share a moment'
+            )}
           </div>
         </div>
       </div>
