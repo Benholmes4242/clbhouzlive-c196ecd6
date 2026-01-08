@@ -1,19 +1,23 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { UserPlus, UserCheck, MoreHorizontal, Loader2, Settings, MapPin, Check } from 'lucide-react';
+import { UserPlus, UserCheck, MoreHorizontal, Loader2, Settings, MapPin, Check, Play, Film } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useFollow } from '@/hooks/useFollow';
-import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
+import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
+import { useInfiniteShortsVideos } from '@/hooks/useInfiniteShortsVideos';
+import { useCreatorStats } from '@/hooks/useCreatorStats';
 import { VideoSection } from '@/components/videos/VideoSection';
-import { VideosEmptyState } from '@/components/videos/VideosEmptyState';
+import { CreatorShortsGrid } from '@/components/creator/CreatorShortsGrid';
+import { CreatorAboutTab } from '@/components/creator/CreatorAboutTab';
 import { useMediaAutoplay } from '@/media';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,40 +28,65 @@ import {
 /**
  * CreatorPage - YouTube-style channel page for creators
  * 
- * ROUTING RULE:
- * - Videos tab creator clicks → /creator/:userId
- * - Watch tab creator clicks → /profile/:userId (unchanged)
+ * TABS:
+ * - Videos: Long-form content (≥4 min) with infinite scroll
+ * - Shorts: Short-form content (<4 min) with infinite scroll
+ * - About: Full bio, stats, links
  * 
- * CONTENT RULE:
- * - Creator Page shows ONLY long-form videos (≥3 min)
- * - No photos, no shorts, no personal activity
- * 
- * DESIGN RULE:
- * - Header layout matches ProfilePageV2 exactly
- * - Uses "Creator" pill instead of "Golfer" pill
+ * ROUTING:
+ * - /creator/:userId - Main creator page
+ * - /creator/:userId?tab=videos|shorts|about - Deep link to specific tab
  */
 
 // Background color - matches profile page (slate-50)
 const BG_COLOR = '#f8fafc';
 
-type VideoSort = 'latest' | 'popular';
+const CREATOR_TABS = [
+  { id: 'videos', label: 'Videos', icon: Film },
+  { id: 'shorts', label: 'Shorts', icon: Play },
+  { id: 'about', label: 'About', icon: null },
+] as const;
+
+type CreatorTab = typeof CREATOR_TABS[number]['id'];
 
 export const CreatorPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSupabaseSession();
-  const [sortBy, setSortBy] = useState<VideoSort>('latest');
+
+  // Read tab from URL, default to 'videos'
+  const urlTab = searchParams.get('tab') as CreatorTab | null;
+  const [activeTab, setActiveTab] = useState<CreatorTab>(
+    urlTab && CREATOR_TABS.some(t => t.id === urlTab) ? urlTab : 'videos'
+  );
+
+  // Update URL when tab changes
+  const handleTabChange = useCallback((tab: string) => {
+    const newTab = tab as CreatorTab;
+    setActiveTab(newTab);
+    if (newTab === 'videos') {
+      // Remove tab param for default
+      searchParams.delete('tab');
+    } else {
+      searchParams.set('tab', newTab);
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   // Scroll restoration for navigation
   const { savePosition } = useScrollRestoration('creator-page');
 
-  // Unified grid autoplay - uses default 0.4/0.25 thresholds for sentinel-based observation
+  // Unified grid autoplay
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
   });
 
   // Fetch creator profile data
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
+
+  // Fetch creator stats
+  const { data: stats, isLoading: statsLoading } = useCreatorStats(userId);
 
   // Check if viewing own page
   const isOwnPage = user?.id === userId;
@@ -72,20 +101,84 @@ export const CreatorPage: React.FC = () => {
     }
   }, [userId, ensureInitial]);
 
-  // Fetch creator's long-form videos using the query hook (same as VideosTab)
-  const { videos, isLoading: videosLoading } = useLongFormVideosQuery({
+  // Fetch long-form videos (≥4 min) with infinite scroll
+  const {
+    items: longFormVideos,
+    isLoading: videosLoading,
+    hasMore: hasMoreVideos,
+    fetchNextPage: fetchMoreVideos,
+    isFetchingNextPage: isFetchingMoreVideos,
+  } = useInfiniteLongFormVideos({
+    section: 'recommended',
     creatorUserId: userId,
-    sort: sortBy,
-    limit: 50,
+    minDuration: 240,
   });
+
+  // Fetch shorts (<4 min) with infinite scroll
+  const {
+    items: shorts,
+    isLoading: shortsLoading,
+    hasMore: hasMoreShorts,
+    fetchNextPage: fetchMoreShorts,
+    isFetchingNextPage: isFetchingMoreShorts,
+  } = useInfiniteShortsVideos({
+    creatorUserId: userId,
+    maxDuration: 240,
+  });
+
+  // Infinite scroll observers
+  const videosObserverRef = useRef<HTMLDivElement>(null);
+  const shortsObserverRef = useRef<HTMLDivElement>(null);
+
+  // Videos tab infinite scroll
+  useEffect(() => {
+    if (activeTab !== 'videos' || !hasMoreVideos || videosLoading || isFetchingMoreVideos) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log('[CreatorPage] 📜 Loading more videos...');
+          fetchMoreVideos();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    if (videosObserverRef.current) {
+      observer.observe(videosObserverRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [activeTab, hasMoreVideos, videosLoading, isFetchingMoreVideos, fetchMoreVideos]);
+
+  // Shorts tab infinite scroll
+  useEffect(() => {
+    if (activeTab !== 'shorts' || !hasMoreShorts || shortsLoading || isFetchingMoreShorts) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log('[CreatorPage] 📜 Loading more shorts...');
+          fetchMoreShorts();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    if (shortsObserverRef.current) {
+      observer.observe(shortsObserverRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [activeTab, hasMoreShorts, shortsLoading, isFetchingMoreShorts, fetchMoreShorts]);
 
   const hasPreloadedFirst = useRef(false);
 
   // Eager preload first video's HLS manifest on mount
   useLayoutEffect(() => {
-    if (hasPreloadedFirst.current || !videos?.length) return;
+    if (hasPreloadedFirst.current || !longFormVideos?.length) return;
     
-    const firstVideo = videos[0];
+    const firstVideo = longFormVideos[0];
     if (firstVideo?.mediaUrl) {
       const uid = uidFromNode({ media_url: firstVideo.mediaUrl });
       if (uid) {
@@ -93,7 +186,7 @@ export const CreatorPage: React.FC = () => {
         hasPreloadedFirst.current = true;
       }
     }
-  }, [videos]);
+  }, [longFormVideos]);
 
   const isFollowingCreator = isFollowing === 'following';
 
@@ -104,19 +197,20 @@ export const CreatorPage: React.FC = () => {
     });
   };
 
-  const handleCreatorClick = (creatorUserId: string) => {
+  const handleShortClick = (shortId: string) => {
+    savePosition();
+    navigate(`/watch?v=${shortId}`, {
+      state: { fromCreatorPage: true }
+    });
+  };
+
+  const handleCreatorClick = () => {
     // Already on creator page, just scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSettingsClick = () => {
     navigate('/settings');
-  };
-
-  // Format handicap with 1 decimal place
-  const formatHandicap = (hcp: number | null | undefined): string => {
-    if (hcp == null) return '–';
-    return hcp.toFixed(1);
   };
 
   if (profileLoading) {
@@ -146,18 +240,23 @@ export const CreatorPage: React.FC = () => {
   const displayName = profile?.display_name || profile?.username || 'Creator';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
 
+  // Format counts for display
+  const formatCount = (count: number): string => {
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+    return count.toString();
+  };
+
   // Creator empty state for own page
-  const creatorEmptyState = (
-    <div className="flex flex-col items-center justify-center py-8 px-4 bg-muted/30 rounded-xl">
-      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-        <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
+  const videosEmptyState = (
+    <div className="flex flex-col items-center justify-center py-12 px-4 bg-muted/30 rounded-xl">
+      <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-4">
+        <Film className="h-7 w-7 text-muted-foreground" />
       </div>
-      <p className="text-sm font-medium text-foreground mb-1">No videos yet</p>
+      <p className="text-base font-medium text-foreground mb-1">No videos yet</p>
       <p className="text-sm text-muted-foreground text-center mb-4">
         {isOwnPage 
-          ? "Upload long-form videos (3+ minutes) to see them here"
+          ? "Upload long-form videos (4+ minutes) to see them here"
           : "This creator hasn't uploaded any long-form videos yet"
         }
       </p>
@@ -167,6 +266,29 @@ export const CreatorPage: React.FC = () => {
           className="px-4 py-2 text-sm font-medium rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
         >
           Upload video
+        </button>
+      )}
+    </div>
+  );
+
+  const shortsEmptyState = (
+    <div className="flex flex-col items-center justify-center py-12 px-4 bg-muted/30 rounded-xl">
+      <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-4">
+        <Play className="h-7 w-7 text-muted-foreground" />
+      </div>
+      <p className="text-base font-medium text-foreground mb-1">No shorts yet</p>
+      <p className="text-sm text-muted-foreground text-center mb-4">
+        {isOwnPage 
+          ? "Upload short videos (under 4 minutes) to see them here"
+          : "This creator hasn't uploaded any shorts yet"
+        }
+      </p>
+      {isOwnPage && (
+        <button
+          onClick={() => navigate('/upload')}
+          className="px-4 py-2 text-sm font-medium rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          Upload short
         </button>
       )}
     </div>
@@ -266,10 +388,25 @@ export const CreatorPage: React.FC = () => {
           </p>
         )}
         
-        {/* Video count */}
-        <p className="mt-1 text-sm text-muted-foreground">
-          {videosLoading ? 'Loading...' : `${videos.length} video${videos.length !== 1 ? 's' : ''}`}
-        </p>
+        {/* Stats row */}
+        <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
+          {stats && (
+            <>
+              <span>{formatCount(stats.followerCount)} subscribers</span>
+              <span className="text-border">•</span>
+              <span>{stats.videoCount} video{stats.videoCount !== 1 ? 's' : ''}</span>
+              {stats.shortCount > 0 && (
+                <>
+                  <span className="text-border">•</span>
+                  <span>{stats.shortCount} short{stats.shortCount !== 1 ? 's' : ''}</span>
+                </>
+              )}
+            </>
+          )}
+          {!stats && !statsLoading && (
+            <span>{longFormVideos.length + shorts.length} video{(longFormVideos.length + shorts.length) !== 1 ? 's' : ''}</span>
+          )}
+        </div>
       </div>
 
       {/* Action Buttons - different for self vs other */}
@@ -386,43 +523,128 @@ export const CreatorPage: React.FC = () => {
       {/* Bio section */}
       {profile?.bio && (
         <div className="mt-5 px-5">
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-2">
             {profile.bio}
           </p>
         </div>
       )}
 
-      {/* Divider */}
-      <div className="h-px bg-border/40 mx-5 mt-6 mb-4" />
+      {/* YouTube-style Tab Navigation */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
+        <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 px-5">
+          {CREATOR_TABS.map((tab) => (
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              className={cn(
+                "relative px-4 py-3 text-sm font-medium rounded-none border-b-2 border-transparent",
+                "data-[state=active]:border-primary data-[state=active]:text-foreground",
+                "data-[state=inactive]:text-muted-foreground hover:text-foreground",
+                "bg-transparent shadow-none transition-colors"
+              )}
+            >
+              <span className="flex items-center gap-2">
+                {tab.icon && <tab.icon className="w-4 h-4" />}
+                {tab.label}
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {/* Sort dropdown */}
-      <div className="px-5 flex justify-between items-center mb-4">
-        <span className="text-sm font-medium text-foreground">
-          Videos
-        </span>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as VideoSort)}
-          className="text-sm bg-transparent border border-border rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-ring"
-        >
-          <option value="latest">Latest</option>
-          <option value="popular">Popular</option>
-        </select>
-      </div>
+        {/* Videos Tab */}
+        <TabsContent value="videos" className="mt-0 focus-visible:ring-0 focus-visible:ring-offset-0">
+          <div className="pt-4">
+            {videosLoading && longFormVideos.length === 0 ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : longFormVideos.length === 0 ? (
+              <div className="px-5">
+                {videosEmptyState}
+              </div>
+            ) : (
+              <>
+                <VideoSection
+                  title=""
+                  videos={longFormVideos}
+                  onVideoClick={handleVideoClick}
+                  onCreatorClick={handleCreatorClick}
+                  showViewAll={false}
+                  className="px-0"
+                  registerVideo={registerMedia}
+                  playingIds={playingIds}
+                  startIndex={0}
+                />
+                
+                {/* Infinite scroll trigger */}
+                {hasMoreVideos && (
+                  <div ref={videosObserverRef} className="flex justify-center py-8">
+                    {isFetchingMoreVideos && (
+                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                )}
+                
+                {/* End state */}
+                {!hasMoreVideos && longFormVideos.length > 0 && (
+                  <p className="text-center text-sm text-muted-foreground py-6">
+                    You've seen all videos
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        </TabsContent>
 
-      {/* Video list - uses same VideoSection component as VideosTab with autoplay */}
-      <VideoSection
-        title=""
-        videos={videos}
-        onVideoClick={handleVideoClick}
-        onCreatorClick={handleCreatorClick}
-        showViewAll={false}
-        emptyState={creatorEmptyState}
-        className="px-0"
-        registerVideo={registerMedia}
-        playingIds={playingIds}
-        startIndex={0}
-      />
+        {/* Shorts Tab */}
+        <TabsContent value="shorts" className="mt-0 focus-visible:ring-0 focus-visible:ring-offset-0">
+          <div className="pt-4 px-5">
+            {shortsLoading && shorts.length === 0 ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : shorts.length === 0 ? (
+              shortsEmptyState
+            ) : (
+              <>
+                <CreatorShortsGrid
+                  shorts={shorts}
+                  onShortClick={handleShortClick}
+                  registerMedia={registerMedia}
+                  playingIds={playingIds}
+                />
+                
+                {/* Infinite scroll trigger */}
+                {hasMoreShorts && (
+                  <div ref={shortsObserverRef} className="flex justify-center py-8">
+                    {isFetchingMoreShorts && (
+                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                )}
+                
+                {/* End state */}
+                {!hasMoreShorts && shorts.length > 0 && (
+                  <p className="text-center text-sm text-muted-foreground py-6">
+                    You've seen all shorts
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* About Tab */}
+        <TabsContent value="about" className="mt-0 focus-visible:ring-0 focus-visible:ring-offset-0">
+          <div className="pt-4 px-5">
+            <CreatorAboutTab 
+              profile={profile} 
+              stats={stats}
+              isOwnProfile={isOwnPage}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </PageRoot>
   );
 };
