@@ -2,13 +2,14 @@
  * HubMessagesCard - Messages section (Fixed Height ~120px)
  * Shows max 2 message previews OR empty state
  * No internal scrolling
+ * Opens HubMessagesSheet instead of navigating
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tile } from '../components/Tile';
-import { useHub } from '@/features/hub/useHub';
 import { MessageCircle } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { HubMessagesSheet } from '../../components/HubMessagesSheet';
 
 // Mock data for v1 - will be replaced with real data later
 const MOCK_CONVERSATIONS: Array<{
@@ -32,95 +33,103 @@ function timeAgo(timestamp: string): string {
 }
 
 export function HubMessagesCard() {
-  const { navigateFromHub } = useHub();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   const conversations = MOCK_CONVERSATIONS;
   const isEmpty = conversations.length === 0;
   // Only show max 2 messages
   const displayConversations = conversations.slice(0, 2);
 
+  const openSheet = () => setIsSheetOpen(true);
+  const closeSheet = () => setIsSheetOpen(false);
+
   return (
-    <Tile 
-      title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-          <h3>Messages</h3>
-          <button
-            onClick={(e) => { e.stopPropagation(); navigateFromHub('/hub/messages'); }}
-            className="text-[14px] font-normal transition"
-            style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-muted)', padding: 0 }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
-          >
-            See all →
-          </button>
-        </div>
-      }
-    >
-      {/* Fixed height content area - NO SCROLLING */}
-      <div className="h-full flex items-center justify-center py-2">
-        {isEmpty ? (
-          <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
-            <div 
-              className="w-9 h-9 rounded-full flex items-center justify-center mb-2"
-              style={{ background: 'var(--hub-glass-bg-input)', opacity: 0.7 }}
+    <>
+      <Tile 
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <h3>Messages</h3>
+            <button
+              onClick={(e) => { e.stopPropagation(); openSheet(); }}
+              className="text-[14px] font-normal transition"
+              style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-muted)', padding: 0 }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
             >
-              <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
-            </div>
-            <h4 
-              className="text-[14px] font-semibold mb-0.5"
-              style={{ color: 'var(--hub-text)' }}
-            >
-              Your clubhouse chats live here
-            </h4>
-            <p 
-              className="text-[12px] leading-snug max-w-[240px]"
-              style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
-            >
-              Game chats, invites, and golfer conversations — all in one place.
-            </p>
+              See all →
+            </button>
           </div>
-        ) : (
-          <div className="w-full space-y-1">
-            {displayConversations.map(conv => (
-              <button
-                key={conv.id}
-                className="w-full flex items-center gap-3 p-2 rounded-xl transition"
-                style={{ background: 'transparent' }}
-                onClick={() => navigateFromHub(`/hub/messages/${conv.id}`)}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+        }
+      >
+        {/* Fixed height content area - NO SCROLLING */}
+        <div className="h-full flex items-center justify-center py-2">
+          {isEmpty ? (
+            <div className="flex flex-col items-center justify-center text-center px-3 -mt-1">
+              <div 
+                className="w-9 h-9 rounded-full flex items-center justify-center mb-2"
+                style={{ background: 'var(--hub-glass-bg-input)', opacity: 0.7 }}
               >
-                <SquircleAvatar
-                  size={38}
-                  src={conv.avatarUrl}
-                  alt={conv.name}
-                  fallback={conv.name.charAt(0).toUpperCase()}
-                />
-                <div className="flex-1 min-w-0 text-left">
-                  <div 
-                    className="text-[13px] font-semibold truncate"
-                    style={{ color: 'var(--hub-text)' }}
-                  >
-                    {conv.name}
-                  </div>
-                  <div 
-                    className="text-[12px] truncate"
-                    style={{ color: 'var(--hub-text-sub)' }}
-                  >
-                    {conv.lastMessage}
-                  </div>
-                </div>
-                <span 
-                  className="text-[11px] shrink-0"
-                  style={{ color: 'var(--hub-text-muted)' }}
+                <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+              </div>
+              <h4 
+                className="text-[14px] font-semibold mb-0.5"
+                style={{ color: 'var(--hub-text)' }}
+              >
+                Your conversations will live here
+              </h4>
+              <p 
+                className="text-[12px] leading-snug max-w-[240px]"
+                style={{ color: 'var(--hub-text-muted)', opacity: 0.8 }}
+              >
+                Game chats, invites, and messages with golfers — all in one place.
+              </p>
+            </div>
+          ) : (
+            <div className="w-full space-y-1">
+              {displayConversations.map(conv => (
+                <button
+                  key={conv.id}
+                  className="w-full flex items-center gap-3 p-2 rounded-xl transition"
+                  style={{ background: 'transparent' }}
+                  onClick={() => openSheet()}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  {timeAgo(conv.timestamp)}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </Tile>
+                  <SquircleAvatar
+                    size={38}
+                    src={conv.avatarUrl}
+                    alt={conv.name}
+                    fallback={conv.name.charAt(0).toUpperCase()}
+                  />
+                  <div className="flex-1 min-w-0 text-left">
+                    <div 
+                      className="text-[13px] font-semibold truncate"
+                      style={{ color: 'var(--hub-text)' }}
+                    >
+                      {conv.name}
+                    </div>
+                    <div 
+                      className="text-[12px] truncate"
+                      style={{ color: 'var(--hub-text-sub)' }}
+                    >
+                      {conv.lastMessage}
+                    </div>
+                  </div>
+                  <span 
+                    className="text-[11px] shrink-0"
+                    style={{ color: 'var(--hub-text-muted)' }}
+                  >
+                    {timeAgo(conv.timestamp)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </Tile>
+      
+      {/* Messages Bottom Sheet */}
+      <HubMessagesSheet isOpen={isSheetOpen} onClose={closeSheet} />
+    </>
   );
 }
