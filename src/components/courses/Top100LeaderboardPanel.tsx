@@ -27,7 +27,7 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       {/* Tabs - sticky once scrolled */}
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <div className="pb-2">
+        <div className="pb-2 px-4">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="players">Players</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
@@ -38,7 +38,7 @@ const Top100LeaderboardPanel = () => {
           <PlayersLeaderboardViewV2 />
         </TabsContent>
 
-        <TabsContent value="courses" className="mt-4 px-4">
+        <TabsContent value="courses" className="mt-0">
           <CoursesLeaderboardView />
         </TabsContent>
       </Tabs>

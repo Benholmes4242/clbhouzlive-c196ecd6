@@ -351,7 +351,7 @@ export function CoursesLeaderboardView() {
       {/* Course Rankings Section */}
       <section className="space-y-4">
         {/* Section Header */}
-        <div>
+        <div className="px-4">
           <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             The world's greatest golf courses
@@ -359,7 +359,7 @@ export function CoursesLeaderboardView() {
         </div>
 
         {/* Sort Tabs - Flat pills with underline active state */}
-        <div className="overflow-x-auto pb-1 -mx-4 px-4">
+        <div className="overflow-x-auto pb-1 px-4">
           <div className="inline-flex gap-1 min-w-max">
             {SORT_OPTIONS.map((opt) => (
               <button
