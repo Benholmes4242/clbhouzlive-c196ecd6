@@ -1,53 +1,15 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, Search, Tag, Sparkles, Check, ChevronDown,
-  // Category icons
-  Flag, Video, Star, Target, Trophy, Plane, 
-  BookOpen, Wrench, Flame, Zap, Circle, MoreHorizontal
-} from 'lucide-react';
+import { X, Search, Tag, Sparkles, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MOMENT_CATEGORIES, getCategoryById } from '../categoryDefinitions';
+import { MOMENT_CATEGORIES, getCategoryById, CORE_CATEGORY_IDS } from '../categoryDefinitions';
 import { suggestCategories } from '@/utils/categorySuggestions';
 import { triggerHaptic } from '@/lib/ui/haptics';
 
-// Core categories shown in main grid (9 max)
-const CORE_CATEGORY_IDS = [
-  'my-round',
-  'course-vlog', 
-  'review',
-  'practice',
-  'tournament',
-  'travel',
-  'tips-coaching',
-  'gear',
-  'challenge',
-];
-
-// More tags (collapsed by default)
-const MORE_CATEGORY_IDS = [
-  'hole-in-one',
-  'swing',
-  'funny',
-  'other',
-];
-
-// Map category IDs to Lucide icons
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  'my-round': Flag,
-  'course-vlog': Video,
-  'review': Star,
-  'practice': Target,
-  'tournament': Trophy,
-  'travel': Plane,
-  'tips-coaching': BookOpen,
-  'gear': Wrench,
-  'challenge': Flame,
-  'hole-in-one': Zap,
-  'swing': Circle,
-  'funny': Sparkles,
-  'other': MoreHorizontal,
-};
+// Core categories (first 9) shown in main grid
+const CORE_CATEGORIES = MOMENT_CATEGORIES.slice(0, 9);
+// More tags (remaining 21) collapsed by default
+const MORE_CATEGORIES = MOMENT_CATEGORIES.slice(9);
 
 interface MomentCategorySheetProps {
   isOpen: boolean;
@@ -63,6 +25,8 @@ interface MomentCategorySheetProps {
  * MomentCategorySheet - Bottom sheet for selecting moment categories
  * Redesigned with 3-column grid, SVG icons, and progressive disclosure
  * Single-select mode with Continue CTA
+ * 
+ * Shows 9 core categories in main grid, 21 more under "More Tags"
  */
 export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
   isOpen,
@@ -91,19 +55,6 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
       .filter(id => !selectedCategories.includes(id))
       .slice(0, 4);
   }, [suggestedCategoryIds, selectedCategories]);
-
-  // Get core and more categories
-  const coreCategories = useMemo(() => {
-    return CORE_CATEGORY_IDS
-      .map(id => getCategoryById(id))
-      .filter(Boolean);
-  }, []);
-
-  const moreCategories = useMemo(() => {
-    return MORE_CATEGORY_IDS
-      .map(id => getCategoryById(id))
-      .filter(Boolean);
-  }, []);
 
   // Filter categories based on search
   const filteredCategories = useMemo(() => {
@@ -136,7 +87,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
     if (!cat) return null;
     
     const isSelected = selectedCategoryId === categoryId;
-    const Icon = CATEGORY_ICONS[categoryId] || Tag;
+    const Icon = cat.icon;
     
     return (
       <motion.button
@@ -314,7 +265,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                   </div>
                 )}
 
-                {/* Core categories */}
+                {/* Core categories (first 9) */}
                 <div className="pb-4">
                   <span 
                     className="text-xs font-medium uppercase tracking-wide mb-3 block"
@@ -323,13 +274,13 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                     Categories
                   </span>
                   <div className="grid grid-cols-3 gap-3">
-                    {coreCategories.map(cat => (
-                      <CategoryTile key={cat!.id} categoryId={cat!.id} />
+                    {CORE_CATEGORIES.map(cat => (
+                      <CategoryTile key={cat.id} categoryId={cat.id} />
                     ))}
                   </div>
                 </div>
 
-                {/* More tags - collapsible */}
+                {/* More tags - collapsible (21 additional categories) */}
                 <div className="pb-4">
                   <button
                     onClick={() => {
@@ -342,7 +293,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                       className="text-xs font-medium uppercase tracking-wide"
                       style={{ color: 'var(--cm-text-secondary)' }}
                     >
-                      More tags
+                      More tags ({MORE_CATEGORIES.length})
                     </span>
                     <motion.div
                       animate={{ rotate: showMoreTags ? 180 : 0 }}
@@ -365,8 +316,8 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
                         className="overflow-hidden"
                       >
                         <div className="grid grid-cols-3 gap-3 pt-2">
-                          {moreCategories.map(cat => (
-                            <CategoryTile key={cat!.id} categoryId={cat!.id} />
+                          {MORE_CATEGORIES.map(cat => (
+                            <CategoryTile key={cat.id} categoryId={cat.id} />
                           ))}
                         </div>
                       </motion.div>

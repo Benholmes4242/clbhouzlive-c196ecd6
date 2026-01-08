@@ -1,10 +1,19 @@
 // Category definitions with keyword matching for intelligent suggestions
 // Used by the suggestion engine to recommend categories based on caption/context
 
+import { 
+  BookOpen, Video, Flag, Star, Target, Trophy, Plane, Wrench, 
+  Flame, Circle, Zap, Sparkles, MoreHorizontal, Users, Umbrella,
+  Shirt, Camera, GraduationCap, TrendingUp, Calendar, MapPin,
+  Clock, Lightbulb, Mountain, Award, Heart, MessageCircle,
+  ThumbsUp, Smile, Bot, LucideIcon
+} from "lucide-react";
+
 export type MomentCategoryDef = {
   id: string;
   label: string;
   emoji: string;
+  icon: LucideIcon;
   keywords?: string[];
   courseBoost?: boolean;
   mediaBoost?: ('video' | 'photo')[];
@@ -18,31 +27,26 @@ export type MomentBadgeDef = {
   keywords?: string[];
 };
 
-// Core categories (prioritized in tie-breaks)
-const CORE_CATEGORY_IDS = ['tips-coaching', 'funny', 'course-vlog', 'my-round'];
+// ===== 30 CATEGORIES =====
+// First 9 are "Core" (shown in main grid)
+// Remaining 21 are "More Tags" (collapsed by default)
 
-// Full category definitions with keyword/boost metadata
 export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
-  // Core categories first
+  // ===== CORE 9 CATEGORIES (shown first in Create Moment) =====
   {
     id: 'tips-coaching',
     label: 'Tips & Coaching',
     emoji: '📚',
+    icon: BookOpen,
     keywords: ['tip', 'tips', 'advice', 'lesson', 'coach', 'coaching', 'teach', 'learn', 'technique', 'drill', 'practice tip', 'how to', 'tutorial', 'improve', 'fix', 'correct'],
     mediaBoost: ['video'],
-    discoverEnabled: true,
-  },
-  {
-    id: 'funny',
-    label: 'Funny',
-    emoji: '😂',
-    keywords: ['funny', 'lol', 'haha', 'hilarious', 'fail', 'oops', 'blooper', 'mishap', 'embarrassing', 'comedy', 'joke', 'laugh'],
     discoverEnabled: true,
   },
   {
     id: 'course-vlog',
     label: 'Course Vlog',
     emoji: '🎬',
+    icon: Video,
     keywords: ['vlog', 'playing', 'round', 'first time', 'bucket list', 'dream course'],
     courseBoost: true,
     mediaBoost: ['video'],
@@ -52,28 +56,69 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     id: 'my-round',
     label: 'My Round',
     emoji: '⛳',
+    icon: Flag,
     keywords: ['round', 'played', 'shot', 'finished', 'scored', 'today', 'front 9', 'back 9', '18 holes', 'great round', 'tough round'],
     courseBoost: true,
-  },
-  // Other categories
-  {
-    id: 'challenge',
-    label: 'Challenge',
-    emoji: '🏆',
-    keywords: ['challenge', 'bet', 'competition', 'contest', 'match', 'vs', 'versus', 'compete'],
     discoverEnabled: true,
   },
   {
     id: 'review',
     label: 'Review',
     emoji: '⭐',
+    icon: Star,
     keywords: ['review', 'rating', 'recommend', 'worth', 'overrated', 'underrated', 'honest opinion', 'thoughts on'],
     courseBoost: true,
+    discoverEnabled: true,
   },
+  {
+    id: 'practice',
+    label: 'Practice',
+    emoji: '🎾',
+    icon: Target,
+    keywords: ['practice', 'range', 'driving range', 'putting green', 'chipping', 'short game', 'working on', 'grind', 'session'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'tournament',
+    label: 'Tournament',
+    emoji: '🏅',
+    icon: Trophy,
+    keywords: ['tournament', 'competition', 'medal', 'trophy', 'winner', 'placing', 'qualified', 'club championship', 'match play', 'stroke play'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'travel',
+    label: 'Travel',
+    emoji: '✈️',
+    icon: Plane,
+    keywords: ['travel', 'trip', 'vacation', 'holiday', 'visiting', 'destination', 'bucket list', 'flew', 'flying', 'abroad'],
+    courseBoost: true,
+    discoverEnabled: true,
+  },
+  {
+    id: 'gear',
+    label: 'Gear',
+    emoji: '🔧',
+    icon: Wrench,
+    keywords: ['gear', 'club', 'clubs', 'driver', 'putter', 'iron', 'wedge', 'bag', 'ball', 'balls', 'glove', 'shoes', 'new', 'just got', 'upgrade', 'fitting', 'custom'],
+    mediaBoost: ['photo'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'challenge',
+    label: 'Challenge',
+    emoji: '🏆',
+    icon: Flame,
+    keywords: ['challenge', 'bet', 'competition', 'contest', 'match', 'vs', 'versus', 'compete'],
+    discoverEnabled: true,
+  },
+
+  // ===== MORE TAGS (21 additional categories) =====
   {
     id: 'swing',
     label: 'Swing',
     emoji: '🏌️',
+    icon: Circle,
     keywords: ['swing', 'driver', 'iron', 'wedge', 'putter', 'form', 'backswing', 'downswing', 'tempo', 'speed', 'club'],
     mediaBoost: ['video'],
     discoverEnabled: true,
@@ -82,41 +127,179 @@ export const MOMENT_CATEGORIES: MomentCategoryDef[] = [
     id: 'hole-in-one',
     label: 'Hole in One',
     emoji: '🎯',
+    icon: Zap,
     keywords: ['hole in one', 'hole-in-one', 'hio', 'ace', 'aced it', 'one shot'],
     discoverEnabled: true,
   },
   {
-    id: 'gear',
-    label: 'Gear',
-    emoji: '🔧',
-    keywords: ['gear', 'club', 'clubs', 'driver', 'putter', 'iron', 'wedge', 'bag', 'ball', 'balls', 'glove', 'shoes', 'new', 'just got', 'upgrade', 'fitting', 'custom'],
+    id: 'funny',
+    label: 'Funny',
+    emoji: '😂',
+    icon: Sparkles,
+    keywords: ['funny', 'lol', 'haha', 'hilarious', 'fail', 'oops', 'blooper', 'mishap', 'embarrassing', 'comedy', 'joke', 'laugh'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'playing-partners',
+    label: 'Playing Partners',
+    emoji: '👥',
+    icon: Users,
+    keywords: ['playing with', 'partners', 'group', 'fourball', 'foursome', 'buddies', 'friends', 'golf buddies'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'weather-conditions',
+    label: 'Weather & Conditions',
+    emoji: '☔',
+    icon: Umbrella,
+    keywords: ['weather', 'rain', 'wind', 'sunny', 'cold', 'hot', 'conditions', 'wet', 'dry', 'frost', 'snow'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'golf-fashion',
+    label: 'Golf Fashion',
+    emoji: '👕',
+    icon: Shirt,
+    keywords: ['fashion', 'outfit', 'clothes', 'polo', 'shirt', 'pants', 'shoes', 'hat', 'style', 'wearing'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'course-photography',
+    label: 'Course Photography',
+    emoji: '📸',
+    icon: Camera,
+    keywords: ['photo', 'photography', 'scenic', 'view', 'landscape', 'beautiful', 'stunning', 'sunrise', 'sunset'],
     mediaBoost: ['photo'],
+    discoverEnabled: true,
   },
   {
-    id: 'travel',
-    label: 'Travel',
-    emoji: '✈️',
-    keywords: ['travel', 'trip', 'vacation', 'holiday', 'visiting', 'destination', 'bucket list', 'flew', 'flying', 'abroad'],
+    id: 'lesson-progress',
+    label: 'Lesson & Progress',
+    emoji: '🎓',
+    icon: GraduationCap,
+    keywords: ['lesson', 'progress', 'improvement', 'getting better', 'coach', 'instructor', 'learning'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'stats-analysis',
+    label: 'Stats & Analysis',
+    emoji: '📊',
+    icon: TrendingUp,
+    keywords: ['stats', 'statistics', 'analysis', 'data', 'strokes gained', 'gir', 'fairways', 'putts', 'handicap'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'tee-time',
+    label: 'Tee Time',
+    emoji: '📅',
+    icon: Calendar,
+    keywords: ['tee time', 'booking', 'booked', 'reserved', 'scheduled', 'tomorrow', 'weekend'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'bucket-list-course',
+    label: 'Bucket List Course',
+    emoji: '🗺️',
+    icon: MapPin,
+    keywords: ['bucket list', 'dream course', 'must play', 'finally played', 'on my list'],
     courseBoost: true,
+    discoverEnabled: true,
   },
   {
-    id: 'tournament',
-    label: 'Tournament',
-    emoji: '🏅',
-    keywords: ['tournament', 'competition', 'medal', 'trophy', 'winner', 'placing', 'qualified', 'club championship', 'match play', 'stroke play'],
+    id: 'quick-tip',
+    label: 'Quick Tip',
+    emoji: '⚡',
+    icon: Lightbulb,
+    keywords: ['quick tip', 'pro tip', 'hack', 'shortcut', 'simple', 'easy'],
+    discoverEnabled: true,
   },
   {
-    id: 'practice',
-    label: 'Practice',
-    emoji: '🎾',
-    keywords: ['practice', 'range', 'driving range', 'putting green', 'chipping', 'short game', 'working on', 'grind', 'session'],
+    id: 'golf-trip',
+    label: 'Golf Trip',
+    emoji: '⛰️',
+    icon: Mountain,
+    keywords: ['golf trip', 'getaway', 'vacation', 'boys trip', 'girls trip', 'away day', 'golf holiday'],
+    courseBoost: true,
+    discoverEnabled: true,
+  },
+  {
+    id: 'personal-best',
+    label: 'Personal Best',
+    emoji: '🥇',
+    icon: Award,
+    keywords: ['personal best', 'pb', 'new low', 'best score', 'best round', 'career low', 'broke'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'course-favorite',
+    label: 'Course Favorite',
+    emoji: '❤️',
+    icon: Heart,
+    keywords: ['favorite course', 'love this course', 'home course', 'best course', 'go-to course'],
+    courseBoost: true,
+    discoverEnabled: true,
+  },
+  {
+    id: '19th-hole',
+    label: '19th Hole',
+    emoji: '💬',
+    icon: MessageCircle,
+    keywords: ['19th hole', 'clubhouse', 'after round', 'drinks', 'food', 'bar', 'restaurant', 'post round'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'club-fitting',
+    label: 'Club Fitting',
+    emoji: '👍',
+    icon: ThumbsUp,
+    keywords: ['fitting', 'club fitting', 'custom fit', 'fitted', 'new clubs', 'getting fitted'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'range-session',
+    label: 'Range Session',
+    emoji: '😊',
+    icon: Smile,
+    keywords: ['range', 'driving range', 'hitting balls', 'practice range', 'warm up'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'golf-tech',
+    label: 'Golf Tech',
+    emoji: '🤖',
+    icon: Bot,
+    keywords: ['tech', 'technology', 'launch monitor', 'trackman', 'gps', 'app', 'gadget', 'device'],
+    discoverEnabled: true,
+  },
+  {
+    id: 'etiquette',
+    label: 'Etiquette & Rules',
+    emoji: '📋',
+    icon: BookOpen,
+    keywords: ['etiquette', 'rules', 'rule', 'penalty', 'drop', 'proper', 'correct', 'golf rules'],
+    discoverEnabled: true,
   },
   {
     id: 'other',
     label: 'Other',
     emoji: '📌',
+    icon: MoreHorizontal,
     keywords: [],
+    discoverEnabled: false, // Hidden from discovery, only in Create
   },
+];
+
+// Core category IDs (first 9 shown in main grid)
+export const CORE_CATEGORY_IDS = [
+  'tips-coaching',
+  'course-vlog',
+  'my-round',
+  'review',
+  'practice',
+  'tournament',
+  'travel',
+  'gear',
+  'challenge',
 ];
 
 // Get categories enabled for Discover filtering

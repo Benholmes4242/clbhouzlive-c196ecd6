@@ -8,19 +8,21 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useMediaAutoplay } from '@/media';
 import { runtimeUserTap } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
-export type VideoCategory = 'all' | 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
+// Dynamic category type from definitions
+export type VideoCategory = string;
 
-const VIDEO_PILLS: { value: VideoCategory; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'funny', label: 'Funny' },
-  { value: 'challenge', label: 'Challenge' },
-  { value: 'course-vlog', label: 'Course Vlog' },
-  { value: 'tips-coaching', label: 'Tips & Coaching' },
-  { value: 'review', label: 'Review' },
-  { value: 'other', label: 'Other' },
+// Build video pills dynamically from MOMENT_CATEGORIES
+const VIDEO_PILLS = [
+  { value: 'all', label: 'All', icon: undefined as React.ElementType | undefined },
+  ...getDiscoverCategories().map(cat => ({
+    value: cat.id,
+    label: cat.label,
+    icon: cat.icon,
+  })),
 ];
 
 const SECTION_TITLES: Record<SectionType, string> = {
@@ -114,11 +116,12 @@ export const VideosSectionPage: React.FC = () => {
     localStorage.setItem(VIDEOS_SECTION_SORT_KEY, sort);
   };
 
-  // Build pills for command center
+  // Build pills for command center with icons
   const pills: Pill[] = VIDEO_PILLS.map(p => ({
     key: p.value,
     label: p.label,
     selected: categoryParam === p.value,
+    icon: p.icon ? React.createElement(p.icon, { className: 'h-4 w-4' }) : undefined,
   }));
 
   // Autoplay setup (same as Videos tab)
