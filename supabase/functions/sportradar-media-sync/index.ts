@@ -71,6 +71,9 @@ Deno.serve(async (req) => {
       case 'pull_headshots':
         result = await pullHeadshots(supabase, provider);
         break;
+      case 'sync_player_photos':
+        result = await syncPlayerPhotos(supabase, provider || 'ap');
+        break;
       case 'pull_logos':
         result = await pullLogos(supabase, provider, year || 2025);
         break;
@@ -285,10 +288,93 @@ async function pullHeadshots(supabase: any, provider: string) {
     else console.log(`[Headshots] Upsert error for ${asset.id}: ${error.message}`);
   }
   
+  // After syncing to sr_media_assets, also update sr_players.photo_url
+  const playerUpdateResult = await updatePlayerPhotosFromAssets(supabase);
+  
   return { 
     records: upserted, 
-    message: `Synced ${upserted} headshots from ${provider}`,
+    message: `Synced ${upserted} headshots from ${provider}. Updated ${playerUpdateResult.updated} player photos.`,
     debug: { url: result.urlCalled, totalParsed: assets.length }
+  };
+}
+
+// Update sr_players.photo_url from sr_media_assets
+async function updatePlayerPhotosFromAssets(supabase: any): Promise<{ updated: number; matched: number; total: number }> {
+  // Get all headshot assets that have player_id refs
+  const { data: assets, error: assetsError } = await supabase
+    .from('sr_media_assets')
+    .select('id, refs, links')
+    .eq('kind', 'headshot');
+  
+  if (assetsError || !assets) {
+    console.log('[updatePlayerPhotosFromAssets] No headshot assets found');
+    return { updated: 0, matched: 0, total: 0 };
+  }
+  
+  let updated = 0;
+  let matched = 0;
+  
+  for (const asset of assets) {
+    const playerSrId = asset.refs?.player_id;
+    if (!playerSrId) continue;
+    
+    // Find player by sr_id
+    const { data: player, error: playerError } = await supabase
+      .from('sr_players')
+      .select('id, photo_url')
+      .eq('sr_id', playerSrId)
+      .maybeSingle();
+    
+    if (playerError || !player) continue;
+    matched++;
+    
+    // Get best quality image URL (prefer original or largest)
+    const links = asset.links as Array<{ href: string; width?: number; height?: number; sizeKey: string }>;
+    if (!links || links.length === 0) continue;
+    
+    // Sort by quality: original > larger width > first available
+    const sortedLinks = [...links].sort((a, b) => {
+      if (a.sizeKey === 'original') return -1;
+      if (b.sizeKey === 'original') return 1;
+      if (a.width && b.width) return b.width - a.width;
+      if (a.height && b.height) return b.height - a.height;
+      return 0;
+    });
+    
+    const bestUrl = sortedLinks[0]?.href;
+    if (!bestUrl) continue;
+    
+    // Only update if different
+    if (player.photo_url !== bestUrl) {
+      const { error: updateError } = await supabase
+        .from('sr_players')
+        .update({ photo_url: bestUrl, updated_at: new Date().toISOString() })
+        .eq('id', player.id);
+      
+      if (!updateError) updated++;
+    }
+  }
+  
+  console.log(`[updatePlayerPhotosFromAssets] Total: ${assets.length}, Matched: ${matched}, Updated: ${updated}`);
+  return { updated, matched, total: assets.length };
+}
+
+// Sync player photos directly (standalone action)
+async function syncPlayerPhotos(supabase: any, provider: string) {
+  // First pull headshots to ensure we have latest data
+  const pullResult = await pullHeadshots(supabase, provider);
+  
+  // Then update player photos
+  const updateResult = await updatePlayerPhotosFromAssets(supabase);
+  
+  return {
+    records: updateResult.updated,
+    message: `Synced ${pullResult.records} headshots, matched ${updateResult.matched} players, updated ${updateResult.updated} photos`,
+    debug: { 
+      headshotsTotal: pullResult.records,
+      playersMatched: updateResult.matched,
+      photosUpdated: updateResult.updated
+    }
   };
 }
 

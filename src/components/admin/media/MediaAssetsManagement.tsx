@@ -417,7 +417,7 @@ export default function MediaAssetsManagement() {
           <h2 className="font-display text-2xl font-bold">Sportradar Media</h2>
           <p className="text-muted-foreground">Browse and sync images from Sportradar Media APIs</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             variant="outline"
             onClick={() => syncMutation.mutate('check_availability')}
@@ -425,6 +425,14 @@ export default function MediaAssetsManagement() {
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
             Check Availability
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => syncMutation.mutate('sync_player_photos')}
+            disabled={syncMutation.isPending}
+          >
+            <Image className="h-4 w-4 mr-2" />
+            Sync Player Headshots
           </Button>
           <Button
             onClick={() => syncMutation.mutate('pull_all')}
