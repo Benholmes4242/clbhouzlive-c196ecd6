@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { X } from 'lucide-react';
 import { useMyJoinRequests } from '../hooks/useMyJoinRequests';
@@ -28,6 +28,7 @@ interface JoinRequestsInboxSheetProps {
   onOpenChange: (open: boolean) => void;
   onViewGame?: (gameId: string) => void;
   onFindGame?: () => void;
+  focusGameId?: string;
 }
 
 export function JoinRequestsInboxSheet({
@@ -35,9 +36,31 @@ export function JoinRequestsInboxSheet({
   onOpenChange,
   onViewGame,
   onFindGame,
+  focusGameId,
 }: JoinRequestsInboxSheetProps) {
   const [activeTab, setActiveTab] = useState<TabValue>('pending');
   const { data: requests = [], isLoading } = useMyJoinRequests();
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // When focusGameId is passed, find the request and scroll/highlight it
+  useEffect(() => {
+    if (!focusGameId || !open || isLoading || !contentRef.current) return;
+
+    const timer = setTimeout(() => {
+      const el = contentRef.current?.querySelector<HTMLElement>(`[data-game-id="${focusGameId}"]`);
+      if (!el) return;
+
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.classList.add('sheet-focus-highlight');
+      const highlightTimer = setTimeout(() => {
+        el.classList.remove('sheet-focus-highlight');
+      }, 1400);
+
+      return () => clearTimeout(highlightTimer);
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [focusGameId, open, isLoading, requests]);
 
   // Filter requests based on active tab
   const filteredRequests = requests.filter((req) => {
@@ -144,6 +167,7 @@ export function JoinRequestsInboxSheet({
   }) => (
     <div
       className="rounded-xl p-4"
+      data-game-id={request.game_id}
       style={{
         background: 'var(--hub-glass-bg-button)',
         border: '1px solid var(--hub-stroke-subtle)',
@@ -287,7 +311,7 @@ export function JoinRequestsInboxSheet({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 pb-6">
+        <div ref={contentRef} className="flex-1 overflow-y-auto px-6 pb-6">
           {isLoading ? (
             <div className="space-y-3 mt-2">
               {[0, 1, 2].map((i) => (

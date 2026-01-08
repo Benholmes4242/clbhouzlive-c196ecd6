@@ -202,6 +202,7 @@ export function HubYourGamesSheet({ isOpen, onClose }: HubYourGamesSheetProps) {
               setJoinRequestsOpen(false);
               setSearchGamesOpen(true);
             }}
+            focusGameId={focusedGameId}
           />
 
           <HubCreateGameSheet

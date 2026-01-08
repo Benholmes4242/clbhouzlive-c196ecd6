@@ -12,7 +12,7 @@ import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
-import { HubCreateGameSheet } from '../../components/HubCreateGameSheet';
+import { HubGamesHubSheet } from '../../components/HubGamesHubSheet';
 
 interface HubNavItem {
   id: string;
@@ -36,7 +36,7 @@ export function HubActionDock() {
   const location = useLocation();
   const { navigateFromHub, close } = useHub();
   const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
-  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
+  const [isGamesHubOpen, setIsGamesHubOpen] = useState(false);
 
   const handleItemClick = (item: HubNavItem) => {
     haptic('light');
@@ -47,9 +47,9 @@ export function HubActionDock() {
       return;
     }
     
-    // Handle Create Game as a sheet
+    // Handle Create Game as GamesHub sheet (opens to Discover tab)
     if (item.isSheet && item.id === 'game') {
-      setIsCreateGameSheetOpen(true);
+      setIsGamesHubOpen(true);
       return;
     }
     
@@ -123,9 +123,10 @@ export function HubActionDock() {
         onClose={() => setIsEchoSheetOpen(false)} 
       />
       
-      <HubCreateGameSheet 
-        isOpen={isCreateGameSheetOpen} 
-        onClose={() => setIsCreateGameSheetOpen(false)} 
+      <HubGamesHubSheet 
+        isOpen={isGamesHubOpen} 
+        onClose={() => setIsGamesHubOpen(false)}
+        initialTab="discover"
       />
     </>
   );
