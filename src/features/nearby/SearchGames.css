@@ -1,30 +1,43 @@
 /* Search Games Surface - Hub-style polish */
 
 .searchGamesSurface {
-  padding: 12px 16px;
+  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Create Game Row */
-.createGameRow {
+/* Create Game Row - Sticky */
+.createGameRowSticky {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--hub-glass-bg);
-  border: 1px solid var(--hub-stroke);
+  margin: 0 -16px 0;
+  background: var(--hub-bg-start);
+  border-bottom: 1px solid var(--hub-stroke-subtle);
   transition: transform 0.1s, background 0.15s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.createGameRow:hover {
+.createGameRowSticky:hover {
   background: var(--hub-glass-bg-hover);
 }
 
-.createGameRow:active {
-  transform: scale(0.98);
+.createGameRowSticky:active {
+  transform: scale(0.99);
+}
+
+/* Find Block */
+.findBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
 }
 
 /* Search Mode Toggle - Hub style */
@@ -39,6 +52,10 @@
 
 .modeChipHub {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
@@ -55,6 +72,22 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+.modeChipHub--disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.comingSoonPill {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--hub-glass-bg);
+  color: var(--hub-text-dim);
+}
+
 /* Search Box - Hub style */
 .searchBoxHub {
   display: flex;
@@ -65,6 +98,8 @@
   background: var(--hub-glass-bg-input);
   border: 1.5px solid var(--hub-stroke);
   transition: border-color 0.15s, box-shadow 0.15s;
+  position: relative;
+  z-index: 2;
 }
 
 .searchBoxHub:focus-within {
@@ -96,14 +131,31 @@
   border: 1.5px solid var(--hub-stroke);
 }
 
+.changeBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hub-accent);
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.changeBtn:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
 /* Results Sheet - Hub style */
 .resultsSheetHub {
+  position: relative;
+  z-index: 10;
   max-height: 280px;
   overflow-y: auto;
   border-radius: 14px;
-  background: var(--hub-glass-bg);
-  border: 1px solid var(--hub-stroke-subtle);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background: var(--hub-bg-start);
+  border: 1px solid var(--hub-stroke);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .resultRowHub {
@@ -117,6 +169,7 @@
   border: none;
   border-bottom: 1px solid var(--hub-stroke-subtle);
   transition: background 0.1s;
+  cursor: pointer;
 }
 
 .resultRowHub:last-child {
@@ -129,6 +182,33 @@
 
 .resultRowHub:active {
   background: var(--hub-glass-bg);
+}
+
+.rMid {
+  flex: 1;
+  min-width: 0;
+}
+
+.rTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hub-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rSub {
+  font-size: 12px;
+  color: var(--hub-text-dim);
+  margin-top: 1px;
+}
+
+.hint {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--hub-text-dim);
 }
 
 /* Filters Row - Hub style */
@@ -153,11 +233,11 @@
   transition: all 0.15s;
 }
 
-.filterChipHub:hover {
+.filterChipHub:hover:not(:disabled) {
   background: var(--hub-glass-bg-hover);
 }
 
-.filterChipHub:active {
+.filterChipHub:active:not(:disabled) {
   transform: scale(0.97);
 }
 
@@ -167,14 +247,33 @@
   color: var(--hub-text);
 }
 
+.filterChipHub--disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* Scoped Heading - Hub style */
 .scopedHeadingHub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.scopedHeadingHub > span:first-child {
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--hub-text-muted);
-  margin-top: 4px;
+}
+
+.scopedHeadingSub {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--hub-text-dim);
 }
 
 /* Empty State - Hub style */
@@ -256,4 +355,14 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Section Label */
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--hub-text-muted);
+  margin: 0 0 0 2px;
 }

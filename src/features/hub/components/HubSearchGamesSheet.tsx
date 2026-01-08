@@ -25,7 +25,9 @@ export const HubSearchGamesSheet: React.FC<HubSearchGamesSheetProps> = ({
 }) => {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   // Complete scroll-lock: save position on open, restore on close
   useEffect(() => {
@@ -37,6 +39,7 @@ export const HubSearchGamesSheet: React.FC<HubSearchGamesSheetProps> = ({
       rootScrollTopRef.current = rootEl.scrollTop;
       rootEl.style.overflow = 'hidden';
       wasOpenRef.current = true;
+      setHasScrolled(false);
     } else if (!isOpen && wasOpenRef.current) {
       // Closing: unlock and restore scroll position
       rootEl.style.overflow = '';
@@ -53,6 +56,12 @@ export const HubSearchGamesSheet: React.FC<HubSearchGamesSheetProps> = ({
       }
     };
   }, [isOpen]);
+
+  // Track scroll for header shadow
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const scrollTop = e.currentTarget.scrollTop;
+    setHasScrolled(scrollTop > 8);
+  }, []);
 
   // Prevent clicks inside sheet from closing
   const handleSheetClick = useCallback((e: React.MouseEvent) => {
@@ -95,8 +104,11 @@ export const HubSearchGamesSheet: React.FC<HubSearchGamesSheetProps> = ({
           >
             {/* Header - always visible, sticky within sheet */}
             <div 
-              className="flex-shrink-0 sticky top-0 z-10"
-              style={{ background: 'var(--hub-bg-start)' }}
+              className="flex-shrink-0 sticky top-0 z-10 transition-shadow duration-150"
+              style={{ 
+                background: 'var(--hub-bg-start)',
+                boxShadow: hasScrolled ? '0 2px 12px rgba(0,0,0,0.08)' : 'none',
+              }}
             >
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-2">
@@ -105,10 +117,9 @@ export const HubSearchGamesSheet: React.FC<HubSearchGamesSheetProps> = ({
               
               {/* Title bar with close button */}
               <div 
-                className="flex items-center justify-between px-4 pb-3 border-b"
+                className="flex items-center justify-between px-4 pb-3"
                 style={{ 
-                  borderColor: 'var(--hub-glass-border)',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                  borderBottom: hasScrolled ? 'none' : '1px solid var(--hub-glass-border)',
                 }}
               >
                 <h2 
@@ -130,8 +141,10 @@ export const HubSearchGamesSheet: React.FC<HubSearchGamesSheetProps> = ({
             
             {/* Content - scrolls */}
             <div 
+              ref={contentRef}
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+              onScroll={handleScroll}
             >
               <SearchGamesSurface
                 bottomPadding={24}
