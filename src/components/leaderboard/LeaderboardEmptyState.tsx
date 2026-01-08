@@ -114,26 +114,33 @@ export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmpty
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-muted/60 flex items-center justify-center mb-4">
-        <Icon className="w-5 h-5 text-muted-foreground" />
+    <div className="max-w-[520px] w-full mx-auto px-6 py-12">
+      <div className="flex flex-col items-center text-center gap-5">
+        {/* Icon disc with glass feel - matching FriendsCoursesEmpty */}
+        <div className="w-20 h-20 rounded-full bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center">
+          <Icon className="w-9 h-9 text-muted-foreground" />
+        </div>
+
+        {/* Headline */}
+        <h2 className="text-xl font-semibold text-foreground">
+          {state.title}
+        </h2>
+
+        {/* Body */}
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-[360px]">
+          {state.body}
+        </p>
+
+        {/* Primary CTA */}
+        {state.cta && (
+          <Button
+            onClick={handleCta}
+            className="w-full h-12 rounded-xl"
+          >
+            {state.cta.label}
+          </Button>
+        )}
       </div>
-      <h3 className="text-sm font-semibold text-foreground mb-1.5">
-        {state.title}
-      </h3>
-      <p className="text-sm text-muted-foreground max-w-[240px] mb-4">
-        {state.body}
-      </p>
-      {state.cta && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCta}
-          className="rounded-sq-sm"
-        >
-          {state.cta.label}
-        </Button>
-      )}
     </div>
   );
 }
