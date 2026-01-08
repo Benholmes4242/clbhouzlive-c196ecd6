@@ -45,22 +45,27 @@ export function HubMessagesCard() {
 
   return (
     <>
-      <Tile 
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-            <h3>Messages</h3>
-            <button
-              onClick={(e) => { e.stopPropagation(); openSheet(); }}
-              className="text-[14px] font-normal transition"
-              style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-muted)', padding: 0 }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text-sub)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-muted)'}
-            >
-              See all →
-            </button>
-          </div>
-        }
+      {/* Entire card is tappable to open sheet */}
+      <div 
+        onClick={openSheet}
+        className="cursor-pointer"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openSheet(); }}
       >
+        <Tile 
+          title={
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+              <h3>Messages</h3>
+              <span
+                className="text-[14px] font-normal transition"
+                style={{ color: 'var(--hub-text-muted)' }}
+              >
+                See all →
+              </span>
+            </div>
+          }
+        >
         {/* Fixed height content area - NO SCROLLING */}
         <div className="h-full flex items-center justify-center py-2">
           {isEmpty ? (
@@ -126,7 +131,8 @@ export function HubMessagesCard() {
             </div>
           )}
         </div>
-      </Tile>
+        </Tile>
+      </div>
       
       {/* Messages Bottom Sheet */}
       <HubMessagesSheet isOpen={isSheetOpen} onClose={closeSheet} />

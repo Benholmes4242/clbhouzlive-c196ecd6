@@ -4,9 +4,11 @@
  * Single snap point at ~70% height
  * Swipe down or tap outside to close
  * Calm, intentional empty state
+ * 
+ * Polish: proper scroll-lock with restore, sticky header, optical centering
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,33 +33,41 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
   onClose,
 }) => {
   const rootScrollTopRef = useRef(0);
+  const wasOpenRef = useRef(false);
   const conversations = MOCK_CONVERSATIONS;
   const isEmpty = conversations.length === 0;
 
-  // Scroll lock for #root container
+  // Complete scroll-lock: save position on open, restore on close
   useEffect(() => {
     const rootEl = document.getElementById('root');
     if (!rootEl) return;
 
-    if (isOpen) {
+    if (isOpen && !wasOpenRef.current) {
+      // Opening: save scroll position and lock
       rootScrollTopRef.current = rootEl.scrollTop;
       rootEl.style.overflow = 'hidden';
+      wasOpenRef.current = true;
+    } else if (!isOpen && wasOpenRef.current) {
+      // Closing: unlock and restore scroll position
+      rootEl.style.overflow = '';
+      rootEl.scrollTop = rootScrollTopRef.current;
+      wasOpenRef.current = false;
     }
 
     return () => {
-      rootEl.style.overflow = '';
+      // Cleanup on unmount
+      if (wasOpenRef.current) {
+        rootEl.style.overflow = '';
+        rootEl.scrollTop = rootScrollTopRef.current;
+        wasOpenRef.current = false;
+      }
     };
   }, [isOpen]);
 
-  // Restore scroll on close
-  useEffect(() => {
-    if (!isOpen) {
-      const rootEl = document.getElementById('root');
-      if (rootEl) {
-        rootEl.style.overflow = '';
-      }
-    }
-  }, [isOpen]);
+  // Prevent clicks inside sheet from closing
+  const handleSheetClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
   if (typeof document === 'undefined') return null;
 
@@ -65,13 +75,14 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - full viewport, tap to close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="fixed inset-0 bg-black/50 z-50"
+            style={{ touchAction: 'none' }}
             onClick={onClose}
           />
           
@@ -87,9 +98,13 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
               background: 'var(--hub-bg-start)',
               paddingBottom: 'env(safe-area-inset-bottom)',
             }}
+            onClick={handleSheetClick}
           >
-            {/* Header with drag handle */}
-            <div className="flex-shrink-0">
+            {/* Header - always visible, sticky within sheet */}
+            <div 
+              className="flex-shrink-0 sticky top-0 z-10"
+              style={{ background: 'var(--hub-bg-start)' }}
+            >
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-2">
                 <div className="w-10 h-1 rounded-full bg-black/10" />
@@ -98,7 +113,10 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
               {/* Title bar with close button */}
               <div 
                 className="flex items-center justify-between px-4 pb-3 border-b"
-                style={{ borderColor: 'var(--hub-glass-border)' }}
+                style={{ 
+                  borderColor: 'var(--hub-glass-border)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                }}
               >
                 <h2 
                   className="text-[18px] font-semibold"
@@ -117,32 +135,40 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
               </div>
             </div>
             
-            {/* Content */}
+            {/* Content - scrolls under header */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
               {isEmpty ? (
-                /* Empty State - Calm, intentional design */
-                <div className="flex flex-col items-center justify-center h-full text-center px-6">
-                  <div 
-                    className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-                    style={{ 
-                      background: 'var(--hub-glass-bg)',
-                      opacity: 0.6,
-                    }}
-                  >
-                    <MessageCircle 
-                      className="w-7 h-7" 
-                      style={{ color: 'var(--hub-text-dim)' }} 
-                    />
+                /* Empty State - Calm, intentional design with optical centering */
+                <div className="flex flex-col items-center justify-center h-full text-center px-6 -mt-6">
+                  {/* Extra breathing room above icon */}
+                  <div className="mb-5">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center"
+                      style={{ 
+                        background: 'var(--hub-glass-bg)',
+                        opacity: 0.5,
+                      }}
+                    >
+                      <MessageCircle 
+                        className="w-8 h-8" 
+                        style={{ color: 'var(--hub-text-dim)' }} 
+                      />
+                    </div>
                   </div>
+                  {/* Title - 16px gap from icon (via mb-5 + mb-2) */}
                   <h3 
                     className="text-[17px] font-semibold mb-2"
                     style={{ color: 'var(--hub-text)' }}
                   >
                     Your conversations will live here
                   </h3>
+                  {/* Subtext - 8px gap from title, max-width for nice line breaks */}
                   <p 
-                    className="text-[14px] leading-relaxed max-w-[280px]"
-                    style={{ color: 'var(--hub-text-sub)' }}
+                    className="text-[14px] leading-relaxed"
+                    style={{ 
+                      color: 'var(--hub-text-sub)',
+                      maxWidth: '280px',
+                    }}
                   >
                     Game chats, invites, and messages with golfers — all in one place.
                   </p>
