@@ -68,7 +68,7 @@ const RegionCard: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 snap-start group"
+      className="flex-shrink-0 group"
     >
       <div className="relative w-44 md:w-56 aspect-[4/3] rounded-xl overflow-hidden shadow-md">
         {/* Background - thumbnail or gradient fallback */}
@@ -134,7 +134,7 @@ export const ExploreRegionCards: React.FC<ExploreRegionCardsProps> = ({
       className={cn("py-6", className)}
     >
       {/* Section Header */}
-      <div className="px-5 mb-4">
+      <div className="px-4 mb-4">
         {isLoading ? (
           <>
             <Skeleton className="h-6 w-40" />
@@ -152,7 +152,7 @@ export const ExploreRegionCards: React.FC<ExploreRegionCardsProps> = ({
       
       {/* Horizontal scroll rail */}
       <div className="relative">
-        <div className="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide snap-x snap-mandatory">
+        <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
           {isLoading ? (
             // Skeleton cards during loading
             Array.from({ length: 4 }).map((_, i) => (
