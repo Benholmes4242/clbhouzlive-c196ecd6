@@ -4,18 +4,16 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
-import { useHub } from '@/features/hub/useHub';
 import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequests';
 import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
-import { scrollChildIntoView } from '../utils/scroll';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import { HubCreateGameSheet } from '@/features/hub/components/HubCreateGameSheet';
 import { HubSearchGamesSheet } from '@/features/hub/components/HubSearchGamesSheet';
+import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
 import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
@@ -42,14 +40,13 @@ type GameWithDetails = {
 };
 
 export function YourGamesTile() {
-  const nav = useNavigate();
-  const { navigateFromHub } = useHub();
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
   const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
   const [isSearchGamesSheetOpen, setIsSearchGamesSheetOpen] = useState(false);
+  const [isYourGamesSheetOpen, setIsYourGamesSheetOpen] = useState(false);
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -94,7 +91,7 @@ export function YourGamesTile() {
 
   const openYourGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    navigateFromHub('/hub/your-games');
+    setIsYourGamesSheetOpen(true);
   };
 
   React.useEffect(() => {
@@ -303,7 +300,7 @@ export function YourGamesTile() {
                   Create a game →
                 </button>
                 <button
-                  onClick={() => navigateFromHub('/explore')}
+                  onClick={openSearchGames}
                   className="text-[14px] font-normal transition-colors"
                   style={{ 
                     background: 'transparent',
@@ -349,6 +346,11 @@ export function YourGamesTile() {
       <HubSearchGamesSheet
         isOpen={isSearchGamesSheetOpen}
         onClose={() => setIsSearchGamesSheetOpen(false)}
+      />
+
+      <HubYourGamesSheet
+        isOpen={isYourGamesSheetOpen}
+        onClose={() => setIsYourGamesSheetOpen(false)}
       />
     </Tile>
   );
