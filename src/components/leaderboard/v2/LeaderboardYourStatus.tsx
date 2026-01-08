@@ -94,34 +94,6 @@ export function LeaderboardYourStatus({
               fallback={initials}
               ringColor={ringColor}
             />
-            {/* XP progress ring overlay (simplified) */}
-            <svg 
-              className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)]"
-              viewBox="0 0 72 72"
-            >
-              <circle
-                cx="36"
-                cy="36"
-                r="34"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="text-muted/20"
-              />
-              <motion.circle
-                cx="36"
-                cy="36"
-                r="34"
-                fill="none"
-                stroke={ringColor}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                initial={{ strokeDasharray: '0 213.6' }}
-                animate={{ strokeDasharray: `${(progressPct / 100) * 213.6} 213.6` }}
-                transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
-                transform="rotate(-90 36 36)"
-              />
-            </svg>
           </div>
 
           {/* Info block */}
