@@ -358,19 +358,20 @@ export function CoursesLeaderboardView() {
           </p>
         </div>
 
-        {/* Sort Tabs - Flat pills with underline active state */}
-        <div className="overflow-x-auto pb-1 px-4">
-          <div className="inline-flex gap-1 min-w-max">
+        {/* Sort Tabs - Underline style matching main page tabs */}
+        <div className="overflow-x-auto px-4">
+          <div className="inline-flex gap-0 min-w-max">
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => handleSortChange(opt.value)}
                 className={cn(
-                  'px-3.5 py-2 text-[13px] font-medium rounded-sq-xs transition-all',
+                  'relative px-3 py-2.5 text-sm font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out',
+                  'after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out',
                   sort === opt.value
-                    ? 'text-foreground bg-muted/60'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                    ? 'text-foreground after:w-full after:opacity-[0.85]'
+                    : 'text-muted-foreground hover:text-foreground after:w-0 after:opacity-0'
                 )}
               >
                 {opt.label}
