@@ -182,7 +182,10 @@ export function HubYourGamesSheet({ isOpen, onClose }: HubYourGamesSheetProps) {
                 <YourGamesSurface
                   bottomPadding={40}
                   onOpenCreate={() => setCreateGameOpen(true)}
-                  onOpenJoinRequests={() => setJoinRequestsOpen(true)}
+                  onOpenJoinRequests={(focusGameId) => {
+                    setFocusedGameId(focusGameId);
+                    setJoinRequestsOpen(true);
+                  }}
                   onOpenSearchGames={() => setSearchGamesOpen(true)}
                   focusId={focusedGameId}
                 />
