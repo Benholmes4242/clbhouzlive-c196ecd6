@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Users } from 'lucide-react';
+import { Users, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CourseRankBadge } from './CourseRankBadge';
+import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
 
 interface CinematicCourseCardProps {
   course: {
@@ -99,7 +100,7 @@ export function CinematicCourseCard({
           <div className="w-full h-full bg-slate-100 flex items-center justify-center">
             <div className="text-center space-y-1.5">
               <div className="w-10 h-10 mx-auto rounded-sq-sm bg-slate-200/60 flex items-center justify-center">
-                <Star className="w-5 h-5 text-slate-400" />
+                <Image className="w-5 h-5 text-slate-400" />
               </div>
               <span className="text-[11px] text-slate-400 font-medium">No image</span>
             </div>
@@ -153,12 +154,13 @@ export function CinematicCourseCard({
           {locationText}
         </p>
 
-        {/* Rating Line */}
+        {/* Rating Line - using CourseCommunityRating with clubhouse logo */}
         <div className="flex items-center gap-1.5 pt-0.5">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="text-[13px] font-medium text-foreground">
-            {course.avg_rating ? course.avg_rating.toFixed(1) : '—'}
-          </span>
+          {course.avg_rating ? (
+            <CourseCommunityRating rating={course.avg_rating} size="sm" />
+          ) : (
+            <span className="text-[13px] font-medium text-muted-foreground">—</span>
+          )}
           {course.ratings_count && course.ratings_count > 0 && (
             <span className="text-xs text-muted-foreground">
               • Rated by {course.ratings_count} member{course.ratings_count === 1 ? '' : 's'}
