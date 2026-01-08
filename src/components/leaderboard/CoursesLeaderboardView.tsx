@@ -90,7 +90,7 @@ export function CoursesLeaderboardView() {
           )
         `)
         .in('user_id', followingIds)
-        .or('golf_courses.global_rank.not.is.null,golf_courses.regional_rank.not.is.null,golf_courses.usa_rank.not.is.null')
+        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null', { foreignTable: 'golf_courses' })
         .order('created_at', { ascending: false })
         .limit(10);
 
