@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
-import { useHub } from '@/features/hub/useHub';
+
 import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequests';
 import { supabase } from '@/integrations/supabase/client';
 import { format, isToday, isTomorrow } from 'date-fns';
@@ -101,10 +101,10 @@ function GameCard({ game, isPrimary = false, onClick }: GameCardProps) {
 }
 
 export function HubGamesPreview() {
-  const { navigateFromHub } = useHub();
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
   const [gamesHubInitialTab, setGamesHubInitialTab] = useState<'discover' | 'yours'>('yours');
+  const [focusGameId, setFocusGameId] = useState<string | undefined>();
   
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -146,7 +146,9 @@ export function HubGamesPreview() {
   const totalPendingRequests = useTotalPendingHostRequests(allGames, currentUserId);
 
   const openGame = (gameId: string) => {
-    navigateFromHub(`/hub/games/${gameId}`);
+    setFocusGameId(gameId);
+    setGamesHubInitialTab('yours');
+    setGamesHubOpen(true);
   };
 
   const openCreateGame = (e?: React.MouseEvent) => {
@@ -284,8 +286,12 @@ export function HubGamesPreview() {
       
       <HubGamesHubSheet 
         isOpen={gamesHubOpen} 
-        onClose={() => setGamesHubOpen(false)}
+        onClose={() => {
+          setGamesHubOpen(false);
+          setFocusGameId(undefined);
+        }}
         initialTab={gamesHubInitialTab}
+        initialFocusGameId={focusGameId}
       />
     </Tile>
   );
