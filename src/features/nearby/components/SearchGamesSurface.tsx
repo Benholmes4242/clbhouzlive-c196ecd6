@@ -4,18 +4,18 @@
  * Can be rendered in a sheet or standalone page
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
-import { Search, MapPin, Calendar, ArrowUpDown, Plus } from 'lucide-react';
+import { Search, MapPin, Calendar, ArrowUpDown, Plus, Users } from 'lucide-react';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
 import { useGameFilters } from '../hooks/useGameFilters';
 import { useGamesQuery } from '../hooks/useGamesQuery';
 import { useJoinGame } from '../hooks/useJoinGame';
 import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './FilterSheets';
-import { PeopleSearchInput } from './PeopleSearchInput';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import '@/features/games/components/GameRow.css';
 import '@/features/nearby/components/your-games/YourGames.css';
 import '../GamesTab.css';
@@ -40,7 +40,7 @@ interface SearchGamesSurfaceProps {
 function CreateGameRow({ onOpen }: { onOpen: () => void }) {
   return (
     <button 
-      className="createGameRow" 
+      className="createGameRowSticky" 
       onClick={() => { haptic('light'); onOpen(); }}
     >
       <div className="flex items-center gap-2">
@@ -63,30 +63,35 @@ function FindAGame({
   onSelectClub,
   searchMode,
   onSearchModeChange,
-  selectedUser,
-  onSelectUser
 }: { 
   selectedClub: GolfCourse | null; 
   onSelectClub: (club: GolfCourse | null) => void;
   searchMode: 'clubs' | 'people';
   onSearchModeChange: (mode: 'clubs' | 'people') => void;
-  selectedUser: { id: string; display_name: string } | null;
-  onSelectUser: (user: { id: string; display_name: string } | null) => void;
 }) {
   const [query, setQuery] = useState('');
   const [isOpen, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { courses, isLoading } = useCourseSearch(query);
 
-  const handleSelect = (club: GolfCourse) => {
+  const handleSelect = useCallback((club: GolfCourse) => {
     haptic('light');
     onSelectClub(club);
     setQuery('');
     setOpen(false);
-  };
+  }, [onSelectClub]);
 
   const handleClear = () => {
     haptic('light');
     onSelectClub(null);
+  };
+
+  const handlePeopleClick = () => {
+    haptic('light');
+    toast('Player search coming soon', {
+      description: 'For now, search by club.',
+      duration: 2000,
+    });
   };
 
   return (
@@ -106,79 +111,85 @@ function FindAGame({
           Clubs
         </button>
         <button
-          className={cn(
-            "modeChipHub",
-            searchMode === 'people' && "modeChipHub--active"
-          )}
-          onClick={() => {
-            haptic('light');
-            onSearchModeChange('people');
-          }}
+          className="modeChipHub modeChipHub--disabled"
+          onClick={handlePeopleClick}
         >
           People
+          <span className="comingSoonPill">Soon</span>
         </button>
       </div>
 
-      {searchMode === 'clubs' ? (
-        selectedClub ? (
-          <div className="selectedClubRowHub">
-            <MapPin className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-            <span className="flex-1 font-medium text-sm" style={{ color: 'var(--hub-text)' }}>
-              {selectedClub.name}
-            </span>
-            <TapButton className="changeBtn" onClick={handleClear}>
-              Clear
-            </TapButton>
-          </div>
-        ) : (
-          <>
-            <label className="sectionLabel">Find a game</label>
-            <div 
-              className="searchBoxHub" 
-              role="search"
-            >
-              <Search size={16} style={{ color: 'var(--hub-text-dim)', flexShrink: 0 }} />
-              <input
-                placeholder="Search golf club..."
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onFocus={() => setOpen(true)}
-                onBlur={() => setTimeout(() => setOpen(false), 200)}
-                aria-label="Search golf clubs"
-                className="searchInputHub"
-              />
-            </div>
-            {isOpen && query.length >= 2 && (
-              <div className="resultsSheetHub">
-                {isLoading ? (
-                  <div className="hint">Searching...</div>
-                ) : courses.length === 0 ? (
-                  <div className="hint">No clubs found</div>
-                ) : (
-                  courses.map(c => (
-                    <button key={c.id} className="resultRowHub" onClick={() => handleSelect(c)}>
-                      <MapPin size={16} style={{ color: 'var(--hub-text-dim)', flexShrink: 0 }} />
-                      <div className="rMid">
-                        <div className="rTitle">{c.name}</div>
-                        <div className="rSub">{c.region || c.country}</div>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-            {isOpen && query.length > 0 && query.length < 2 && (
-              <div className="resultsSheetHub">
-                <div className="hint">Type at least 2 characters</div>
-              </div>
-            )}
-          </>
-        )
+      {selectedClub ? (
+        <div className="selectedClubRowHub">
+          <MapPin className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+          <span className="flex-1 font-medium text-sm" style={{ color: 'var(--hub-text)' }}>
+            {selectedClub.name}
+          </span>
+          <TapButton className="changeBtn" onClick={handleClear}>
+            Clear
+          </TapButton>
+        </div>
       ) : (
-        <PeopleSearchInput
-          selectedUser={selectedUser}
-          onSelect={onSelectUser}
-        />
+        <>
+          <label className="sectionLabel">Find a game</label>
+          <div 
+            className="searchBoxHub" 
+            role="search"
+          >
+            <Search size={16} style={{ color: 'var(--hub-text-dim)', flexShrink: 0 }} />
+            <input
+              placeholder="Search golf club..."
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onFocus={() => setOpen(true)}
+              aria-label="Search golf clubs"
+              className="searchInputHub"
+            />
+          </div>
+          {isOpen && query.length >= 2 && (
+            <div 
+              ref={dropdownRef}
+              className="resultsSheetHub"
+            >
+              {isLoading ? (
+                <div className="hint">Searching...</div>
+              ) : courses.length === 0 ? (
+                <div className="hint">No clubs found</div>
+              ) : (
+                courses.map(c => (
+                  <button 
+                    key={c.id} 
+                    className="resultRowHub" 
+                    onPointerDown={(e) => {
+                      e.preventDefault(); // Prevent blur before click
+                      handleSelect(c);
+                    }}
+                  >
+                    <MapPin size={16} style={{ color: 'var(--hub-text-dim)', flexShrink: 0 }} />
+                    <div className="rMid">
+                      <div className="rTitle">{c.name}</div>
+                      <div className="rSub">{c.region || c.country}</div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+          {isOpen && query.length > 0 && query.length < 2 && (
+            <div className="resultsSheetHub">
+              <div className="hint">Type at least 2 characters</div>
+            </div>
+          )}
+          
+          {/* Click outside to close */}
+          {isOpen && (
+            <div 
+              className="fixed inset-0 z-[1]" 
+              onClick={() => setOpen(false)}
+              style={{ background: 'transparent' }}
+            />
+          )}
+        </>
       )}
     </div>
   );
@@ -186,7 +197,7 @@ function FindAGame({
 
 function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   const filters = useGameFilters();
-  const showDistance = !selectedClub;
+  const isDistanceDisabled = !!selectedClub;
   
   const getWhenLabel = () => {
     if (filters.when === null) return 'When';
@@ -194,6 +205,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   };
   
   const getDistanceLabel = () => {
+    if (selectedClub) return 'At club';
     if (filters.distanceKm === null) return 'Distance';
     return `${filters.distanceKm} km`;
   };
@@ -217,15 +229,18 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         <span>{getWhenLabel()}</span>
       </button>
       
-      {showDistance && (
-        <button 
-          className={cn("filterChipHub", filters.distanceKm !== null && "filterChipHub--active")}
-          onClick={() => openDistanceSheet(filters)}
-        >
-          {filters.distanceKm === null && <MapPin size={14} />}
-          <span>{getDistanceLabel()}</span>
-        </button>
-      )}
+      <button 
+        className={cn(
+          "filterChipHub", 
+          filters.distanceKm !== null && !isDistanceDisabled && "filterChipHub--active",
+          isDistanceDisabled && "filterChipHub--disabled"
+        )}
+        onClick={() => !isDistanceDisabled && openDistanceSheet(filters)}
+        disabled={isDistanceDisabled}
+      >
+        {!isDistanceDisabled && filters.distanceKm === null && <MapPin size={14} />}
+        <span>{getDistanceLabel()}</span>
+      </button>
       
       <button 
         className={cn("filterChipHub", filters.sort !== null && "filterChipHub--active")}
@@ -319,12 +334,11 @@ function GamesList({
 export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGamesSurfaceProps) {
   const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(null);
   const [searchMode, setSearchMode] = useState<'clubs' | 'people'>('clubs');
-  const [selectedUser, setSelectedUser] = useState<{ id: string; display_name: string } | null>(null);
   const { data: games, isLoading } = useGamesQuery(selectedClub?.id);
 
   return (
     <div className="searchGamesSurface" style={{ paddingBottom: `${bottomPadding}px` }}>
-      {/* Create Game CTA Row */}
+      {/* Create Game CTA Row - Sticky */}
       {onOpenCreate && <CreateGameRow onOpen={onOpenCreate} />}
       
       <FindAGame 
@@ -332,14 +346,15 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
         onSelectClub={setSelectedClub}
         searchMode={searchMode}
         onSearchModeChange={setSearchMode}
-        selectedUser={selectedUser}
-        onSelectUser={setSelectedUser}
       />
       
       <FiltersRow selectedClub={selectedClub} />
       
       <div className="scopedHeadingHub">
-        {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
+        <span>{selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}</span>
+        {selectedClub?.region && (
+          <span className="scopedHeadingSub">{selectedClub.region}</span>
+        )}
       </div>
       
       <GamesList 
