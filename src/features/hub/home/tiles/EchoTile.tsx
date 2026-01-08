@@ -1,32 +1,23 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Tile } from '../components/Tile';
-import { useHub } from '@/features/hub/useHub';
 import { Send } from 'lucide-react';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
 import '../echo-tip.css';
 
 export function EchoTile() {
-  const [input, setInput] = React.useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { navigateFromHub } = useHub();
+  const [initialMessage, setInitialMessage] = useState('');
 
   const tips = [
     'When is the next major?',
-    'Who won the Ryder Cup in 2025?',
-    'Plan me a 5-night golf trip to the USA.',
-    'Plan me a 3-day island golf tour.',
-    "What's the best driver on the market right now?",
-    'What wedges should I use?',
-    'What bounce should my wedges have?',
+    'Plan me a golf trip to the USA.',
+    "What's the best driver right now?",
     'Give me chipping tips.',
     'How do I fix my slice?',
-    'How do I hit further?',
     "What's a good putting drill?",
-    'Recommend a golf podcast.',
-    'Show me the top 10 courses in Scotland.',
+    'Show me top courses in Scotland.',
     'How do I play better in the wind?',
-    'Create a weekly practice plan for me.',
   ];
 
   const [tipIdx, setTipIdx] = React.useState(0);
@@ -47,27 +38,19 @@ export function EchoTile() {
     return () => clearTimeout(id);
   }, [paused, tips.length, tipIdx, isFirstTip]);
 
-  const openSheet = () => setIsSheetOpen(true);
-  const closeSheet = () => setIsSheetOpen(false);
-
-  const sendTip = (t: string) => {
-    // Open sheet and it will navigate with the message
-    closeSheet();
-    navigateFromHub(`/hub/echo?msg=${encodeURIComponent(t)}`);
+  const openSheet = (msg = '') => {
+    setInitialMessage(msg);
+    setIsSheetOpen(true);
   };
-
-  const handleSend = () => {
-    const text = input.trim();
-    if (text) {
-      navigateFromHub(`/hub/echo?msg=${encodeURIComponent(text)}`);
-      setInput('');
-    }
+  const closeSheet = () => {
+    setIsSheetOpen(false);
+    setInitialMessage('');
   };
 
   return (
     <>
       <div 
-        onClick={openSheet}
+        onClick={() => openSheet()}
         className="cursor-pointer"
         role="button"
         tabIndex={0}
@@ -117,39 +100,32 @@ export function EchoTile() {
                 </div>
               </div>
 
-              {/* Sample question */}
+              {/* Sample question - tap opens sheet with that message */}
               <p 
-                className="mt-2 text-[12px] leading-snug line-clamp-2 text-center"
+                className="mt-2 text-[12px] leading-snug line-clamp-2 text-center cursor-pointer"
                 style={{ color: 'var(--hub-text-muted)' }}
-                onClick={(e) => { e.stopPropagation(); sendTip(tips[tipIdx]); }}
+                onClick={(e) => { e.stopPropagation(); openSheet(tips[tipIdx]); }}
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') sendTip(tips[tipIdx]); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') openSheet(tips[tipIdx]); }}
               >
                 "{tips[tipIdx]}"
               </p>
             </div>
 
-            {/* Bottom link */}
-            <button
-              type="button"
-              onClick={(e) => { 
-                e.stopPropagation(); 
-                navigateFromHub('/hub/echo/history'); 
-              }}
-              className="mt-3 self-end text-[15px] font-medium inline-flex items-center gap-1"
-              style={{ color: 'var(--hub-text-bright)' }}
-            >
-              View Chats
-              <span aria-hidden>→</span>
-            </button>
+            {/* Bottom - removed history link for V1 */}
+            <div className="mt-3" />
           </div>
         </Tile>
       </div>
       
-      <HubEchoSheet isOpen={isSheetOpen} onClose={closeSheet} />
+      <HubEchoSheet 
+        isOpen={isSheetOpen} 
+        onClose={closeSheet} 
+        initialMessage={initialMessage}
+      />
     </>
   );
 }
