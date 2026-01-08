@@ -5,17 +5,21 @@
  * - Cinematic hero header
  * - Your Status card with rank/tier/progress
  * - Arena tabs (Global Elite, Regional Wars, Friends, Climbers, Nearby)
+ * - Players From filter (country-based filtering)
  * - Your Rivals section
  * - Premium player cards with badges
  * - Region selector for Regional Wars
  * - Rival preview sheet
+ * - Polish animations & transitions
  */
 
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useTop100Leaderboard, LeaderboardScope } from '@/hooks/useTop100Leaderboard';
+import { useNearbyPlayers } from '@/hooks/useNearbyPlayers';
 import { FLAGS } from '@/config/flags';
 import { getMockLeaderboardV2Entries, mergeWithMockEntries } from '@/mocks/leaderboardV2MockGenerator';
 
@@ -36,6 +40,8 @@ import {
   type RivalPlayer,
 } from './v2';
 
+import { PlayersFromFilter, type PlayersFromValue, getCountryName, ALL_COUNTRIES } from './v2/PlayersFromFilter';
+import { NearbyEmptyState } from './v2/NearbyEmptyState';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
 
 // Map arena mode to scope
@@ -56,6 +62,15 @@ const REGION_TO_SCOPE: Record<LeaderboardRegion, LeaderboardScope> = {
   'asia-pacific': 'worldwide', // Fallback
 };
 
+// Arena descriptions for helper text
+const ARENA_DESCRIPTIONS: Record<ArenaMode, string> = {
+  global: 'All-time Top 100 explorers worldwide',
+  regional: 'Compete within your chosen Top 100 region list',
+  friends: 'Your private competition',
+  climbers: 'Biggest movers this month',
+  nearby: 'Within 50 miles of your home club',
+};
+
 export function PlayersLeaderboardViewV2() {
   const navigate = useNavigate();
   const listRef = useRef<HTMLDivElement>(null);
@@ -63,9 +78,11 @@ export function PlayersLeaderboardViewV2() {
   // UI state
   const [arenaMode, setArenaMode] = useState<ArenaMode>('global');
   const [region, setRegion] = useState<LeaderboardRegion>('worldwide');
+  const [playersFrom, setPlayersFrom] = useState<PlayersFromValue>('worldwide');
   const [selectedRival, setSelectedRival] = useState<LeaderboardPlayerEntry | null>(null);
   const [rivalSheetOpen, setRivalSheetOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isFilterTransitioning, setIsFilterTransitioning] = useState(false);
 
   // Get current user ID
   useEffect(() => {
@@ -82,17 +99,31 @@ export function PlayersLeaderboardViewV2() {
     return ARENA_TO_SCOPE[arenaMode];
   }, [arenaMode, region]);
 
-  // Get current user profile
+  // Get current user profile with home club info
   const { data: currentUserProfile } = useQuery({
-    queryKey: ['current-user-profile', currentUserId],
+    queryKey: ['current-user-profile-extended', currentUserId],
     enabled: !!currentUserId,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: profile } = await supabase
         .from('user_profiles')
-        .select('id, display_name, profile_photo_url, home_club')
+        .select('id, display_name, profile_photo_url, home_club, home_club_id')
         .eq('id', currentUserId!)
         .single();
-      return data;
+      
+      if (!profile) return null;
+
+      // Get home club country if available
+      let homeClubCountry: string | null = null;
+      if (profile.home_club_id) {
+        const { data: club } = await supabase
+          .from('golf_clubs')
+          .select('country')
+          .eq('id', profile.home_club_id)
+          .single();
+        homeClubCountry = club?.country || null;
+      }
+
+      return { ...profile, homeClubCountry };
     },
   });
 
@@ -102,6 +133,12 @@ export function PlayersLeaderboardViewV2() {
     timeRange: 'all_time',
     pageSize: 500,
   });
+
+  // Nearby players hook
+  const nearbyData = useNearbyPlayers(currentUserId);
+
+  // Friends are identified by is_friend flag from the RPC
+  // No separate query needed - the RPC already marks friends
 
   // All entries from paginated data, optionally merged with mocks
   const allEntries = useMemo(() => {
@@ -116,29 +153,59 @@ export function PlayersLeaderboardViewV2() {
     return rawEntries;
   }, [data]);
 
+  // Apply "Players From" filter
+  const filteredByCountry = useMemo(() => {
+    // Don't apply to Friends League
+    if (arenaMode === 'friends') return allEntries;
+
+    if (playersFrom === 'worldwide') return allEntries;
+
+    const targetCountry = playersFrom === 'my-country' 
+      ? currentUserProfile?.homeClubCountry 
+      : playersFrom;
+
+    if (!targetCountry) return allEntries;
+
+    // Filter by country (from the country field or derive from home_club)
+    return allEntries.filter(e => {
+      // Check country field if available
+      if (e.country) {
+        return e.country === targetCountry || 
+               e.country.toLowerCase() === targetCountry.toLowerCase();
+      }
+      // Fallback: match country name in home_club string
+      const countryName = getCountryName(targetCountry);
+      return e.home_club?.toLowerCase().includes(countryName.toLowerCase());
+    });
+  }, [allEntries, playersFrom, arenaMode, currentUserProfile?.homeClubCountry]);
+
   // Current user's entry
   const currentUserEntry = data?.pages[0]?.current_user_entry;
 
-  // Find user's index in the list
+  // Find user's index in the filtered list
   const myIndex = useMemo(() => {
     if (!currentUserEntry) return -1;
-    return allEntries.findIndex(e => e.user_id === currentUserEntry.user_id);
-  }, [allEntries, currentUserEntry]);
+    return filteredByCountry.findIndex(e => e.user_id === currentUserEntry.user_id);
+  }, [filteredByCountry, currentUserEntry]);
 
   // Build user status model
   const userStatus: LeaderboardUserStatus | null = useMemo(() => {
     if (!currentUserEntry) return null;
+    
+    // Compute rank within filtered list
+    const filteredRank = myIndex >= 0 ? myIndex + 1 : currentUserEntry.rank;
+    
     return {
       user_id: currentUserEntry.user_id,
       display_name: currentUserProfile?.display_name || currentUserEntry.display_name,
       avatar_url: currentUserProfile?.profile_photo_url || currentUserEntry.avatar_url,
       total_top100_played: currentUserEntry.total_top100_played,
-      rank: currentUserEntry.rank,
+      rank: playersFrom !== 'worldwide' ? filteredRank : currentUserEntry.rank,
       activeRegion: arenaMode === 'regional' ? region.toUpperCase() : undefined,
     };
-  }, [currentUserEntry, currentUserProfile, arenaMode, region]);
+  }, [currentUserEntry, currentUserProfile, arenaMode, region, myIndex, playersFrom]);
 
-  // Compute rivals (above/current/below)
+  // Compute rivals (above/current/below) from filtered list
   const rivals = useMemo(() => {
     if (myIndex < 0 || !currentUserEntry) {
       return { above: null, current: null, below: null };
@@ -149,19 +216,19 @@ export function PlayersLeaderboardViewV2() {
       display_name: currentUserProfile?.display_name || currentUserEntry.display_name,
       avatar_url: currentUserProfile?.profile_photo_url || currentUserEntry.avatar_url,
       total_top100_played: currentUserEntry.total_top100_played,
-      rank: currentUserEntry.rank,
+      rank: myIndex + 1,
       home_club: currentUserProfile?.home_club || currentUserEntry.home_club,
     };
 
-    const aboveEntry = myIndex > 0 ? allEntries[myIndex - 1] : null;
-    const belowEntry = myIndex < allEntries.length - 1 ? allEntries[myIndex + 1] : null;
+    const aboveEntry = myIndex > 0 ? filteredByCountry[myIndex - 1] : null;
+    const belowEntry = myIndex < filteredByCountry.length - 1 ? filteredByCountry[myIndex + 1] : null;
 
     const above: RivalPlayer | null = aboveEntry ? {
       user_id: aboveEntry.user_id,
       display_name: aboveEntry.display_name,
       avatar_url: aboveEntry.avatar_url,
       total_top100_played: aboveEntry.total_top100_played,
-      rank: aboveEntry.rank,
+      rank: myIndex,
       home_club: aboveEntry.home_club,
     } : null;
 
@@ -170,81 +237,84 @@ export function PlayersLeaderboardViewV2() {
       display_name: belowEntry.display_name,
       avatar_url: belowEntry.avatar_url,
       total_top100_played: belowEntry.total_top100_played,
-      rank: belowEntry.rank,
+      rank: myIndex + 2,
       home_club: belowEntry.home_club,
     } : null;
 
     return { above, current, below };
-  }, [myIndex, allEntries, currentUserEntry, currentUserProfile]);
+  }, [myIndex, filteredByCountry, currentUserEntry, currentUserProfile]);
 
   // Filter entries based on arena mode
   const displayedEntries = useMemo((): LeaderboardPlayerEntry[] => {
     switch (arenaMode) {
       case 'global':
       case 'regional':
-        return allEntries.slice(0, 100).map(e => ({
+        return filteredByCountry.slice(0, 100).map((e, i) => ({
           user_id: e.user_id,
           display_name: e.display_name,
           avatar_url: e.avatar_url,
           home_club: e.home_club,
           total_top100_played: e.total_top100_played,
-          rank: e.rank,
+          rank: i + 1, // Re-rank within filtered list
         }));
 
-      case 'friends':
-        return allEntries
-          .filter(e => e.is_friend && e.total_top100_played > 0)
-          .map(e => ({
+      case 'friends': {
+        // Use is_friend flag from RPC (marks mutual follows)
+        const friendEntries = allEntries
+          .filter(e => 
+            (e.is_friend || e.user_id === currentUserId) && 
+            e.total_top100_played > 0
+          )
+          .sort((a, b) => b.total_top100_played - a.total_top100_played)
+          .map((e, i) => ({
             user_id: e.user_id,
             display_name: e.display_name,
             avatar_url: e.avatar_url,
             home_club: e.home_club,
             total_top100_played: e.total_top100_played,
-            rank: e.rank,
+            rank: i + 1,
           }));
+        return friendEntries;
+      }
 
       case 'climbers':
         // Sort by delta_rank (if available) or just show top movers
-        return [...allEntries]
+        return [...filteredByCountry]
           .filter((e: any) => e.delta_rank && e.delta_rank > 0)
           .sort((a: any, b: any) => (b.delta_rank || 0) - (a.delta_rank || 0))
           .slice(0, 50)
-          .map((e: any) => ({
+          .map((e: any, i) => ({
             user_id: e.user_id,
             display_name: e.display_name,
             avatar_url: e.avatar_url,
             home_club: e.home_club,
             total_top100_played: e.total_top100_played,
-            rank: e.rank,
+            rank: i + 1,
             delta_rank: e.delta_rank,
           }));
 
       case 'nearby':
-        // TODO: Implement nearby based on location
-        // For now, show around-you style
-        if (myIndex < 0) return [];
-        const start = Math.max(0, myIndex - 10);
-        const end = Math.min(allEntries.length, myIndex + 11);
-        return allEntries.slice(start, end).map(e => ({
-          user_id: e.user_id,
-          display_name: e.display_name,
-          avatar_url: e.avatar_url,
-          home_club: e.home_club,
-          total_top100_played: e.total_top100_played,
-          rank: e.rank,
+        // Use nearby players hook data
+        return nearbyData.players.map((p, i) => ({
+          user_id: p.user_id,
+          display_name: p.display_name,
+          avatar_url: p.avatar_url,
+          home_club: p.home_club,
+          total_top100_played: p.total_top100_played,
+          rank: i + 1,
         }));
 
       default:
-        return allEntries.slice(0, 100).map(e => ({
+        return filteredByCountry.slice(0, 100).map((e, i) => ({
           user_id: e.user_id,
           display_name: e.display_name,
           avatar_url: e.avatar_url,
           home_club: e.home_club,
           total_top100_played: e.total_top100_played,
-          rank: e.rank,
+          rank: i + 1,
         }));
     }
-  }, [allEntries, arenaMode, myIndex]);
+  }, [filteredByCountry, allEntries, arenaMode, myIndex, nearbyData.players, currentUserId]);
 
   // Check if user is new (no Top 100s played)
   const isNewUser = !currentUserEntry || currentUserEntry.total_top100_played === 0;
@@ -252,9 +322,13 @@ export function PlayersLeaderboardViewV2() {
   // Disabled arena modes for new users
   const disabledModes: ArenaMode[] = isNewUser ? ['nearby'] : [];
 
+  // Show Players From filter for these modes
+  const showPlayersFromFilter = arenaMode === 'global' || arenaMode === 'regional' || arenaMode === 'climbers';
+
   // Handle rival click
   const handleViewRival = useCallback((userId: string) => {
-    const player = allEntries.find(e => e.user_id === userId);
+    const player = allEntries.find(e => e.user_id === userId) || 
+                   nearbyData.players.find(p => p.user_id === userId);
     if (player) {
       setSelectedRival({
         user_id: player.user_id,
@@ -266,7 +340,7 @@ export function PlayersLeaderboardViewV2() {
       });
       setRivalSheetOpen(true);
     }
-  }, [allEntries]);
+  }, [allEntries, nearbyData.players]);
 
   // Scroll to user in list
   const scrollToUser = useCallback(() => {
@@ -284,6 +358,18 @@ export function PlayersLeaderboardViewV2() {
     if (mode !== 'regional') {
       setRegion('worldwide');
     }
+    // Reset playersFrom for Friends League (not applicable)
+    if (mode === 'friends') {
+      setPlayersFrom('worldwide');
+    }
+  };
+
+  // Handle playersFrom filter change with transition
+  const handlePlayersFromChange = (value: PlayersFromValue) => {
+    setIsFilterTransitioning(true);
+    setPlayersFrom(value);
+    // Short delay for visual feedback
+    setTimeout(() => setIsFilterTransitioning(false), 300);
   };
 
   // Loading state
@@ -308,29 +394,94 @@ export function PlayersLeaderboardViewV2() {
     );
   }
 
+  // Nearby empty states
+  const renderNearbyContent = () => {
+    if (nearbyData.fallbackMode === 'none') {
+      return <NearbyEmptyState variant="no-home-club" />;
+    }
+    if (nearbyData.players.length === 0) {
+      return <NearbyEmptyState variant="no-nearby-players" />;
+    }
+    return null;
+  };
+
+  // Empty state for filtered results
+  const renderEmptyState = () => {
+    if (arenaMode === 'nearby') {
+      return renderNearbyContent();
+    }
+    if (arenaMode === 'friends') {
+      return <LeaderboardEmptyState type="friends-no-friends" />;
+    }
+    if (arenaMode === 'climbers') {
+      return <LeaderboardEmptyState type="rising-no-data" />;
+    }
+    if (playersFrom !== 'worldwide' && displayedEntries.length === 0) {
+      const countryName = playersFrom === 'my-country' 
+        ? getCountryName(currentUserProfile?.homeClubCountry || '')
+        : getCountryName(playersFrom);
+      return (
+        <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-muted/60 flex items-center justify-center mb-4">
+            <span className="text-2xl">🌍</span>
+          </div>
+          <h3 className="text-sm font-semibold text-foreground mb-1.5">
+            No players from {countryName} yet
+          </h3>
+          <p className="text-sm text-muted-foreground max-w-[240px] mb-4">
+            Be the first to set the standard for your country!
+          </p>
+          <button
+            onClick={() => setPlayersFrom('worldwide')}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            View worldwide leaderboard
+          </button>
+        </div>
+      );
+    }
+    return (
+      <LeaderboardEmptyState 
+        type="no-matches" 
+        onResetFilters={() => setArenaMode('global')} 
+      />
+    );
+  };
+
   return (
     <div className="w-full" ref={listRef}>
       {/* A) Cinematic Hero */}
       <LeaderboardHero />
 
-      {/* B) Your Status Card */}
+      {/* B) Your Status Card with animated progress */}
       {userStatus && (
-        <LeaderboardYourStatus
-          user={userStatus}
-          onViewRivals={scrollToUser}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <LeaderboardYourStatus
+            user={userStatus}
+            onViewRivals={scrollToUser}
+          />
+        </motion.div>
       )}
 
       {/* New user encouragement */}
       {isNewUser && (
-        <div className="mx-4 mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="mx-4 mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3"
+        >
           <p className="text-sm text-amber-600 dark:text-amber-400">
             Log your first Top 100 course to join the race and track your progress.
           </p>
-        </div>
+        </motion.div>
       )}
 
-      {/* C) Arena Tabs */}
+      {/* C) Arena Tabs with animation */}
       <div className="px-4 pt-5 pb-2">
         <LeaderboardArenaTabs
           activeMode={arenaMode}
@@ -339,19 +490,66 @@ export function PlayersLeaderboardViewV2() {
         />
       </div>
 
+      {/* Players From Filter (for applicable modes) */}
+      <AnimatePresence mode="wait">
+        {showPlayersFromFilter && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="px-4 pb-2"
+          >
+            <PlayersFromFilter
+              value={playersFrom}
+              onChange={handlePlayersFromChange}
+              userCountry={currentUserProfile?.homeClubCountry}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Region Selector (for Regional Wars) */}
-      {arenaMode === 'regional' && (
-        <div className="px-4 pb-3">
-          <LeaderboardRegionSelector
-            value={region}
-            onChange={setRegion}
-          />
-        </div>
+      <AnimatePresence mode="wait">
+        {arenaMode === 'regional' && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="px-4 pb-3"
+          >
+            <LeaderboardRegionSelector
+              value={region}
+              onChange={setRegion}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Nearby helper text */}
+      {arenaMode === 'nearby' && nearbyData.userLocation && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="px-4 pb-2"
+        >
+          <p className="text-xs text-muted-foreground">
+            {nearbyData.fallbackMode === 'nearby' 
+              ? `Players within ${nearbyData.radiusUsed} miles of ${nearbyData.userLocation.clubName}`
+              : `Players in ${nearbyData.userLocation.country}`
+            }
+          </p>
+        </motion.div>
       )}
 
       {/* D) Your Rivals Section (only when user has rank) */}
       {rivals.current && !isNewUser && (arenaMode === 'global' || arenaMode === 'regional') && (
-        <>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
           <LeaderboardRivalsSection
             playerAbove={rivals.above}
             currentUser={rivals.current}
@@ -360,7 +558,7 @@ export function PlayersLeaderboardViewV2() {
             onViewRival={handleViewRival}
           />
           <div className="h-px bg-border/30 mx-4 my-4" />
-        </>
+        </motion.div>
       )}
 
       {/* Season/Reset Callout */}
@@ -370,39 +568,64 @@ export function PlayersLeaderboardViewV2() {
         </p>
       </div>
 
-      {/* E) Leaderboard List */}
+      {/* E) Leaderboard List with staggered animation */}
       <div className="w-full">
-        {displayedEntries.length === 0 ? (
-          <div className="py-6">
-            {arenaMode === 'friends' ? (
-              <LeaderboardEmptyState type="friends-no-friends" />
-            ) : arenaMode === 'climbers' ? (
-              <LeaderboardEmptyState type="rising-no-data" />
-            ) : (
-              <LeaderboardEmptyState 
-                type="no-matches" 
-                onResetFilters={() => setArenaMode('global')} 
-              />
-            )}
-          </div>
-        ) : (
-          <div className="divide-y divide-border/30">
-            {displayedEntries.map((player) => {
-              const isMe = currentUserEntry?.user_id === player.user_id;
-              
-              return (
-                <div key={player.user_id} data-user-id={player.user_id}>
-                  <LeaderboardPlayerCard
-                    player={player}
-                    isCurrentUser={isMe}
-                    showTrend={arenaMode === 'climbers'}
-                    onClick={() => handleViewRival(player.user_id)}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {isFilterTransitioning ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <LeaderboardListSkeleton count={5} />
+            </motion.div>
+          ) : displayedEntries.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="py-6"
+            >
+              {renderEmptyState()}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="divide-y divide-border/30"
+            >
+              {displayedEntries.map((player, index) => {
+                const isMe = currentUserEntry?.user_id === player.user_id;
+                
+                return (
+                  <motion.div 
+                    key={player.user_id} 
+                    data-user-id={player.user_id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: Math.min(index * 0.03, 0.5) // Cap delay at 0.5s
+                    }}
+                  >
+                    <LeaderboardPlayerCard
+                      player={player}
+                      isCurrentUser={isMe}
+                      showTrend={arenaMode === 'climbers'}
+                      onClick={() => handleViewRival(player.user_id)}
+                    />
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Rival Preview Sheet */}
