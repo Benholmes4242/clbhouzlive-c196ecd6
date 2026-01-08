@@ -32,9 +32,11 @@ export function HubGamesHubSheet({
 }: HubGamesHubSheetProps) {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [joinRequestsOpen, setJoinRequestsOpen] = useState(false);
+  const [joinRequestsFocusGameId, setJoinRequestsFocusGameId] = useState<string | undefined>();
   const [createGameOpen, setCreateGameOpen] = useState(false);
   const [focusedGameId, setFocusedGameId] = useState<string | undefined>();
 
@@ -48,6 +50,7 @@ export function HubGamesHubSheet({
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab);
+      setFocusedGameId(undefined);
     }
   }, [isOpen, initialTab]);
 
@@ -88,16 +91,25 @@ export function HubGamesHubSheet({
     haptic('light');
     setActiveTab(tab);
     setHasScrolled(false);
+    // Scroll content to top when switching tabs
+    contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   };
 
   const handleOpenCreate = () => {
     setCreateGameOpen(true);
   };
 
+  const handleOpenJoinRequests = (focusGameId?: string) => {
+    setJoinRequestsFocusGameId(focusGameId);
+    setJoinRequestsOpen(true);
+  };
+
   const handleViewGame = (gameId: string) => {
     setJoinRequestsOpen(false);
     setFocusedGameId(gameId);
     setActiveTab('yours');
+    // Scroll to top so focus animation is visible
+    contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   };
 
   if (typeof document === 'undefined') return null;
@@ -231,6 +243,7 @@ export function HubGamesHubSheet({
 
             {/* Scrollable content */}
             <div
+              ref={contentRef}
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}
               onScroll={handleScroll}
@@ -245,8 +258,8 @@ export function HubGamesHubSheet({
                   <YourGamesSurface
                     bottomPadding={40}
                     onOpenCreate={handleOpenCreate}
-                    onOpenJoinRequests={() => setJoinRequestsOpen(true)}
-                    onOpenSearchGames={() => setActiveTab('discover')}
+                    onOpenJoinRequests={handleOpenJoinRequests}
+                    onOpenSearchGames={() => handleTabChange('discover')}
                     focusId={focusedGameId}
                   />
                 </div>

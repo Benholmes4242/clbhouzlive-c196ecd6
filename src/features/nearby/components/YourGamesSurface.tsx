@@ -21,7 +21,7 @@ import './your-games/YourGamesSurface.css';
 interface YourGamesSurfaceProps {
   bottomPadding?: number;
   onOpenCreate?: () => void;
-  onOpenJoinRequests?: () => void;
+  onOpenJoinRequests?: (focusGameId?: string) => void;
   onOpenSearchGames?: () => void;
   focusId?: string;
 }
@@ -202,7 +202,7 @@ export function YourGamesSurface({
                   key={req.id}
                   type="button"
                   className="yourGames__pendingItem yourGames__pendingItem--tappable"
-                  onClick={() => onOpenJoinRequests?.()}
+                  onClick={() => onOpenJoinRequests?.(req.game_id)}
                 >
                   <div className="yourGames__pendingMain">
                     <div className="yourGames__pendingTitle">
