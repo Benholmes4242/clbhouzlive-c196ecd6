@@ -18,6 +18,8 @@ interface LongFormVideosPage {
 interface UseInfiniteLongFormVideosOptions {
   section: SectionType;
   followedCreatorIds?: string[];
+  creatorUserId?: string; // Filter to specific creator
+  minDuration?: number; // Minimum duration in seconds (default 240)
   category?: string; // Kept for compatibility, ignored
 }
 
@@ -36,10 +38,15 @@ const formatDuration = (seconds: number): string => {
  * Production infinite scroll hook for long-form videos (≥4 minutes, public visibility)
  */
 export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOptions) {
-  const { section, followedCreatorIds = [] } = options;
+  const { 
+    section, 
+    followedCreatorIds = [],
+    creatorUserId,
+    minDuration = VIDEO_DURATION_THRESHOLD_SECONDS,
+  } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v3', section, followedCreatorIds.join(',')],
+    queryKey: ['videos-infinite-longform-v3', section, followedCreatorIds.join(','), creatorUserId || '', minDuration],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
@@ -87,12 +94,17 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           post_views(count)
         `)
         .eq('post_media.media_type', 'video')
-        .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
+        .gte('post_media.duration_seconds', minDuration)
         .not('post_media.duration_seconds', 'is', null)
         .eq('visibility', 'anyone');
 
+      // Filter by specific creator if provided
+      if (creatorUserId) {
+        baseQuery = baseQuery.eq('user_id', creatorUserId);
+      }
+
       // Section-specific filters
-      if (section === 'following') {
+      if (section === 'following' && !creatorUserId) {
         baseQuery = baseQuery.in('user_id', followedCreatorIds);
       }
 
