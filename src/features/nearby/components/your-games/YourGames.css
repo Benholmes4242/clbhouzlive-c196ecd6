@@ -440,17 +440,43 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Focus highlight for navigated items */
+/* Focus highlight for navigated items - premium pulse */
 .sheet-focus-highlight {
-  background: rgba(59, 130, 246, 0.15) !important;
+  position: relative;
+  background: rgba(110, 146, 119, 0.12) !important;
   animation: focusPulse 1.4s ease-out;
+  border-radius: 12px;
+}
+
+.sheet-focus-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  border: 2px solid rgba(110, 146, 119, 0.3);
+  animation: focusRing 1.4s ease-out forwards;
+  pointer-events: none;
 }
 
 @keyframes focusPulse {
-  0%, 100% {
-    background: rgba(59, 130, 246, 0.15);
+  0% {
+    background: rgba(110, 146, 119, 0.2);
   }
   50% {
-    background: rgba(59, 130, 246, 0.25);
+    background: rgba(110, 146, 119, 0.15);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@keyframes focusRing {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
   }
 }

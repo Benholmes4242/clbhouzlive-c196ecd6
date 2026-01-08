@@ -37,23 +37,24 @@ interface SearchGamesSurfaceProps {
   onOpenCreate?: () => void;
 }
 
-function CreateGameRow({ onOpen }: { onOpen: () => void }) {
+function CreateGameHero({ onOpen }: { onOpen: () => void }) {
   return (
     <button 
-      className="createGameRowSticky" 
+      className="createGameHero" 
       onClick={() => { haptic('light'); onOpen(); }}
     >
-      <div className="flex items-center gap-2">
-        <div 
-          className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: 'var(--hub-primary-bg)' }}
-        >
-          <Plus className="w-4 h-4 text-white" />
+      <div className="createGameHero__content">
+        <div className="createGameHero__icon">
+          <Plus className="w-5 h-5 text-white" />
         </div>
-        <span className="font-semibold text-[15px]" style={{ color: 'var(--hub-text)' }}>
-          Create a game
-        </span>
+        <div className="createGameHero__text">
+          <span className="createGameHero__title">Start a game</span>
+          <span className="createGameHero__subtitle">Find a fourth, set a tee time, invite players</span>
+        </div>
       </div>
+      <svg className="createGameHero__chevron" width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
     </button>
   );
 }
@@ -338,8 +339,8 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
 
   return (
     <div className="searchGamesSurface" style={{ paddingBottom: `${bottomPadding}px` }}>
-      {/* Create Game CTA Row - Sticky */}
-      {onOpenCreate && <CreateGameRow onOpen={onOpenCreate} />}
+      {/* Create Game Hero Card */}
+      {onOpenCreate && <CreateGameHero onOpen={onOpenCreate} />}
       
       <FindAGame 
         selectedClub={selectedClub} 
