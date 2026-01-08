@@ -164,6 +164,7 @@ export function useInsertMilestone() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Always set season_key for time-based milestones (critical for recaps)
       const seasonKey = getCurrentSeasonKey();
       const dedupeKey = buildDedupeKey(
         user.id,
@@ -175,30 +176,27 @@ export function useInsertMilestone() {
         percentile
       );
 
-      const { data, error } = await supabase
-        .from('leaderboard_milestones')
-        .upsert({
-          user_id: user.id,
-          milestone_type: milestoneType,
-          rank_scope: rankScope,
-          time_range: timeRange,
-          rank_value: rankValue,
-          rank_delta: rankDelta ?? null,
-          rivals_overtaken: rivalsOvertaken ?? null,
-          percentile: percentile ?? null,
-          season_key: seasonKey,
-          dedupe_key: dedupeKey,
-        }, {
-          onConflict: 'dedupe_key',
-          ignoreDuplicates: true,
-        })
-        .select()
-        .single();
+      // Use RPC for secure insertion (bypasses disabled client INSERT policy)
+      const milestonePayload = [{
+        milestone_type: milestoneType,
+        rank_scope: rankScope,
+        time_range: timeRange,
+        rank_value: rankValue,
+        rank_delta: rankDelta ?? null,
+        rivals_overtaken: rivalsOvertaken ?? null,
+        percentile: percentile ?? null,
+        season_key: seasonKey,
+        dedupe_key: dedupeKey,
+      }];
 
-      if (error && error.code !== '23505') throw error; // Ignore unique constraint violations
+      const { data, error } = await supabase.rpc('insert_leaderboard_milestones', {
+        milestones: milestonePayload,
+      });
+
+      if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leaderboard-milestones'] });
     },
   });
