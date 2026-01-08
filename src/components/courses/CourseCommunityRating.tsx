@@ -19,13 +19,13 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   const sizeClasses = {
     sm: 'h-3.5 w-3.5',
     md: 'h-4 w-4',
-    lg: 'h-5 w-5',
+    lg: 'h-[18px] w-[18px]',
   }[size];
   
   const textClasses = {
     sm: 'text-[11px]',
     md: 'text-xs',
-    lg: 'text-sm',
+    lg: 'text-[13px]',
   }[size];
 
   return (
