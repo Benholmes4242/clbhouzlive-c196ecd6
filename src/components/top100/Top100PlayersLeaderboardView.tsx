@@ -12,8 +12,10 @@ import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
+import { FLAGS } from '@/config/flags';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
+import { getMockLeaderboardUsers, BENJAMIN_HOLMES_USER_ID } from '@/mocks/leaderboardMockUsers';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import {
@@ -112,21 +114,43 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
   const rawEntries = data?.pages.flatMap(page => page.entries) || [];
   const currentUserEntry = data?.pages[0]?.current_user_entry;
 
+  // Check if current user is Benjamin Holmes (for 100-user mock injection)
+  const isBenjaminHolmes = currentUser?.id === BENJAMIN_HOLMES_USER_ID;
+
   // Merge mock players if flag is enabled
   const allEntries = useMemo(() => {
-    if (!ENABLE_TOP100_MOCK_PLAYERS) return rawEntries;
+    // Original 30 mock players (global feature flag)
+    let entries = rawEntries;
     
-    // Avoid colliding with real users
-    const realIds = new Set(rawEntries.map((e: any) => e.user_id));
-    const mockPlayers = TOP100_MOCK_PLAYERS.filter(
-      mock => !realIds.has(mock.user_id)
+    if (ENABLE_TOP100_MOCK_PLAYERS) {
+      const realIds = new Set(rawEntries.map((e: any) => e.user_id));
+      const mockPlayers = TOP100_MOCK_PLAYERS.filter(
+        mock => !realIds.has(mock.user_id)
+      );
+      entries = [...entries, ...mockPlayers];
+    }
+    
+    // Benjamin Holmes: inject 100 additional mock users for UI testing
+    if (FLAGS.LEADERBOARD_MOCK_USERS_ENABLED && isBenjaminHolmes) {
+      const existingIds = new Set(entries.map((e: any) => e.user_id));
+      const leaderboardMocks = getMockLeaderboardUsers().filter(
+        mock => !existingIds.has(mock.user_id)
+      );
+      entries = [...entries, ...leaderboardMocks];
+    }
+    
+    // Sort by total_top100_played descending, then reassign ranks
+    const sorted = [...entries].sort(
+      (a: any, b: any) => (b.total_top100_played ?? 0) - (a.total_top100_played ?? 0)
     );
     
-    // Merge and re-sort by rank
-    return [...rawEntries, ...mockPlayers].sort(
-      (a: any, b: any) => (a.rank ?? 9999) - (b.rank ?? 9999)
-    );
-  }, [rawEntries]);
+    // Reassign ranks after merge
+    sorted.forEach((entry: any, idx) => {
+      entry.rank = idx + 1;
+    });
+    
+    return sorted;
+  }, [rawEntries, isBenjaminHolmes]);
 
   // Apply location filter client-side
   const filteredEntries = useMemo(() => {
