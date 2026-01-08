@@ -248,8 +248,8 @@ export function CoursesLeaderboardView() {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Cinematic Hero - Full bleed */}
-      <div>
+      {/* Cinematic Hero - Full bleed edge to edge */}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw]">
         <CourseLeaderboardHero course={featuredCourse} />
       </div>
 
@@ -387,8 +387,8 @@ export function CoursesLeaderboardView() {
           />
         )}
 
-        {/* Course Grid - Full width single column */}
-        <div className="flex flex-col">
+        {/* Course Grid - Full bleed edge to edge */}
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] flex flex-col">
           {displayCourses.length === 0 ? (
             <div className="col-span-full py-8">
               {sort === 'friends' ? (
