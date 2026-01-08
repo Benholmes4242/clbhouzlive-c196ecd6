@@ -11,9 +11,7 @@ import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequest
 import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
-import { HubCreateGameSheet } from '@/features/hub/components/HubCreateGameSheet';
-import { HubSearchGamesSheet } from '@/features/hub/components/HubSearchGamesSheet';
-import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
+import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
@@ -44,9 +42,8 @@ export function YourGamesTile() {
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
-  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
-  const [isSearchGamesSheetOpen, setIsSearchGamesSheetOpen] = useState(false);
-  const [isYourGamesSheetOpen, setIsYourGamesSheetOpen] = useState(false);
+  const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [gamesHubInitialTab, setGamesHubInitialTab] = useState<'discover' | 'yours'>('discover');
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -81,17 +78,20 @@ export function YourGamesTile() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setIsCreateGameSheetOpen(true);
+    setGamesHubInitialTab('yours');
+    setGamesHubOpen(true);
   };
 
   const openSearchGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setIsSearchGamesSheetOpen(true);
+    setGamesHubInitialTab('discover');
+    setGamesHubOpen(true);
   };
 
   const openYourGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setIsYourGamesSheetOpen(true);
+    setGamesHubInitialTab('yours');
+    setGamesHubOpen(true);
   };
 
   React.useEffect(() => {
@@ -338,19 +338,10 @@ export function YourGamesTile() {
       </div>
       </div>
       
-      <HubCreateGameSheet 
-        isOpen={isCreateGameSheetOpen} 
-        onClose={() => setIsCreateGameSheetOpen(false)} 
-      />
-      
-      <HubSearchGamesSheet
-        isOpen={isSearchGamesSheetOpen}
-        onClose={() => setIsSearchGamesSheetOpen(false)}
-      />
-
-      <HubYourGamesSheet
-        isOpen={isYourGamesSheetOpen}
-        onClose={() => setIsYourGamesSheetOpen(false)}
+      <HubGamesHubSheet
+        isOpen={gamesHubOpen}
+        onClose={() => setGamesHubOpen(false)}
+        initialTab={gamesHubInitialTab}
       />
     </Tile>
   );

@@ -174,7 +174,7 @@ export function YourGamesSurface({
         </div>
       )}
 
-      {/* "Awaiting approval" panel (Joined tab only) */}
+      {/* "Awaiting approval" panel (Joined tab only) - tappable to open Join Requests */}
       {!isHostingTab && pendingRequests.length > 0 && (
         <section className="yourGames__pendingPanel">
           <div className="yourGames__pendingHeader">
@@ -198,7 +198,12 @@ export function YourGamesSurface({
               });
               
               return (
-                <div key={req.id} className="yourGames__pendingItem">
+                <button
+                  key={req.id}
+                  type="button"
+                  className="yourGames__pendingItem yourGames__pendingItem--tappable"
+                  onClick={() => onOpenJoinRequests?.()}
+                >
                   <div className="yourGames__pendingMain">
                     <div className="yourGames__pendingTitle">
                       {game.course_name || 'Golf game'}
@@ -210,7 +215,7 @@ export function YourGamesSurface({
                   <div className="yourGames__pendingStatus">
                     Pending
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
