@@ -15,27 +15,15 @@ import { JoinRequestsInboxSheet } from '@/features/nearby/components/JoinRequest
 import { HubCreateGameSheet } from './HubCreateGameSheet';
 import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { haptic } from '@/utils/haptics';
-import { track } from '@/utils/analytics';
 import '../home/hubThemeLight.css';
 
 type TabValue = 'discover' | 'yours';
-
-export interface PrefillCourse {
-  id: string;
-  name: string;
-  region?: string;
-  country?: string;
-}
 
 interface HubGamesHubSheetProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: TabValue;
   initialFocusGameId?: string;
-  /** Pre-select a course in Discover (for deep-links from leaderboard) */
-  prefillCourse?: PrefillCourse;
-  /** Auto-open the Create Game sheet after mounting */
-  autoOpenCreate?: boolean;
 }
 
 export function HubGamesHubSheet({ 
@@ -43,8 +31,6 @@ export function HubGamesHubSheet({
   onClose, 
   initialTab = 'discover',
   initialFocusGameId,
-  prefillCourse,
-  autoOpenCreate = false,
 }: HubGamesHubSheetProps) {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
@@ -60,8 +46,6 @@ export function HubGamesHubSheet({
   // V2.4: FAB long-press menu state
   const [fabMenuOpen, setFabMenuOpen] = useState(false);
   const fabTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // V3: Track if we've handled auto-open for this open cycle
-  const didAutoOpenRef = useRef(false);
 
   const { data: myRequests = [] } = useMyJoinRequests();
   const pendingCount = useMemo(
@@ -69,25 +53,15 @@ export function HubGamesHubSheet({
     [myRequests]
   );
 
+  // Reset to initial tab when sheet opens
   // Reset state when sheet opens, apply initial focus only for 'yours' tab
   useEffect(() => {
     if (isOpen) {
-      track('gameshub_open', { tab: initialTab, hasPrefillCourse: !!prefillCourse });
       setActiveTab(initialTab);
       // Only set focus when opening to 'yours' tab to avoid mystery focus
       setFocusedGameId(initialTab === 'yours' ? initialFocusGameId : undefined);
-      didAutoOpenRef.current = false;
     }
-  }, [isOpen, initialTab, initialFocusGameId, prefillCourse]);
-
-  // V3: Auto-open create sheet after mount if requested
-  useEffect(() => {
-    if (isOpen && autoOpenCreate && !didAutoOpenRef.current && !createGameOpen) {
-      didAutoOpenRef.current = true;
-      const timer = setTimeout(() => setCreateGameOpen(true), 150);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, autoOpenCreate, createGameOpen]);
+  }, [isOpen, initialTab, initialFocusGameId]);
 
   // Standardized scroll-lock: #root approach
   useEffect(() => {
@@ -349,7 +323,6 @@ export function HubGamesHubSheet({
                   bottomPadding={24}
                   onOpenCreate={handleOpenCreate}
                   onMeta={setDiscoverMeta}
-                  prefillCourse={prefillCourse}
                 />
               ) : (
                 <div className="pt-2">

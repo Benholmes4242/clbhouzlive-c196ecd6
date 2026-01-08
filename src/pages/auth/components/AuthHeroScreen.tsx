@@ -85,14 +85,23 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         {/* Hero text - increased spacing, refined typography */}
         <div className="flex-1 flex flex-col justify-center items-center text-center -mt-8">
           <h1 
-            className="text-[32px] font-semibold text-white leading-tight"
+            className="text-[32px] font-semibold text-white leading-tight mb-4"
             style={{ 
               fontFamily: 'SF Pro Display, system-ui, sans-serif',
               letterSpacing: '-0.01em',
             }}
           >
-            Stay in play.
+            Your home of golf.
           </h1>
+          <p 
+            className="text-[15px] text-white/70 max-w-[280px]"
+            style={{ 
+              fontFamily: 'SF Pro Text, system-ui, sans-serif',
+              lineHeight: '1.5',
+            }}
+          >
+            Everywhere you play. Every moment remembered.
+          </p>
         </div>
         
         {/* Action buttons - glass container */}

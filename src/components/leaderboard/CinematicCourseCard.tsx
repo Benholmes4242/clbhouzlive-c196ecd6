@@ -1,10 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Image, Plus } from 'lucide-react';
+import { Users, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CourseRankBadge } from './CourseRankBadge';
 import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
-import { haptic } from '@/utils/haptics';
 
 interface CinematicCourseCardProps {
   course: {
@@ -24,10 +23,6 @@ interface CinematicCourseCardProps {
   listPosition: number;
   showFriendsContext?: boolean;
   className?: string;
-  /** V3: Count of active games at this course (for badge) */
-  activeGamesCount?: number;
-  /** V3: Callback to open Games Hub with this course pre-selected */
-  onCreateGame?: (course: { id: string; name: string; country: string }) => void;
 }
 
 /**
@@ -46,24 +41,12 @@ export function CinematicCourseCard({
   course, 
   listPosition,
   showFriendsContext = false,
-  className,
-  activeGamesCount = 0,
-  onCreateGame,
+  className 
 }: CinematicCourseCardProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/courses/${course.course_id}`);
-  };
-
-  const handleCreateGame = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    haptic('light');
-    onCreateGame?.({
-      id: course.course_id,
-      name: course.course_name,
-      country: course.country,
-    });
   };
 
   // Determine if course qualifies for flair badge
@@ -161,23 +144,10 @@ export function CinematicCourseCard({
 
       {/* Metadata Block - Below Image */}
       <div className="px-4 py-3.5 bg-white space-y-1">
-        {/* Course Name + Active Games Badge Row */}
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-foreground truncate flex-1">
-            {course.course_name}
-          </h3>
-          
-          {/* V3: Active Games Badge */}
-          {activeGamesCount > 0 && (
-            <button
-              onClick={handleCreateGame}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
-            >
-              <Users className="w-3 h-3" />
-              {activeGamesCount} {activeGamesCount === 1 ? 'game' : 'games'}
-            </button>
-          )}
-        </div>
+        {/* Course Name */}
+        <h3 className="text-sm font-semibold text-foreground truncate">
+          {course.course_name}
+        </h3>
 
         {/* Location */}
         <p className="text-xs text-muted-foreground truncate">
@@ -206,17 +176,6 @@ export function CinematicCourseCard({
               {course.friends_count} friend{course.friends_count === 1 ? '' : 's'} played
             </span>
           </div>
-        )}
-
-        {/* V3: Create Game CTA */}
-        {onCreateGame && (
-          <button
-            onClick={handleCreateGame}
-            className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors w-full justify-center"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Create game here
-          </button>
         )}
       </div>
     </button>
