@@ -48,24 +48,25 @@ export function CoursesLeaderboardView() {
 
   const allCourses = data?.pages.flatMap(page => page.entries) || [];
 
-  // Fetch recent Top 100 rounds by friends (real) - ACTUALLY filtered to friends
-  const { data: friendsRecentRounds } = useQuery({
-    queryKey: ['friends-recent-top100-rounds'],
+  // Fetch recent Top 100 rounds by circle (people user follows)
+  const { data: circleRecentRounds } = useQuery({
+    queryKey: ['circle-recent-top100-rounds'],
     enabled: !USE_MOCK_COURSE_LEADERBOARD_DATA,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
       
-      // First get the user's friend IDs (people they follow)
+      // Get people the user follows (their "circle")
       const { data: followingRows } = await supabase
         .from('user_follows')
         .select('following_id')
         .eq('follower_id', user.id);
       
-      const friendIds = (followingRows ?? []).map(r => r.following_id);
-      if (friendIds.length === 0) return [];
+      // Cap at 500 to prevent performance issues with large follow lists
+      const followingIds = (followingRows ?? []).map(r => r.following_id).slice(0, 500);
+      if (followingIds.length === 0) return [];
       
-      // Then get ratings from those friends only
+      // Get ratings from circle members on any Top 100 list (global, regional, or USA)
       const { data } = await supabase
         .from('course_ratings')
         .select(`
@@ -78,7 +79,9 @@ export function CoursesLeaderboardView() {
             id,
             name,
             thumbnail_image,
-            global_rank
+            global_rank,
+            regional_rank,
+            usa_rank
           ),
           user_profiles!inner (
             id,
@@ -86,8 +89,8 @@ export function CoursesLeaderboardView() {
             profile_photo_url
           )
         `)
-        .in('user_id', friendIds)
-        .not('golf_courses.global_rank', 'is', null)
+        .in('user_id', followingIds)
+        .or('golf_courses.global_rank.not.is.null,golf_courses.regional_rank.not.is.null,golf_courses.usa_rank.not.is.null')
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -189,7 +192,7 @@ export function CoursesLeaderboardView() {
   // Circle rounds to display
   const circleRoundsToDisplay = USE_MOCK_COURSE_LEADERBOARD_DATA 
     ? mockCircleRounds 
-    : friendsRecentRounds;
+    : circleRecentRounds;
 
   // Featured course for hero (first ranked course or mock)
   const featuredCourse = useMemo(() => {
@@ -284,7 +287,7 @@ export function CoursesLeaderboardView() {
                       </div>
                     </button>
                   ))
-                : (friendsRecentRounds || []).slice(0, 8).map((round: any) => (
+                : (circleRecentRounds || []).slice(0, 8).map((round: any) => (
                     <button
                       key={round.id}
                       onClick={() => navigate(`/courses/${round.course_id}`)}
