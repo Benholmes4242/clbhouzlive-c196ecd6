@@ -4,19 +4,19 @@
  * Can be rendered in a sheet or standalone page
  */
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
-import { Search, MapPin, Calendar, ArrowUpDown, Plus, Users, SlidersHorizontal } from 'lucide-react';
+import { Search, MapPin, Calendar, ArrowUpDown, Plus } from 'lucide-react';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
-import { useGameFilters, WhenFilter } from '../hooks/useGameFilters';
+import { useGameFilters } from '../hooks/useGameFilters';
 import { useGamesQuery } from '../hooks/useGamesQuery';
 import { useJoinGame } from '../hooks/useJoinGame';
 import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './FilterSheets';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { addDays, isToday, isTomorrow, isThisWeek, isWithinInterval, endOfWeek, startOfWeek } from 'date-fns';
+import { addDays } from 'date-fns';
 import '@/features/games/components/GameRow.css';
 import '@/features/nearby/components/your-games/YourGames.css';
 import '../GamesTab.css';
@@ -197,8 +197,14 @@ function FindAGame({
   );
 }
 
-function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
-  const filters = useGameFilters();
+// FiltersRow now receives filters as prop to avoid duplicate hook instances
+function FiltersRow({ 
+  selectedClub, 
+  filters 
+}: { 
+  selectedClub: GolfCourse | null; 
+  filters: ReturnType<typeof useGameFilters>;
+}) {
   const isDistanceDisabled = !!selectedClub;
   
   const getWhenLabel = () => {
@@ -259,11 +265,11 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
 function StatusStrip({ 
   selectedClub, 
   distanceKm, 
-  onOpenFilters 
+  filters
 }: { 
   selectedClub: GolfCourse | null; 
   distanceKm: number | null;
-  onOpenFilters: () => void;
+  filters: ReturnType<typeof useGameFilters>;
 }) {
   const scopeText = selectedClub 
     ? `At ${selectedClub.name}`
@@ -279,16 +285,16 @@ function StatusStrip({
         <span className="statusStrip__main">{scopeText}</span>
         {subText && <span className="statusStrip__sub">{subText}</span>}
       </div>
-      <button className="statusStrip__filterBtn" onClick={onOpenFilters}>
-        <SlidersHorizontal size={14} />
-        Filters
+      <button className="statusStrip__filterBtn" onClick={() => openWhenSheet(filters)}>
+        <Calendar size={14} />
+        When
       </button>
     </div>
   );
 }
 
-// V2.2: Suggested time quick chips
-type QuickTimeOption = 'today' | 'tomorrow' | 'weekend' | 'week';
+// V2.2: Suggested time quick chips (removed "Next 7 days" as it requires range support)
+type QuickTimeOption = 'today' | 'tomorrow' | 'weekend';
 
 function SuggestedTimesChips({ 
   activeOption, 
@@ -301,7 +307,6 @@ function SuggestedTimesChips({
     { key: 'today', label: 'Today' },
     { key: 'tomorrow', label: 'Tomorrow' },
     { key: 'weekend', label: 'This weekend' },
-    { key: 'week', label: 'Next 7 days' },
   ];
 
   const handleClick = (key: QuickTimeOption) => {
@@ -324,48 +329,7 @@ function SuggestedTimesChips({
   );
 }
 
-// V2.2: Popular clubs derived from games
-function PopularClubsChips({ 
-  games, 
-  onSelectClub 
-}: { 
-  games: Game[];
-  onSelectClub: (clubName: string) => void;
-}) {
-  // Dedupe and count clubs from games
-  const clubs = useMemo(() => {
-    const clubCounts = new Map<string, number>();
-    games.forEach(g => {
-      if (g.course_name) {
-        clubCounts.set(g.course_name, (clubCounts.get(g.course_name) || 0) + 1);
-      }
-    });
-    return Array.from(clubCounts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([name]) => name);
-  }, [games]);
-
-  if (clubs.length < 3) return null;
-
-  return (
-    <div className="popularClubsSection">
-      <span className="popularClubs__label">Popular this week</span>
-      <div className="popularClubsChips">
-        {clubs.map(name => (
-          <button
-            key={name}
-            className="clubChip"
-            onClick={() => { haptic('light'); onSelectClub(name); }}
-          >
-            <MapPin size={12} />
-            <span>{name}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
+// PopularClubsChips removed - requires course_id support for proper filtering
 
 function GameCard({ game, index }: { game: Game; index: number }) {
   const { requestJoin, isPending, state } = useJoinGame(game.id);
@@ -472,25 +436,36 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
         const daysUntilSat = (6 - today.getDay() + 7) % 7 || 7;
         filters.setWhen({ date: addDays(today, daysUntilSat), window: 'any', exactTime: null });
         break;
-      case 'week':
-        filters.setWhen({ date: today, window: 'any', exactTime: null });
-        break;
     }
   };
 
-  // Handle club chip selection (search by name)
-  const handleClubChipSelect = (clubName: string) => {
-    // Find the club in games and select it
-    const matchingGame = games?.find(g => g.course_name === clubName);
-    if (matchingGame?.course_name) {
-      toast.info(`Filtering by ${clubName}`);
-      // We'd need course_id to properly filter, for now just show toast
+  // Clear quickTime if user manually sets a different filter via When sheet
+  React.useEffect(() => {
+    if (!filters.when) {
+      setQuickTime(null);
+      return;
     }
-  };
-
-  const handleOpenFilters = () => {
-    openWhenSheet(filters);
-  };
+    // Check if current filter matches any quick option
+    const today = new Date();
+    const tomorrow = addDays(today, 1);
+    const daysUntilSat = (6 - today.getDay() + 7) % 7 || 7;
+    const weekend = addDays(today, daysUntilSat);
+    
+    const filterDate = filters.when.date;
+    if (!filterDate) {
+      setQuickTime(null);
+      return;
+    }
+    
+    const isToday = filterDate.toDateString() === today.toDateString();
+    const isTomorrow = filterDate.toDateString() === tomorrow.toDateString();
+    const isWeekend = filterDate.toDateString() === weekend.toDateString();
+    
+    if (isToday && quickTime !== 'today') setQuickTime('today');
+    else if (isTomorrow && quickTime !== 'tomorrow') setQuickTime('tomorrow');
+    else if (isWeekend && quickTime !== 'weekend') setQuickTime('weekend');
+    else if (!isToday && !isTomorrow && !isWeekend) setQuickTime(null);
+  }, [filters.when]);
 
   return (
     <div className="searchGamesSurface" style={{ paddingBottom: `${bottomPadding}px` }}>
@@ -501,7 +476,7 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
       <StatusStrip 
         selectedClub={selectedClub} 
         distanceKm={filters.distanceKm}
-        onOpenFilters={handleOpenFilters}
+        filters={filters}
       />
       
       {/* V2.2: Suggested times chips */}
@@ -510,11 +485,6 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
         onSelect={handleQuickTimeSelect} 
       />
       
-      {/* V2.2: Popular clubs (only if we have games) */}
-      {!isLoading && games && games.length > 0 && (
-        <PopularClubsChips games={games} onSelectClub={handleClubChipSelect} />
-      )}
-      
       <FindAGame 
         selectedClub={selectedClub} 
         onSelectClub={setSelectedClub}
@@ -522,7 +492,7 @@ export function SearchGamesSurface({ bottomPadding = 0, onOpenCreate }: SearchGa
         onSearchModeChange={setSearchMode}
       />
       
-      <FiltersRow selectedClub={selectedClub} />
+      <FiltersRow selectedClub={selectedClub} filters={filters} />
       
       <div className="scopedHeadingHub">
         <span>{selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}</span>
