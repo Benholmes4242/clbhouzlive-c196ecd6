@@ -85,8 +85,8 @@ export function CinematicCourseCard({
       )}
       style={{ animationDelay: `${listPosition * 50}ms` }}
     >
-      {/* Hero Image - wider aspect ratio (reduced height by ~50%) */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden group">
+      {/* Hero Image - match UnifiedCourseCard aspect ratio */}
+      <div className="relative w-full aspect-[1.77/1] overflow-hidden group">
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -142,8 +142,8 @@ export function CinematicCourseCard({
         )}
       </div>
 
-      {/* Metadata Block - Below Image */}
-      <div className="px-4 py-3.5 bg-white space-y-1">
+      {/* Metadata Block - Below Image (match UnifiedCourseCard padding) */}
+      <div className="px-4 py-3 bg-white space-y-1">
         {/* Course Name */}
         <h3 className="text-sm font-semibold text-foreground truncate">
           {course.course_name}
