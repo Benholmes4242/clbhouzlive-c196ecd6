@@ -417,3 +417,148 @@
   color: var(--hub-text-muted);
   margin: 0 0 0 2px;
 }
+
+/* V2.2: Status Strip */
+.statusStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--hub-glass-bg-subtle);
+  border: 1px solid var(--hub-stroke-subtle);
+}
+
+.statusStrip__scope {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.statusStrip__main {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hub-text);
+}
+
+.statusStrip__sub {
+  font-size: 12px;
+  color: var(--hub-text-dim);
+}
+
+.statusStrip__filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid var(--hub-stroke);
+  background: var(--hub-glass-bg);
+  color: var(--hub-text-sub);
+  transition: all 0.15s;
+}
+
+.statusStrip__filterBtn:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+.statusStrip__filterBtn:active {
+  transform: scale(0.97);
+}
+
+/* V2.2: Suggested Times Chips */
+.suggestedTimesChips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px 0;
+}
+
+.suggestedTimesChips::-webkit-scrollbar {
+  display: none;
+}
+
+.timeChip {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 20px;
+  border: 1px solid var(--hub-stroke-subtle);
+  background: var(--hub-glass-bg-subtle);
+  color: var(--hub-text-sub);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.timeChip:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+.timeChip:active {
+  transform: scale(0.97);
+}
+
+.timeChip--active {
+  border-color: var(--hub-stroke-strong);
+  background: var(--hub-glass-bg);
+  color: var(--hub-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* V2.2: Popular Clubs Section */
+.popularClubsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.popularClubs__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--hub-text-muted);
+}
+
+.popularClubsChips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px 0;
+}
+
+.popularClubsChips::-webkit-scrollbar {
+  display: none;
+}
+
+.clubChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 10px;
+  border: 1px solid var(--hub-stroke-subtle);
+  background: var(--hub-glass-bg-subtle);
+  color: var(--hub-text-sub);
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.clubChip:hover {
+  background: var(--hub-glass-bg-hover);
+  border-color: var(--hub-stroke);
+}
+
+.clubChip:active {
+  transform: scale(0.97);
+}
