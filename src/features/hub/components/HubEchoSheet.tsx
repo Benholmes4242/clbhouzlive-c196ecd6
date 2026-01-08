@@ -1,18 +1,17 @@
 /**
  * HubEchoSheet - Bottom sheet for Echo AI chat
  * 
- * V1: Fully self-contained chat experience
+ * V2: Uses shared EchoChatSurface with real AI wiring
  * - No navigation to external pages
- * - Local messages state with mock responses
+ * - Real AI responses via useEchoConversation
  * - Empty state → Chat thread transition
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Send, Sparkles, User } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { nanoid } from 'nanoid';
+import { EchoChatSurface, EchoChatSurfaceRef } from '@/features/echo/components/EchoChatSurface';
 import '../home/hubThemeLight.css';
 
 interface HubEchoSheetProps {
@@ -20,14 +19,6 @@ interface HubEchoSheetProps {
   onClose: () => void;
   initialMessage?: string;
 }
-
-// Message type
-type EchoMessage = {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  ts: number;
-};
 
 // Prompt chips for quick start
 const PROMPT_CHIPS = [
@@ -37,28 +28,6 @@ const PROMPT_CHIPS = [
   'How does stableford work?',
 ];
 
-// Mock responses for V1
-const MOCK_RESPONSES: Record<string, string> = {
-  'fix my slice': "A slice usually comes from an open clubface at impact. Try these fixes:\n\n1. **Strengthen your grip** — rotate both hands slightly clockwise\n2. **Check your alignment** — shoulders may be aiming left\n3. **Swing inside-out** — feel like you're hitting toward right field\n\nPractice with half-swings first to groove the new path.",
-  'what club from 155y?': "From 155 yards, most amateurs would hit a **6 or 7 iron**. But it depends on your game:\n\n• **Strong hitter**: 7 iron or even 8\n• **Average**: 6 iron\n• **Smooth swinger**: 5 iron or hybrid\n\nConsider wind, elevation, and whether the pin is front or back.",
-  'course tips for portrush': "Royal Portrush is a proper links test. Key tips:\n\n1. **Play for the wind** — it's always a factor\n2. **Calamity Corner (14th)** — aim well right of the cliffs\n3. **Use the ground** — bump and run around greens\n4. **Stay below the hole** — greens are slick\n\nBook a caddie if you can — local knowledge is invaluable.",
-  'how does stableford work?': "Stableford awards points based on your score relative to par:\n\n• **Albatross (3 under)**: 5 points\n• **Eagle (2 under)**: 4 points\n• **Birdie (1 under)**: 3 points\n• **Par**: 2 points\n• **Bogey (1 over)**: 1 point\n• **Double bogey or worse**: 0 points\n\nHighest total wins. Great format because one bad hole doesn't ruin your round!",
-};
-
-const getDefaultResponse = (query: string): string => {
-  return `Great question about "${query}"! I'm still learning, but here's what I know:\n\nThis is a mock response for V1. The full Echo AI will provide detailed, personalized golf advice here.\n\nTry asking about:\n• Swing tips\n• Club selection\n• Course strategy\n• Rules of golf`;
-};
-
-const getMockResponse = (query: string): string => {
-  const normalizedQuery = query.toLowerCase().trim();
-  for (const [key, response] of Object.entries(MOCK_RESPONSES)) {
-    if (normalizedQuery.includes(key) || key.includes(normalizedQuery)) {
-      return response;
-    }
-  }
-  return getDefaultResponse(query);
-};
-
 export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
   isOpen,
   onClose,
@@ -66,12 +35,10 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
 }) => {
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatSurfaceRef = useRef<EchoChatSurfaceRef>(null);
   
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<EchoMessage[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [chatStarted, setChatStarted] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState('');
 
   // Complete scroll-lock: save position on open, restore on close
   useEffect(() => {
@@ -100,89 +67,40 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
   // Reset state when sheet closes
   useEffect(() => {
     if (!isOpen) {
-      setInput('');
-      setMessages([]);
-      setIsTyping(false);
+      setChatStarted(false);
+      setPendingMessage('');
     }
   }, [isOpen]);
 
   // Handle initial message on open
   useEffect(() => {
     if (isOpen && initialMessage) {
-      setInput(initialMessage);
+      setPendingMessage(initialMessage);
       // Auto-focus when there's an initial message
       setTimeout(() => {
-        try {
-          inputRef.current?.focus({ preventScroll: true });
-        } catch {
-          inputRef.current?.focus();
-        }
+        chatSurfaceRef.current?.focus();
       }, 200);
     }
   }, [isOpen, initialMessage]);
-
-  // Scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, isTyping]);
 
   // Prevent clicks inside sheet from closing
   const handleSheetClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
   }, []);
 
-  // Handle prompt chip click - fill input and focus (stay in sheet)
+  // Handle prompt chip click - send message immediately
   const handleChipClick = useCallback((prompt: string) => {
-    setInput(prompt);
+    setChatStarted(true);
+    // Small delay to let the chat surface mount
     setTimeout(() => {
-      try {
-        inputRef.current?.focus({ preventScroll: true });
-      } catch {
-        inputRef.current?.focus();
-      }
+      chatSurfaceRef.current?.sendMessage(prompt);
     }, 50);
   }, []);
 
-  // Handle send - stay in sheet, add to local messages
-  const handleSend = useCallback(() => {
-    const trimmed = input.trim();
-    if (!trimmed || isTyping) return;
-    
-    // Add user message
-    const userMessage: EchoMessage = {
-      id: nanoid(),
-      role: 'user',
-      text: trimmed,
-      ts: Date.now(),
-    };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsTyping(true);
-    
-    // Simulate assistant response after delay
-    setTimeout(() => {
-      const assistantMessage: EchoMessage = {
-        id: nanoid(),
-        role: 'assistant',
-        text: getMockResponse(trimmed),
-        ts: Date.now(),
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsTyping(false);
-    }, 800 + Math.random() * 400);
-  }, [input, isTyping]);
-
-  // Handle enter key
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  }, [handleSend]);
-
-  const hasMessages = messages.length > 0;
+  // Callback when chat becomes active
+  const handleChatStarted = useCallback(() => {
+    setChatStarted(true);
+  }, []);
 
   if (typeof document === 'undefined') return null;
 
@@ -250,10 +168,10 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
             </div>
             
             {/* Content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain flex flex-col min-h-0">
-              {!hasMessages ? (
-                /* Empty State - centered with breathing room */
-                <div className="flex-1 flex flex-col items-center justify-center text-center px-6 -mt-8">
+            {!chatStarted && !pendingMessage ? (
+              /* Empty State - centered with breathing room */
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="flex flex-col items-center justify-center text-center px-6 py-12 min-h-full -mt-8">
                   {/* Icon - subtle watermark feel */}
                   <div className="mb-5">
                     <div 
@@ -318,153 +236,16 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
                     </div>
                   </div>
                 </div>
-              ) : (
-                /* Chat Messages */
-                <div className="flex-1 px-4 py-4 space-y-4">
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={cn(
-                        "flex gap-3",
-                        msg.role === 'user' ? "justify-end" : "justify-start"
-                      )}
-                    >
-                      {msg.role === 'assistant' && (
-                        <div 
-                          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ background: 'var(--hub-glass-bg)' }}
-                        >
-                          <Sparkles className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                        </div>
-                      )}
-                      
-                      <div
-                        className={cn(
-                          "max-w-[80%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed",
-                          msg.role === 'user' 
-                            ? "rounded-br-md" 
-                            : "rounded-bl-md"
-                        )}
-                        style={{
-                          background: msg.role === 'user' 
-                            ? 'var(--hub-primary-bg, #1a1a1a)' 
-                            : 'var(--hub-glass-bg)',
-                          color: msg.role === 'user' 
-                            ? 'white' 
-                            : 'var(--hub-text)',
-                        }}
-                      >
-                        {msg.text.split('\n').map((line, i) => (
-                          <React.Fragment key={i}>
-                            {line}
-                            {i < msg.text.split('\n').length - 1 && <br />}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                      
-                      {msg.role === 'user' && (
-                        <div 
-                          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ background: 'var(--hub-glass-bg)' }}
-                        >
-                          <User className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  
-                  {/* Typing indicator */}
-                  {isTyping && (
-                    <div className="flex gap-3 justify-start">
-                      <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'var(--hub-glass-bg)' }}
-                      >
-                        <Sparkles className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                      </div>
-                      <div
-                        className="rounded-2xl rounded-bl-md px-4 py-3"
-                        style={{ background: 'var(--hub-glass-bg)' }}
-                      >
-                        <div className="flex gap-1">
-                          <span className="w-2 h-2 rounded-full bg-current opacity-40 animate-pulse" style={{ color: 'var(--hub-text-dim)' }} />
-                          <span className="w-2 h-2 rounded-full bg-current opacity-40 animate-pulse" style={{ color: 'var(--hub-text-dim)', animationDelay: '0.15s' }} />
-                          <span className="w-2 h-2 rounded-full bg-current opacity-40 animate-pulse" style={{ color: 'var(--hub-text-dim)', animationDelay: '0.3s' }} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Scroll anchor */}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </div>
-            
-            {/* Input Bar - anchored bottom, keyboard-safe */}
-            <div 
-              className="flex-shrink-0 px-4 pt-3"
-              style={{ 
-                background: 'var(--hub-bg-start)',
-                borderTop: '1px solid var(--hub-glass-border)',
-                paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
-              }}
-            >
-              <div
-                className="flex items-center gap-2 rounded-full px-4 py-2"
-                style={{
-                  background: 'var(--hub-glass-bg)',
-                  border: '1px solid var(--hub-stroke)',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                }}
-              >
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask Echo..."
-                  disabled={isTyping}
-                  className="flex-1 bg-transparent border-none outline-none text-[15px]"
-                  style={{ 
-                    color: 'var(--hub-text)',
-                    caretColor: 'var(--hub-text-sub)',
-                  }}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  enterKeyHint="send"
-                />
-                
-                <button
-                  type="button"
-                  onClick={handleSend}
-                  disabled={!input.trim() || isTyping}
-                  className={cn(
-                    "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0",
-                    "transition-all active:scale-[0.94]",
-                    input.trim() && !isTyping
-                      ? "opacity-100"
-                      : "opacity-40"
-                  )}
-                  style={{
-                    background: input.trim() && !isTyping
-                      ? 'var(--hub-primary-bg, #1a1a1a)' 
-                      : 'var(--hub-glass-bg-subtle)',
-                    border: input.trim() && !isTyping
-                      ? 'none' 
-                      : '1px solid var(--hub-stroke)',
-                  }}
-                  aria-label="Send"
-                >
-                  <Send 
-                    className="h-4 w-4" 
-                    style={{ 
-                      color: input.trim() && !isTyping ? 'white' : 'var(--hub-text-dim)' 
-                    }} 
-                  />
-                </button>
               </div>
-            </div>
+            ) : (
+              /* Chat Surface - real AI wiring */
+              <EchoChatSurface
+                ref={chatSurfaceRef}
+                initialMessage={pendingMessage}
+                onChatStarted={handleChatStarted}
+                hubTheme
+              />
+            )}
           </motion.div>
         </>
       )}
@@ -472,5 +253,3 @@ export const HubEchoSheet: React.FC<HubEchoSheetProps> = ({
     document.body
   );
 };
-
-export default HubEchoSheet;
