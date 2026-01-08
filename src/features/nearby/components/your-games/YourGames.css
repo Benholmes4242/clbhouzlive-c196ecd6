@@ -209,6 +209,28 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  cursor: default;
+}
+
+.yourGames__pendingItem--tappable {
+  cursor: pointer;
+  padding: 8px 10px;
+  margin: -8px -10px;
+  border-radius: 10px;
+  transition: background-color 0.15s ease;
+}
+
+.yourGames__pendingItem--tappable:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+.yourGames__pendingItem--tappable:active {
+  transform: scale(0.98);
 }
 
 .yourGames__pendingMain {
