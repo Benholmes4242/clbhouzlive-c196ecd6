@@ -116,24 +116,9 @@ function CountryBottomSheet({
   selectedCode,
   onSelect,
 }: CountryBottomSheetProps) {
-  // Handle outside interaction explicitly to prevent freeze
-  const handleClose = React.useCallback(() => {
-    onOpenChange(false);
-  }, [onOpenChange]);
-
   return (
-    <Drawer 
-      open={open} 
-      onOpenChange={onOpenChange}
-      dismissible
-      modal
-    >
-      <DrawerContent 
-        className="max-h-[85vh]"
-        onPointerDownOutside={handleClose}
-        onInteractOutside={handleClose}
-        onEscapeKeyDown={handleClose}
-      >
+    <Drawer open={open} onOpenChange={onOpenChange} dismissible>
+      <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="pb-2">
           <DrawerTitle className="text-center">Select Country</DrawerTitle>
         </DrawerHeader>
@@ -272,7 +257,10 @@ export function PlayersFromFilter({
           <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              onClick={() => setCountrySearchOpen(true)}
+              onSelect={() => {
+                // Defer opening so the selecting click doesn't immediately dismiss the drawer
+                window.setTimeout(() => setCountrySearchOpen(true), 0);
+              }}
               className="flex items-center gap-2 cursor-pointer"
             >
               <Search className="w-4 h-4 text-muted-foreground" />
