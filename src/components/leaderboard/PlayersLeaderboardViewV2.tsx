@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { useTop100Leaderboard, LeaderboardScope } from '@/hooks/useTop100Leaderboard';
+import { useTop100Leaderboard, LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { useNearbyPlayers } from '@/hooks/useNearbyPlayers';
 import { FLAGS } from '@/config/flags';
 import { getMockLeaderboardV2Entries, mergeWithMockEntries } from '@/mocks/leaderboardV2MockGenerator';
@@ -33,11 +33,15 @@ import {
   RivalPreviewSheet,
   LeaderboardFullSkeleton,
   LeaderboardListSkeleton,
+  TimeRangeFilter,
+  AchievementBanner,
+  useAchievementDetection,
   type ArenaMode,
   type LeaderboardRegion,
   type LeaderboardPlayerEntry,
   type LeaderboardUserStatus,
   type RivalPlayer,
+  type AchievementType,
 } from './v2';
 
 import { PlayersFromFilter, type PlayersFromValue, getCountryName, ALL_COUNTRIES } from './v2/PlayersFromFilter';
@@ -78,10 +82,13 @@ export function PlayersLeaderboardViewV2() {
   const [arenaMode, setArenaMode] = useState<ArenaMode>('global');
   const [region, setRegion] = useState<LeaderboardRegion>('worldwide');
   const [playersFrom, setPlayersFrom] = useState<PlayersFromValue>('worldwide');
+  const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
   const [selectedRival, setSelectedRival] = useState<LeaderboardPlayerEntry | null>(null);
   const [rivalSheetOpen, setRivalSheetOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isFilterTransitioning, setIsFilterTransitioning] = useState(false);
+  const [previousRank, setPreviousRank] = useState<number | null>(null);
+  const [dismissedAchievements, setDismissedAchievements] = useState(false);
 
   // Get current user ID
   useEffect(() => {
@@ -126,10 +133,10 @@ export function PlayersLeaderboardViewV2() {
     },
   });
 
-  // Fetch leaderboard data
+  // Fetch leaderboard data with time range
   const { data, isLoading, isError, refetch } = useTop100Leaderboard({
     scope: effectiveScope,
-    timeRange: 'all_time',
+    timeRange: timeRange,
     pageSize: 500,
   });
 
@@ -193,16 +200,33 @@ export function PlayersLeaderboardViewV2() {
     
     // Compute rank within filtered list
     const filteredRank = myIndex >= 0 ? myIndex + 1 : currentUserEntry.rank;
+    const currentRank = playersFrom !== 'worldwide' ? filteredRank : currentUserEntry.rank;
     
     return {
       user_id: currentUserEntry.user_id,
       display_name: currentUserProfile?.display_name || currentUserEntry.display_name,
       avatar_url: currentUserProfile?.profile_photo_url || currentUserEntry.avatar_url,
       total_top100_played: currentUserEntry.total_top100_played,
-      rank: playersFrom !== 'worldwide' ? filteredRank : currentUserEntry.rank,
+      rank: currentRank,
       activeRegion: arenaMode === 'regional' ? region.toUpperCase() : undefined,
+      timeRange: timeRange !== 'all_time' ? (timeRange === 'this_year' ? 'This Year' : 'This Month') : undefined,
     };
-  }, [currentUserEntry, currentUserProfile, arenaMode, region, myIndex, playersFrom]);
+  }, [currentUserEntry, currentUserProfile, arenaMode, region, myIndex, playersFrom, timeRange]);
+
+  // Track rank changes for achievement detection
+  useEffect(() => {
+    if (userStatus?.rank && previousRank !== userStatus.rank) {
+      setPreviousRank(userStatus.rank);
+    }
+  }, [userStatus?.rank, previousRank]);
+
+  // Achievement detection
+  const detectedAchievements = useAchievementDetection({
+    currentRank: userStatus?.rank || null,
+    previousRank,
+    bestRankAllTime: null, // TODO: Track from user profile
+    timeRange,
+  });
 
   // Compute rivals (above/current/below) from filtered list
   const rivals = useMemo(() => {
@@ -377,6 +401,14 @@ export function PlayersLeaderboardViewV2() {
     setTimeout(() => setIsFilterTransitioning(false), 300);
   };
 
+  // Handle time range filter change with transition
+  const handleTimeRangeChange = (value: LeaderboardTimeRange) => {
+    setIsFilterTransitioning(true);
+    setTimeRange(value);
+    setDismissedAchievements(false); // Reset achievements on time range change
+    setTimeout(() => setIsFilterTransitioning(false), 300);
+  };
+
   // Loading state
   if (isLoading) {
     return <LeaderboardFullSkeleton />;
@@ -484,6 +516,14 @@ export function PlayersLeaderboardViewV2() {
         </motion.div>
       )}
 
+      {/* Achievement Banner - after status card */}
+      {!dismissedAchievements && detectedAchievements.length > 0 && (
+        <AchievementBanner
+          achievements={detectedAchievements}
+          onDismiss={() => setDismissedAchievements(true)}
+        />
+      )}
+
       {/* New user encouragement */}
       {isNewUser && (
         <motion.div
@@ -507,7 +547,7 @@ export function PlayersLeaderboardViewV2() {
         />
       </div>
 
-      {/* Players From Filter (for applicable modes) */}
+      {/* Filters row: Players From + Time Range (for applicable modes) */}
       <AnimatePresence mode="wait">
         {showPlayersFromFilter && (
           <motion.div
@@ -515,12 +555,16 @@ export function PlayersLeaderboardViewV2() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="px-4 pb-2"
+            className="px-4 pb-2 flex flex-wrap gap-3"
           >
             <PlayersFromFilter
               value={playersFrom}
               onChange={handlePlayersFromChange}
               userCountry={currentUserProfile?.homeClubCountry}
+            />
+            <TimeRangeFilter
+              value={timeRange}
+              onChange={handleTimeRangeChange}
             />
           </motion.div>
         )}
@@ -578,12 +622,14 @@ export function PlayersLeaderboardViewV2() {
         </motion.div>
       )}
 
-      {/* Season/Reset Callout */}
-      <div className="px-4 py-2 mb-2">
-        <p className="text-[11px] text-muted-foreground/60 text-center">
-          Monthly seasons reset rankings — lifetime progress is always preserved.
-        </p>
-      </div>
+      {/* Time Range Helper Callout */}
+      {timeRange !== 'all_time' && (
+        <div className="px-4 py-2 mb-2">
+          <p className="text-[11px] text-muted-foreground/60 text-center">
+            Showing {timeRange === 'this_year' ? 'this year' : 'this month'}'s rankings — lifetime progress is always preserved.
+          </p>
+        </div>
+      )}
 
       {/* E) Leaderboard List with staggered animation */}
       <div className="w-full">

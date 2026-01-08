@@ -20,6 +20,7 @@ export interface LeaderboardUserStatus {
   rank: number;
   region_rank?: number;
   activeRegion?: string;
+  timeRange?: string; // e.g. "This Year", "This Month"
 }
 
 interface LeaderboardYourStatusProps {
@@ -63,9 +64,14 @@ export function LeaderboardYourStatus({
     ? user.region_rank 
     : user.rank;
 
-  const rankLabel = user.activeRegion 
+  // Build rank label with time range context
+  let rankLabel = user.activeRegion 
     ? `#${displayRank} ${user.activeRegion}` 
     : `#${displayRank} Global`;
+  
+  if (user.timeRange) {
+    rankLabel += ` (${user.timeRange})`;
+  }
 
   // Animate progress bar on mount
   useEffect(() => {
