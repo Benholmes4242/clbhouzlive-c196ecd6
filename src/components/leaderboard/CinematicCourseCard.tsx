@@ -76,9 +76,9 @@ export function CinematicCourseCard({
       type="button"
       onClick={handleClick}
       className={cn(
-        'w-full rounded-sq-md overflow-hidden bg-card text-left',
-        'border border-border/40',
-        'shadow-sm hover:shadow-md transition-shadow duration-200',
+        'w-full overflow-hidden bg-card text-left',
+        'border-b border-border/40',
+        'hover:bg-muted/30 transition-colors duration-200',
         'animate-fadeIn',
         className
       )}

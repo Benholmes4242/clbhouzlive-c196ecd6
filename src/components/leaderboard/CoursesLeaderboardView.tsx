@@ -387,8 +387,8 @@ export function CoursesLeaderboardView() {
           />
         )}
 
-        {/* Course Grid - 1 col mobile, 2 col tablet, 3 col desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Course Grid - Full width single column */}
+        <div className="flex flex-col">
           {displayCourses.length === 0 ? (
             <div className="col-span-full py-8">
               {sort === 'friends' ? (
