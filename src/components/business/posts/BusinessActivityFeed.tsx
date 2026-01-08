@@ -1,12 +1,14 @@
 /**
  * BusinessActivityFeed - Premium activity feed with Activity/Tagged sub-tabs
  * Phase 1-6 implementation for business profile posts
- * Now with lazy loading to prevent all videos mounting at once
+ * Now with infinite scroll and duration-based video filters
  */
 
-import React, { useState, useCallback, useMemo, useLayoutEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { useBusinessTaggedPosts, useHideTaggedPost } from '@/hooks/useBusinessTaggedPosts';
+import { useInfiniteBusinessPosts } from '@/hooks/useInfiniteBusinessPosts';
+import { useInfiniteBusinessTaggedPosts } from '@/hooks/useInfiniteBusinessTaggedPosts';
 import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -21,7 +23,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useMediaAutoplay } from '@/media';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { cn } from '@/lib/utils';
-import { Image as ImageIcon, Plus, Users, RefreshCw } from 'lucide-react';
+import { Image as ImageIcon, Plus, Users, RefreshCw, Loader2 } from 'lucide-react';
 import BusinessPostCard from './BusinessPostCard';
 import TaggedPostCard from './TaggedPostCard';
 import { toast } from 'sonner';
@@ -35,11 +37,12 @@ interface BusinessActivityFeedProps {
 }
 
 type FeedTab = 'activity' | 'tagged';
-type FilterType = 'all' | 'videos' | 'images';
+type FilterType = 'all' | 'longform' | 'shorts' | 'images';
 
 const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
-  { key: 'all', label: 'Posts' },
-  { key: 'videos', label: 'Videos' },
+  { key: 'all', label: 'All' },
+  { key: 'longform', label: 'Long-form' },
+  { key: 'shorts', label: 'Shorts' },
   { key: 'images', label: 'Images' },
 ];
 
@@ -50,8 +53,23 @@ export function BusinessActivityFeed({
   followerCount = 0,
   membership,
 }: BusinessActivityFeedProps) {
-  const { data: posts, isLoading: postsLoading, error: postsError } = useBusinessPosts(businessId);
-  const { data: taggedPosts, isLoading: taggedLoading, error: taggedError, refetch: refetchTagged } = useBusinessTaggedPosts(businessId);
+  // Use infinite scroll hooks
+  const {
+    items: activityPosts,
+    isLoading: postsLoading,
+    hasMore: hasMoreActivity,
+    fetchNextPage: fetchMoreActivity,
+    isFetchingNextPage: isFetchingActivity,
+  } = useInfiniteBusinessPosts({ businessId, filterType: 'all' });
+
+  const {
+    items: taggedPosts,
+    isLoading: taggedLoading,
+    hasMore: hasMoreTagged,
+    fetchNextPage: fetchMoreTagged,
+    isFetchingNextPage: isFetchingTagged,
+  } = useInfiniteBusinessTaggedPosts({ businessId, filterType: 'all' });
+
   useRealtimeBusinessPosts(businessId);
   const { setActiveActor, availableActors } = useActiveActor();
   const { submitPost } = useOptimisticPostSubmission();
@@ -65,6 +83,10 @@ export function BusinessActivityFeed({
   const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Infinite scroll observer refs
+  const activityObserverRef = useRef<HTMLDivElement>(null);
+  const taggedObserverRef = useRef<HTMLDivElement>(null);
+
   // Uses default 0.4/0.25 thresholds for sentinel-based observation
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
@@ -73,39 +95,119 @@ export function BusinessActivityFeed({
 
   const canManage = membership?.canManage ?? false;
   const hasPreloadedFirst = useRef(false);
-  
-  // Get filtered posts count for lazy loading
-  const filteredPostsCount = useMemo(() => {
-    const source = feedTab === 'activity' ? (posts || []) : (taggedPosts || []);
-    return source.filter((post) => {
-      if (activeFilter === 'all') return true;
-      const hasVideo = post.post_media?.some((m) => m.media_type === 'video');
-      const hasImage = post.post_media?.some((m) => m.media_type === 'image');
-      if (activeFilter === 'videos') return hasVideo;
-      if (activeFilter === 'images') return hasImage;
+
+  // Get filtered posts - apply client-side filter for duration
+  const filteredActivityPosts = useMemo(() => {
+    if (activeFilter === 'all') return activityPosts;
+    
+    return activityPosts.filter((post) => {
+      const hasVideo = post.post_media?.some((m: any) => m.media_type === 'video');
+      const hasImage = post.post_media?.some((m: any) => m.media_type === 'image');
+      
+      if (activeFilter === 'longform') {
+        return post.post_media?.some((m: any) => 
+          m.media_type === 'video' && (m.duration_seconds || 0) >= 240
+        );
+      }
+      if (activeFilter === 'shorts') {
+        return post.post_media?.some((m: any) => {
+          const duration = m.duration_seconds || 0;
+          return m.media_type === 'video' && duration > 0 && duration < 240;
+        });
+      }
+      if (activeFilter === 'images') return hasImage && !hasVideo;
       return true;
-    }).length;
-  }, [feedTab, posts, taggedPosts, activeFilter]);
-  
+    });
+  }, [activityPosts, activeFilter]);
+
+  const filteredTaggedPosts = useMemo(() => {
+    if (activeFilter === 'all') return taggedPosts;
+    
+    return taggedPosts.filter((post) => {
+      const hasVideo = post.post_media?.some((m: any) => m.media_type === 'video');
+      const hasImage = post.post_media?.some((m: any) => m.media_type === 'image');
+      
+      if (activeFilter === 'longform') {
+        return post.post_media?.some((m: any) => 
+          m.media_type === 'video' && (m.duration_seconds || 0) >= 240
+        );
+      }
+      if (activeFilter === 'shorts') {
+        return post.post_media?.some((m: any) => {
+          const duration = m.duration_seconds || 0;
+          return m.media_type === 'video' && duration > 0 && duration < 240;
+        });
+      }
+      if (activeFilter === 'images') return hasImage && !hasVideo;
+      return true;
+    });
+  }, [taggedPosts, activeFilter]);
+
+  const filteredPosts = feedTab === 'activity' ? filteredActivityPosts : filteredTaggedPosts;
+  const hasMore = feedTab === 'activity' ? hasMoreActivity : hasMoreTagged;
+  const isFetching = feedTab === 'activity' ? isFetchingActivity : isFetchingTagged;
+  const fetchMore = feedTab === 'activity' ? fetchMoreActivity : fetchMoreTagged;
+
   // Lazy loading - only mount posts near viewport
   const { visibleIndices, registerTile } = useLazyTiles({
-    totalItems: filteredPostsCount,
-    initialVisible: 3, // First 3 posts visible immediately
+    totalItems: filteredPosts.length,
+    initialVisible: 3,
     preloadViewports: 2,
-    estimatedRowHeight: 400, // Posts are tall
+    estimatedRowHeight: 400,
   });
+
+  // Infinite scroll observer for Activity tab
+  useEffect(() => {
+    if (feedTab !== 'activity' || !hasMoreActivity) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingActivity) {
+          console.log('[BusinessActivityFeed] 📜 Loading more activity posts...');
+          fetchMoreActivity();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    if (activityObserverRef.current) {
+      observer.observe(activityObserverRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [feedTab, hasMoreActivity, fetchMoreActivity, isFetchingActivity]);
+
+  // Infinite scroll observer for Tagged tab
+  useEffect(() => {
+    if (feedTab !== 'tagged' || !hasMoreTagged) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingTagged) {
+          console.log('[BusinessActivityFeed] 📜 Loading more tagged posts...');
+          fetchMoreTagged();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    if (taggedObserverRef.current) {
+      observer.observe(taggedObserverRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [feedTab, hasMoreTagged, fetchMoreTagged, isFetchingTagged]);
 
   // Eager preload first video's HLS manifest on mount
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current) return;
     
-    const allPosts = posts || [];
-    const firstVideoPost = allPosts.find(p => 
-      p.post_media?.some(m => m.media_type === 'video')
+    const firstVideoPost = activityPosts.find((p: any) => 
+      p.post_media?.some((m: any) => m.media_type === 'video')
     );
     
     if (firstVideoPost) {
-      const videoMedia = firstVideoPost.post_media?.find(m => m.media_type === 'video');
+      const videoMedia = firstVideoPost.post_media?.find((m: any) => m.media_type === 'video');
       if (videoMedia?.media_url) {
         const uid = uidFromNode({ media_url: videoMedia.media_url });
         if (uid) {
@@ -114,35 +216,7 @@ export function BusinessActivityFeed({
         }
       }
     }
-  }, [posts]);
-
-  // Sort posts: pinned first, then by date
-  const sortedPosts = useMemo(() => {
-    if (!posts) return [];
-    const now = new Date();
-    return [...posts].sort((a, b) => {
-      // Check if pinned and not expired
-      const aIsPinned = a.is_pinned && (!a.pinned_until || new Date(a.pinned_until) > now);
-      const bIsPinned = b.is_pinned && (!b.pinned_until || new Date(b.pinned_until) > now);
-      
-      if (aIsPinned && !bIsPinned) return -1;
-      if (!aIsPinned && bIsPinned) return 1;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  }, [posts]);
-
-  // Filter posts based on media type
-  const filteredPosts = useMemo(() => {
-    const source = feedTab === 'activity' ? sortedPosts : (taggedPosts || []);
-    return source.filter((post) => {
-      if (activeFilter === 'all') return true;
-      const hasVideo = post.post_media?.some((m) => m.media_type === 'video');
-      const hasImage = post.post_media?.some((m) => m.media_type === 'image');
-      if (activeFilter === 'videos') return hasVideo;
-      if (activeFilter === 'images') return hasImage;
-      return true;
-    });
-  }, [feedTab, sortedPosts, taggedPosts, activeFilter]);
+  }, [activityPosts]);
 
   const handleCreatePost = useCallback(() => {
     const businessActor = availableActors.find(
@@ -173,6 +247,7 @@ export function BusinessActivityFeed({
           setIsComposerOpen(false);
           setComposerMedia([]);
           setIsSubmitting(false);
+          queryClient.invalidateQueries({ queryKey: ['business-posts-infinite', businessId] });
           queryClient.invalidateQueries({ queryKey: ['actor-posts', 'business', businessId] });
           queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', businessId] });
         },
@@ -192,6 +267,7 @@ export function BusinessActivityFeed({
   const handleHideTaggedPost = useCallback(async (postId: string) => {
     try {
       await hidePost(postId);
+      queryClient.invalidateQueries({ queryKey: ['business-tagged-posts-infinite', businessId] });
       queryClient.invalidateQueries({ queryKey: ['business-tagged-posts', businessId] });
       toast.success('Post hidden from Tagged');
     } catch (error) {
@@ -200,7 +276,6 @@ export function BusinessActivityFeed({
   }, [hidePost, businessId, queryClient]);
 
   const isLoading = feedTab === 'activity' ? postsLoading : taggedLoading;
-  const error = feedTab === 'activity' ? postsError : taggedError;
 
   if (isLoading) {
     return (
@@ -213,7 +288,7 @@ export function BusinessActivityFeed({
         {/* Filter pills skeleton */}
         <div className="flex justify-center py-2">
           <div className="flex gap-2">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-8 w-20 bg-muted animate-pulse rounded-full flex-shrink-0" />
             ))}
           </div>
@@ -234,21 +309,6 @@ export function BusinessActivityFeed({
             <div className="h-64 bg-muted animate-pulse" />
           </div>
         ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12 px-4">
-        <p className="text-muted-foreground mb-4">Failed to load posts.</p>
-        <button
-          onClick={() => feedTab === 'tagged' ? refetchTagged() : undefined}
-          className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Retry
-        </button>
       </div>
     );
   }
@@ -347,69 +407,105 @@ export function BusinessActivityFeed({
         >
           <div className="flex flex-col gap-3 md:gap-4 py-3 md:py-4">
             {feedTab === 'activity' ? (
-              filteredPosts.map((post, index) => (
-                <div
-                  key={post.id}
-                  ref={(el) => registerTile(index, el)}
-                  data-lazy-index={index}
-                >
-                  {visibleIndices.has(index) ? (
-                    <BusinessPostCard
-                      post={post as BusinessPost}
-                      businessId={businessId}
-                      businessName={businessName}
-                      businessLogo={businessLogo}
-                      followerCount={followerCount}
-                      canManage={canManage}
-                      registerVideo={registerMedia}
-                      isPlaying={playingIds.has(post.id)}
-                      videoIndex={index}
-                    />
-                  ) : (
-                    <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
-                      <div className="p-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-sq-sm bg-muted" />
-                          <div className="space-y-2">
-                            <div className="h-4 w-32 bg-muted rounded" />
-                            <div className="h-3 w-24 bg-muted rounded" />
+              <>
+                {filteredPosts.map((post, index) => (
+                  <div
+                    key={post.id}
+                    ref={(el) => registerTile(index, el)}
+                    data-lazy-index={index}
+                  >
+                    {visibleIndices.has(index) ? (
+                      <BusinessPostCard
+                        post={post as unknown as BusinessPost}
+                        businessId={businessId}
+                        businessName={businessName}
+                        businessLogo={businessLogo}
+                        followerCount={followerCount}
+                        canManage={canManage}
+                        registerVideo={registerMedia}
+                        isPlaying={playingIds.has(post.id)}
+                        videoIndex={index}
+                      />
+                    ) : (
+                      <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                        <div className="p-4 space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-sq-sm bg-muted" />
+                            <div className="space-y-2">
+                              <div className="h-4 w-32 bg-muted rounded" />
+                              <div className="h-3 w-24 bg-muted rounded" />
+                            </div>
                           </div>
                         </div>
+                        <div className="h-48 bg-muted" />
                       </div>
-                      <div className="h-48 bg-muted" />
-                    </div>
-                  )}
-                </div>
-              ))
+                    )}
+                  </div>
+                ))}
+                
+                {/* Infinite scroll trigger for Activity */}
+                {hasMoreActivity && (
+                  <div ref={activityObserverRef} className="py-8 flex justify-center">
+                    {isFetchingActivity && (
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                )}
+                
+                {/* End state for Activity */}
+                {!hasMoreActivity && filteredPosts.length > 0 && (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    You've seen all posts
+                  </div>
+                )}
+              </>
             ) : (
-              filteredPosts.map((post, index) => (
-                <div
-                  key={post.id}
-                  ref={(el) => registerTile(index, el)}
-                  data-lazy-index={index}
-                >
-                  {visibleIndices.has(index) ? (
-                    <TaggedPostCard
-                      post={post as any}
-                      canManage={canManage}
-                      onHide={handleHideTaggedPost}
-                    />
-                  ) : (
-                    <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
-                      <div className="p-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-muted" />
-                          <div className="space-y-2">
-                            <div className="h-4 w-32 bg-muted rounded" />
-                            <div className="h-3 w-24 bg-muted rounded" />
+              <>
+                {filteredPosts.map((post, index) => (
+                  <div
+                    key={post.id}
+                    ref={(el) => registerTile(index, el)}
+                    data-lazy-index={index}
+                  >
+                    {visibleIndices.has(index) ? (
+                      <TaggedPostCard
+                        post={post as any}
+                        canManage={canManage}
+                        onHide={handleHideTaggedPost}
+                      />
+                    ) : (
+                      <div className="bg-white rounded-sq-md border border-border/50 overflow-hidden min-h-[300px] animate-pulse">
+                        <div className="p-4 space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-muted" />
+                            <div className="space-y-2">
+                              <div className="h-4 w-32 bg-muted rounded" />
+                              <div className="h-3 w-24 bg-muted rounded" />
+                            </div>
                           </div>
                         </div>
+                        <div className="h-48 bg-muted" />
                       </div>
-                      <div className="h-48 bg-muted" />
-                    </div>
-                  )}
-                </div>
-              ))
+                    )}
+                  </div>
+                ))}
+                
+                {/* Infinite scroll trigger for Tagged */}
+                {hasMoreTagged && (
+                  <div ref={taggedObserverRef} className="py-8 flex justify-center">
+                    {isFetchingTagged && (
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                )}
+                
+                {/* End state for Tagged */}
+                {!hasMoreTagged && filteredPosts.length > 0 && (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    You've seen all tagged posts
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -444,15 +540,29 @@ function EmptyState({
   onCreatePost: () => void;
 }) {
   // Filter-specific empty states
-  if (filter === 'videos') {
+  if (filter === 'longform') {
     return (
       <div className="py-12 text-center">
         <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
           <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
         </div>
-        <p className="text-base font-medium text-foreground mb-1">No videos yet</p>
+        <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
         <p className="text-sm text-muted-foreground">
-          {tab === 'activity' ? 'Share video content to engage your followers.' : 'No video posts have tagged this business yet.'}
+          {tab === 'activity' ? 'Share video content 4+ minutes to engage your followers.' : 'No long-form videos have tagged this business yet.'}
+        </p>
+      </div>
+    );
+  }
+
+  if (filter === 'shorts') {
+    return (
+      <div className="py-12 text-center">
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#EDEFF2' }}>
+          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+        </div>
+        <p className="text-base font-medium text-foreground mb-1">No shorts yet</p>
+        <p className="text-sm text-muted-foreground">
+          {tab === 'activity' ? 'Share short videos under 4 minutes.' : 'No short videos have tagged this business yet.'}
         </p>
       </div>
     );
