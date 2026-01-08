@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { UserPlus, UserCheck, MoreHorizontal, Loader2, Settings, MapPin, Check, Play, Film } from 'lucide-react';
@@ -10,7 +10,8 @@ import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useInfiniteShortsVideos } from '@/hooks/useInfiniteShortsVideos';
 import { useCreatorStats } from '@/hooks/useCreatorStats';
 import { VideoSection } from '@/components/videos/VideoSection';
-import { CreatorShortsGrid } from '@/components/creator/CreatorShortsGrid';
+import { ActivityGridV2 } from '@/components/profile/activity/v2';
+import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorAboutTab } from '@/components/creator/CreatorAboutTab';
 import { useMediaAutoplay } from '@/media';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
@@ -116,7 +117,7 @@ export const CreatorPage: React.FC = () => {
 
   // Fetch shorts (<4 min) with infinite scroll
   const {
-    items: shorts,
+    items: shortsRaw,
     isLoading: shortsLoading,
     hasMore: hasMoreShorts,
     fetchNextPage: fetchMoreShorts,
@@ -125,6 +126,26 @@ export const CreatorPage: React.FC = () => {
     creatorUserId: userId,
     maxDuration: 240,
   });
+
+  // Transform shorts to UnifiedMediaItem format for ActivityGridV2
+  const shorts: UnifiedMediaItem[] = useMemo(() => 
+    shortsRaw.map((short, index) => ({
+      id: short.id,
+      postId: short.id,
+      type: 'video' as const,
+      url: short.mediaUrl || '',
+      thumbnailUrl: short.thumbnailUrl,
+      playbackUrl: short.mediaUrl,
+      durationSeconds: short.durationSeconds,
+      likes: short.likes,
+      creator: {
+        id: short.creatorUserId,
+        name: short.creatorName,
+        avatar: short.creatorAvatarUrl,
+      },
+      isAutoplayCandidate: index === 0 || index % 3 === 0,
+      sortIndex: index,
+    })), [shortsRaw]);
 
   // Infinite scroll observers
   const videosObserverRef = useRef<HTMLDivElement>(null);
@@ -607,11 +628,20 @@ export const CreatorPage: React.FC = () => {
               shortsEmptyState
             ) : (
               <>
-                <CreatorShortsGrid
-                  shorts={shorts}
-                  onShortClick={handleShortClick}
-                  registerMedia={registerMedia}
-                  playingIds={playingIds}
+                <ActivityGridV2
+                  items={shorts}
+                  isLoading={shortsLoading}
+                  isFetchingNextPage={isFetchingMoreShorts}
+                  hasMore={hasMoreShorts}
+                  onLoadMore={fetchMoreShorts}
+                  onItemClick={(item) => handleShortClick(item.postId)}
+                  config={{
+                    autoplayEnabled: true,
+                    playThreshold: 0.6,
+                    pauseThreshold: 0.2,
+                    showLikes: false,
+                    showCreator: true,
+                  }}
                 />
                 
                 {/* Infinite scroll trigger */}
