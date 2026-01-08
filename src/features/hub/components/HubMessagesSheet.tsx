@@ -81,7 +81,7 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/50 z-[10001]"
             style={{ touchAction: 'none' }}
             onClick={onClose}
           />
@@ -92,7 +92,7 @@ export const HubMessagesSheet: React.FC<HubMessagesSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl overflow-hidden flex flex-col overscroll-contain"
+            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-2xl overflow-hidden flex flex-col overscroll-contain"
             style={{ 
               height: '70vh',
               background: 'var(--hub-bg-start)',
