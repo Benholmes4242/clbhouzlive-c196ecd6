@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
+import { HubCreateGameSheet } from '../../components/HubCreateGameSheet';
 
 /* --- SF-style icons (inline SVGs) --- */
 const FlagIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -71,9 +72,10 @@ export function QuickActionsTile() {
   const navigate = useNavigate();
   const { navigateFromHub } = useHub();
   const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
+  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
 
   const openProfile = () => navigate('/profile');
-  const openCreateGame = () => navigateFromHub('/hub/create-game');
+  const openCreateGame = () => setIsCreateGameSheetOpen(true);
   const openSwing = () => navigateFromHub('/hub/swing');
   const openEcho = () => setIsEchoSheetOpen(true);
 
@@ -111,6 +113,11 @@ export function QuickActionsTile() {
       <HubEchoSheet 
         isOpen={isEchoSheetOpen} 
         onClose={() => setIsEchoSheetOpen(false)} 
+      />
+      
+      <HubCreateGameSheet 
+        isOpen={isCreateGameSheetOpen} 
+        onClose={() => setIsCreateGameSheetOpen(false)} 
       />
     </>
   );

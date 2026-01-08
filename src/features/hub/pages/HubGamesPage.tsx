@@ -2,17 +2,19 @@
  * Hub Games Page
  * Full-screen page with standard Hub light theme styling
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GamesTab } from '@/features/nearby/GamesTab';
 import { useHub } from '@/features/hub/useHub';
 import { HubHeader } from '../components/HubHeader';
+import { HubCreateGameSheet } from '../components/HubCreateGameSheet';
 import '../home/hubThemeLight.css';
 
 export function HubGamesPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const { navigateFromHub } = useHub();
+  const [isCreateGameSheetOpen, setIsCreateGameSheetOpen] = useState(false);
 
   const goBack = () => {
     const state = loc.state as any;
@@ -24,7 +26,7 @@ export function HubGamesPage() {
   };
 
   const handleOpenCreate = () => {
-    navigateFromHub('/hub/create-game');
+    setIsCreateGameSheetOpen(true);
   };
 
   return (
@@ -55,6 +57,11 @@ export function HubGamesPage() {
           <GamesTab onOpenCreate={handleOpenCreate} />
         </div>
       </div>
+      
+      <HubCreateGameSheet 
+        isOpen={isCreateGameSheetOpen} 
+        onClose={() => setIsCreateGameSheetOpen(false)} 
+      />
     </div>
   );
 }
