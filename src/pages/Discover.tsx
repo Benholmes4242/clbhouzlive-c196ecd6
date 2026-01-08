@@ -226,7 +226,7 @@ const Discover = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)] compact-header-offset">
+    <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)]">
       <FadeInContent>
         <main className="pb-20 bg-[var(--bg-page)]">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}

@@ -72,7 +72,7 @@ const Top100Hub = () => {
   // Guard against invalid data
   if (!lists && !listsLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)] safe-top compact-header-offset">
+      <PageRoot className="min-h-screen bg-[var(--bg-page)]">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-foreground mb-2">Unable to load Top 100 lists</h2>
@@ -85,7 +85,7 @@ const Top100Hub = () => {
 
   if (listsLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)] safe-top compact-header-offset">
+      <PageRoot className="min-h-screen bg-[var(--bg-page)]">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="animate-pulse space-y-4">
             <div className="h-64 bg-muted rounded-sq-md" />
@@ -97,7 +97,7 @@ const Top100Hub = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)] safe-top compact-header-offset">
+    <PageRoot className="min-h-screen bg-[var(--bg-page)]">
       <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}

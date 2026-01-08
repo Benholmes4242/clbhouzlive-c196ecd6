@@ -69,7 +69,7 @@ export default function SeasonShop() {
     : shopItems?.filter(item => item.category === selectedCategory);
 
   return (
-    <PageRoot className="min-h-screen bg-background pb-24 compact-header-offset">
+    <PageRoot className="min-h-screen bg-background pb-24">
       <div>
         {/* Header */}
         <div className="px-4 py-6 bg-gradient-to-b from-primary/10 to-background">

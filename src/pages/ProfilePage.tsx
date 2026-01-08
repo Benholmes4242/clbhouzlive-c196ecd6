@@ -100,7 +100,7 @@ const ProfilePage = () => {
   }
   
   return (
-    <PageRoot className="min-h-screen bg-background safe-top">
+    <PageRoot className="min-h-screen bg-background">
       <HeroProfileHeader
         profile={profile ?? null}
         isOwnProfile={true}
