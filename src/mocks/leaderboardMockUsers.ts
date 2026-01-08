@@ -13,6 +13,7 @@ export interface LeaderboardMockUser {
   total_top100_played: number;
   rank: number;
   previous_rank: number | null;
+  delta_rank: number | null; // For Rising segment: positive = moved up
   country: string | null;
   country_code: string | null;
   is_friend: boolean;
@@ -122,9 +123,11 @@ export function generateMockLeaderboardUsers(
     const baseScore = Math.floor(50 * Math.pow(topWeight, 1.5) + random() * 5);
     const totalPlayed = Math.max(1, baseScore);
     
-    // Previous rank with some variation
-    const rankDelta = Math.floor(random() * 10) - 5; // -5 to +5
+    // Previous rank with some variation (for Rising calculations)
+    const rankDelta = Math.floor(random() * 20) - 5; // -5 to +15 (bias towards positive for more risers)
     const prevRank = i + 1 + rankDelta;
+    // delta_rank is positive if they moved UP (current rank < previous rank)
+    const deltaRank = prevRank > 0 ? prevRank - (i + 1) : 0;
     
     users.push({
       user_id: `mock-lb-${seed.slice(0, 8)}-${i + 1}`,
@@ -134,6 +137,7 @@ export function generateMockLeaderboardUsers(
       total_top100_played: totalPlayed,
       rank: i + 1,
       previous_rank: prevRank > 0 ? prevRank : null,
+      delta_rank: deltaRank > 0 ? deltaRank : null, // Only set if positive (rising)
       country: country.name,
       country_code: country.code,
       is_friend: random() < 0.15, // 15% chance of being a "friend"
@@ -166,3 +170,64 @@ export function getMockLeaderboardUsers(): LeaderboardMockUser[] {
 
 // Benjamin Holmes user ID - used to scope mock injection
 export const BENJAMIN_HOLMES_USER_ID = '6a5bcbb9-c22c-4655-ad8e-088b2858ca3e';
+
+// Mock spotlight players for "Setting the Standard" section
+export interface MockSpotlightPlayer {
+  user_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  home_club: string | null;
+  metric_value: number;
+  spotlight_type: 'most_played' | 'highest_rated' | 'fastest_riser';
+}
+
+export function getMockSpotlightPlayers(): MockSpotlightPlayer[] {
+  const mocks = getMockLeaderboardUsers();
+  
+  // Pick top performers from mock data
+  const sortedByPlayed = [...mocks].sort((a, b) => b.total_top100_played - a.total_top100_played);
+  const sortedByRising = [...mocks].filter(m => m.delta_rank && m.delta_rank > 0)
+    .sort((a, b) => (b.delta_rank || 0) - (a.delta_rank || 0));
+  
+  const spotlights: MockSpotlightPlayer[] = [];
+  
+  // Most Played this month
+  if (sortedByPlayed[0]) {
+    spotlights.push({
+      user_id: sortedByPlayed[0].user_id,
+      display_name: sortedByPlayed[0].display_name,
+      avatar_url: sortedByPlayed[0].avatar_url,
+      home_club: sortedByPlayed[0].home_club,
+      metric_value: Math.min(12, Math.floor(sortedByPlayed[0].total_top100_played / 3)),
+      spotlight_type: 'most_played',
+    });
+  }
+  
+  // Fastest Riser
+  if (sortedByRising[0]) {
+    spotlights.push({
+      user_id: sortedByRising[0].user_id,
+      display_name: sortedByRising[0].display_name,
+      avatar_url: sortedByRising[0].avatar_url,
+      home_club: sortedByRising[0].home_club,
+      metric_value: sortedByRising[0].delta_rank || 0,
+      spotlight_type: 'fastest_riser',
+    });
+  }
+  
+  // Highest Rated (pick a different user)
+  const usedIds = new Set(spotlights.map(s => s.user_id));
+  const highRated = sortedByPlayed.find(m => !usedIds.has(m.user_id) && m.total_top100_played > 5);
+  if (highRated) {
+    spotlights.push({
+      user_id: highRated.user_id,
+      display_name: highRated.display_name,
+      avatar_url: highRated.avatar_url,
+      home_club: highRated.home_club,
+      metric_value: 8.7, // Realistic avg rating
+      spotlight_type: 'highest_rated',
+    });
+  }
+  
+  return spotlights;
+}
