@@ -33,7 +33,7 @@ const CourseDetailPage = () => {
   // Add defensive check for courseId
   if (!courseId) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)] safe-top compact-header-offset flex items-center justify-center">
+      <PageRoot className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Course not found</h1>
           <p className="text-muted-foreground mb-4">The course you're looking for doesn't exist.</p>
@@ -46,7 +46,7 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)] safe-top compact-header-offset">
+    <PageRoot className="min-h-screen bg-[var(--bg-page)]">
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>

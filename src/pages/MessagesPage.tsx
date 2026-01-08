@@ -43,7 +43,7 @@ const MessagesPage = () => {
 
   if (!user) {
     return (
-      <PageRoot className="min-h-screen bg-background safe-top">
+      <PageRoot className="min-h-screen bg-background">
         <div className="px-4 md:container md:mx-auto md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view messages.</p>
         </div>
@@ -52,7 +52,7 @@ const MessagesPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-background compact-header-offset">
+    <PageRoot className="min-h-screen bg-background">
       <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-6">

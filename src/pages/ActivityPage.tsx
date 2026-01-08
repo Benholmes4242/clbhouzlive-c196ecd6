@@ -222,7 +222,7 @@ const ActivityPage: React.FC = () => {
   const isAllCaughtUp = hasNotifications && effectiveNewItems.length === 0;
 
   return (
-    <PageRoot className="pb-24 compact-header-offset">
+    <PageRoot className="pb-24">
       {/* Header section with padding */}
       <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6">
         <section className="mb-4">
