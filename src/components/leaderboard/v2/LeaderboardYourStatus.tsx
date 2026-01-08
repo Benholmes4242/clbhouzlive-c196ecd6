@@ -25,12 +25,16 @@ export interface LeaderboardUserStatus {
 interface LeaderboardYourStatusProps {
   user: LeaderboardUserStatus;
   onViewRivals?: () => void;
+  rivalsDisabled?: boolean;
+  rivalsDisabledReason?: string;
   className?: string;
 }
 
 export function LeaderboardYourStatus({ 
   user, 
   onViewRivals,
+  rivalsDisabled = false,
+  rivalsDisabledReason,
   className 
 }: LeaderboardYourStatusProps) {
   const navigate = useNavigate();
@@ -166,15 +170,22 @@ export function LeaderboardYourStatus({
       {/* CTAs row with press effect */}
       <div className="flex border-t border-border/40">
         <motion.button
-          onClick={onViewRivals}
-          whileTap={{ scale: 0.98 }}
-          className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors border-r border-border/40"
+          onClick={rivalsDisabled ? undefined : onViewRivals}
+          whileTap={rivalsDisabled ? undefined : { scale: 0.98 }}
+          disabled={rivalsDisabled}
+          title={rivalsDisabled ? rivalsDisabledReason : undefined}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors border-r border-border/40",
+            rivalsDisabled 
+              ? "text-muted-foreground/40 cursor-not-allowed" 
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+          )}
         >
           <Target className="w-4 h-4" />
           View Rivals
         </motion.button>
         <motion.button
-          onClick={() => navigate('/top100?tab=courses')}
+          onClick={() => navigate('/discover?tab=explore')}
           whileTap={{ scale: 0.98 }}
           className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
         >

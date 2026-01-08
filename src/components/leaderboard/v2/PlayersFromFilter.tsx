@@ -12,12 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { 
+  Drawer, 
+  DrawerContent, 
+  DrawerHeader, 
+  DrawerTitle 
+} from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -96,6 +96,84 @@ function getCountryName(code: string): string {
   return country?.name || code;
 }
 
+// Country Bottom Sheet Component (iOS-style)
+interface CountryBottomSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  countries: typeof ALL_COUNTRIES;
+  selectedCode: string;
+  onSelect: (code: string) => void;
+}
+
+function CountryBottomSheet({
+  open,
+  onOpenChange,
+  searchQuery,
+  onSearchChange,
+  countries,
+  selectedCode,
+  onSelect,
+}: CountryBottomSheetProps) {
+  return (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="max-h-[85vh]">
+        <DrawerHeader className="pb-2">
+          <DrawerTitle className="text-center">Select Country</DrawerTitle>
+        </DrawerHeader>
+        
+        <div className="px-4 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search countries..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-9"
+              autoFocus
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <ScrollArea className="h-[50vh] px-2">
+          <div className="px-2 pb-6 space-y-0.5">
+            {countries.map((country) => (
+              <button
+                key={country.code}
+                onClick={() => onSelect(country.code)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left',
+                  'hover:bg-muted/60 transition-colors active:scale-[0.98]',
+                  selectedCode === country.code && 'bg-muted'
+                )}
+              >
+                <span className="text-sm font-medium">{country.name}</span>
+                {selectedCode === country.code && (
+                  <Check className="w-4 h-4 text-primary ml-auto" />
+                )}
+              </button>
+            ))}
+            {countries.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                No countries found
+              </p>
+            )}
+          </div>
+        </ScrollArea>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
 export function PlayersFromFilter({
   value,
   onChange,
@@ -124,38 +202,44 @@ export function PlayersFromFilter({
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            className={cn(
-              'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg',
-              'bg-muted/40 hover:bg-muted/60 transition-colors',
-              'text-xs font-medium text-muted-foreground hover:text-foreground',
-              'border border-border/40',
-              className
-            )}
-          >
-            <span className="text-muted-foreground/70">Players from:</span>
-            {value === 'worldwide' ? (
-              <Globe className="w-3.5 h-3.5" />
-            ) : (
-              <MapPin className="w-3.5 h-3.5" />
-            )}
-            <span className="font-semibold text-foreground">{getDisplayLabel()}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-52">
-          <DropdownMenuItem
-            onClick={() => onChange('worldwide')}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Globe className="w-4 h-4 text-muted-foreground" />
-            <span>Worldwide</span>
-            {value === 'worldwide' && (
-              <Check className="w-4 h-4 text-primary ml-auto" />
-            )}
-          </DropdownMenuItem>
+      <div className="space-y-1">
+        <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60 px-0.5">
+          Golfers based in
+        </p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg',
+                'bg-muted/40 hover:bg-muted/60 transition-colors',
+                'text-xs font-medium text-muted-foreground hover:text-foreground',
+                'border border-border/40',
+                className
+              )}
+            >
+              {value === 'worldwide' ? (
+                <Globe className="w-3.5 h-3.5" />
+              ) : (
+                <MapPin className="w-3.5 h-3.5" />
+              )}
+              <span className="font-semibold text-foreground">{getDisplayLabel()}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-52">
+            <div className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+              Filter golfers by home club country
+            </div>
+            <DropdownMenuItem
+              onClick={() => onChange('worldwide')}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              <span>Worldwide</span>
+              {value === 'worldwide' && (
+                <Check className="w-4 h-4 text-primary ml-auto" />
+              )}
+            </DropdownMenuItem>
 
           {userCountry && (
             <DropdownMenuItem
@@ -172,69 +256,27 @@ export function PlayersFromFilter({
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem
-            onClick={() => setCountrySearchOpen(true)}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <span>Choose Country...</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuItem
+              onClick={() => setCountrySearchOpen(true)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Search className="w-4 h-4 text-muted-foreground" />
+              <span>Choose Country...</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-      {/* Country Search Dialog */}
-      <Dialog open={countrySearchOpen} onOpenChange={setCountrySearchOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Select Country</DialogTitle>
-          </DialogHeader>
-          
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search countries..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-              autoFocus
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
-            )}
-          </div>
-
-          <ScrollArea className="h-[300px] -mx-2">
-            <div className="px-2 space-y-0.5">
-              {filteredCountries.map((country) => (
-                <button
-                  key={country.code}
-                  onClick={() => handleCountrySelect(country.code)}
-                  className={cn(
-                    'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left',
-                    'hover:bg-muted/60 transition-colors',
-                    value === country.code && 'bg-muted'
-                  )}
-                >
-                  <span className="text-sm">{country.name}</span>
-                  {value === country.code && (
-                    <Check className="w-4 h-4 text-primary ml-auto" />
-                  )}
-                </button>
-              ))}
-              {filteredCountries.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No countries found
-                </p>
-              )}
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+      {/* Country Search Bottom Sheet */}
+      <CountryBottomSheet
+        open={countrySearchOpen}
+        onOpenChange={setCountrySearchOpen}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        countries={filteredCountries}
+        selectedCode={value}
+        onSelect={handleCountrySelect}
+      />
     </>
   );
 }
