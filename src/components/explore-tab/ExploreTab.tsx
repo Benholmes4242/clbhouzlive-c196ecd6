@@ -30,9 +30,9 @@ const EXPLORE_PILLS: { id: string; label: string }[] = [
 
 // Region metadata for carousels
 const REGION_CONFIG: { key: RegionKey; title: string }[] = [
-  { key: 'GBI', title: 'Great Britain & Ireland' },
-  { key: 'EU', title: 'Continental Europe' },
-  { key: 'USA', title: 'United States' },
+  { key: 'GBI', title: 'GB&I' },
+  { key: 'EU', title: 'Europe' },
+  { key: 'USA', title: 'USA' },
   { key: 'ROW', title: 'Rest of World' },
 ];
 
