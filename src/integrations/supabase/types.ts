@@ -3075,6 +3075,7 @@ export type Database = {
           longitude: number | null
           name: string
           region: string | null
+          region_key: string | null
           regional_rank: number | null
           sub_country: string | null
           thumbnail_image: string | null
@@ -3096,6 +3097,7 @@ export type Database = {
           longitude?: number | null
           name: string
           region?: string | null
+          region_key?: string | null
           regional_rank?: number | null
           sub_country?: string | null
           thumbnail_image?: string | null
@@ -3117,6 +3119,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           region?: string | null
+          region_key?: string | null
           regional_rank?: number | null
           sub_country?: string | null
           thumbnail_image?: string | null
@@ -8098,6 +8101,24 @@ export type Database = {
           message_count: number | null
           preview_snippet: string | null
           thread_id: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      explore_moments: {
+        Row: {
+          aspect_ratio: number | null
+          course_id: string | null
+          created_at: string | null
+          display_order: number | null
+          media_type: string | null
+          media_url: string | null
+          moment_id: string | null
+          region_key: string | null
+          source_id: string | null
+          source_type: string | null
+          stream_id: string | null
+          thumbnail_url: string | null
           user_id: string | null
         }
         Relationships: []

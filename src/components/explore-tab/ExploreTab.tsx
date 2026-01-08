@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { Compass, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import ExploreHero from './ExploreHero';
 import Top100JourneySummary from './Top100JourneySummary';
-import RegionExploreRail from './RegionExploreRail';
-import ThemeExploreRail from './ThemeExploreRail';
-import CourseDiscoveryFeed from './CourseDiscoveryFeed';
+import ExploreRegionCards from './ExploreRegionCards';
+import DiscoverMomentsGrid from './DiscoverMomentsGrid';
+import ExploreSearchSheet from './ExploreSearchSheet';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import ExploreSearchResults from './ExploreSearchResults';
 import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
@@ -28,6 +28,12 @@ const EXPLORE_PILLS: { id: string; label: string }[] = [
 
 /**
  * ExploreTab - The aspirational discovery surface for golf places, courses, and journeys
+ * 
+ * Phase 1 V1:
+ * - Hero with "Start exploring" that opens search sheet
+ * - Top 100 Journey summary (kept as-is)
+ * - Explore by Region cards (GBI, EU, USA, ROW) with moment counts
+ * - Discover Courses grid using explore_moments view (20 + infinite scroll)
  */
 export const ExploreTab: React.FC<ExploreTabProps> = ({
   onMediaClick,
@@ -44,6 +50,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     const saved = localStorage.getItem(EXPLORE_SORT_KEY);
     return (saved as SortOption) || 'newest';
   });
+  
+  // Search sheet state
+  const [isSearchSheetOpen, setIsSearchSheetOpen] = useState(false);
 
   // Data hooks
   const { data: trendingCourses } = useTrendingCourses(20);
@@ -86,9 +95,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     selected: activeFilter === p.id,
   }));
 
-  const handleExploreClick = () => {
-    window.scrollTo({ top: 300, behavior: 'smooth' });
-  };
+  const handleSearchClick = useCallback(() => {
+    setIsSearchSheetOpen(true);
+  }, []);
 
   const handleStartJourney = () => {
     navigate('/top100');
@@ -202,16 +211,15 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       default: // 'all'
         return (
           <>
-            <ExploreHero onExploreClick={handleExploreClick} />
+            <ExploreHero onSearchClick={handleSearchClick} />
             <Top100JourneySummary
               onStartJourney={handleStartJourney}
               onContinueJourney={handleContinueJourney}
             />
             <div className="h-px bg-border/40 mx-5" />
-            <RegionExploreRail />
-            <ThemeExploreRail />
+            <ExploreRegionCards />
             <div className="h-px bg-border/40 mx-5" />
-            <CourseDiscoveryFeed onItemClick={handleItemClick} />
+            <DiscoverMomentsGrid onMomentClick={handleItemClick} />
           </>
         );
     }
@@ -246,6 +254,12 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       
       {/* Bottom spacing */}
       <div className="h-8" />
+      
+      {/* Search Sheet */}
+      <ExploreSearchSheet 
+        isOpen={isSearchSheetOpen} 
+        onClose={() => setIsSearchSheetOpen(false)} 
+      />
     </div>
   );
 };
