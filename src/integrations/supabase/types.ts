@@ -9701,6 +9701,28 @@ export type Database = {
             }
             Returns: undefined
           }
+      rpc_explore_trending: {
+        Args: { p_limit?: number; p_region_key?: string }
+        Returns: {
+          aspect_ratio: number
+          comments_count: number
+          course_id: string
+          created_at: string
+          display_order: number
+          likes_count: number
+          media_type: string
+          media_url: string
+          moment_id: string
+          region_key: string
+          shares_count: number
+          source_id: string
+          source_type: string
+          stream_id: string
+          thumbnail_url: string
+          trend_score: number
+          user_id: string
+        }[]
+      }
       search_golf_courses: {
         Args: {
           country_filter?: string

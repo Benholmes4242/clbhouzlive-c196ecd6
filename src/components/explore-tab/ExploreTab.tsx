@@ -7,9 +7,11 @@ import Top100JourneySummary from './Top100JourneySummary';
 import ExploreRegionCards from './ExploreRegionCards';
 import DiscoverMomentsGrid from './DiscoverMomentsGrid';
 import ExploreSearchSheet from './ExploreSearchSheet';
+import NewThisWeekCarousel from './NewThisWeekCarousel';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import ExploreSearchResults from './ExploreSearchResults';
 import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
+import { useExplorePrefetch, RegionKey } from '@/hooks/useExploreMoments';
 
 interface ExploreTabProps {
   onMediaClick?: (item: any) => void;
@@ -26,14 +28,21 @@ const EXPLORE_PILLS: { id: string; label: string }[] = [
   { id: 'bucket-list', label: 'Bucket List' },
 ];
 
+// Region metadata for carousels
+const REGION_CONFIG: { key: RegionKey; title: string }[] = [
+  { key: 'GBI', title: 'Great Britain & Ireland' },
+  { key: 'EU', title: 'Continental Europe' },
+  { key: 'USA', title: 'United States' },
+  { key: 'ROW', title: 'Rest of World' },
+];
+
 /**
  * ExploreTab - The aspirational discovery surface for golf places, courses, and journeys
  * 
- * Phase 1 V1:
- * - Hero with "Start exploring" that opens search sheet
- * - Top 100 Journey summary (kept as-is)
- * - Explore by Region cards (GBI, EU, USA, ROW) with moment counts
- * - Discover Courses grid using explore_moments view (20 + infinite scroll)
+ * Phase 2:
+ * - Trending support (7 days weighted by engagement)
+ * - "New this week in [Region]" micro-carousels
+ * - Caching + prefetch for instant tab switching
  */
 export const ExploreTab: React.FC<ExploreTabProps> = ({
   onMediaClick,
@@ -41,6 +50,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 }) => {
   const navigate = useNavigate();
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Prefetch explore data on mount
+  useExplorePrefetch();
   
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
@@ -218,6 +230,20 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
             />
             <div className="h-px bg-border/40 mx-5" />
             <ExploreRegionCards />
+            
+            {/* New this week micro-carousels */}
+            <div className="h-px bg-border/40 mx-5" />
+            <div className="py-2">
+              {REGION_CONFIG.map(region => (
+                <NewThisWeekCarousel
+                  key={region.key}
+                  regionKey={region.key}
+                  regionTitle={region.title}
+                  onMomentClick={handleItemClick}
+                />
+              ))}
+            </div>
+            
             <div className="h-px bg-border/40 mx-5" />
             <DiscoverMomentsGrid onMomentClick={handleItemClick} />
           </>
@@ -226,9 +252,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   };
 
   return (
-    <div className={cn("min-h-screen bg-[var(--bg-page)]", className)}>
+    <div className={cn("min-h-screen bg-background", className)}>
       {/* Sticky Command Center: Search + Sort + Pills */}
-      <div ref={searchContainerRef} className="sticky top-0 z-30 bg-[var(--bg-page)]">
+      <div ref={searchContainerRef} className="sticky top-0 z-30 bg-background">
         <DiscoverCommandCenter
           searchPlaceholder="Search courses, regions..."
           searchValue={searchQuery}

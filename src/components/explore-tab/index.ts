@@ -8,3 +8,4 @@ export { default as CourseDiscoveryFeed } from './CourseDiscoveryFeed';
 export { default as DiscoverMomentsGrid } from './DiscoverMomentsGrid';
 export { default as ExploreSearchSheet } from './ExploreSearchSheet';
 export { default as ExploreEmptyState } from './ExploreEmptyState';
+export { default as NewThisWeekCarousel } from './NewThisWeekCarousel';
