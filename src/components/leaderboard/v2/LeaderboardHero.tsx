@@ -19,13 +19,13 @@ export function LeaderboardHero({
 }: LeaderboardHeroProps) {
   return (
     <div className="relative w-full overflow-hidden">
-      {/* Background gradient with subtle texture */}
+      {/* Background gradient with subtle texture - using global slate */}
       <div 
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse 120% 80% at 50% 0%, hsl(220 20% 18%) 0%, hsl(220 25% 8%) 100%),
-            linear-gradient(180deg, hsl(220 25% 12%) 0%, hsl(220 30% 6%) 100%)
+            radial-gradient(ellipse 120% 80% at 50% 0%, hsl(216 10% 32%) 0%, hsl(216 10% 24%) 100%),
+            linear-gradient(180deg, hsl(216 10% 28%) 0%, hsl(216 10% 22%) 100%)
           `,
         }}
       />
@@ -39,15 +39,15 @@ export function LeaderboardHero({
               0deg,
               transparent,
               transparent 39px,
-              hsl(210 30% 50%) 39px,
-              hsl(210 30% 50%) 40px
+              hsl(216 10% 50%) 39px,
+              hsl(216 10% 50%) 40px
             ),
             repeating-linear-gradient(
               90deg,
               transparent,
               transparent 39px,
-              hsl(210 30% 50%) 39px,
-              hsl(210 30% 50%) 40px
+              hsl(216 10% 50%) 39px,
+              hsl(216 10% 50%) 40px
             )
           `,
         }}

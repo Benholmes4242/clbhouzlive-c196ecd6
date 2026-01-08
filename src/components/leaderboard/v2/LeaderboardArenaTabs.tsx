@@ -81,7 +81,7 @@ export function LeaderboardArenaTabs({
                   'flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium transition-all',
                   'whitespace-nowrap',
                   isActive
-                    ? 'bg-foreground text-background shadow-sm'
+                    ? 'bg-surface-slate text-white shadow-sm'
                     : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
                   isDisabled && 'opacity-40 cursor-not-allowed'
                 )}
