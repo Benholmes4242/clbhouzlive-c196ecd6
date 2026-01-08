@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
-export type LeaderboardRegion = 'worldwide' | 'gbi' | 'europe' | 'usa' | 'asia-pacific';
+export type LeaderboardRegion = 'worldwide' | 'gbi' | 'europe' | 'usa';
 
 interface Region {
   id: LeaderboardRegion;
@@ -21,12 +21,12 @@ interface Region {
   icon: React.ElementType;
 }
 
+// Top 100 Lists - removed Asia-Pacific as not currently supported
 const REGIONS: Region[] = [
   { id: 'worldwide', label: 'Worldwide', shortLabel: 'World', icon: Globe },
   { id: 'gbi', label: 'GB & Ireland', shortLabel: 'GB&I', icon: MapPin },
   { id: 'europe', label: 'Continental Europe', shortLabel: 'Europe', icon: MapPin },
   { id: 'usa', label: 'USA', shortLabel: 'USA', icon: MapPin },
-  { id: 'asia-pacific', label: 'Asia-Pacific', shortLabel: 'APAC', icon: MapPin },
 ];
 
 interface LeaderboardRegionSelectorProps {
@@ -44,45 +44,53 @@ export function LeaderboardRegionSelector({
   const Icon = activeRegion.icon;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          className={cn(
-            'inline-flex items-center gap-2 px-3 py-2 rounded-lg',
-            'bg-muted/50 hover:bg-muted transition-colors',
-            'text-sm font-medium text-foreground',
-            className
-          )}
-        >
-          <Icon className="w-4 h-4 text-muted-foreground" />
-          <span>{activeRegion.label}</span>
-          <ChevronDown className="w-4 h-4 text-muted-foreground ml-1" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
-        {REGIONS.map((region) => {
-          const RegionIcon = region.icon;
-          const isActive = value === region.id;
-          
-          return (
-            <DropdownMenuItem
-              key={region.id}
-              onClick={() => onChange(region.id)}
-              className={cn(
-                'flex items-center gap-2 cursor-pointer',
-                isActive && 'bg-muted'
-              )}
-            >
-              <RegionIcon className="w-4 h-4 text-muted-foreground" />
-              <span>{region.label}</span>
-              {isActive && (
-                <span className="ml-auto text-primary">✓</span>
-              )}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="space-y-1">
+      <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60 px-0.5">
+        Top 100 List
+      </p>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className={cn(
+              'inline-flex items-center gap-2 px-3 py-2 rounded-lg',
+              'bg-muted/50 hover:bg-muted transition-colors',
+              'text-sm font-medium text-foreground',
+              className
+            )}
+          >
+            <Icon className="w-4 h-4 text-muted-foreground" />
+            <span>{activeRegion.label}</span>
+            <ChevronDown className="w-4 h-4 text-muted-foreground ml-1" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-52">
+          <div className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+            Choose which Top 100 list this leaderboard is based on
+          </div>
+          {REGIONS.map((region) => {
+            const RegionIcon = region.icon;
+            const isActive = value === region.id;
+            
+            return (
+              <DropdownMenuItem
+                key={region.id}
+                onClick={() => onChange(region.id)}
+                className={cn(
+                  'flex items-center gap-2 cursor-pointer',
+                  isActive && 'bg-muted'
+                )}
+              >
+                <RegionIcon className="w-4 h-4 text-muted-foreground" />
+                <span>{region.label}</span>
+                {isActive && (
+                  <span className="ml-auto text-primary">✓</span>
+                )}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 

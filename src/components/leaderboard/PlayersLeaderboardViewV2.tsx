@@ -59,7 +59,6 @@ const REGION_TO_SCOPE: Record<LeaderboardRegion, LeaderboardScope> = {
   gbi: 'gb-i-top-100',
   europe: 'europe-top-100',
   usa: 'usa-top-100',
-  'asia-pacific': 'worldwide', // Fallback
 };
 
 // Arena descriptions for helper text
@@ -322,6 +321,12 @@ export function PlayersLeaderboardViewV2() {
   // Disabled arena modes for new users
   const disabledModes: ArenaMode[] = isNewUser ? ['nearby'] : [];
 
+  // Rivals are only available on Global, Regional, and Friends modes
+  const rivalsDisabled = arenaMode === 'climbers' || arenaMode === 'nearby';
+  const rivalsDisabledReason = rivalsDisabled 
+    ? 'Rivals are available in Global, Regional, and Friends leagues.' 
+    : undefined;
+
   // Show Players From filter for these modes
   const showPlayersFromFilter = arenaMode === 'global' || arenaMode === 'regional' || arenaMode === 'climbers';
 
@@ -473,6 +478,8 @@ export function PlayersLeaderboardViewV2() {
           <LeaderboardYourStatus
             user={userStatus}
             onViewRivals={scrollToUser}
+            rivalsDisabled={rivalsDisabled}
+            rivalsDisabledReason={rivalsDisabledReason}
           />
         </motion.div>
       )}
@@ -633,6 +640,23 @@ export function PlayersLeaderboardViewV2() {
                   </motion.div>
                 );
               })}
+              
+              {/* End of list indicator */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="py-8 px-6 text-center"
+              >
+                <p className="text-sm text-muted-foreground/60 font-medium">
+                  End of leaderboard
+                </p>
+                {arenaMode !== 'climbers' && (
+                  <p className="text-xs text-muted-foreground/40 mt-1">
+                    Check Fast Climbers to see who's moving up.
+                  </p>
+                )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

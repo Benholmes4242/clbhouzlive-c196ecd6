@@ -65,23 +65,41 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
     queryKey: ['user-home-club-location', userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data: profile } = await supabase
+      // Debug: Log the user ID being queried
+      console.log('[useNearbyPlayers] Fetching home club for userId:', userId);
+      
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('home_club_id, home_club')
         .eq('id', userId!)
         .single();
 
+      // Debug: Log profile data
+      console.log('[useNearbyPlayers] Profile data:', profile, 'Error:', profileError);
+
       if (!profile?.home_club_id) {
+        console.log('[useNearbyPlayers] No home_club_id found for user');
         return null;
       }
 
-      const { data: club } = await supabase
+      const { data: club, error: clubError } = await supabase
         .from('golf_clubs')
         .select('latitude, longitude, country, name')
         .eq('id', profile.home_club_id)
         .single();
 
-      if (!club) return null;
+      // Debug: Log club data
+      console.log('[useNearbyPlayers] Club data:', club, 'Error:', clubError);
+
+      if (!club) {
+        console.log('[useNearbyPlayers] No club found for home_club_id:', profile.home_club_id);
+        return null;
+      }
+
+      // Check if club has valid coordinates
+      if (!club.latitude || !club.longitude) {
+        console.log('[useNearbyPlayers] Club missing lat/lng:', club);
+      }
 
       return {
         lat: club.latitude,
@@ -141,7 +159,16 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
 
   // Compute nearby players
   const result = (() => {
+    // Debug: Log the decision-making process
+    console.log('[useNearbyPlayers] Computing result:', {
+      userId,
+      hasPlayersData: !!playersData,
+      userClubData,
+      hasClubLocations: !!clubLocations,
+    });
+
     if (!userId || !playersData) {
+      console.log('[useNearbyPlayers] No userId or playersData, returning none');
       return {
         players: [],
         fallbackMode: 'none' as const,
@@ -150,6 +177,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
     }
 
     const hasValidLocation = userClubData?.lat && userClubData?.lng;
+    console.log('[useNearbyPlayers] hasValidLocation:', hasValidLocation);
 
     if (hasValidLocation && clubLocations) {
       // Calculate distances and filter
@@ -233,6 +261,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
 
     // Fallback: same country
     if (userClubData?.country) {
+      console.log('[useNearbyPlayers] Using country fallback for:', userClubData.country);
       const countryPlayers = (playersData as any[])
         .filter((p) => p.user_id !== userId)
         .map((player) => ({
@@ -249,6 +278,7 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
         .slice(0, 50)
         .map((p, i) => ({ ...p, rank: i + 1 }));
 
+      console.log('[useNearbyPlayers] Found', countryPlayers.length, 'players in country');
       return {
         players: countryPlayers,
         fallbackMode: 'country' as const,
@@ -256,12 +286,21 @@ export function useNearbyPlayers(userId: string | null): UseNearbyPlayersResult 
       };
     }
 
+    console.log('[useNearbyPlayers] No valid location or country, returning none');
     return {
       players: [],
       fallbackMode: 'none' as const,
       radiusUsed: 0,
     };
   })();
+
+  // Debug: Log final result
+  console.log('[useNearbyPlayers] Final result:', {
+    playerCount: result.players.length,
+    fallbackMode: result.fallbackMode,
+    radiusUsed: result.radiusUsed,
+    hasUserLocation: !!userClubData,
+  });
 
   return {
     players: result.players,
