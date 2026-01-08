@@ -1,16 +1,25 @@
 /**
  * useActiveGameCounts - fetch active game counts by course ID
  * Returns a map of courseId -> count of active games
+ * 
+ * V3: Used by leaderboard to show "X games" badge on course rows
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export function useActiveGameCounts(courseIds: string[]) {
-  return useQuery({
-    queryKey: ['active-game-counts', courseIds.sort().join(',')],
+export interface UseActiveGameCountsResult {
+  counts: Record<string, number>;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+export function useActiveGameCounts(courseIds: string[]): UseActiveGameCountsResult {
+  const query = useQuery({
+    queryKey: ['active-game-counts', courseIds.slice().sort().join(',')],
     enabled: courseIds.length > 0,
     staleTime: 30_000, // 30 second cache
-    queryFn: async () => {
+    gcTime: 60_000, // keep in cache 1 minute
+    queryFn: async (): Promise<Record<string, number>> => {
       if (courseIds.length === 0) return {};
 
       const now = new Date().toISOString();
@@ -40,4 +49,10 @@ export function useActiveGameCounts(courseIds: string[]) {
       return counts;
     },
   });
+
+  return {
+    counts: query.data ?? {},
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
