@@ -63,11 +63,11 @@ export function CourseLeaderboardHero({
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
       />
 
-      {/* Very subtle slate tint - light mode optimized */}
-      <div className="absolute inset-0 bg-slate-900/20" />
+      {/* Very subtle slate tint - light mode optimized, never "black" */}
+      <div className="absolute inset-0 bg-slate-600/15" />
       
-      {/* Bottom gradient for text readability */}
-      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-slate-900/60 via-slate-900/30 to-transparent" />
+      {/* Bottom gradient for text readability - warm slate, not dark */}
+      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-slate-700/50 via-slate-600/20 to-transparent" />
 
       {/* Content overlay */}
       <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-6">
