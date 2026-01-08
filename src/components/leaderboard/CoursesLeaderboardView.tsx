@@ -4,11 +4,12 @@ import { useTop100CourseLeaderboard } from '@/hooks/useTop100CourseLeaderboard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LeaderboardCourseCard } from './LeaderboardCourseCard';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
-import { LeaderboardInsightChip } from './LeaderboardInsightChip';
+import { CourseLeaderboardHero } from './CourseLeaderboardHero';
+import { CinematicCourseCard } from './CinematicCourseCard';
+import { CourseMomentumCallout } from './CourseMomentumCallout';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { TrendingUp, TrendingDown, Star, Users, ChevronDown } from 'lucide-react';
+import { Star, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -20,8 +21,7 @@ import {
   CourseSortKey,
 } from '@/lib/mockCourseLeaderboardData';
 
-type CourseSortOption = 'most_played' | 'highest_rated' | 'trending' | 'friends';
-type AudienceFilter = 'all' | 'friends';
+type CourseSortOption = 'most_played' | 'highest_rated' | 'rising' | 'friends';
 
 const PAGE_SIZE = 10;
 const MAX_COURSES = 100;
@@ -29,22 +29,15 @@ const MAX_COURSES = 100;
 const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'most_played', label: 'Most Played' },
   { value: 'highest_rated', label: 'Highest Rated' },
-  { value: 'trending', label: 'Trending' },
-  { value: 'friends', label: 'Friends Playing' },
+  { value: 'rising', label: 'Rising This Month' },
+  { value: 'friends', label: 'Friends' },
 ];
-
-const SORT_SUBTITLES: Record<CourseSortOption, string> = {
-  most_played: 'Top 100 courses by play count',
-  highest_rated: 'Top 100 courses by community rating',
-  trending: 'Courses gaining momentum this month',
-  friends: 'Courses your circle is playing most',
-};
 
 export function CoursesLeaderboardView() {
   const navigate = useNavigate();
   const [sort, setSort] = useState<CourseSortOption>('most_played');
-  const [audienceFilter, setAudienceFilter] = useState<AudienceFilter>('all');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [dismissedCallout, setDismissedCallout] = useState(false);
 
   // Real data hooks (disabled in mock mode)
   const { data, isLoading } = useTop100CourseLeaderboard({
@@ -95,10 +88,8 @@ export function CoursesLeaderboardView() {
   // Mock data
   const mockData = useMemo(() => {
     if (!USE_MOCK_COURSE_LEADERBOARD_DATA) return null;
-    
-    const page = Math.ceil(visibleCount / PAGE_SIZE);
-    return getMockCoursesPaginated(sort as CourseSortKey, 1, visibleCount, audienceFilter, MAX_COURSES);
-  }, [sort, audienceFilter, visibleCount]);
+    return getMockCoursesPaginated(sort as CourseSortKey, 1, visibleCount, 'all', MAX_COURSES);
+  }, [sort, visibleCount]);
 
   const mockCircleRounds = useMemo(() => {
     if (!USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
@@ -110,8 +101,8 @@ export function CoursesLeaderboardView() {
     return getMockCoursesOnTheMove();
   }, []);
 
-  // Get trending courses (real data)
-  const trendingCourses = useMemo(() => {
+  // Get trending/rising courses (real data)
+  const risingCourses = useMemo(() => {
     if (USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
     return [...allCourses]
       .filter(c => c.avg_rating && c.avg_rating >= 7.5)
@@ -125,14 +116,10 @@ export function CoursesLeaderboardView() {
     
     let courses = [...allCourses];
     
-    if (audienceFilter === 'friends') {
-      courses = courses.filter(c => (c.friends_count ?? 0) > 0);
-    }
-    
     switch (sort) {
       case 'highest_rated':
         return courses.sort((a, b) => (b.avg_rating ?? 0) - (a.avg_rating ?? 0));
-      case 'trending':
+      case 'rising':
         return courses.sort((a, b) => b.times_played - a.times_played);
       case 'friends':
         return courses
@@ -142,7 +129,7 @@ export function CoursesLeaderboardView() {
       default:
         return courses.sort((a, b) => b.times_played - a.times_played);
     }
-  }, [allCourses, sort, audienceFilter]);
+  }, [allCourses, sort]);
 
   // Data to display
   const cappedCourses = USE_MOCK_COURSE_LEADERBOARD_DATA
@@ -181,12 +168,7 @@ export function CoursesLeaderboardView() {
   const handleSortChange = useCallback((newSort: CourseSortOption) => {
     setSort(newSort);
     setVisibleCount(PAGE_SIZE);
-  }, []);
-
-  // Reset pagination when audience filter changes
-  const handleAudienceChange = useCallback((newAudience: AudienceFilter) => {
-    setAudienceFilter(newAudience);
-    setVisibleCount(PAGE_SIZE);
+    setDismissedCallout(false);
   }, []);
 
   const handleLoadMore = useCallback(() => {
@@ -198,47 +180,73 @@ export function CoursesLeaderboardView() {
     ? mockCircleRounds 
     : friendsRecentRounds;
 
-  // Courses on the move to display
-  const coursesOnTheMoveToDisplay = USE_MOCK_COURSE_LEADERBOARD_DATA 
-    ? mockCoursesOnTheMove 
-    : trendingCourses;
+  // Featured course for hero (first ranked course or mock)
+  const featuredCourse = useMemo(() => {
+    if (USE_MOCK_COURSE_LEADERBOARD_DATA && mockData?.courses?.[0]) {
+      const c = mockData.courses[0];
+      return {
+        id: c.course_id,
+        name: c.course_name,
+        location: c.region,
+        imageUrl: c.hero_image_url || '',
+        globalRank: c.global_rank,
+        region: 'Global'
+      };
+    }
+    if (allCourses[0]) {
+      const c = allCourses[0];
+      return {
+        id: c.course_id,
+        name: c.course_name,
+        location: c.country,
+        imageUrl: (c as any).thumbnail_url || (c as any).thumbnail_image || '',
+        globalRank: c.global_rank ?? undefined,
+        region: 'Global'
+      };
+    }
+    return undefined;
+  }, [allCourses, mockData]);
 
   if (isLoading && !USE_MOCK_COURSE_LEADERBOARD_DATA) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-24 w-full rounded-sq-md" />
+      <div className="space-y-4 px-4">
+        <Skeleton className="h-48 w-full rounded-sq-md" />
         <Skeleton className="h-10 w-full rounded-sq-pill" />
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-40 w-full rounded-sq-md" />
+          <Skeleton key={i} className="h-80 w-full rounded-sq-md" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 pb-8">
+      {/* Cinematic Hero */}
+      <div className="px-4">
+        <CourseLeaderboardHero course={featuredCourse} />
+      </div>
+
       {/* Recently Played by Your Circle */}
       {circleRoundsToDisplay && circleRoundsToDisplay.length > 0 && (
         <section className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground px-2.5">
+          <h3 className="text-sm font-semibold text-foreground px-4">
             Recently Played by Your Circle
           </h3>
-          <div className="overflow-x-auto pb-2 -mx-4 px-4">
-            <div className="flex gap-3 min-w-max">
+          <div className="overflow-x-auto pb-2 pl-4">
+            <div className="flex gap-3 pr-4">
               {USE_MOCK_COURSE_LEADERBOARD_DATA 
                 ? mockCircleRounds.map((round) => (
                     <button
                       key={round.id}
                       onClick={() => navigate(`/courses/${round.course_id}`)}
-                      className="w-[200px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card overflow-hidden shadow-sm hover:bg-muted/20 transition-colors text-left"
+                      className="w-[180px] flex-shrink-0 rounded-sq-sm border border-border/50 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
                     >
-                      <div className="relative h-24 w-full">
+                      <div className="relative h-20 w-full">
                         <img
                           src={round.course_image_url}
                           alt={round.course_name}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                       </div>
                       <div className="p-2.5 space-y-1.5">
                         <p className="text-xs font-medium text-foreground truncate">
@@ -246,7 +254,7 @@ export function CoursesLeaderboardView() {
                         </p>
                         <div className="flex items-center gap-2">
                           <SquircleAvatar
-                            size={20}
+                            size={18}
                             src={round.friend_avatar_url}
                             alt={round.friend_name}
                             fallback={(round.friend_name?.[0] || '?').toUpperCase()}
@@ -258,8 +266,8 @@ export function CoursesLeaderboardView() {
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                           <span>{round.time_ago} ago</span>
                           <span className="flex items-center gap-0.5">
-                            <Star className="h-2.5 w-2.5 text-primary/70" />
-                            Gave it {round.rating_given.toFixed(1)}
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            {round.rating_given.toFixed(1)}
                           </span>
                         </div>
                       </div>
@@ -269,16 +277,15 @@ export function CoursesLeaderboardView() {
                     <button
                       key={round.id}
                       onClick={() => navigate(`/courses/${round.course_id}`)}
-                      className="w-[200px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card overflow-hidden shadow-sm hover:bg-muted/20 transition-colors text-left"
+                      className="w-[180px] flex-shrink-0 rounded-sq-sm border border-border/50 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
                     >
                       {round.golf_courses?.thumbnail_image && (
-                        <div className="relative h-24 w-full">
+                        <div className="relative h-20 w-full">
                           <img
                             src={round.golf_courses.thumbnail_image}
                             alt={round.golf_courses.name}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                         </div>
                       )}
                       <div className="p-2.5 space-y-1.5">
@@ -287,7 +294,7 @@ export function CoursesLeaderboardView() {
                         </p>
                         <div className="flex items-center gap-2">
                           <SquircleAvatar
-                            size={20}
+                            size={18}
                             src={round.user_profiles?.profile_photo_url}
                             alt={round.user_profiles?.display_name}
                             fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
@@ -300,8 +307,8 @@ export function CoursesLeaderboardView() {
                           <span>{formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago</span>
                           {round.rating && (
                             <span className="flex items-center gap-0.5">
-                              <Star className="h-2.5 w-2.5 text-primary/70" />
-                              Gave it {round.rating.toFixed(1)}
+                              <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                              {round.rating.toFixed(1)}
                             </span>
                           )}
                         </div>
@@ -314,184 +321,89 @@ export function CoursesLeaderboardView() {
         </section>
       )}
 
-      {/* Courses on the Move */}
-      {coursesOnTheMoveToDisplay && coursesOnTheMoveToDisplay.length > 0 && (
-        <section className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground px-2.5">
-            Courses on the Move
-          </h3>
-          <div className="overflow-x-auto pb-2 -mx-4 px-4">
-            <div className="flex gap-2.5 min-w-max">
-              {USE_MOCK_COURSE_LEADERBOARD_DATA
-                ? mockCoursesOnTheMove.map((course) => (
-                    <button
-                      key={course.id}
-                      onClick={() => navigate(`/courses/${course.course_id}`)}
-                      className="w-[150px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card p-2.5 text-left hover:bg-muted/20 transition-colors"
-                    >
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <span className={cn(
-                          'w-1.5 h-1.5 rounded-full',
-                          course.rating_delta_30d > 0 ? 'bg-emerald-500' : 'bg-red-400'
-                        )} />
-                        {course.rating_delta_30d > 0 
-                          ? <TrendingUp className="h-3 w-3 text-emerald-500" />
-                          : <TrendingDown className="h-3 w-3 text-red-400" />
-                        }
-                        <span className={cn(
-                          'text-[10px] font-medium',
-                          course.rating_delta_30d > 0 ? 'text-emerald-600' : 'text-red-500'
-                        )}>
-                          {course.trend_label}
-                        </span>
-                      </div>
-                      <p className="text-xs font-medium text-foreground line-clamp-2 mb-1">
-                        {course.course_name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {course.region}
-                      </p>
-                    </button>
-                  ))
-                : trendingCourses.map((course) => (
-                    <button
-                      key={course.course_id}
-                      onClick={() => navigate(`/courses/${course.course_id}`)}
-                      className="w-[150px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card p-2.5 text-left hover:bg-muted/20 transition-colors"
-                    >
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <TrendingUp className="h-3 w-3 text-emerald-500" />
-                        <span className="text-[10px] font-medium text-emerald-600">
-                          Rating up +{((course.avg_rating ?? 7) - 7).toFixed(1)}
-                        </span>
-                      </div>
-                      <p className="text-xs font-medium text-foreground line-clamp-2 mb-1">
-                        {course.course_name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {course.country}
-                      </p>
-                    </button>
-                  ))
-              }
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Course Rankings Section */}
-      <section className="space-y-3 pt-2">
-        {/* Header row */}
-        <div className="flex items-start justify-between gap-3 px-2.5">
-          <div>
-            <h2 className="text-base font-semibold text-foreground">Course Rankings</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{SORT_SUBTITLES[sort]}</p>
-          </div>
-          
-          {/* All / Friends toggle */}
-          <div className="flex rounded-sq-pill bg-muted/60 p-0.5 text-xs font-medium">
-            <button
-              type="button"
-              onClick={() => handleAudienceChange('all')}
-              className={cn(
-                'px-2.5 py-1 rounded-sq-pill transition-all',
-                audienceFilter === 'all'
-                  ? 'bg-background shadow-sm text-foreground'
-                  : 'text-muted-foreground'
-              )}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAudienceChange('friends')}
-              className={cn(
-                'px-2.5 py-1 rounded-sq-pill transition-all',
-                audienceFilter === 'friends'
-                  ? 'bg-background shadow-sm text-foreground'
-                  : 'text-muted-foreground'
-              )}
-            >
-              Friends
-            </button>
-          </div>
+      <section className="space-y-4 px-4">
+        {/* Section Header */}
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Course Rankings</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            The world's greatest golf courses
+          </p>
         </div>
 
-        {/* Sort pills */}
-        <div className="py-2 -mx-4 px-4">
-          <div className="overflow-x-auto pb-1 -mx-1 px-1">
-            <div className="inline-flex rounded-sq-pill bg-muted/60 p-1 text-xs font-medium min-w-max">
-              {SORT_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => handleSortChange(opt.value)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-sq-pill transition-all whitespace-nowrap',
-                    sort === opt.value
-                      ? 'bg-background shadow-sm text-foreground'
-                      : 'text-muted-foreground'
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Insight Chip */}
-        <LeaderboardInsightChip variant="courses" />
-
-        {/* Ranked Course List */}
-        <div className="-mx-4 sm:mx-0">
-          <div className="space-y-4">
-            {displayCourses.length === 0 ? (
-              <div className="py-2">
-                {sort === 'friends' || audienceFilter === 'friends' ? (
-                  <LeaderboardEmptyState type="courses-friends-no-friends" />
-                ) : sort === 'trending' ? (
-                  <LeaderboardEmptyState type="courses-trending" />
-                ) : sort === 'highest_rated' ? (
-                  <LeaderboardEmptyState type="courses-highest-rated" />
-                ) : sort === 'most_played' ? (
-                  <LeaderboardEmptyState type="courses-most-played" />
-                ) : (
-                  <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
+        {/* Sort Tabs - Flat pills with underline active state */}
+        <div className="overflow-x-auto pb-1 -mx-4 px-4">
+          <div className="inline-flex gap-1 min-w-max">
+            {SORT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => handleSortChange(opt.value)}
+                className={cn(
+                  'px-3.5 py-2 text-[13px] font-medium rounded-sq-xs transition-all',
+                  sort === opt.value
+                    ? 'text-foreground bg-muted/60'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                 )}
-              </div>
-            ) : (
-              <>
-                {displayCourses.map((course: any, idx: number) => (
-                  <LeaderboardCourseCard
-                    key={course.course_id}
-                    course={course}
-                    listPosition={idx + 1}
-                    showFriendsContext={audienceFilter === 'friends' || sort === 'friends'}
-                  />
-                ))}
-              </>
-            )}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Pagination controls */}
+        {/* Momentum Callout (dismissible) */}
+        {!dismissedCallout && sort === 'rising' && (
+          <CourseMomentumCallout 
+            type="rising" 
+            onDismiss={() => setDismissedCallout(true)}
+          />
+        )}
+
+        {/* Course Grid - 2 columns on mobile, cinematic cards */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {displayCourses.length === 0 ? (
+            <div className="col-span-2 py-8">
+              {sort === 'friends' ? (
+                <LeaderboardEmptyState type="courses-friends-no-friends" />
+              ) : sort === 'rising' ? (
+                <LeaderboardEmptyState type="courses-trending" />
+              ) : sort === 'highest_rated' ? (
+                <LeaderboardEmptyState type="courses-highest-rated" />
+              ) : sort === 'most_played' ? (
+                <LeaderboardEmptyState type="courses-most-played" />
+              ) : (
+                <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
+              )}
+            </div>
+          ) : (
+            displayCourses.map((course: any, idx: number) => (
+              <CinematicCourseCard
+                key={course.course_id}
+                course={course}
+                listPosition={idx}
+                showFriendsContext={sort === 'friends'}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Pagination - "Continue the journey" */}
         {displayCourses.length > 0 && (
-          <div className="flex flex-col items-center gap-2 pt-4 pb-8">
+          <div className="flex flex-col items-center gap-3 pt-4">
             {hasMore && (
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={handleLoadMore}
-                className="w-full max-w-xs gap-1.5"
+                className="w-full max-w-xs gap-2 rounded-sq-sm"
               >
-                <ChevronDown className="h-4 w-4" />
-                Next {Math.min(PAGE_SIZE, totalCount - visibleCount)} courses
+                Continue the journey
+                <ChevronRight className="h-4 w-4" />
               </Button>
             )}
-            <p className="text-[11px] text-muted-foreground">
-              Showing 1–{Math.min(visibleCount, totalCount)} of {totalCount} courses
+            <p className="text-[11px] text-muted-foreground text-center">
+              Showing 1–{Math.min(visibleCount, totalCount)} of the world's greatest courses
             </p>
           </div>
         )}
