@@ -26,7 +26,6 @@ export function useActiveGameCounts(courseIds: string[]): UseActiveGameCountsRes
     gcTime: 60_000,
     queryFn: async (): Promise<ActiveGameCountMap> => {
       if (courseIds.length === 0) return {};
-
       const now = new Date().toISOString();
 
       const { data, error } = await supabase
@@ -58,3 +57,4 @@ export function useActiveGameCounts(courseIds: string[]): UseActiveGameCountsRes
     isError: query.isError,
   };
 }
+
