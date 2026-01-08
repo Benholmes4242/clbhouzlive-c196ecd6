@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTop100Leaderboard, LeaderboardScope } from '@/hooks/useTop100Leaderboard';
+import { FLAGS } from '@/config/flags';
+import { getMockLeaderboardV2Entries, mergeWithMockEntries } from '@/mocks/leaderboardV2MockGenerator';
 
 import {
   LeaderboardHero,
@@ -101,9 +103,17 @@ export function PlayersLeaderboardViewV2() {
     pageSize: 500,
   });
 
-  // All entries from paginated data
+  // All entries from paginated data, optionally merged with mocks
   const allEntries = useMemo(() => {
-    return data?.pages.flatMap(page => page.entries) || [];
+    const rawEntries = data?.pages.flatMap(page => page.entries) || [];
+    
+    // Inject 100 mock players for busy-state testing when flag is enabled
+    if (FLAGS.LEADERBOARD_V2_MOCK_100) {
+      const mockEntries = getMockLeaderboardV2Entries();
+      return mergeWithMockEntries(rawEntries, mockEntries);
+    }
+    
+    return rawEntries;
   }, [data]);
 
   // Current user's entry
