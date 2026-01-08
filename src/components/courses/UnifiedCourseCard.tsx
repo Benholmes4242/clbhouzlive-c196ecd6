@@ -17,14 +17,12 @@ import { format } from 'date-fns';
  * - horizontal: Thumbnail left, meta right (used in profile lists)
  */
 
-// Standardized padding - NO MORE VARIATIONS
-const META_PADDING = 'px-4 py-3';
+// Standardized padding - matches CinematicCourseCard
+const META_PADDING = 'px-4 py-3.5';
 const META_PADDING_HORIZONTAL = 'p-3';
 
-// Image aspect ratio - 6% taller than previous 1.88/1
-// Previous: 1.88/1 = 0.532
-// New: 1.77/1 = 0.565 (approximately 6% taller)
-const IMAGE_ASPECT = 'aspect-[1.77/1]';
+// Image aspect ratio - matches CinematicCourseCard (16:9)
+const IMAGE_ASPECT = 'aspect-[16/9]';
 
 interface UnifiedCourseCardProps {
   course: CourseCardModel;
@@ -157,7 +155,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all ${className}`}
+      className={`w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all ${className}`}
     >
       {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
