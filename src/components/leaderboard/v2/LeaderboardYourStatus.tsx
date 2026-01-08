@@ -1,11 +1,12 @@
 /**
  * LeaderboardYourStatus - Prominent "Your Status" card
- * Shows rank, tier, progress, and CTAs
+ * Shows rank, tier, progress, and CTAs with animated progress bar
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Plus, Target } from 'lucide-react';
+import { Plus, Target } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
@@ -33,6 +34,7 @@ export function LeaderboardYourStatus({
   className 
 }: LeaderboardYourStatusProps) {
   const navigate = useNavigate();
+  const [animatedProgress, setAnimatedProgress] = useState(0);
   const club = getTop100Club(user.total_top100_played);
   const nextClub = getNextTop100Club(user.total_top100_played);
   const ringColor = getRingColorForTotalPlayed(user.total_top100_played);
@@ -60,6 +62,14 @@ export function LeaderboardYourStatus({
   const rankLabel = user.activeRegion 
     ? `#${displayRank} ${user.activeRegion}` 
     : `#${displayRank} Global`;
+
+  // Animate progress bar on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedProgress(progressPct);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [progressPct]);
 
   return (
     <div 
@@ -98,7 +108,7 @@ export function LeaderboardYourStatus({
                 strokeWidth="2"
                 className="text-muted/20"
               />
-              <circle
+              <motion.circle
                 cx="36"
                 cy="36"
                 r="34"
@@ -106,9 +116,10 @@ export function LeaderboardYourStatus({
                 stroke={ringColor}
                 strokeWidth="2.5"
                 strokeLinecap="round"
-                strokeDasharray={`${(progressPct / 100) * 213.6} 213.6`}
+                initial={{ strokeDasharray: '0 213.6' }}
+                animate={{ strokeDasharray: `${(progressPct / 100) * 213.6} 213.6` }}
+                transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
                 transform="rotate(-90 36 36)"
-                className="transition-all duration-500"
               />
             </svg>
           </div>
@@ -118,9 +129,14 @@ export function LeaderboardYourStatus({
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
               Your Rank
             </p>
-            <p className="text-lg font-bold text-foreground mt-0.5">
+            <motion.p 
+              className="text-lg font-bold text-foreground mt-0.5"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+            >
               {rankLabel}
-            </p>
+            </motion.p>
             {club.tierName && (
               <p className="text-xs text-muted-foreground mt-0.5">
                 {club.tierName}
@@ -130,31 +146,43 @@ export function LeaderboardYourStatus({
 
           {/* Courses count */}
           <div className="text-right flex-shrink-0">
-            <p className="text-2xl font-bold text-foreground">
+            <motion.p 
+              className="text-2xl font-bold text-foreground"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
               {user.total_top100_played}
-            </p>
+            </motion.p>
             <p className="text-[11px] text-muted-foreground">
               / 100
             </p>
           </div>
         </div>
 
-        {/* Progress to next milestone */}
+        {/* Progress to next milestone with animation */}
         {nextClub && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs mb-1.5">
               <span className="text-muted-foreground">
                 Next: <span className="font-medium text-foreground">{nextClub.tierName}</span>
               </span>
-              <span className="text-muted-foreground font-medium">
-                {coursesAway} away
-              </span>
+              <motion.span 
+                className="text-muted-foreground font-medium"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                {coursesAway} {coursesAway === 1 ? 'course' : 'courses'} away
+              </motion.span>
             </div>
             <div className="h-2 rounded-full bg-muted/40 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
+              <motion.div
+                className="h-full rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${animatedProgress}%` }}
+                transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
                 style={{ 
-                  width: `${progressPct}%`,
                   background: `linear-gradient(90deg, ${ringColor}, ${ringColor}dd)`,
                 }}
               />
@@ -163,22 +191,24 @@ export function LeaderboardYourStatus({
         )}
       </div>
 
-      {/* CTAs row */}
+      {/* CTAs row with press effect */}
       <div className="flex border-t border-border/40">
-        <button
+        <motion.button
           onClick={onViewRivals}
+          whileTap={{ scale: 0.98 }}
           className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors border-r border-border/40"
         >
           <Target className="w-4 h-4" />
           View Rivals
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={() => navigate('/top100?tab=courses')}
+          whileTap={{ scale: 0.98 }}
           className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Log a Course
-        </button>
+        </motion.button>
       </div>
     </div>
   );

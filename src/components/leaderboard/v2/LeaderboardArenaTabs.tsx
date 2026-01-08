@@ -1,9 +1,10 @@
 /**
- * LeaderboardArenaTabs - Competitive arena mode tabs
+ * LeaderboardArenaTabs - Competitive arena mode tabs with underline animation
  * Global Elite | Regional Wars | Friends League | Fast Climbers | Nearby Rivals
  */
 
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Flag, Users, TrendingUp, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,25 +28,25 @@ const ARENA_TABS: ArenaTab[] = [
     id: 'regional', 
     label: 'Regional Wars', 
     icon: Flag,
-    description: 'Compete within your region'
+    description: 'Compete within your chosen Top 100 region list'
   },
   { 
     id: 'friends', 
     label: 'Friends League', 
     icon: Users,
-    description: 'See how you rank among friends'
+    description: 'Your private competition with friends'
   },
   { 
     id: 'climbers', 
     label: 'Fast Climbers', 
     icon: TrendingUp,
-    description: 'Rising stars over the past 30 days'
+    description: 'Biggest movers this month'
   },
   { 
     id: 'nearby', 
     label: 'Nearby', 
     icon: MapPin,
-    description: 'Players near your location'
+    description: 'Within 50 miles of your home club'
   },
 ];
 
@@ -64,7 +65,7 @@ export function LeaderboardArenaTabs({
 
   return (
     <div className="w-full">
-      {/* Scrollable tabs */}
+      {/* Scrollable tabs with underline animation */}
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div className="inline-flex gap-2 pb-1 min-w-max">
           {ARENA_TABS.map((tab) => {
@@ -73,33 +74,53 @@ export function LeaderboardArenaTabs({
             const isDisabled = disabledModes.includes(tab.id);
 
             return (
-              <button
+              <motion.button
                 key={tab.id}
                 onClick={() => !isDisabled && onChange(tab.id)}
                 disabled={isDisabled}
+                whileTap={!isDisabled ? { scale: 0.97 } : undefined}
                 className={cn(
-                  'flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium transition-all',
+                  'relative flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium transition-colors',
                   'whitespace-nowrap',
                   isActive
-                    ? 'bg-surface-slate text-white shadow-sm'
+                    ? 'text-white'
                     : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
                   isDisabled && 'opacity-40 cursor-not-allowed'
                 )}
               >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
+                {/* Animated background for active state */}
+                {isActive && (
+                  <motion.div
+                    layoutId="arena-tab-bg"
+                    className="absolute inset-0 bg-surface-slate rounded-full shadow-sm"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </span>
+              </motion.button>
             );
           })}
         </div>
       </div>
 
-      {/* Active tab description */}
-      {activeTab && (
-        <p className="text-xs text-muted-foreground mt-2.5 px-1">
-          {activeTab.description}
-        </p>
-      )}
+      {/* Active tab description with fade animation */}
+      <AnimatePresence mode="wait">
+        {activeTab && (
+          <motion.p 
+            key={activeTab.id}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs text-muted-foreground mt-2.5 px-1"
+          >
+            {activeTab.description}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

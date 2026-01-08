@@ -1,10 +1,11 @@
 /**
  * LeaderboardRivalsSection - Core hook: shows player above, you, player below
- * Displays the gap in Top 100 count with motivational callouts
+ * Enhanced with connector lines and improved gap copy
  */
 
 import React from 'react';
-import { ChevronDown, ChevronUp, Target } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Target } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { cn } from '@/lib/utils';
@@ -47,16 +48,27 @@ function RivalRow({
 
   const isCurrent = position === 'current';
 
+  // Enhanced gap copy: "1 course to overtake" style
+  const getGapLabel = () => {
+    if (!gap || gap === 0) return null;
+    const courseWord = gap === 1 ? 'course' : 'courses';
+    if (position === 'above') {
+      return `${gap} ${courseWord} to overtake`;
+    }
+    return `${gap} ${courseWord} ahead`;
+  };
+
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
       disabled={isCurrent}
+      whileTap={!isCurrent ? { scale: 0.98 } : undefined}
       className={cn(
-        'w-full flex items-center gap-3 p-3 rounded-xl transition-all',
+        'w-full flex items-center gap-3 p-3 rounded-xl transition-all relative',
         isCurrent 
-          ? 'bg-primary/[0.08] border border-primary/20' 
-          : 'hover:bg-muted/40 active:scale-[0.99]',
+          ? 'bg-primary/[0.12] border-2 border-primary/30 shadow-sm z-10' 
+          : 'hover:bg-muted/40',
       )}
     >
       {/* Rank */}
@@ -71,7 +83,7 @@ function RivalRow({
 
       {/* Avatar */}
       <SquircleAvatar
-        size={40}
+        size={isCurrent ? 44 : 40}
         src={player.avatar_url}
         alt={player.display_name}
         fallback={initials}
@@ -83,10 +95,10 @@ function RivalRow({
       <div className="flex-1 min-w-0 text-left">
         <p className={cn(
           'text-sm font-medium truncate',
-          isCurrent && 'font-semibold'
+          isCurrent && 'font-semibold text-foreground'
         )}>
           {player.display_name}
-          {isCurrent && <span className="text-muted-foreground font-normal"> (You)</span>}
+          {isCurrent && <span className="text-primary font-medium ml-1">(You)</span>}
         </p>
         {player.home_club && (
           <p className="text-xs text-muted-foreground truncate">
@@ -95,18 +107,44 @@ function RivalRow({
         )}
       </div>
 
-      {/* Top 100 count + gap indicator */}
+      {/* Top 100 count + enhanced gap indicator */}
       <div className="flex-shrink-0 text-right">
-        <p className="text-sm font-semibold">
+        <p className={cn(
+          'text-sm font-semibold',
+          isCurrent && 'text-lg'
+        )}>
           {player.total_top100_played}
         </p>
         {gap !== undefined && gap > 0 && (
-          <p className="text-[10px] text-muted-foreground">
-            {position === 'above' ? `${gap} ahead` : `${gap} behind`}
+          <p className={cn(
+            'text-[10px] font-medium',
+            position === 'above' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
+          )}>
+            {getGapLabel()}
           </p>
         )}
       </div>
-    </button>
+    </motion.button>
+  );
+}
+
+// Connector line component
+function ConnectorLine({ direction }: { direction: 'up' | 'down' }) {
+  return (
+    <div className="flex justify-center py-1 relative">
+      <div className="flex flex-col items-center">
+        {direction === 'up' && (
+          <svg width="12" height="16" viewBox="0 0 12 16" className="text-muted-foreground/30">
+            <path d="M6 16 L6 4 M2 8 L6 4 L10 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {direction === 'down' && (
+          <svg width="12" height="16" viewBox="0 0 12 16" className="text-muted-foreground/30">
+            <path d="M6 0 L6 12 M2 8 L6 12 L10 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -125,11 +163,11 @@ export function LeaderboardRivalsSection({
     ? currentUser.total_top100_played - playerBelow.total_top100_played 
     : 0;
 
-  // Motivational callout
+  // Motivational callout with enhanced copy
   const callout = gapAbove === 1 
-    ? 'Next jump within reach — 1 more Top 100!' 
+    ? '🎯 Just 1 course away from climbing!' 
     : gapAbove > 0 && gapAbove <= 3 
-      ? `Overtake with ${gapAbove} more Top 100s`
+      ? `🔥 ${gapAbove} courses to overtake and climb!`
       : null;
 
   return (
@@ -142,62 +180,83 @@ export function LeaderboardRivalsSection({
         </div>
       </div>
 
-      {/* Rivals stack */}
-      <div className="space-y-1.5">
-        {/* Player above */}
-        {playerAbove && (
-          <>
-            <RivalRow 
-              player={playerAbove} 
-              position="above"
-              gap={gapAbove}
-              onClick={() => onViewRival?.(playerAbove.user_id)}
-            />
-            <div className="flex justify-center py-0.5">
-              <ChevronUp className="w-4 h-4 text-muted-foreground/40" />
-            </div>
-          </>
-        )}
+      {/* Rivals stack with connector lines */}
+      <div className="relative">
+        {/* Vertical connector line behind cards */}
+        <div className="absolute left-[2.75rem] top-0 bottom-0 w-px bg-gradient-to-b from-muted/0 via-muted/40 to-muted/0 pointer-events-none" />
+        
+        <div className="relative space-y-0">
+          {/* Player above */}
+          {playerAbove && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <RivalRow 
+                player={playerAbove} 
+                position="above"
+                gap={gapAbove}
+                onClick={() => onViewRival?.(playerAbove.user_id)}
+              />
+              <ConnectorLine direction="up" />
+            </motion.div>
+          )}
 
-        {/* Current user */}
-        <RivalRow 
-          player={currentUser} 
-          position="current" 
-        />
-
-        {/* Player below */}
-        {playerBelow && (
-          <>
-            <div className="flex justify-center py-0.5">
-              <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
-            </div>
+          {/* Current user - elevated centerpiece */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
             <RivalRow 
-              player={playerBelow} 
-              position="below"
-              gap={gapBelow}
-              onClick={() => onViewRival?.(playerBelow.user_id)}
+              player={currentUser} 
+              position="current" 
             />
-          </>
-        )}
+          </motion.div>
+
+          {/* Player below */}
+          {playerBelow && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <ConnectorLine direction="down" />
+              <RivalRow 
+                player={playerBelow} 
+                position="below"
+                gap={gapBelow}
+                onClick={() => onViewRival?.(playerBelow.user_id)}
+              />
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* Motivational callout */}
       {callout && (
-        <div className="mt-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+        <motion.div 
+          className="mt-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20"
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
           <p className="text-xs text-amber-600 dark:text-amber-400 font-medium text-center">
             {callout}
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* View full leaderboard CTA */}
       {onViewLeaderboard && (
-        <button
+        <motion.button
           onClick={onViewLeaderboard}
+          whileTap={{ scale: 0.98 }}
           className="w-full mt-3 py-2.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors text-center"
         >
           View full leaderboard →
-        </button>
+        </motion.button>
       )}
     </div>
   );
