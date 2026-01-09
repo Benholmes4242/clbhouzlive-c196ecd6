@@ -11,7 +11,7 @@ import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
 import { HubGamesTripsSheet } from '../../components/HubGamesTripsSheet';
-import { HubCreateGameTripSheet } from '../../components/HubCreateGameTripSheet';
+import { CreateGameTripSheetV2 } from '../../components/create-game-trip-v2';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 
 interface DockItemProps {
@@ -161,7 +161,7 @@ export function HubFloatingDock() {
         onOpenCreate={handleOpenCreateGameTrip}
       />
 
-      <HubCreateGameTripSheet
+      <CreateGameTripSheetV2
         isOpen={isCreateGameTripOpen}
         onClose={() => setIsCreateGameTripOpen(false)}
       />

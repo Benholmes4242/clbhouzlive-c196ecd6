@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Calendar, MapPin, Plane, ChevronRight } from 'lucide-react';
 import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
-import { HubCreateGameTripSheet } from '@/features/hub/components/HubCreateGameTripSheet';
+import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 import { HUB_DEMO_MODE, MOCK_DIARY_ITEMS } from '../hubDemoConfig';
 
@@ -186,7 +186,7 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
         onOpenCreate={() => setCreateOpen(true)}
       />
 
-      <HubCreateGameTripSheet
+      <CreateGameTripSheetV2
         isOpen={createOpen}
         onClose={() => setCreateOpen(false)}
       />
