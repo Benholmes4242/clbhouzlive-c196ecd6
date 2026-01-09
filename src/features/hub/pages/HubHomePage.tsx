@@ -15,9 +15,9 @@ import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
 import { UpNextHeroTile } from '../home/tiles/UpNextHeroTile';
 import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
 import { ActiveGamesNearYouTile } from '../home/tiles/ActiveGamesNearYouTile';
-import { CreateGameSquareTile } from '../home/tiles/CreateGameSquareTile';
-import { CreateGameGradientCTA } from '../home/tiles/CreateGameGradientCTA';
-import { HubProgressTile } from '../home/tiles/HubProgressTile';
+import { EchoTile } from '../home/tiles/EchoTile';
+import { YourGamesGradientCTA } from '../home/tiles/YourGamesGradientCTA';
+import { CourseLegacyMiniTile } from '../home/tiles/CourseLegacyMiniTile';
 import { HubFloatingDock } from '../home/tiles/HubFloatingDock';
 
 import '../home/hubThemeLight.css';
@@ -27,6 +27,10 @@ const HUB_ENTRY_DURATION = 500;
 const HUB_EXIT_DURATION = 500;
 const HUB_ENTRY_EASING = 'ease-in-out';
 const HUB_EXIT_EASING = 'ease-in-out';
+
+// Layout constants
+const DOCK_HEIGHT = 88;
+const DOCK_GAP = 14;
 
 export function HubHomePage() {
   const { close } = useHub();
@@ -157,11 +161,11 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999]">
+    <div className="fixed inset-0 z-[9999] flex flex-col">
       {/* Glass Sheet */}
       <div 
         ref={sheetRef}
-        className="hub-glass-page fixed inset-0"
+        className="hub-glass-page flex-1 flex flex-col"
         style={{
           background: 'var(--hub-bg-start)',
           borderTop: '1px solid var(--hub-stroke)',
@@ -182,13 +186,13 @@ export function HubHomePage() {
 
         {/* 
           SCROLLABLE LAYOUT
-          Main content scrolls, dock is fixed
+          Content scrolls, dock is anchored at bottom
         */}
         <div 
-          className="w-full h-full overflow-y-auto"
+          className="flex-1 overflow-y-auto"
           style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+            paddingBottom: `calc(${DOCK_HEIGHT}px + ${DOCK_GAP}px + env(safe-area-inset-bottom, 0px))`,
             WebkitOverflowScrolling: 'touch',
           }}
         >
@@ -196,7 +200,7 @@ export function HubHomePage() {
             {/* Zone 1: Header - Greeting + Right Button */}
             <HubHeaderToday />
 
-            {/* Zone 2: What's Up Next Hero Tile */}
+            {/* Zone 2: What's Up Next Hero Tile (10% taller) */}
             <div className="mt-4">
               <UpNextHeroTile />
             </div>
@@ -206,25 +210,25 @@ export function HubHomePage() {
               <HubMessagesCard />
             </div>
 
-            {/* Zone 4: 2-up Grid - Active Games + Create Game Square */}
+            {/* Zone 4: 2-up Grid - Active Games + Echo */}
             <div className="mt-4 grid grid-cols-2 gap-4">
               <ActiveGamesNearYouTile />
-              <CreateGameSquareTile />
+              <EchoTile />
             </div>
 
-            {/* Zone 5: Full-width Create Game Gradient CTA */}
+            {/* Zone 5: Full-width "Your Games" Gradient CTA */}
             <div className="mt-4">
-              <CreateGameGradientCTA />
+              <YourGamesGradientCTA />
             </div>
 
-            {/* Zone 6: Progress Tile */}
+            {/* Zone 6: Course Legacy Mini Tile */}
             <div className="mt-4">
-              <HubProgressTile />
+              <CourseLegacyMiniTile />
             </div>
           </div>
         </div>
 
-        {/* Floating Dock - Fixed at bottom */}
+        {/* Anchored Dock - at bottom */}
         <HubFloatingDock />
       </div>
     </div>

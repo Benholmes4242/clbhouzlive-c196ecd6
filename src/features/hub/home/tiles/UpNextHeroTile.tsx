@@ -43,13 +43,13 @@ export function UpNextHeroTile() {
     return FALLBACK_HERO;
   }, [nextGame, imageError]);
 
-  // Loading skeleton
+  // Loading skeleton - 10% taller (165px)
   if (isLoading) {
     return (
       <div 
         className="relative rounded-[26px] overflow-hidden"
         style={{
-          height: '150px',
+          height: '165px',
           background: 'var(--hub-skeleton-base)',
         }}
       >
@@ -63,7 +63,7 @@ export function UpNextHeroTile() {
     return null;
   }
 
-  // With upcoming game - show hero with course image
+  // With upcoming game - show hero with course image (10% taller: 165px)
   const courseName = nextGame.course?.name || nextGame.courseName || 'Course TBD';
 
   return (
@@ -71,7 +71,7 @@ export function UpNextHeroTile() {
       <button 
         className="relative w-full rounded-[26px] overflow-hidden text-left transition-transform active:scale-[0.98]"
         style={{
-          height: '150px',
+          height: '165px',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
         }}
         onClick={openViewGame}
