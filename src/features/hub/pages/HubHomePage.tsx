@@ -76,18 +76,21 @@ export function HubHomePage() {
   const activeGames: ActiveGameSummary = useMemo(() => ({ title: 'Active Games Near You', subtitle: 'No games nearby' }), []);
   const courseLegacy: CourseLegacySummary = useMemo(() => ({ coursesPlayed: 32, countries: 7, avgRating: 7.2 }), []);
 
+  // Create moment modal state
+  const [createMomentOpen, setCreateMomentOpen] = useState(false);
+
   // Dock config
   const dockItems = useMemo(() => ({
-    left1: { key: 'your_games' as const, label: 'Your Games' },
+    left1: { key: 'create_game' as const, label: 'Create Game' },
     left2: { key: 'search' as const, label: 'Search' },
-    center: { key: 'create' as const, label: 'Create' },
+    center: { key: 'create_moment' as const, label: 'Moment' },
     right1: { key: 'echo' as const, label: 'Echo' },
     right2: { key: 'profile' as const, label: 'Profile' },
   }), []);
 
   const onDockPress = (key: HubDockItemKey) => {
     switch (key) {
-      case 'your_games':
+      case 'create_game':
         setGamesHubTab('yours');
         setGamesHubOpen(true);
         break;
@@ -95,9 +98,8 @@ export function HubHomePage() {
         setGamesHubTab('discover');
         setGamesHubOpen(true);
         break;
-      case 'create':
-        setGamesHubTab('yours');
-        setGamesHubOpen(true);
+      case 'create_moment':
+        setCreateMomentOpen(true);
         break;
       case 'echo':
         setEchoSheetOpen(true);
