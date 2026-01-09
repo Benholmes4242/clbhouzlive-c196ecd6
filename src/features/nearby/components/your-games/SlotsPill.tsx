@@ -10,11 +10,13 @@ type Props = {
 export const SlotsPill: React.FC<Props> = ({ slotsOpen, slotsTotal, className }) => {
   const bump = useBumpOnChange(`${slotsOpen}/${slotsTotal}`, 450);
   const filled = Math.max(0, slotsTotal - slotsOpen);
+  const isFull = slotsOpen === 0;
 
   return (
     <span
       className={[
-        "shrink-0 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[12px] text-white/85 will-change-transform transition-transform",
+        "shrink-0 px-3 py-1 rounded-full text-[12px] text-white will-change-transform transition-transform",
+        isFull ? "bg-orange-500/80" : "bg-green-500/80",
         bump ? "pill-bump" : "",
         className || ""
       ].join(" ")}
@@ -23,7 +25,7 @@ export const SlotsPill: React.FC<Props> = ({ slotsOpen, slotsTotal, className })
       aria-atomic="true"
     >
       <span className={bump ? "count-flip" : ""}>
-        {filled}/{slotsTotal} filled
+        {filled}/{slotsTotal}
       </span>
     </span>
   );
