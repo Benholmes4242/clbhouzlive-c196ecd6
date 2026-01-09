@@ -209,7 +209,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 setNavRef(el);
               }}
             className={cn(
-              "chrome-bottom-nav clubhouse-footer rounded-t-lg",
+              "chrome-bottom-nav clubhouse-footer",
               isClubhouseRoute
                 ? isDimmed
                   ? "border-transparent backdrop-blur-0"
