@@ -66,11 +66,11 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
         className={`w-full rounded-[22px] overflow-hidden relative flex flex-col transition-all active:scale-[0.98] mb-3 ${className || ''}`}
         style={{
           background: `
-            radial-gradient(800px 200px at 10% 0%, rgba(110, 146, 119, 0.18), transparent 50%),
-            linear-gradient(135deg, rgba(110, 146, 119, 0.12), rgba(137, 167, 140, 0.04))
+            radial-gradient(800px 200px at 10% 0%, rgba(255, 140, 60, 0.14), transparent 50%),
+            linear-gradient(135deg, rgba(255, 140, 60, 0.08), rgba(255, 180, 100, 0.03))
           `,
           border: '1px solid rgba(255, 255, 255, 0.5)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+          boxShadow: '0 8px 24px rgba(255, 140, 60, 0.06), 0 4px 12px rgba(0,0,0,0.04)',
           minHeight: '90px',
         }}
       >
@@ -79,10 +79,11 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           <div 
             className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0"
             style={{ 
-              background: 'linear-gradient(135deg, #6E9277 0%, #89A78C 100%)',
+              background: 'linear-gradient(135deg, rgba(255, 140, 60, 0.18) 0%, rgba(255, 160, 90, 0.12) 100%)',
+              border: '1px solid rgba(255, 140, 60, 0.15)',
             }}
           >
-            <Calendar className="h-3.5 w-3.5 text-white" />
+            <Calendar className="h-3.5 w-3.5" style={{ color: 'rgba(180, 90, 30, 0.9)' }} />
           </div>
           
           <div className="flex-1 text-left min-w-0">
