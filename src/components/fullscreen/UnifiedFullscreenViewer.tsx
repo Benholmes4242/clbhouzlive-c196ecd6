@@ -797,11 +797,24 @@ export function UnifiedFullscreenViewer<T>({
         <CommentsPage
           isOpen={commentsModalOpen}
           postId={currentItem.id}
-          videoThumbnail={
-            currentItem.media[0]?.media_url
-              ? generateStreamThumbnailUrl(uidFromNode({ src: currentItem.media[0].media_url }) || '', { height: 400 })
-              : undefined
-          }
+          videoThumbnail={(() => {
+            const currentMediaIdx = mediaIndices[currentItem.id] || 0;
+            const currentMedia = currentItem.media[currentMediaIdx] || currentItem.media[0];
+            return currentMedia?.media_url
+              ? generateStreamThumbnailUrl(uidFromNode({ src: currentMedia.media_url }) || '', { height: 400 })
+              : undefined;
+          })()}
+          aspectRatio={(() => {
+            const currentMediaIdx = mediaIndices[currentItem.id] || 0;
+            const currentMedia = currentItem.media[currentMediaIdx] || currentItem.media[0];
+            // Try to get aspect ratio from media dimensions or default to portrait (9:16)
+            if (currentMedia?.width && currentMedia?.height) {
+              return currentMedia.width / currentMedia.height;
+            }
+            return currentMedia?.aspect_ratio || 0.5625; // 9:16 portrait default
+          })()}
+          isReview={currentItem.isReview}
+          reviewRating={currentItem.reviewData?.rating}
           creatorName={currentItem.creator.name}
           creatorAvatar={currentItem.creator.avatar}
           creatorHomeClub={currentItem.creator.homeClub}

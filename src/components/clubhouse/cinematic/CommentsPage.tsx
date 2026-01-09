@@ -53,6 +53,11 @@ interface CommentsPageProps {
   courseCountry?: string;
   courseSubCountry?: string | null;
   courseRegion?: string | null;
+  // Media aspect ratio for smart thumbnail rendering
+  aspectRatio?: number; // width/height - < 1 = portrait, >= 1 = landscape
+  // Review post info
+  isReview?: boolean;
+  reviewRating?: number;
 }
 
 // ReplyingTo state always stores the top-level comment ID for one-level threading
@@ -745,6 +750,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   courseCountry,
   courseSubCountry,
   courseRegion,
+  aspectRatio,
+  isReview,
+  reviewRating,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -1144,7 +1152,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                   transition={{ duration: 0.2 }}
                 >
                   <div className="flex gap-3">
-                    {/* Left column: Media thumbnail with smart scaling + minimum height for cinematic feel */}
+                    {/* Left column: Media thumbnail with smart aspect-ratio handling */}
                     {videoThumbnail && (
                       <motion.div 
                         className="relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity"
@@ -1155,32 +1163,68 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         transition={{ duration: 0.25, ease: 'easeOut' }}
                         onClick={onClose}
                       >
-                        {/* Blurred background - generated from same image */}
-                        <div 
-                          className="absolute inset-0"
-                          style={{
-                            backgroundImage: `url(${videoThumbnail})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            filter: 'blur(20px) brightness(0.65)',
-                            transform: 'scale(1.3)',
-                          }}
-                        />
-                        {/* Vertical gradient overlay for premium blend - softens blur edges */}
-                        <div 
-                          className="absolute inset-0"
-                          style={{
-                            background: isDark 
-                              ? 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.15) 100%)'
-                              : 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.08) 100%)',
-                          }}
-                        />
-                        {/* Actual image - fit, not fill, scales up to cinematic presence */}
-                        <img
-                          src={videoThumbnail}
-                          alt="Post thumbnail"
-                          className="relative w-full h-full object-contain"
-                        />
+                        {/* Portrait media (aspectRatio < 1): Fill entire thumbnail, no blur bars */}
+                        {/* Landscape media (aspectRatio >= 1): Show blur backdrop with contained image */}
+                        {(!aspectRatio || aspectRatio < 1) ? (
+                          // Portrait: Fill entire thumbnail
+                          <>
+                            <img
+                              src={videoThumbnail}
+                              alt="Post thumbnail"
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                            {/* Review badge overlay for portrait */}
+                            {isReview && reviewRating && (
+                              <div className="absolute bottom-1 left-1 right-1 flex items-center justify-center">
+                                <div className="bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center gap-1">
+                                  <span className="text-[10px] font-semibold text-amber-400">★</span>
+                                  <span className="text-[10px] font-bold text-white">{reviewRating.toFixed(1)}</span>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          // Landscape: Blur backdrop + contained image at ~60% height
+                          <>
+                            {/* Blurred background */}
+                            <div 
+                              className="absolute inset-0"
+                              style={{
+                                backgroundImage: `url(${videoThumbnail})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                filter: 'blur(20px) brightness(0.65)',
+                                transform: 'scale(1.3)',
+                              }}
+                            />
+                            {/* Vertical gradient overlay for premium blend */}
+                            <div 
+                              className="absolute inset-0"
+                              style={{
+                                background: isDark 
+                                  ? 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.15) 100%)'
+                                  : 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.08) 100%)',
+                              }}
+                            />
+                            {/* Contained image centered */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <img
+                                src={videoThumbnail}
+                                alt="Post thumbnail"
+                                className="w-full h-auto max-h-[75%] object-contain"
+                              />
+                            </div>
+                            {/* Review badge overlay for landscape */}
+                            {isReview && reviewRating && (
+                              <div className="absolute bottom-1 left-1 right-1 flex items-center justify-center">
+                                <div className="bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center gap-1">
+                                  <span className="text-[10px] font-semibold text-amber-400">★</span>
+                                  <span className="text-[10px] font-bold text-white">{reviewRating.toFixed(1)}</span>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </motion.div>
                     )}
                     
