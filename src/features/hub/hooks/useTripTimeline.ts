@@ -20,6 +20,7 @@ export interface TripTimelineItem {
     maybe: number;
     declined: number;
   };
+  userRsvp?: 'going' | 'maybe' | 'declined' | 'invited' | null;
 }
 
 export interface TripData {
@@ -137,23 +138,32 @@ export function useTripTimeline(tripId: string | undefined) {
       
       if (gamesError) throw gamesError;
       
-      // Fetch RSVP counts for all games in this trip
+      // Fetch RSVP counts for all games in this trip + current user's status
       const gameIds = games?.map(g => g.id) || [];
       let rsvpCountsMap = new Map<string, { going: number; maybe: number; declined: number }>();
+      let userRsvpMap = new Map<string, 'going' | 'maybe' | 'declined' | 'invited' | null>();
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
       
       if (gameIds.length > 0) {
         const { data: participants } = await supabase
           .from('game_participants')
-          .select('game_id, rsvp_status')
+          .select('game_id, rsvp_status, user_id')
           .in('game_id', gameIds);
         
-        // Calculate counts per game
+        // Calculate counts per game and track user's status
         participants?.forEach(p => {
           const counts = rsvpCountsMap.get(p.game_id) || { going: 0, maybe: 0, declined: 0 };
           if (p.rsvp_status === 'going') counts.going++;
           else if (p.rsvp_status === 'maybe') counts.maybe++;
           else if (p.rsvp_status === 'declined') counts.declined++;
           rsvpCountsMap.set(p.game_id, counts);
+          
+          // Track current user's RSVP status
+          if (user && p.user_id === user.id) {
+            userRsvpMap.set(p.game_id, p.rsvp_status as any);
+          }
         });
       }
       
@@ -179,9 +189,10 @@ export function useTripTimeline(tripId: string | undefined) {
           });
         }
         
-        // Add game item with RSVP counts
+        // Add game item with RSVP counts (only if we have participant data)
         const course = game.golf_courses as any;
         const gameCounts = rsvpCountsMap.get(game.id);
+        const userRsvp = userRsvpMap.get(game.id) ?? null;
         
         items.push({
           id: game.id,
@@ -196,7 +207,9 @@ export function useTripTimeline(tripId: string | undefined) {
           courseName: course?.name,
           courseThumbnail: course?.hero_image_url,
           gameId: game.id,
-          rsvpCounts: gameCounts || { going: 1, maybe: 0, declined: 0 }, // Default 1 for host
+          // Only include counts if we actually have participant data
+          rsvpCounts: gameCounts,
+          userRsvp,
         });
       }
       

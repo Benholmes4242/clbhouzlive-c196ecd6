@@ -1,11 +1,12 @@
 /**
  * TripTimelineCard - Individual timeline item card
- * V2.1: Added RSVP summary line for game items
+ * V2.1: Uses GameRsvpSummary for consistent RSVP display
  */
 
 import React from 'react';
-import { Clock, Users } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import type { TripTimelineItem } from '../../hooks/useTripTimeline';
+import { GameRsvpSummary } from '../rsvp/GameRsvpSummary';
 
 interface TripTimelineCardProps {
   item: TripTimelineItem;
@@ -23,6 +24,13 @@ export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
       </div>
     );
   }
+
+  // Check if we have valid RSVP counts (at least one non-zero value)
+  const hasRsvpCounts = item.rsvpCounts && (
+    item.rsvpCounts.going > 0 || 
+    item.rsvpCounts.maybe > 0 || 
+    item.rsvpCounts.declined > 0
+  );
 
   return (
     <button
@@ -61,14 +69,15 @@ export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
           </div>
         )}
 
-        {/* RSVP Summary - compact variant */}
-        {item.rsvpCounts && (
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-            <Users className="w-3 h-3" />
-            <span>{item.rsvpCounts.going} going</span>
-            {item.rsvpCounts.maybe > 0 && (
-              <span className="opacity-70">· {item.rsvpCounts.maybe} maybe</span>
-            )}
+        {/* RSVP Summary - using shared component for consistency */}
+        {hasRsvpCounts && (
+          <div className="mt-1.5">
+            <GameRsvpSummary
+              variant="compact"
+              goingCount={item.rsvpCounts!.going}
+              maybeCount={item.rsvpCounts!.maybe}
+              userRsvp={item.userRsvp ?? null}
+            />
           </div>
         )}
       </div>
