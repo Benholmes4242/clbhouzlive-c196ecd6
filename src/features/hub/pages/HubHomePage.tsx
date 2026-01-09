@@ -162,7 +162,14 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col overflow-hidden">
+    <div 
+      className="fixed inset-0 z-[9999] flex flex-col"
+      style={{
+        height: '100svh',
+        overflow: 'hidden',
+        touchAction: 'none', // Prevent any scroll/bounce on the root
+      }}
+    >
       {/* Glass Sheet */}
       <div 
         ref={sheetRef}

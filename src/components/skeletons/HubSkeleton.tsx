@@ -33,10 +33,10 @@ export function HubSkeleton() {
         {/* Content skeleton */}
         <main className="w-full overflow-y-auto h-screen pt-[env(safe-area-inset-top,0px)] px-3.5">
           <div className="pt-6 space-y-3.5">
-            {/* Hero tile skeleton */}
+            {/* Hero tile skeleton - matches 165px height */}
             <Skeleton 
-              className="w-full rounded-sq-md bg-white/8" 
-              style={{ height: 'var(--hub-tile-fixed-h, 180px)' }}
+              className="w-full rounded-[26px] bg-white/8" 
+              style={{ height: '165px' }}
             />
             
             {/* Secondary tile skeleton */}

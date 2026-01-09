@@ -90,10 +90,10 @@ export function ActiveGamesNearYouTile() {
             </>
           ) : (
             <div 
-              className="text-[13px] mt-2"
+              className="text-[13px] mt-2 leading-snug"
               style={{ color: 'var(--hub-text-muted)' }}
             >
-              No games nearby currently – create one to be the first.
+              No games nearby – create one to be the first.
             </div>
           )}
         </div>
