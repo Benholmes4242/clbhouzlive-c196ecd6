@@ -1,0 +1,535 @@
+/**
+ * CreateGameTripSheetV2 - Main composer sheet for creating games/trips
+ * Phase 1: Full UI with mocked actions
+ */
+
+import React, { useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from 'sonner';
+import { nanoid } from 'nanoid';
+
+import { ModeToggle } from './ModeToggle';
+import { HeroStartCard } from './HeroStartCard';
+import { PlayersCard } from './PlayersCard';
+import { PlayersCounter } from './PlayersCounter';
+import { VisibilityChips } from './VisibilityChips';
+import { GameDetailsSection } from './GameDetailsSection';
+import { TripDatesCard } from './TripDatesCard';
+import { TripItineraryList } from './TripItineraryList';
+import { TripDetailsSection } from './TripDetailsSection';
+import { CTABar } from './CTABar';
+import { ChooseGolfClubSheetV2 } from './ChooseGolfClubSheetV2';
+import { AddPlayersSheetV2 } from './AddPlayersSheetV2';
+import { TripDateRangeSheet } from './TripDateRangeSheet';
+
+import type {
+  SheetMode,
+  GameVisibility,
+  TripVisibility,
+  GameType,
+  HoleCount,
+  SelectedCourse,
+  SelectedPlayer,
+  TripCourseStop,
+  GameDraft,
+  TripDraft,
+} from './types';
+
+interface CreateGameTripSheetV2Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2Props) {
+  const isMobile = useIsMobile();
+  
+  // Mode state
+  const [mode, setMode] = useState<SheetMode>('game');
+  
+  // Game state
+  const [gameCourse, setGameCourse] = useState<SelectedCourse | null>(null);
+  const [gamePlayers, setGamePlayers] = useState<SelectedPlayer[]>([]);
+  const [gameVisibility, setGameVisibility] = useState<GameVisibility>('friends');
+  const [gameDetailsExpanded, setGameDetailsExpanded] = useState(false);
+  const [gameDate, setGameDate] = useState<Date | null>(null);
+  const [gameTime, setGameTime] = useState<string>('');
+  const [gameHoles, setGameHoles] = useState<HoleCount>(18);
+  const [gameType, setGameType] = useState<GameType>('casual');
+  const [gameNotes, setGameNotes] = useState('');
+  
+  // Trip state
+  const [tripItinerary, setTripItinerary] = useState<TripCourseStop[]>([]);
+  const [tripAttendees, setTripAttendees] = useState<SelectedPlayer[]>([]);
+  const [tripVisibility, setTripVisibility] = useState<TripVisibility>('invite');
+  const [tripStartDate, setTripStartDate] = useState<Date | null>(null);
+  const [tripEndDate, setTripEndDate] = useState<Date | null>(null);
+  const [tripDetailsExpanded, setTripDetailsExpanded] = useState(false);
+  const [tripNotes, setTripNotes] = useState('');
+  
+  // Sub-sheet states
+  const [showCoursePicker, setShowCoursePicker] = useState(false);
+  const [showPlayersPicker, setShowPlayersPicker] = useState(false);
+  const [showTripDatesPicker, setShowTripDatesPicker] = useState(false);
+  const [coursePickerContext, setCoursePickerContext] = useState<'game' | 'trip-add'>('game');
+  
+  // Loading state
+  const [isCreating, setIsCreating] = useState(false);
+  
+  // Lock body scroll when sheet is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      const originalHeight = document.body.style.height;
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100svh';
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.height = originalHeight;
+      };
+    }
+  }, [isOpen]);
+  
+  // Reset state when sheet closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Reset after animation completes
+      const timer = setTimeout(() => {
+        setMode('game');
+        setGameCourse(null);
+        setGamePlayers([]);
+        setGameVisibility('friends');
+        setGameDetailsExpanded(false);
+        setGameDate(null);
+        setGameTime('');
+        setGameHoles(18);
+        setGameType('casual');
+        setGameNotes('');
+        setTripItinerary([]);
+        setTripAttendees([]);
+        setTripVisibility('invite');
+        setTripStartDate(null);
+        setTripEndDate(null);
+        setTripDetailsExpanded(false);
+        setTripNotes('');
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+  
+  // Derived state
+  const maxPlayers = 4;
+  const currentPlayers = 1 + gamePlayers.length; // Creator + selected players
+  const hasCourseSelected = mode === 'game' ? !!gameCourse : tripItinerary.length > 0;
+  const tripDatesSet = tripStartDate && tripEndDate;
+  
+  // Validation
+  const canCreate = mode === 'game' 
+    ? hasCourseSelected 
+    : hasCourseSelected && tripStartDate !== null && tripEndDate !== null;
+  
+  const validationHint = mode === 'game'
+    ? (!hasCourseSelected ? 'Choose a golf club to continue' : undefined)
+    : (!hasCourseSelected ? 'Add your first course to continue' : !tripDatesSet ? 'Add trip dates to continue' : undefined);
+  
+  // Handlers
+  const handleHeroTap = useCallback(() => {
+    if (mode === 'game') {
+      setCoursePickerContext('game');
+      setShowCoursePicker(true);
+    } else {
+      setCoursePickerContext('trip-add');
+      setShowCoursePicker(true);
+    }
+  }, [mode]);
+  
+  const handleCourseSelect = useCallback((course: { id: string; name: string; country: string; sub_country?: string; thumbnail_image?: string }) => {
+    const selectedCourse: SelectedCourse = {
+      id: course.id,
+      name: course.name,
+      country: course.country,
+      sub_country: course.sub_country,
+      location: course.sub_country || course.country,
+      thumbnail_image: course.thumbnail_image,
+    };
+    
+    if (coursePickerContext === 'game') {
+      setGameCourse(selectedCourse);
+    } else {
+      // Add to trip itinerary
+      const newStop: TripCourseStop = {
+        id: nanoid(),
+        courseId: course.id,
+        courseName: course.name,
+        courseCountry: course.country,
+        courseThumbnail: course.thumbnail_image,
+        courseLocation: course.sub_country || course.country,
+        dayIndex: tripItinerary.length,
+      };
+      setTripItinerary(prev => [...prev, newStop]);
+    }
+    setShowCoursePicker(false);
+  }, [coursePickerContext, tripItinerary.length]);
+  
+  const handleChangeCourse = useCallback(() => {
+    setCoursePickerContext('game');
+    setShowCoursePicker(true);
+  }, []);
+  
+  const handleAddPlayers = useCallback(() => {
+    setShowPlayersPicker(true);
+  }, []);
+  
+  const handlePlayerSelect = useCallback((player: SelectedPlayer) => {
+    const players = mode === 'game' ? gamePlayers : tripAttendees;
+    const setPlayers = mode === 'game' ? setGamePlayers : setTripAttendees;
+    
+    // Check for duplicates
+    if (players.some(p => p.id === player.id)) return;
+    
+    // Check max players for game mode
+    if (mode === 'game' && currentPlayers >= maxPlayers) return;
+    
+    setPlayers(prev => [...prev, player]);
+  }, [mode, gamePlayers, tripAttendees, currentPlayers, maxPlayers]);
+  
+  const handleRemovePlayer = useCallback((playerId: string) => {
+    if (mode === 'game') {
+      setGamePlayers(prev => prev.filter(p => p.id !== playerId));
+    } else {
+      setTripAttendees(prev => prev.filter(p => p.id !== playerId));
+    }
+  }, [mode]);
+  
+  const handleAddTripCourse = useCallback(() => {
+    setCoursePickerContext('trip-add');
+    setShowCoursePicker(true);
+  }, []);
+  
+  const handleEditTripCourse = useCallback((stop: TripCourseStop) => {
+    // Phase 1: Just log for now, Phase 2 will open editor sheet
+    console.log('Edit trip course:', stop);
+  }, []);
+  
+  const handleTripDatesChange = useCallback((start: Date, end: Date) => {
+    setTripStartDate(start);
+    setTripEndDate(end);
+    setShowTripDatesPicker(false);
+  }, []);
+  
+  const handleCreate = useCallback(async () => {
+    if (!canCreate) return;
+    
+    setIsCreating(true);
+    
+    // Build draft payload
+    if (mode === 'game') {
+      const draft: GameDraft = {
+        courseId: gameCourse!.id,
+        playerIds: gamePlayers.filter(p => !p.isGuest).map(p => p.id),
+        guestPlayers: gamePlayers.filter(p => p.isGuest).map(p => p.name),
+        maxPlayers,
+        visibility: gameVisibility,
+        dateTime: gameDate && gameTime ? new Date(`${gameDate.toISOString().split('T')[0]}T${gameTime}`) : undefined,
+        holes: gameHoles,
+        gameType,
+        notes: gameNotes || undefined,
+      };
+      console.log('Creating game (mock):', draft);
+      toast.success('Game created (mock)');
+    } else {
+      const draft: TripDraft = {
+        startDate: tripStartDate!,
+        endDate: tripEndDate!,
+        visibility: tripVisibility,
+        attendeeIds: tripAttendees.filter(p => !p.isGuest).map(p => p.id),
+        guestAttendees: tripAttendees.filter(p => p.isGuest).map(p => p.name),
+        notes: tripNotes || undefined,
+        itinerary: tripItinerary,
+      };
+      console.log('Creating trip (mock):', draft);
+      toast.success('Trip created (mock)');
+    }
+    
+    setIsCreating(false);
+    onClose();
+  }, [
+    canCreate, mode, gameCourse, gamePlayers, maxPlayers, gameVisibility,
+    gameDate, gameTime, gameHoles, gameType, gameNotes,
+    tripStartDate, tripEndDate, tripVisibility, tripAttendees, tripNotes, tripItinerary,
+    onClose
+  ]);
+  
+  if (!isOpen) return null;
+  
+  const portalRoot = document.getElementById('portal-root') || document.body;
+  
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]"
+            onClick={onClose}
+          />
+          
+          {/* Sheet */}
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.3 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 100 || info.velocity.y > 500) {
+                onClose();
+              }
+            }}
+            className="fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden"
+            style={{
+              height: '80svh',
+              maxHeight: '80svh',
+              background: 'hsl(var(--hub-surface, 45 30% 97%))',
+              boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
+            }}
+          >
+            {/* Grabber */}
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+              <div 
+                className="w-10 h-1 rounded-full"
+                style={{ background: 'rgba(0, 0, 0, 0.1)' }}
+              />
+            </div>
+            
+            {/* Scrollable content */}
+            <div 
+              className="flex-1 overflow-y-auto overscroll-contain px-5 pb-32"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {/* Title */}
+              <h2 
+                className="text-xl font-semibold mb-4"
+                style={{ color: 'hsl(var(--hub-text, 220 20% 20%))' }}
+              >
+                {mode === 'game' ? 'Create a Game' : 'Create a Trip'}
+              </h2>
+              
+              {/* Mode Toggle */}
+              <ModeToggle mode={mode} onModeChange={setMode} />
+              
+              {/* Hero Card */}
+              <div className="mt-5">
+                <HeroStartCard
+                  mode={mode}
+                  selectedCourse={mode === 'game' ? gameCourse : (tripItinerary[0] ? {
+                    id: tripItinerary[0].courseId,
+                    name: tripItinerary[0].courseName,
+                    country: tripItinerary[0].courseCountry,
+                    location: tripItinerary[0].courseLocation,
+                    thumbnail_image: tripItinerary[0].courseThumbnail,
+                  } : null)}
+                  onTap={handleHeroTap}
+                  onChangeCourse={handleChangeCourse}
+                />
+              </div>
+              
+              {/* Progressive reveal content */}
+              <AnimatePresence mode="wait">
+                {mode === 'game' && hasCourseSelected && (
+                  <motion.div
+                    key="game-content"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, staggerChildren: 0.1 }}
+                    className="space-y-4 mt-5"
+                  >
+                    {/* Who's playing */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 }}
+                    >
+                      <PlayersCard
+                        mode="game"
+                        players={gamePlayers}
+                        maxPlayers={maxPlayers}
+                        onOpenPicker={handleAddPlayers}
+                        onRemovePlayer={handleRemovePlayer}
+                      />
+                    </motion.div>
+                    
+                    {/* Players counter */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <PlayersCounter current={currentPlayers} max={maxPlayers} />
+                    </motion.div>
+                    
+                    {/* Visibility */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                    >
+                      <VisibilityChips
+                        mode="game"
+                        visibility={gameVisibility}
+                        onVisibilityChange={(v) => setGameVisibility(v as GameVisibility)}
+                      />
+                    </motion.div>
+                    
+                    {/* Add Details */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <GameDetailsSection
+                        isExpanded={gameDetailsExpanded}
+                        onToggle={() => setGameDetailsExpanded(!gameDetailsExpanded)}
+                        gameDate={gameDate}
+                        onGameDateChange={setGameDate}
+                        gameTime={gameTime}
+                        onGameTimeChange={setGameTime}
+                        holeCount={gameHoles}
+                        onHoleCountChange={setGameHoles}
+                        gameType={gameType}
+                        onGameTypeChange={setGameType}
+                        notes={gameNotes}
+                        onNotesChange={setGameNotes}
+                      />
+                    </motion.div>
+                  </motion.div>
+                )}
+                
+                {mode === 'trip' && hasCourseSelected && (
+                  <motion.div
+                    key="trip-content"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-4 mt-5"
+                  >
+                    {/* Trip Dates */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 }}
+                    >
+                      <TripDatesCard
+                        startDate={tripStartDate}
+                        endDate={tripEndDate}
+                        onOpenPicker={() => setShowTripDatesPicker(true)}
+                      />
+                    </motion.div>
+                    
+                    {/* Trip Itinerary */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <TripItineraryList
+                        itinerary={tripItinerary}
+                        onAddCourse={handleAddTripCourse}
+                        onEditCourse={handleEditTripCourse}
+                        onReorder={(newItinerary) => setTripItinerary(newItinerary)}
+                      />
+                    </motion.div>
+                    
+                    {/* Who's attending */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                    >
+                      <PlayersCard
+                        mode="trip"
+                        players={tripAttendees}
+                        onOpenPicker={handleAddPlayers}
+                        onRemovePlayer={handleRemovePlayer}
+                      />
+                    </motion.div>
+                    
+                    {/* Visibility */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <VisibilityChips
+                        mode="trip"
+                        visibility={tripVisibility}
+                        onVisibilityChange={(v) => setTripVisibility(v as TripVisibility)}
+                      />
+                    </motion.div>
+                    
+                    {/* Add Details */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.25 }}
+                    >
+                      <TripDetailsSection
+                        isExpanded={tripDetailsExpanded}
+                        onToggle={() => setTripDetailsExpanded(!tripDetailsExpanded)}
+                        notes={tripNotes}
+                        onNotesChange={setTripNotes}
+                      />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            {/* CTA Bar */}
+            <CTABar
+              mode={mode}
+              isValid={canCreate}
+              isSubmitting={isCreating}
+              validationHint={validationHint}
+              onSubmit={handleCreate}
+            />
+          </motion.div>
+          
+          {/* Sub-sheets */}
+          <ChooseGolfClubSheetV2
+            isOpen={showCoursePicker}
+            onClose={() => setShowCoursePicker(false)}
+            onSelect={handleCourseSelect}
+          />
+          
+          <AddPlayersSheetV2
+            isOpen={showPlayersPicker}
+            onClose={() => setShowPlayersPicker(false)}
+            onAddPlayer={handlePlayerSelect}
+            selectedPlayers={mode === 'game' ? gamePlayers : tripAttendees}
+            maxPlayers={mode === 'game' ? maxPlayers : undefined}
+          />
+          
+          <TripDateRangeSheet
+            isOpen={showTripDatesPicker}
+            onClose={() => setShowTripDatesPicker(false)}
+            startDate={tripStartDate}
+            endDate={tripEndDate}
+            onSave={handleTripDatesChange}
+          />
+        </>
+      )}
+    </AnimatePresence>,
+    portalRoot
+  );
+}
