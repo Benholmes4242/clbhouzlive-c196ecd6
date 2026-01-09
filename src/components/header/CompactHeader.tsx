@@ -105,17 +105,18 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       <header
         data-chrome="header"
         className={cn(
-          "compact-header clubhouse-header fixed-header-safe",
+          "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
-          "fixed top-0 left-0 right-0 z-header",
-          
+          "fixed left-0 right-0 z-header",
           className
         )}
         style={{
+          // Position at top of safe area
+          top: 'var(--sat)',
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          // ALL pages: header extends into safe area so bg is flush to top
+          // Header extends into safe area with paddingTop
           paddingTop: 'env(safe-area-inset-top, 0px)',
           height: `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`,
           borderBottom: `1px solid ${getBorder()}`,

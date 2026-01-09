@@ -428,62 +428,26 @@ html.lightbox-open {
 }
 
 /* ============================================================================
- * CRITICAL: PAGE HEADER OFFSET - DO NOT REMOVE OR MODIFY
+ * HEADER POSITIONING - SAFE AREA SYSTEM
  * ============================================================================
  * 
- * ALL pages that display under the GlobalHeader/CompactHeader MUST use the
- * "compact-header-offset" class on their root container (typically PageRoot).
+ * All headers (GlobalHeader/CompactHeader) now use:
+ *   - top: var(--sat) for positioning below the notch
+ *   - paddingTop: env(safe-area-inset-top) so header background extends into safe area
+ *   - height includes the safe area
  * 
- * This adds padding-top to prevent page content from being hidden behind
- * the fixed header (40px) + iOS safe area inset.
- * 
- * ⚠️ REGRESSION PREVENTION RULE ⚠️
- * When creating or modifying any page component:
- * 1. Check if the page is visible under GlobalHeader (see GlobalHeader.tsx excludedRoutes)
- * 2. If YES → the page's PageRoot MUST include className="compact-header-offset"
- * 3. If NO → the page handles its own header/safe area
- * 
- * Pages that need compact-header-offset:
- * - /courses, /courses/:id, /courses/:id/rate, /courses/:id/reviews
- * - /top100, /top100/:slug
- * - /discover, /discover/explore/*
- * - /profile (when not own), /profile/:username/*
- * - /settings, /messages, /news, /achievements, etc.
- * - All business pages under /business/*
- * 
- * Pages that do NOT need it (excluded from GlobalHeader):
- * - / and /clubhouse (has own dark header)
- * - /auth, /signup, /onboarding (clean auth flow)
- * - /admin/* (separate admin layout)
- * - /create-moment (full-screen composer)
- * 
- * ⚠️ REMOVING THIS CLASS WILL HIDE PAGE CONTENT BEHIND THE HEADER ⚠️
+ * Page content NO LONGER needs compact-header-offset as headers handle their
+ * own safe area positioning.
  * ============================================================================
  */
+
+/* Legacy support - kept for any remaining explicit usages */
 .compact-header-offset {
   padding-top: calc(40px + var(--sat)) !important;
 }
 
-/* Discover needs the compact header offset WITHOUT adding safe-area again
-   (CompactHeader already handles safe-area padding internally). */
 .compact-header-offset-no-safe {
   padding-top: 40px;
-}
-
-/* ========================================
-   AUTOMATIC HEADER OFFSET - REGRESSION PREVENTION
-   ======================================== 
-   This rule auto-applies header offset to all page containers
-   when a fixed header is present. Uses high-specificity and !important
-   to prevent accidental overrides from CSS resets.
-   
-   Pages that genuinely need no offset should add .no-header-offset class.
-   ======================================== */
-body:has(header.fixed-header-safe) main,
-body:has(header.fixed-header-safe) .page-container,
-body:has(header.fixed-header-safe) .page-root,
-body:has(header.fixed-header-safe) .min-h-screen:not(.no-header-offset) {
-  padding-top: calc(40px + var(--sat)) !important;
 }
 
 /* Opt-out class for pages that handle their own header offset */
