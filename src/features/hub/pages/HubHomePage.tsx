@@ -1,6 +1,6 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Matches the Golf OS Dashboard mock 1:1
+ * Fixed dashboard layout - no scroll, locked in place
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -18,6 +18,8 @@ import { ActiveGamesNearYouTile } from '../home/tiles/ActiveGamesNearYouTile';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { YourGamesGradientCTA } from '../home/tiles/YourGamesGradientCTA';
 import { HubFloatingDock } from '../home/tiles/HubFloatingDock';
+import { HubContentSkeleton } from '../home/tiles/HubContentSkeleton';
+import { useHubDataReady } from '../home/hooks/useHubDataReady';
 
 import '../home/hubThemeLight.css';
 
@@ -28,11 +30,11 @@ const HUB_ENTRY_EASING = 'ease-in-out';
 const HUB_EXIT_EASING = 'ease-in-out';
 
 // Layout constants
-const DOCK_HEIGHT = 88;
-const DOCK_GAP = 14;
+const DOCK_HEIGHT = 70;
 
 export function HubHomePage() {
   const { close } = useHub();
+  const isDataReady = useHubDataReady();
   
   useJoinRequestNotifications();
 
@@ -160,11 +162,11 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col">
+    <div className="fixed inset-0 z-[9999] flex flex-col overflow-hidden">
       {/* Glass Sheet */}
       <div 
         ref={sheetRef}
-        className="hub-glass-page flex-1 flex flex-col"
+        className="hub-glass-page flex-1 flex flex-col overflow-hidden"
         style={{
           background: 'var(--hub-bg-start)',
           borderTop: '1px solid var(--hub-stroke)',
@@ -184,42 +186,41 @@ export function HubHomePage() {
         <div className="hub-grabber" />
 
         {/* 
-          SCROLLABLE LAYOUT
-          Content scrolls, dock is anchored at bottom
+          FIXED LAYOUT - NO SCROLL
+          Content fills viewport, dock is anchored at bottom
         */}
         <div 
-          className="flex-1 overflow-y-auto"
+          className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            paddingBottom: `calc(${DOCK_HEIGHT}px + ${DOCK_GAP}px + env(safe-area-inset-bottom, 0px))`,
-            WebkitOverflowScrolling: 'touch',
+            paddingBottom: `calc(${DOCK_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
           }}
         >
-          <div className="px-5 pb-4">
-            {/* Zone 1: Header - Greeting + Right Button */}
-            <HubHeaderToday />
+          <div className="px-5 flex flex-col gap-3 flex-1">
+            {/* Show skeleton while loading, real content when ready */}
+            {!isDataReady ? (
+              <HubContentSkeleton />
+            ) : (
+              <>
+                {/* Zone 1: Header - Greeting + Right Button */}
+                <HubHeaderToday />
 
-            {/* Zone 2: What's Up Next Hero Tile (10% taller) */}
-            <div className="mt-4">
-              <UpNextHeroTile />
-            </div>
+                {/* Zone 2: What's Up Next Hero Tile */}
+                <UpNextHeroTile />
 
-            {/* Zone 3: Messages Card */}
-            <div className="mt-4">
-              <HubMessagesCard />
-            </div>
+                {/* Zone 3: Messages Card */}
+                <HubMessagesCard />
 
-            {/* Zone 4: 2-up Grid - Active Games + Echo */}
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <ActiveGamesNearYouTile />
-              <EchoTile />
-            </div>
+                {/* Zone 4: 2-up Grid - Active Games + Echo */}
+                <div className="grid grid-cols-2 gap-3">
+                  <ActiveGamesNearYouTile />
+                  <EchoTile />
+                </div>
 
-            {/* Zone 5: Full-width "Your Games" Gradient CTA */}
-            <div className="mt-4">
-              <YourGamesGradientCTA />
-            </div>
-
+                {/* Zone 5: Full-width "Your Games" Gradient CTA */}
+                <YourGamesGradientCTA />
+              </>
+            )}
           </div>
         </div>
 

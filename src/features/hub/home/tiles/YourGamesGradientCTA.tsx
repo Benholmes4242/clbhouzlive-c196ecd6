@@ -53,7 +53,7 @@ export function YourGamesGradientCTA() {
             className="text-[13px] mt-0.5"
             style={{ color: 'var(--hub-text-muted)' }}
           >
-            View invites, hosts, and your upcoming rounds
+            Trips, matches, games, and getaways – your golf diary for every upcoming round.
           </div>
         </div>
       </button>
