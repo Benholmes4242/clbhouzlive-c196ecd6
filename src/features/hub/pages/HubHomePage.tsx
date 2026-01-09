@@ -170,14 +170,16 @@ export function HubHomePage() {
         height: '100svh',
         overflow: 'hidden',
         touchAction: 'none', // Prevent any scroll/bounce on the root
+        // Time-of-day background extends into safe area (behind status bar)
+        background: timeOfDayTheme.bg,
       }}
     >
-      {/* Glass Sheet with time-of-day theming */}
+      {/* Glass Sheet - NO background here, let root show through */}
       <div 
         ref={sheetRef}
         className="hub-glass-page flex-1 flex flex-col overflow-hidden"
         style={{
-          background: timeOfDayTheme.bg,
+          // No background - let root time-of-day bg show through safe area
           borderTop: '1px solid var(--hub-stroke)',
           transform: `translateY(${translateY}px)`,
           transition:
@@ -197,6 +199,7 @@ export function HubHomePage() {
         {/* 
           FIXED LAYOUT - NO SCROLL
           Content fills viewport, dock is anchored at bottom
+          NO background on content wrapper - let root show through
         */}
         <div 
           className="flex-1 flex flex-col overflow-hidden"

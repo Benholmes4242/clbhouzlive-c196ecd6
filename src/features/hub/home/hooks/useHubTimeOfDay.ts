@@ -30,40 +30,40 @@ const themes: Record<TimeOfDay, TimeOfDayTheme> = {
     bg: '#f7f9fb',
     surface: '#ffffff',
     gradient: 'linear-gradient(180deg, rgba(230, 240, 255, 0.35), rgba(255, 255, 255, 0))',
-    // Dock: matches page bg with glass effect
+    // Dock: matches page bg with glass effect, subtle shadow
     dockBg: 'rgba(247, 249, 251, 0.85)',
-    dockBorder: 'rgba(120, 140, 170, 0.12)',
-    dockShadow: '0 -8px 24px rgba(0,0,0,0.06)',
+    dockBorder: 'rgba(120, 140, 170, 0.08)',
+    dockShadow: '0 -4px 12px rgba(0,0,0,0.03)',
   },
   afternoon: {
     timeOfDay: 'afternoon',
     bg: '#f6f7f5',
     surface: '#ffffff',
     gradient: 'linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0))',
-    // Dock: matches page bg with glass effect
+    // Dock: matches page bg with glass effect, subtle shadow
     dockBg: 'rgba(246, 247, 245, 0.88)',
-    dockBorder: 'rgba(0, 0, 0, 0.06)',
-    dockShadow: '0 -8px 24px rgba(0,0,0,0.06)',
+    dockBorder: 'rgba(0, 0, 0, 0.05)',
+    dockShadow: '0 -4px 12px rgba(0,0,0,0.03)',
   },
   evening: {
     timeOfDay: 'evening',
     bg: '#f5f3ef',
     surface: '#ffffff',
     gradient: 'linear-gradient(180deg, rgba(255, 220, 190, 0.25), rgba(255, 255, 255, 0))',
-    // Dock: matches warm cream page bg with glass effect
+    // Dock: matches warm cream page bg with glass effect, subtle shadow
     dockBg: 'rgba(245, 243, 239, 0.88)',
-    dockBorder: 'rgba(140, 120, 100, 0.10)',
-    dockShadow: '0 -8px 24px rgba(0,0,0,0.06)',
+    dockBorder: 'rgba(140, 120, 100, 0.06)',
+    dockShadow: '0 -4px 12px rgba(0,0,0,0.03)',
   },
   night: {
     timeOfDay: 'night',
     bg: '#f2f3f4',
     surface: '#ffffff',
     gradient: 'linear-gradient(180deg, rgba(200, 210, 220, 0.25), rgba(255, 255, 255, 0))',
-    // Dock: matches cool page bg with glass effect
+    // Dock: matches cool page bg with glass effect, subtle shadow
     dockBg: 'rgba(242, 243, 244, 0.88)',
-    dockBorder: 'rgba(90, 110, 130, 0.10)',
-    dockShadow: '0 -8px 24px rgba(0,0,0,0.08)',
+    dockBorder: 'rgba(90, 110, 130, 0.06)',
+    dockShadow: '0 -4px 12px rgba(0,0,0,0.04)',
   },
 };
 
