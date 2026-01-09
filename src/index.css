@@ -1451,7 +1451,6 @@ html, body, #root {
 /* Clubhouse: full-bleed edge-to-edge */
 body.route-clubhouse {
   overflow: hidden; /* prevent body scroll behind the stage */
-  background: #0F0F0F !important; /* Dark bg extends into safe area */
 }
 
 body.route-clubhouse .app-shell {
