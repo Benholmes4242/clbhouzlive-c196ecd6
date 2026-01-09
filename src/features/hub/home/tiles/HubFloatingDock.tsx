@@ -71,6 +71,12 @@ export function HubFloatingDock() {
     navigate(path);
   };
 
+  const handleHomeToClubhouse = () => {
+    haptic('light');
+    close();
+    navigate('/clubhouse');
+  };
+
   const handleCreateGame = () => {
     haptic('medium');
     setIsGamesHubOpen(true);
@@ -105,11 +111,11 @@ export function HubFloatingDock() {
             borderBottom: 'none',
           }}
         >
-          {/* Left items: Home, Search */}
+          {/* Left items: Home (goes to Clubhouse), Search */}
           <DockItem 
             icon={Home} 
             label="Home" 
-            onClick={() => handleNavigate('/hub')}
+            onClick={handleHomeToClubhouse}
           />
           <DockItem 
             icon={Search} 
@@ -117,9 +123,9 @@ export function HubFloatingDock() {
             onClick={() => handleNavigate('/discover', true)}
           />
 
-          {/* Center orange glass camera button */}
+          {/* Center orange glass camera button - smaller size */}
           <button
-            className="h-[64px] w-[64px] rounded-full flex items-center justify-center -mt-6 transition-transform active:scale-95"
+            className="h-14 w-14 rounded-full flex items-center justify-center -mt-6 transition-transform active:scale-95"
             style={{
               background: 'radial-gradient(circle at 30% 25%, rgba(255, 170, 90, 0.85), rgba(255, 120, 40, 0.55))',
               border: '1px solid rgba(255, 255, 255, 0.45)',
@@ -130,7 +136,7 @@ export function HubFloatingDock() {
             onClick={handleCreateMoment}
             aria-label="Create Moment"
           >
-            <Camera className="h-7 w-7 text-white" strokeWidth={2} />
+            <Camera className="h-6 w-6 text-white" strokeWidth={2} />
           </button>
 
           {/* Right items: Create Game, Profile */}
