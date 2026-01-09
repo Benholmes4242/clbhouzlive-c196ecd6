@@ -8,6 +8,7 @@ import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin } from 'lucide-react';
 import { useNextUserGame } from '../hooks/useNextUserGame';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { SlotsPill } from '@/features/nearby/components/your-games/SlotsPill';
 import { haptic } from '@/utils/haptics';
 
 // Fallback hero image when course has no image
@@ -65,9 +66,6 @@ export function UpNextHeroTile() {
 
   // With upcoming game - show hero with course image (10% taller: 165px)
   const courseName = nextGame.course?.name || nextGame.courseName || 'Course TBD';
-  const playersFilled = (nextGame.slotsTotal ?? 4) - (nextGame.slotsOpen ?? 0);
-  const playersTotal = nextGame.slotsTotal ?? 4;
-  const isFull = nextGame.slotsOpen === 0;
 
   return (
     <>
@@ -119,15 +117,11 @@ export function UpNextHeroTile() {
                 {formatGameDate(nextGame.startTimeISO)}
               </div>
               {/* Players pill - under date */}
-              <div 
-                className="inline-flex items-center mt-2 px-2.5 py-1 rounded-full text-[12px] font-semibold"
-                style={{
-                  background: isFull ? 'rgba(255, 120, 40, 0.95)' : 'rgba(34, 197, 94, 0.95)',
-                  color: 'white',
-                }}
-              >
-                {playersFilled}/{playersTotal}
-              </div>
+              <SlotsPill 
+                slotsOpen={nextGame.slotsOpen ?? 0} 
+                slotsTotal={nextGame.slotsTotal ?? 4}
+                className="mt-2"
+              />
             </div>
           </div>
         </div>
