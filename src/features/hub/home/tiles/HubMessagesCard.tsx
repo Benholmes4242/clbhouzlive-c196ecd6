@@ -7,13 +7,25 @@ import React, { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { HubMessagesSheet } from '../../components/HubMessagesSheet';
 import { haptic } from '@/utils/haptics';
+import { HUB_DEMO_MODE, MOCK_MESSAGES } from '../hubDemoConfig';
 
-// TODO: Replace with real messages hook
-// For now, simulate no messages (empty state)
-const useMockMessages = () => ({
-  unreadCount: 0,
-  latestSnippet: null as string | null,
-});
+// Hook for messages data - uses demo data when flag is on
+const useMessagesData = () => {
+  if (HUB_DEMO_MODE) {
+    return {
+      unreadCount: MOCK_MESSAGES.unreadCount,
+      groupChatsCount: MOCK_MESSAGES.groupChatsCount,
+      latestSnippet: MOCK_MESSAGES.latestSnippet,
+    };
+  }
+  
+  // Real data - currently empty
+  return {
+    unreadCount: 0,
+    groupChatsCount: 0,
+    latestSnippet: null as string | null,
+  };
+};
 
 interface HubMessagesCardProps {
   className?: string;
@@ -21,8 +33,8 @@ interface HubMessagesCardProps {
 
 export function HubMessagesCard({ className }: HubMessagesCardProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const messages = useMessagesData();
   
-  const messages = useMockMessages();
   const hasMessages = messages.unreadCount > 0;
 
   const openSheet = () => {
@@ -68,7 +80,7 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
                 style={{ color: 'var(--hub-text-muted)' }}
               >
                 {hasMessages
-                  ? (messages.latestSnippet ?? 'You have new messages')
+                  ? `${messages.groupChatsCount} group chats · "${messages.latestSnippet}"`
                   : 'Group chats, game invites, and messages with golfers – all in one place.'}
               </div>
             </div>

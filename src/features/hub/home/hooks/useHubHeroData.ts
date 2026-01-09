@@ -7,6 +7,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { HUB_DEMO_MODE, MOCK_HERO_DATA } from '../hubDemoConfig';
 
 // Global Top 100 list ID
 const GLOBAL_TOP100_LIST_ID = 'df05127d-9f5c-47ab-9e2f-949a200eeaf2';
@@ -158,11 +159,16 @@ async function fetchFallbackCourse(): Promise<HeroFallbackData | null> {
 
 export function useHubHeroData() {
   return useQuery<HubHeroResult>({
-    queryKey: ['hub-hero-data'],
+    queryKey: ['hub-hero-data', HUB_DEMO_MODE],
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true,
     queryFn: async () => {
+      // Demo mode - return mock data immediately
+      if (HUB_DEMO_MODE) {
+        return MOCK_HERO_DATA as HubHeroResult;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       // Fetch all data in parallel
