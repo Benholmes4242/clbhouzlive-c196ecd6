@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-import { MapPin, Plane } from 'lucide-react';
+import { MapPin, Plane, Users } from 'lucide-react';
 import { useHubHeroData, HeroGameData, HeroTripData, HeroFallbackData } from '../hooks/useHubHeroData';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { SlotsPill } from '@/features/nearby/components/your-games/SlotsPill';
@@ -78,16 +78,17 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
         </div>
         <div className="flex items-center gap-2 mt-2">
           <ProgressPill text={`${data.slotsTotal - data.slotsOpen}/${data.slotsTotal}`} />
-          {/* RSVP summary - compact for hero tile */}
+          {/* RSVP summary - using icon instead of emoji for premium feel */}
           {data.goingCount !== undefined && data.goingCount > 0 && (
             <span 
-              className="text-[11px] font-medium"
+              className="flex items-center gap-1 text-[11px] font-medium"
               style={{ 
                 color: 'rgba(255, 255, 255, 0.85)',
                 textShadow: '0 1px 3px rgba(0,0,0,0.3)',
               }}
             >
-              👥 {data.goingCount} going
+              <Users className="w-3 h-3" />
+              {data.goingCount} going
             </span>
           )}
         </div>
