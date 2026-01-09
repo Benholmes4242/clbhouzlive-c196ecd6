@@ -13,7 +13,7 @@ const baseTabs = [
   { id: 'clubhouse', label: 'Home', icon: HomeIcon, path: '/clubhouse' },
   { id: 'discover', label: 'Discover', icon: IoCompassOutline, path: '/discover?main=shorts' },
   { id: 'tourhub', label: 'Tours', icon: TrophyIcon, path: '/tourhub' },
-  { id: 'post', label: 'Post', icon: CameraIcon, path: null, isAction: true },
+  { id: 'post', label: 'Moment', icon: CameraIcon, path: null, isAction: true },
   { id: 'courses', label: 'Courses', icon: MapPinIcon, path: '/courses' },
 ];
 

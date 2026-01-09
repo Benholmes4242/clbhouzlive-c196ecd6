@@ -102,7 +102,7 @@ export function HubFloatingDock() {
         }}
       >
         <div 
-          className="w-full h-[55px] flex items-center justify-between px-4 rounded-t-lg"
+          className="w-full h-[55px] flex items-center justify-around"
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(24px)',
