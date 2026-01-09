@@ -409,6 +409,50 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       whileTap={animationsAllowed && onClick ? { scale: 0.99 } : {}}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
     >
+      {/* ═══ CHANGE 1: Atmosphere Layer - Star dust/nebula for Elite+ tiers ═══ */}
+      {earned && !isGhost && threshold >= 150 && !isLowQuality && (
+        <>
+          {/* Deep space gradient base */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(ellipse 120% 80% at 20% 50%, ${config.badgeGlow}15 0%, transparent 50%),
+                radial-gradient(ellipse 80% 100% at 80% 30%, ${config.cardGlow}20 0%, transparent 40%),
+                radial-gradient(ellipse 60% 60% at 60% 70%, rgba(255,255,255,0.02) 0%, transparent 50%)
+              `,
+              opacity: 0.8,
+            }}
+          />
+          {/* Star dust particles - static CSS, no animation overhead */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: `
+                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.15) 0%, transparent 100%),
+                radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.1) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 45% 15%, rgba(255,255,255,0.12) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 100%),
+                radial-gradient(1px 1px at 85% 40%, rgba(255,255,255,0.1) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 55% 45%, rgba(255,255,255,0.06) 0%, transparent 100%)
+              `,
+              opacity: threshold >= 300 ? 0.9 : 0.7,
+            }}
+          />
+        </>
+      )}
+      
+      {/* ═══ CHANGE 2: Glass Sheen - Top edge highlight for glossy look ═══ */}
+      {earned && !isGhost && !isLowQuality && (
+        <div 
+          className="absolute inset-x-0 top-0 h-[45%] pointer-events-none rounded-t-xl"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 40%, transparent 100%)',
+            opacity: threshold >= 150 ? 1 : 0.7,
+          }}
+        />
+      )}
+      
       {/* Subtle animated background gradient (CSS-only style, framer for perf) */}
       {shouldAnimate && !isLowQuality && (
         <motion.div
@@ -466,18 +510,34 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       <div className={cn('relative z-10 h-full flex items-center gap-3', compact ? 'px-2.5' : 'px-3.5')}>
         {/* Badge with pedestal - coin on plinth style */}
         <div className="relative flex-shrink-0 flex flex-col items-center">
-          {/* Glow behind badge - only for earned */}
+          {/* ═══ CHANGE 3: Enhanced Badge Halo - Stronger glow for Elite+ ═══ */}
           {earned && !isGhost && !isLowQuality && (
-            <div
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ 
-                background: `radial-gradient(circle, ${config.badgeGlow} 0%, transparent 70%)`, 
-                transform: 'scale(1.8)', 
-                filter: 'blur(6px)',
-                opacity: config.glowIntensity,
-                top: '-10%',
-              }}
-            />
+            <>
+              {/* Primary glow - larger and more intense for Elite+ */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ 
+                  background: `radial-gradient(circle, ${config.badgeGlow} 0%, transparent 65%)`, 
+                  transform: threshold >= 150 ? 'scale(2.2)' : 'scale(1.8)', 
+                  filter: threshold >= 150 ? 'blur(10px)' : 'blur(6px)',
+                  opacity: threshold >= 150 ? config.glowIntensity * 1.4 : config.glowIntensity,
+                  top: '-10%',
+                }}
+              />
+              {/* Secondary halo ring - Elite+ only */}
+              {threshold >= 150 && (
+                <div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{ 
+                    background: `radial-gradient(circle, transparent 50%, ${config.badgeGlow}40 70%, transparent 90%)`, 
+                    transform: 'scale(2.6)', 
+                    filter: 'blur(4px)',
+                    opacity: threshold >= 300 ? 0.5 : 0.35,
+                    top: '-10%',
+                  }}
+                />
+              )}
+            </>
           )}
           
           {/* Coin/medallion badge */}
