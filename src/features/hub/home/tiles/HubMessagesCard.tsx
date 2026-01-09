@@ -16,6 +16,7 @@ const useMessagesData = () => {
       unreadCount: MOCK_MESSAGES.unreadCount,
       groupChatsCount: MOCK_MESSAGES.groupChatsCount,
       latestSnippet: MOCK_MESSAGES.latestSnippet,
+      senderNames: MOCK_MESSAGES.senderNames || [],
     };
   }
   
@@ -24,6 +25,7 @@ const useMessagesData = () => {
     unreadCount: 0,
     groupChatsCount: 0,
     latestSnippet: null as string | null,
+    senderNames: [] as string[],
   };
 };
 
@@ -95,7 +97,15 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
               style={{ color: 'var(--hub-text-muted)' }}
             >
               {hasMessages
-                ? `${messages.groupChatsCount} group chats · "${messages.latestSnippet}"`
+                ? (() => {
+                    const names = messages.senderNames;
+                    if (names.length === 0) return 'Group chats, game invites, and messages.';
+                    if (names.length === 1) return `Message from ${names[0]}`;
+                    if (names.length === 2) return `Messages from ${names[0]} and ${names[1]}`;
+                    const shown = names.slice(0, 2);
+                    const remaining = names.length - 2;
+                    return `Messages from ${shown.join(', ')} and ${remaining} more`;
+                  })()
                 : 'Group chats, game invites, and messages.'}
             </div>
           </div>

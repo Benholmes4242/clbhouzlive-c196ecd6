@@ -224,7 +224,7 @@ export function HubHomePage() {
                 </div>
 
                 {/* Zone 5: Full-width "Your Games" Gradient CTA - flex grow to fill remaining space */}
-                <div className="flex-1 flex flex-col min-h-0 pb-3">
+                <div className="flex-1 flex flex-col min-h-0">
                   <YourGamesGradientCTA className="flex-1" />
                 </div>
               </>
