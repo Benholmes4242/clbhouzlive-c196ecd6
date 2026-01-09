@@ -127,7 +127,7 @@ export function HubSharePanel({
     const base = window.location.origin;
     switch (entityType) {
       case 'game':
-        return `${base}/hub/game/${entityId}?tab=timeline`;
+        return `${base}/game/${entityId}?tab=details`;
       case 'trip':
         return `${base}/hub/trip/${entityId}?tab=timeline`;
       case 'moment':

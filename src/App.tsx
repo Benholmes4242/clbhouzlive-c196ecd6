@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -178,6 +178,12 @@ const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHist
 const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
 const HubTripPage = lazy(() => import("./features/hub/pages/HubTripPage"));
+
+// Simple redirect component for /hub/game/:id → /game/:id
+function HubGameRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/game/${id}`} replace />;
+}
 
 // Public Echo Share Page
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
@@ -451,6 +457,8 @@ function AppRoutes() {
           <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
           <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
+          {/* Redirect /hub/game/:id to /game/:id */}
+          <Route path="/hub/game/:id" element={<HubGameRedirect />} />
           </>
         )}
         

@@ -1,24 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, MapPin, Users, Clock } from 'lucide-react';
+import { ArrowLeft, MapPin, Users, Clock, MoreVertical, Bell, UserPlus, Flag } from 'lucide-react';
 import { useGameDetail } from './hooks/useGameDetail';
 import { GameMessagesTab } from './GameMessagesTab';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import HcpBadge from '@/components/HcpBadge';
+
+// Hub components
+import { RsvpStrip } from '@/features/hub/components/rsvp/RsvpStrip';
+import { InviteToGameModal } from '@/features/hub/components/invite/InviteToGameModal';
+import { GameRemindersSheet } from '@/features/hub/components/reminders/GameRemindersSheet';
+import { EndGameSheet } from '@/features/hub/components/game/EndGameSheet';
+import { useGameRsvp } from '@/features/hub/hooks/useGameRsvp';
 
 export default function GameDetailView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { game, participants, isLoading } = useGameDetail(id || null);
-  const [activeTab, setActiveTab] = useState<'details' | 'messages' | 'participants'>('messages');
+  const { game, participants, isLoading, currentUserId, refetch } = useGameDetail(id || null);
+  const [activeTab, setActiveTab] = useState<'details' | 'messages' | 'participants'>('details');
+
+  // Sheet/modal state
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [remindersOpen, setRemindersOpen] = useState(false);
+  const [endGameOpen, setEndGameOpen] = useState(false);
+
+  // RSVP state
+  const { data: rsvpData, isLoading: rsvpLoading, setRsvp, isUpdating: rsvpUpdating } = useGameRsvp(id);
+
+  // Computed flags
+  const isHost = !!currentUserId && game?.host_user_id === currentUserId;
+  const isCompleted = game?.status === 'completed';
 
   // Handle deep link tab parameter
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['details', 'messages', 'participants'].includes(tabParam)) {
+    if (tabParam === 'overview') {
+      setActiveTab('details');
+    } else if (tabParam && ['details', 'messages', 'participants'].includes(tabParam)) {
       setActiveTab(tabParam as 'details' | 'messages' | 'participants');
     }
   }, [searchParams]);
@@ -43,7 +70,7 @@ export default function GameDetailView() {
   const slotsFilledText = `${game.slots_total - game.slots_open}/${game.slots_total} filled`;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-32">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">
@@ -61,8 +88,59 @@ export default function GameDetailView() {
               {format(new Date(game.start_time), 'EEE, MMM d · h:mm a')}
             </p>
           </div>
+
+          {/* Invite button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setInviteOpen(true)}
+            disabled={isCompleted}
+            className="gap-1.5"
+          >
+            <UserPlus className="w-4 h-4" />
+            Invite
+          </Button>
+
+          {/* Overflow menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-2 hover:bg-muted rounded-full transition-colors">
+                <MoreVertical className="w-5 h-5" />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => setRemindersOpen(true)}
+                disabled={isCompleted}
+                className="gap-2"
+              >
+                <Bell className="w-4 h-4" />
+                Reminders
+              </DropdownMenuItem>
+
+              {isHost && !isCompleted && (
+                <DropdownMenuItem 
+                  onClick={() => setEndGameOpen(true)} 
+                  className="gap-2 text-orange-600 focus:text-orange-600"
+                >
+                  <Flag className="w-4 h-4" />
+                  End game
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
+
+      {/* Completed banner */}
+      {isCompleted && (
+        <div className="bg-muted/50 border-b border-border px-4 py-2">
+          <p className="text-sm text-muted-foreground text-center">
+            This game has ended
+          </p>
+        </div>
+      )}
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
@@ -139,7 +217,7 @@ export default function GameDetailView() {
           ) : (
             participants.map((participant) => {
               const profile = participant.user_profiles;
-              const isHost = participant.user_id === game.host_user_id;
+              const isParticipantHost = participant.user_id === game.host_user_id;
 
               return (
                 <div
@@ -150,7 +228,7 @@ export default function GameDetailView() {
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                       {profile?.display_name?.[0] || '?'}
                     </div>
-                    {isHost && (
+                    {isParticipantHost && (
                       <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-primary-foreground border-2 border-background">
                         H
                       </div>
@@ -159,7 +237,7 @@ export default function GameDetailView() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 font-medium">
                       <span>{profile?.display_name || 'Unknown'}</span>
-                      {isHost && <span className="text-xs text-primary">(Host)</span>}
+                      {isParticipantHost && <span className="text-xs text-primary">(Host)</span>}
                       <HcpBadge 
                         value={profile?.handicap} 
                         show={profile?.show_handicap ?? true}
@@ -179,6 +257,46 @@ export default function GameDetailView() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* RSVP Strip - Sticky footer */}
+      {!rsvpLoading && rsvpData && (
+        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-4 py-3 z-20">
+          {isCompleted ? (
+            <div className="text-center py-2">
+              <p className="text-sm text-muted-foreground">This game has ended</p>
+            </div>
+          ) : (
+            <RsvpStrip
+              currentStatus={rsvpData.currentUserRsvp}
+              counts={rsvpData.counts}
+              isHost={isHost}
+              isUpdating={rsvpUpdating}
+              onStatusChange={setRsvp}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Modals & Sheets */}
+      <InviteToGameModal
+        isOpen={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        gameId={id!}
+        onInviteSuccess={refetch}
+      />
+
+      <GameRemindersSheet
+        isOpen={remindersOpen}
+        onClose={() => setRemindersOpen(false)}
+        gameId={id!}
+      />
+
+      <EndGameSheet
+        isOpen={endGameOpen}
+        onClose={() => setEndGameOpen(false)}
+        gameId={id!}
+        onSuccess={refetch}
+      />
     </div>
   );
 }

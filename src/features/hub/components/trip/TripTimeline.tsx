@@ -52,7 +52,7 @@ export function TripTimeline({ items, isLoading }: TripTimelineProps) {
           <TripTimelineCard
             key={item.id}
             item={item}
-            onTap={item.gameId ? () => navigate(`/hub/game/${item.gameId}`) : undefined}
+            onTap={item.gameId ? () => navigate(`/game/${item.gameId}`) : undefined}
           />
         ))}
       </div>
