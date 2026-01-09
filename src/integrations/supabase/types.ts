@@ -2814,6 +2814,50 @@ export type Database = {
           },
         ]
       }
+      game_reminders: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          game_id: string
+          id: string
+          last_24h_sent_at: string | null
+          last_2h_sent_at: string | null
+          remind_24h: boolean
+          remind_2h: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          game_id: string
+          id?: string
+          last_24h_sent_at?: string | null
+          last_2h_sent_at?: string | null
+          remind_24h?: boolean
+          remind_2h?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          game_id?: string
+          id?: string
+          last_24h_sent_at?: string | null
+          last_2h_sent_at?: string | null
+          remind_24h?: boolean
+          remind_2h?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_reminders_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_thread_messages: {
         Row: {
           attachments: Json | null
@@ -2928,6 +2972,7 @@ export type Database = {
           course_name: string | null
           course_name_normalized: string | null
           created_at: string
+          ends_at: string | null
           expires_at: string
           host_user_id: string
           id: string
@@ -2939,6 +2984,7 @@ export type Database = {
           slots_total: number
           start_time: string
           status: string
+          trip_id: string | null
           updated_at: string | null
           visibility: string
         }
@@ -2947,6 +2993,7 @@ export type Database = {
           course_name?: string | null
           course_name_normalized?: string | null
           created_at?: string
+          ends_at?: string | null
           expires_at: string
           host_user_id: string
           id?: string
@@ -2958,6 +3005,7 @@ export type Database = {
           slots_total?: number
           start_time?: string
           status?: string
+          trip_id?: string | null
           updated_at?: string | null
           visibility?: string
         }
@@ -2966,6 +3014,7 @@ export type Database = {
           course_name?: string | null
           course_name_normalized?: string | null
           created_at?: string
+          ends_at?: string | null
           expires_at?: string
           host_user_id?: string
           id?: string
@@ -2977,6 +3026,7 @@ export type Database = {
           slots_total?: number
           start_time?: string
           status?: string
+          trip_id?: string | null
           updated_at?: string | null
           visibility?: string
         }
@@ -2986,6 +3036,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -6683,6 +6740,86 @@ export type Database = {
           name?: string | null
           payload?: Json | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      trip_participants: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string | null
+          role: string
+          rsvp_status: string
+          rsvp_updated_at: string | null
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+          rsvp_status?: string
+          rsvp_updated_at?: string | null
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+          rsvp_status?: string
+          rsvp_updated_at?: string | null
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_participants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          end_date: string
+          id: string
+          name: string
+          start_date: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_date: string
+          id?: string
+          name: string
+          start_date: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          name?: string
+          start_date?: string
+          updated_at?: string
+          visibility?: string
         }
         Relationships: []
       }
