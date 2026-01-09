@@ -317,7 +317,7 @@ export function UpNextHeroTile() {
       <div 
         className="relative rounded-[26px] overflow-hidden"
         style={{
-          height: '165px',
+          height: '150px',
           background: 'var(--hub-skeleton-base)',
         }}
       >
@@ -336,7 +336,7 @@ export function UpNextHeroTile() {
       <div 
         className="relative w-full rounded-[26px] overflow-hidden"
         style={{
-          height: '165px',
+          height: '150px',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
         }}
         onTouchStart={handleTouchStart}
