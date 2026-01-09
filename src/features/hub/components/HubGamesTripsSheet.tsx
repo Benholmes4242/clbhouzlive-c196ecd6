@@ -212,10 +212,11 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
               />
 
               <MenuCard
-                icon={<CalendarDays className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-sub)' }} />}
+                icon={<CalendarDays className="w-[18px] h-[18px]" style={{ color: 'rgba(180, 90, 30, 0.85)' }} />}
                 title="Your Games & Trips"
                 subtitle="Upcoming games and trips"
                 onClick={handleYourGamesTrips}
+                isPrimary
               />
 
               <MenuCard
