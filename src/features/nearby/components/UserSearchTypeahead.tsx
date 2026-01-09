@@ -109,29 +109,39 @@ export function UserSearchTypeahead({
           {selectedUsers.map((user) => (
             <div
               key={user.id}
-              className="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm text-white"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm"
+              style={{ 
+                background: 'rgba(100, 116, 139, 0.08)',
+                border: '1px solid rgba(100, 116, 139, 0.15)',
+              }}
             >
-              <div className="flex items-center gap-2">
-                {user.guest_name ? (
-                  <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
-                    <UserPlus className="w-3 h-3 text-white/60" />
-                  </div>
-                ) : (
-                  <SquircleAvatar
-                    size={24}
-                    src={user.profile_photo_url}
-                    alt={user.display_name}
-                    fallback={user.display_name?.charAt(0)?.toUpperCase() || '?'}
-                  />
-                )}
-                <span>{user.display_name}</span>
-                {!user.guest_name && (
-                  <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
-                )}
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2">
+                  {user.guest_name ? (
+                    <div 
+                      className="w-5 h-5 flex items-center justify-center shrink-0"
+                      style={{ borderRadius: '6px', background: 'rgba(100, 116, 139, 0.1)' }}
+                    >
+                      <UserPlus className="w-3 h-3" style={{ color: '#64748b' }} />
+                    </div>
+                  ) : (
+                    <SquircleAvatar
+                      size={20}
+                      src={user.profile_photo_url}
+                      alt={user.display_name}
+                      fallback={user.display_name?.charAt(0)?.toUpperCase() || '?'}
+                    />
+                  )}
+                  <span className="font-medium truncate" style={{ color: '#1e293b' }}>{user.display_name}</span>
+                  {!user.guest_name && (
+                    <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => onUserRemove(user.id)}
-                className="hover:text-white/70 transition-colors"
+                className="hover:opacity-70 transition-colors"
+                style={{ color: '#64748b' }}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -172,7 +182,17 @@ export function UserSearchTypeahead({
                 className="fixed inset-0 z-10"
                 onClick={() => setShowDropdown(false)}
               />
-              <div className="resultsSheet">
+              <div 
+                className="absolute left-0 right-0 top-full z-[100] mt-2 rounded-xl overflow-hidden"
+                style={{ 
+                  background: 'white',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  boxShadow: '0 10px 24px rgba(0, 0, 0, 0.12)',
+                  maxHeight: '42vh',
+                  overflowY: 'auto',
+                  padding: '8px',
+                }}
+              >
                 {/* Add Guest option - ALWAYS pinned at top */}
                 <button
                   onPointerDown={(e) => {
@@ -180,21 +200,24 @@ export function UserSearchTypeahead({
                     e.stopPropagation();
                     handleAddGuest();
                   }}
-                  className="resultRow"
-                  style={{ marginBottom: '8px' }}
+                  className="flex items-center gap-3 w-full p-3 rounded-lg transition-colors"
+                  style={{ marginBottom: '8px', background: 'rgba(100, 116, 139, 0.04)' }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                    <UserPlus className="w-4 h-4 text-white/70" />
+                  <div 
+                    className="w-8 h-8 flex items-center justify-center shrink-0"
+                    style={{ borderRadius: '8px', background: 'rgba(100, 116, 139, 0.08)' }}
+                  >
+                    <UserPlus className="w-4 h-4" style={{ color: '#64748b' }} />
                   </div>
-                  <div className="rMid">
-                    <div className="rTitle">➕ Add Guest</div>
-                    <div className="rSub">Add an unnamed player</div>
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold text-[15px]" style={{ color: '#1e293b' }}>➕ Add Guest</div>
+                    <div className="text-[13px]" style={{ color: '#64748b' }}>Add an unnamed player</div>
                   </div>
                 </button>
                 
                 {/* Loading indicator */}
                 {isSearching && (
-                  <div className="hint">Searching for users...</div>
+                  <div className="p-4 text-center text-[14px]" style={{ color: '#64748b' }}>Searching for users...</div>
                 )}
                 
                 {/* User results - only show when not searching */}
@@ -206,7 +229,7 @@ export function UserSearchTypeahead({
                       e.stopPropagation();
                       handleUserSelect(user);
                     }}
-                    className="resultRow"
+                    className="flex items-center gap-3 w-full p-3 rounded-lg transition-colors hover:bg-slate-50"
                   >
                     <SquircleAvatar
                       size={36}
@@ -214,22 +237,22 @@ export function UserSearchTypeahead({
                       alt={user.display_name}
                       fallback={user.display_name?.charAt(0)?.toUpperCase() || '?'}
                     />
-                    <div className="rMid">
-                      <div className="rTitle flex items-center gap-2">
-                        <span>{user.display_name}</span>
-                        <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} className="text-white/60" />
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-2 font-semibold text-[15px]" style={{ color: '#1e293b' }}>
+                        <span className="truncate">{user.display_name}</span>
+                        <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
                       </div>
                       {user.username && (
-                        <div className="rSub">@{user.username}</div>
+                        <div className="text-[13px]" style={{ color: '#64748b' }}>@{user.username}</div>
                       )}
                     </div>
-                    <UserPlus className="w-4 h-4 text-white/40" />
+                    <UserPlus className="w-4 h-4" style={{ color: '#94a3b8' }} />
                   </button>
                 ))}
                 
                 {/* No results message */}
                 {!isSearching && results.length === 0 && (
-                  <div className="hint">No users found matching "{searchTerm}"</div>
+                  <div className="p-4 text-center text-[14px]" style={{ color: '#64748b' }}>No users found matching "{searchTerm}"</div>
                 )}
               </div>
             </>

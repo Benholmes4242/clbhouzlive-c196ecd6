@@ -349,10 +349,10 @@ export function HubCreateGameTripSheet({
                     <div 
                       className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ 
-                        background: 'linear-gradient(135deg, rgba(110, 146, 119, 0.15) 0%, rgba(110, 146, 119, 0.08) 100%)',
+                        background: 'rgba(100, 116, 139, 0.08)',
                       }}
                     >
-                      <MapPin className="w-[18px] h-[18px]" style={{ color: 'var(--hub-accent)' }} />
+                      <MapPin className="w-[18px] h-[18px]" style={{ color: '#64748b' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[15px] font-medium truncate" style={{ color: 'var(--hub-text)' }}>
@@ -368,8 +368,8 @@ export function HubCreateGameTripSheet({
                       onClick={() => setCourseSearchOpen(true)}
                       className="text-[13px] font-medium px-3 py-1.5 rounded-full transition-all active:scale-[0.96]"
                       style={{ 
-                        color: 'var(--hub-accent)',
-                        background: 'rgba(110, 146, 119, 0.08)',
+                        color: '#64748b',
+                        background: 'rgba(100, 116, 139, 0.08)',
                       }}
                     >
                       Change
@@ -448,22 +448,24 @@ export function HubCreateGameTripSheet({
                           {displayedPlayers.map(player => (
                             <div
                               key={player.id}
-                              className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-full"
+                              className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1"
                               style={{
                                 background: 'rgba(16, 185, 129, 0.15)',
                                 border: '1px solid rgba(16, 185, 129, 0.3)',
+                                borderRadius: '10px',
                               }}
                             >
                               {player.profile_photo_url ? (
                                 <img 
                                   src={player.profile_photo_url}
                                   alt=""
-                                  className="w-5 h-5 rounded-full object-cover"
+                                  className="w-5 h-5 object-cover"
+                                  style={{ borderRadius: '6px' }}
                                 />
                               ) : (
                                 <div 
-                                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium"
-                                  style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10B981' }}
+                                  className="w-5 h-5 flex items-center justify-center text-[10px] font-medium"
+                                  style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10B981', borderRadius: '6px' }}
                                 >
                                   {(player.display_name || player.name || '?').charAt(0).toUpperCase()}
                                 </div>
@@ -473,8 +475,8 @@ export function HubCreateGameTripSheet({
                               </span>
                               <button
                                 onClick={() => handleRemovePlayer(player.id)}
-                                className="w-4 h-4 rounded-full flex items-center justify-center transition-colors"
-                                style={{ background: 'rgba(16, 185, 129, 0.2)' }}
+                                className="w-4 h-4 flex items-center justify-center transition-colors"
+                                style={{ background: 'rgba(16, 185, 129, 0.2)', borderRadius: '5px' }}
                               >
                                 <X className="w-2.5 h-2.5" style={{ color: '#10B981' }} />
                               </button>
@@ -640,38 +642,40 @@ export function HubCreateGameTripSheet({
                         <div className="pt-2 pb-1 space-y-3">
                           {mode === 'game' ? (
                             <>
-                              {/* Date & Time chips */}
+                              {/* Date & Time inputs */}
                               <div className="flex gap-2">
-                                <button
-                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition-all active:scale-[0.98]"
+                                <div
+                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl"
                                   style={{ 
                                     background: 'rgba(255, 255, 255, 0.8)',
                                     border: '1px solid rgba(0, 0, 0, 0.04)',
                                   }}
                                 >
-                                  <Calendar className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                                  <span 
-                                    className="text-[13px] font-medium"
+                                  <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
+                                  <input
+                                    type="date"
+                                    value={gameDate ? format(gameDate, 'yyyy-MM-dd') : ''}
+                                    onChange={(e) => setGameDate(e.target.value ? new Date(e.target.value) : null)}
+                                    className="flex-1 text-[13px] font-medium bg-transparent border-none outline-none"
                                     style={{ color: gameDate ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
-                                  >
-                                    {gameDate ? format(gameDate, 'MMM d') : 'Date'}
-                                  </span>
-                                </button>
-                                <button
-                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition-all active:scale-[0.98]"
+                                  />
+                                </div>
+                                <div
+                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl"
                                   style={{ 
                                     background: 'rgba(255, 255, 255, 0.8)',
                                     border: '1px solid rgba(0, 0, 0, 0.04)',
                                   }}
                                 >
-                                  <Clock className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                                  <span 
-                                    className="text-[13px] font-medium"
+                                  <Clock className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
+                                  <input
+                                    type="time"
+                                    value={gameTime}
+                                    onChange={(e) => setGameTime(e.target.value)}
+                                    className="flex-1 text-[13px] font-medium bg-transparent border-none outline-none"
                                     style={{ color: gameTime ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
-                                  >
-                                    {gameTime || 'Time'}
-                                  </span>
-                                </button>
+                                  />
+                                </div>
                               </div>
 
                               {/* Holes */}
@@ -743,36 +747,40 @@ export function HubCreateGameTripSheet({
                             <>
                               {/* Trip dates */}
                               <div className="flex gap-2">
-                                <button
-                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition-all active:scale-[0.98]"
+                                <div
+                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl"
                                   style={{ 
                                     background: 'rgba(255, 255, 255, 0.8)',
                                     border: '1px solid rgba(0, 0, 0, 0.04)',
                                   }}
                                 >
-                                  <Calendar className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                                  <span 
-                                    className="text-[13px] font-medium"
+                                  <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
+                                  <input
+                                    type="date"
+                                    value={tripStartDate ? format(tripStartDate, 'yyyy-MM-dd') : ''}
+                                    onChange={(e) => setTripStartDate(e.target.value ? new Date(e.target.value) : null)}
+                                    placeholder="Start date"
+                                    className="flex-1 text-[13px] font-medium bg-transparent border-none outline-none"
                                     style={{ color: tripStartDate ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
-                                  >
-                                    {tripStartDate ? format(tripStartDate, 'MMM d') : 'Start date'}
-                                  </span>
-                                </button>
-                                <button
-                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition-all active:scale-[0.98]"
+                                  />
+                                </div>
+                                <div
+                                  className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl"
                                   style={{ 
                                     background: 'rgba(255, 255, 255, 0.8)',
                                     border: '1px solid rgba(0, 0, 0, 0.04)',
                                   }}
                                 >
-                                  <Calendar className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                                  <span 
-                                    className="text-[13px] font-medium"
+                                  <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
+                                  <input
+                                    type="date"
+                                    value={tripEndDate ? format(tripEndDate, 'yyyy-MM-dd') : ''}
+                                    onChange={(e) => setTripEndDate(e.target.value ? new Date(e.target.value) : null)}
+                                    placeholder="End date"
+                                    className="flex-1 text-[13px] font-medium bg-transparent border-none outline-none"
                                     style={{ color: tripEndDate ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
-                                  >
-                                    {tripEndDate ? format(tripEndDate, 'MMM d') : 'End date'}
-                                  </span>
-                                </button>
+                                  />
+                                </div>
                               </div>
 
                               {/* Trip notes */}
