@@ -22,7 +22,6 @@ interface UseMediaCardProps {
 
 export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, isPortrait = false, autoplayManager, videoIndex = 0 }: UseMediaCardProps) => {
   const [imageError, setImageError] = useState(false);
-  const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -139,33 +138,9 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
     // Only open media for image and video types, not CTA
     if (item.type === 'image' || item.type === 'video') {
       console.log('MediaCard handleMediaClick - item.golfCourse:', item.golfCourse);
-      // Call the onMediaClick prop instead of opening the post viewer modal
-      if (onMediaClick) {
-        onMediaClick(item);
-      } else {
-        setIsPostViewerOpen(true);
-      }
+      // Call the onMediaClick prop - parent handles fullscreen
+      onMediaClick?.(item);
     }
-  };
-
-  // Transform ExploreContentItem to PostData format
-  const transformedPost = {
-    id: item.id,
-    content: item.title || null,
-    created_at: new Date().toISOString(), // ExploreContentItem doesn't have created_at
-    user: {
-      id: item.user?.id || 'unknown',
-      display_name: item.user?.name || 'Unknown User',
-      username: item.user?.name || null,
-      profile_photo_url: item.user?.avatar || null,
-    },
-    post_media: mediaItems.map(media => ({
-      id: media.id,
-      media_type: media.media_type,
-      media_url: media.media_url,
-    })),
-    post_tags: [],
-    golfCourse: item.golfCourse,
   };
 
   const handleImageError = () => {
@@ -185,8 +160,6 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
   return {
     // State
     imageError,
-    isPostViewerOpen,
-    setIsPostViewerOpen,
     currentMediaIndex,
     isHovered,
     isLoading,
@@ -202,7 +175,6 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
     currentMedia,
     hasMultipleMedia,
     shouldAutoplay,
-    transformedPost,
     
     // Handlers
     handlePrevMedia,
