@@ -14,10 +14,11 @@ export function LastUpdatedPill({ timestamp, className }: LastUpdatedPillProps) 
   
   return (
     <span className={cn(
-      "inline-flex items-center gap-1 px-3 py-1 rounded-sq-pill bg-surface-alt border border-border-subtle text-meta text-text-tertiary",
+      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-[10px]",
+      "bg-white/20 border border-white/25 text-white/90",
       className
     )}>
-      <span className="w-1.5 h-1.5 rounded-full bg-text-tertiary/50" />
+      <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
       Updated {display}
     </span>
   );

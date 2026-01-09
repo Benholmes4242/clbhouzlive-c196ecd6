@@ -3,9 +3,10 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowRight, TrendingUp, User } from 'lucide-react';
+import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { toTitleCase } from '@/lib/formatters';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 type SortOption = 'events' | 'cuts' | 'world_rank';
@@ -84,7 +85,7 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
         </div>
         <Link 
           to="/tourhub?tab=player-stats"
-          className="text-sm text-primary hover:underline flex items-center gap-1"
+          className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 transition-colors"
         >
           View all <ArrowRight className="w-3.5 h-3.5" />
         </Link>
@@ -99,7 +100,7 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
             className={cn(
               "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all border",
               sortBy === opt.value
-                ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                ? 'bg-foreground text-background border-foreground shadow-sm'
                 : 'bg-muted/50 text-muted-foreground border-transparent hover:bg-muted'
             )}
           >
@@ -131,24 +132,7 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
               to={`/tourhub/player/${stat.player_id}`}
               className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors group"
             >
-              {/* Rank Badge */}
-              <div 
-                className="relative w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                style={{
-                  background: index < 3 
-                    ? `linear-gradient(135deg, hsl(var(--primary) / ${0.15 + rankIntensity}), hsl(var(--primary) / ${0.05 + rankIntensity}))` 
-                    : 'hsl(var(--muted))',
-                  boxShadow: index < 3 ? `0 0 ${12 + index * 4}px hsl(var(--primary) / ${0.2 - index * 0.05})` : 'none',
-                }}
-              >
-                <span className={cn(
-                  index < 3 ? 'text-primary' : 'text-muted-foreground'
-                )}>
-                  {index + 1}
-                </span>
-              </div>
-
-              {/* Avatar with halo */}
+              {/* Avatar with halo - now the left-most element */}
               <div 
                 className="relative w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0"
                 style={{
@@ -175,11 +159,11 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
                   {stat.player?.full_name}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs text-muted-foreground">{stat.player?.country}</span>
+                  <span className="text-xs text-muted-foreground">{toTitleCase(stat.player?.country)}</span>
                   {narrativeTag && (
                     <>
                       <span className="text-muted-foreground/50">•</span>
-                      <span className="text-xs text-primary/70">{narrativeTag}</span>
+                      <span className="text-xs text-muted-foreground">{narrativeTag}</span>
                     </>
                   )}
                 </div>
@@ -195,13 +179,13 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
                 )}
               </div>
               
-              {/* Primary Stat */}
+              {/* Primary Stat - simplified without redundant labels */}
               <div className="text-right shrink-0">
                 {sortBy === 'events' && (
-                  <p className="font-semibold text-foreground text-sm">{stat.events_played || 0} events</p>
+                  <p className="font-semibold text-foreground text-sm">{stat.events_played || 0}</p>
                 )}
                 {sortBy === 'cuts' && (
-                  <p className="font-semibold text-foreground text-sm">{stat.cuts_made || 0} cuts</p>
+                  <p className="font-semibold text-foreground text-sm">{stat.cuts_made || 0}</p>
                 )}
                 {sortBy === 'world_rank' && worldRank && (
                   <p className="font-semibold text-foreground text-sm">#{worldRank}</p>
