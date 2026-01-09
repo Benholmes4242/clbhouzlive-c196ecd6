@@ -111,14 +111,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          // Position at top of safe area
-          top: 'var(--sat)',
+          // Position at top - no safe area offset
+          top: 0,
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          // Header extends into safe area with paddingTop
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          height: `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`,
+          // No safe area padding
+          height: `${headerHeight}px`,
           borderBottom: `1px solid ${getBorder()}`,
           boxShadow: isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
