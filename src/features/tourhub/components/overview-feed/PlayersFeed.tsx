@@ -1,10 +1,10 @@
 /**
- * PlayersFeed - Photo-led player list (feed style, not table)
- * Image-first rows with narrative labels
+ * PlayersFeed - Flat rows on page background (no cards)
+ * Image-first with subtle dividers
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowRight, User } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
@@ -104,21 +104,34 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
         ))}
       </div>
 
-      {/* Player List - Photo-led */}
-      <div className="space-y-2">
+      {/* Player List - Flat rows on page background */}
+      <div>
         {sortedPlayers.map((stat, index) => {
           const rawStats = stat.raw_data?.statistics;
           const worldRank = rawStats?.world_rank;
           const narrativeTag = getNarrativeTag(stat, sortBy);
+          const isLast = index === sortedPlayers.length - 1;
           
           return (
             <Link
               key={stat.id}
               to={`/tourhub/player/${stat.player_id}`}
-              className="flex items-center gap-3 p-3 rounded-2xl bg-card border border-border hover:border-primary/40 hover:shadow-md transition-all group"
+              className="flex items-center gap-3 py-3 group transition-colors"
             >
-              {/* Large photo - left aligned */}
-              <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
+              {/* Rank chip - small subtle */}
+              <div 
+                className={cn(
+                  "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0",
+                  index < 3 
+                    ? 'bg-primary/10 text-primary' 
+                    : 'bg-muted text-muted-foreground'
+                )}
+              >
+                {index + 1}
+              </div>
+              
+              {/* Player photo - circular */}
+              <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
                 {stat.player?.photo_url ? (
                   <img 
                     src={stat.player.photo_url} 
@@ -127,37 +140,34 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                    <span className="text-lg font-bold text-muted-foreground/50">
+                    <span className="text-sm font-bold text-muted-foreground/50">
                       {stat.player?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </span>
                   </div>
                 )}
-                
-                {/* Rank badge overlay */}
-                <div className={cn(
-                  "absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                  index < 3 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted-foreground/20 text-muted-foreground'
-                )}>
-                  {index + 1}
-                </div>
               </div>
 
               {/* Player Info - center */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate text-[15px]">
                   {stat.player?.full_name}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {stat.player?.country}
-                </p>
-                <p className="text-xs text-primary/80 mt-1 font-medium">
-                  {narrativeTag}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-muted-foreground">
+                    {stat.player?.country}
+                  </span>
+                  {narrativeTag && (
+                    <>
+                      <span className="text-muted-foreground/30">·</span>
+                      <span className="text-xs text-primary/80 font-medium">
+                        {narrativeTag}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
               
-              {/* Primary Stat - right */}
+              {/* Primary Stat - right aligned */}
               <div className="text-right flex-shrink-0">
                 {sortBy === 'events' && (
                   <p className="text-lg font-bold text-foreground">{stat.events_played || 0}</p>
@@ -168,7 +178,7 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                 {sortBy === 'world_rank' && worldRank && (
                   <p className="text-lg font-bold text-foreground">#{worldRank}</p>
                 )}
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
                   {sortBy === 'events' ? 'events' : sortBy === 'cuts' ? 'cuts' : 'world'}
                 </p>
               </div>

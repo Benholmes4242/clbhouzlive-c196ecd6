@@ -1,6 +1,6 @@
 /**
  * useCourseImageResolver - Resolves SR venue names to golf_courses images
- * Uses deterministic + fuzzy matching with caching
+ * Uses base name extraction + trigram matching with caching
  */
 
 import { useQuery } from '@tanstack/react-query';
@@ -13,28 +13,39 @@ interface ResolvedCourse {
   name: string;
 }
 
-interface VenueInput {
+export interface VenueInput {
   venueName: string;
   venueCourseName?: string | null;
   city?: string | null;
   country?: string | null;
 }
 
-// Normalize name for matching
-function normalizeName(name: string): string {
-  return name
+// Extract base name: strip variant suffixes like "- South Course", "- Black Course"
+function courseBaseName(input: string): string {
+  return input
     .toLowerCase()
-    .replace(/['']/g, '') // Remove apostrophes
-    .replace(/[^\w\s]/g, '') // Remove punctuation
-    .replace(/\b(golf|club|course|country|the|at|resort|lodge|cc|gc)\b/gi, '')
+    .replace(/\s*[-–]\s*.*$/, '') // Strip "- South Course" etc
+    .replace(/\s*\(.*$/, '')       // Strip "(Championship)" etc
+    .trim();
+}
+
+// Normalize for matching: remove common words and punctuation
+function courseNormalize(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\b(the|at|golf|club|course|resort|country|cc|gc)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-// Calculate similarity score (simple token overlap)
+// Calculate similarity score using trigram-like token overlap
 function calculateSimilarity(a: string, b: string): number {
-  const tokensA = new Set(normalizeName(a).split(' ').filter(Boolean));
-  const tokensB = new Set(normalizeName(b).split(' ').filter(Boolean));
+  const normA = courseNormalize(courseBaseName(a));
+  const normB = courseNormalize(courseBaseName(b));
+  
+  const tokensA = new Set(normA.split(' ').filter(Boolean));
+  const tokensB = new Set(normB.split(' ').filter(Boolean));
   
   if (tokensA.size === 0 || tokensB.size === 0) return 0;
   
@@ -44,32 +55,49 @@ function calculateSimilarity(a: string, b: string): number {
   return intersection / union; // Jaccard similarity
 }
 
+// Boost score for primary/championship variants
+function getVariantBoost(courseName: string): number {
+  const lower = courseName.toLowerCase();
+  if (lower.includes(' south ')) return 100;
+  if (lower.includes(' championship ')) return 90;
+  if (lower.includes(' black ')) return 80;
+  if (lower.includes(' stadium ')) return 75;
+  if (lower.includes(' north ')) return 70;
+  if (lower.includes(' gold ')) return 60;
+  if (lower.includes(' links ')) return 50;
+  return 0;
+}
+
 export function useCourseImageResolver(venues: VenueInput[]) {
   return useQuery({
     queryKey: ['course-images', venues.map(v => v.venueName).join(',')],
     queryFn: async () => {
       if (!venues.length) return new Map<string, ResolvedCourse>();
       
-      // First check cache
-      const { data: cached } = await supabase
-        .from('sr_course_map')
-        .select('sr_venue_name, golf_course_id, confidence, golf_courses:golf_course_id(id, name, thumbnail_image)')
-        .in('sr_venue_name', venues.map(v => v.venueName));
-      
       const results = new Map<string, ResolvedCourse>();
       const uncached: VenueInput[] = [];
       
-      // Process cached results
-      cached?.forEach((row: any) => {
-        if (row.golf_courses) {
-          results.set(row.sr_venue_name, {
-            golfCourseId: row.golf_courses.id,
-            imageUrl: row.golf_courses.thumbnail_image,
-            confidence: row.confidence,
-            name: row.golf_courses.name,
-          });
-        }
-      });
+      // Check cache first
+      try {
+        const { data: cached } = await supabase
+          .from('sr_course_map')
+          .select('sr_venue_name, golf_course_id, confidence, golf_courses:golf_course_id(id, name, thumbnail_image)')
+          .in('sr_venue_name', venues.map(v => v.venueName));
+        
+        cached?.forEach((row: any) => {
+          if (row.golf_courses) {
+            results.set(row.sr_venue_name, {
+              golfCourseId: row.golf_courses.id,
+              imageUrl: row.golf_courses.thumbnail_image,
+              confidence: row.confidence,
+              name: row.golf_courses.name,
+            });
+          }
+        });
+      } catch (e) {
+        // Cache check failed, proceed with resolution
+        console.log('Cache check failed, resolving fresh');
+      }
       
       // Find uncached venues
       venues.forEach(v => {
@@ -80,48 +108,68 @@ export function useCourseImageResolver(venues: VenueInput[]) {
       
       // Resolve uncached venues
       if (uncached.length > 0) {
-        // Build search terms
-        const searchTerms = uncached.flatMap(v => {
-          const terms = [v.venueName];
-          if (v.venueCourseName) terms.push(v.venueCourseName);
-          return terms;
-        });
-        
-        // Fetch potential matches (courses in same countries)
+        // Fetch potential matches from golf_courses
         const countries = [...new Set(uncached.map(v => v.country).filter(Boolean))];
         
         const { data: courses } = await supabase
           .from('golf_courses')
-          .select('id, name, thumbnail_image, country')
+          .select('id, name, thumbnail_image, country, sub_country')
           .in('country', countries.length ? countries as string[] : ['USA'])
-          .limit(500);
+          .limit(800);
         
         if (courses) {
           for (const venue of uncached) {
             const searchName = venue.venueCourseName || venue.venueName;
-            const normalizedSearch = normalizeName(searchName);
+            const searchBase = courseBaseName(searchName);
+            const searchNorm = courseNormalize(searchBase);
+            
+            // Debug logging for key venues
+            if (searchName.toLowerCase().includes('tiburon') || searchName.toLowerCase().includes('torrey')) {
+              console.log(`[CourseResolver] Resolving: "${searchName}"`);
+              console.log(`  Base: "${searchBase}", Normalized: "${searchNorm}"`);
+            }
             
             // Find best match
-            let bestMatch: { course: typeof courses[0]; score: number } | null = null;
+            let bestMatch: { course: typeof courses[0]; score: number; boost: number } | null = null;
+            const candidates: { name: string; score: number; boost: number }[] = [];
             
             for (const course of courses) {
               // Skip if different country
               if (venue.country && course.country !== venue.country) continue;
               
+              const courseBase = courseBaseName(course.name);
               const score = calculateSimilarity(searchName, course.name);
+              const boost = getVariantBoost(course.name);
               
-              // Boost score if city matches in name
-              let boostedScore = score;
-              if (venue.city && course.name.toLowerCase().includes(venue.city.toLowerCase())) {
-                boostedScore += 0.15;
-              }
+              // Also try direct base name comparison
+              const baseScore = calculateSimilarity(searchBase, courseBase);
+              const finalScore = Math.max(score, baseScore);
               
-              if (boostedScore > (bestMatch?.score || 0.5)) {
-                bestMatch = { course, score: boostedScore };
+              candidates.push({ name: course.name, score: finalScore, boost });
+              
+              // Combined score: similarity * 100 + variant boost
+              const combinedScore = finalScore * 100 + boost;
+              const bestCombined = bestMatch ? (bestMatch.score * 100 + bestMatch.boost) : 0;
+              
+              if (combinedScore > bestCombined && finalScore >= 0.4) {
+                bestMatch = { course, score: finalScore, boost };
               }
             }
             
-            if (bestMatch && bestMatch.score >= 0.5) {
+            // Debug logging
+            if (searchName.toLowerCase().includes('tiburon') || searchName.toLowerCase().includes('torrey')) {
+              const topCandidates = candidates
+                .sort((a, b) => (b.score * 100 + b.boost) - (a.score * 100 + a.boost))
+                .slice(0, 5);
+              console.log(`  Top 5 candidates:`, topCandidates);
+              if (bestMatch) {
+                console.log(`  ✓ Matched: "${bestMatch.course.name}" (score: ${bestMatch.score.toFixed(2)}, image: ${bestMatch.course.thumbnail_image ? 'YES' : 'NO'})`);
+              } else {
+                console.log(`  ✗ No match found`);
+              }
+            }
+            
+            if (bestMatch && bestMatch.score >= 0.4) {
               results.set(venue.venueName, {
                 golfCourseId: bestMatch.course.id,
                 imageUrl: bestMatch.course.thumbnail_image,
@@ -129,7 +177,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
                 name: bestMatch.course.name,
               });
               
-              // Cache the result
+              // Cache the result (fire-and-forget)
               supabase.from('sr_course_map').upsert({
                 sr_venue_name: venue.venueName,
                 sr_venue_course_name: venue.venueCourseName,
@@ -137,8 +185,8 @@ export function useCourseImageResolver(venues: VenueInput[]) {
                 sr_country: venue.country,
                 golf_course_id: bestMatch.course.id,
                 confidence: bestMatch.score,
-                source: 'fuzzy',
-              }, { onConflict: 'sr_venue_name,sr_city,sr_country' });
+                match_type: bestMatch.score > 0.8 ? 'normalized' : 'fuzzy',
+              }, { onConflict: 'sr_venue_name,sr_city,sr_country' }).then(() => {});
             }
           }
         }

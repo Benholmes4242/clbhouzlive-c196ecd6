@@ -27,6 +27,7 @@ export interface SeasonLeader {
     id: string;
     name: string;
     country: string | null;
+    photoUrl: string | null;
   };
   value: number | string;
   formattedValue: string;
@@ -145,7 +146,12 @@ export function useTourOverviewData() {
       leaders.push({
         category: 'events',
         label: 'Most Events',
-        player: { id: byEvents[0].player_id, name: byEvents[0].player.full_name, country: byEvents[0].player.country },
+        player: { 
+          id: byEvents[0].player_id, 
+          name: byEvents[0].player.full_name, 
+          country: byEvents[0].player.country,
+          photoUrl: byEvents[0].player.photo_url || null,
+        },
         value: byEvents[0].events_played!,
         formattedValue: `${byEvents[0].events_played} events`,
       });
@@ -159,7 +165,12 @@ export function useTourOverviewData() {
       leaders.push({
         category: 'cuts',
         label: 'Most Cuts Made',
-        player: { id: byCuts[0].player_id, name: byCuts[0].player.full_name, country: byCuts[0].player.country },
+        player: { 
+          id: byCuts[0].player_id, 
+          name: byCuts[0].player.full_name, 
+          country: byCuts[0].player.country,
+          photoUrl: byCuts[0].player.photo_url || null,
+        },
         value: byCuts[0].cuts_made!,
         formattedValue: `${byCuts[0].cuts_made} cuts`,
       });
@@ -174,7 +185,12 @@ export function useTourOverviewData() {
       leaders.push({
         category: 'scoring',
         label: 'Lowest Scoring Avg',
-        player: { id: byScoring[0].player_id, name: byScoring[0].player.full_name, country: byScoring[0].player.country },
+        player: { 
+          id: byScoring[0].player_id, 
+          name: byScoring[0].player.full_name, 
+          country: byScoring[0].player.country,
+          photoUrl: byScoring[0].player.photo_url || null,
+        },
         value: avg,
         formattedValue: avg.toFixed(2),
       });
@@ -189,7 +205,12 @@ export function useTourOverviewData() {
       leaders.push({
         category: 'world_rank',
         label: `World No. ${rank}`,
-        player: { id: byRank[0].player_id, name: byRank[0].player.full_name, country: byRank[0].player.country },
+        player: { 
+          id: byRank[0].player_id, 
+          name: byRank[0].player.full_name, 
+          country: byRank[0].player.country,
+          photoUrl: byRank[0].player.photo_url || null,
+        },
         value: rank,
         formattedValue: `#${rank}`,
       });
