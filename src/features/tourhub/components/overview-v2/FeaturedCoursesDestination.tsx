@@ -43,9 +43,9 @@ export function FeaturedCoursesDestination({ courses }: FeaturedCoursesDestinati
         <h3 className="font-semibold text-foreground text-lg">Featured Courses</h3>
         <Link 
           to="/tourhub?tab=schedule"
-          className="text-sm text-primary hover:underline flex items-center gap-1"
+          className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 transition-colors"
         >
-          View all <ArrowRight className="w-3.5 h-3.5" />
+          All venues <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
