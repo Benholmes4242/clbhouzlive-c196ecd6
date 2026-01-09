@@ -4,10 +4,10 @@ import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityGridV2, useActivityPostsV2 } from './activity/v2';
 import ActivityFiltersSheet, { ActivityFilters } from './ActivityFiltersSheet';
 import ActivityFilterToolbar from './activity/ActivityFilterToolbar';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface ActivityFeedProps {
   userId: string;
@@ -38,8 +38,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   // Realtime subscription for post_media inserts - secondary safety net
   useRealtimePersonalPosts(userId);
   
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalStartIndex, setModalStartIndex] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
@@ -58,28 +56,28 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     }
   }, [items, filters.type]);
 
-  // For lightbox - extract all media URLs, types, and filter IDs
-  const allMediaData = useMemo(() => {
-    const urls: string[] = [];
-    const types: ('image' | 'video')[] = [];
-    const filterIds: (string | null)[] = [];
-    const studioEdits: (any | null)[] = [];
-    
-    filteredItems.forEach(item => {
-      urls.push(item.url);
-      types.push(item.type);
-      filterIds.push(item.filterId ?? null);
-      studioEdits.push(item.studioEdits ?? null);
-    });
-    
-    return { urls, types, filterIds, studioEdits };
-  }, [filteredItems]);
+  // Use unified fullscreen player for activity items
+  const { openFullscreen } = useUnifiedFullscreen('unified', {
+    allowLandscape: true,
+    onLike: (itemId) => {
+      console.log('Like from profile fullscreen:', itemId);
+      // TODO: Add actual like mutation
+    },
+    onComment: (itemId) => {
+      console.log('Comment from profile fullscreen:', itemId);
+    },
+    onShare: (itemId) => {
+      console.log('Share from profile fullscreen:', itemId);
+    },
+    onLoadMore: hasMore ? fetchNextPage : undefined,
+    hasMore,
+    isLoadingMore: isFetchingNextPage,
+  });
 
-  // Handle item click - open fullscreen modal
+  // Handle item click - open unified fullscreen player
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
-    setModalStartIndex(index);
-    setModalOpen(true);
-  }, []);
+    openFullscreen(filteredItems, index);
+  }, [filteredItems, openFullscreen]);
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
@@ -121,18 +119,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         onChange={setFilters}
       />
 
-      {/* Fullscreen Media Modal - only mount when open */}
-      {modalOpen && (
-        <FullscreenMediaModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          mediaUrl={allMediaData.urls}
-          mediaType={allMediaData.types}
-          filterIds={allMediaData.filterIds}
-          studioEdits={allMediaData.studioEdits}
-          initialIndex={modalStartIndex}
-        />
-      )}
+      {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
 
       {/* Achievements Modal */}
       <ClbhouzAchievementsModal

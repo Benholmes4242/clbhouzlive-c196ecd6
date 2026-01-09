@@ -27,11 +27,12 @@ import {
   exploreFeedAdapter, 
   profileFeedAdapter, 
   courseFeedAdapter,
+  unifiedMediaItemAdapter,
   type FeedAdapter,
   type NormalizedItem
 } from '@/adapters';
 
-export type FullscreenSourceType = 'explore' | 'profile' | 'course';
+export type FullscreenSourceType = 'explore' | 'profile' | 'course' | 'unified';
 
 interface UseUnifiedFullscreenOptions {
   /** Callback when like action is triggered */
@@ -84,6 +85,8 @@ function getAdapter(sourceType: FullscreenSourceType): FeedAdapter<any> {
       return profileFeedAdapter;
     case 'course':
       return courseFeedAdapter;
+    case 'unified':
+      return unifiedMediaItemAdapter;
     default:
       return exploreFeedAdapter;
   }
