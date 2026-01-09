@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
-import { HubCreateGameTripSheet } from '@/features/hub/components/HubCreateGameTripSheet';
+import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { HUB_DEMO_MODE, MOCK_NEARBY_GAMES } from '../hubDemoConfig';
@@ -170,7 +170,7 @@ export function ActiveGamesNearYouTile() {
         onOpenCreate={() => setCreateOpen(true)}
       />
 
-      <HubCreateGameTripSheet
+      <CreateGameTripSheetV2
         isOpen={createOpen}
         onClose={() => setCreateOpen(false)}
       />
