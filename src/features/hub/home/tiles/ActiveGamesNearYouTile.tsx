@@ -6,7 +6,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
+import { HubCreateGameTripSheet } from '@/features/hub/components/HubCreateGameTripSheet';
 import { haptic } from '@/utils/haptics';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { HUB_DEMO_MODE, MOCK_NEARBY_GAMES } from '../hubDemoConfig';
@@ -23,6 +24,7 @@ function formatShortDate(isoDate: string): string {
 export function ActiveGamesNearYouTile() {
   const { data: realGames = [], isLoading: realLoading } = useGamesQuery();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
@@ -162,10 +164,15 @@ export function ActiveGamesNearYouTile() {
         )}
       </button>
 
-      <HubGamesHubSheet
+      <HubGamesTripsSheet
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
-        initialTab="discover"
+        onOpenCreate={() => setCreateOpen(true)}
+      />
+
+      <HubCreateGameTripSheet
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
       />
     </>
   );

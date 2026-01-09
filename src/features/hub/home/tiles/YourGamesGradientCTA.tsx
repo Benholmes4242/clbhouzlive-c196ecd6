@@ -5,7 +5,8 @@
 
 import React, { useState } from 'react';
 import { Calendar, MapPin, Plane, ChevronRight } from 'lucide-react';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
+import { HubCreateGameTripSheet } from '@/features/hub/components/HubCreateGameTripSheet';
 import { haptic } from '@/utils/haptics';
 import { HUB_DEMO_MODE, MOCK_DIARY_ITEMS } from '../hubDemoConfig';
 
@@ -15,6 +16,7 @@ interface YourGamesGradientCTAProps {
 
 export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const openYourGames = () => {
     haptic('light');
@@ -178,10 +180,15 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
         )}
       </button>
 
-      <HubGamesHubSheet
+      <HubGamesTripsSheet
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
-        initialTab="yours"
+        onOpenCreate={() => setCreateOpen(true)}
+      />
+
+      <HubCreateGameTripSheet
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
       />
     </>
   );
