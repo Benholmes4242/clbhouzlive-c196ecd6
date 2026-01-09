@@ -5,8 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Search, User } from 'lucide-react';
-import { Bot } from 'lucide-react';
+import { Plus, Search, User, Calendar, Sparkles } from 'lucide-react';
 import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -82,12 +81,15 @@ export function HubFloatingDock() {
 
   return (
     <>
+      {/* Anchored dock - sticky at bottom, not floating */}
       <nav 
-        className="fixed left-0 right-0 bottom-0 z-[10000] flex justify-center"
+        className="sticky bottom-0 left-0 right-0 z-[10000] flex justify-center"
         style={{ 
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           paddingLeft: '16px',
           paddingRight: '16px',
+          paddingTop: '8px',
+          background: 'transparent',
         }}
       >
         <div 
@@ -100,10 +102,10 @@ export function HubFloatingDock() {
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.08)',
           }}
         >
-          {/* Left items */}
+          {/* Left items: Your Games, Search */}
           <DockItem 
-            icon={Plus} 
-            label="Create Game" 
+            icon={Calendar} 
+            label="Your Games" 
             onClick={handleCreateGame}
           />
           <DockItem 
@@ -112,12 +114,15 @@ export function HubFloatingDock() {
             onClick={() => handleNavigate('/discover', true)}
           />
 
-          {/* Center blue plus button */}
+          {/* Center orange glass plus button */}
           <button
-            className="h-[58px] w-[58px] rounded-full flex items-center justify-center -mt-6 transition-transform active:scale-95"
+            className="h-[64px] w-[64px] rounded-full flex items-center justify-center -mt-6 transition-transform active:scale-95"
             style={{
-              background: 'linear-gradient(180deg, #4DA3FF 0%, #2F7CFF 100%)',
-              boxShadow: '0 8px 24px rgba(47, 124, 255, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.2)',
+              background: 'radial-gradient(circle at 30% 25%, rgba(255, 170, 90, 0.85), rgba(255, 120, 40, 0.55))',
+              border: '1px solid rgba(255, 255, 255, 0.45)',
+              boxShadow: '0 14px 30px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
             }}
             onClick={handleCreateGame}
             aria-label="Create"
@@ -125,9 +130,9 @@ export function HubFloatingDock() {
             <Plus className="h-7 w-7 text-white" strokeWidth={2.5} />
           </button>
 
-          {/* Right items */}
+          {/* Right items: Echo, Profile */}
           <DockItem 
-            icon={Bot} 
+            icon={Sparkles} 
             label="Echo" 
             onClick={handleEcho}
           />

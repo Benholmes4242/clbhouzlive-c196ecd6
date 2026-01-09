@@ -8,15 +8,18 @@ import { MessageSquare } from 'lucide-react';
 import { HubMessagesSheet } from '../../components/HubMessagesSheet';
 import { haptic } from '@/utils/haptics';
 
-// Mock data - will be replaced with real data later
-const MOCK_MESSAGE_COUNT = 3;
-const MOCK_SUBTITLE = "Home messages tara messages";
+// TODO: Replace with real messages hook
+// For now, simulate no messages (empty state)
+const useMockMessages = () => ({
+  unreadCount: 0,
+  latestSnippet: null as string | null,
+});
 
 export function HubMessagesCard() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   
-  const messageCount = MOCK_MESSAGE_COUNT;
-  const hasMessages = messageCount > 0;
+  const messages = useMockMessages();
+  const hasMessages = messages.unreadCount > 0;
 
   const openSheet = () => {
     haptic('light');
@@ -60,12 +63,14 @@ export function HubMessagesCard() {
                 className="text-[13px] mt-0.5"
                 style={{ color: 'var(--hub-text-muted)' }}
               >
-                {MOCK_SUBTITLE}
+                {hasMessages
+                  ? (messages.latestSnippet ?? 'You have new messages')
+                  : 'Game chats, invites, and messages with golfers — all in one place.'}
               </div>
             </div>
           </div>
           
-          {/* Message count badge */}
+          {/* Message count badge - only show when has messages */}
           {hasMessages && (
             <div 
               className="h-7 min-w-[28px] px-2.5 rounded-full flex items-center justify-center text-[14px] font-semibold"
@@ -74,7 +79,7 @@ export function HubMessagesCard() {
                 color: 'var(--hub-text)',
               }}
             >
-              {messageCount}
+              {messages.unreadCount}
             </div>
           )}
         </div>

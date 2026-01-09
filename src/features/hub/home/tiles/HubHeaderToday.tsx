@@ -39,21 +39,27 @@ export function HubHeaderToday() {
   };
 
   return (
-    <header className="px-1 pt-5">
-      <div className="flex items-center justify-between">
+    <header className="pt-2">
+      <div className="flex items-center justify-between gap-3">
+        {/* Greeting - responsive sizing, allows wrap for long names */}
         <h1 
-          className="text-[28px] font-extrabold leading-[1.05] tracking-[-0.01em]"
-          style={{ color: 'var(--hub-text)' }}
+          className="font-extrabold leading-[1.05] tracking-[-0.02em]"
+          style={{ 
+            color: 'var(--hub-text)',
+            fontSize: 'clamp(22px, 5.6vw, 32px)',
+            maxWidth: '80%',
+          }}
         >
           {greeting}, {firstName}
         </h1>
 
+        {/* Right circle button */}
         <button
-          className="h-11 w-11 rounded-full flex items-center justify-center transition-all active:scale-95"
+          className="h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center transition-all active:scale-95"
           style={{
-            background: 'rgba(255, 255, 255, 0.9)',
-            border: '1px solid rgba(0, 0, 0, 0.05)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+            background: 'rgba(255, 255, 255, 0.85)',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.10)',
           }}
           onClick={handleHomeAction}
           aria-label="Home"
