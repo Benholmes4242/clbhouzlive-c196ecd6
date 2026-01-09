@@ -447,16 +447,16 @@ export function HubCreateGameTripSheet({
                   <div 
                     className="p-3 rounded-2xl"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.6)',
-                      border: '1px solid rgba(0, 0, 0, 0.03)',
+                      background: 'rgba(100, 116, 139, 0.08)',
+                      border: '1px solid rgba(100, 116, 139, 0.15)',
                     }}
                   >
                     <div className="flex items-start gap-3">
                       <div 
                         className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                        style={{ background: 'rgba(100, 116, 139, 0.12)' }}
                       >
-                        <Users className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+                        <Users className="w-[18px] h-[18px]" style={{ color: '#64748b' }} />
                       </div>
                       
                       <div className="flex-1 min-w-0 pt-2">
