@@ -160,11 +160,11 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col">
+    <div className="fixed inset-0 z-[9999] flex flex-col h-[100svh] overflow-hidden">
       {/* Glass Sheet */}
       <div 
         ref={sheetRef}
-        className="hub-glass-page flex-1 flex flex-col"
+        className="hub-glass-page flex-1 flex flex-col h-[100svh] overflow-hidden"
         style={{
           background: 'var(--hub-bg-start)',
           borderTop: '1px solid var(--hub-stroke)',
@@ -184,41 +184,34 @@ export function HubHomePage() {
         <div className="hub-grabber" />
 
         {/* 
-          SCROLLABLE LAYOUT
-          Content scrolls, dock is anchored at bottom
+          FIXED LAYOUT - No scroll
+          Content area is flex-1 with overflow hidden, dock is anchored
         */}
         <div 
-          className="flex-1 overflow-y-auto"
+          className="flex-1 overflow-hidden flex flex-col"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 6px)',
             paddingBottom: `calc(${DOCK_HEIGHT}px + ${DOCK_GAP}px + env(safe-area-inset-bottom, 0px))`,
-            WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div className="px-5 pb-4">
+          <div className="px-5 flex flex-col gap-3 flex-1 min-h-0">
             {/* Zone 1: Header - Greeting + Right Button */}
             <HubHeaderToday />
 
-            {/* Zone 2: What's Up Next Hero Tile (10% taller) */}
-            <div className="mt-4">
-              <UpNextHeroTile />
-            </div>
+            {/* Zone 2: What's Up Next Hero Tile */}
+            <UpNextHeroTile />
 
             {/* Zone 3: Messages Card */}
-            <div className="mt-4">
-              <HubMessagesCard />
-            </div>
+            <HubMessagesCard />
 
             {/* Zone 4: 2-up Grid - Active Games + Echo */}
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <ActiveGamesNearYouTile />
               <EchoTile />
             </div>
 
             {/* Zone 5: Full-width "Your Games" Gradient CTA */}
-            <div className="mt-4">
-              <YourGamesGradientCTA />
-            </div>
+            <YourGamesGradientCTA />
 
           </div>
         </div>
