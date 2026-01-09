@@ -8,7 +8,11 @@ import { Calendar } from 'lucide-react';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { haptic } from '@/utils/haptics';
 
-export function YourGamesGradientCTA() {
+interface YourGamesGradientCTAProps {
+  className?: string;
+}
+
+export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
 
   const openYourGames = () => {
@@ -20,7 +24,7 @@ export function YourGamesGradientCTA() {
     <>
       <button
         onClick={openYourGames}
-        className="w-full rounded-[22px] overflow-hidden relative flex items-center gap-4 px-5 py-[18px] transition-all active:scale-[0.98]"
+        className={`w-full rounded-[22px] overflow-hidden relative flex items-center gap-4 px-5 py-[18px] transition-all active:scale-[0.98] min-h-[80px] ${className || ''}`}
         style={{
           background: `
             radial-gradient(1200px 300px at 10% 0%, rgba(255, 140, 60, 0.20), transparent 60%),

@@ -193,7 +193,8 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            paddingBottom: `calc(${DOCK_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
+            // Bottom padding: dock height (55px) + safe area + extra 28px to clear raised orange button
+            paddingBottom: `calc(83px + env(safe-area-inset-bottom, 0px))`,
           }}
         >
           <div className="px-5 flex flex-col gap-3 flex-1">
@@ -208,8 +209,8 @@ export function HubHomePage() {
                 {/* Zone 2: What's Up Next Hero Tile */}
                 <UpNextHeroTile />
 
-                {/* Zone 3: Messages Card */}
-                <HubMessagesCard />
+                {/* Zone 3: Messages Card - grows to fill space */}
+                <HubMessagesCard className="flex-1" />
 
                 {/* Zone 4: 2-up Grid - Active Games + Echo */}
                 <div className="grid grid-cols-2 gap-3">
@@ -217,8 +218,8 @@ export function HubHomePage() {
                   <EchoTile />
                 </div>
 
-                {/* Zone 5: Full-width "Your Games" Gradient CTA */}
-                <YourGamesGradientCTA />
+                {/* Zone 5: Full-width "Your Games" Gradient CTA - grows to fill space */}
+                <YourGamesGradientCTA className="flex-1" />
               </>
             )}
           </div>
