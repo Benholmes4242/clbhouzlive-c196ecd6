@@ -43,25 +43,17 @@ export function ActiveGamesNearYouTile() {
     <>
       <button
         onClick={openGamesHub}
-        className="w-full h-full rounded-[22px] p-4 text-left transition-all active:scale-[0.98] flex flex-col"
+        className="w-full h-[140px] rounded-[22px] p-4 text-left transition-all active:scale-[0.98] flex flex-col relative"
         style={{
           background: 'var(--hub-glass-bg)',
           border: '1px solid var(--hub-stroke)',
           boxShadow: 'var(--hub-shadow-tile)',
         }}
       >
-        {/* Title - two lines */}
-        <div 
-          className="text-[16px] font-extrabold leading-tight"
-          style={{ color: 'var(--hub-text)' }}
-        >
-          Active Games<br/>Near You
-        </div>
-        
-        {/* Games count badge */}
+        {/* Games count badge - top right */}
         {gamesCount > 0 && (
           <div 
-            className="absolute top-3 right-3 h-6 min-w-[24px] px-2 rounded-full flex items-center justify-center text-[13px] font-bold"
+            className="absolute top-3 right-3 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold"
             style={{
               background: '#2F7CFF',
               color: 'white',
@@ -71,34 +63,42 @@ export function ActiveGamesNearYouTile() {
           </div>
         )}
 
+        {/* Title - single line with line break */}
+        <div 
+          className="text-[15px] font-extrabold leading-[1.15]"
+          style={{ color: 'var(--hub-text)' }}
+        >
+          Active Games<br/>Near You
+        </div>
+
         <div className="mt-auto">
           {isLoading ? (
             <div 
-              className="h-4 w-24 rounded animate-pulse mt-2"
+              className="h-3 w-20 rounded animate-pulse"
               style={{ background: 'var(--hub-skeleton-base)' }}
             />
           ) : nearbyGame ? (
             <>
-              {/* Course name */}
+              {/* Course name - single line */}
               <div 
-                className="text-[13px] mt-2 italic truncate"
+                className="text-[11px] leading-tight italic line-clamp-1"
                 style={{ color: 'var(--hub-text-dim)' }}
               >
                 {nearbyGame.course_name || 'Golf Course'}
               </div>
               
-              {/* Date/time */}
+              {/* Date/time - single line, tighter */}
               <div 
-                className="flex items-center gap-1 text-[13px] mt-1"
+                className="flex items-center gap-1 text-[11px] leading-tight mt-0.5"
                 style={{ color: 'var(--hub-text-dim)' }}
               >
-                <MapPin className="w-3 h-3" />
-                {formatShortDate(nearbyGame.start_time)}
+                <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
+                <span className="line-clamp-1">{formatShortDate(nearbyGame.start_time)}</span>
               </div>
 
-              {/* Slots pill */}
+              {/* Slots pill - pinned at bottom */}
               <div 
-                className="inline-flex items-center justify-center rounded-full px-3 py-1 text-[13px] font-semibold mt-3"
+                className="inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold mt-2"
                 style={{
                   background: 'var(--hub-glass-bg-input)',
                   color: '#2F7CFF',
@@ -109,7 +109,7 @@ export function ActiveGamesNearYouTile() {
             </>
           ) : (
             <div 
-              className="text-[13px] mt-2 leading-snug"
+              className="text-[11px] leading-tight line-clamp-2"
               style={{ color: 'var(--hub-text-muted)' }}
             >
               No games nearby – create one to be the first.

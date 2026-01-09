@@ -25,7 +25,7 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
     <>
       <button
         onClick={openYourGames}
-        className={`w-full rounded-[22px] overflow-hidden relative flex items-center gap-4 px-5 py-[18px] transition-all active:scale-[0.98] min-h-[80px] ${className || ''}`}
+        className={`w-full rounded-[22px] overflow-hidden relative flex items-center gap-3 px-4 py-3 transition-all active:scale-[0.98] ${className || ''}`}
         style={{
           background: `
             radial-gradient(1200px 300px at 10% 0%, rgba(255, 140, 60, 0.20), transparent 60%),
@@ -33,34 +33,35 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           `,
           border: '1px solid rgba(255, 255, 255, 0.55)',
           boxShadow: '0 12px 30px rgba(0,0,0,0.08)',
+          minHeight: '64px',
         }}
       >
         {/* Icon circle */}
         <div 
-          className="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0"
+          className="h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
             background: 'rgba(255, 140, 60, 0.15)',
             border: '1px solid rgba(255, 140, 60, 0.25)',
           }}
         >
-          <Calendar className="h-5 w-5" style={{ color: 'rgba(180, 90, 30, 0.8)' }} />
+          <Calendar className="h-4 w-4" style={{ color: 'rgba(180, 90, 30, 0.8)' }} />
         </div>
         
         {/* Text content */}
-        <div className="flex-1 text-left">
+        <div className="flex-1 text-left min-w-0">
           <div 
-            className="text-[17px] font-extrabold"
+            className="text-[15px] font-extrabold"
             style={{ color: 'var(--hub-text)' }}
           >
             Your Games
           </div>
           <div 
-            className="text-[13px] mt-0.5"
+            className="text-[12px] mt-0.5 line-clamp-1"
             style={{ color: 'var(--hub-text-muted)' }}
           >
             {HUB_DEMO_MODE 
-              ? `${MOCK_YOUR_GAMES_SUMMARY.nextGameSummary} · ${MOCK_YOUR_GAMES_SUMMARY.nextTripSummary} + ${MOCK_YOUR_GAMES_SUMMARY.upcomingCount} more`
-              : 'Trips, matches, games, and getaways – your golf diary for everything ahead.'}
+              ? `${MOCK_YOUR_GAMES_SUMMARY.nextGameSummary} · ${MOCK_YOUR_GAMES_SUMMARY.nextTripSummary} · +${MOCK_YOUR_GAMES_SUMMARY.upcomingCount}`
+              : 'Trips, matches, games – your golf diary.'}
           </div>
         </div>
       </button>

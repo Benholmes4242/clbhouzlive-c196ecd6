@@ -48,56 +48,55 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
     <>
       <button 
         onClick={openSheet}
-        className={`w-full rounded-[22px] p-4 text-left transition-all active:scale-[0.98] min-h-[72px] ${className || ''}`}
+        className={`w-full rounded-[22px] p-3 text-left transition-all active:scale-[0.98] relative ${className || ''}`}
         style={{
           background: 'var(--hub-glass-bg)',
           border: '1px solid var(--hub-stroke)',
           boxShadow: 'var(--hub-shadow-tile)',
+          minHeight: '64px',
         }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Icon bubble */}
-            <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'var(--hub-glass-bg-input)' }}
-            >
-              <MessageSquare 
-                className="w-5 h-5" 
-                style={{ color: 'var(--hub-text-dim)' }} 
-              />
-            </div>
-            
-            <div>
-              <div 
-                className="text-[17px] font-semibold"
-                style={{ color: 'var(--hub-text)' }}
-              >
-                Messages
-              </div>
-              <div 
-                className="text-[13px] mt-0.5"
-                style={{ color: 'var(--hub-text-muted)' }}
-              >
-                {hasMessages
-                  ? `${messages.groupChatsCount} group chats · "${messages.latestSnippet}"`
-                  : 'Group chats, game invites, and messages with golfers – all in one place.'}
-              </div>
-            </div>
+        {/* Orange badge - top right */}
+        {hasMessages && (
+          <div 
+            className="absolute top-2.5 right-2.5 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold"
+            style={{
+              background: 'linear-gradient(135deg, #FF8C3C, #FF6B20)',
+              color: 'white',
+            }}
+          >
+            {messages.unreadCount}
+          </div>
+        )}
+
+        <div className="flex items-center gap-3">
+          {/* Icon bubble */}
+          <div 
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'var(--hub-glass-bg-input)' }}
+          >
+            <MessageSquare 
+              className="w-4 h-4" 
+              style={{ color: 'var(--hub-text-dim)' }} 
+            />
           </div>
           
-          {/* Message count badge - only show when has messages */}
-          {hasMessages && (
+          <div className="flex-1 min-w-0 pr-6">
             <div 
-              className="h-7 min-w-[28px] px-2.5 rounded-full flex items-center justify-center text-[14px] font-semibold"
-              style={{
-                background: 'var(--hub-glass-bg-input)',
-                color: 'var(--hub-text)',
-              }}
+              className="text-[15px] font-semibold"
+              style={{ color: 'var(--hub-text)' }}
             >
-              {messages.unreadCount}
+              Messages
             </div>
-          )}
+            <div 
+              className="text-[12px] mt-0.5 line-clamp-1"
+              style={{ color: 'var(--hub-text-muted)' }}
+            >
+              {hasMessages
+                ? `${messages.groupChatsCount} group chats · "${messages.latestSnippet}"`
+                : 'Group chats, game invites, and messages.'}
+            </div>
+          </div>
         </div>
       </button>
       

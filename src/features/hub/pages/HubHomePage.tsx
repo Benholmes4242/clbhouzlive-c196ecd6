@@ -199,12 +199,11 @@ export function HubHomePage() {
         <div 
           className="flex-1 flex flex-col overflow-hidden"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            // 12px gap above orange button: button extends ~12px above dock, so 12 + 12 = 24px
-            paddingBottom: '24px',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+            paddingBottom: '16px',
           }}
         >
-          <div className="px-5 flex flex-col gap-3 flex-1">
+          <div className="px-5 flex flex-col gap-2.5 flex-1">
             {/* Show skeleton while loading, real content when ready */}
             {!isDataReady ? (
               <HubContentSkeleton />
@@ -216,17 +215,17 @@ export function HubHomePage() {
                 {/* Zone 2: What's Up Next Hero Tile */}
                 <UpNextHeroTile />
 
-                {/* Zone 3: Messages Card - grows to fill space */}
-                <HubMessagesCard className="flex-1" />
+                {/* Zone 3: Messages Card */}
+                <HubMessagesCard />
 
-                {/* Zone 4: 2-up Grid - Active Games + Echo */}
-                <div className="grid grid-cols-2 gap-3">
+                {/* Zone 4: 2-up Grid - Active Games + Echo (fixed height) */}
+                <div className="grid grid-cols-2 gap-2.5">
                   <ActiveGamesNearYouTile />
                   <EchoTile />
                 </div>
 
-                {/* Zone 5: Full-width "Your Games" Gradient CTA - grows to fill space */}
-                <YourGamesGradientCTA className="flex-1" />
+                {/* Zone 5: Full-width "Your Games" Gradient CTA */}
+                <YourGamesGradientCTA />
               </>
             )}
           </div>
