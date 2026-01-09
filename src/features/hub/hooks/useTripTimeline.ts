@@ -352,6 +352,14 @@ export function useTripTimeline(tripId: string | undefined) {
         dayAggregates.set(si.dayKey, existing);
       }
       
+      // Build itemsByDayKey map once for O(n) lookups
+      const itemsByDayKey = new Map<string, typeof sortableItems>();
+      for (const si of sortableItems) {
+        const dayItems = itemsByDayKey.get(si.dayKey) || [];
+        dayItems.push(si);
+        itemsByDayKey.set(si.dayKey, dayItems);
+      }
+      
       // Build final items with day markers
       const items: TripTimelineItem[] = [];
       let currentDay: string | null = null;
@@ -381,8 +389,8 @@ export function useTripTimeline(tripId: string | undefined) {
           });
         }
         
-        // Determine if this is first/last item of the day
-        const dayItems = sortableItems.filter(s => s.dayKey === si.dayKey);
+        // O(1) lookup for day items
+        const dayItems = itemsByDayKey.get(si.dayKey) || [];
         const indexInDay = dayItems.indexOf(si);
         const isFirstOfDay = indexInDay === 0;
         const isLastOfDay = indexInDay === dayItems.length - 1;
@@ -437,9 +445,20 @@ export function useTripTimeline(tripId: string | undefined) {
     return items.some(item => item.dayAggregate?.isToday);
   }, [timelineQuery.data]);
 
-  // Check if current user is trip host
-  const isHost = tripQuery.data?.createdBy === participantsQuery.data?.find(p => p.role === 'host')?.userId || 
-                 (tripQuery.data && participantsQuery.data?.some(p => p.role === 'host'));
+  // Get current user for isHost check
+  const { data: sessionData } = useQuery({
+    queryKey: ['current-user-session'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 mins
+  });
+
+  // Check if current user is trip host (creator)
+  const isHost = useMemo(() => {
+    return !!sessionData && !!tripQuery.data && tripQuery.data.createdBy === sessionData.id;
+  }, [sessionData, tripQuery.data]);
 
   return {
     trip: tripQuery.data,
@@ -447,7 +466,7 @@ export function useTripTimeline(tripId: string | undefined) {
     timeline: timelineQuery.data || [],
     isLoading: tripQuery.isLoading || participantsQuery.isLoading || timelineQuery.isLoading,
     error: tripQuery.error || participantsQuery.error || timelineQuery.error,
-    isHost: tripQuery.data ? true : false,
+    isHost,
     todayDayNumber,
     hasMultipleDays,
     hasTodayInTrip,
