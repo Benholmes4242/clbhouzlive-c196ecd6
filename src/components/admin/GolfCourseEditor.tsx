@@ -214,14 +214,13 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     enabled: !isCreating && !!course?.id,
   });
 
-  // Initialize form with course data or draft
+  // Initialize form with course data or draft - only run ONCE when loadedOnce becomes true
   useEffect(() => {
-    if (!loadedOnce) return;
+    if (!loadedOnce || isFormInitialized) return;
     
-    console.log('=== EDITOR: UseEffect triggered ===');
+    console.log('=== EDITOR: Initializing form (one-time) ===');
     console.log('course:', course);
     console.log('isCreating:', isCreating);
-    console.log('draft:', draft);
     
     if (course && !isCreating) {
       console.log('=== EDITOR: Initializing form with course data ===');
@@ -311,7 +310,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setGlobalRank('');
       setIsFormInitialized(true);
     }
-  }, [course?.id, isCreating, reset, draft, loadedOnce]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedOnce]);
 
   // Save course mutation
   const saveMutation = useMutation({
