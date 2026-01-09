@@ -1,9 +1,8 @@
 /**
- * HubGamesTripsSheet - Half-height Hub Sheet
+ * HubGamesTripsSheet - Polished Hub Sheet
  * 
  * Simple 3-card menu for Games & Trips
- * Opens to ~45% height (visually halfway up hero)
- * No internal scroll, matches Hub design language
+ * Matches Hub design language precisely
  */
 
 import React, { useEffect, useRef, useCallback } from 'react';
@@ -33,25 +32,29 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all duration-150 active:scale-[0.98]"
+      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-[18px] text-left transition-all duration-150 active:scale-[0.99] active:opacity-90"
       style={{
         background: isPrimary 
-          ? 'linear-gradient(135deg, rgba(110, 146, 119, 0.06) 0%, rgba(137, 167, 140, 0.03) 100%)'
-          : 'var(--hub-glass-bg)',
+          ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.05) 0%, rgba(255, 180, 100, 0.02) 100%)'
+          : 'rgba(255, 255, 255, 0.85)',
         border: isPrimary 
-          ? '1px solid rgba(110, 146, 119, 0.2)'
-          : '1px solid var(--hub-stroke-subtle)',
-        boxShadow: 'var(--hub-shadow-tile)',
+          ? '1px solid rgba(255, 140, 60, 0.25)'
+          : '1px solid rgba(0, 0, 0, 0.04)',
+        boxShadow: isPrimary
+          ? '0 2px 8px rgba(255, 140, 60, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+          : '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
     >
-      {/* Icon circle - matched to Hub tile sizing */}
+      {/* Icon circle - aligned with text baseline */}
       <div 
-        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+        className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
         style={{
           background: isPrimary 
-            ? 'linear-gradient(135deg, #6E9277 0%, #89A78C 100%)'
-            : 'var(--hub-glass-bg-input)',
-          border: isPrimary ? 'none' : '1px solid var(--hub-stroke-subtle)',
+            ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.15) 0%, rgba(255, 160, 90, 0.1) 100%)'
+            : 'rgba(0, 0, 0, 0.03)',
+          border: isPrimary 
+            ? '1px solid rgba(255, 140, 60, 0.2)' 
+            : '1px solid rgba(0, 0, 0, 0.04)',
         }}
       >
         {icon}
@@ -60,23 +63,23 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
       {/* Text content */}
       <div className="flex-1 min-w-0">
         <div 
-          className="text-[15px] font-semibold"
+          className="text-[15px] font-semibold leading-tight"
           style={{ color: 'var(--hub-text)' }}
         >
           {title}
         </div>
         <div 
-          className="text-[13px] mt-0.5 line-clamp-1"
-          style={{ color: 'var(--hub-text-sub)' }}
+          className="text-[12.5px] mt-px truncate"
+          style={{ color: 'var(--hub-text-dim)', opacity: 0.7 }}
         >
           {subtitle}
         </div>
       </div>
 
-      {/* Chevron - subtle */}
+      {/* Chevron - lighter and smaller */}
       <ChevronRight 
-        className="flex-shrink-0 w-5 h-5 opacity-40"
-        style={{ color: 'var(--hub-text-dim)' }}
+        className="flex-shrink-0 w-4 h-4"
+        style={{ color: 'var(--hub-text-dim)', opacity: 0.35 }}
       />
     </button>
   );
@@ -153,68 +156,76 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             onClick={onClose}
           />
 
-          {/* Sheet - anchored to bottom, auto height based on content */}
+          {/* Sheet - anchored to bottom, sits halfway up hero */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[26px] overflow-hidden"
+            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[28px] overflow-hidden"
             style={{
-              background: 'var(--hub-bg-start)',
-              boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
+              background: 'linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%)',
+              boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.08), 0 -1px 0 rgba(255, 255, 255, 0.5) inset',
+              borderTop: '1px solid rgba(255, 255, 255, 0.8)',
               overscrollBehavior: 'contain',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
             onClick={handleSheetClick}
           >
-            {/* Header */}
-            <div style={{ background: 'var(--hub-bg-start)' }}>
-              {/* Drag handle */}
-              <div className="flex justify-center pt-3 pb-2">
-                <div 
-                  className="w-10 h-1 rounded-full"
-                  style={{ background: 'var(--hub-stroke)' }}
-                />
-              </div>
-
-              {/* Title */}
-              <div className="px-5 pb-4">
-                <h2 
-                  className="text-[20px] font-bold"
-                  style={{ color: 'var(--hub-text)' }}
-                >
-                  Games & Trips
-                </h2>
-                <p 
-                  className="text-[13px] mt-0.5"
-                  style={{ color: 'var(--hub-text-sub)' }}
-                >
-                  Plan games, organise trips, invite golfers
-                </p>
-              </div>
+            {/* Drag handle - shorter and softer */}
+            <div className="flex justify-center pt-2.5 pb-1.5">
+              <div 
+                className="w-8 h-[3px] rounded-full"
+                style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+              />
             </div>
 
-            {/* Cards */}
-            <div className="px-5 pb-6 flex flex-col gap-3">
+            {/* Header - tighter spacing */}
+            <div className="px-5 pb-3">
+              <h2 
+                className="text-[19px] font-bold leading-tight"
+                style={{ color: 'var(--hub-text)' }}
+              >
+                Games & Trips
+              </h2>
+              <p 
+                className="text-[12.5px] mt-0.5 truncate"
+                style={{ color: 'var(--hub-text-dim)', opacity: 0.65 }}
+              >
+                Plan games, organise trips, invite golfers
+              </p>
+            </div>
+
+            {/* Section label */}
+            <div className="px-5 pb-2">
+              <span 
+                className="text-[10.5px] font-medium uppercase tracking-wider"
+                style={{ color: 'var(--hub-text-dim)', opacity: 0.5 }}
+              >
+                Quick actions
+              </span>
+            </div>
+
+            {/* Cards - tighter gaps */}
+            <div className="px-5 pb-5 flex flex-col gap-2">
               <MenuCard
-                icon={<Search className="w-5 h-5" style={{ color: 'var(--hub-text-sub)' }} />}
+                icon={<Search className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-sub)' }} />}
                 title="Discover Games"
                 subtitle="Find games near you or join one"
                 onClick={handleDiscoverGames}
               />
 
               <MenuCard
-                icon={<CalendarDays className="w-5 h-5" style={{ color: 'var(--hub-text-sub)' }} />}
+                icon={<CalendarDays className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-sub)' }} />}
                 title="Your Games & Trips"
                 subtitle="Upcoming games and trips"
                 onClick={handleYourGamesTrips}
               />
 
               <MenuCard
-                icon={<Plus className="w-5 h-5 text-white" />}
+                icon={<Plus className="w-[18px] h-[18px]" style={{ color: 'rgba(180, 90, 30, 0.85)' }} />}
                 title="Create Game or Trip"
-                subtitle="Set up a game, invite players, or plan a golf trip"
+                subtitle="Set up a game, invite players, or plan a trip"
                 onClick={handleCreateGameTrip}
                 isPrimary
               />
