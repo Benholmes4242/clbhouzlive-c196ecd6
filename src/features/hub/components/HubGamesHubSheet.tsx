@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SearchGamesSurface } from '@/features/nearby/components/SearchGamesSurface';
 import { YourGamesSurface } from '@/features/nearby/components/YourGamesSurface';
 import { JoinRequestsInboxSheet } from '@/features/nearby/components/JoinRequestsInboxSheet';
-import { HubCreateGameSheet } from './HubCreateGameSheet';
+import { CreateGameTripSheetV2 } from './create-game-trip-v2';
 import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { haptic } from '@/utils/haptics';
 import { track } from '@/utils/analytics';
@@ -468,7 +468,7 @@ export function HubGamesHubSheet({
             focusGameId={joinRequestsFocusGameId}
           />
 
-          <HubCreateGameSheet
+          <CreateGameTripSheetV2
             isOpen={createGameOpen}
             onClose={() => setCreateGameOpen(false)}
           />
