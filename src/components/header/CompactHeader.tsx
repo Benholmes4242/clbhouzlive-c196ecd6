@@ -105,7 +105,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       <header
         data-chrome="header"
         className={cn(
-          "compact-header clubhouse-header",
+          "compact-header clubhouse-header fixed-header-safe",
           isClubhouseRoute && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           
@@ -115,9 +115,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          // Only Clubhouse gets safe-area padding (header bg extends into notch)
-          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : undefined,
-          height: isClubhouseRoute ? `calc(${headerHeight}px + env(safe-area-inset-top))` : `${headerHeight}px`,
+          // ALL pages: header extends into safe area so bg is flush to top
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          height: `calc(${headerHeight}px + env(safe-area-inset-top, 0px))`,
           borderBottom: `1px solid ${getBorder()}`,
           boxShadow: isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
