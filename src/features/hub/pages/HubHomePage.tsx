@@ -193,8 +193,8 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            // TEST: make last tile flush to the dock (no intentional bottom gap)
-            paddingBottom: '0px',
+            // 12px gap above orange button: button extends ~12px above dock, so 12 + 12 = 24px
+            paddingBottom: '24px',
           }}
         >
           <div className="px-5 flex flex-col gap-3 flex-1">
