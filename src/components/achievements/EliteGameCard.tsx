@@ -464,62 +464,95 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       
       {/* Content */}
       <div className={cn('relative z-10 h-full flex items-center gap-3', compact ? 'px-2.5' : 'px-3.5')}>
-        {/* Badge - flat metallic coin/medallion style */}
-        <div className="relative flex-shrink-0">
+        {/* Badge with pedestal - coin on plinth style */}
+        <div className="relative flex-shrink-0 flex flex-col items-center">
           {/* Glow behind badge - only for earned */}
           {earned && !isGhost && !isLowQuality && (
             <div
               className="absolute inset-0 rounded-full pointer-events-none"
               style={{ 
                 background: `radial-gradient(circle, ${config.badgeGlow} 0%, transparent 70%)`, 
-                transform: 'scale(1.5)', 
-                filter: 'blur(4px)',
+                transform: 'scale(1.8)', 
+                filter: 'blur(6px)',
                 opacity: config.glowIntensity,
+                top: '-10%',
               }}
             />
           )}
           
           {/* Coin/medallion badge */}
           <div
-            className={cn('relative rounded-full flex items-center justify-center', badgeSize)}
+            className={cn('relative rounded-full flex items-center justify-center z-10', badgeSize)}
             style={{
               background: earned && !isGhost ? config.badgeGradient : LOCKED_CONFIG.badgeGradient,
               boxShadow: earned && !isGhost
-                ? `inset 0 2px 4px rgba(255,255,255,0.15), inset 0 -2px 6px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.3)`
+                ? `inset 0 2px 6px rgba(255,255,255,0.2), inset 0 -3px 8px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.4)`
                 : 'inset 0 1px 2px rgba(255,255,255,0.05), inset 0 -1px 3px rgba(0,0,0,0.2)',
             }}
           >
+            {/* Outer ring - premium coin rim */}
+            <div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ 
+                border: `2px solid ${earned && !isGhost ? config.badgeBorderColor : lockedTierConfig?.badgeBorderColor || LOCKED_CONFIG.badgeBorderColor}`,
+                opacity: earned && !isGhost ? 0.4 : 0.15,
+              }}
+            />
             {/* Inner rim - coin edge detail */}
             <div
-              className="absolute inset-1 rounded-full pointer-events-none"
+              className="absolute inset-1.5 rounded-full pointer-events-none"
               style={{ 
                 border: `1.5px solid ${earned && !isGhost ? config.badgeBorderColor : lockedTierConfig?.badgeBorderColor || LOCKED_CONFIG.badgeBorderColor}`, 
-                opacity: earned && !isGhost ? 0.6 : 0.25,
+                opacity: earned && !isGhost ? 0.5 : 0.2,
               }}
             />
             
-            {/* Badge content */}
+            {/* Badge content - large number */}
             {earned && !isGhost ? (
               isRegional ? (
                 <div style={{ color: config.badgeTextColor }}>
-                  {getRegionalIcon(tier, compact ? 'w-5 h-5' : 'w-6 h-6')}
+                  {getRegionalIcon(tier, compact ? 'w-5 h-5' : 'w-7 h-7')}
                 </div>
               ) : (
                 <span 
-                  className={cn(numberSize, 'tracking-tight')} 
-                  style={{ color: config.badgeTextColor, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
+                  className={cn(compact ? 'text-lg font-bold' : 'text-2xl font-bold', 'tracking-tight')} 
+                  style={{ color: config.badgeTextColor, textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}
                 >
                   {threshold}
                 </span>
               )
             ) : (
-              // Locked: show tier color rim but lock icon
-              <Lock 
-                className={cn(compact ? 'w-4 h-4' : 'w-5 h-5')} 
-                style={{ color: LOCKED_CONFIG.badgeTextColor }} 
-              />
+              // Locked: show number faded, not lock icon
+              <span 
+                className={cn(compact ? 'text-lg font-bold' : 'text-2xl font-bold', 'tracking-tight')} 
+                style={{ color: 'rgba(255,255,255,0.25)', textShadow: 'none' }}
+              >
+                {isRegional ? '?' : threshold}
+              </span>
             )}
           </div>
+          
+          {/* Pedestal/plinth base - only visible on non-compact */}
+          {!compact && (
+            <div 
+              className="relative -mt-1.5 w-full flex justify-center z-0"
+              style={{ transform: 'perspective(100px) rotateX(5deg)' }}
+            >
+              {/* Pedestal top surface */}
+              <div 
+                className="h-2 rounded-b-sm"
+                style={{
+                  width: compact ? '80%' : '85%',
+                  background: earned && !isGhost 
+                    ? `linear-gradient(to bottom, ${config.badgeBorderColor}40 0%, rgba(0,0,0,0.5) 100%)`
+                    : 'linear-gradient(to bottom, rgba(100,100,100,0.3) 0%, rgba(0,0,0,0.4) 100%)',
+                  boxShadow: earned && !isGhost 
+                    ? `0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 ${config.badgeBorderColor}30`
+                    : '0 2px 4px rgba(0,0,0,0.3)',
+                }}
+              />
+            </div>
+          )}
         </div>
         
         {/* Text content */}

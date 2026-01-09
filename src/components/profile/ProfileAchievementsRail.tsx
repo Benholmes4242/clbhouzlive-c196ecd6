@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { getNextBadgeNudge, type BadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 
 interface ProfileAchievementsRailProps {
@@ -15,11 +15,11 @@ interface ProfileAchievementsRailProps {
 
 const MAX_VISIBLE = 12;
 
-// Map achievement IDs to AchievementTier
-function getAchievementTier(achievement: { id: string; threshold?: number; type: string }): AchievementTier {
+// Map achievement IDs to EliteCardTier
+function getAchievementTier(achievement: { id: string; threshold?: number; type: string }): EliteCardTier {
   // Milestones
   if (achievement.type === 'milestone' && achievement.threshold) {
-    return achievement.threshold.toString() as AchievementTier;
+    return achievement.threshold.toString() as EliteCardTier;
   }
   // List completions
   if (achievement.id === 'list_gb_ireland') return 'GBI';
@@ -31,11 +31,11 @@ function getAchievementTier(achievement: { id: string; threshold?: number; type:
 }
 
 // Get ghost card tier from nudge
-function getGhostTier(nudge: BadgeNudge): AchievementTier {
+function getGhostTier(nudge: BadgeNudge): EliteCardTier {
   if (nudge.type === 'global') {
-    return nudge.nextThreshold.toString() as AchievementTier;
+    return nudge.nextThreshold.toString() as EliteCardTier;
   }
-  return nudge.regionId;
+  return nudge.regionId as EliteCardTier;
 }
 
 /**
@@ -118,19 +118,21 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
         </button>
       </div>
 
-      {/* Horizontal scroll strip with shared AchievementBadgeCard */}
+      {/* Horizontal scroll strip with premium EliteGameCard */}
       <div className="flex gap-3 overflow-x-auto pb-1 pt-2 [-webkit-overflow-scrolling:touch] scrollbar-hide -mx-4 px-4">
-        {visible.map((ach, index) => (
-          <AchievementBadgeCard
-            key={ach.id}
-            tier={getAchievementTier(ach)}
-            title={ach.shortLabel}
-            subtitle={ach.type === 'milestone' ? 'Milestone' : 'Completed'}
-            unlocked={true}
-            isPrimary={index === 0}
-            totalTop100Played={progressData?.totalTop100Played}
-            compact
-          />
+        {visible.map((ach) => (
+          <div key={ach.id} className="shrink-0 w-[280px]">
+            <EliteGameCard
+              tier={getAchievementTier(ach)}
+              earned={true}
+              currentProgress={progressData?.totalTop100Played || 0}
+              title={ach.shortLabel}
+              subtitle={ach.type === 'milestone' ? 'Milestone' : 'Completed'}
+              compact
+              enableAnimations={false}
+              quality="low"
+            />
+          </div>
         ))}
 
         {/* Ghost card for next badge */}
@@ -138,17 +140,21 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
           <button
             type="button"
             onClick={handleViewAll}
-            className="shrink-0"
+            className="shrink-0 w-[280px]"
           >
-            <AchievementBadgeCard
+            <EliteGameCard
               tier={getGhostTier(nudge)}
+              earned={false}
+              isGhost={true}
+              currentProgress={nudge.type === 'global' ? progressData?.totalTop100Played || 0 : nudge.playedOnList}
+              targetProgress={nudge.type === 'global' ? nudge.nextThreshold : nudge.totalOnList}
               title={nudge.type === 'global' 
                 ? `${nudge.nextThreshold} Club` 
                 : `${nudge.regionLabel}`}
               subtitle={`${nudge.remaining} away`}
-              unlocked={false}
-              isGhost={true}
               compact
+              enableAnimations={false}
+              quality="low"
             />
           </button>
         )}
