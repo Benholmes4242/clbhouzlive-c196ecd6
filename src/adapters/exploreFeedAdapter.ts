@@ -119,9 +119,18 @@ export const exploreFeedAdapter: FeedAdapter<ExploreContentItem> = {
 
   getReviewData: (item) => {
     if (!item.isReview || !item.sourceReviewId) return null;
+    
+    const course = item.golfCourse;
+    const rating = item.reviewRating || 0;
+    const tierLabel = rating >= 9 ? 'OUTSTANDING' : rating >= 8 ? 'EXCELLENT' : rating >= 7 ? 'VERY GOOD' : rating >= 6 ? 'GOOD' : 'FAIR';
+    
     return {
-      rating: item.reviewRating || 0,
-      reviewId: item.sourceReviewId,
+      courseId: course?.id || '',
+      courseName: course?.name || 'Golf Course',
+      courseLocation: course ? `${course.region || ''}, ${course.country || ''}`.replace(/^, |, $/g, '') : undefined,
+      rating,
+      tierLabel,
+      sourceReviewId: item.sourceReviewId,
     };
   },
 

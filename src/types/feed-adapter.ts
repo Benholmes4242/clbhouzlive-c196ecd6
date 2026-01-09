@@ -75,8 +75,12 @@ export interface MusicTrackInfo {
 }
 
 export interface ExtractedReviewData {
+  courseId: string;
+  courseName: string;
+  courseLocation?: string;
   rating: number;
-  reviewId: string;
+  tierLabel: string;
+  sourceReviewId: string;
   reviewDate?: string;
   conditionScore?: number;
   designScore?: number;
