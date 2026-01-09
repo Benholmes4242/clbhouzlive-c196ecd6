@@ -1,14 +1,14 @@
 /**
  * HubCreateGameTripSheet - Message-composer style for creating games/trips
  * 
- * Matches Hub glass styling
+ * Matches Hub glass styling exactly (same surface as Games & Trips sheet)
  * Composer-style blocks (not form fields)
  * Premium CTA bar
  */
 
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MapPin, Users, Calendar, Clock, Plus } from 'lucide-react';
+import { X, MapPin, Users, Calendar, Clock, Plus, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
@@ -204,7 +204,7 @@ export function HubCreateGameTripSheet({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop - lighter for Hub context */}
+          {/* Backdrop - same as Games & Trips sheet */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -215,7 +215,7 @@ export function HubCreateGameTripSheet({
             onClick={onClose}
           />
 
-          {/* Sheet */}
+          {/* Sheet - exact same surface as Games & Trips */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -231,17 +231,17 @@ export function HubCreateGameTripSheet({
             }}
             onClick={handleSheetClick}
           >
-            {/* Header */}
+            {/* Header - compact, matching Games & Trips */}
             <div className="flex-shrink-0">
-              {/* Drag handle - centered at top */}
-              <div className="flex justify-center pt-2.5 pb-1">
+              {/* Drag handle - thinner, lower contrast */}
+              <div className="flex justify-center pt-2.5 pb-1.5">
                 <div 
                   className="w-8 h-[3px] rounded-full"
-                  style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+                  style={{ background: 'rgba(0, 0, 0, 0.1)' }}
                 />
               </div>
 
-              {/* Title bar - compact */}
+              {/* Title bar with close button */}
               <div className="flex items-center justify-between px-5 pb-2">
                 <h2 
                   className="text-[17px] font-semibold"
@@ -251,37 +251,35 @@ export function HubCreateGameTripSheet({
                 </h2>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
                   style={{ 
-                    background: 'rgba(0, 0, 0, 0.04)',
+                    background: 'rgba(0, 0, 0, 0.03)',
                     border: '1px solid rgba(0, 0, 0, 0.04)',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
                   }}
                   aria-label="Close"
                 >
-                  <X className="w-4.5 h-4.5" style={{ color: 'var(--hub-text-sub)' }} />
+                  <X className="w-4 h-4" style={{ color: 'var(--hub-text-sub)' }} />
                 </button>
               </div>
 
-              {/* Mode toggle - Hub glass style */}
+              {/* Mode toggle - Hub glass pill style */}
               <div className="px-5 pb-3">
                 <div
-                  className="inline-flex rounded-2xl p-1 w-full"
+                  className="inline-flex rounded-2xl p-0.5 w-full"
                   style={{
                     background: 'rgba(0, 0, 0, 0.03)',
-                    border: '1px solid rgba(0, 0, 0, 0.04)',
                   }}
                 >
                   {(['game', 'trip'] as SheetMode[]).map((m) => (
                     <button
                       key={m}
                       onClick={() => handleModeChange(m)}
-                      className="flex-1 px-4 py-2 rounded-xl text-[14px] font-medium transition-all capitalize"
+                      className="flex-1 px-4 py-1.5 rounded-xl text-[13px] font-medium transition-all capitalize"
                       style={{
                         background: mode === m ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
-                        border: mode === m ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid transparent',
+                        border: mode === m ? '1px solid rgba(0, 0, 0, 0.04)' : '1px solid transparent',
                         color: mode === m ? 'var(--hub-text)' : 'var(--hub-text-muted)',
-                        boxShadow: mode === m ? '0 1px 4px rgba(0, 0, 0, 0.05)' : 'none',
+                        boxShadow: mode === m ? '0 1px 3px rgba(0, 0, 0, 0.04)' : 'none',
                       }}
                     >
                       {m}
@@ -291,7 +289,7 @@ export function HubCreateGameTripSheet({
               </div>
             </div>
 
-            {/* Scrollable content - composer blocks */}
+            {/* Scrollable content - unified surface, no section cards */}
             <div
               ref={contentRef}
               className="flex-1 overflow-y-auto px-5"
@@ -300,41 +298,35 @@ export function HubCreateGameTripSheet({
                 overscrollBehavior: 'contain',
               }}
             >
-              {/* Composer blocks container - unified feel */}
-              <div className="flex flex-col gap-3">
+              {/* Composer flow - tight vertical rhythm */}
+              <div className="flex flex-col gap-2.5">
                 
-                {/* WHERE block - tappable composer row */}
+                {/* WHERE - tappable composer row (no input styling) */}
                 {selectedCourse ? (
                   <div 
-                    className="flex items-center gap-3 p-3 rounded-[20px]"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.85)',
-                      border: '1px solid rgba(0, 0, 0, 0.04)',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-                    }}
+                    className="flex items-center gap-3 py-2.5"
                   >
                     <div 
-                      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ 
-                        background: 'rgba(110, 146, 119, 0.1)',
-                        border: '1px solid rgba(110, 146, 119, 0.15)',
+                        background: 'rgba(110, 146, 119, 0.12)',
                       }}
                     >
-                      <MapPin className="w-[18px] h-[18px]" style={{ color: 'var(--hub-accent)' }} />
+                      <MapPin className="w-4 h-4" style={{ color: 'var(--hub-accent)' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[15px] font-medium" style={{ color: 'var(--hub-text)' }}>
                         {selectedCourse.name}
                       </div>
                       {selectedCourse.location && (
-                        <div className="text-[12.5px]" style={{ color: 'var(--hub-text-sub)' }}>
+                        <div className="text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
                           {selectedCourse.location}
                         </div>
                       )}
                     </div>
                     <button
                       onClick={() => setSelectedCourse(null)}
-                      className="text-[13px] font-medium px-2 py-1 rounded-lg"
+                      className="text-[12px] font-medium px-2 py-1"
                       style={{ color: 'var(--hub-accent)' }}
                     >
                       Change
@@ -343,18 +335,13 @@ export function HubCreateGameTripSheet({
                 ) : (
                   <button
                     onClick={handleSelectCourse}
-                    className="w-full flex items-center gap-3 p-3 rounded-[20px] text-left transition-all active:scale-[0.99] active:opacity-90"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.85)',
-                      border: '1px solid rgba(0, 0, 0, 0.04)',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-                    }}
+                    className="w-full flex items-center gap-3 py-2.5 text-left transition-all active:opacity-70"
                   >
                     <div 
-                      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(0, 0, 0, 0.03)' }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(0, 0, 0, 0.04)' }}
                     >
-                      <MapPin className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+                      <MapPin className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                     </div>
                     <span 
                       className="text-[15px]"
@@ -365,99 +352,83 @@ export function HubCreateGameTripSheet({
                   </button>
                 )}
 
-                {/* WHO block - chips + add */}
-                <div 
-                  className="rounded-[20px] p-3"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    border: '1px solid rgba(0, 0, 0, 0.04)',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div 
-                      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(0, 0, 0, 0.03)' }}
-                    >
-                      <Users className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
-                    </div>
-                    <span 
-                      className="text-[15px]"
-                      style={{ color: selectedPlayers.length > 0 ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
-                    >
-                      {mode === 'game' ? 'Who\'s playing?' : 'Who\'s attending?'}
-                    </span>
+                {/* WHO - chips inline with icon */}
+                <div className="flex items-start gap-3 py-2.5">
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                  >
+                    <Users className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                   </div>
                   
-                  {/* Player chips - WhatsApp style */}
-                  <div className="flex flex-wrap gap-1.5 pl-11">
-                    {displayedPlayers.map(player => (
-                      <div
-                        key={player.id}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
-                        style={{
-                          background: 'rgba(0, 0, 0, 0.04)',
-                          border: '1px solid rgba(0, 0, 0, 0.04)',
-                        }}
+                  <div className="flex-1 min-w-0">
+                    {selectedPlayers.length === 0 ? (
+                      <button
+                        onClick={handleAddPlayers}
+                        className="text-[15px] transition-all active:opacity-70"
+                        style={{ color: 'var(--hub-text-muted)' }}
                       >
-                        <span className="text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
-                          {player.name}
-                        </span>
+                        {mode === 'game' ? "Who's playing?" : "Who's attending?"}
+                      </button>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5 items-center">
+                        {displayedPlayers.map(player => (
+                          <div
+                            key={player.id}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+                            style={{
+                              background: 'rgba(0, 0, 0, 0.04)',
+                            }}
+                          >
+                            <span className="text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
+                              {player.name}
+                            </span>
+                            <button
+                              onClick={() => handleRemovePlayer(player.id)}
+                              className="w-3.5 h-3.5 rounded-full flex items-center justify-center"
+                              style={{ background: 'rgba(0, 0, 0, 0.08)' }}
+                            >
+                              <X className="w-2.5 h-2.5" style={{ color: 'var(--hub-text-sub)' }} />
+                            </button>
+                          </div>
+                        ))}
+
+                        {extraPlayerCount > 0 && (
+                          <div
+                            className="inline-flex items-center px-2.5 py-1 rounded-full"
+                            style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                          >
+                            <span className="text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
+                              +{extraPlayerCount} more
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Add chip */}
                         <button
-                          onClick={() => handleRemovePlayer(player.id)}
-                          className="w-3.5 h-3.5 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(0, 0, 0, 0.08)' }}
+                          onClick={handleAddPlayers}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors active:opacity-70"
+                          style={{
+                            border: '1px dashed rgba(0, 0, 0, 0.12)',
+                          }}
                         >
-                          <X className="w-2.5 h-2.5" style={{ color: 'var(--hub-text-sub)' }} />
+                          <Plus className="w-3 h-3" style={{ color: 'var(--hub-text-dim)' }} />
+                          <span className="text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
+                            Add
+                          </span>
                         </button>
                       </div>
-                    ))}
-
-                    {extraPlayerCount > 0 && (
-                      <div
-                        className="inline-flex items-center px-2.5 py-1 rounded-full"
-                        style={{
-                          background: 'rgba(0, 0, 0, 0.04)',
-                          border: '1px solid rgba(0, 0, 0, 0.04)',
-                        }}
-                      >
-                        <span className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
-                          +{extraPlayerCount} more
-                        </span>
-                      </div>
                     )}
-
-                    {/* Add chip */}
-                    <button
-                      onClick={handleAddPlayers}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors active:opacity-80"
-                      style={{
-                        background: 'transparent',
-                        border: '1px dashed rgba(0, 0, 0, 0.15)',
-                      }}
-                    >
-                      <Plus className="w-3.5 h-3.5" style={{ color: 'var(--hub-text-dim)' }} />
-                      <span className="text-[13px]" style={{ color: 'var(--hub-text-dim)' }}>
-                        Add
-                      </span>
-                    </button>
                   </div>
                 </div>
 
-                {/* VISIBILITY + SLOTS block - compact chips */}
-                <div 
-                  className="rounded-[20px] p-3"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    border: '1px solid rgba(0, 0, 0, 0.04)',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-                  }}
-                >
+                {/* VISIBILITY + SLOTS - inline chips, no card wrapper */}
+                <div className="py-2.5 space-y-3">
                   {/* Visibility */}
-                  <div className="mb-3">
+                  <div>
                     <span 
-                      className="text-[11px] font-medium mb-1.5 block"
-                      style={{ color: 'var(--hub-text-dim)' }}
+                      className="text-[11px] font-medium mb-2 block"
+                      style={{ color: 'var(--hub-text-dim)', opacity: 0.7 }}
                     >
                       Visibility
                     </span>
@@ -472,14 +443,11 @@ export function HubCreateGameTripSheet({
                           className="px-3 py-1.5 rounded-full text-[13px] font-medium transition-all"
                           style={{
                             background: visibility === option.value 
-                              ? 'var(--hub-text)' 
+                              ? 'rgba(0, 0, 0, 0.08)' 
                               : 'rgba(0, 0, 0, 0.03)',
                             color: visibility === option.value 
-                              ? 'white' 
-                              : 'var(--hub-text-sub)',
-                            border: visibility === option.value 
-                              ? '1px solid var(--hub-text)'
-                              : '1px solid rgba(0, 0, 0, 0.04)',
+                              ? 'var(--hub-text)' 
+                              : 'var(--hub-text-muted)',
                           }}
                         >
                           {option.label}
@@ -488,12 +456,12 @@ export function HubCreateGameTripSheet({
                     </div>
                   </div>
 
-                  {/* Slots (Game only) - pill style */}
+                  {/* Slots (Game only) - small pill buttons */}
                   {mode === 'game' && (
                     <div>
                       <span 
-                        className="text-[11px] font-medium mb-1.5 block"
-                        style={{ color: 'var(--hub-text-dim)' }}
+                        className="text-[11px] font-medium mb-2 block"
+                        style={{ color: 'var(--hub-text-dim)', opacity: 0.7 }}
                       >
                         Slots
                       </span>
@@ -505,17 +473,14 @@ export function HubCreateGameTripSheet({
                               haptic('light');
                               setSlots(num);
                             }}
-                            className="w-9 h-8 rounded-xl text-[13px] font-semibold transition-all"
+                            className="px-3 py-1.5 rounded-full text-[13px] font-medium transition-all"
                             style={{
                               background: slots === num 
-                                ? 'var(--hub-text)' 
+                                ? 'rgba(0, 0, 0, 0.08)' 
                                 : 'rgba(0, 0, 0, 0.03)',
                               color: slots === num 
-                                ? 'white' 
-                                : 'var(--hub-text-sub)',
-                              border: slots === num 
-                                ? '1px solid var(--hub-text)'
-                                : '1px solid rgba(0, 0, 0, 0.04)',
+                                ? 'var(--hub-text)' 
+                                : 'var(--hub-text-muted)',
                             }}
                           >
                             {num}
@@ -526,30 +491,34 @@ export function HubCreateGameTripSheet({
                   )}
                 </div>
 
-                {/* Optional details - subtle expansion */}
+                {/* Single divider before optional details */}
+                <div 
+                  className="h-px my-1"
+                  style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+                />
+
+                {/* Optional details - subtle expansion row */}
                 <div>
                   <button
                     onClick={() => {
                       haptic('light');
                       setShowDetails(!showDetails);
                     }}
-                    className="w-full flex items-center justify-between py-2.5 text-left"
+                    className="w-full flex items-center justify-between py-2 text-left"
                   >
-                    <div className="flex items-center gap-2">
-                      <Plus 
-                        className={cn(
-                          "w-4 h-4 transition-transform duration-200",
-                          showDetails && "rotate-45"
-                        )}
-                        style={{ color: 'var(--hub-text-dim)' }}
-                      />
-                      <span 
-                        className="text-[14px]"
-                        style={{ color: 'var(--hub-text-sub)' }}
-                      >
-                        Add details (optional)
-                      </span>
-                    </div>
+                    <span 
+                      className="text-[14px]"
+                      style={{ color: 'var(--hub-text-sub)' }}
+                    >
+                      Add details (optional)
+                    </span>
+                    <ChevronDown 
+                      className={cn(
+                        "w-4 h-4 transition-transform duration-200",
+                        showDetails && "rotate-180"
+                      )}
+                      style={{ color: 'var(--hub-text-dim)', opacity: 0.5 }}
+                    />
                   </button>
 
                   <AnimatePresence>
@@ -561,24 +530,14 @@ export function HubCreateGameTripSheet({
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div 
-                          className="rounded-[20px] p-3 space-y-3"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.85)',
-                            border: '1px solid rgba(0, 0, 0, 0.04)',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-                          }}
-                        >
+                        <div className="pt-2 pb-1 space-y-2.5">
                           {mode === 'game' ? (
                             <>
                               {/* Date & Time */}
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="flex gap-2">
                                 <button
-                                  className="flex items-center gap-2 p-2.5 rounded-xl text-left"
-                                  style={{
-                                    background: 'rgba(0, 0, 0, 0.03)',
-                                    border: '1px solid rgba(0, 0, 0, 0.04)',
-                                  }}
+                                  className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-left"
+                                  style={{ background: 'rgba(0, 0, 0, 0.03)' }}
                                 >
                                   <Calendar className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                                   <span 
@@ -589,11 +548,8 @@ export function HubCreateGameTripSheet({
                                   </span>
                                 </button>
                                 <button
-                                  className="flex items-center gap-2 p-2.5 rounded-xl text-left"
-                                  style={{
-                                    background: 'rgba(0, 0, 0, 0.03)',
-                                    border: '1px solid rgba(0, 0, 0, 0.04)',
-                                  }}
+                                  className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-left"
+                                  style={{ background: 'rgba(0, 0, 0, 0.03)' }}
                                 >
                                   <Clock className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                                   <span 
@@ -605,8 +561,8 @@ export function HubCreateGameTripSheet({
                                 </button>
                               </div>
 
-                              {/* Holes */}
-                              <div className="flex gap-2">
+                              {/* Holes - inline chips */}
+                              <div className="flex gap-1.5">
                                 {([9, 18] as const).map(num => (
                                   <button
                                     key={num}
@@ -614,17 +570,14 @@ export function HubCreateGameTripSheet({
                                       haptic('light');
                                       setHoleCount(num);
                                     }}
-                                    className="flex-1 py-2 rounded-xl text-[13px] font-medium transition-all"
+                                    className="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all"
                                     style={{
                                       background: holeCount === num 
-                                        ? 'var(--hub-text)' 
+                                        ? 'rgba(0, 0, 0, 0.08)' 
                                         : 'rgba(0, 0, 0, 0.03)',
                                       color: holeCount === num 
-                                        ? 'white' 
-                                        : 'var(--hub-text-sub)',
-                                      border: holeCount === num 
-                                        ? '1px solid var(--hub-text)'
-                                        : '1px solid rgba(0, 0, 0, 0.04)',
+                                        ? 'var(--hub-text)' 
+                                        : 'var(--hub-text-muted)',
                                     }}
                                   >
                                     {num} holes
@@ -632,8 +585,8 @@ export function HubCreateGameTripSheet({
                                 ))}
                               </div>
 
-                              {/* Game type */}
-                              <div className="flex gap-2">
+                              {/* Game type - inline chips */}
+                              <div className="flex gap-1.5">
                                 {(['casual', 'practice', 'match'] as const).map(type => (
                                   <button
                                     key={type}
@@ -641,17 +594,14 @@ export function HubCreateGameTripSheet({
                                       haptic('light');
                                       setGameType(type);
                                     }}
-                                    className="flex-1 py-2 rounded-xl text-[13px] font-medium transition-all capitalize"
+                                    className="px-3 py-1.5 rounded-full text-[13px] font-medium transition-all capitalize"
                                     style={{
                                       background: gameType === type 
-                                        ? 'var(--hub-text)' 
+                                        ? 'rgba(0, 0, 0, 0.08)' 
                                         : 'rgba(0, 0, 0, 0.03)',
                                       color: gameType === type 
-                                        ? 'white' 
-                                        : 'var(--hub-text-sub)',
-                                      border: gameType === type 
-                                        ? '1px solid var(--hub-text)'
-                                        : '1px solid rgba(0, 0, 0, 0.04)',
+                                        ? 'var(--hub-text)' 
+                                        : 'var(--hub-text-muted)',
                                     }}
                                   >
                                     {type}
@@ -661,13 +611,10 @@ export function HubCreateGameTripSheet({
                             </>
                           ) : (
                             /* Trip dates */
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="flex gap-2">
                               <button
-                                className="flex items-center gap-2 p-2.5 rounded-xl text-left"
-                                style={{
-                                  background: 'rgba(0, 0, 0, 0.03)',
-                                  border: '1px solid rgba(0, 0, 0, 0.04)',
-                                }}
+                                className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-left"
+                                style={{ background: 'rgba(0, 0, 0, 0.03)' }}
                               >
                                 <Calendar className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                                 <span 
@@ -678,11 +625,8 @@ export function HubCreateGameTripSheet({
                                 </span>
                               </button>
                               <button
-                                className="flex items-center gap-2 p-2.5 rounded-xl text-left"
-                                style={{
-                                  background: 'rgba(0, 0, 0, 0.03)',
-                                  border: '1px solid rgba(0, 0, 0, 0.04)',
-                                }}
+                                className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-left"
+                                style={{ background: 'rgba(0, 0, 0, 0.03)' }}
                               >
                                 <Calendar className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                                 <span 
@@ -701,12 +645,12 @@ export function HubCreateGameTripSheet({
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Add any notes..."
                             rows={2}
-                            className="w-full p-2.5 rounded-xl text-[13px] resize-none"
+                            className="w-full px-3 py-2 rounded-xl text-[13px] resize-none"
                             style={{
                               background: 'rgba(0, 0, 0, 0.03)',
-                              border: '1px solid rgba(0, 0, 0, 0.04)',
                               color: 'var(--hub-text)',
                               outline: 'none',
+                              border: 'none',
                             }}
                           />
                         </div>
@@ -717,20 +661,20 @@ export function HubCreateGameTripSheet({
               </div>
             </div>
 
-            {/* Sticky CTA - premium glass separator */}
+            {/* Sticky CTA - soft glass fade, premium button */}
             <div 
               className="absolute bottom-0 left-0 right-0 z-20"
               style={{ 
-                background: 'linear-gradient(180deg, rgba(250, 250, 250, 0) 0%, rgba(250, 250, 250, 1) 20%)',
-                padding: '20px 20px 12px 20px',
+                background: 'linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, rgba(245, 245, 245, 1) 30%)',
+                padding: '24px 20px 12px 20px',
                 paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
               }}
             >
-              {/* Validation hint - subtle, left-aligned */}
+              {/* Validation hint - subtle */}
               {!isValid && (
                 <p 
                   className="text-[12px] mb-2"
-                  style={{ color: 'var(--hub-text-muted)' }}
+                  style={{ color: 'var(--hub-text-dim)', opacity: 0.7 }}
                 >
                   Choose a course to continue
                 </p>
@@ -743,10 +687,10 @@ export function HubCreateGameTripSheet({
                 style={{
                   background: isValid 
                     ? 'linear-gradient(135deg, #6E9277 0%, #7FA888 100%)'
-                    : 'rgba(0, 0, 0, 0.05)',
+                    : 'rgba(0, 0, 0, 0.04)',
                   color: isValid ? 'white' : 'var(--hub-text-muted)',
-                  boxShadow: isValid ? '0 2px 12px rgba(110, 146, 119, 0.25)' : 'none',
-                  opacity: isSubmitting ? 0.7 : 1,
+                  boxShadow: isValid ? '0 2px 12px rgba(110, 146, 119, 0.2)' : 'none',
+                  opacity: isSubmitting ? 0.7 : (isValid ? 1 : 0.8),
                 }}
               >
                 {isSubmitting ? (
