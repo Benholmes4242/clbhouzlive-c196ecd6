@@ -30,9 +30,11 @@ export function CoursesPhotoGrid({ courses, courseImages }: CoursesPhotoGridProp
 
       {/* 2-column grid of photo cards */}
       <div className="grid grid-cols-2 gap-3">
-        {courses.map((course, idx) => {
-          // Try to get image from resolved course images
-          const resolvedImage = courseImages?.get(course.tournamentName)?.imageUrl || course.imageUrl;
+        {courses.map((course) => {
+          // Try to get image: first from course name lookup, then tournament name, then direct URL
+          const resolvedFromName = courseImages?.get(course.name)?.imageUrl;
+          const resolvedFromTournament = courseImages?.get(course.tournamentName)?.imageUrl;
+          const resolvedImage = resolvedFromName || resolvedFromTournament || course.imageUrl;
           
           return (
             <Link
@@ -40,7 +42,7 @@ export function CoursesPhotoGrid({ courses, courseImages }: CoursesPhotoGridProp
               to={`/tourhub/tournament/${course.id}`}
               className="group relative overflow-hidden rounded-xl aspect-[4/3]"
             >
-              {/* Background image or gradient */}
+              {/* Background image or fallback */}
               {resolvedImage ? (
                 <img
                   src={resolvedImage}
@@ -49,12 +51,12 @@ export function CoursesPhotoGrid({ courses, courseImages }: CoursesPhotoGridProp
                 />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-zinc-900">
-                  {/* Contour texture */}
-                  <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-                    <path d="M0 50 Q25 30 50 50 T100 50" fill="none" stroke="white" strokeWidth="0.5" />
-                    <path d="M0 70 Q25 50 50 70 T100 70" fill="none" stroke="white" strokeWidth="0.3" />
-                    <circle cx="75" cy="25" r="15" fill="none" stroke="white" strokeWidth="0.3" />
-                  </svg>
+                  {/* Large initials as fallback */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-white/10">
+                      {course.name.split(' ').slice(0, 2).map(w => w[0]).join('')}
+                    </span>
+                  </div>
                 </div>
               )}
               

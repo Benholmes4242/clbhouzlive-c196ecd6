@@ -11,12 +11,12 @@ interface LeadersPhotoCardsProps {
   leaders: SeasonLeader[];
 }
 
-// Category-specific gradients (fallback when no photo)
-const categoryGradients: Record<string, string> = {
-  events: 'from-emerald-600 via-emerald-700 to-teal-800',
-  cuts: 'from-blue-600 via-blue-700 to-indigo-800',
-  scoring: 'from-amber-600 via-orange-700 to-red-800',
-  world_rank: 'from-purple-600 via-violet-700 to-indigo-800',
+// Category-specific accent colors for overlay
+const categoryColors: Record<string, { gradient: string; accent: string }> = {
+  events: { gradient: 'from-emerald-900/90 via-emerald-800/60', accent: 'bg-emerald-500' },
+  cuts: { gradient: 'from-blue-900/90 via-blue-800/60', accent: 'bg-blue-500' },
+  scoring: { gradient: 'from-amber-900/90 via-orange-800/60', accent: 'bg-amber-500' },
+  world_rank: { gradient: 'from-purple-900/90 via-violet-800/60', accent: 'bg-purple-500' },
 };
 
 export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
@@ -38,7 +38,8 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
       {/* 2-column grid */}
       <div className="grid grid-cols-2 gap-3">
         {leaders.map((leader) => {
-          const gradient = categoryGradients[leader.category] || categoryGradients.events;
+          const colors = categoryColors[leader.category] || categoryColors.events;
+          const playerPhotoUrl = leader.player.photoUrl;
           
           return (
             <Link
@@ -46,30 +47,41 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
               to={`/tourhub/player/${leader.player.id}`}
               className="group relative overflow-hidden rounded-xl aspect-[4/3]"
             >
-              {/* Background - gradient fallback (would be player photo) */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`}>
-                {/* Texture overlay */}
-                <div className="absolute inset-0 opacity-20">
-                  <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                      <pattern id={`pattern-${leader.category}`} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                        <circle cx="10" cy="10" r="1" fill="white" />
-                      </pattern>
-                    </defs>
-                    <rect width="100" height="100" fill={`url(#pattern-${leader.category})`} />
-                  </svg>
-                </div>
-              </div>
-              
-              {/* Gradient overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              {/* Background - player photo or gradient fallback */}
+              {playerPhotoUrl ? (
+                <>
+                  <img
+                    src={playerPhotoUrl}
+                    alt={leader.player.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {/* Dark overlay for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+                </>
+              ) : (
+                <>
+                  {/* Gradient fallback with initials */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} to-slate-900`}>
+                    {/* Large initials as fallback */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-4xl font-bold text-white/20">
+                        {leader.player.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                </>
+              )}
               
               {/* Content overlay */}
               <div className="absolute inset-0 p-3 flex flex-col justify-between">
-                {/* Category label */}
-                <span className="self-start px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-medium">
-                  {leader.label}
-                </span>
+                {/* Category label with accent color */}
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${colors.accent}`} />
+                  <span className="text-white/90 text-[10px] font-medium uppercase tracking-wide">
+                    {leader.label}
+                  </span>
+                </div>
                 
                 {/* Bottom content */}
                 <div>
