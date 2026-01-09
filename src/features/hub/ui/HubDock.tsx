@@ -1,12 +1,12 @@
 import React from 'react';
-import { Plus, Search, User, MessageCircle, CalendarDays } from 'lucide-react';
+import { Camera, Search, User, MessageCircle, Plus } from 'lucide-react';
 
-export type HubDockItemKey = 'your_games' | 'search' | 'create' | 'echo' | 'profile';
+export type HubDockItemKey = 'create_game' | 'search' | 'create_moment' | 'echo' | 'profile';
 
 export interface HubDockItems {
-  left1: { key: 'your_games'; label: string };
+  left1: { key: 'create_game'; label: string };
   left2: { key: 'search'; label: string };
-  center: { key: 'create'; label: string };
+  center: { key: 'create_moment'; label: string };
   right1: { key: 'echo'; label: string };
   right2: { key: 'profile'; label: string };
 }
@@ -28,7 +28,7 @@ export function HubDock({ items, onPress }: HubDockProps) {
       <div className="dockInner">
         <DockItem
           label={items.left1.label}
-          icon={<CalendarDays className="h-5 w-5" />}
+          icon={<Plus className="h-5 w-5" />}
           onClick={() => onPress(items.left1.key)}
         />
         <DockItem
@@ -43,7 +43,7 @@ export function HubDock({ items, onPress }: HubDockProps) {
           onClick={() => onPress(items.center.key)}
           aria-label={items.center.label}
         >
-          <Plus className="h-7 w-7 text-white/90" />
+          <Camera className="h-7 w-7 text-white/90" />
         </button>
 
         <DockItem
