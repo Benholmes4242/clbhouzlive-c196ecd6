@@ -992,21 +992,38 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
         <CommentsPage
           isOpen={commentsModalOpen}
           postId={selectedPostId}
-          videoThumbnail={
-            filteredPosts[currentIndex].media?.[0]?.media_url
-              ? generateStreamThumbnailUrl(uidFromNode({ src: filteredPosts[currentIndex].media?.[0]?.media_url || '' }) || '', { height: 400 })
-              : undefined
-          }
-          creatorName={filteredPosts[currentIndex].user?.name}
-          creatorAvatar={filteredPosts[currentIndex].user?.avatar}
-          creatorHomeClub={filteredPosts[currentIndex].user?.homeClub}
-          creatorHandicap={filteredPosts[currentIndex].user?.handicap}
-          caption={filteredPosts[currentIndex].title || filteredPosts[currentIndex].ctaDescription}
-          courseId={filteredPosts[currentIndex].golfCourse?.id}
-          courseName={filteredPosts[currentIndex].golfCourse?.name}
-          courseCountry={filteredPosts[currentIndex].golfCourse?.country}
-          courseSubCountry={filteredPosts[currentIndex].golfCourse?.sub_country}
-          courseRegion={filteredPosts[currentIndex].golfCourse?.region}
+          videoThumbnail={(() => {
+            const post = filteredPosts[currentIndex];
+            const currentMediaIdx = mediaIndices[post?.id] || 0;
+            const mediaItems = post?.media && post.media.length > 0 ? post.media : [{
+              id: `${post?.id}-single`,
+              media_type: post?.type as 'video' | 'image',
+              media_url: post?.src
+            }];
+            const currentMedia = mediaItems[currentMediaIdx] || mediaItems[0];
+            return currentMedia?.media_url
+              ? generateStreamThumbnailUrl(uidFromNode({ src: currentMedia.media_url || '' }) || '', { height: 400 })
+              : undefined;
+          })()}
+          aspectRatio={(() => {
+            const post = filteredPosts[currentIndex];
+            // Try to get aspect ratio - default to portrait
+            if (post?.width && post?.height) {
+              return post.width / post.height;
+            }
+            return 0.5625; // 9:16 portrait default
+          })()}
+          isReview={filteredPosts[currentIndex]?.categories?.includes('review')}
+          creatorName={filteredPosts[currentIndex]?.user?.name}
+          creatorAvatar={filteredPosts[currentIndex]?.user?.avatar}
+          creatorHomeClub={filteredPosts[currentIndex]?.user?.homeClub}
+          creatorHandicap={filteredPosts[currentIndex]?.user?.handicap}
+          caption={filteredPosts[currentIndex]?.title || filteredPosts[currentIndex]?.ctaDescription}
+          courseId={filteredPosts[currentIndex]?.golfCourse?.id}
+          courseName={filteredPosts[currentIndex]?.golfCourse?.name}
+          courseCountry={filteredPosts[currentIndex]?.golfCourse?.country}
+          courseSubCountry={filteredPosts[currentIndex]?.golfCourse?.sub_country}
+          courseRegion={filteredPosts[currentIndex]?.golfCourse?.region}
           onClose={() => {
             setCommentsModalOpen(false);
             setSelectedPostId('');
