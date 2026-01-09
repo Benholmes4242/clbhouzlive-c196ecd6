@@ -37,6 +37,8 @@ export const SeasonalAchievementsSection: React.FC<SeasonalAchievementsSectionPr
             title={achievement.title}
             subtitle={achievement.seasonLabel}
             compact
+            enableAnimations={false}
+            quality="low"
           />
         ))}
       </div>

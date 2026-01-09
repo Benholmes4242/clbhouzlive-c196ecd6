@@ -291,6 +291,8 @@ export const MilestonesAndAchievementsContent: React.FC<MilestonesAndAchievement
                       currentProgress={totalTop100Played}
                       title={milestone.shortLabel}
                       subtitle={milestone.label}
+                      enableAnimations={false}
+                      quality="medium"
                     />
                   );
                 })}
@@ -329,6 +331,8 @@ export const MilestonesAndAchievementsContent: React.FC<MilestonesAndAchievement
                       targetProgress={total}
                       title={list.shortLabel}
                       subtitle={`${played} / ${total} courses`}
+                      enableAnimations={false}
+                      quality="medium"
                     />
                   );
                 })}

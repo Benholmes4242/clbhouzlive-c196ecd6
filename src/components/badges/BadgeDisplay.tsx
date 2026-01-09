@@ -48,6 +48,8 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
         title={badge.display_name}
         subtitle={badge.description}
         compact={size === 'sm'}
+        enableAnimations={false}
+        quality={size === 'sm' ? 'low' : 'medium'}
       />
     </div>
   );
