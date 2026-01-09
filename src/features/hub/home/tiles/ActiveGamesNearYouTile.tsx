@@ -1,10 +1,9 @@
 /**
  * ActiveGamesNearYouTile V2 - Premium tile for 2-up grid
- * Matching heights, consistent radius, V2 icon styling
+ * Clean layout, no icon, spacing between title and game text
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MapPin } from 'lucide-react';
 import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
@@ -67,18 +66,10 @@ export function ActiveGamesNearYouTile() {
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-soft)', // Soft shadow for secondary tile
+          boxShadow: 'var(--hub-shadow-soft)',
         }}
       >
-        {/* V2 Top icon - rounded square background */}
-        <div 
-          className="w-9 h-9 rounded-[10px] flex items-center justify-center mb-2"
-          style={{ background: 'var(--hub-badge-green-bg)' }}
-        >
-          <MapPin className="w-4 h-4" style={{ color: 'var(--hub-badge-green-text)' }} />
-        </div>
-
-        {/* Title - V2 typography polish */}
+        {/* Title */}
         <div 
           className="text-[14px] font-semibold"
           style={{ 
@@ -90,7 +81,7 @@ export function ActiveGamesNearYouTile() {
           Active Games<br/>Near You
         </div>
 
-        {/* V2 Badge - top right, soft pill style */}
+        {/* Badge - top right */}
         {gamesCount > 0 && (
           <div 
             className="absolute top-3 right-3 h-5 min-w-[20px] px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
@@ -104,6 +95,7 @@ export function ActiveGamesNearYouTile() {
           </div>
         )}
 
+        {/* Game details - with spacing from title */}
         <div className="mt-auto">
           {isLoading ? (
             <div 
@@ -131,7 +123,7 @@ export function ActiveGamesNearYouTile() {
                 {formatShortDate(nearbyGame.start_time)}
               </div>
 
-              {/* V2 Mini progress pill - matches Create Sheet chips */}
+              {/* Mini progress pill */}
               <div 
                 className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold mt-1.5"
                 style={{
@@ -173,16 +165,6 @@ export function ActiveGamesNearYouTile() {
             ))}
           </div>
         )}
-
-        {/* V2 Subtle accent bar at bottom */}
-        <div 
-          className="absolute bottom-0 left-4 right-4 rounded-full"
-          style={{
-            height: '3px',
-            background: 'var(--hub-badge-green-text)',
-            opacity: 0.35,
-          }}
-        />
       </button>
 
       <HubGamesTripsSheet
