@@ -23,6 +23,7 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { usePostEngagement } from '@/hooks/usePostEngagement';
 import type { ExploreContentItem } from '@/components/explore/types';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { useUserTop100Intent } from '@/hooks/useUserTop100Intent';
@@ -33,6 +34,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import Top100Pills from '@/components/courses/Top100Pills';
+import { toast } from 'sonner';
 
 
 // Lazy load heavy/inactive components for better initial bundle size
@@ -46,6 +48,9 @@ const Discover = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  
+  // Track current fullscreen post for engagement
+  const [currentFullscreenPostId, setCurrentFullscreenPostId] = useState<string | null>(null);
   
   // Rehydration state - show skeleton when app is rehydrating after background
   const { isRehydrating } = useRehydrationSafe();
@@ -155,19 +160,63 @@ const Discover = () => {
     return [...optimisticPosts, ...(content || [])];
   }, [optimisticPosts, content]);
 
+  // Get engagement state for current fullscreen post
+  const { toggleLike } = usePostEngagement(currentFullscreenPostId);
+
+  // Share handler
+  const handleSharePost = useCallback((postId: string) => {
+    const shareUrl = `${window.location.origin}/post/${postId}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Check out this post on Clbhouz',
+        url: shareUrl,
+      }).catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+        }
+      });
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast.success('Link copied to clipboard!');
+      }).catch(() => {
+        toast.error('Failed to copy link');
+      });
+    }
+  }, []);
+
   // Use unified fullscreen player for Watch/Discover content
   const { openFullscreen } = useUnifiedFullscreen('explore', {
     allowLandscape: true,
+    
+    // Track current post when user swipes
+    onIndexChange: (index) => {
+      const currentPost = allContent[index];
+      setCurrentFullscreenPostId(currentPost?.id || null);
+    },
+    
+    // Like handler - uses engagement hook
     onLike: (itemId) => {
-      console.log('Like from fullscreen:', itemId);
-      // TODO: Add actual like mutation
+      toggleLike();
     },
+    
+    // Comment handler - CommentsPage handles this automatically
     onComment: (itemId) => {
-      console.log('Comment from fullscreen:', itemId);
+      // No action needed - CommentsPage opens automatically
     },
+    
+    // Share handler
     onShare: (itemId) => {
-      console.log('Share from fullscreen:', itemId);
+      handleSharePost(itemId);
     },
+    
+    // Close handler - reset current post
+    onClose: () => {
+      setCurrentFullscreenPostId(null);
+    },
+    
+    // Infinite scroll
     onLoadMore: hasMore ? loadMore : undefined,
     hasMore,
   });
@@ -181,13 +230,11 @@ const Discover = () => {
   // if (loading && allContent.length === 0) return null;
 
   const handleLike = (contentId: string) => {
-    // Update likes optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
+    // Update likes optimistically via engagement hook
   };
 
   const handleFollow = (contentId: string) => {
     // Update follow status optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
   };
 
   // Handle media click from DiscoverContent - opens unified fullscreen player
@@ -195,6 +242,7 @@ const Discover = () => {
     // Find the index if not provided
     const clickedIndex = index ?? allContent.findIndex(c => c.id === item.id);
     if (clickedIndex !== -1) {
+      setCurrentFullscreenPostId(item.id); // Set initial post
       openFullscreen(allContent, clickedIndex);
     }
   }, [allContent, openFullscreen]);
