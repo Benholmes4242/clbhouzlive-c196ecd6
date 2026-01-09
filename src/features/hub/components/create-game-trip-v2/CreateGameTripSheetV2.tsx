@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
 import { useCreateGame } from '../../hooks/useCreateGame';
 import { useCreateTrip } from '../../hooks/useCreateTrip';
+import { HubSharePanel, ShareEntityType } from '../share/HubSharePanel';
 
 import { ModeToggle } from './ModeToggle';
 import { HeroStartCard } from './HeroStartCard';
@@ -75,6 +76,12 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
   const [showPlayersPicker, setShowPlayersPicker] = useState(false);
   const [showTripDatesPicker, setShowTripDatesPicker] = useState(false);
   const [coursePickerContext, setCoursePickerContext] = useState<'game' | 'trip-add'>('game');
+  
+  // Share panel state
+  const [showSharePanel, setShowSharePanel] = useState(false);
+  const [createdEntityId, setCreatedEntityId] = useState<string | null>(null);
+  const [createdEntityType, setCreatedEntityType] = useState<ShareEntityType>('game');
+  const [createdEntityName, setCreatedEntityName] = useState<string>('');
   
   // Loading state
   // Mutations
@@ -241,8 +248,13 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
           notes: gameNotes || undefined,
         };
         
-        await createGameMutation.mutateAsync(draft);
-        toast.success('Game created!');
+        const result = await createGameMutation.mutateAsync(draft);
+        
+        // Open share panel
+        setCreatedEntityId(result.gameId);
+        setCreatedEntityType('game');
+        setCreatedEntityName(gameCourse!.name);
+        setShowSharePanel(true);
       } else {
         const draft: TripDraft = {
           startDate: tripStartDate!,
@@ -254,11 +266,14 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
           itinerary: tripItinerary,
         };
         
-        await createTripMutation.mutateAsync(draft);
-        toast.success('Trip created!');
+        const result = await createTripMutation.mutateAsync(draft);
+        
+        // Open share panel
+        setCreatedEntityId(result.tripId);
+        setCreatedEntityType('trip');
+        setCreatedEntityName(tripItinerary[0]?.courseName || 'Golf Trip');
+        setShowSharePanel(true);
       }
-      
-      onClose();
     } catch (error) {
       console.error('Creation failed:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to create');
@@ -267,8 +282,14 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
     canCreate, mode, gameCourse, gamePlayers, maxPlayers, gameVisibility,
     gameDate, gameTime, gameHoles, gameType, gameNotes,
     tripStartDate, tripEndDate, tripVisibility, tripAttendees, tripNotes, tripItinerary,
-    createGameMutation, createTripMutation, onClose
+    createGameMutation, createTripMutation
   ]);
+  
+  const handleSharePanelClose = useCallback(() => {
+    setShowSharePanel(false);
+    setCreatedEntityId(null);
+    onClose();
+  }, [onClose]);
   
   if (!isOpen) return null;
   
@@ -491,6 +512,18 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             endDate={tripEndDate}
             onSave={handleTripDatesChange}
           />
+          
+          {/* Share Panel - shown after creation */}
+          {createdEntityId && (
+            <HubSharePanel
+              isOpen={showSharePanel}
+              onClose={handleSharePanelClose}
+              entityType={createdEntityType}
+              entityId={createdEntityId}
+              entityName={createdEntityName}
+              context="hub"
+            />
+          )}
         </>
       )}
     </AnimatePresence>,
