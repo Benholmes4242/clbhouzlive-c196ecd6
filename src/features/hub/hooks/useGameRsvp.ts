@@ -7,6 +7,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { 
+  useSendRsvpNotification, 
+  formatGameDateForNotification 
+} from './useGameNotifications';
 
 export type RsvpStatus = 'going' | 'maybe' | 'declined' | 'invited';
 
@@ -30,10 +34,16 @@ export interface GameRsvpData {
     displayName?: string;
     avatarUrl?: string;
   }[];
+  _gameData?: {
+    hostUserId: string;
+    courseName: string | null;
+    startTime: string;
+  };
 }
 
 export function useGameRsvp(gameId: string | undefined) {
   const queryClient = useQueryClient();
+  const sendRsvpNotification = useSendRsvpNotification();
 
   const query = useQuery({
     queryKey: ['game-rsvp', gameId],
@@ -46,7 +56,7 @@ export function useGameRsvp(gameId: string | undefined) {
       // Get game to check if user is host
       const { data: game, error: gameError } = await supabase
         .from('games')
-        .select('host_user_id')
+        .select('host_user_id, course_name, start_time')
         .eq('id', gameId)
         .single();
 
@@ -106,6 +116,12 @@ export function useGameRsvp(gameId: string | undefined) {
         isHost,
         counts,
         participants: mappedParticipants,
+        // Store game data for notifications
+        _gameData: {
+          hostUserId: game.host_user_id,
+          courseName: game.course_name,
+          startTime: game.start_time,
+        },
       };
     },
     enabled: !!gameId,
@@ -118,6 +134,13 @@ export function useGameRsvp(gameId: string | undefined) {
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
+
+      // Get user's display name for notifications
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
 
       // Upsert participant with new RSVP status
       const { error } = await supabase
@@ -138,9 +161,9 @@ export function useGameRsvp(gameId: string | undefined) {
         );
 
       if (error) throw error;
-      return newStatus;
+      return { newStatus, playerName: userProfile?.display_name || 'Someone' };
     },
-    onSuccess: (newStatus) => {
+    onSuccess: ({ newStatus, playerName }) => {
       queryClient.invalidateQueries({ queryKey: ['game-rsvp', gameId] });
       queryClient.invalidateQueries({ queryKey: ['user-games'] });
       
@@ -151,6 +174,27 @@ export function useGameRsvp(gameId: string | undefined) {
         invited: "RSVP cleared",
       };
       toast.success(messages[newStatus]);
+
+      // Send RSVP notification for "going" status
+      if (newStatus === 'going' && query.data?._gameData) {
+        const gameData = query.data._gameData;
+        // Recipients: host + other participants who are going (friends in game)
+        const recipientUserIds = [
+          gameData.hostUserId,
+          ...query.data.participants
+            .filter(p => p.userId && p.rsvpStatus === 'going')
+            .map(p => p.userId!)
+        ].filter((id, idx, arr) => arr.indexOf(id) === idx); // Dedupe
+
+        sendRsvpNotification.mutate({
+          gameId: gameId!,
+          newStatus,
+          playerName,
+          courseName: gameData.courseName || 'Golf Game',
+          date: formatGameDateForNotification(gameData.startTime),
+          recipientUserIds,
+        });
+      }
     },
     onError: (error) => {
       console.error('Failed to update RSVP:', error);

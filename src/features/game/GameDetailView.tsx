@@ -299,6 +299,8 @@ export default function GameDetailView() {
         isOpen={inviteOpen}
         onClose={() => setInviteOpen(false)}
         gameId={id!}
+        courseName={game.course_name}
+        startTime={game.start_time}
         onInviteSuccess={refetch}
       />
 
