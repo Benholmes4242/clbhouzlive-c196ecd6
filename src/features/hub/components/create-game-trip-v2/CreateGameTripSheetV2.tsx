@@ -298,7 +298,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             style={{
               height: '80svh',
               maxHeight: '80svh',
-              backgroundColor: '#F7F4EE',
+              backgroundColor: '#F8FAFC',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
             }}
           >
