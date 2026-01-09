@@ -9,6 +9,7 @@ import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { haptic } from '@/utils/haptics';
 import { format, isToday, isTomorrow } from 'date-fns';
+import { HUB_DEMO_MODE, MOCK_NEARBY_GAMES } from '../hubDemoConfig';
 
 function formatShortDate(isoDate: string): string {
   const date = new Date(isoDate);
@@ -18,8 +19,13 @@ function formatShortDate(isoDate: string): string {
 }
 
 export function ActiveGamesNearYouTile() {
-  const { data: allGames = [], isLoading } = useGamesQuery();
+  const { data: realGames = [], isLoading: realLoading } = useGamesQuery();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  
+  // Use demo data when flag is on
+  const allGames = HUB_DEMO_MODE ? MOCK_NEARBY_GAMES : realGames;
+  const isLoading = HUB_DEMO_MODE ? false : realLoading;
+  const gamesCount = allGames.length;
   
   // Get the first nearby game
   const nearbyGame = allGames[0];
@@ -51,6 +57,19 @@ export function ActiveGamesNearYouTile() {
         >
           Active Games<br/>Near You
         </div>
+        
+        {/* Games count badge */}
+        {gamesCount > 0 && (
+          <div 
+            className="absolute top-3 right-3 h-6 min-w-[24px] px-2 rounded-full flex items-center justify-center text-[13px] font-bold"
+            style={{
+              background: '#2F7CFF',
+              color: 'white',
+            }}
+          >
+            {gamesCount}
+          </div>
+        )}
 
         <div className="mt-auto">
           {isLoading ? (

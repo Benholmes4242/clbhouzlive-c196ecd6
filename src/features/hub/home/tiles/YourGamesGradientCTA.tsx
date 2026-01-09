@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { haptic } from '@/utils/haptics';
+import { HUB_DEMO_MODE, MOCK_YOUR_GAMES_SUMMARY } from '../hubDemoConfig';
 
 interface YourGamesGradientCTAProps {
   className?: string;
@@ -57,7 +58,9 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
             className="text-[13px] mt-0.5"
             style={{ color: 'var(--hub-text-muted)' }}
           >
-            Trips, matches, games, and getaways – your golf diary for everything ahead.
+            {HUB_DEMO_MODE 
+              ? `${MOCK_YOUR_GAMES_SUMMARY.nextGameSummary} · ${MOCK_YOUR_GAMES_SUMMARY.nextTripSummary} + ${MOCK_YOUR_GAMES_SUMMARY.upcomingCount} more`
+              : 'Trips, matches, games, and getaways – your golf diary for everything ahead.'}
           </div>
         </div>
       </button>
