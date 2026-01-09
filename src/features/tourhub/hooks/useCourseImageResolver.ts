@@ -56,12 +56,14 @@ function calculateSimilarity(a: string, b: string): number {
 }
 
 // Boost score for primary/championship variants
+// Black Course is typically the primary tournament course at Tiburon
 function getVariantBoost(courseName: string): number {
   const lower = courseName.toLowerCase();
+  if (lower.includes(' black ')) return 120;  // Tiburon Black Course is primary
   if (lower.includes(' south ')) return 100;
   if (lower.includes(' championship ')) return 90;
-  if (lower.includes(' black ')) return 80;
-  if (lower.includes(' stadium ')) return 75;
+  if (lower.includes(' stadium ')) return 85;
+  if (lower.includes(' players ')) return 80;
   if (lower.includes(' north ')) return 70;
   if (lower.includes(' gold ')) return 60;
   if (lower.includes(' links ')) return 50;
@@ -108,14 +110,11 @@ export function useCourseImageResolver(venues: VenueInput[]) {
       
       // Resolve uncached venues
       if (uncached.length > 0) {
-        // Fetch potential matches from golf_courses
-        const countries = [...new Set(uncached.map(v => v.country).filter(Boolean))];
-        
+        // Fetch ALL courses that could match (don't filter by country here - do it in matching)
         const { data: courses } = await supabase
           .from('golf_courses')
           .select('id, name, thumbnail_image, country, sub_country')
-          .in('country', countries.length ? countries as string[] : ['USA'])
-          .limit(800);
+          .limit(2000);
         
         if (courses) {
           for (const venue of uncached) {
@@ -130,12 +129,12 @@ export function useCourseImageResolver(venues: VenueInput[]) {
             }
             
             // Find best match
-            let bestMatch: { course: typeof courses[0]; score: number; boost: number } | null = null;
+            let bestMatch: { course: typeof courses[0]; score: number; boost: number; exactMatch: boolean; countryMatch: boolean } | null = null;
             const candidates: { name: string; score: number; boost: number }[] = [];
             
             for (const course of courses) {
-              // Skip if different country
-              if (venue.country && course.country !== venue.country) continue;
+              // Prefer same country, but don't exclude entirely
+              const countryMatch = !venue.country || course.country === venue.country;
               
               const courseBase = courseBaseName(course.name);
               const score = calculateSimilarity(searchName, course.name);
@@ -145,14 +144,19 @@ export function useCourseImageResolver(venues: VenueInput[]) {
               const baseScore = calculateSimilarity(searchBase, courseBase);
               const finalScore = Math.max(score, baseScore);
               
+              // If base names match exactly (e.g., "tiburon" vs "tiburon"), that's a strong signal
+              const exactBaseMatch = courseNormalize(searchBase) === courseNormalize(courseBase);
+              const exactBonus = exactBaseMatch ? 50 : 0;
+              
               candidates.push({ name: course.name, score: finalScore, boost });
               
-              // Combined score: similarity * 100 + variant boost
-              const combinedScore = finalScore * 100 + boost;
-              const bestCombined = bestMatch ? (bestMatch.score * 100 + bestMatch.boost) : 0;
+              // Combined score: similarity * 100 + variant boost + exact match bonus + country bonus
+              const countryBonus = countryMatch ? 10 : 0;
+              const combinedScore = finalScore * 100 + boost + exactBonus + countryBonus;
+              const bestCombined = bestMatch ? (bestMatch.score * 100 + bestMatch.boost + (bestMatch.exactMatch ? 50 : 0) + (bestMatch.countryMatch ? 10 : 0)) : 0;
               
-              if (combinedScore > bestCombined && finalScore >= 0.4) {
-                bestMatch = { course, score: finalScore, boost };
+              if (combinedScore > bestCombined && finalScore >= 0.35) {
+                bestMatch = { course, score: finalScore, boost, exactMatch: exactBaseMatch, countryMatch };
               }
             }
             
