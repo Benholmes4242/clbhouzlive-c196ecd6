@@ -36,7 +36,7 @@ export function UpcomingTab({ searchQuery, onCreateGame, onClose }: UpcomingTabP
 
   const handleGameTap = (game: UserGame) => {
     onClose();
-    navigate(`/hub/game/${game.id}?tab=overview`);
+    navigate(`/game/${game.id}?tab=overview`);
   };
 
   if (isLoading) {

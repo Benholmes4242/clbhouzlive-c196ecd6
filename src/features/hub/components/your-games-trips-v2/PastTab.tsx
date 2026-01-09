@@ -32,7 +32,7 @@ export function PastTab({ searchQuery, onClose }: PastTabProps) {
 
   const handleGameTap = (game: UserGame) => {
     onClose();
-    navigate(`/hub/game/${game.id}?tab=overview`);
+    navigate(`/game/${game.id}?tab=overview`);
   };
 
   if (isLoading) {
