@@ -78,10 +78,14 @@ export function ActiveGamesNearYouTile() {
           <MapPin className="w-4 h-4" style={{ color: 'var(--hub-badge-green-text)' }} />
         </div>
 
-        {/* Title */}
+        {/* Title - V2 typography polish */}
         <div 
-          className="text-[14px] font-semibold leading-[1.2]"
-          style={{ color: 'var(--hub-text)' }}
+          className="text-[14px] font-semibold"
+          style={{ 
+            color: 'var(--hub-text)',
+            lineHeight: '1.1',
+            letterSpacing: '-0.2px',
+          }}
         >
           Active Games<br/>Near You
         </div>
@@ -127,13 +131,15 @@ export function ActiveGamesNearYouTile() {
                 {formatShortDate(nearbyGame.start_time)}
               </div>
 
-              {/* V2 Mini progress pill */}
+              {/* V2 Mini progress pill - matches Create Sheet chips */}
               <div 
-                className="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-1.5"
+                className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold mt-1.5"
                 style={{
                   background: 'rgba(15, 23, 42, 0.04)',
-                  color: 'var(--hub-text-dim)',
+                  color: 'rgba(15, 23, 42, 0.75)',
                   border: '1px solid rgba(15, 23, 42, 0.06)',
+                  padding: '2px 8px',
+                  borderRadius: '999px',
                 }}
               >
                 {slotsLabel}

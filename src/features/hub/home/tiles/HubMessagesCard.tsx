@@ -75,9 +75,13 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
             >
               Messages
             </div>
+            {/* V2 snippet - slightly larger, editorial feel */}
             <div 
-              className="text-[12px] mt-0.5 line-clamp-1"
-              style={{ color: 'var(--hub-text-muted)' }}
+              className="mt-0.5 line-clamp-1"
+              style={{ 
+                color: 'var(--hub-text-dim)', 
+                fontSize: '12.5px',
+              }}
             >
               {hasMessages
                 ? (() => {

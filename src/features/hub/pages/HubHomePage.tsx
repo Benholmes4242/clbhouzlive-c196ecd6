@@ -199,10 +199,11 @@ export function HubHomePage() {
         <div 
           className="flex-1 flex flex-col overflow-hidden"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)', // Reduced from 8px
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)',
+            paddingBottom: '80px', // Extra padding to prevent dock overlap
           }}
         >
-          <div className="px-5 flex flex-col gap-[12px] flex-1"> {/* Standardized to 12px gap */}
+          <div className="px-5 flex flex-col gap-[12px] flex-1">
             {/* Show skeleton while loading, real content when ready */}
             {!isDataReady ? (
               <HubContentSkeleton />
