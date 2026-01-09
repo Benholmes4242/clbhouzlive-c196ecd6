@@ -32,29 +32,25 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-[18px] text-left transition-all duration-150 active:scale-[0.99] active:opacity-90"
+      className="w-full flex items-center gap-3 pl-3 pr-3 py-3 rounded-[20px] text-left transition-all duration-150 active:scale-[0.99] active:opacity-90"
       style={{
         background: isPrimary 
-          ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.05) 0%, rgba(255, 180, 100, 0.02) 100%)'
+          ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.06) 0%, rgba(255, 180, 100, 0.03) 100%)'
           : 'rgba(255, 255, 255, 0.85)',
-        border: isPrimary 
-          ? '1px solid rgba(255, 140, 60, 0.25)'
-          : '1px solid rgba(0, 0, 0, 0.04)',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
         boxShadow: isPrimary
-          ? '0 2px 8px rgba(255, 140, 60, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
-          : '0 1px 3px rgba(0, 0, 0, 0.04)',
+          ? '0 2px 8px rgba(255, 140, 60, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03)'
+          : '0 1px 3px rgba(0, 0, 0, 0.03)',
       }}
     >
-      {/* Icon circle - aligned with text baseline */}
+      {/* Icon circle */}
       <div 
         className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
         style={{
           background: isPrimary 
-            ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.15) 0%, rgba(255, 160, 90, 0.1) 100%)'
+            ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.14) 0%, rgba(255, 160, 90, 0.08) 100%)'
             : 'rgba(0, 0, 0, 0.03)',
-          border: isPrimary 
-            ? '1px solid rgba(255, 140, 60, 0.2)' 
-            : '1px solid rgba(0, 0, 0, 0.04)',
+          border: '1px solid rgba(0, 0, 0, 0.04)',
         }}
       >
         {icon}
@@ -70,16 +66,16 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
         </div>
         <div 
           className="text-[12.5px] mt-px truncate"
-          style={{ color: 'var(--hub-text-dim)', opacity: 0.7 }}
+          style={{ color: 'var(--hub-text-dim)', opacity: 0.65 }}
         >
           {subtitle}
         </div>
       </div>
 
-      {/* Chevron - lighter and smaller */}
+      {/* Chevron - consistent positioning */}
       <ChevronRight 
-        className="flex-shrink-0 w-4 h-4"
-        style={{ color: 'var(--hub-text-dim)', opacity: 0.35 }}
+        className="flex-shrink-0 w-4 h-4 mr-0.5"
+        style={{ color: 'var(--hub-text-dim)', opacity: 0.3 }}
       />
     </button>
   );
@@ -145,13 +141,13 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - lighter for context */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/40 z-[10001]"
+            className="fixed inset-0 bg-black/25 z-[10001]"
             style={{ touchAction: 'none' }}
             onClick={onClose}
           />
@@ -196,11 +192,11 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
               </p>
             </div>
 
-            {/* Section label */}
-            <div className="px-5 pb-2">
+            {/* Section label - subtle */}
+            <div className="px-5 pb-1.5">
               <span 
-                className="text-[10.5px] font-medium uppercase tracking-wider"
-                style={{ color: 'var(--hub-text-dim)', opacity: 0.5 }}
+                className="text-[10px] font-medium uppercase tracking-wide"
+                style={{ color: 'var(--hub-text-dim)', opacity: 0.4 }}
               >
                 Quick actions
               </span>
