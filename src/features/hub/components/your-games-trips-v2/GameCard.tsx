@@ -9,6 +9,7 @@ import { Bell, MoreHorizontal, Users, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { UserGame } from '../../hooks/useUserGamesTrips';
 import type { RsvpStatus } from './types';
+import { RsvpPill } from '../rsvp';
 
 interface GameCardProps {
   game: UserGame;
@@ -24,26 +25,6 @@ function formatGameDate(dateStr: string): string {
   return format(date, 'EEE, MMM d · h:mm a');
 }
 
-function getRsvpLabel(rsvp: RsvpStatus | null): string {
-  switch (rsvp) {
-    case 'going': return 'Going';
-    case 'maybe': return 'Maybe';
-    case 'declined': return 'Declined';
-    case 'invited': return 'Invited';
-    default: return '';
-  }
-}
-
-function getRsvpColor(rsvp: RsvpStatus | null): string {
-  switch (rsvp) {
-    case 'going': return 'rgba(34, 197, 94, 0.85)';
-    case 'maybe': return 'rgba(234, 179, 8, 0.85)';
-    case 'declined': return 'rgba(239, 68, 68, 0.7)';
-    case 'invited': return 'rgba(59, 130, 246, 0.75)';
-    default: return 'rgba(100, 116, 139, 0.6)';
-  }
-}
-
 function getStatusChip(status: string): { label: string; bg: string; color: string } | null {
   switch (status) {
     case 'live':
@@ -57,7 +38,6 @@ function getStatusChip(status: string): { label: string; bg: string; color: stri
 
 export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
   const statusChip = getStatusChip(game.status);
-  const rsvpLabel = getRsvpLabel(game.currentUserRsvp);
 
   if (variant === 'hero') {
     return (
@@ -105,13 +85,8 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* RSVP status */}
-            {rsvpLabel && (
-              <span 
-                className="text-[12px] font-medium"
-                style={{ color: getRsvpColor(game.currentUserRsvp) }}
-              >
-                You: {rsvpLabel}
-              </span>
+            {game.currentUserRsvp && (
+              <RsvpPill status={game.currentUserRsvp} size="md" />
             )}
             
             {/* Attendance summary */}
@@ -170,10 +145,10 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
           style={{ color: 'rgba(30, 41, 59, 0.55)' }}
         >
           <span>{formatGameDate(game.startsAt)}</span>
-          {rsvpLabel && (
+          {game.currentUserRsvp && (
             <>
               <span>·</span>
-              <span style={{ color: getRsvpColor(game.currentUserRsvp) }}>{rsvpLabel}</span>
+              <RsvpPill status={game.currentUserRsvp} size="sm" />
             </>
           )}
         </div>
