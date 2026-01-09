@@ -48,7 +48,7 @@ export function EchoTile() {
             className="text-[12px] mt-1 leading-snug"
             style={{ color: 'var(--hub-text-muted)' }}
           >
-            Ask anything — courses, gear, rules, shots
+            Ask anything – courses, gear, rules, shots.
           </div>
         </div>
       </button>

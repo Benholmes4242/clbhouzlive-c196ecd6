@@ -44,13 +44,13 @@ export function UpNextHeroTile() {
     return FALLBACK_HERO;
   }, [nextGame, imageError]);
 
-  // Loading skeleton - 10% taller (165px)
+  // Loading skeleton - compact 150px
   if (isLoading) {
     return (
       <div 
         className="relative rounded-[26px] overflow-hidden"
         style={{
-          height: '165px',
+          height: '150px',
           background: 'var(--hub-skeleton-base)',
         }}
       >
@@ -72,7 +72,7 @@ export function UpNextHeroTile() {
       <button 
         className="relative w-full rounded-[26px] overflow-hidden text-left transition-transform active:scale-[0.98]"
         style={{
-          height: '165px',
+          height: '150px',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
         }}
         onClick={openViewGame}
