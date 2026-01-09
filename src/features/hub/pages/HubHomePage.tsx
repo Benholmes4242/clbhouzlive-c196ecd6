@@ -193,8 +193,9 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            // Bottom padding: dock (55px) + button overhang (24px) + gap (12px) = 91px
-            paddingBottom: `calc(91px + env(safe-area-inset-bottom, 0px))`,
+            // Bottom: orange button top is 32px above dock top. For 12px gap: 55 + 32 + 12 = 99px
+            // But gap is too big currently, so reduce to let content get closer
+            paddingBottom: `calc(67px + env(safe-area-inset-bottom, 0px))`,
           }}
         >
           <div className="px-5 flex flex-col gap-3 flex-1">
