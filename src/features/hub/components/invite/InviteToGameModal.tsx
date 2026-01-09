@@ -39,7 +39,33 @@ export function InviteToGameModal({
   const { searchInput, setSearchInput, users, isLoading } = useInviteSearch(gameId);
   const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
   const [invitingId, setInvitingId] = useState<string | null>(null);
+  const [gameData, setGameData] = useState<{ courseName: string; startTime: string } | null>(null);
   const sendGameInviteNotification = useSendGameInviteNotification();
+
+  // Fetch game data if not provided via props (ensures notifications never silently fail)
+  useEffect(() => {
+    if (isOpen && gameId && (!courseName || !startTime)) {
+      supabase
+        .from('games')
+        .select('course_name, start_time')
+        .eq('id', gameId)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setGameData({
+              courseName: data.course_name || 'Golf Game',
+              startTime: data.start_time,
+            });
+          }
+        });
+    } else if (courseName && startTime) {
+      // Use props if provided
+      setGameData({
+        courseName,
+        startTime: typeof startTime === 'string' ? startTime : startTime.toISOString(),
+      });
+    }
+  }, [isOpen, gameId, courseName, startTime]);
 
   // Lock body scroll
   useEffect(() => {
@@ -67,6 +93,7 @@ export function InviteToGameModal({
     if (!isOpen) {
       setSearchInput('');
       setInvitedIds(new Set());
+      setGameData(null);
     }
   }, [isOpen, setSearchInput]);
 
@@ -100,13 +127,13 @@ export function InviteToGameModal({
         setInvitedIds(prev => new Set([...prev, user.id]));
         toast.success(`Invited ${user.displayName}`);
         
-        // Send game invite notification
-        if (courseName && startTime) {
-          const startDate = typeof startTime === 'string' ? new Date(startTime) : startTime;
+        // Send game invite notification (always works - uses fetched data if props missing)
+        if (gameData) {
+          const startDate = new Date(gameData.startTime);
           sendGameInviteNotification.mutate({
             gameId,
             invitedUserIds: [user.id],
-            courseName,
+            courseName: gameData.courseName,
             date: formatGameDateForNotification(startDate),
             time: formatGameTimeForNotification(startDate),
           });
@@ -120,7 +147,7 @@ export function InviteToGameModal({
     } finally {
       setInvitingId(null);
     }
-  }, [gameId, courseName, startTime, onInviteSuccess, sendGameInviteNotification]);
+  }, [gameId, gameData, onInviteSuccess, sendGameInviteNotification]);
 
   if (!isOpen) return null;
 
