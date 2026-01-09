@@ -91,7 +91,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               letterSpacing: '-0.01em',
             }}
           >
-            Your home of golf.
+            Stay in play.
           </h1>
           <p 
             className="text-[15px] text-white/70 max-w-[280px]"
