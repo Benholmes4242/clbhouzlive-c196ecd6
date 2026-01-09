@@ -161,13 +161,13 @@ export function YourGamesTripsSheetV2({
             onClick={handleClose}
           />
 
-          {/* Sheet */}
+          {/* Sheet - add class for stacked depth effect */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden"
+            className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${gameSheetOpen ? 'stacked-behind' : ''}`}
             style={{
               height: '85svh',
               maxHeight: '85svh',

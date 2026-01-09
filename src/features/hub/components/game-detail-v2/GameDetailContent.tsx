@@ -1,10 +1,15 @@
 /**
  * GameDetailContent - Shared content component for game detail sheet & page
  * Reusable between GameDetailSheetV2 and GameDetailView
+ * 
+ * V2 Design:
+ * - Glass cards with premium styling
+ * - Matched pill tabs
+ * - Consistent spacing
  */
 
 import React, { useState } from 'react';
-import { MapPin, Users, Clock, MoreVertical, Bell, UserPlus, Flag, ExternalLink } from 'lucide-react';
+import { MapPin, Users, Clock, MoreVertical, Bell, UserPlus, Flag, ExternalLink, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +24,7 @@ import { InviteToGameModal } from '@/features/hub/components/invite/InviteToGame
 import { GameRemindersSheet } from '@/features/hub/components/reminders/GameRemindersSheet';
 import { EndGameSheet } from '@/features/hub/components/game/EndGameSheet';
 import { GameMessagesTab } from '@/features/game/GameMessagesTab';
+import { GameDetailTabPills } from './GameDetailTabPills';
 import type { RsvpStatus, GameRsvpData } from '@/features/hub/hooks/useGameRsvp';
 
 // Types for game data - made flexible to match various sources
@@ -84,6 +90,58 @@ function RsvpStatusLabel({ status }: { status: RsvpStatus | string | null }) {
   );
 }
 
+// V2 Glass Card component for details
+function DetailCard({ 
+  icon: Icon, 
+  title, 
+  subtitle,
+  accent = false,
+}: { 
+  icon: React.ElementType; 
+  title: string; 
+  subtitle?: string;
+  accent?: boolean;
+}) {
+  return (
+    <div 
+      className="flex items-center gap-3.5 p-4 rounded-2xl transition-all"
+      style={{
+        background: 'rgba(255, 255, 255, 0.7)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
+        border: '1px solid rgba(0, 0, 0, 0.03)',
+      }}
+    >
+      <div 
+        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{
+          background: accent ? 'rgba(59, 130, 246, 0.08)' : 'rgba(0, 0, 0, 0.03)',
+        }}
+      >
+        <Icon 
+          className="w-5 h-5" 
+          style={{ color: accent ? 'rgb(59, 130, 246)' : 'rgba(30, 41, 59, 0.45)' }} 
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div 
+          className="font-medium text-[14px] leading-snug"
+          style={{ color: '#1e293b' }}
+        >
+          {title}
+        </div>
+        {subtitle && (
+          <div 
+            className="text-[12px] mt-0.5"
+            style={{ color: 'rgba(30, 41, 59, 0.5)' }}
+          >
+            {subtitle}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function GameDetailContent({
   game,
   participants,
@@ -103,20 +161,17 @@ export function GameDetailContent({
 
   const isHost = !!currentUserId && game.host_user_id === currentUserId;
   const isCompleted = game.status === 'completed';
-  const slotsFilledText = `${game.slots_total - game.slots_open}/${game.slots_total} filled`;
-
-  const tabs: { key: 'details' | 'messages' | 'participants'; label: string }[] = [
-    { key: 'details', label: 'Details' },
-    { key: 'messages', label: 'Messages' },
-    { key: 'participants', label: `Participants (${participants.length})` },
-  ];
+  const slotsFilled = game.slots_total - game.slots_open;
+  const slotsAvailableText = game.slots_open > 0 
+    ? `${game.slots_open} ${game.slots_open === 1 ? 'spot' : 'spots'} available` 
+    : 'Game full';
 
   return (
     <>
       {/* Completed banner */}
       {isCompleted && (
         <div 
-          className="px-5 py-2 text-center"
+          className="px-5 py-2 text-center flex-shrink-0"
           style={{ background: 'rgba(0,0,0,0.03)' }}
         >
           <p className="text-xs text-muted-foreground">This game has ended</p>
@@ -124,14 +179,14 @@ export function GameDetailContent({
       )}
 
       {/* Header actions row */}
-      <div className="flex items-center justify-end gap-2 px-5 py-2">
+      <div className="flex items-center justify-end gap-2 px-5 py-2 flex-shrink-0">
         {/* Invite button */}
         <Button
           variant="outline"
           size="sm"
           onClick={() => setInviteOpen(true)}
           disabled={isCompleted}
-          className="h-8 gap-1.5 text-xs"
+          className="h-8 gap-1.5 text-xs rounded-full border-black/10 hover:bg-black/5"
         >
           <UserPlus className="w-3.5 h-3.5" />
           Invite
@@ -178,66 +233,64 @@ export function GameDetailContent({
         </DropdownMenu>
       </div>
 
-      {/* Pill tabs */}
-      <div className="flex gap-2 px-5 pb-3">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => onTabChange(tab.key)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
-            style={{
-              background: activeTab === tab.key 
-                ? 'rgba(0,0,0,0.06)' 
-                : 'transparent',
-              color: activeTab === tab.key 
-                ? '#1e293b' 
-                : 'rgba(30,41,59,0.5)',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Pill tabs - matching V2 design */}
+      <div className="px-5 pb-3 flex-shrink-0">
+        <GameDetailTabPills
+          activeTab={activeTab}
+          onTabChange={onTabChange}
+          participantCount={participants.length}
+        />
       </div>
 
       {/* Tab content */}
       <div className="flex-1 overflow-y-auto px-5 pb-24">
         {activeTab === 'details' && (
           <div className="space-y-3">
+            {/* Location Card */}
             {game.course_name && (
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/60">
-                <MapPin className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-sm">{game.course_name}</div>
-                </div>
-              </div>
+              <DetailCard
+                icon={MapPin}
+                title={game.course_name}
+                accent
+              />
             )}
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/60">
-              <Clock className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-              <div>
-                <div className="font-medium text-sm">
-                  {format(new Date(game.start_time), 'EEEE, MMMM d, yyyy')}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {format(new Date(game.start_time), 'h:mm a')}
-                </div>
-              </div>
-            </div>
+            {/* Date & Time Card */}
+            <DetailCard
+              icon={Calendar}
+              title={format(new Date(game.start_time), 'EEEE, MMMM d, yyyy')}
+              subtitle={format(new Date(game.start_time), 'h:mm a')}
+            />
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/60">
-              <Users className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-              <div>
-                <div className="font-medium text-sm">{slotsFilledText}</div>
-                <div className="text-xs text-muted-foreground">
-                  {game.slots_open > 0 ? `${game.slots_open} seats available` : 'Game full'}
-                </div>
-              </div>
-            </div>
+            {/* Slots Card */}
+            <DetailCard
+              icon={Users}
+              title={`${slotsFilled}/${game.slots_total} players`}
+              subtitle={slotsAvailableText}
+            />
 
+            {/* Note */}
             {game.note && (
-              <div className="p-3 rounded-xl bg-white/60">
-                <div className="text-xs font-medium text-muted-foreground mb-1">Note</div>
-                <p className="text-sm">{game.note}</p>
+              <div 
+                className="p-4 rounded-2xl"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
+                  border: '1px solid rgba(0, 0, 0, 0.03)',
+                }}
+              >
+                <div 
+                  className="text-[11px] font-medium uppercase tracking-wide mb-1.5"
+                  style={{ color: 'rgba(30, 41, 59, 0.4)' }}
+                >
+                  Note from host
+                </div>
+                <p 
+                  className="text-[14px] leading-relaxed"
+                  style={{ color: '#1e293b' }}
+                >
+                  {game.note}
+                </p>
               </div>
             )}
           </div>
@@ -263,7 +316,12 @@ export function GameDetailContent({
                 return (
                   <div
                     key={participant.id}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-white/60"
+                    className="flex items-center gap-3 p-3.5 rounded-2xl"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.7)',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                      border: '1px solid rgba(0, 0, 0, 0.03)',
+                    }}
                   >
                     <div className="relative">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
@@ -301,11 +359,12 @@ export function GameDetailContent({
       {/* RSVP Footer */}
       {!rsvpLoading && rsvpData && (
         <div 
-          className="absolute bottom-0 left-0 right-0 px-5 py-3 border-t"
+          className="absolute bottom-0 left-0 right-0 px-5 py-3"
           style={{ 
             background: 'rgba(249, 250, 251, 0.95)',
             backdropFilter: 'blur(12px)',
-            borderColor: 'rgba(0,0,0,0.06)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderTop: '1px solid rgba(0,0,0,0.06)',
           }}
         >
           {isCompleted ? (
