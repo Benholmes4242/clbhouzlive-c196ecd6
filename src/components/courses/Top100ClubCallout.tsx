@@ -77,6 +77,8 @@ const Top100ClubCallout: React.FC = () => {
                       currentProgress={coursesPlayed}
                       title={club.tierName || 'Top 100 Club'}
                       compact
+                      enableAnimations={false}
+                      quality="low"
                     />
                   </div>
                 )}

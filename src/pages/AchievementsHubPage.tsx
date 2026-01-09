@@ -203,6 +203,8 @@ const AchievementsHubPage: React.FC = () => {
                     currentProgress={totalTop100Played}
                     title={milestone.shortLabel}
                     subtitle={milestone.label}
+                    enableAnimations={false}
+                    quality="medium"
                   />
                 );
               })}
@@ -239,6 +241,8 @@ const AchievementsHubPage: React.FC = () => {
                     targetProgress={total}
                     title={list.shortLabel}
                     subtitle={`${played} / ${total} courses`}
+                    enableAnimations={false}
+                    quality="medium"
                   />
                 );
               })}
