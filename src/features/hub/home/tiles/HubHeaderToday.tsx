@@ -39,7 +39,7 @@ export function HubHeaderToday() {
   };
 
   return (
-    <header className="pt-1 pb-1">
+    <header className="pt-1 pb-2">
       <div className="flex items-center justify-between gap-3">
         {/* Greeting - V2 responsive sizing with tighter tracking + line-height */}
         <h1 
