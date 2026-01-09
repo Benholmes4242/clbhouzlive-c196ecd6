@@ -1,16 +1,17 @@
 /**
- * HubFloatingDock - Floating rounded dock with center blue plus
- * Replaces standard bottom nav
+ * HubFloatingDock - Bottom-anchored dock with center camera button
+ * Links to create moment modal
  */
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Search, User, Calendar, Sparkles } from 'lucide-react';
+import { Camera, Search, User, Plus, Sparkles } from 'lucide-react';
 import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
 import { HubGamesHubSheet } from '../../components/HubGamesHubSheet';
+import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 
 interface DockItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -60,6 +61,7 @@ export function HubFloatingDock() {
   const { close } = useHub();
   const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
   const [isGamesHubOpen, setIsGamesHubOpen] = useState(false);
+  const [isCreateMomentOpen, setIsCreateMomentOpen] = useState(false);
 
   const handleNavigate = (path: string, external = false) => {
     haptic('light');
@@ -74,6 +76,11 @@ export function HubFloatingDock() {
     setIsGamesHubOpen(true);
   };
 
+  const handleCreateMoment = () => {
+    haptic('medium');
+    setIsCreateMomentOpen(true);
+  };
+
   const handleEcho = () => {
     haptic('light');
     setIsEchoSheetOpen(true);
@@ -81,31 +88,26 @@ export function HubFloatingDock() {
 
   return (
     <>
-      {/* Anchored dock - sticky at bottom, not floating */}
+      {/* Anchored dock - full width at bottom, no background */}
       <nav 
-        className="sticky bottom-0 left-0 right-0 z-[10000] flex justify-center"
+        className="sticky bottom-0 left-0 right-0 z-[10000] w-full"
         style={{ 
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          paddingLeft: '16px',
-          paddingRight: '16px',
-          paddingTop: '8px',
-          background: 'transparent',
         }}
       >
         <div 
-          className="w-full max-w-[430px] h-[72px] rounded-[32px] flex items-center justify-between px-4"
+          className="w-full h-[72px] flex items-center justify-between px-4"
           style={{
-            background: 'rgba(255, 255, 255, 0.85)',
+            background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(0, 0, 0, 0.05)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.08)',
+            borderTop: '1px solid rgba(0, 0, 0, 0.05)',
           }}
         >
-          {/* Left items: Your Games, Search */}
+          {/* Left items: Create Game, Search */}
           <DockItem 
-            icon={Calendar} 
-            label="Your Games" 
+            icon={Plus} 
+            label="Create Game" 
             onClick={handleCreateGame}
           />
           <DockItem 
@@ -114,7 +116,7 @@ export function HubFloatingDock() {
             onClick={() => handleNavigate('/discover', true)}
           />
 
-          {/* Center orange glass plus button */}
+          {/* Center orange glass camera button */}
           <button
             className="h-[64px] w-[64px] rounded-full flex items-center justify-center -mt-6 transition-transform active:scale-95"
             style={{
@@ -124,10 +126,10 @@ export function HubFloatingDock() {
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
             }}
-            onClick={handleCreateGame}
-            aria-label="Create"
+            onClick={handleCreateMoment}
+            aria-label="Create Moment"
           >
-            <Plus className="h-7 w-7 text-white" strokeWidth={2.5} />
+            <Camera className="h-7 w-7 text-white" strokeWidth={2} />
           </button>
 
           {/* Right items: Echo, Profile */}
@@ -153,6 +155,13 @@ export function HubFloatingDock() {
         isOpen={isGamesHubOpen} 
         onClose={() => setIsGamesHubOpen(false)}
         initialTab="yours"
+      />
+
+      <EnhancedCreateMomentModalCinematic
+        isOpen={isCreateMomentOpen}
+        onClose={() => setIsCreateMomentOpen(false)}
+        onSubmit={() => setIsCreateMomentOpen(false)}
+        isSubmitting={false}
       />
     </>
   );
