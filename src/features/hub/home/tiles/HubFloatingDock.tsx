@@ -34,7 +34,7 @@ function DockItem({ icon: Icon, label, onClick, isActive }: DockItemProps) {
     >
       <Icon 
         className={cn(
-          "h-[22px] w-[22px] transition-colors duration-300",
+          "h-[26px] w-[26px] transition-colors duration-300",
           "[stroke-width:1.5]",
           isActive 
             ? "text-slate-800" 
@@ -96,7 +96,7 @@ export function HubFloatingDock() {
         }}
       >
         <div 
-          className="w-full h-[72px] flex items-center justify-between px-4 rounded-t-lg"
+          className="w-full h-[55px] flex items-center justify-between px-4 rounded-t-lg"
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(24px)',
