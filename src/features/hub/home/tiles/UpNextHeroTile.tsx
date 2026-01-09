@@ -192,7 +192,7 @@ function CarouselDots({
   if (count <= 1) return null;
   
   return (
-    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-20">
       {Array.from({ length: count }).map((_, i) => (
         <button
           key={i}
@@ -200,12 +200,12 @@ function CarouselDots({
             e.stopPropagation();
             onDotClick(i);
           }}
-          className={cn(
-            "w-2 h-2 rounded-full transition-all duration-300",
-            i === activeIndex 
-              ? "bg-white w-4" 
-              : "bg-white/50"
-          )}
+          className="rounded-full transition-all duration-300"
+          style={{
+            width: i === activeIndex ? '12px' : '6px',
+            height: '6px',
+            background: i === activeIndex ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.4)',
+          }}
           aria-label={`Go to slide ${i + 1}`}
         />
       ))}

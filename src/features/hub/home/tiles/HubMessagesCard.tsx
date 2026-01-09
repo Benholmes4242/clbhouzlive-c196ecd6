@@ -56,14 +56,15 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
           minHeight: '64px',
         }}
       >
-        {/* Orange badge - top right - matching verified pill style */}
+        {/* Orange badge - top right - consistent with Active Games badge */}
         {hasMessages && (
           <div 
-            className="absolute top-2.5 right-2.5 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold"
+            className="absolute top-3 right-3 h-[18px] min-w-[18px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold"
             style={{
               background: 'rgba(247, 158, 27, 0.15)',
               color: '#F79E1B',
               border: '1px solid rgba(247, 158, 27, 0.3)',
+              boxShadow: '0 2px 8px rgba(247, 158, 27, 0.1)',
             }}
           >
             {messages.unreadCount}
@@ -84,7 +85,7 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
           
           <div className="flex-1 min-w-0 pr-6">
             <div 
-              className="text-[15px] font-semibold"
+              className="text-[15px] font-extrabold"
               style={{ color: 'var(--hub-text)' }}
             >
               Messages
