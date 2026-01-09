@@ -5,6 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { toTitleCase } from '@/lib/formatters';
 import type { SeasonLeader } from '../../hooks/useTourOverviewData';
 
 interface LeadersPhotoCardsProps {
@@ -29,7 +30,7 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
         <h3 className="font-semibold text-foreground text-lg">Season Leaders</h3>
         <Link 
           to="/tourhub?tab=player-stats"
-          className="text-sm text-primary hover:underline flex items-center gap-1"
+          className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 transition-colors"
         >
           All stats <ArrowRight className="w-3.5 h-3.5" />
         </Link>
@@ -98,7 +99,7 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
                   {/* Country */}
                   {leader.player.country && (
                     <p className="text-white/60 text-xs mt-0.5">
-                      {leader.player.country}
+                      {toTitleCase(leader.player.country)}
                     </p>
                   )}
                 </div>

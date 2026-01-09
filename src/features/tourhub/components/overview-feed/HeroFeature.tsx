@@ -18,7 +18,7 @@ interface HeroFeatureProps {
 export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeatureProps) {
   const labelConfig = {
     live: { text: 'Live Now', icon: <Zap className="w-3.5 h-3.5" />, className: 'bg-emerald-500 text-white' },
-    recent: { text: 'Most Recent', icon: <Trophy className="w-3.5 h-3.5" />, className: 'bg-amber-500 text-white' },
+    recent: { text: 'Most Recent', icon: <Trophy className="w-3.5 h-3.5" />, className: 'bg-white/20 border border-white/25 text-white/90 backdrop-blur-[10px]' },
     upcoming: { text: 'Next Up', icon: <Calendar className="w-3.5 h-3.5" />, className: 'bg-white/90 text-slate-900' },
   };
 
