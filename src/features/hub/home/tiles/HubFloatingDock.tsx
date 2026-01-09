@@ -27,8 +27,8 @@ function DockItem({ icon: Icon, label, onClick, isActive }: DockItemProps) {
       onClick={onClick}
       className={cn(
         "flex flex-col items-center justify-center gap-1 flex-1 py-1",
-        "transition-transform duration-[120ms] ease-out",
-        "active:scale-95",
+        "transition-all duration-[120ms] ease-out",
+        "active:scale-[0.92]", // V2 micro press
         "focus:outline-none"
       )}
       aria-label={label}
@@ -47,7 +47,7 @@ function DockItem({ icon: Icon, label, onClick, isActive }: DockItemProps) {
           "text-[10px] leading-none transition-colors duration-300",
           isActive 
             ? "text-slate-800" 
-            : "text-slate-500"
+            : "text-[rgba(15,23,42,0.55)]" // V2 muted label
         )}
       >
         {label}
@@ -100,7 +100,7 @@ export function HubFloatingDock() {
 
   return (
     <>
-      {/* Anchored dock - full width at bottom, no background */}
+      {/* Anchored dock - full width at bottom, premium gradient + hairline */}
       <nav 
         className="sticky bottom-0 left-0 right-0 z-[10000] w-full"
         style={{ 
@@ -110,11 +110,10 @@ export function HubFloatingDock() {
         <div 
           className="w-full h-[55px] flex items-center justify-around"
           style={{
-            background: 'rgba(255, 255, 255, 0.95)',
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.98) 100%)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(0, 0, 0, 0.05)',
-            borderBottom: 'none',
+            borderTop: '1px solid rgba(15, 23, 42, 0.06)', // V2 hairline
           }}
         >
           {/* Left items: Home (goes to Clubhouse), Search */}

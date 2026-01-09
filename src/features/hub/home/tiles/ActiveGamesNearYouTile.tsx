@@ -67,7 +67,7 @@ export function ActiveGamesNearYouTile() {
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)',
+          boxShadow: 'var(--hub-shadow-soft)', // Soft shadow for secondary tile
         }}
       >
         {/* V2 Top icon - rounded square background */}
@@ -86,10 +86,10 @@ export function ActiveGamesNearYouTile() {
           Active Games<br/>Near You
         </div>
 
-        {/* V2 Badge - top right */}
+        {/* V2 Badge - top right, soft pill style */}
         {gamesCount > 0 && (
           <div 
-            className="absolute top-3 right-3 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold"
+            className="absolute top-3 right-3 h-5 min-w-[20px] px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
             style={{
               background: 'var(--hub-badge-green-bg)',
               color: 'var(--hub-badge-green-text)',
@@ -127,12 +127,13 @@ export function ActiveGamesNearYouTile() {
                 {formatShortDate(nearbyGame.start_time)}
               </div>
 
-              {/* V2 Slots mini-pill */}
+              {/* V2 Mini progress pill */}
               <div 
                 className="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-1.5"
                 style={{
-                  background: 'var(--hub-badge-green-bg)',
-                  color: 'var(--hub-badge-green-text)',
+                  background: 'rgba(15, 23, 42, 0.04)',
+                  color: 'var(--hub-text-dim)',
+                  border: '1px solid rgba(15, 23, 42, 0.06)',
                 }}
               >
                 {slotsLabel}
@@ -166,6 +167,16 @@ export function ActiveGamesNearYouTile() {
             ))}
           </div>
         )}
+
+        {/* V2 Subtle accent bar at bottom */}
+        <div 
+          className="absolute bottom-0 left-4 right-4 rounded-full"
+          style={{
+            height: '3px',
+            background: 'var(--hub-badge-green-text)',
+            opacity: 0.35,
+          }}
+        />
       </button>
 
       <HubGamesTripsSheet

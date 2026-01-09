@@ -24,14 +24,14 @@ export function EchoTile() {
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)',
+          boxShadow: 'var(--hub-shadow-soft)', // Soft shadow for secondary tile
         }}
       >
-        {/* V2 Icon - rounded square with subtle warm gradient */}
+        {/* V2 Icon - rounded square with warmer gradient */}
         <div 
           className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2"
           style={{ 
-            background: 'linear-gradient(135deg, rgba(255, 142, 61, 0.12) 0%, rgba(255, 180, 100, 0.08) 100%)',
+            background: 'linear-gradient(135deg, rgba(255, 142, 61, 0.20) 0%, rgba(255, 142, 61, 0.05) 100%)',
           }}
         >
           <Sparkles className="h-4 w-4" style={{ color: '#F59E0B' }} />
@@ -40,7 +40,7 @@ export function EchoTile() {
         {/* Text content */}
         <div className="flex-1 flex flex-col">
           <div 
-            className="text-[14px] font-semibold leading-tight"
+            className="text-[15px] font-semibold leading-tight" // Slightly larger title
             style={{ color: 'var(--hub-text)' }}
           >
             Echo

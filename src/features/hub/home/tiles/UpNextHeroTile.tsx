@@ -28,17 +28,17 @@ function formatTripDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'd')}–${format(end, 'd MMM')}`;
 }
 
-// V2 Glass icon chip - top left
+// V2 Glass icon chip - top left (premium styling)
 function IconChip({ icon: Icon }: { icon: typeof MapPin }) {
   return (
     <div 
       className="h-8 w-8 rounded-full flex items-center justify-center"
       style={{
-        background: 'rgba(255, 255, 255, 0.85)',
+        background: 'rgba(255, 255, 255, 0.82)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        border: '1px solid rgba(15, 23, 42, 0.08)',
+        boxShadow: '0 6px 16px rgba(2, 6, 23, 0.08)',
       }}
     >
       <Icon className="w-4 h-4 text-slate-700" />
@@ -191,11 +191,11 @@ function HeroSlide({ data, onClick, isActive }: HeroSlideProps) {
         }}
       />
       
-      {/* Left gradient for text readability */}
+      {/* V2 Left gradient for text legibility */}
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 40%, transparent 70%)',
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 65%)',
         }}
       />
 
@@ -354,8 +354,9 @@ export function UpNextHeroTile() {
         className="relative w-full overflow-hidden transition-shadow duration-200"
         style={{
           height: '150px',
-          borderRadius: 'var(--hub-radius-xl)',
+          borderRadius: 'var(--hub-radius-xl)', // 24px for hero
           boxShadow: 'var(--hub-shadow-hero)',
+          border: '1px solid rgba(255, 255, 255, 0.18)', // Glass edge
         }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
