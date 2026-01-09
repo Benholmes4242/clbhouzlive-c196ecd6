@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Camera, Search, User, Plus, Sparkles } from 'lucide-react';
+import { Camera, Search, User, Plus, Sparkles, Home } from 'lucide-react';
 import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -96,7 +96,7 @@ export function HubFloatingDock() {
         }}
       >
         <div 
-          className="w-full h-[72px] flex items-center justify-between px-4 rounded-t-[28px]"
+          className="w-full h-[72px] flex items-center justify-between px-4 rounded-t-lg"
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(24px)',
@@ -105,11 +105,11 @@ export function HubFloatingDock() {
             borderBottom: 'none',
           }}
         >
-          {/* Left items: Create Game, Search */}
+          {/* Left items: Home, Search */}
           <DockItem 
-            icon={Plus} 
-            label="Create Game" 
-            onClick={handleCreateGame}
+            icon={Home} 
+            label="Home" 
+            onClick={() => handleNavigate('/hub')}
           />
           <DockItem 
             icon={Search} 
@@ -133,11 +133,11 @@ export function HubFloatingDock() {
             <Camera className="h-7 w-7 text-white" strokeWidth={2} />
           </button>
 
-          {/* Right items: Echo, Profile */}
+          {/* Right items: Create Game, Profile */}
           <DockItem 
-            icon={Sparkles} 
-            label="Echo" 
-            onClick={handleEcho}
+            icon={Plus} 
+            label="Create Game" 
+            onClick={handleCreateGame}
           />
           <DockItem 
             icon={User} 
