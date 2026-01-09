@@ -121,12 +121,13 @@ export function ActiveGamesNearYouTile() {
                 <span className="line-clamp-1">{formatShortDate(nearbyGame.start_time)}</span>
               </div>
 
-              {/* Slots pill - pinned at bottom */}
+              {/* Slots pill - pinned at bottom - emerald green */}
               <div 
                 className="inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold mt-2"
                 style={{
-                  background: 'var(--hub-glass-bg-input)',
-                  color: '#2F7CFF',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#10B981',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
                 }}
               >
                 {slotsLabel}
@@ -142,7 +143,7 @@ export function ActiveGamesNearYouTile() {
           )}
         </div>
 
-        {/* Carousel dots - tiny, only show if 2+ games */}
+        {/* Carousel dots - tiny, only show if 2+ games - emerald green */}
         {hasCarousel && (
           <div className="absolute bottom-3 right-3 flex gap-1">
             {allGames.map((_, idx) => (
@@ -150,7 +151,7 @@ export function ActiveGamesNearYouTile() {
                 key={idx}
                 className="w-1 h-1 rounded-full transition-all"
                 style={{
-                  background: idx === activeIndex ? '#2F7CFF' : 'rgba(0,0,0,0.15)',
+                  background: idx === activeIndex ? '#10B981' : 'rgba(16, 185, 129, 0.3)',
                 }}
               />
             ))}
