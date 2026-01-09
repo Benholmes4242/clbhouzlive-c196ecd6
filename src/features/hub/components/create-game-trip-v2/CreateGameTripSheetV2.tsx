@@ -1,6 +1,6 @@
 /**
  * CreateGameTripSheetV2 - Main composer sheet for creating games/trips
- * Phase 1: Full UI with mocked actions
+ * Wired to real database creation
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
+import { useCreateGame } from '../../hooks/useCreateGame';
+import { useCreateTrip } from '../../hooks/useCreateTrip';
 
 import { ModeToggle } from './ModeToggle';
 import { HeroStartCard } from './HeroStartCard';
@@ -75,7 +77,10 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
   const [coursePickerContext, setCoursePickerContext] = useState<'game' | 'trip-add'>('game');
   
   // Loading state
-  const [isCreating, setIsCreating] = useState(false);
+  // Mutations
+  const createGameMutation = useCreateGame();
+  const createTripMutation = useCreateTrip();
+  const isCreating = createGameMutation.isPending || createTripMutation.isPending;
   
   // Lock body scroll when sheet is open
   useEffect(() => {
@@ -222,44 +227,47 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
   const handleCreate = useCallback(async () => {
     if (!canCreate) return;
     
-    setIsCreating(true);
-    
-    // Build draft payload
-    if (mode === 'game') {
-      const draft: GameDraft = {
-        courseId: gameCourse!.id,
-        playerIds: gamePlayers.filter(p => !p.isGuest).map(p => p.id),
-        guestPlayers: gamePlayers.filter(p => p.isGuest).map(p => p.name),
-        maxPlayers,
-        visibility: gameVisibility,
-        dateTime: gameDate && gameTime ? new Date(`${gameDate.toISOString().split('T')[0]}T${gameTime}`) : undefined,
-        holes: gameHoles,
-        gameType,
-        notes: gameNotes || undefined,
-      };
-      console.log('Creating game (mock):', draft);
-      toast.success('Game created (mock)');
-    } else {
-      const draft: TripDraft = {
-        startDate: tripStartDate!,
-        endDate: tripEndDate!,
-        visibility: tripVisibility,
-        attendeeIds: tripAttendees.filter(p => !p.isGuest).map(p => p.id),
-        guestAttendees: tripAttendees.filter(p => p.isGuest).map(p => p.name),
-        notes: tripNotes || undefined,
-        itinerary: tripItinerary,
-      };
-      console.log('Creating trip (mock):', draft);
-      toast.success('Trip created (mock)');
+    try {
+      if (mode === 'game') {
+        const draft: GameDraft = {
+          courseId: gameCourse!.id,
+          playerIds: gamePlayers.filter(p => !p.isGuest).map(p => p.id),
+          guestPlayers: gamePlayers.filter(p => p.isGuest).map(p => p.name),
+          maxPlayers,
+          visibility: gameVisibility,
+          dateTime: gameDate && gameTime ? new Date(`${gameDate.toISOString().split('T')[0]}T${gameTime}`) : undefined,
+          holes: gameHoles,
+          gameType,
+          notes: gameNotes || undefined,
+        };
+        
+        await createGameMutation.mutateAsync(draft);
+        toast.success('Game created!');
+      } else {
+        const draft: TripDraft = {
+          startDate: tripStartDate!,
+          endDate: tripEndDate!,
+          visibility: tripVisibility,
+          attendeeIds: tripAttendees.filter(p => !p.isGuest).map(p => p.id),
+          guestAttendees: tripAttendees.filter(p => p.isGuest).map(p => p.name),
+          notes: tripNotes || undefined,
+          itinerary: tripItinerary,
+        };
+        
+        await createTripMutation.mutateAsync(draft);
+        toast.success('Trip created!');
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error('Creation failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create');
     }
-    
-    setIsCreating(false);
-    onClose();
   }, [
     canCreate, mode, gameCourse, gamePlayers, maxPlayers, gameVisibility,
     gameDate, gameTime, gameHoles, gameType, gameNotes,
     tripStartDate, tripEndDate, tripVisibility, tripAttendees, tripNotes, tripItinerary,
-    onClose
+    createGameMutation, createTripMutation, onClose
   ]);
   
   if (!isOpen) return null;
