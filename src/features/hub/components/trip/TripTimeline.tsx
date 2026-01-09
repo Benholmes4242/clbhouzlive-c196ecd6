@@ -1,9 +1,9 @@
 /**
  * TripTimeline - Timeline view for a trip
+ * V2: Supports notes, day markers, stacked sheet navigation
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { TripTimelineCard } from './TripTimelineCard';
 import type { TripTimelineItem } from '../../hooks/useTripTimeline';
 import { Loader2 } from 'lucide-react';
@@ -11,11 +11,10 @@ import { Loader2 } from 'lucide-react';
 interface TripTimelineProps {
   items: TripTimelineItem[];
   isLoading?: boolean;
+  onGameTap?: (gameId: string) => void;
 }
 
-export function TripTimeline({ items, isLoading }: TripTimelineProps) {
-  const navigate = useNavigate();
-
+export function TripTimeline({ items, isLoading, onGameTap }: TripTimelineProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -52,7 +51,7 @@ export function TripTimeline({ items, isLoading }: TripTimelineProps) {
           <TripTimelineCard
             key={item.id}
             item={item}
-            onTap={item.gameId ? () => navigate(`/game/${item.gameId}`) : undefined}
+            onTap={item.gameId && onGameTap ? () => onGameTap(item.gameId!) : undefined}
           />
         ))}
       </div>

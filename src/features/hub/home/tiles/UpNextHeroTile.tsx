@@ -78,8 +78,8 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
         </div>
         <div className="flex items-center gap-2 mt-2">
           <ProgressPill text={`${data.slotsTotal - data.slotsOpen}/${data.slotsTotal}`} />
-          {/* RSVP summary - using icon instead of emoji for premium feel */}
-          {data.goingCount !== undefined && data.goingCount > 0 && (
+          {/* RSVP summary - show if goingCount exists (even 0) */}
+          {data.goingCount !== undefined && (
             <span 
               className="flex items-center gap-1 text-[11px] font-medium"
               style={{ 

@@ -6793,6 +6793,44 @@ export type Database = {
           },
         ]
       }
+      trip_timeline_notes: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          occurs_at: string | null
+          text: string
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          occurs_at?: string | null
+          text: string
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          occurs_at?: string | null
+          text?: string
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_timeline_notes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           cover_image_url: string | null

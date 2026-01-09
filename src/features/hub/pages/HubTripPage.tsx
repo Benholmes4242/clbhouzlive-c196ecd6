@@ -1,17 +1,23 @@
 /**
  * HubTripPage - Trip detail page with timeline
+ * V2: GameDetailSheetV2 stacked navigation, Add Note for hosts
  */
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, MoreHorizontal, Share2 } from 'lucide-react';
+import { ChevronLeft, MoreHorizontal, Share2, Plus } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { TripHeader } from '../components/trip/TripHeader';
 import { TripTimeline } from '../components/trip/TripTimeline';
+import { TripAddNoteSheetV2 } from '../components/trip/TripAddNoteSheetV2';
+import { GameDetailSheetV2 } from '../components/game-detail-v2/GameDetailSheetV2';
 import { useTripTimeline } from '../hooks/useTripTimeline';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Loader2 } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { haptic } from '@/utils/haptics';
 
 const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]";
 
@@ -20,8 +26,19 @@ export default function HubTripPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'timeline';
+  const { user } = useSupabaseSession();
 
-  const { trip, participants, timeline, isLoading, error } = useTripTimeline(tripId);
+  const { trip, participants, timeline, isLoading, error, isHost } = useTripTimeline(tripId);
+  
+  // Game detail sheet state
+  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+  const [gameSheetOpen, setGameSheetOpen] = useState(false);
+  
+  // Add note sheet state
+  const [addNoteOpen, setAddNoteOpen] = useState(false);
+
+  // Check if current user is the trip creator (host)
+  const isCurrentUserHost = user && trip && trip.createdBy === user.id;
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -34,6 +51,23 @@ export default function HubTripPage() {
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value });
   };
+
+  const handleGameTap = useCallback((gameId: string) => {
+    haptic('light');
+    setSelectedGameId(gameId);
+    setGameSheetOpen(true);
+  }, []);
+
+  const handleCloseGameSheet = useCallback(() => {
+    setGameSheetOpen(false);
+    // Clear gameId after animation
+    setTimeout(() => setSelectedGameId(null), 300);
+  }, []);
+
+  const handleAddNote = useCallback(() => {
+    haptic('light');
+    setAddNoteOpen(true);
+  }, []);
 
   if (isLoading) {
     return (
@@ -92,17 +126,36 @@ export default function HubTripPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
-          <TabsList className="w-full justify-start bg-transparent border-b border-border/50 rounded-none p-0 h-auto">
-            <TabsTrigger value="timeline" className={tabTriggerClass}>
-              Timeline
-            </TabsTrigger>
-            <TabsTrigger value="players" className={tabTriggerClass}>
-              Players
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex items-center justify-between">
+            <TabsList className="flex-1 justify-start bg-transparent border-b border-border/50 rounded-none p-0 h-auto">
+              <TabsTrigger value="timeline" className={tabTriggerClass}>
+                Timeline
+              </TabsTrigger>
+              <TabsTrigger value="players" className={tabTriggerClass}>
+                Players
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* Add Note button - only for hosts on timeline tab */}
+            {isCurrentUserHost && activeTab === 'timeline' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAddNote}
+                className="gap-1.5 text-primary hover:text-primary hover:bg-primary/10"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="text-sm font-medium">Add note</span>
+              </Button>
+            )}
+          </div>
 
           <TabsContent value="timeline" className="mt-4">
-            <TripTimeline items={timeline} isLoading={false} />
+            <TripTimeline 
+              items={timeline} 
+              isLoading={false}
+              onGameTap={handleGameTap}
+            />
           </TabsContent>
 
           <TabsContent value="players" className="mt-4">
@@ -112,7 +165,11 @@ export default function HubTripPage() {
                   key={p.id}
                   className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50"
                 >
-                  <div className="w-10 h-10 rounded-full bg-muted" />
+                  <SquircleAvatar
+                    src={p.profile?.profilePhotoUrl}
+                    alt={p.profile?.displayName || 'Participant'}
+                    size={40}
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground truncate">
                       {p.profile?.displayName || 'Unknown'}
@@ -127,6 +184,24 @@ export default function HubTripPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Game Detail Sheet - stacked over trip page */}
+      {selectedGameId && (
+        <GameDetailSheetV2
+          isOpen={gameSheetOpen}
+          onClose={handleCloseGameSheet}
+          gameId={selectedGameId}
+        />
+      )}
+
+      {/* Add Note Sheet */}
+      {tripId && (
+        <TripAddNoteSheetV2
+          isOpen={addNoteOpen}
+          onClose={() => setAddNoteOpen(false)}
+          tripId={tripId}
+        />
+      )}
     </PageRoot>
   );
 }
