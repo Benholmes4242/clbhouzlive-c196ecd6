@@ -3,8 +3,8 @@
  * Opens from YourGamesTripsSheet without route change
  * 
  * Matches V2 design language:
- * - Glass-lite surface
- * - Premium spacing
+ * - Glass-lite surface with frosted header
+ * - Premium stacked sheet depth (blur+scale underlying)
  * - No bounce animation
  */
 
@@ -103,7 +103,7 @@ export function GameDetailSheetV2({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop - slightly dimmer to show stacking */}
+          {/* Backdrop - blur + dim for premium stacked feel */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -111,10 +111,23 @@ export function GameDetailSheetV2({
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[10001]"
             style={{
-              background: 'rgba(0, 0, 0, 0.15)',
+              background: 'rgba(0, 0, 0, 0.18)',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
             }}
             onClick={handleClose}
           />
+
+          {/* Underlying sheet scale effect - applied via CSS on YourGamesTripsSheet */}
+          <style>{`
+            .your-games-trips-sheet-wrapper {
+              transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            }
+            .your-games-trips-sheet-wrapper.stacked-behind {
+              transform: scale(0.985);
+              opacity: 0.96;
+            }
+          `}</style>
 
           {/* Sheet */}
           <motion.div
@@ -130,16 +143,23 @@ export function GameDetailSheetV2({
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
             }}
           >
-            {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+            {/* Grabber - thinner, lighter */}
+            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
               <div 
-                className="w-10 h-1 rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+                className="w-9 h-[3px] rounded-full"
+                style={{ background: 'rgba(0, 0, 0, 0.08)' }}
               />
             </div>
 
-            {/* Header */}
-            <div className="flex items-center gap-3 px-4 pb-2 flex-shrink-0">
+            {/* Header - frosted glass chrome */}
+            <div 
+              className="flex items-center gap-3 px-4 pt-1 pb-3 flex-shrink-0"
+              style={{
+                background: 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }}
+            >
               <button
                 onClick={handleClose}
                 className="p-2 -ml-2 rounded-full transition-colors hover:bg-black/5"
@@ -147,7 +167,8 @@ export function GameDetailSheetV2({
                 <ChevronLeft className="w-5 h-5" style={{ color: 'rgba(30, 41, 59, 0.7)' }} />
               </button>
 
-              <div className="flex-1 min-w-0">
+              {/* Fixed height header to prevent layout jump */}
+              <div className="flex-1 min-w-0 min-h-[44px] flex flex-col justify-center">
                 {isLoading || !game ? (
                   <div className="space-y-1.5 animate-pulse">
                     <div className="h-5 w-36 bg-black/5 rounded-lg" />
@@ -171,6 +192,14 @@ export function GameDetailSheetV2({
                 )}
               </div>
             </div>
+
+            {/* Fading divider - not hard line */}
+            <div 
+              className="h-px flex-shrink-0"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 15%, rgba(0,0,0,0.06) 85%, transparent 100%)',
+              }}
+            />
 
             {/* Content */}
             <div className="flex-1 flex flex-col overflow-hidden relative">
