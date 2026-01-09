@@ -165,23 +165,51 @@ export function CourseSearchSheet({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            transition={{ type: 'tween', duration: 0.2 }}
             className={`
               fixed z-[10011] overflow-hidden
               ${isMobile 
-                ? 'left-0 right-0 bottom-0 max-h-[80vh] rounded-t-2xl' 
-                : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] rounded-xl'
+                ? 'inset-x-0 bottom-0 rounded-t-[24px]' 
+                : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl rounded-xl'
               }
-              bg-white border-t md:border border-slate-200 shadow-2xl
               flex flex-col
             `}
             style={{
+              background: '#F8FAFC',
+              maxHeight: '60vh',
               paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0
             }}
           >
+            {/* Grabber handle */}
+            {isMobile && (
+              <div className="flex justify-center pt-2.5 pb-1.5">
+                <div 
+                  className="w-8 h-[3px] rounded-full"
+                  style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+                />
+              </div>
+            )}
+
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
-              <div className="flex-1">
+            <div className="px-5 pb-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text, #1e293b)' }}>
+                  Choose Golf Club
+                </h3>
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+                  aria-label="Close search"
+                >
+                  <X className="w-4 h-4" style={{ color: 'var(--hub-text-sub, #64748b)' }} />
+                </button>
+              </div>
+              
+              <div 
+                className="rounded-xl"
+                style={{ background: 'white' }}
+              >
                 <input
                   ref={inputRef}
                   type="text"
@@ -189,20 +217,16 @@ export function CourseSearchSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-600"
+                  className="w-full px-4 py-3 rounded-xl text-[15px] focus:outline-none"
+                  style={{ 
+                    background: 'white',
+                    color: 'var(--hub-text, #1e293b)',
+                  }}
                   autoComplete="off"
                   autoCapitalize="off"
                   spellCheck="false"
                 />
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                aria-label="Close search"
-              >
-                <X className="h-5 w-5" />
-              </Button>
             </div>
 
             {/* Results */}
