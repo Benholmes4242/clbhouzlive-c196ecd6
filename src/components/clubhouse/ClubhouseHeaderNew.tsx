@@ -108,14 +108,18 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
         ref={headerRef}
         className={cn(
           "chrome-header", // Chrome auto-hide class
-          "relative z-header m-0", // Remove transition, handled by chrome-autohide.css, ensure no top margin
-          "h-16 md:h-18", // 64px mobile, 72px desktop
+          "fixed left-0 right-0 z-header m-0", // Fixed positioning
           className
         )}
         data-hides-on-scroll
         data-chrome="header"
         style={{ 
+          // Position at top of safe area
+          top: 'var(--sat)',
           '--header-h-mobile': '60px',
+          // Header extends into safe area
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          height: 'calc(64px + env(safe-area-inset-top, 0px))',
           background: isDarkContext ? 'rgba(13, 13, 13, 0.95)' : 'var(--surface-slate)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
