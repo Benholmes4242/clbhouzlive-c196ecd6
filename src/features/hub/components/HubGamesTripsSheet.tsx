@@ -87,6 +87,9 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   const { close: closeHub } = useHub();
   const rootScrollTopRef = useRef(0);
   const wasOpenRef = useRef(false);
+  
+  // State for nested Your Games & Trips sheet
+  const [yourGamesTripsOpen, setYourGamesTripsOpen] = useState(false);
 
   // Scroll-lock
   useEffect(() => {
@@ -126,8 +129,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   const handleYourGamesTrips = () => {
     haptic('light');
     onClose();
-    closeHub();
-    navigate('/diary');
+    setYourGamesTripsOpen(true);
   };
 
   const handleCreateGameTrip = () => {
@@ -138,7 +140,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
 
   if (typeof document === 'undefined') return null;
 
-  return createPortal(
+  const sheetPortal = createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -232,6 +234,20 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
       )}
     </AnimatePresence>,
     document.body
+  );
+
+  return (
+    <>
+      {sheetPortal}
+      
+      {/* Nested Your Games & Trips Sheet */}
+      <YourGamesTripsSheetV2
+        isOpen={yourGamesTripsOpen}
+        onClose={() => setYourGamesTripsOpen(false)}
+        onOpenCreateGame={onOpenCreate}
+        onOpenCreateTrip={onOpenCreate}
+      />
+    </>
   );
 }
 
