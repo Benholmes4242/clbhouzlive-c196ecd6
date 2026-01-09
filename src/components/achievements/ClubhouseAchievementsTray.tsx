@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface ClubhouseAchievementsTrayProps {
   userId: string;
@@ -17,13 +17,12 @@ interface Achievement {
   subtitle: string;
   threshold: number;
   isEarned: boolean;
-  tier: AchievementTier;
-  category: 'exploration' | 'skill';
+  tier: EliteCardTier;
 }
 
 /**
  * ClubhouseAchievementsTray - Part of Global Achievement & Milestone System
- * Uses unified AchievementBadgeCard for consistent styling site-wide
+ * Uses unified EliteGameCard for premium game-reward styling
  */
 const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
   userId,
@@ -37,7 +36,6 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
     queryFn: async () => {
       if (!userId) return 0;
       
-      // Get courses from course_ratings table (ratings-only: single source of truth)
       const { data: ratingsData, error: ratingsError } = await supabase
         .from('course_ratings')
         .select(`
@@ -76,80 +74,15 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
     enabled: !!userId,
   });
 
-  // Define achievements using unified tier system
   const achievements: Achievement[] = useMemo(() => [
-    {
-      id: '5-club',
-      title: '5 Club',
-      subtitle: 'Rookie Club',
-      threshold: 5,
-      isEarned: userProgress >= 5,
-      tier: '5' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '10-club',
-      title: '10 Club',
-      subtitle: 'Fairway Club',
-      threshold: 10,
-      isEarned: userProgress >= 10,
-      tier: '10' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '20-club',
-      title: '20 Club',
-      subtitle: 'Founders Club',
-      threshold: 20,
-      isEarned: userProgress >= 20,
-      tier: '20' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '50-club',
-      title: '50 Club',
-      subtitle: 'Heritage Club',
-      threshold: 50,
-      isEarned: userProgress >= 50,
-      tier: '50' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '100-club',
-      title: '100 Club',
-      subtitle: 'Century Club',
-      threshold: 100,
-      isEarned: userProgress >= 100,
-      tier: '100' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '200-club',
-      title: '200 Club',
-      subtitle: 'Elite Club',
-      threshold: 200,
-      isEarned: userProgress >= 200,
-      tier: '200' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '300-club',
-      title: '300 Club',
-      subtitle: 'Legendary Club',
-      threshold: 300,
-      isEarned: userProgress >= 300,
-      tier: '300' as AchievementTier,
-      category: 'exploration'
-    },
-    {
-      id: '400-club',
-      title: '400 Club',
-      subtitle: 'Grand Slam Club',
-      threshold: 400,
-      isEarned: userProgress >= 400,
-      tier: '400' as AchievementTier,
-      category: 'exploration'
-    }
+    { id: '5-club', title: '5 Club', subtitle: 'Rookie Club', threshold: 5, isEarned: userProgress >= 5, tier: '5' },
+    { id: '10-club', title: '10 Club', subtitle: 'Fairway Club', threshold: 10, isEarned: userProgress >= 10, tier: '10' },
+    { id: '20-club', title: '20 Club', subtitle: 'Founders Club', threshold: 20, isEarned: userProgress >= 20, tier: '20' },
+    { id: '50-club', title: '50 Club', subtitle: 'Heritage Club', threshold: 50, isEarned: userProgress >= 50, tier: '50' },
+    { id: '100-club', title: '100 Club', subtitle: 'Century Club', threshold: 100, isEarned: userProgress >= 100, tier: '100' },
+    { id: '200-club', title: '200 Club', subtitle: 'Elite Club', threshold: 200, isEarned: userProgress >= 200, tier: '200' },
+    { id: '300-club', title: '300 Club', subtitle: 'Legendary Club', threshold: 300, isEarned: userProgress >= 300, tier: '300' },
+    { id: '400-club', title: '400 Club', subtitle: 'Grand Slam Club', threshold: 400, isEarned: userProgress >= 400, tier: '400' },
   ], [userProgress]);
 
   const earnedAchievements = achievements.filter(a => a.isEarned);
@@ -168,23 +101,17 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
             </p>
           </div>
 
-          {/* Achievement Grid - using unified AchievementBadgeCard */}
+          {/* Achievement Grid - using EliteGameCard */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {achievements.map((achievement) => {
-              const remaining = Math.max(0, achievement.threshold - userProgress);
-              
-              return (
-                <AchievementBadgeCard
-                  key={achievement.id}
-                  tier={achievement.tier}
-                  title={achievement.title}
-                  subtitle={achievement.subtitle}
-                  unlocked={achievement.isEarned}
-                  remaining={achievement.isEarned ? undefined : remaining}
-                  totalTop100Played={userProgress}
-                />
-              );
-            })}
+            {achievements.map((achievement) => (
+              <EliteGameCard
+                key={achievement.id}
+                tier={achievement.tier}
+                earned={achievement.isEarned}
+                currentProgress={userProgress}
+                enableAnimations={false}
+              />
+            ))}
           </div>
         </div>
       </CardContent>
