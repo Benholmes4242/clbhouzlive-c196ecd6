@@ -200,10 +200,10 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)',
-            paddingBottom: '80px', // Extra padding to prevent dock overlap
+            paddingBottom: '65px', // 10px gap to dock (55px dock height + 10px)
           }}
         >
-          <div className="px-5 flex flex-col gap-[12px] flex-1">
+          <div className="px-5 flex flex-col gap-[10px] flex-1">
             {/* Show skeleton while loading, real content when ready */}
             {!isDataReady ? (
               <HubContentSkeleton />
@@ -215,13 +215,11 @@ export function HubHomePage() {
                 {/* Zone 2: What's Up Next Hero Tile */}
                 <UpNextHeroTile />
 
-                {/* Zone 3: Messages Card - tighter gap to hero */}
-                <div style={{ marginTop: '-6px' }}>
-                  <HubMessagesCard />
-                </div>
+                {/* Zone 3: Messages Card */}
+                <HubMessagesCard />
 
                 {/* Zone 4: 2-up Grid - Active Games + Echo (fixed height) */}
-                <div className="grid grid-cols-2 gap-[12px]">
+                <div className="grid grid-cols-2 gap-[10px]">
                   <ActiveGamesNearYouTile />
                   <EchoTile />
                 </div>
