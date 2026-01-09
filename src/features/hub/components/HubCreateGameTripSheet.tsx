@@ -415,35 +415,51 @@ export function HubCreateGameTripSheet({
                 )}
 
                 {/* WHO - composer bar with chips */}
-                <div 
-                  className="p-3 rounded-2xl"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.6)',
-                    border: '1px solid rgba(0, 0, 0, 0.03)',
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-                    >
-                      <Users className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+                {selectedPlayers.length === 0 ? (
+                  <button
+                    onClick={() => {
+                      haptic('light');
+                      setPlayerPickerOpen(true);
+                    }}
+                    className="w-full p-3 rounded-2xl text-left transition-all active:scale-[0.99] active:opacity-90"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.6)',
+                      border: '1px solid rgba(0, 0, 0, 0.03)',
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                      >
+                        <Users className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+                      </div>
+                      <span 
+                        className="flex-1 text-[15px]"
+                        style={{ color: 'var(--hub-text-muted)' }}
+                      >
+                        {mode === 'game' ? "Who's playing?" : "Who's attending?"}
+                      </span>
+                      <Plus className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                     </div>
-                    
-                    <div className="flex-1 min-w-0 pt-2">
-                      {selectedPlayers.length === 0 ? (
-                        <button
-                          onClick={() => {
-                            haptic('light');
-                            setPlayerPickerOpen(true);
-                          }}
-                          className="text-[15px] transition-all active:opacity-70 flex items-center gap-2"
-                          style={{ color: 'var(--hub-text-muted)' }}
-                        >
-                          <span>{mode === 'game' ? "Who's playing?" : "Who's attending?"}</span>
-                          <Plus className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                        </button>
-                      ) : (
+                  </button>
+                ) : (
+                  <div 
+                    className="p-3 rounded-2xl"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.6)',
+                      border: '1px solid rgba(0, 0, 0, 0.03)',
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                      >
+                        <Users className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0 pt-2">
                         <div className="flex flex-wrap gap-1.5 items-center">
                           {displayedPlayers.map(player => (
                             <div
@@ -514,10 +530,10 @@ export function HubCreateGameTripSheet({
                             </button>
                           )}
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* VISIBILITY + PLAYERS - inline section */}
                 <div className="py-1 space-y-4">
