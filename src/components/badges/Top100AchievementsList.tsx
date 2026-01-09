@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { useBadges } from '@/hooks/useBadges';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,24 +9,9 @@ interface Top100AchievementsListProps {
   showAllInitially?: boolean;
 }
 
-// Map threshold to AchievementTier
-function getAchievementTier(threshold: number): AchievementTier {
-  const tierMap: Record<number, AchievementTier> = {
-    5: '5',
-    10: '10',
-    20: '20',
-    50: '50',
-    100: '100',
-    200: '200',
-    300: '300',
-    400: '400',
-  };
-  return tierMap[threshold] || '5';
-}
-
 /**
  * Top100AchievementsList - Part of Global Achievement & Milestone System
- * Uses unified AchievementBadgeCard for consistent styling site-wide
+ * Uses unified EliteGameCard for premium game-reward styling
  */
 const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({ 
   userId, 
@@ -40,7 +25,6 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
     queryFn: async () => {
       if (!userId) return 0;
       
-      // Get courses from course_ratings table (ratings-only: single source of truth)
       const { data: ratingsData, error: ratingsError } = await supabase
         .from('course_ratings')
         .select(`
@@ -58,7 +42,6 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
         return 0;
       }
       
-      // Get unique course IDs and filter for Top 100 ranked courses
       const uniqueCourseIds = new Set();
       const uniqueTop100Courses = (ratingsData || []).filter(course => {
         const gc = course.golf_courses;
@@ -96,7 +79,7 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
       <div className="space-y-3">
         {[1, 2, 3, 4].map(i => (
           <div key={i} className="animate-pulse">
-            <div className="h-[92px] bg-muted rounded-sq-md"></div>
+            <div className="h-[110px] bg-muted rounded-xl"></div>
           </div>
         ))}
       </div>
@@ -108,17 +91,14 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
       <div className="space-y-3">
         {milestones.map((milestone) => {
           const isUnlocked = userProgress >= milestone.threshold;
-          const remaining = Math.max(0, milestone.threshold - userProgress);
           
           return (
-            <AchievementBadgeCard
+            <EliteGameCard
               key={milestone.threshold}
-              tier={getAchievementTier(milestone.threshold)}
-              title={`${milestone.threshold} Club`}
-              subtitle={milestone.label}
-              unlocked={isUnlocked}
-              remaining={isUnlocked ? undefined : remaining}
-              totalTop100Played={userProgress}
+              tier={String(milestone.threshold) as EliteCardTier}
+              earned={isUnlocked}
+              currentProgress={userProgress}
+              enableAnimations={false}
             />
           );
         })}
