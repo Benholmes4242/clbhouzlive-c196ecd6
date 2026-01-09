@@ -24,13 +24,61 @@
  * Also supports regional completion cards (GBI, EU, USA, WORLD)
  */
 
-import React, { useMemo, memo } from 'react';
+import React, { useMemo, memo, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// HOOKS
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Hook to respect prefers-reduced-motion - updates if user changes preference
+ */
+function useReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
+/**
+ * Hook for intersection-based visibility gating (only animate when visible)
+ */
+function useIsVisible(threshold = 0.4): [React.RefObject<HTMLDivElement>, boolean] {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true); // fallback: assume visible
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible];
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -222,10 +270,20 @@ function getRegionalIcon(tier: string, size: string = 'w-7 h-7'): React.ReactNod
   }
 }
 
-// Check for reduced motion preference
-const prefersReducedMotion = typeof window !== 'undefined' 
-  ? window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches 
-  : false;
+// Milestone tier resolver - maps any threshold to nearest defined tier
+function resolveMilestoneConfig(threshold: number): TierVisualConfig {
+  // Discrete tiers we support
+  const tiers = [5, 10, 20, 50, 100, 150, 200, 300, 400];
+  
+  // Find exact match first
+  if (MILESTONE_CONFIGS[threshold]) return MILESTONE_CONFIGS[threshold];
+  
+  // Bucket ranges: Entry (5-20), Progression (50-100), Elite (150-200), Legendary (300-400)
+  if (threshold <= 20) return MILESTONE_CONFIGS[Math.max(5, ...tiers.filter(t => t <= threshold))];
+  if (threshold <= 100) return MILESTONE_CONFIGS[Math.max(50, ...tiers.filter(t => t <= threshold && t >= 50))];
+  if (threshold <= 200) return MILESTONE_CONFIGS[Math.max(150, ...tiers.filter(t => t <= threshold && t >= 150))];
+  return MILESTONE_CONFIGS[Math.max(300, ...tiers.filter(t => t <= threshold && t >= 300))] || MILESTONE_CONFIGS[400];
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // COMPONENT PROPS
@@ -279,22 +337,28 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   title: titleOverride,
   subtitle: subtitleOverride,
 }) => {
+  // Hooks - must be called unconditionally
+  const prefersReducedMotion = useReducedMotion();
+  const [cardRef, isVisible] = useIsVisible(0.4);
+  
   // Determine if this is a milestone or regional card
   const isRegional = ['GBI', 'EU', 'USA', 'WORLD'].includes(tier);
   const threshold = isRegional ? (targetProgress || 100) : parseInt(tier, 10);
   
-  // Get tier config - memoized
+  // Get tier config - using resolver for continuous tier support
+  const earnedConfig = useMemo(() => {
+    if (isRegional) return REGIONAL_CONFIGS[tier] || REGIONAL_CONFIGS['GBI'];
+    return resolveMilestoneConfig(threshold);
+  }, [tier, threshold, isRegional]);
+  
+  // Active config: earned uses full config, locked uses LOCKED_CONFIG
   const config = useMemo(() => {
     if (isGhost || !earned) return LOCKED_CONFIG;
-    if (isRegional) return REGIONAL_CONFIGS[tier] || LOCKED_CONFIG;
-    return MILESTONE_CONFIGS[threshold] || MILESTONE_CONFIGS[5];
-  }, [tier, threshold, earned, isGhost, isRegional]);
+    return earnedConfig;
+  }, [earned, isGhost, earnedConfig]);
   
-  // Get locked tier config for badge outline (shows tier color even when locked)
-  const lockedTierConfig = useMemo(() => {
-    if (isRegional) return REGIONAL_CONFIGS[tier];
-    return MILESTONE_CONFIGS[threshold] || MILESTONE_CONFIGS[5];
-  }, [tier, threshold, isRegional]);
+  // Locked tier config for subtle tier identity (tinted rim/progress)
+  const lockedTierConfig = earnedConfig;
   
   // Get display text
   const clubName = titleOverride || CLUB_NAMES[tier] || `${tier} Club`;
@@ -306,10 +370,10 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   const progressPercent = earned ? 100 : Math.min(100, (currentProgress / target) * 100);
   const remaining = earned ? 0 : Math.max(0, target - currentProgress);
   
-  // Animation states - respect reduced motion + quality mode
+  // Animation states - respect reduced motion + quality mode + visibility
   const isLowQuality = quality === 'low';
   const isHighQuality = quality === 'high';
-  const animationsAllowed = enableAnimations && !prefersReducedMotion && !isLowQuality;
+  const animationsAllowed = enableAnimations && !prefersReducedMotion && !isLowQuality && isVisible;
   const shouldAnimate = animationsAllowed && earned && !isGhost && config.animationSpeed > 0;
   const showParticles = shouldAnimate && config.hasParticles && isHighQuality;
   
@@ -325,6 +389,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   
   return (
     <motion.div
+      ref={cardRef}
       className={cn(
         'relative rounded-xl overflow-hidden select-none w-full',
         cardHeight,
