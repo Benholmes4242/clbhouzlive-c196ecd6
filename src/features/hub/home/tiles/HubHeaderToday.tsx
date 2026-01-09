@@ -39,17 +39,18 @@ export function HubHeaderToday() {
   };
 
   return (
-    <header className="pt-1 pb-2">
+    <header className="pt-1 pb-1" style={{ overflow: 'visible' }}>
       <div className="flex items-center justify-between gap-3">
-        {/* Greeting - V2 responsive sizing with tighter tracking + line-height */}
+        {/* Greeting - V2 responsive sizing */}
         <h1 
           className="font-semibold truncate"
           style={{ 
             color: 'var(--hub-text)',
             fontSize: 'clamp(18px, 5vw, 22px)',
             maxWidth: '75%',
-            lineHeight: '1.25', // Allow room for descenders (g, y, p, etc.)
+            lineHeight: '1.4', // Extra room for descenders on mobile
             letterSpacing: '-0.2px',
+            overflow: 'visible',
           }}
         >
           {greeting}, {firstName}

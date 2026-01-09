@@ -203,7 +203,7 @@ export function HubHomePage() {
             paddingBottom: '65px', // 10px gap to dock (55px dock height + 10px)
           }}
         >
-          <div className="px-5 flex flex-col gap-[10px] flex-1">
+          <div className="px-5 flex flex-col gap-[8px] flex-1">
             {/* Show skeleton while loading, real content when ready */}
             {!isDataReady ? (
               <HubContentSkeleton />
@@ -219,7 +219,7 @@ export function HubHomePage() {
                 <HubMessagesCard />
 
                 {/* Zone 4: 2-up Grid - Active Games + Echo (fixed height) */}
-                <div className="grid grid-cols-2 gap-[10px]">
+                <div className="grid grid-cols-2 gap-[8px]">
                   <ActiveGamesNearYouTile />
                   <EchoTile />
                 </div>
