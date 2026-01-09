@@ -1,6 +1,6 @@
 /**
  * VisibilityChips - Soft chips for visibility selection
- * Hub style, selected has subtle elevation
+ * Selected has subtle elevation, unselected border-only
  */
 
 import React from 'react';
@@ -29,16 +29,17 @@ interface VisibilityChipsProps {
 
 export function VisibilityChips({ mode, visibility, onVisibilityChange }: VisibilityChipsProps) {
   const options = mode === 'game' ? GAME_OPTIONS : TRIP_OPTIONS;
+  const helperText = mode === 'game' ? 'Who can see this game' : 'Who can see this trip';
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
     >
       <span 
-        className="text-[12px] font-medium mb-2.5 block tracking-wide"
-        style={{ color: 'var(--hub-text-dim)' }}
+        className="text-[12px] font-medium mb-2.5 block tracking-wide uppercase"
+        style={{ color: '#94a3b8' }}
       >
         Visibility
       </span>
@@ -46,33 +47,40 @@ export function VisibilityChips({ mode, visibility, onVisibilityChange }: Visibi
         {options.map(option => {
           const isSelected = visibility === option.value;
           return (
-            <button
+            <motion.button
               key={option.value}
               onClick={() => {
                 haptic('light');
                 onVisibilityChange(option.value);
               }}
-              className="px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all active:scale-[0.96]"
+              whileTap={{ scale: 0.96 }}
+              className="px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all"
               style={{
                 background: isSelected 
-                  ? 'rgba(255, 255, 255, 0.98)' 
-                  : 'rgba(255, 255, 255, 0.7)',
+                  ? '#FFFFFF' 
+                  : 'transparent',
                 border: isSelected
                   ? '1px solid rgba(0, 0, 0, 0.08)'
-                  : '1px solid rgba(0, 0, 0, 0.04)',
+                  : '1px solid rgba(0, 0, 0, 0.08)',
                 color: isSelected 
-                  ? 'var(--hub-text)' 
-                  : 'var(--hub-text-muted)',
+                  ? '#1e293b' 
+                  : '#64748b',
                 boxShadow: isSelected
-                  ? '0 2px 8px rgba(0, 0, 0, 0.05)'
+                  ? '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)'
                   : 'none',
               }}
             >
               {option.label}
-            </button>
+            </motion.button>
           );
         })}
       </div>
+      <p 
+        className="text-[11px] mt-2"
+        style={{ color: '#94a3b8' }}
+      >
+        {helperText}
+      </p>
     </motion.div>
   );
 }

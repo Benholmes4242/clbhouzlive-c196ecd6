@@ -1,6 +1,7 @@
 /**
  * PlayersCard - Tappable composer card for adding players
  * Shows chips when players selected, + Add affordance
+ * Ghost chip when at max
  */
 
 import React from 'react';
@@ -27,13 +28,15 @@ export function PlayersCard({
   const displayedPlayers = players.slice(0, 6);
   const extraCount = players.length - 6;
   const canAddMore = mode === 'trip' || players.length < maxPlayers - 1;
+  const isAtMax = mode === 'game' && players.length >= maxPlayers - 1;
 
   if (players.length === 0) {
     // Empty state
     return (
       <motion.button
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
         whileTap={{ scale: 0.98, opacity: 0.9 }}
         onClick={() => {
           haptic('light');
@@ -42,13 +45,13 @@ export function PlayersCard({
         className="w-full p-4 rounded-2xl text-left transition-all"
         style={{
           background: 'rgba(100, 116, 139, 0.06)',
-          border: '1px solid rgba(100, 116, 139, 0.12)',
+          border: '1px solid rgba(100, 116, 139, 0.1)',
         }}
       >
         <div className="flex items-center gap-3.5">
           <div 
             className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(100, 116, 139, 0.10)' }}
+            style={{ background: 'rgba(100, 116, 139, 0.08)' }}
           >
             <Users className="w-5 h-5" style={{ color: '#64748b' }} />
           </div>
@@ -72,24 +75,25 @@ export function PlayersCard({
   // With players
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
       className="p-4 rounded-2xl"
       style={{
         background: 'rgba(100, 116, 139, 0.06)',
-        border: '1px solid rgba(100, 116, 139, 0.12)',
+        border: '1px solid rgba(100, 116, 139, 0.1)',
       }}
     >
       <div className="flex items-start gap-3.5">
         <div 
           className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(100, 116, 139, 0.10)' }}
+          style={{ background: 'rgba(100, 116, 139, 0.08)' }}
         >
           <Users className="w-5 h-5" style={{ color: '#64748b' }} />
         </div>
         
         <div className="flex-1 min-w-0 pt-1">
-          <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex flex-wrap gap-2.5 items-center">
             <AnimatePresence mode="popLayout">
               {displayedPlayers.map(player => (
                 <motion.div
@@ -100,11 +104,11 @@ export function PlayersCard({
                   className="inline-flex items-center gap-1.5 pl-2 pr-1.5 py-1.5"
                   style={{
                     background: player.isGuest 
-                      ? 'rgba(147, 51, 234, 0.12)' 
-                      : 'rgba(16, 185, 129, 0.12)',
+                      ? 'rgba(147, 51, 234, 0.1)' 
+                      : 'rgba(16, 185, 129, 0.1)',
                     border: player.isGuest
-                      ? '1px solid rgba(147, 51, 234, 0.25)'
-                      : '1px solid rgba(16, 185, 129, 0.25)',
+                      ? '1px solid rgba(147, 51, 234, 0.2)'
+                      : '1px solid rgba(16, 185, 129, 0.2)',
                     borderRadius: '10px',
                   }}
                 >
@@ -156,10 +160,27 @@ export function PlayersCard({
                 className="inline-flex items-center px-3 py-1.5 rounded-full transition-colors active:opacity-70"
                 style={{ background: 'rgba(0, 0, 0, 0.05)' }}
               >
-                <span className="text-[12px] font-medium" style={{ color: 'var(--hub-text-sub)' }}>
+                <span className="text-[12px] font-medium" style={{ color: '#64748b' }}>
                   +{extraCount} more
                 </span>
               </button>
+            )}
+
+            {/* Ghost chip when at max */}
+            {isAtMax && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="inline-flex items-center px-3 py-1.5 rounded-full"
+                style={{ 
+                  background: 'rgba(0, 0, 0, 0.03)',
+                  border: '1px dashed rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <span className="text-[12px] font-medium" style={{ color: '#94a3b8' }}>
+                  Max players reached
+                </span>
+              </motion.div>
             )}
 
             {canAddMore && (
@@ -173,8 +194,8 @@ export function PlayersCard({
                   border: '1px dashed rgba(0, 0, 0, 0.15)',
                 }}
               >
-                <Plus className="w-3 h-3" style={{ color: 'var(--hub-text-dim)' }} />
-                <span className="text-[12px] font-medium" style={{ color: 'var(--hub-text-dim)' }}>
+                <Plus className="w-3 h-3" style={{ color: '#94a3b8' }} />
+                <span className="text-[12px] font-medium" style={{ color: '#94a3b8' }}>
                   Add
                 </span>
               </button>
