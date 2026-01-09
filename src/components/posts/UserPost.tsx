@@ -28,7 +28,6 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     rawCourseId,
     handleDeletePost,
     handleProfileClick,
-    handlePostClick,
   } = useUserPostLogic({
     post,
     allUserPosts,

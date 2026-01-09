@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useFollow } from '@/hooks/useFollow';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
-import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
@@ -122,7 +122,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(user?.id);
   
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
-  const { openMedia } = useFullscreenMedia();
+  const { openFullscreen } = useUnifiedFullscreen('profile', {});
   const [isClosing, setIsClosing] = useState(false);
   
   const headerRef = React.useRef<HTMLDivElement>(null);
@@ -228,24 +228,23 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
 
   const isFollowing = followState === 'following';
 
-  const handlePostClick = (post: any) => {
-    if (post.post_media?.length > 0) {
-      const media = post.post_media[0];
-      // For videos, use the original HLS URL, for images use the image URL
-      const mediaUrl = media.type === 'video' ? media.url : media.url;
-      openMedia(
-        mediaUrl,
-        media.type,
-        'User post',
-        undefined,
-        {
+  const handlePostClick = (postItem: any) => {
+    if (postItem.post_media?.length > 0) {
+      // Convert post media to ProfileContentItem format
+      const items = postItem.post_media.map((m: any, idx: number) => ({
+        id: `${postItem.id}-${idx}`,
+        type: m.type as 'image' | 'video',
+        url: m.url,
+        posterUrl: m.poster_url,
+        user: {
           id: user.id,
-          displayName: user.name,
-          profile_photo_url: user.avatar
+          profile_photo_url: user.avatar,
+          display_name: user.name,
+          username: user.username
         },
-        user.name,
-        post.content
-      );
+        content: postItem.content
+      }));
+      openFullscreen(items, 0);
     }
   };
 
