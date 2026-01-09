@@ -107,9 +107,18 @@ export const courseFeedAdapter: FeedAdapter<CourseReviewMediaItem> = {
 
   getReviewData: (item) => {
     if (!item.review_id) return null;
+    
+    const course = item.course;
+    const rating = item.rating || 0;
+    const tierLabel = rating >= 9 ? 'OUTSTANDING' : rating >= 8 ? 'EXCELLENT' : rating >= 7 ? 'VERY GOOD' : rating >= 6 ? 'GOOD' : 'FAIR';
+    
     return {
-      rating: item.rating || 0,
-      reviewId: item.review_id,
+      courseId: course?.id || '',
+      courseName: course?.name || 'Golf Course',
+      courseLocation: course ? `${course.region || ''}, ${course.country || ''}`.replace(/^, |, $/g, '') : undefined,
+      rating,
+      tierLabel,
+      sourceReviewId: item.review_id,
     };
   },
 
