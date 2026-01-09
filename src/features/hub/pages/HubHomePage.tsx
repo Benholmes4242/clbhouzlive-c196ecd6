@@ -210,9 +210,13 @@ export function HubHomePage() {
               <EchoTile />
             </div>
 
-            {/* Zone 5: Full-width "Your Games" Gradient CTA */}
-            <YourGamesGradientCTA />
+            {/* Spacer to push Your Games to bottom */}
+            <div className="flex-1" />
 
+            {/* Zone 5: Full-width "Your Games" Gradient CTA - 12px above dock */}
+            <div className="pb-3">
+              <YourGamesGradientCTA />
+            </div>
           </div>
         </div>
 
