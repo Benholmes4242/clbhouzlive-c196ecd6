@@ -2757,9 +2757,12 @@ export type Database = {
           game_id: string
           guest_name: string | null
           id: string
+          invited_by: string | null
           joined_at: string | null
           reserves_slot: boolean
           role: string
+          rsvp_status: string | null
+          rsvp_updated_at: string | null
           state: string
           updated_at: string
           user_id: string | null
@@ -2770,9 +2773,12 @@ export type Database = {
           game_id: string
           guest_name?: string | null
           id?: string
+          invited_by?: string | null
           joined_at?: string | null
           reserves_slot?: boolean
           role?: string
+          rsvp_status?: string | null
+          rsvp_updated_at?: string | null
           state?: string
           updated_at?: string
           user_id?: string | null
@@ -2783,9 +2789,12 @@ export type Database = {
           game_id?: string
           guest_name?: string | null
           id?: string
+          invited_by?: string | null
           joined_at?: string | null
           reserves_slot?: boolean
           role?: string
+          rsvp_status?: string | null
+          rsvp_updated_at?: string | null
           state?: string
           updated_at?: string
           user_id?: string | null

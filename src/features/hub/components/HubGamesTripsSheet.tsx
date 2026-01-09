@@ -5,13 +5,14 @@
  * Matches Hub design language precisely
  */
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search, CalendarDays, Plus, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { useHub } from '../useHub';
+import { YourGamesTripsSheetV2 } from './your-games-trips-v2';
 import '../home/hubThemeLight.css';
 
 interface HubGamesTripsSheetProps {
