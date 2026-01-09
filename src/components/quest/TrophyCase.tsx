@@ -6,7 +6,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CLUB_STEPS } from '@/lib/top100Club';
-import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 type FilterMode = 'milestones' | 'regions';
 
@@ -25,7 +25,7 @@ interface TrophyCaseProps {
 }
 
 // Map region id to tier
-const REGION_TIER_MAP: Record<string, AchievementTier> = {
+const REGION_TIER_MAP: Record<string, EliteCardTier> = {
   'gb-i': 'GBI',
   'europe': 'EU',
   'usa': 'USA',
@@ -62,10 +62,6 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
 
   const unlockedRegions = regions.filter(r => r.isUnlocked);
   
-  // Latest earned badge (for showcase - slightly larger)
-  const latestMilestone = unlockedMilestones[unlockedMilestones.length - 1];
-  const latestRegion = unlockedRegions[unlockedRegions.length - 1];
-
   // Determine what to show based on filter
   const showMilestones = filter === 'milestones';
   const displayItems = showMilestones ? unlockedMilestones : unlockedRegions;
@@ -76,11 +72,11 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
 
   return (
     <section>
-      {/* Section header with inline toggle - mb-4 */}
+      {/* Section header with inline toggle */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Trophy Case</h2>
         
-        {/* Filter toggle - inline with header, no extra spacing */}
+        {/* Filter toggle */}
         <div className="flex rounded-full p-0.5 bg-slate-100 border border-slate-200/60">
           <button
             onClick={() => setFilter('milestones')}
@@ -105,7 +101,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
         </div>
       </div>
 
-      {/* Badge grid - gap-3 row spacing */}
+      {/* Badge grid */}
       <div>
         <AnimatePresence mode="wait">
           {!hasItems ? (
@@ -143,15 +139,16 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                       transition={{ delay: index * 0.03 }}
                       onClick={() => onBadgeClick?.({ type: 'milestone', id: String(m.threshold), threshold: m.threshold })}
                     >
-                      <AchievementBadgeCard
-                        tier={String(m.threshold) as AchievementTier}
+                      <EliteGameCard
+                        tier={String(m.threshold) as EliteCardTier}
+                        earned={true}
+                        currentProgress={totalPlayed}
+                        targetProgress={m.threshold}
                         title={m.name}
                         subtitle={m.tierName}
-                        unlocked={true}
-                        status="UNLOCKED"
-                        totalTop100Played={totalPlayed}
-                        threshold={m.threshold}
                         compact={true}
+                        enableAnimations={false}
+                        quality="low"
                       />
                     </motion.div>
                   ))}
@@ -163,16 +160,17 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                       transition={{ delay: unlockedMilestones.length * 0.03 }}
                       onClick={() => onBadgeClick?.({ type: 'milestone', id: String(nextMilestone.threshold), threshold: nextMilestone.threshold })}
                     >
-                      <AchievementBadgeCard
-                        tier={String(nextMilestone.threshold) as AchievementTier}
+                      <EliteGameCard
+                        tier={String(nextMilestone.threshold) as EliteCardTier}
+                        earned={false}
+                        isGhost={true}
+                        currentProgress={totalPlayed}
+                        targetProgress={nextMilestone.threshold}
                         title={nextMilestone.name}
                         subtitle={nextMilestone.tierName}
-                        unlocked={false}
-                        isGhost={true}
-                        remaining={nextMilestone.threshold - totalPlayed}
-                        totalTop100Played={totalPlayed}
-                        threshold={nextMilestone.threshold}
                         compact={true}
+                        enableAnimations={false}
+                        quality="low"
                       />
                     </motion.div>
                   )}
@@ -190,16 +188,17 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                         transition={{ delay: index * 0.03 }}
                         onClick={() => onBadgeClick?.({ type: 'region', id: r.id })}
                       >
-                        <AchievementBadgeCard
+                        <EliteGameCard
                           tier={tier}
+                          earned={r.isUnlocked}
+                          isGhost={!r.isUnlocked}
+                          currentProgress={r.played}
+                          targetProgress={r.total}
                           title={`${r.name} Complete`}
                           subtitle={`${r.played}/${r.total} courses`}
-                          unlocked={r.isUnlocked}
-                          isGhost={!r.isUnlocked}
-                          status={r.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
-                          playedOnList={r.played}
-                          totalOnList={r.total}
                           compact={true}
+                          enableAnimations={false}
+                          quality="low"
                         />
                       </motion.div>
                     );

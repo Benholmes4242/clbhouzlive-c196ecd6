@@ -1,15 +1,10 @@
 import React from 'react';
-import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from './EliteGameCard';
 import { MILESTONE_ACHIEVEMENTS } from '@/lib/achievementDefinitions';
 import { getTop100Club } from '@/lib/top100Club';
 
 interface MilestonesSectionProps {
   totalTop100Played: number;
-}
-
-// Map milestone threshold to AchievementTier
-function getMilestoneTier(threshold: number): AchievementTier {
-  return threshold.toString() as AchievementTier;
 }
 
 export const MilestonesSection: React.FC<MilestonesSectionProps> = ({
@@ -27,16 +22,18 @@ export const MilestonesSection: React.FC<MilestonesSectionProps> = ({
         {MILESTONE_ACHIEVEMENTS.map((milestone) => {
           const threshold = milestone.threshold ?? 0;
           const isUnlocked = totalTop100Played >= threshold;
-          const isCurrent = currentClub.threshold === threshold;
 
           return (
-            <AchievementBadgeCard
+            <EliteGameCard
               key={milestone.id}
-              tier={getMilestoneTier(threshold)}
+              tier={String(threshold) as EliteCardTier}
+              earned={isUnlocked}
+              currentProgress={totalTop100Played}
+              targetProgress={threshold}
               title={milestone.shortLabel}
               subtitle={milestone.label}
-              unlocked={isUnlocked}
-              isPrimary={isCurrent}
+              enableAnimations={false}
+              quality="medium"
             />
           );
         })}

@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Top100TierId } from '@/lib/top100Club';
 import { TIER_BY_ID } from '@/lib/top100Club';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
-// Club name mapping (same source as AchievementBadgeCard)
+// Club name mapping
 const CLUB_NAMES: Record<number, string> = {
   5: 'Rookie Club',
   10: 'Fairway Club',
@@ -27,8 +27,8 @@ interface Top100AchievementBadgeProps {
 /**
  * Top100AchievementBadge - Part of Global Achievement & Milestone System
  * 
- * Now wraps the unified AchievementBadgeCard for consistent styling site-wide.
- * This component is kept for backwards compatibility but delegates to AchievementBadgeCard.
+ * Now wraps the unified EliteGameCard for consistent styling site-wide.
+ * This component is kept for backwards compatibility but delegates to EliteGameCard.
  */
 export function Top100AchievementBadge({ 
   tier, 
@@ -42,19 +42,22 @@ export function Top100AchievementBadge({
   const tierMeta = TIER_BY_ID[tier];
   if (!tierMeta) return null;
 
-  // Convert Top100TierId to AchievementTier
-  const achievementTier = tierMeta.threshold.toString() as AchievementTier;
+  // Convert Top100TierId to EliteCardTier
+  const eliteTier = tierMeta.threshold.toString() as EliteCardTier;
   const clubName = CLUB_NAMES[tierMeta.threshold] || `${tierMeta.threshold} Club`;
 
   return (
     <div className={className}>
-      <AchievementBadgeCard
-        tier={achievementTier}
+      <EliteGameCard
+        tier={eliteTier}
+        earned={true}
+        currentProgress={totalTop100Played}
+        targetProgress={tierMeta.threshold}
         title={clubName}
-        subtitle={tierMeta.tierName}
-        unlocked={true}
+        subtitle={showSubtitle ? tierMeta.tierName : undefined}
         compact={size === 'compact'}
-        totalTop100Played={totalTop100Played}
+        enableAnimations={false}
+        quality={size === 'compact' ? 'low' : 'medium'}
       />
     </div>
   );

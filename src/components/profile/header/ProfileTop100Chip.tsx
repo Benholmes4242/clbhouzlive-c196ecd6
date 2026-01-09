@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import ProfileCompletionStamps from './ProfileCompletionStamps';
 import { getCompletionStamps } from '@/lib/top100Helpers';
 import type { Top100ListProgress } from '@/lib/top100Helpers';
@@ -24,7 +24,7 @@ interface ProfileTop100ChipProps {
 /**
  * ProfileTop100Chip - Part of Global Achievement & Milestone System
  * 
- * Uses the unified AchievementBadgeCard component with colors from
+ * Uses the unified EliteGameCard component with colors from
  * globalAchievementMilestoneSystem.ts to match all other achievement displays.
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
@@ -45,8 +45,8 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   const club = getTop100Club(totalPlayed);
   const completionStamps = getCompletionStamps(top100Overview.lists);
   
-  // Map threshold to AchievementTier
-  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
+  // Map threshold to EliteCardTier
+  const eliteTier = club.threshold?.toString() as EliteCardTier || '5';
 
   return (
     <section className="mt-8 flex flex-col items-center">
@@ -60,12 +60,16 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           'hover:scale-[1.01]'
         )}
       >
-        <AchievementBadgeCard
-          tier={achievementTier}
+        <EliteGameCard
+          tier={eliteTier}
+          earned={true}
+          currentProgress={totalPlayed}
+          targetProgress={club.threshold}
           title={`${totalPlayed} Top 100`}
           subtitle={club.tierName || 'Top 100 Club'}
-          unlocked={true}
           compact={true}
+          enableAnimations={false}
+          quality="low"
         />
         <ChevronRight className="absolute -right-7 h-5 w-5 text-slate-400" />
       </button>
