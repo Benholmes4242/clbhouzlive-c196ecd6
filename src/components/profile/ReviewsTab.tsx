@@ -7,12 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from "@/lib/utils";
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import ReviewMediaThumb from './ReviewMediaThumb';
 import { MediaItem } from '@/types/media';
 import { ExploreContentItem } from '@/components/explore/types';
 import { getStreamPoster } from '@/utils/stream';
 import { FLAGS } from '@/config/flags';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 type Review = {
   id: string;
@@ -114,14 +114,31 @@ function ReviewCard({
   const [unhelpful, setUnhelpful] = React.useState(review.unhelpfulCount || 0);
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
   const [pending, setPending] = React.useState(false);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [startIndex, setStartIndex] = React.useState(0);
+
+  // Use unified fullscreen for review media
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+  });
 
   const MAX_THUMBS = 3;
 
   const openModal = (index: number) => {
-    setStartIndex(index);
-    setIsModalOpen(true);
+    if (review.media && review.media.length > 0) {
+      // Transform review media to explore content items for unified player
+      const mediaItems = review.media.map((m, i) => ({
+        id: `${review.id}-media-${i}`,
+        type: m.type as 'video' | 'image',
+        src: m.url,
+        title: review.text?.slice(0, 50) || 'Review media',
+        likes: 0,
+        user: {
+          id: review.user.name,
+          name: review.user.name,
+          avatar: review.user.avatarUrl,
+        },
+      }));
+      openFullscreen(mediaItems, index);
+    }
   };
 
   // Vote handling logic
@@ -302,16 +319,6 @@ function ReviewCard({
         </div>
       </CardContent>
 
-      {/* Fullscreen Media Modal */}
-      {isModalOpen && review.media && review.media.length > 0 && (
-        <FullscreenMediaModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          mediaUrl={review.media.map(m => m.url)}
-          mediaType={review.media.map(m => m.type)}
-          initialIndex={startIndex}
-        />
-      )}
     </Card>
   );
 }

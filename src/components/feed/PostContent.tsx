@@ -1,14 +1,13 @@
-import React, { useRef, useEffect, useState, useId } from 'react';
-import { Play, Pause, Maximize2 } from 'lucide-react';
+import React, { useRef, useState, useId } from 'react';
+import { Play } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import TaggedText from '@/components/posts/TaggedText';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface Tag {
   id: string;
@@ -53,8 +52,12 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
   const mediaId = useId();
+
+  // Unified fullscreen for media
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+  });
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -88,12 +91,28 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
     return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
   };
 
-  const handleImageClick = (imageUrl: string) => {
-    openMedia(imageUrl, 'image');
+  const handleImageClick = (imageUrl: string, index: number = 0) => {
+    // Transform to explore content items for unified player
+    const allImages = getAllImages();
+    const mediaItems = allImages.map((url, i) => ({
+      id: `post-image-${i}`,
+      type: 'image' as const,
+      src: url,
+      title: content.description?.slice(0, 50) || 'Image',
+      likes: 0,
+    }));
+    openFullscreen(mediaItems, index);
   };
 
   const handleVideoFullscreen = (videoUrl: string) => {
-    openMedia(videoUrl, 'video');
+    const mediaItems = [{
+      id: 'post-video',
+      type: 'video' as const,
+      src: videoUrl,
+      title: content.description?.slice(0, 50) || 'Video',
+      likes: 0,
+    }];
+    openFullscreen(mediaItems, 0);
   };
 
   // Get all images for carousel
@@ -273,15 +292,6 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
           createImageWithPin(allImages[0], 0)
         ) : null}
       </div>
-
-      {/* Fullscreen Media Modal */}
-      <FullscreenMediaModal
-        isOpen={isOpen}
-        onClose={closeMedia}
-        mediaUrl={currentMedia ? (currentMedia.mediaUrls || currentMedia.items?.map(i => i.url) || '') : ''}
-        mediaType={currentMedia ? (currentMedia.mediaTypes || currentMedia.items?.map(i => i.type) || 'image') : 'image'}
-        alt={currentMedia ? currentMedia.items?.[currentMedia.initialIndex ?? 0]?.alt : undefined}
-      />
     </>
   );
 };

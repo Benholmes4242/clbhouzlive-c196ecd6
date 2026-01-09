@@ -1,22 +1,16 @@
 import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaAutoplay } from '@/media';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { UserPostData, GolfCourse } from './types';
 import { UserInfoOverlay } from './overlays/UserInfoOverlay';
-
 import { CaptionOverlay } from './overlays/CaptionOverlay';
 import { InteractionIconsOverlay } from './overlays/InteractionIconsOverlay';
 import { MediaNavigationDots } from './overlays/MediaNavigationDots';
 import { MediaContainer } from './MediaContainer';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { useFullscreenPostNavigation } from '@/hooks/useFullscreenPostNavigation';
 import { AchievementBadgesOverlay } from '@/components/post/badges/AchievementBadgesOverlay';
-
 
 interface IndexFeedPostProps {
   post: UserPostData;
@@ -40,9 +34,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
-  const [shouldResumeOnReturn, setShouldResumeOnReturn] = useState(false);
   const { user } = useSupabaseSession();
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const isMobile = useIsMobile();
   
   // Unified media autoplay system
@@ -54,21 +46,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   });
   
   const isPlaying = playingIds.has(mediaId);
-  
-  // Use the new fullscreen post navigation hook
-  const {
-    isOpen: isFullscreenOpen,
-    currentMedia,
-    userPosts,
-    currentPostIndex,
-    loading: postsLoading,
-    openMedia: openFullscreenMedia,
-    closeMedia: closeFullscreenMedia,
-    goToNextPost,
-    goToPreviousPost,
-    canGoNext,
-    canGoPrevious
-  } = useFullscreenPostNavigation();
   
   // Video ref callback for media registration - passed to MediaContainer
   const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
@@ -125,48 +102,13 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     // Handle interaction logic here (like, comment, share)
   }, []);
 
-  const handleMaximizeClick = useCallback(async (e: React.MouseEvent) => {
+  const handleMaximizeClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentMediaMemo) return;
     
-    let videoPosition = 0;
-    let videoMuted = true;
-    
-    // Store current state and get current position for videos
-    if (currentMediaMemo.media_type === 'video') {
-      const videoId = `index-${currentMediaMemo.id}`;
-      const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
-      
-      if (video) {
-        videoPosition = video.currentTime;
-        videoMuted = video.muted;
-      }
-      
-      setShouldResumeOnReturn(true);
-    }
-    
-    const mediaUrls = post.post_media.map(m => m.media_url);
-    const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
-    const filterIds = post.post_media.map(m => m.filter_id ?? null);
-    const studioEdits = post.post_media.map(m => m.studio_edits ?? null);
-    
-    // Open with post navigation enabled, passing current video position and mute state
-    await openFullscreenMedia(
-      mediaUrls,
-      mediaTypes,
-      'Post content',
-      golfCourse || undefined,
-      post.user,
-      displayName,
-      post.content,
-      post.post_tags,
-      currentMediaIndex,
-      post.id, // Pass post ID
-      post.user.id, // Pass user ID for fetching other posts
-      videoPosition, // Pass current video position
-      videoMuted // Pass current mute state
-    );
-  }, [currentMediaIndex, currentMediaMemo, post, golfCourse, displayName, openFullscreenMedia]);
+    // Delegate to parent's onMediaClick handler which uses unified fullscreen
+    onMediaClick(currentMediaMemo.media_url, currentMediaMemo.media_type as 'image' | 'video', currentMediaIndex);
+  }, [currentMediaIndex, currentMediaMemo, onMediaClick]);
 
   // Memoized values
   const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
@@ -263,63 +205,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           currentIndex={currentMediaIndex}
         />
       </MediaContainer>
-
-      {/* Enhanced Fullscreen Modal with Post Navigation */}
-      <FullscreenMediaModal
-        isOpen={isFullscreenOpen}
-        onClose={(videoPosition, videoMuted) => {
-          // Handle video resume on modal close
-          if (shouldResumeOnReturn && currentMediaMemo) {
-            if (currentMediaMemo.media_type === 'video') {
-              const videoId = `index-${currentMediaMemo.id}`;
-              const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
-              
-              if (video && videoPosition !== undefined) {
-                // Set the video to the position and mute state from the modal
-                video.currentTime = videoPosition;
-                if (videoMuted !== undefined) {
-                  video.muted = videoMuted;
-                  // Update global audio state to match the video's new mute state
-                  setGlobalMute(videoMuted);
-                }
-                console.log('▶️ Resumed video from modal position:', videoPosition, 'muted:', videoMuted);
-              }
-            }
-            setShouldResumeOnReturn(false);
-          }
-          closeFullscreenMedia();
-        }}
-        mediaUrl={currentMedia?.mediaUrls || []}
-        mediaType={currentMedia?.mediaTypes || []}
-        alt={currentMedia?.items?.[currentMedia?.initialIndex ?? 0]?.alt}
-        golfCourse={golfCourse || undefined}
-        user={currentMedia?.user}
-        displayName={currentMedia?.displayName}
-        content={currentMedia?.content}
-        postTags={currentMedia?.postTags}
-        initialIndex={currentMedia?.initialIndex || 0}
-        canNavigatePosts={userPosts.length > 1}
-        canGoNext={canGoNext}
-        canGoPrevious={canGoPrevious}
-        onNextPost={goToNextPost}
-        onPreviousPost={goToPreviousPost}
-        currentPostIndex={currentPostIndex}
-        totalPosts={userPosts.length}
-        initialVideoPosition={currentMedia?.videoPosition}
-        initialVideoMuted={currentMedia?.videoMuted}
-        filterIds={currentMedia?.filterIds}
-        studioEdits={currentMedia?.studioEdits}
-        postId={post.id}
-        onPostDeleted={() => {
-          onDeletePost?.();
-          closeFullscreenMedia();
-        }}
-        onPostEdit={(postId) => {
-          // TODO: Implement edit functionality 
-          console.log('Edit post:', postId);
-          closeFullscreenMedia();
-        }}
-      />
     </div>
   );
 };
