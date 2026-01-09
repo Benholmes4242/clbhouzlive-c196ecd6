@@ -178,12 +178,17 @@ export function useGameRsvp(gameId: string | undefined) {
       // Send RSVP notification for "going" status
       if (newStatus === 'going' && query.data?._gameData) {
         const gameData = query.data._gameData;
-        // Recipients: host + other participants who are going (friends in game)
+        
+        // Recipients: host always + capped going participants (max 10 to prevent noise)
+        const MAX_GOING_RECIPIENTS = 10;
+        const goingParticipants = query.data.participants
+          .filter(p => p.userId && p.rsvpStatus === 'going')
+          .slice(0, MAX_GOING_RECIPIENTS)
+          .map(p => p.userId!);
+        
         const recipientUserIds = [
           gameData.hostUserId,
-          ...query.data.participants
-            .filter(p => p.userId && p.rsvpStatus === 'going')
-            .map(p => p.userId!)
+          ...goingParticipants,
         ].filter((id, idx, arr) => arr.indexOf(id) === idx); // Dedupe
 
         sendRsvpNotification.mutate({
