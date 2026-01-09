@@ -1,14 +1,13 @@
 import React from 'react';
-import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from './EliteGameCard';
 
 // Future-proofed skill achievements - currently empty
-// Will be populated with handicap, PB rounds, hole-in-one, longest drive, etc.
 interface SkillAchievement {
   id: string;
   title: string;
   subtitle: string;
   unlocked: boolean;
-  tier: AchievementTier;
+  tier: EliteCardTier;
 }
 
 interface SkillAchievementsSectionProps {
@@ -32,11 +31,13 @@ export const SkillAchievementsSection: React.FC<SkillAchievementsSectionProps> =
       <div className="flex gap-3 overflow-x-auto pb-1 -ml-4 pl-4 md:ml-0 md:pl-0">
         {skillAchievements.map((achievement) => (
           <div className="min-w-[140px] max-w-[160px] flex-shrink-0" key={achievement.id}>
-            <AchievementBadgeCard
+            <EliteGameCard
               tier={achievement.tier}
+              earned={achievement.unlocked}
               title={achievement.title}
               subtitle={achievement.subtitle}
-              unlocked={achievement.unlocked}
+              enableAnimations={false}
+              quality="medium"
             />
           </div>
         ))}

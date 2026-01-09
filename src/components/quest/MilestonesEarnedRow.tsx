@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { CLUB_STEPS } from '@/lib/top100Club';
-import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface MilestonesEarnedRowProps {
   totalPlayed: number;
@@ -38,14 +38,15 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
               animationDelay: `${index * 50}ms`,
             }}
           >
-            <AchievementBadgeCard
-              tier={String(m.threshold) as AchievementTier}
+            <EliteGameCard
+              tier={String(m.threshold) as EliteCardTier}
+              earned={true}
+              currentProgress={totalPlayed}
+              targetProgress={m.threshold}
               title={m.name}
               subtitle={m.tierName}
-              unlocked={true}
-              status="UNLOCKED"
-              totalTop100Played={totalPlayed}
-              threshold={m.threshold}
+              enableAnimations={false}
+              quality="medium"
             />
           </div>
         ))}
@@ -53,15 +54,16 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
         {/* Show next locked milestone as ghost */}
         {nextMilestone && (
           <div className="flex-shrink-0">
-            <AchievementBadgeCard
-              tier={String(nextMilestone.threshold) as AchievementTier}
+            <EliteGameCard
+              tier={String(nextMilestone.threshold) as EliteCardTier}
+              earned={false}
+              isGhost={true}
+              currentProgress={totalPlayed}
+              targetProgress={nextMilestone.threshold}
               title={nextMilestone.name}
               subtitle={nextMilestone.tierName}
-              unlocked={false}
-              isGhost={true}
-              remaining={nextMilestone.threshold - totalPlayed}
-              totalTop100Played={totalPlayed}
-              threshold={nextMilestone.threshold}
+              enableAnimations={false}
+              quality="medium"
             />
           </div>
         )}

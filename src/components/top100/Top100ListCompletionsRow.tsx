@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 const LIST_LABELS: Record<string, string> = {
   global: 'World Complete',
@@ -9,7 +9,7 @@ const LIST_LABELS: Record<string, string> = {
   europe: 'Europe Complete',
 };
 
-const TIER_MAP: Record<string, AchievementTier> = {
+const TIER_MAP: Record<string, EliteCardTier> = {
   global: 'WORLD',
   'gb-i': 'GBI',
   usa: 'USA',
@@ -34,7 +34,7 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
 
   return (
     <div className="mt-10 px-4">
-      {/* Section header - lighter text, mb-4 */}
+      {/* Section header */}
       <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">
         Top 100 list completions
       </p>
@@ -45,7 +45,6 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
           const played = progress?.played ?? 0;
           const total = progress?.total ?? 100;
           const complete = played >= total && total > 0;
-          const remaining = Math.max(0, total - played);
 
           return (
             <button
@@ -54,14 +53,15 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
               onClick={() => onCardClick(slug, played, total)}
               className="text-left"
             >
-              <AchievementBadgeCard
+              <EliteGameCard
                 tier={TIER_MAP[slug]}
+                earned={complete}
+                currentProgress={played}
+                targetProgress={total}
                 title={LIST_LABELS[slug]}
                 subtitle={`${played} / ${total} courses`}
-                unlocked={complete}
-                remaining={complete ? undefined : remaining}
-                playedOnList={played}
-                totalOnList={total}
+                enableAnimations={false}
+                quality="medium"
               />
             </button>
           );

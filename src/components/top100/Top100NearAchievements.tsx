@@ -1,6 +1,6 @@
 import React from 'react';
 import { TOP100_MILESTONES } from '@/config/top100Milestones';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface Top100NearAchievementsProps {
   totalTop100Played: number;
@@ -35,12 +35,15 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
       {/* Single badge display - clear distance to unlock */}
       <div className="flex justify-center">
         <div className="w-full max-w-xs">
-          <AchievementBadgeCard
-            tier={closest.threshold.toString() as AchievementTier}
+          <EliteGameCard
+            tier={closest.threshold.toString() as EliteCardTier}
+            earned={false}
+            currentProgress={totalTop100Played}
+            targetProgress={closest.threshold}
             title={`${closest.threshold} Club`}
             subtitle={closest.remaining === 1 ? 'Just 1 more course' : `${closest.remaining} away`}
-            unlocked={false}
-            remaining={closest.remaining}
+            enableAnimations={false}
+            quality="medium"
           />
         </div>
       </div>

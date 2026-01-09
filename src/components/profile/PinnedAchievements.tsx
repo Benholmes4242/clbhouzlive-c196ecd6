@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Lock, Settings, Trophy, MoreVertical, Medal, Award, Star } from 'lucide-react';
+import { Lock, Settings, Trophy, MoreVertical } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { toast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface Achievement {
   id: string;
@@ -20,7 +18,7 @@ interface Achievement {
   unlocked: boolean;
   iconURL?: string;
   description?: string;
-  tier?: AchievementTier;
+  tier?: EliteCardTier;
   subtitle?: string;
 }
 
@@ -96,14 +94,12 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     const unlockedAchievements = mockAchievements.filter(a => a.unlocked);
     
     if (pinnedAchievementIds.length > 0) {
-      // Show pinned achievements in saved order
       const pinned = pinnedAchievementIds
         .map(id => mockAchievements.find(a => a.id === id))
         .filter(Boolean) as Achievement[];
       return pinned.slice(0, 4);
     }
     
-    // Show top 4 unlocked by XP
     return unlockedAchievements
       .sort((a, b) => b.xp - a.xp)
       .slice(0, 4);
@@ -111,9 +107,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 
   // Check if section should be visible
   const shouldShowSection = (): boolean => {
-    if (isOwnProfile) return true; // Always show for owner
-    
-    // For visitors: only show if public and has achievements to display
+    if (isOwnProfile) return true;
     const hasAchievements = getDisplayAchievements().length > 0;
     return showAchievementsPublic && hasAchievements;
   };
@@ -192,17 +186,16 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     setIsManagePinsOpen(true);
   };
 
-  // Render achievement using shared AchievementBadgeCard
+  // Render achievement using EliteGameCard
   const renderAchievementCard = (achievement: Achievement, isPlaceholder = false) => {
     if (isPlaceholder || !achievement.tier) {
-      // Ghost/placeholder card
       return (
-        <AchievementBadgeCard
+        <EliteGameCard
           tier="5"
-          title=""
-          subtitle=""
-          unlocked={false}
+          earned={false}
           isGhost={true}
+          enableAnimations={false}
+          quality="low"
         />
       );
     }
@@ -212,11 +205,13 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         className="cursor-pointer"
         onClick={() => setIsAchievementsModalOpen(true)}
       >
-        <AchievementBadgeCard
+        <EliteGameCard
           tier={achievement.tier}
+          earned={achievement.unlocked}
           title={achievement.name}
           subtitle={achievement.subtitle || achievement.description || ''}
-          unlocked={achievement.unlocked}
+          enableAnimations={false}
+          quality="low"
         />
       </div>
     );
@@ -265,13 +260,12 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           </div>
         )}
 
-        {/* Achievement badges grid - using unified AchievementBadgeCard */}
+        {/* Achievement badges grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {Array.from({ length: 4 }, (_, index) => {
             const achievement = displayAchievements[index];
             
             if (!achievement && unlockedCount === 0 && isOwnProfile) {
-              // Show placeholder for empty state
               return (
                 <div key={`placeholder-${index}`}>
                   {renderAchievementCard(
@@ -325,7 +319,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Select up to 4 achievements to pin to your profile. Pinned achievements will be displayed to others when your profile is public.
+              Select up to 4 achievements to pin to your profile.
             </p>
             
             {/* Unlocked achievements */}
@@ -415,7 +409,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         isCurrentUser={isOwnProfile}
       />
 
-      {/* Achievement Detail Modal for Mobile - using unified AchievementBadgeCard */}
+      {/* Achievement Detail Modal for Mobile */}
       {selectedAchievement && (
         <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
           <DialogContent className="max-w-[90vw] max-h-[70vh] p-4">
@@ -425,11 +419,13 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
             <div className="space-y-4">
               <div className="flex justify-center">
                 {selectedAchievement.tier && (
-                  <AchievementBadgeCard
+                  <EliteGameCard
                     tier={selectedAchievement.tier}
+                    earned={selectedAchievement.unlocked}
                     title={selectedAchievement.name}
                     subtitle={selectedAchievement.subtitle || selectedAchievement.description || ''}
-                    unlocked={selectedAchievement.unlocked}
+                    enableAnimations={true}
+                    quality="high"
                   />
                 )}
               </div>

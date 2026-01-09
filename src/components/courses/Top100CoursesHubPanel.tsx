@@ -10,7 +10,7 @@ import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X, ChevronDown, ChevronRight } from 'lucide-react';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -254,12 +254,15 @@ const Top100CoursesHubPanel = () => {
               {/* Left: Badge tile - uses full AchievementBadgeCard (same as My Progress) */}
               <div className="shrink-0">
                 {totalRated >= 5 ? (
-                  <AchievementBadgeCard
-                    tier={club.threshold?.toString() as AchievementTier || '5'}
+                  <EliteGameCard
+                    tier={club.threshold?.toString() as EliteCardTier || '5'}
+                    earned={true}
+                    currentProgress={totalRated}
+                    targetProgress={club.threshold}
                     title={`${club.threshold} Club`}
                     subtitle={club.tierName || 'Top 100 Club'}
-                    unlocked={true}
-                    totalTop100Played={totalRated}
+                    enableAnimations={false}
+                    quality="medium"
                   />
                 ) : (
                   <div className="h-[88px] w-[180px] rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">

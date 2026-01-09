@@ -2,14 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100AchievementPrompts } from '@/hooks/useTop100AchievementPrompts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface Top100AchievementsBlockProps {
   listId: string;
 }
 
 // Map list ID to regional tier
-function getListTier(listId: string): AchievementTier {
+function getListTier(listId: string): EliteCardTier {
   if (listId.includes('gb') || listId.includes('ireland')) return 'GBI';
   if (listId.includes('europe')) return 'EU';
   if (listId.includes('usa')) return 'USA';
@@ -18,7 +18,7 @@ function getListTier(listId: string): AchievementTier {
 
 /**
  * Top100AchievementsBlock - Part of Global Achievement & Milestone System
- * Uses unified AchievementBadgeCard for consistent styling site-wide
+ * Uses unified EliteGameCard for consistent styling site-wide
  */
 export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = ({ listId }) => {
   const { user } = useSupabaseSession();
@@ -39,8 +39,10 @@ export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = (
       
       <div className="space-y-3">
         {prompts.map((prompt) => {
-          // Determine tier based on prompt
           const tier = getListTier(listId);
+          const progressParts = prompt.progressLabel?.split('/') || [];
+          const current = parseInt(progressParts[0] || '0', 10);
+          const total = parseInt(progressParts[1] || '100', 10);
           
           return (
             <button
@@ -48,12 +50,15 @@ export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = (
               onClick={handlePromptClick}
               className="w-full text-left"
             >
-              <AchievementBadgeCard
+              <EliteGameCard
                 tier={tier}
+                earned={prompt.isUnlocked}
+                currentProgress={current}
+                targetProgress={total}
                 title={prompt.name}
                 subtitle={prompt.description}
-                unlocked={prompt.isUnlocked}
-                remaining={prompt.isUnlocked ? undefined : parseInt(prompt.progressLabel?.split('/')[0] || '0')}
+                enableAnimations={false}
+                quality="medium"
               />
             </button>
           );

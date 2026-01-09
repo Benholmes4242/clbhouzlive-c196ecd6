@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
-import { REGION_SLUG_THEMES, getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface Top100ListAchievementsRowProps {
   listName: string;
@@ -27,8 +27,8 @@ const getAchievementsTitleForList = (listSlug?: string): string => {
   }
 };
 
-// Map list slug to AchievementBadgeCard tier
-const getListTier = (listSlug?: string): AchievementTier => {
+// Map list slug to EliteCardTier
+const getListTier = (listSlug?: string): EliteCardTier => {
   switch (listSlug) {
     case 'global': return 'WORLD';
     case 'gb-i': return 'GBI';
@@ -49,7 +49,7 @@ const getListSubtitle = (listSlug?: string): string => {
   }
 };
 
-// Maps playedCount → percentage across achievements (evenly spaced circles)
+// Maps playedCount → percentage across achievements
 function getAchievementsProgressPct(playedCount: number, milestones: { threshold: number }[], maxThreshold: number): number {
   if (playedCount <= 0) return 0;
   if (playedCount >= maxThreshold) return 100;
@@ -121,37 +121,35 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
       <div className="overflow-x-auto pb-1 -mx-1 px-1">
         {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full px-4">
-          {/* Row of AchievementBadgeCards */}
+          {/* Row of EliteGameCards */}
           <div className="flex gap-3">
             {milestones.map((m) => {
               const unlocked = playedCount >= m.threshold;
-              const remaining = Math.max(0, m.threshold - playedCount);
               const isListComplete = m.threshold >= totalCount;
 
-              // Badge title - use list name for complete badge, threshold for milestones
+              // Badge title
               const badgeTitle = isListComplete 
                 ? `${getListSubtitle(listSlug)} Complete`
                 : `${m.threshold} Club`;
 
-              // Use regional tier for ALL badges on regional list pages
-              // This ensures milestones (10/25/50/75 Club) use regional colors too
-              const tier: AchievementTier = listTier;
-
               return (
-                <AchievementBadgeCard
+                <EliteGameCard
                   key={m.threshold}
-                  tier={tier}
+                  tier={listTier}
+                  earned={unlocked}
+                  currentProgress={playedCount}
+                  targetProgress={m.threshold}
                   title={badgeTitle}
                   subtitle={isListComplete ? 'List Complete' : 'Milestone'}
-                  unlocked={unlocked}
-                  remaining={unlocked ? undefined : remaining}
                   compact
+                  enableAnimations={false}
+                  quality="low"
                 />
               );
             })}
           </div>
 
-          {/* Progress bar - uses region bgDark for soft pastel consistency with cards */}
+          {/* Progress bar */}
           <div className="h-1.5 rounded-full bg-muted/80 relative overflow-hidden">
             <div
               className="h-full rounded-full transition-all"

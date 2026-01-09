@@ -3,17 +3,17 @@
  * Phase 2: Extended with Top 100 List Completion achievements ("Mastery Track")
  * 
  * This is the "Journey Map" showing milestones AND regional list completions
- * Uses AchievementBadgeCard for consistent collector card design
+ * Uses EliteGameCard for consistent collector card design
  */
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Check, Lock, Trophy, Crown } from 'lucide-react';
-import { MILESTONE_TIER_META, type AchievementMilestone } from '@/config/achievements';
+import { MILESTONE_TIER_META } from '@/config/achievements';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
-import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
-import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { type Top100ListSlug } from '@/lib/regionTheme';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -60,7 +60,7 @@ interface MilestoneNodeProps {
 // REGION TIER MAPPING
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-const REGION_TO_TIER: Record<Top100ListSlug, AchievementTier> = {
+const REGION_TO_TIER: Record<Top100ListSlug, EliteCardTier> = {
   'gb-i': 'GBI',
   'europe': 'EU',
   'usa': 'USA',
@@ -92,7 +92,6 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   onClick,
 }) => {
   const isRegional = milestone.type === 'list_completion';
-  const remaining = milestone.threshold - totalPlayed;
   
   // Get colors based on type
   const accentColor = isRegional && milestone.regionSlug
@@ -112,9 +111,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         <div
           className="absolute left-5 w-0.5 z-0"
           style={{
-            // Start from center of circle (20px from top for 40px circle)
             top: '20px',
-            // Height extends down to connect with next node
             height: 'calc(100% + 16px)',
             background: milestone.isUnlocked
               ? `linear-gradient(to bottom, ${accentColor}80, rgb(226 232 240 / 0.6))`
@@ -179,23 +176,19 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
 
       {/* Milestone card - z-10 ensures it covers the connector line */}
       <div className="flex-1 mb-4 relative z-10" onClick={onClick}>
-          <AchievementBadgeCard
-            tier={isRegional && milestone.regionSlug 
-              ? REGION_TO_TIER[milestone.regionSlug] 
-              : String(milestone.threshold) as AchievementTier}
-            title={milestone.name}
-            subtitle={milestone.tierName}
-            unlocked={milestone.isUnlocked}
-            isGhost={!milestone.isUnlocked && !isCurrent}
-            status={milestone.isUnlocked ? 'UNLOCKED' : isCurrent ? undefined : 'LOCKED'}
-            remaining={!milestone.isUnlocked && !isRegional ? remaining : undefined}
-            totalTop100Played={totalPlayed}
-            isCurrentTarget={isCurrent}
-            playedOnList={milestone.played}
-            totalOnList={milestone.total}
-            threshold={milestone.threshold}
-            showSubtext={true}
-          />
+        <EliteGameCard
+          tier={isRegional && milestone.regionSlug 
+            ? REGION_TO_TIER[milestone.regionSlug] 
+            : String(milestone.threshold) as EliteCardTier}
+          earned={milestone.isUnlocked}
+          isGhost={!milestone.isUnlocked && !isCurrent}
+          currentProgress={isRegional ? milestone.played : totalPlayed}
+          targetProgress={isRegional ? milestone.total : milestone.threshold}
+          title={milestone.name}
+          subtitle={milestone.tierName}
+          enableAnimations={false}
+          quality="medium"
+        />
       </div>
     </motion.div>
   );
@@ -209,15 +202,14 @@ function buildMilestoneItems(totalPlayed: number): MilestoneItem[] {
   return MILESTONE_TIER_META.map(meta => ({
     id: `milestone_${meta.threshold}`,
     threshold: meta.threshold,
-    name: meta.tierName, // Use "Rookie Club", "Fairway Club" etc.
-    tierName: MILESTONE_TAGLINES[meta.threshold] || '', // Witty tagline as subtitle
+    name: meta.tierName,
+    tierName: MILESTONE_TAGLINES[meta.threshold] || '',
     type: 'milestone' as const,
     isUnlocked: totalPlayed >= meta.threshold,
   }));
 }
 
 function buildRegionCompletionItems(regions: RegionCompletionData[]): MilestoneItem[] {
-  // Order: GB&I, Europe, USA, Worldwide
   const orderedSlugs: Top100ListSlug[] = ['gb-i', 'europe', 'usa', 'global'];
   
   const items: MilestoneItem[] = [];
@@ -231,8 +223,8 @@ function buildRegionCompletionItems(regions: RegionCompletionData[]): MilestoneI
     items.push({
       id: `region_${slug}`,
       threshold: region.total,
-      name: REGION_FULL_NAMES[slug] || region.name, // Full display name
-      tierName: REGION_TAGLINES[slug] || '', // Witty tagline as subtitle
+      name: REGION_FULL_NAMES[slug] || region.name,
+      tierName: REGION_TAGLINES[slug] || '',
       type: 'list_completion',
       isUnlocked: isComplete,
       regionSlug: slug,
@@ -274,14 +266,9 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   // Check if all core milestones are complete (400 Club achieved)
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
 
-  // Calculate height for background line - ends at center of last core milestone (Grand Slam)
-  // Each milestone card is ~100px, line should stop at the last node's center (not extend past it)
-
   return (
     <div className="relative">
       <div className="relative pl-2">
-        {/* Background path line - hidden since individual node lines handle this */}
-
         <div className="space-y-0">
           {coreMilestones.map((milestone, index) => (
             <MilestoneNode
@@ -347,24 +334,22 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                     transition={{ delay: 0.5 + index * 0.05 }}
                     onClick={() => onMilestoneClick?.(milestone)}
                     style={{
-                      // Subtle regional color tint for unlocked cards
                       background: milestone.isUnlocked 
                         ? `linear-gradient(135deg, ${accentColor}08 0%, transparent 100%)`
                         : undefined,
-                      // Top accent strip for unlocked
                       borderTop: milestone.isUnlocked ? `2px solid ${accentColor}50` : undefined,
                     }}
                   >
-                    <AchievementBadgeCard
+                    <EliteGameCard
                       tier={REGION_TO_TIER[regionSlug]}
+                      earned={milestone.isUnlocked}
+                      isGhost={!milestone.isUnlocked && !coreComplete}
+                      currentProgress={milestone.played}
+                      targetProgress={milestone.total}
                       title={milestone.name}
                       subtitle={milestone.tierName}
-                      unlocked={milestone.isUnlocked}
-                      isGhost={!milestone.isUnlocked && !coreComplete}
-                      status={milestone.isUnlocked ? 'UNLOCKED' : 'LOCKED'}
-                      playedOnList={milestone.played}
-                      totalOnList={milestone.total}
-                      showSubtext={true}
+                      enableAnimations={false}
+                      quality="medium"
                     />
                   </motion.div>
                 );
