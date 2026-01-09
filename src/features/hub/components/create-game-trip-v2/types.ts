@@ -14,6 +14,8 @@ export type HoleCount = 9 | 18;
 export interface SelectedCourse {
   id: string;
   name: string;
+  country: string;
+  sub_country?: string;
   location?: string;
   thumbnail_image?: string;
 }
@@ -30,6 +32,8 @@ export interface TripCourseStop {
   id: string;
   courseId: string;
   courseName: string;
+  courseCountry: string;
+  courseThumbnail?: string;
   courseLocation?: string;
   dayIndex: number;
   playDateTime?: Date;

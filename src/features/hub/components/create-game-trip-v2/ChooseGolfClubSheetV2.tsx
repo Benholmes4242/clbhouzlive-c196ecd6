@@ -23,7 +23,13 @@ export function ChooseGolfClubSheetV2({ isOpen, onClose, onSelect }: ChooseGolfC
     <CourseSearchSheet
       isOpen={isOpen}
       onClose={onClose}
-      onSelect={onSelect}
+      onSelectCourse={(course) => onSelect({
+        id: course.id,
+        name: course.name,
+        country: course.country,
+        sub_country: course.sub_country,
+        thumbnail_image: course.thumbnail_image,
+      })}
     />
   );
 }
