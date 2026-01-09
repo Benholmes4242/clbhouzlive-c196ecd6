@@ -28,7 +28,7 @@ export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeaturePro
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className="group block relative overflow-hidden -mx-4 sm:-mx-6"
-      style={{ height: 'min(52vh, 420px)' }}
+      style={{ height: 'min(36vh, 290px)' }}
     >
       {/* Background Image or Gradient Fallback */}
       {courseImageUrl ? (
