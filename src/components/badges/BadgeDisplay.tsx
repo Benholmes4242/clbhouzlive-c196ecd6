@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge as BadgeType } from '@/types/badges';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGameCard';
 
 interface BadgeDisplayProps {
   badge: BadgeType;
@@ -12,7 +12,7 @@ interface BadgeDisplayProps {
 }
 
 // Map badge criteria to tier
-function getBadgeTier(badge: BadgeType): AchievementTier {
+function getBadgeTier(badge: BadgeType): EliteCardTier {
   const value = badge.criteria_value;
   if (value <= 5) return '5';
   if (value <= 10) return '10';
@@ -26,7 +26,7 @@ function getBadgeTier(badge: BadgeType): AchievementTier {
 
 /**
  * BadgeDisplay - Part of Global Achievement & Milestone System
- * Now wraps the unified AchievementBadgeCard for consistent styling site-wide.
+ * Now wraps the unified EliteGameCard for consistent styling site-wide.
  */
 const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
   badge,
@@ -37,16 +37,17 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
   className
 }) => {
   const tier = getBadgeTier(badge);
-  const remaining = Math.max(0, badge.criteria_value - progress);
 
   return (
     <div className={className}>
-      <AchievementBadgeCard
+      <EliteGameCard
         tier={tier}
+        earned={isEarned}
+        currentProgress={progress}
+        targetProgress={badge.criteria_value}
         title={badge.display_name}
         subtitle={badge.description}
-        unlocked={isEarned}
-        remaining={isEarned ? undefined : remaining}
+        compact={size === 'sm'}
       />
     </div>
   );

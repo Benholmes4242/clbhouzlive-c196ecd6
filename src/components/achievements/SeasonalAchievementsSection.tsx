@@ -1,5 +1,5 @@
 import React from 'react';
-import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
+import { EliteGameCard, EliteCardTier } from './EliteGameCard';
 
 // Future-proofed seasonal/limited achievements
 interface SeasonalAchievement {
@@ -7,7 +7,7 @@ interface SeasonalAchievement {
   title: string;
   seasonLabel: string;
   unlocked: boolean;
-  tier: AchievementTier;
+  tier: EliteCardTier;
 }
 
 interface SeasonalAchievementsSectionProps {
@@ -28,14 +28,15 @@ export const SeasonalAchievementsSection: React.FC<SeasonalAchievementsSectionPr
         <h2 className="text-base md:text-lg font-semibold">Seasonal & Limited Events</h2>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {seasonalAchievements.map((achievement) => (
-          <AchievementBadgeCard
+          <EliteGameCard
             key={achievement.id}
             tier={achievement.tier}
+            earned={achievement.unlocked}
             title={achievement.title}
             subtitle={achievement.seasonLabel}
-            unlocked={achievement.unlocked}
+            compact
           />
         ))}
       </div>

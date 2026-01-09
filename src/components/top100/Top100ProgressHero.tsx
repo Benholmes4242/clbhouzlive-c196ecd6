@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
-import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
@@ -78,7 +78,7 @@ function HeroWithMilestoneRow({
   avatarUrl: string | null; 
   displayName: string | null;
   ringColor: string | null;
-  achievementTier: AchievementTier;
+  achievementTier: EliteCardTier;
   totalTop100Played: number;
   clubName: string;
 }) {
@@ -122,7 +122,7 @@ function HeroWithMilestoneRow({
           />
         </div>
 
-        {/* Achievement badge card on the right - removed secondary Unlocked line per polish (1) */}
+        {/* Achievement badge card on the right */}
         <div
           style={{
             width: 'min(42vw, 260px)',
@@ -130,12 +130,12 @@ function HeroWithMilestoneRow({
           }}
           className="flex flex-col items-center gap-2"
         >
-          <AchievementBadgeCard
+          <EliteGameCard
             tier={achievementTier}
-            title={`${achievementTier} Club`}
-            subtitle={clubName}
-            unlocked={true}
-            totalTop100Played={totalTop100Played}
+            earned={true}
+            currentProgress={totalTop100Played}
+            title={clubName}
+            compact
           />
         </div>
       </div>
@@ -159,8 +159,8 @@ export function Top100ProgressHero({
   const club = getTop100Club(totalTop100Played);
   const hasAchievement = totalTop100Played >= 5;
   
-  // Map threshold to AchievementTier
-  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
+  // Map threshold to EliteCardTier
+  const achievementTier = club.threshold?.toString() as EliteCardTier || '5';
   
   // Human-friendly date format: "1 Feb 2026" (A3)
   const formattedDate = lastRoundAt

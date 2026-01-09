@@ -9,18 +9,18 @@ import {
   LIST_ACHIEVEMENTS,
 } from '@/lib/achievementDefinitions';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGameCard';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 
-// Map milestone threshold to AchievementTier
-function getMilestoneTier(threshold: number): AchievementTier {
-  return threshold.toString() as AchievementTier;
+// Map milestone threshold to EliteCardTier
+function getMilestoneTier(threshold: number): EliteCardTier {
+  return threshold.toString() as EliteCardTier;
 }
 
-// Map list ID to AchievementTier
-function getListTier(id: string): AchievementTier {
+// Map list ID to EliteCardTier
+function getListTier(id: string): EliteCardTier {
   if (id === 'list_gb_ireland') return 'GBI';
   if (id === 'list_europe') return 'EU';
   if (id === 'list_usa') return 'USA';
@@ -190,23 +190,19 @@ const AchievementsHubPage: React.FC = () => {
               Milestone badges
             </h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {MILESTONE_ACHIEVEMENTS.map((milestone) => {
                 const threshold = milestone.threshold ?? 0;
                 const isUnlocked = isDebugUser ? true : totalTop100Played >= threshold;
-                const isCurrent = currentClub.threshold === threshold;
-                const remaining = Math.max(0, threshold - totalTop100Played);
 
                 return (
-                  <AchievementBadgeCard
+                  <EliteGameCard
                     key={milestone.id}
                     tier={getMilestoneTier(threshold)}
+                    earned={isUnlocked}
+                    currentProgress={totalTop100Played}
                     title={milestone.shortLabel}
                     subtitle={milestone.label}
-                    unlocked={isUnlocked}
-                    isPrimary={isCurrent}
-                    remaining={isUnlocked ? undefined : remaining}
-                    totalTop100Played={isUnlocked ? totalTop100Played : undefined}
                   />
                 );
               })}
@@ -219,7 +215,7 @@ const AchievementsHubPage: React.FC = () => {
               Regional lists
             </h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {LIST_ACHIEVEMENTS.map((list) => {
                 const listSlugMap: Record<string, string> = {
                   'list_gb_ireland': 'gb-i',
@@ -231,20 +227,18 @@ const AchievementsHubPage: React.FC = () => {
                 const listProgress = progressData?.lists?.find(l => l.listSlug === slug);
                 const played = listProgress?.played ?? 0;
                 const total = listProgress?.total ?? 100;
-                const remaining = Math.max(0, total - played);
                 
                 const isUnlocked = isDebugUser ? true : (played >= total && total > 0);
 
                 return (
-                  <AchievementBadgeCard
+                  <EliteGameCard
                     key={list.id}
                     tier={getListTier(list.id)}
+                    earned={isUnlocked}
+                    currentProgress={played}
+                    targetProgress={total}
                     title={list.shortLabel}
                     subtitle={`${played} / ${total} courses`}
-                    unlocked={isUnlocked}
-                    remaining={isUnlocked ? undefined : remaining}
-                    playedOnList={played}
-                    totalOnList={total}
                   />
                 );
               })}
