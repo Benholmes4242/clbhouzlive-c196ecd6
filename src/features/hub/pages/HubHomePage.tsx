@@ -1,6 +1,6 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Fixed dashboard layout - no scroll, locked in place
+ * Fixed dashboard layout with subtle time-of-day theming
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -9,6 +9,7 @@ import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequ
 import { useHub } from '../useHub';
 import { prefersReduced } from '@/lib/ui/motion';
 import { useChromeState } from '@/hooks/useChromeState';
+import { useHubTimeOfDay } from '../home/hooks/useHubTimeOfDay';
 
 // Hub components
 import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
@@ -35,6 +36,7 @@ const DOCK_HEIGHT = 70;
 export function HubHomePage() {
   const { close } = useHub();
   const isDataReady = useHubDataReady();
+  const timeOfDayTheme = useHubTimeOfDay();
   
   useJoinRequestNotifications();
 
@@ -170,12 +172,12 @@ export function HubHomePage() {
         touchAction: 'none', // Prevent any scroll/bounce on the root
       }}
     >
-      {/* Glass Sheet */}
+      {/* Glass Sheet with time-of-day theming */}
       <div 
         ref={sheetRef}
         className="hub-glass-page flex-1 flex flex-col overflow-hidden"
         style={{
-          background: 'var(--hub-bg-start)',
+          background: timeOfDayTheme.bg,
           borderTop: '1px solid var(--hub-stroke)',
           transform: `translateY(${translateY}px)`,
           transition:
