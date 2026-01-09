@@ -18,7 +18,7 @@ import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2 } from 'lucide-react';
-import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -674,9 +674,9 @@ const ProfilePageV2: React.FC = () => {
             </div>
             <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
               {unlockedAchievements.slice(0, 3).map((achievement) => {
-                const tier: AchievementTier | null =
+                const tier: EliteCardTier | null =
                   achievement.type === 'milestone' && achievement.threshold
-                    ? (String(achievement.threshold) as AchievementTier)
+                    ? (String(achievement.threshold) as EliteCardTier)
                     : achievement.id === 'list_gb_ireland'
                       ? 'GBI'
                       : achievement.id === 'list_europe'
@@ -690,13 +690,14 @@ const ProfilePageV2: React.FC = () => {
                 if (!tier) return null;
 
                 return (
-                  <div key={achievement.id} className="flex-shrink-0">
-                    <AchievementBadgeCard
+                  <div key={achievement.id} className="flex-shrink-0 w-[280px]">
+                    <EliteGameCard
                       tier={tier}
+                      earned={true}
+                      currentProgress={top100Count}
                       title={achievement.shortLabel}
                       subtitle={achievement.label}
-                      unlocked
-                      totalTop100Played={top100Count}
+                      compact
                     />
                   </div>
                 );

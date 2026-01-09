@@ -8,7 +8,7 @@ import {
   LIST_ACHIEVEMENTS,
 } from '@/lib/achievementDefinitions';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
-import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
+import { EliteGameCard, EliteCardTier } from './EliteGameCard';
 import NudgeBanner from './NudgeBanner';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
@@ -23,13 +23,13 @@ interface MilestonesAndAchievementsContentProps {
   backLabel?: string;
 }
 
-// Map milestone threshold to AchievementTier
-function getMilestoneTier(threshold: number): AchievementTier {
-  return threshold.toString() as AchievementTier;
+// Map milestone threshold to EliteCardTier
+function getMilestoneTier(threshold: number): EliteCardTier {
+  return threshold.toString() as EliteCardTier;
 }
 
-// Map list ID to AchievementTier
-function getListTier(id: string): AchievementTier {
+// Map list ID to EliteCardTier
+function getListTier(id: string): EliteCardTier {
   if (id === 'list_gb_ireland') return 'GBI';
   if (id === 'list_europe') return 'EU';
   if (id === 'list_usa') return 'USA';
@@ -277,24 +277,20 @@ export const MilestonesAndAchievementsContent: React.FC<MilestonesAndAchievement
                 Top 100 milestone clubs
               </h2>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {MILESTONE_ACHIEVEMENTS.map((milestone) => {
                   const threshold = milestone.threshold ?? 0;
                   // In debug mode, all are unlocked
                   const isUnlocked = isDebugUser ? true : totalTop100Played >= threshold;
-                  const isCurrent = currentClub.threshold === threshold;
-                  const remaining = Math.max(0, threshold - totalTop100Played);
 
                   return (
-                    <AchievementBadgeCard
+                    <EliteGameCard
                       key={milestone.id}
                       tier={getMilestoneTier(threshold)}
+                      earned={isUnlocked}
+                      currentProgress={totalTop100Played}
                       title={milestone.shortLabel}
                       subtitle={milestone.label}
-                      unlocked={isUnlocked}
-                      isPrimary={isCurrent}
-                      remaining={isUnlocked ? undefined : remaining}
-                      totalTop100Played={isUnlocked ? totalTop100Played : undefined}
                     />
                   );
                 })}
@@ -307,7 +303,7 @@ export const MilestonesAndAchievementsContent: React.FC<MilestonesAndAchievement
                 Completed Top 100 lists
               </h2>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {LIST_ACHIEVEMENTS.map((list) => {
                   // Get list progress for this region
                   const listSlugMap: Record<string, string> = {
@@ -320,21 +316,19 @@ export const MilestonesAndAchievementsContent: React.FC<MilestonesAndAchievement
                   const listProgress = progressData?.lists?.find(l => l.listSlug === slug);
                   const played = listProgress?.played ?? 0;
                   const total = listProgress?.total ?? 100;
-                  const remaining = Math.max(0, total - played);
                   
                   // In debug mode, all are unlocked
                   const isUnlocked = isDebugUser ? true : (played >= total && total > 0);
 
                   return (
-                    <AchievementBadgeCard
+                    <EliteGameCard
                       key={list.id}
                       tier={getListTier(list.id)}
+                      earned={isUnlocked}
+                      currentProgress={played}
+                      targetProgress={total}
                       title={list.shortLabel}
                       subtitle={`${played} / ${total} courses`}
-                      unlocked={isUnlocked}
-                      remaining={isUnlocked ? undefined : remaining}
-                      playedOnList={played}
-                      totalOnList={total}
                     />
                   );
                 })}

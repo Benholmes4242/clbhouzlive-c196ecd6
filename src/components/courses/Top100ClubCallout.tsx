@@ -5,12 +5,12 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { Button } from '@/components/ui/button';
 import { Top100FriendsStrip } from './Top100FriendsStrip';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { getTop100Club } from '@/lib/top100Club';
 
 /**
  * Top100ClubCallout - Part of Global Achievement & Milestone System
- * Uses unified AchievementBadgeCard with colors from globalAchievementMilestoneSystem.ts
+ * Uses unified EliteGameCard with colors from globalAchievementMilestoneSystem.ts
  */
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
@@ -40,7 +40,7 @@ const Top100ClubCallout: React.FC = () => {
   // Achievement badge data
   const hasAchievement = coursesPlayed >= 5;
   const club = getTop100Club(coursesPlayed);
-  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
+  const achievementTier = club.threshold?.toString() as EliteCardTier || '5';
 
   return (
     <section 
@@ -68,15 +68,15 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
-                {/* Achievement Badge - using unified AchievementBadgeCard */}
+                {/* Achievement Badge - using unified EliteGameCard */}
                 {hasAchievement && (
-                  <div className="mb-4">
-                    <AchievementBadgeCard
+                  <div className="mb-4 w-full max-w-xs">
+                    <EliteGameCard
                       tier={achievementTier}
-                      title={`${coursesPlayed} Top 100`}
-                      subtitle={club.tierName || 'Top 100 Club'}
-                      unlocked={true}
-                      compact={true}
+                      earned={true}
+                      currentProgress={coursesPlayed}
+                      title={club.tierName || 'Top 100 Club'}
+                      compact
                     />
                   </div>
                 )}
