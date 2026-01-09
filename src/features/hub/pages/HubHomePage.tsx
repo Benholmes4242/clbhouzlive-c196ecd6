@@ -1,32 +1,26 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Clean component architecture with slide-in/out animation shell
+ * Matches the Golf OS Dashboard mock 1:1
  */
 
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { useHub } from '../useHub';
 import { prefersReduced } from '@/lib/ui/motion';
 import { useChromeState } from '@/hooks/useChromeState';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useNextUserGame } from '../home/hooks/useNextUserGame';
 
-// Clean UI components
-import { HubHeader } from '../ui/HubHeader';
-import { NextUpHeroCard, type NextUpGame } from '../ui/NextUpHeroCard';
-import { MessagesCard, type HubMessagesSummary } from '../ui/MessagesCard';
-import { ActiveGamesCard, type ActiveGameSummary } from '../ui/ActiveGamesCard';
-import { EchoCard } from '../ui/EchoCard';
-import { YourGamesGradientCTA } from '../ui/YourGamesGradientCTA';
-import { CourseLegacyMiniCard, type CourseLegacySummary } from '../ui/CourseLegacyMiniCard';
-import { HubDock, type HubDockItemKey } from '../ui/HubDock';
-import { HubGamesHubSheet } from '../components/HubGamesHubSheet';
-import { HubEchoSheet } from '../components/HubEchoSheet';
+// Hub components
+import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
+import { UpNextHeroTile } from '../home/tiles/UpNextHeroTile';
+import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
+import { ActiveGamesNearYouTile } from '../home/tiles/ActiveGamesNearYouTile';
+import { EchoTile } from '../home/tiles/EchoTile';
+import { YourGamesGradientCTA } from '../home/tiles/YourGamesGradientCTA';
+import { CourseLegacyMiniTile } from '../home/tiles/CourseLegacyMiniTile';
+import { HubFloatingDock } from '../home/tiles/HubFloatingDock';
 
-import '../ui/hubDashboard.css';
+import '../home/hubThemeLight.css';
 
 // Animation constants
 const HUB_ENTRY_DURATION = 500;
@@ -34,115 +28,69 @@ const HUB_EXIT_DURATION = 500;
 const HUB_ENTRY_EASING = 'ease-in-out';
 const HUB_EXIT_EASING = 'ease-in-out';
 
-function getFirstName(displayName: string | null | undefined): string {
-  if (!displayName) return 'there';
-  return displayName.split(' ')[0];
-}
+// Layout constants
+const DOCK_HEIGHT = 88;
+const DOCK_GAP = 14;
 
 export function HubHomePage() {
-  const navigate = useNavigate();
   const { close } = useHub();
   
   useJoinRequestNotifications();
-
-  // User data
-  const { user } = useSupabaseSession();
-  const { data: profile } = useUserProfile(user?.id);
-  const firstName = getFirstName(profile?.display_name);
-
-  // Next up game
-  const { data: nextGameData } = useNextUserGame();
-  const nextUp: NextUpGame | null = useMemo(() => {
-    if (!nextGameData) return null;
-    return {
-      id: nextGameData.gameId,
-      courseId: nextGameData.course?.id || '',
-      courseName: nextGameData.course?.name || nextGameData.courseName || 'Course TBD',
-      region: nextGameData.course?.region || null,
-      startTimeISO: nextGameData.startTimeISO,
-      playersJoined: nextGameData.slotsTotal - nextGameData.slotsOpen,
-      playersTotal: nextGameData.slotsTotal,
-      heroImageUrl: nextGameData.course?.heroImageUrl || null,
-    };
-  }, [nextGameData]);
-
-  // Sheet states
-  const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [gamesHubTab, setGamesHubTab] = useState<'discover' | 'yours'>('yours');
-  const [echoSheetOpen, setEchoSheetOpen] = useState(false);
-
-  // Mock data (TODO: replace with real hooks)
-  const messages: HubMessagesSummary = useMemo(() => ({ unreadCount: 0, latestSnippet: undefined }), []);
-  const activeGames: ActiveGameSummary = useMemo(() => ({ title: 'Active Games Near You', subtitle: 'No games nearby' }), []);
-  const courseLegacy: CourseLegacySummary = useMemo(() => ({ coursesPlayed: 32, countries: 7, avgRating: 7.2 }), []);
-
-  // Create moment modal state
-  const [createMomentOpen, setCreateMomentOpen] = useState(false);
-
-  // Dock config
-  const dockItems = useMemo(() => ({
-    left1: { key: 'create_game' as const, label: 'Create Game' },
-    left2: { key: 'search' as const, label: 'Search' },
-    center: { key: 'create_moment' as const, label: 'Moment' },
-    right1: { key: 'echo' as const, label: 'Echo' },
-    right2: { key: 'profile' as const, label: 'Profile' },
-  }), []);
-
-  const onDockPress = (key: HubDockItemKey) => {
-    switch (key) {
-      case 'create_game':
-        setGamesHubTab('yours');
-        setGamesHubOpen(true);
-        break;
-      case 'search':
-        setGamesHubTab('discover');
-        setGamesHubOpen(true);
-        break;
-      case 'create_moment':
-        setCreateMomentOpen(true);
-        break;
-      case 'echo':
-        setEchoSheetOpen(true);
-        break;
-      case 'profile':
-        close();
-        navigate('/profile');
-        break;
-    }
-  };
 
   // Animation & swipe-to-dismiss state
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [translateY, setTranslateY] = useState(() => {
     if (typeof window === 'undefined') return 0;
-    return prefersReduced() ? 0 : window.innerHeight;
+    const reduced = prefersReduced();
+    if (reduced) return 0;
+    return window.innerHeight;
   });
   const [isDragging, setIsDragging] = useState(false);
-  const [hasEntered, setHasEntered] = useState(() => typeof window === 'undefined' || prefersReduced());
+  const [hasEntered, setHasEntered] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return prefersReduced();
+  });
   const [isExiting, setIsExiting] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [revealChrome, setRevealChrome] = useState(false);
 
   const CHROME_REVEAL_OFFSET = 40;
-  const DRAG_THRESHOLD = 120;
 
-  useChromeState({ forceHidden: !revealChrome, disabled: false });
+  useChromeState({
+    forceHidden: !revealChrome,
+    disabled: false,
+  });
   
   const sheetRef = useRef<HTMLDivElement | null>(null);
+  const DRAG_THRESHOLD = 120;
 
   const animateAndClose = useCallback(() => {
-    if (prefersReduced() || typeof window === 'undefined') {
+    const reduced = prefersReduced();
+
+    if (reduced) {
       close();
       return;
     }
 
+    if (typeof window === 'undefined') {
+      close();
+      return;
+    }
+
+    setIsClosing(true);
     setIsExiting(true);
     setTranslateY(window.innerHeight);
 
-    window.setTimeout(() => setRevealChrome(true), HUB_EXIT_DURATION - CHROME_REVEAL_OFFSET);
-    window.setTimeout(() => close(), HUB_EXIT_DURATION);
+    window.setTimeout(() => {
+      setRevealChrome(true);
+    }, HUB_EXIT_DURATION - CHROME_REVEAL_OFFSET);
+
+    window.setTimeout(() => {
+      close();
+    }, HUB_EXIT_DURATION);
   }, [close]);
 
-  // Touch handlers
+  // Touch handlers for swipe-to-dismiss
   const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
     if (isExiting) return;
     setIsDragging(true);
@@ -151,22 +99,29 @@ export function HubHomePage() {
 
   const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
     if (!isDragging || dragStartY == null || isExiting) return;
+
     const deltaY = e.touches[0].clientY - dragStartY;
-    setTranslateY(deltaY <= 0 ? 0 : deltaY);
+    if (deltaY <= 0) {
+      setTranslateY(0);
+      return;
+    }
+    setTranslateY(deltaY);
   };
 
   const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
     if (!isDragging || isExiting) return;
+
     if (translateY > DRAG_THRESHOLD) {
       animateAndClose();
     } else {
       setTranslateY(0);
     }
+
     setIsDragging(false);
     setDragStartY(null);
   };
 
-  // Escape key
+  // Escape key to close
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -174,24 +129,28 @@ export function HubHomePage() {
         animateAndClose();
       }
     };
+
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [animateAndClose]);
 
-  // Slide-in on mount
+  // Slide-in from bottom on mount
   useEffect(() => {
-    if (prefersReduced() || typeof window === 'undefined') {
+    const reduced = prefersReduced();
+
+    if (reduced || typeof window === 'undefined') {
       setTranslateY(0);
       setHasEntered(true);
       return;
     }
+
     requestAnimationFrame(() => {
       setHasEntered(true);
       setTranslateY(0);
     });
   }, []);
 
-  // Analytics
+  // Track Hub open
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', analyticsEvents.hub.opened.event, {
@@ -202,11 +161,14 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999]">
+    <div className="fixed inset-0 z-[9999] flex flex-col">
+      {/* Glass Sheet */}
       <div 
         ref={sheetRef}
-        className="hubRoot"
+        className="hub-glass-page flex-1 flex flex-col"
         style={{
+          background: 'var(--hub-bg-start)',
+          borderTop: '1px solid var(--hub-stroke)',
           transform: `translateY(${translateY}px)`,
           transition:
             isDragging || !hasEntered || prefersReduced()
@@ -219,92 +181,56 @@ export function HubHomePage() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="hubScroll">
-          <div className="hubContainer">
-            <HubHeader
-              firstName={firstName}
-              onRightIconPress={() => {
-                close();
-                navigate('/clubhouse');
-              }}
-            />
+        {/* Grabber bar */}
+        <div className="hub-grabber" />
 
-            <div className="mt-3">
-              <NextUpHeroCard
-                game={nextUp}
-                onPress={() => {
-                  if (!nextUp) return;
-                  setGamesHubTab('yours');
-                  setGamesHubOpen(true);
-                }}
-              />
-            </div>
+        {/* 
+          SCROLLABLE LAYOUT
+          Content scrolls, dock is anchored at bottom
+        */}
+        <div 
+          className="flex-1 overflow-y-auto"
+          style={{
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+            paddingBottom: `calc(${DOCK_HEIGHT}px + ${DOCK_GAP}px + env(safe-area-inset-bottom, 0px))`,
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <div className="px-5 pb-4">
+            {/* Zone 1: Header - Greeting + Right Button */}
+            <HubHeaderToday />
 
+            {/* Zone 2: What's Up Next Hero Tile (10% taller) */}
             <div className="mt-4">
-              <MessagesCard
-                summary={messages}
-                onPress={() => {
-                  close();
-                  navigate('/messages');
-                }}
-                onSeeAll={() => {
-                  close();
-                  navigate('/messages');
-                }}
-              />
+              <UpNextHeroTile />
             </div>
 
+            {/* Zone 3: Messages Card */}
+            <div className="mt-4">
+              <HubMessagesCard />
+            </div>
+
+            {/* Zone 4: 2-up Grid - Active Games + Echo */}
             <div className="mt-4 grid grid-cols-2 gap-4">
-              <ActiveGamesCard 
-                summary={activeGames} 
-                onPress={() => {
-                  setGamesHubTab('discover');
-                  setGamesHubOpen(true);
-                }} 
-              />
-              <EchoCard onPress={() => setEchoSheetOpen(true)} />
+              <ActiveGamesNearYouTile />
+              <EchoTile />
             </div>
 
+            {/* Zone 5: Full-width "Your Games" Gradient CTA */}
             <div className="mt-4">
-              <YourGamesGradientCTA
-                countBadge={undefined}
-                onPress={() => {
-                  setGamesHubTab('yours');
-                  setGamesHubOpen(true);
-                }}
-              />
+              <YourGamesGradientCTA />
             </div>
 
+            {/* Zone 6: Course Legacy Mini Tile */}
             <div className="mt-4">
-              <CourseLegacyMiniCard 
-                summary={courseLegacy} 
-                onPress={() => {
-                  close();
-                  navigate('/courses');
-                }} 
-              />
+              <CourseLegacyMiniTile />
             </div>
-
-            <div className="h-2" />
           </div>
         </div>
 
-        <div className="hubDockWrap">
-          <HubDock items={dockItems} onPress={onDockPress} />
-        </div>
+        {/* Anchored Dock - at bottom */}
+        <HubFloatingDock />
       </div>
-
-      {/* Sheets */}
-      <HubGamesHubSheet
-        isOpen={gamesHubOpen}
-        onClose={() => setGamesHubOpen(false)}
-        initialTab={gamesHubTab}
-      />
-      
-      <HubEchoSheet
-        isOpen={echoSheetOpen}
-        onClose={() => setEchoSheetOpen(false)}
-      />
     </div>
   );
 }
