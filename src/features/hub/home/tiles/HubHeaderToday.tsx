@@ -41,13 +41,15 @@ export function HubHeaderToday() {
   return (
     <header className="pt-1 pb-1">
       <div className="flex items-center justify-between gap-3">
-        {/* Greeting - V2 responsive sizing with tighter tracking */}
+        {/* Greeting - V2 responsive sizing with tighter tracking + line-height */}
         <h1 
-          className="font-semibold leading-[1.1] tracking-tight truncate"
+          className="font-semibold truncate"
           style={{ 
             color: 'var(--hub-text)',
             fontSize: 'clamp(18px, 5vw, 22px)',
             maxWidth: '75%',
+            lineHeight: '1.05',
+            letterSpacing: '-0.2px',
           }}
         >
           {greeting}, {firstName}

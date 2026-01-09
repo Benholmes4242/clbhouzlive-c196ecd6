@@ -116,10 +116,11 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
             displayItems.map((item, idx) => (
               <div 
                 key={idx}
-                className="flex items-center gap-2.5 py-2 px-3 rounded-[12px] transition-all duration-150 hover:shadow-[0_6px_18px_rgba(2,6,23,0.06)]"
+                className="flex items-center gap-2.5 py-2 px-3 rounded-[12px] transition-all duration-150 active:scale-[0.99] active:translate-y-[-1px] active:shadow-[0_10px_24px_rgba(2,6,23,0.08)]"
                 style={{
                   background: 'rgba(255, 255, 255, 0.92)',
                   border: '1px solid rgba(255, 255, 255, 0.5)',
+                  boxShadow: '0 2px 8px rgba(2,6,23,0.03)',
                 }}
               >
                 {/* V2 Icon badge */}

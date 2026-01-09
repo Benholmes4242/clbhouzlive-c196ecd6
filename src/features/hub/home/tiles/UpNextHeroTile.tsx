@@ -183,19 +183,20 @@ function HeroSlide({ data, onClick, isActive }: HeroSlideProps) {
         />
       )}
 
-      {/* V2 Bottom fade gradient */}
+      {/* V2 Bottom fade gradient - reduced opacity to prevent muddy look */}
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%)',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.28) 100%)',
         }}
       />
       
-      {/* V2 Left gradient for text legibility */}
+      {/* V2 Left gradient for text legibility - only behind text column */}
       <div 
-        className="absolute inset-0"
+        className="absolute left-0 top-0 bottom-0"
         style={{
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 65%)',
+          width: '60%',
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 100%)',
         }}
       />
 
