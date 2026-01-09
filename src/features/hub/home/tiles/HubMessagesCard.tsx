@@ -15,7 +15,11 @@ const useMockMessages = () => ({
   latestSnippet: null as string | null,
 });
 
-export function HubMessagesCard() {
+interface HubMessagesCardProps {
+  className?: string;
+}
+
+export function HubMessagesCard({ className }: HubMessagesCardProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   const messages = useMockMessages();
@@ -32,7 +36,7 @@ export function HubMessagesCard() {
     <>
       <button 
         onClick={openSheet}
-        className="w-full rounded-[22px] p-4 text-left transition-all active:scale-[0.98]"
+        className={`w-full rounded-[22px] p-4 text-left transition-all active:scale-[0.98] min-h-[72px] ${className || ''}`}
         style={{
           background: 'var(--hub-glass-bg)',
           border: '1px solid var(--hub-stroke)',
