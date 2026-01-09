@@ -39,7 +39,7 @@ function DockItem({ icon: Icon, label, onClick, isActive }: DockItemProps) {
           "[stroke-width:1.5]",
           isActive 
             ? "text-slate-800" 
-            : "text-slate-500"
+            : "text-slate-400" // Reduced visual weight - hub is the destination
         )}
       />
       <span 

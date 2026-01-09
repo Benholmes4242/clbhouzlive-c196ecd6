@@ -215,8 +215,10 @@ export function HubHomePage() {
                 {/* Zone 2: What's Up Next Hero Tile */}
                 <UpNextHeroTile />
 
-                {/* Zone 3: Messages Card */}
-                <HubMessagesCard />
+                {/* Zone 3: Messages Card - tighter gap to hero */}
+                <div style={{ marginTop: '-6px' }}>
+                  <HubMessagesCard />
+                </div>
 
                 {/* Zone 4: 2-up Grid - Active Games + Echo (fixed height) */}
                 <div className="grid grid-cols-2 gap-[12px]">
