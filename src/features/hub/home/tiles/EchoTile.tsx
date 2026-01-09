@@ -27,12 +27,12 @@ export function EchoTile() {
           boxShadow: 'var(--hub-shadow-tile)',
         }}
       >
-        {/* Icon */}
+        {/* Icon - yellow sparkles */}
         <div 
           className="h-9 w-9 rounded-full flex items-center justify-center"
           style={{ background: 'var(--hub-glass-bg-input)' }}
         >
-          <Sparkles className="h-4 w-4" style={{ color: 'var(--hub-text-dim)' }} />
+          <Sparkles className="h-4 w-4" style={{ color: '#FBBF24' }} />
         </div>
         
         {/* Text content */}

@@ -56,13 +56,14 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
           minHeight: '64px',
         }}
       >
-        {/* Orange badge - top right */}
+        {/* Orange badge - top right - matching verified pill style */}
         {hasMessages && (
           <div 
             className="absolute top-2.5 right-2.5 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold"
             style={{
-              background: 'linear-gradient(135deg, #FF8C3C, #FF6B20)',
-              color: 'white',
+              background: 'rgba(247, 158, 27, 0.15)',
+              color: '#F79E1B',
+              border: '1px solid rgba(247, 158, 27, 0.3)',
             }}
           >
             {messages.unreadCount}

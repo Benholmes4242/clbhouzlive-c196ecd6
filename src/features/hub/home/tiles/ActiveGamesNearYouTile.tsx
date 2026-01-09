@@ -71,13 +71,14 @@ export function ActiveGamesNearYouTile() {
           boxShadow: 'var(--hub-shadow-tile)',
         }}
       >
-        {/* Games count badge - top right (shows total, not current index) */}
+        {/* Games count badge - top right (shows total, not current index) - emerald green like verified pill */}
         {gamesCount > 0 && (
           <div 
             className="absolute top-3 right-3 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold z-10"
             style={{
-              background: '#2F7CFF',
-              color: 'white',
+              background: 'rgba(16, 185, 129, 0.15)',
+              color: '#10B981',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
             }}
           >
             {gamesCount}
