@@ -1,23 +1,29 @@
 /**
  * GameInviteTestLab - Test Lab section for testing game invite flows
  * 
- * Allows Benjamin Holmes (or any admin) to:
- * 1. Create a test game (hosted by test user)
- * 2. Send game invite to themselves
- * 3. Accept/decline the invite
- * 4. See RSVP updates flow back
- * 5. Test the full notification flow
+ * Uses the SAME code paths as the real product:
+ * - useSendGameInviteNotification for invites
+ * - useSendRsvpNotification for RSVP updates
+ * 
+ * Flow: Test User (host) → Admin (recipient)
+ * This proves the multi-user notification path works correctly.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTestUser } from '@/hooks/useAdminTestActions';
 import { cn } from '@/lib/utils';
-import { Flag, Loader2, Check, X, RotateCcw, Send, UserPlus, Calendar, Trash2 } from 'lucide-react';
+import { Flag, Loader2, Check, X, Send, Calendar, Trash2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
+import { 
+  useSendGameInviteNotification, 
+  useSendRsvpNotification,
+  formatGameDateForNotification,
+  formatGameTimeForNotification,
+} from '@/features/hub/hooks/useGameNotifications';
 
 // Button component matching test lab style
 const ActionButton: React.FC<{
@@ -208,9 +214,11 @@ function useCreateTestGame() {
 }
 
 // Hook to send game invite from test user to target
+// Uses the SAME useSendGameInviteNotification hook as the real InviteToGameModal
 function useSendGameInvite() {
   const queryClient = useQueryClient();
   const { data: testUser } = useTestUser();
+  const sendGameInviteNotification = useSendGameInviteNotification();
 
   return useMutation({
     mutationFn: async ({ gameId, targetUserId }: { gameId: string; targetUserId: string }) => {
@@ -224,10 +232,9 @@ function useSendGameInvite() {
         .single();
 
       const courseName = (game?.golf_courses as any)?.name || 'Golf Course';
-      const gameDate = game?.start_time ? format(new Date(game.start_time), 'EEE d MMM') : 'TBD';
-      const gameTime = game?.start_time ? format(new Date(game.start_time), 'HH:mm') : 'TBD';
+      const startTime = game?.start_time ? new Date(game.start_time) : new Date();
 
-      // Add as participant with invited status
+      // Add as participant with invited status (same as InviteToGameModal)
       const { error: participantError } = await supabase
         .from('game_participants')
         .upsert({
@@ -242,27 +249,20 @@ function useSendGameInvite() {
 
       if (participantError) throw participantError;
 
-      // Create game_invite notification for target
-      const { error: notifyError } = await supabase.rpc('test_lab_insert_notification', {
-        p_user_id: targetUserId,
-        p_actor_id: testUser.id,
-        p_type: 'game_invite',
-        p_title: "You've been invited to a game",
-        p_message: `${courseName} · ${gameDate} · ${gameTime}`,
-        p_entity_type: 'game',
-        p_entity_id: gameId,
-        p_is_read: false,
-        p_data: { game_id: gameId, course_name: courseName },
+      // Use the SAME notification hook as real product
+      // Note: We pass actorUserId to override current user (since admin is logged in)
+      await sendGameInviteNotification.mutateAsync({
+        gameId,
+        invitedUserIds: [targetUserId],
+        courseName,
+        date: formatGameDateForNotification(startTime),
+        time: formatGameTimeForNotification(startTime),
       });
 
-      if (notifyError) {
-        console.warn('Failed to create notification:', notifyError);
-      }
-
-      return { success: true };
+      return { success: true, courseName };
     },
     onSuccess: () => {
-      toast.success('Game invite sent', { 
+      toast.success('Game invite sent (via real hook)', { 
         description: 'Check your notifications!',
         position: 'top-center' 
       });
@@ -277,9 +277,11 @@ function useSendGameInvite() {
 }
 
 // Hook to respond to game invite (accept/decline)
+// Uses the SAME useSendRsvpNotification hook as the real RSVP flow
 function useRespondToInvite() {
   const queryClient = useQueryClient();
   const { data: testUser } = useTestUser();
+  const sendRsvpNotification = useSendRsvpNotification();
 
   return useMutation({
     mutationFn: async ({ 
@@ -287,15 +289,17 @@ function useRespondToInvite() {
       participantId,
       response,
       targetUserId,
+      targetDisplayName,
     }: { 
       gameId: string; 
       participantId: string;
       response: 'going' | 'declined';
       targetUserId: string;
+      targetDisplayName: string;
     }) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Update participant status
+      // Update participant status (same as real RSVP flow)
       const { error: updateError } = await supabase
         .from('game_participants')
         .update({
@@ -308,37 +312,28 @@ function useRespondToInvite() {
 
       if (updateError) throw updateError;
 
-      // If accepted, notify the host (test user) about the RSVP
+      // If accepted, use the SAME notification hook as real product
       if (response === 'going') {
-        // Get target's profile for notification
-        const { data: targetProfile } = await supabase
-          .from('user_profiles')
-          .select('display_name')
-          .eq('id', targetUserId)
-          .single();
-
-        const playerName = targetProfile?.display_name || 'Someone';
-
         // Get game details
         const { data: game } = await supabase
           .from('games')
-          .select('golf_courses:course_id (name)')
+          .select('start_time, golf_courses:course_id (name)')
           .eq('id', gameId)
           .single();
 
         const courseName = (game?.golf_courses as any)?.name || 'Golf Course';
+        const gameDate = game?.start_time 
+          ? formatGameDateForNotification(game.start_time) 
+          : 'TBD';
 
-        // Create rsvp_update notification for host (test user)
-        await supabase.rpc('test_lab_insert_notification', {
-          p_user_id: testUser.id,
-          p_actor_id: targetUserId,
-          p_type: 'rsvp_update',
-          p_title: `${playerName} is going`,
-          p_message: courseName,
-          p_entity_type: 'game',
-          p_entity_id: gameId,
-          p_is_read: false,
-          p_data: { game_id: gameId, player_name: playerName },
+        // Use the SAME notification hook - notify host (test user)
+        await sendRsvpNotification.mutateAsync({
+          gameId,
+          newStatus: 'going',
+          playerName: targetDisplayName,
+          courseName,
+          date: gameDate,
+          recipientUserIds: [testUser.id], // Notify the host
         });
       }
 
@@ -346,7 +341,7 @@ function useRespondToInvite() {
     },
     onSuccess: (_, variables) => {
       const action = variables.response === 'going' ? 'Accepted' : 'Declined';
-      toast.success(`${action} game invite`, { position: 'top-center' });
+      toast.success(`${action} game invite (via real hook)`, { position: 'top-center' });
       queryClient.invalidateQueries({ queryKey: ['test-lab-participations'] });
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['game-rsvp'] });
@@ -396,9 +391,11 @@ function useCleanupTestGames() {
 }
 
 // Hook for full invite flow scenario
+// Uses the SAME notification hooks as the real product
 function useFullInviteFlow() {
   const queryClient = useQueryClient();
   const { data: testUser } = useTestUser();
+  const sendGameInviteNotification = useSendGameInviteNotification();
 
   return useMutation({
     mutationFn: async (targetUserId: string) => {
@@ -450,10 +447,7 @@ function useFullInviteFlow() {
 
       await new Promise(r => setTimeout(r, 300));
 
-      // Step 2: Invite target
-      const gameDate = format(startTime, 'EEE d MMM');
-      const gameTime = format(startTime, 'HH:mm');
-
+      // Step 2: Invite target using same flow as InviteToGameModal
       await supabase
         .from('game_participants')
         .insert({
@@ -466,23 +460,19 @@ function useFullInviteFlow() {
           reserves_slot: false,
         });
 
-      // Create invite notification
-      await supabase.rpc('test_lab_insert_notification', {
-        p_user_id: targetUserId,
-        p_actor_id: testUser.id,
-        p_type: 'game_invite',
-        p_title: "You've been invited to a game",
-        p_message: `${courseName} · ${gameDate} · ${gameTime}`,
-        p_entity_type: 'game',
-        p_entity_id: game.id,
-        p_is_read: false,
-        p_data: { game_id: game.id, course_name: courseName },
+      // Use the SAME notification hook as real product
+      await sendGameInviteNotification.mutateAsync({
+        gameId: game.id,
+        invitedUserIds: [targetUserId],
+        courseName,
+        date: formatGameDateForNotification(startTime),
+        time: formatGameTimeForNotification(startTime),
       });
 
       return { gameId: game.id, courseName };
     },
     onSuccess: (data) => {
-      toast.success('Full invite flow completed', {
+      toast.success('Full invite flow completed (via real hooks)', {
         description: `Game created at ${data.courseName} → Invite sent`,
         position: 'top-center',
       });
@@ -500,6 +490,23 @@ export function GameInviteTestLab() {
   const { user } = useSupabaseSession();
   const { data: testUser, isLoading: testUserLoading } = useTestUser();
   const targetUserId = user?.id;
+
+  // Fetch current admin's display name for RSVP notifications
+  const { data: adminProfile } = useQuery({
+    queryKey: ['admin-profile-for-test', targetUserId],
+    queryFn: async () => {
+      if (!targetUserId) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('display_name')
+        .eq('id', targetUserId)
+        .single();
+      return data;
+    },
+    enabled: !!targetUserId,
+  });
+
+  const adminDisplayName = adminProfile?.display_name || 'Admin';
 
   const { data: testGames, isLoading: gamesLoading } = useTestGames(testUser?.id);
   const { data: participations, isLoading: participationsLoading } = useTargetGameParticipations(testUser?.id, targetUserId);
@@ -621,6 +628,7 @@ export function GameInviteTestLab() {
                           participantId: invite.id,
                           response: 'going',
                           targetUserId: targetUserId!,
+                          targetDisplayName: adminDisplayName,
                         })}
                         loading={respondToInvite.isPending}
                       />
@@ -633,6 +641,7 @@ export function GameInviteTestLab() {
                           participantId: invite.id,
                           response: 'declined',
                           targetUserId: targetUserId!,
+                          targetDisplayName: adminDisplayName,
                         })}
                         loading={respondToInvite.isPending}
                       />
