@@ -49,6 +49,16 @@ export type ActivityType =
   | 'course_follow'
   | 'course_update'
   | 'event'
+  // Games & Trips
+  | 'game_invite'
+  | 'rsvp_update'
+  | 'game_reminder_24h'
+  | 'game_reminder_2h'
+  | 'game_updated'
+  | 'game_completed'
+  | 'trip_created'
+  | 'trip_game_added'
+  | 'trip_reminder'
   // Achievements
   | 'achievement'
   | 'achievement_unlocked'
@@ -136,6 +146,12 @@ const CLUB_COURSE_TYPES = new Set([
   'course_review', 'course_like', 'course_follow', 'course_update', 'event'
 ]);
 
+// Types that are game/trip related
+const GAME_TRIP_TYPES = new Set([
+  'game_invite', 'rsvp_update', 'game_reminder_24h', 'game_reminder_2h',
+  'game_updated', 'game_completed', 'trip_created', 'trip_game_added', 'trip_reminder'
+]);
+
 function getTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
@@ -153,6 +169,15 @@ function getTimeAgo(dateString: string): string {
 
 function getContextUrl(notification: any): string {
   const { type, entity_type, entity_id, data, actor_id } = notification;
+  
+  // Game notifications route to /game/:id
+  if (GAME_TRIP_TYPES.has(type) && data?.game_id) {
+    return `/game/${data.game_id}`;
+  }
+  // Trip notifications route to /hub/trip/:id (but trips may not exist yet, fallback to hub)
+  if (type.startsWith('trip_') && data?.trip_id) {
+    return `/hub?trip=${data.trip_id}`;
+  }
   
   if (entity_type === 'post' && entity_id) {
     return `/post/${entity_id}`;
@@ -178,6 +203,10 @@ function getContextUrl(notification: any): string {
 
 function getContextLabel(notification: any): string {
   const { type, entity_type } = notification;
+  
+  // Game/Trip labels
+  if (type.startsWith('game_') || type === 'rsvp_update') return 'Game';
+  if (type.startsWith('trip_')) return 'Trip';
   
   if (entity_type === 'post') return 'Post';
   if (entity_type === 'comment') return 'Comment';

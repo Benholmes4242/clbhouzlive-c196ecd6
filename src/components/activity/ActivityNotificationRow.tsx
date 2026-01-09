@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Flag } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { NotificationCard, getNotificationButtonClass } from '@/components/ui/NotificationCard';
 import { GOLFER_VERIFICATION_COPY } from '@/lib/golferVerificationCopy';
 import { BUSINESS_VERIFICATION_COPY } from '@/lib/businessVerificationCopy';
+import { GAME_NOTIFICATION_COPY, isGameNotification } from '@/lib/gameNotificationCopy';
 
 // Clbhouz logomark URL for system notifications
 const CLBHOUZ_LOGOMARK_URL = '/assets/logomark-orange.png';
@@ -109,6 +110,22 @@ function getNotificationBadgeIcon(type: string) {
     case 'golfer_verification_rejected':
     case 'golfer_verification_removed':
       return <ShieldOff className={cn(iconClass, "text-red-500")} />;
+    // Game & Trip notifications
+    case 'game_invite':
+      return <CalendarDays className={cn(iconClass, "text-emerald-500")} />;
+    case 'rsvp_update':
+      return <UserCheck className={cn(iconClass, "text-emerald-500")} />;
+    case 'game_reminder_24h':
+    case 'game_reminder_2h':
+      return <Bell className={cn(iconClass, "text-amber-500")} />;
+    case 'game_updated':
+      return <CalendarDays className={cn(iconClass, "text-blue-500")} />;
+    case 'game_completed':
+      return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
+    case 'trip_created':
+    case 'trip_game_added':
+    case 'trip_reminder':
+      return <MapPin className={cn(iconClass, "text-violet-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -983,7 +1000,319 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 17) DEFAULT – All other notification types (follow, like, comment, etc.)
+     * 17) GAME INVITE - You've been invited to a game
+     */
+    case 'game_invite': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      const date = data?.date || '';
+      const time = data?.time || '';
+      const subcopy = [courseName, date, time].filter(Boolean).join(' · ');
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_invite.title}
+            </span>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          actions={
+            <div className="flex items-center gap-2">
+              <span className={cn(basePillClass, "border-amber-400 bg-amber-500/10 text-amber-600")}>
+                Pending
+              </span>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onClick(); }}
+                className={getNotificationButtonClass('primary')}
+              >
+                View game
+              </button>
+            </div>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 18) RSVP UPDATE - Friend is going to a game
+     */
+    case 'rsvp_update': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const playerName = data?.player_name || actorName;
+      const courseName = data?.course_name || 'Golf Course';
+      const date = data?.date || '';
+      const subcopy = [courseName, date].filter(Boolean).join(' · ');
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{playerName}</span>{' '}
+              <span className="font-normal text-muted-foreground">is going</span>
+            </>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 19) GAME REMINDER 24H - You're playing tomorrow
+     */
+    case 'game_reminder_24h': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      const time = data?.time || '';
+      const subcopy = [courseName, time].filter(Boolean).join(' · ');
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_reminder_24h.title}
+            </span>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View game
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 20) GAME REMINDER 2H - Game starting soon
+     */
+    case 'game_reminder_2h': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      const time = data?.time || '';
+      const subcopy = [courseName, time].filter(Boolean).join(' · ');
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_reminder_2h.title}
+            </span>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View game
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 21) GAME UPDATED - Game details changed
+     */
+    case 'game_updated': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      const newTime = data?.new_time;
+      const subcopy = newTime 
+        ? `${courseName} · New tee time: ${newTime}`
+        : courseName;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_updated.title}
+            </span>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View game
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 22) GAME COMPLETED - Game has ended
+     */
+    case 'game_completed': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_completed.title}
+            </span>
+          }
+          subtext={`${courseName} · View recap`}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View game
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 23) TRIP CREATED - You've been added to a trip
+     */
+    case 'trip_created': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      const dateRange = data?.date_range || '';
+      const subcopy = [tripName, dateRange].filter(Boolean).join(' · ');
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.trip_created.title}
+            </span>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View trip
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 24) TRIP GAME ADDED - New game added to trip
+     */
+    case 'trip_game_added': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      const courseName = data?.course_name || 'Golf Course';
+      const subcopy = `${tripName} · ${courseName}`;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.trip_game_added.title}
+            </span>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 25) TRIP REMINDER - Trip starts tomorrow
+     */
+    case 'trip_reminder': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.trip_reminder.title}
+            </span>
+          }
+          subtext={tripName}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View trip
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 26) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
       const statusIcon = getNotificationBadgeIcon(type);
