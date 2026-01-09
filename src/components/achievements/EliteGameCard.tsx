@@ -453,70 +453,123 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
             }}
           />
           
-          {/* SUNRISE effect - warm diagonal rays */}
+          {/* SUNRISE effect - VISIBLE warm diagonal rays beaming across */}
           {config.effectType === 'sunrise' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  linear-gradient(135deg, rgba(255,200,150,0.3) 0%, transparent 40%),
-                  linear-gradient(160deg, rgba(255,180,100,0.2) 10%, transparent 50%)
-                `,
-              }}
-            />
+            <>
+              {/* Main sunrise rays */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `
+                    linear-gradient(125deg, rgba(255,180,100,0.7) 0%, rgba(255,150,80,0.4) 20%, transparent 45%),
+                    linear-gradient(145deg, rgba(255,200,120,0.5) 5%, rgba(255,160,90,0.3) 25%, transparent 50%),
+                    linear-gradient(110deg, rgba(255,220,160,0.4) 0%, transparent 30%)
+                  `,
+                }}
+              />
+              {/* Warm horizon glow at bottom */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `linear-gradient(0deg, rgba(255,140,60,0.25) 0%, transparent 40%)`,
+                }}
+              />
+            </>
           )}
           
-          {/* MIST effect - soft horizontal layers */}
+          {/* MIST effect - VISIBLE soft horizontal cloud layers */}
           {config.effectType === 'mist' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  linear-gradient(180deg, rgba(200,220,240,0.15) 0%, transparent 30%),
-                  linear-gradient(0deg, rgba(180,200,220,0.1) 0%, transparent 40%)
-                `,
-              }}
-            />
+            <>
+              {/* Layered mist bands */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `
+                    linear-gradient(180deg, rgba(200,220,250,0.5) 0%, rgba(180,200,230,0.25) 15%, transparent 35%),
+                    linear-gradient(180deg, transparent 50%, rgba(190,210,240,0.2) 70%, rgba(200,220,250,0.35) 100%)
+                  `,
+                }}
+              />
+              {/* Subtle vertical depth */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `radial-gradient(ellipse 150% 100% at 50% 0%, rgba(220,235,255,0.3) 0%, transparent 50%)`,
+                }}
+              />
+            </>
           )}
           
-          {/* SHIMMER effect - diagonal golden streaks */}
+          {/* SHIMMER effect - VISIBLE diagonal golden light streaks */}
           {config.effectType === 'shimmer' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  linear-gradient(120deg, transparent 20%, rgba(255,220,100,0.25) 40%, transparent 60%),
-                  linear-gradient(60deg, transparent 30%, rgba(255,200,80,0.15) 50%, transparent 70%)
-                `,
-              }}
-            />
+            <>
+              {/* Multiple shimmer streaks */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `
+                    linear-gradient(115deg, transparent 15%, rgba(255,230,130,0.6) 25%, rgba(255,220,100,0.4) 35%, transparent 50%),
+                    linear-gradient(125deg, transparent 40%, rgba(255,210,80,0.45) 55%, rgba(255,200,60,0.3) 65%, transparent 80%),
+                    linear-gradient(105deg, rgba(255,240,180,0.35) 0%, transparent 20%)
+                  `,
+                }}
+              />
+              {/* Bottom gold reflection */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `linear-gradient(0deg, rgba(255,200,80,0.2) 0%, transparent 30%)`,
+                }}
+              />
+            </>
           )}
           
-          {/* EMBER effect - warm flickering glow */}
+          {/* EMBER effect - VISIBLE warm flickering fire glow */}
           {config.effectType === 'ember' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 80% 60% at 20% 60%, rgba(255,120,40,0.35) 0%, transparent 50%),
-                  radial-gradient(ellipse 60% 80% at 70% 40%, rgba(255,80,20,0.2) 0%, transparent 40%)
-                `,
-              }}
-            />
+            <>
+              {/* Hot ember spots */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `
+                    radial-gradient(ellipse 70% 50% at 15% 65%, rgba(255,100,30,0.6) 0%, rgba(255,80,20,0.3) 30%, transparent 55%),
+                    radial-gradient(ellipse 50% 60% at 75% 35%, rgba(255,140,50,0.45) 0%, transparent 45%),
+                    radial-gradient(ellipse 40% 40% at 45% 80%, rgba(255,60,10,0.35) 0%, transparent 40%)
+                  `,
+                }}
+              />
+              {/* Warm ambient glow */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `linear-gradient(180deg, transparent 40%, rgba(255,120,40,0.25) 100%)`,
+                }}
+              />
+            </>
           )}
           
-          {/* OBSIDIAN effect - sleek black with gold edges */}
+          {/* OBSIDIAN effect - VISIBLE sleek black with prominent gold edges */}
           {config.effectType === 'obsidian' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  linear-gradient(135deg, rgba(212,175,55,0.15) 0%, transparent 20%),
-                  linear-gradient(-45deg, rgba(212,175,55,0.15) 100%, transparent 80%),
-                  radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%)
-                `,
-              }}
-            />
+            <>
+              {/* Gold corner accents */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `
+                    linear-gradient(135deg, rgba(255,215,0,0.4) 0%, rgba(212,175,55,0.2) 10%, transparent 25%),
+                    linear-gradient(-135deg, rgba(255,215,0,0.35) 0%, transparent 20%),
+                    linear-gradient(45deg, transparent 75%, rgba(212,175,55,0.3) 90%, rgba(255,215,0,0.4) 100%)
+                  `,
+                }}
+              />
+              {/* Deep black center vignette */}
+              <div 
+                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+                style={{
+                  background: `radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, rgba(0,0,0,0.4) 100%)`,
+                }}
+              />
+            </>
           )}
           
           {/* AURORA effect - flowing green waves */}
