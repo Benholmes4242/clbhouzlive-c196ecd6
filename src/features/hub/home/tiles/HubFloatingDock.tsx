@@ -10,7 +10,8 @@ import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
-import { HubGamesHubSheet } from '../../components/HubGamesHubSheet';
+import { HubGamesTripsSheet } from '../../components/HubGamesTripsSheet';
+import { HubCreateGameTripSheet } from '../../components/HubCreateGameTripSheet';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 
 interface DockItemProps {
@@ -60,7 +61,8 @@ export function HubFloatingDock() {
   const location = useLocation();
   const { close } = useHub();
   const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
-  const [isGamesHubOpen, setIsGamesHubOpen] = useState(false);
+  const [isGamesTripsHubOpen, setIsGamesTripsHubOpen] = useState(false);
+  const [isCreateGameTripOpen, setIsCreateGameTripOpen] = useState(false);
   const [isCreateMomentOpen, setIsCreateMomentOpen] = useState(false);
 
   const handleNavigate = (path: string, external = false) => {
@@ -77,9 +79,13 @@ export function HubFloatingDock() {
     navigate('/clubhouse');
   };
 
-  const handleCreateGame = () => {
+  const handleOpenGamesTripsHub = () => {
     haptic('medium');
-    setIsGamesHubOpen(true);
+    setIsGamesTripsHubOpen(true);
+  };
+
+  const handleOpenCreateGameTrip = () => {
+    setIsCreateGameTripOpen(true);
   };
 
   const handleCreateMoment = () => {
@@ -133,8 +139,8 @@ export function HubFloatingDock() {
           {/* Right items: Create Game, Profile */}
           <DockItem 
             icon={Plus} 
-            label="Create Game" 
-            onClick={handleCreateGame}
+            label="Create" 
+            onClick={handleOpenGamesTripsHub}
           />
           <DockItem 
             icon={User} 
@@ -149,10 +155,15 @@ export function HubFloatingDock() {
         onClose={() => setIsEchoSheetOpen(false)} 
       />
       
-      <HubGamesHubSheet 
-        isOpen={isGamesHubOpen} 
-        onClose={() => setIsGamesHubOpen(false)}
-        initialTab="yours"
+      <HubGamesTripsSheet 
+        isOpen={isGamesTripsHubOpen} 
+        onClose={() => setIsGamesTripsHubOpen(false)}
+        onOpenCreate={handleOpenCreateGameTrip}
+      />
+
+      <HubCreateGameTripSheet
+        isOpen={isCreateGameTripOpen}
+        onClose={() => setIsCreateGameTripOpen(false)}
       />
 
       <EnhancedCreateMomentModalCinematic
