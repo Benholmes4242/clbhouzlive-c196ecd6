@@ -15,8 +15,10 @@ export const SlotsPill: React.FC<Props> = ({ slotsOpen, slotsTotal, className })
   return (
     <span
       className={[
-        "shrink-0 px-3 py-1 rounded-full text-[12px] text-white will-change-transform transition-transform",
-        isFull ? "bg-orange-500/80" : "bg-green-500/80",
+        "shrink-0 px-3 py-1 rounded-full border text-[12px] text-white will-change-transform transition-transform",
+        isFull 
+          ? "bg-orange-500/20 border-orange-400/30" 
+          : "bg-green-500/20 border-green-400/30",
         bump ? "pill-bump" : "",
         className || ""
       ].join(" ")}
