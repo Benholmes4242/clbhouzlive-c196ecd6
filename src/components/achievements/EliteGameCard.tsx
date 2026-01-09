@@ -628,29 +628,22 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
             />
           )}
           
-          {/* Sparkle particles - varied by effect type */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-xl"
-            style={{
-              backgroundImage: ['aurora', 'crystal', 'nebula', 'divine', 'cosmic'].includes(config.effectType)
-                ? `
-                  radial-gradient(2px 2px at 12% 18%, ${config.badgeBorderColor}90 0%, transparent 100%),
-                  radial-gradient(1.5px 1.5px at 28% 52%, ${config.badgeBorderColor}70 0%, transparent 100%),
-                  radial-gradient(2px 2px at 45% 15%, ${config.badgeBorderColor}80 0%, transparent 100%),
-                  radial-gradient(1px 1px at 72% 72%, ${config.badgeBorderColor}60 0%, transparent 100%),
-                  radial-gradient(2px 2px at 85% 38%, ${config.badgeBorderColor}75 0%, transparent 100%),
-                  radial-gradient(1.5px 1.5px at 58% 45%, ${config.badgeBorderColor}50 0%, transparent 100%),
-                  radial-gradient(1px 1px at 18% 78%, ${config.badgeBorderColor}55 0%, transparent 100%),
-                  radial-gradient(1.5px 1.5px at 92% 62%, ${config.badgeBorderColor}65 0%, transparent 100%)
-                `
-                : `
-                  radial-gradient(1.5px 1.5px at 15% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
-                  radial-gradient(1px 1px at 35% 60%, rgba(255,255,255,0.35) 0%, transparent 100%),
-                  radial-gradient(1px 1px at 65% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
-                  radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.3) 0%, transparent 100%)
+          {/* Sparkle particles - ONLY for Elite+ effects (aurora, crystal, nebula, divine, cosmic, emerald, royal, crimson) */}
+          {['aurora', 'crystal', 'nebula', 'divine', 'cosmic', 'emerald', 'royal', 'crimson'].includes(config.effectType) && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl"
+              style={{
+                backgroundImage: `
+                  radial-gradient(2px 2px at 12% 18%, ${config.badgeBorderColor}80 0%, transparent 100%),
+                  radial-gradient(1.5px 1.5px at 28% 52%, ${config.badgeBorderColor}60 0%, transparent 100%),
+                  radial-gradient(2px 2px at 45% 15%, ${config.badgeBorderColor}70 0%, transparent 100%),
+                  radial-gradient(1px 1px at 72% 72%, ${config.badgeBorderColor}50 0%, transparent 100%),
+                  radial-gradient(2px 2px at 85% 38%, ${config.badgeBorderColor}65 0%, transparent 100%),
+                  radial-gradient(1.5px 1.5px at 58% 45%, ${config.badgeBorderColor}45 0%, transparent 100%)
                 `,
-            }}
-          />
+              }}
+            />
+          )}
         </>
       )}
       
