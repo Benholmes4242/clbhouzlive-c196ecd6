@@ -70,7 +70,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-[70px] w-auto relative z-10"
+            className="h-[77px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
             <span 
@@ -85,23 +85,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         {/* Hero text - increased spacing, refined typography */}
         <div className="flex-1 flex flex-col justify-center items-center text-center -mt-8">
           <h1 
-            className="text-[32px] font-semibold text-white leading-tight mb-4"
+            className="text-[32px] font-semibold text-white leading-tight"
             style={{ 
               fontFamily: 'SF Pro Display, system-ui, sans-serif',
               letterSpacing: '-0.01em',
             }}
           >
-            Stay in play.
+            stay in play.
           </h1>
-          <p 
-            className="text-[15px] text-white/70 max-w-[280px]"
-            style={{ 
-              fontFamily: 'SF Pro Text, system-ui, sans-serif',
-              lineHeight: '1.5',
-            }}
-          >
-            Everywhere you play. Every moment remembered.
-          </p>
         </div>
         
         {/* Action buttons - glass container */}
