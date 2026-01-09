@@ -1,9 +1,9 @@
 /**
- * OverviewTab - Now uses the cinematic V2 design
+ * OverviewTab - Cinematic image-led Tour Feed
  */
 
-import { OverviewTabV2 } from './OverviewTabV2';
+import { OverviewTabFeed } from './OverviewTabFeed';
 
 export function OverviewTab() {
-  return <OverviewTabV2 />;
+  return <OverviewTabFeed />;
 }

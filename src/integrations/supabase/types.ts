@@ -5000,6 +5000,53 @@ export type Database = {
           },
         ]
       }
+      sr_course_map: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          golf_course_id: string | null
+          id: string
+          source: string
+          sr_city: string | null
+          sr_country: string | null
+          sr_venue_course_name: string | null
+          sr_venue_name: string
+          updated_at: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          golf_course_id?: string | null
+          id?: string
+          source?: string
+          sr_city?: string | null
+          sr_country?: string | null
+          sr_venue_course_name?: string | null
+          sr_venue_name: string
+          updated_at?: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          golf_course_id?: string | null
+          id?: string
+          source?: string
+          sr_city?: string | null
+          sr_country?: string | null
+          sr_venue_course_name?: string | null
+          sr_venue_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sr_courses: {
         Row: {
           city: string | null
@@ -5352,6 +5399,38 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      sr_player_images: {
+        Row: {
+          created_at: string
+          image_url: string
+          source: string
+          sr_player_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          image_url: string
+          source?: string
+          sr_player_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          image_url?: string
+          source?: string
+          sr_player_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_player_images_sr_player_id_fkey"
+            columns: ["sr_player_id"]
+            isOneToOne: true
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sr_player_profiles: {
         Row: {
