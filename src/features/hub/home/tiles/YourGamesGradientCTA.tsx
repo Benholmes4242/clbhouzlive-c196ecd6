@@ -1,13 +1,13 @@
 /**
- * YourGamesGradientCTA - Full-width gradient "Your Games" diary card
- * Expands to fill remaining vertical space in Hub
+ * YourGamesGradientCTA - Full-width gradient "Your Games and Trips" diary card
+ * Expands to fill remaining vertical space in Hub with internal scroll
  */
 
 import React, { useState } from 'react';
 import { Calendar, MapPin, Plane, ChevronRight } from 'lucide-react';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { haptic } from '@/utils/haptics';
-import { HUB_DEMO_MODE, MOCK_YOUR_GAMES_SUMMARY, MOCK_NEXT_GAME, MOCK_NEXT_TRIP } from '../hubDemoConfig';
+import { HUB_DEMO_MODE, MOCK_DIARY_ITEMS } from '../hubDemoConfig';
 
 interface YourGamesGradientCTAProps {
   className?: string;
@@ -21,21 +21,8 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
     setGamesHubOpen(true);
   };
 
-  // Demo diary items
-  const diaryItems = HUB_DEMO_MODE ? [
-    {
-      type: 'game' as const,
-      title: MOCK_NEXT_GAME.courseName,
-      subtitle: 'Sun · 1:00 PM',
-      icon: MapPin,
-    },
-    {
-      type: 'trip' as const,
-      title: MOCK_NEXT_TRIP.tripName,
-      subtitle: 'May 12–16',
-      icon: Plane,
-    },
-  ] : [];
+  // Get diary items from demo config or empty array
+  const diaryItems = HUB_DEMO_MODE ? MOCK_DIARY_ITEMS : [];
 
   return (
     <>
@@ -52,8 +39,8 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           minHeight: '90px',
         }}
       >
-        {/* Header row with chevron */}
-        <div className="flex items-center gap-3 px-4 pt-3 pb-2">
+        {/* Fixed header row */}
+        <div className="flex items-center gap-3 px-4 pt-3 pb-2 flex-shrink-0">
           <div 
             className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0"
             style={{ 
@@ -69,7 +56,7 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
               className="text-[15px] font-extrabold"
               style={{ color: 'var(--hub-text)' }}
             >
-              Your Games
+              Your Games and Trips
             </div>
           </div>
 
@@ -80,78 +67,104 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           </div>
         </div>
 
-        {/* Diary entries area */}
-        <div className="px-4 pb-3 flex flex-col gap-2">
-          {HUB_DEMO_MODE && diaryItems.length > 0 ? (
-            <>
-              {diaryItems.map((item, idx) => (
-                <div 
-                  key={idx}
-                  className="flex items-center gap-2.5 py-2 px-3 rounded-xl"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.5)',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                  }}
-                >
-                  {/* Icon in circular background */}
+        {/* Scrollable diary entries area */}
+        <div 
+          className="flex-1 min-h-0 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Top fade mask */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-3 z-10 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255, 240, 230, 0.6), transparent)',
+            }}
+          />
+          
+          {/* Scrollable list */}
+          <div 
+            className="h-full overflow-y-auto px-4 pb-3 pt-1"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              openYourGames();
+            }}
+          >
+            <style>{`
+              .diary-scroll::-webkit-scrollbar { display: none; }
+            `}</style>
+            <div className="diary-scroll flex flex-col gap-2">
+              {HUB_DEMO_MODE && diaryItems.length > 0 ? (
+                diaryItems.map((item, idx) => (
                   <div 
-                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ 
-                      background: item.type === 'game' 
-                        ? 'rgba(16, 185, 129, 0.12)' 
-                        : 'rgba(59, 130, 246, 0.12)',
-                    }}
-                  >
-                    <item.icon 
-                      className="w-3 h-3" 
-                      style={{ 
-                        color: item.type === 'game' ? '#10B981' : '#3B82F6',
-                      }} 
-                    />
-                  </div>
-                  
-                  {/* Primary text - bold */}
-                  <span 
-                    className="text-[13px] font-semibold line-clamp-1 flex-1"
-                    style={{ color: 'var(--hub-text)' }}
-                  >
-                    {item.title}
-                  </span>
-                  
-                  {/* Subtitle - lighter and smaller */}
-                  <span 
-                    className="text-[11px] flex-shrink-0"
-                    style={{ color: 'var(--hub-text-muted)' }}
-                  >
-                    {item.subtitle}
-                  </span>
-                </div>
-              ))}
-              
-              {/* "+2 more" pill */}
-              {MOCK_YOUR_GAMES_SUMMARY.upcomingCount > 0 && (
-                <div className="flex justify-center pt-1">
-                  <div 
-                    className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-medium"
+                    key={idx}
+                    className="flex items-center gap-2.5 py-2 px-3 rounded-xl flex-shrink-0"
                     style={{
-                      background: 'rgba(0, 0, 0, 0.04)',
-                      color: 'var(--hub-text-muted)',
-                      border: '1px solid rgba(0, 0, 0, 0.06)',
+                      background: 'rgba(255, 255, 255, 0.5)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)',
                     }}
                   >
-                    +{MOCK_YOUR_GAMES_SUMMARY.upcomingCount} more upcoming
+                    {/* Icon in circular background */}
+                    <div 
+                      className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ 
+                        background: item.type === 'game' 
+                          ? 'rgba(16, 185, 129, 0.12)' 
+                          : 'rgba(59, 130, 246, 0.12)',
+                      }}
+                    >
+                      {item.type === 'game' ? (
+                        <MapPin 
+                          className="w-3 h-3" 
+                          style={{ color: '#10B981' }} 
+                        />
+                      ) : (
+                        <Plane 
+                          className="w-3 h-3" 
+                          style={{ color: '#3B82F6' }} 
+                        />
+                      )}
+                    </div>
+                    
+                    {/* Primary text - bold */}
+                    <span 
+                      className="text-[13px] font-semibold line-clamp-1 flex-1"
+                      style={{ color: 'var(--hub-text)' }}
+                    >
+                      {item.title}
+                    </span>
+                    
+                    {/* Subtitle - lighter and smaller */}
+                    <span 
+                      className="text-[11px] flex-shrink-0 whitespace-nowrap"
+                      style={{ color: 'var(--hub-text-muted)' }}
+                    >
+                      {item.subtitle}
+                    </span>
                   </div>
+                ))
+              ) : (
+                <div 
+                  className="text-[12px] py-2"
+                  style={{ color: 'var(--hub-text-muted)' }}
+                >
+                  Trips, matches, games – your golf diary.
                 </div>
               )}
-            </>
-          ) : (
-            <div 
-              className="text-[12px] py-2"
-              style={{ color: 'var(--hub-text-muted)' }}
-            >
-              Trips, matches, games – your golf diary.
             </div>
-          )}
+          </div>
+          
+          {/* Bottom fade mask */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-4 z-10 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to top, rgba(255, 240, 230, 0.8), transparent)',
+            }}
+          />
         </div>
       </button>
 

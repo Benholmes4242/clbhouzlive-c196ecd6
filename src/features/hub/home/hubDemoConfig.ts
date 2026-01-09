@@ -92,11 +92,21 @@ export const MOCK_NEARBY_GAMES = [
   },
 ];
 
-// F) Diary tile / Your Games (filled state)
+// F) Diary tile / Your Games and Trips (filled state with scrollable list)
+export const MOCK_DIARY_ITEMS = [
+  { type: 'game' as const, title: 'Ardglass Golf Club', subtitle: 'Sun · 1:00 PM' },
+  { type: 'trip' as const, title: 'Portugal Golf Break', subtitle: 'May 12–16' },
+  { type: 'game' as const, title: 'Sunningdale (Old)', subtitle: 'Sat · 9:10 AM' },
+  { type: 'game' as const, title: 'Royal Birkdale', subtitle: 'Wed · 2:40 PM' },
+  { type: 'trip' as const, title: 'St Andrews Weekend', subtitle: 'Jun 21–23' },
+  { type: 'trip' as const, title: 'Dubai Winter Golf', subtitle: 'Nov 4–10' },
+  { type: 'game' as const, title: 'Wentworth (West)', subtitle: 'Fri · 11:30 AM' },
+];
+
 export const MOCK_YOUR_GAMES_SUMMARY = {
   nextGameSummary: 'Ardglass · Sun 1:00 PM',
   nextTripSummary: 'Portugal · May 12–16',
-  upcomingCount: 2,
+  upcomingCount: 5,
 };
 
 // ============================================
