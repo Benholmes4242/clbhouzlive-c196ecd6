@@ -1,6 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { 
   DesktopUserPost, 
   MobileUserPost, 
@@ -8,6 +7,7 @@ import {
   useUserPostLogic,
   UserPostData
 } from './user-post';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface UserPostProps {
   post: UserPostData;
@@ -29,10 +29,6 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     handleDeletePost,
     handleProfileClick,
     handlePostClick,
-    isFullscreenOpen,
-    currentMedia,
-    openMedia,
-    closeMedia
   } = useUserPostLogic({
     post,
     allUserPosts,
@@ -40,30 +36,35 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     onPostDeleted
   });
 
-  const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video', currentIndex: number = 0) => {
-    // On mobile, always use post viewer for tap-to-expand functionality
-    if (isMobile) {
-      handlePostClick();
-    } else if (source === 'profile') {
-      handlePostClick();
+  // Unified fullscreen for posts
+  const { openFullscreen } = useUnifiedFullscreen('profile', {
+    allowLandscape: true,
+    onLike: (itemId) => console.log('Like:', itemId),
+    onComment: (itemId) => console.log('Comment:', itemId),
+    onShare: (itemId) => console.log('Share:', itemId),
+  });
+
+  // Filter posts with media for the unified player
+  const postsWithMedia = useMemo(() => 
+    allUserPosts.filter(p => p.post_media && p.post_media.length > 0),
+    [allUserPosts]
+  );
+
+  const handleMediaClick = useCallback((mediaUrl: string, mediaType: 'image' | 'video', currentIndex: number = 0) => {
+    // On mobile or profile source, use unified fullscreen
+    if (isMobile || source === 'profile') {
+      const postIndex = postsWithMedia.findIndex(p => p.id === post.id);
+      if (postIndex >= 0) {
+        openFullscreen(postsWithMedia, postIndex);
+      }
     } else {
-      // For index feed posts, pass all media items to fullscreen modal
-      const mediaUrls = post.post_media.map(media => media.media_url);
-      const mediaTypes = post.post_media.map(media => media.media_type as 'image' | 'video');
-      
-      openMedia(
-        mediaUrls, 
-        mediaTypes, 
-        undefined, 
-        golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined,
-        post.user,
-        displayName,
-        post.content,
-        post.post_tags,
-        currentIndex
-      );
+      // For index feed, also use unified fullscreen
+      const postIndex = postsWithMedia.findIndex(p => p.id === post.id);
+      if (postIndex >= 0) {
+        openFullscreen(postsWithMedia, postIndex);
+      }
     }
-  };
+  }, [isMobile, source, postsWithMedia, post.id, openFullscreen]);
 
   return (
     <>
@@ -102,23 +103,6 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
           onMediaClick={handleMediaClick}
         />
       )}
-
-      {/* Remove FullscreenMediaModal for profile and index sources - now handled elsewhere */}
-
-      {/* Fallback fullscreen modal for other sources */}
-      <FullscreenMediaModal
-        isOpen={isFullscreenOpen}
-        onClose={closeMedia}
-        mediaUrl={currentMedia?.mediaUrls || []}
-        mediaType={currentMedia?.mediaTypes || []}
-        alt={currentMedia?.items?.[currentMedia?.initialIndex ?? 0]?.alt}
-        golfCourse={currentMedia?.golfCourse}
-        user={currentMedia?.user}
-        displayName={currentMedia?.displayName}
-        content={currentMedia?.content}
-        postTags={currentMedia?.postTags}
-        initialIndex={currentMedia?.initialIndex || 0}
-      />
     </>
   );
 };

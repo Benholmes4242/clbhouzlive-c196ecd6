@@ -1,20 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost, SocialActivityProps } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
 import BadgeCarousel from '../badges/BadgeCarousel';
-import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import { MediaItem } from '@/types/media';
-import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
@@ -26,11 +22,43 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   userType = 'individual'
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
-  const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
+  const [selectedReviewPost, setSelectedReviewPost] = useState<ActivityPost | null>(null);
 
-  const handlePostClick = (post: ActivityPost) => {
-    setSelectedPost(post);
-  };
+  // Unified fullscreen for regular (non-review) posts
+  const { openFullscreen } = useUnifiedFullscreen('profile', {
+    allowLandscape: true,
+    onLike: (itemId) => {
+      console.log('Like:', itemId);
+    },
+    onComment: (itemId) => {
+      console.log('Comment:', itemId);
+    },
+    onShare: (itemId) => {
+      console.log('Share:', itemId);
+    },
+  });
+
+  // Filter to only media posts for the unified player
+  const mediaPosts = useMemo(() => 
+    posts.filter(p => p.post_media && p.post_media.length > 0),
+    [posts]
+  );
+
+  const handlePostClick = useCallback((post: ActivityPost) => {
+    // Check if this is a review post
+    const isReview = checkIsReviewPost(post);
+    
+    if (isReview) {
+      // Review posts use the dedicated ReviewPostViewer
+      setSelectedReviewPost(post);
+    } else {
+      // Regular posts use the unified fullscreen player
+      const postIndex = mediaPosts.findIndex(p => p.id === post.id);
+      if (postIndex >= 0) {
+        openFullscreen(mediaPosts, postIndex);
+      }
+    }
+  }, [mediaPosts, openFullscreen]);
 
   const handlePostUpdated = () => {
     fetchUserPosts();
@@ -103,129 +131,55 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         </div>
       )}
 
-      {/* Fullscreen viewer for posts */}
-      {selectedPost && (() => {
-        // Check if this is a review post using unified helper
-        const isReview = checkIsReviewPost(selectedPost);
+      {/* Review post viewer - only for review posts */}
+      {selectedReviewPost && (() => {
+        const reviewData = extractReviewData(selectedReviewPost);
+        const userData = extractUserData(selectedReviewPost);
+        
+        const reviewMedia: ReviewMediaItem[] = (selectedReviewPost.post_media || []).map(media => ({
+          id: media.id,
+          media_type: media.media_type,
+          media_url: media.media_url,
+          poster_url: media.poster_url,
+        }));
 
-        // Review post: use FullscreenReviewPost with unified data extraction
-        if (isReview) {
-          const reviewData = extractReviewData(selectedPost);
-          const userData = extractUserData(selectedPost);
-          
-          const reviewMedia: ReviewMediaItem[] = (selectedPost.post_media || []).map(media => ({
-            id: media.id,
-            media_type: media.media_type,
-            media_url: media.media_url,
-            poster_url: media.poster_url,
-          }));
-
-          return (
-            <Dialog open={!!selectedPost} onOpenChange={() => setSelectedPost(null)}>
-              <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
-                <ReviewPostViewer
-                  mode="live"
-                  courseId={reviewData?.courseId || ''}
-                  courseName={reviewData?.courseName || 'Course'}
-                  heroSubtitle={reviewData?.courseLocation}
-                  rating={reviewData?.rating ?? 0}
-                  reviewText={selectedPost.content}
-                  media={reviewMedia}
-                  initialIndex={0}
-                  onBack={() => setSelectedPost(null)}
-                  sourceReviewId={reviewData?.sourceReviewId || ''}
-                  creator={{
+        return (
+          <Dialog open={!!selectedReviewPost} onOpenChange={() => setSelectedReviewPost(null)}>
+            <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
+              <ReviewPostViewer
+                mode="live"
+                courseId={reviewData?.courseId || ''}
+                courseName={reviewData?.courseName || 'Course'}
+                heroSubtitle={reviewData?.courseLocation}
+                rating={reviewData?.rating ?? 0}
+                reviewText={selectedReviewPost.content}
+                media={reviewMedia}
+                initialIndex={0}
+                onBack={() => setSelectedReviewPost(null)}
+                sourceReviewId={reviewData?.sourceReviewId || ''}
+                creator={{
+                  id: userData.id,
+                  name: userData.name,
+                  username: userData.username,
+                  avatar: userData.avatar,
+                }}
+                showReviewCapsule={false}
+                renderMedia={true}
+              >
+                <ReviewBottomPanel
+                  user={{
                     id: userData.id,
                     name: userData.name,
                     username: userData.username,
                     avatar: userData.avatar,
                   }}
-                  showReviewCapsule={false}
-                  renderMedia={true}
-                >
-                  <ReviewBottomPanel
-                    user={{
-                      id: userData.id,
-                      name: userData.name,
-                      username: userData.username,
-                      avatar: userData.avatar,
-                    }}
-                    courseId={reviewData?.courseId || ''}
-                    rating={reviewData?.rating ?? 0}
-                  />
-                </ReviewPostViewer>
+                  courseId={reviewData?.courseId || ''}
+                  rating={reviewData?.rating ?? 0}
+                />
+              </ReviewPostViewer>
 
-              </DialogContent>
-            </Dialog>
-          );
-        }
-
-        // Regular post: use existing FullscreenMediaModal
-        const mediaItems: MediaItem[] = (selectedPost.post_media || []).map(media => {
-          if (media.media_type === 'video') {
-            const streamId = getStreamIdFromUrl(media.media_url);
-            return {
-              id: media.id,
-              type: 'video' as const,
-              url: media.media_url,
-              streamId,
-              posterUrl: getStreamPoster(media.media_url, '1s') ?? undefined,
-              alt: 'Video'
-            };
-          }
-          return {
-            id: media.id,
-            type: 'image' as const,
-            url: media.media_url,
-            alt: 'Photo'
-          };
-        });
-
-        // Extract filter IDs for FullscreenMediaModal
-        const filterIds = (selectedPost.post_media || []).map(media => 
-          media.filter_id || (media.studio_edits as any)?.filter || null
-        );
-        
-        // Extract studioEdits for FullscreenMediaModal
-        const studioEdits = (selectedPost.post_media || []).map(media => 
-          media.studio_edits || null
-        );
-        
-
-        return (
-          <FullscreenMediaModal
-            isOpen={!!selectedPost}
-            onClose={() => setSelectedPost(null)}
-            mediaUrl={mediaItems.map(m => m.url)}
-            mediaType={mediaItems.map(m => m.type)}
-            filterIds={filterIds}
-            studioEdits={studioEdits}
-            initialIndex={0}
-            alt={`Post media`}
-            golfCourse={(() => {
-              // Use canonical resolver
-              const resolved = resolveGolfCourse(selectedPost);
-              if (resolved) {
-                return {
-                  id: resolved.id,
-                  name: resolved.name,
-                  country: resolved.country || ''
-                };
-              }
-              // Fallback to content extraction for very old posts
-              return extractGolfCourseFromContent(selectedPost.content);
-            })()}
-            user={selectedPost.user}
-            displayName={selectedPost.user?.display_name || 'User'}
-            content={selectedPost.content}
-            postTags={selectedPost.post_tags}
-            postId={selectedPost.id}
-            onPostDeleted={handlePostDeleted}
-            onPostEdit={(postId) => {
-              console.log('Edit post:', postId);
-              setSelectedPost(null);
-            }}
-          />
+            </DialogContent>
+          </Dialog>
         );
       })()}
     </div>
