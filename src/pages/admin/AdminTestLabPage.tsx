@@ -37,6 +37,7 @@ import {
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles } from 'lucide-react';
 import { BusinessAccessTestLab } from '@/components/admin/BusinessAccessTestLab';
+import { GameInviteTestLab } from '@/components/admin/GameInviteTestLab';
 
 // Reusable button component
 const TestButton: React.FC<{
@@ -436,6 +437,9 @@ export function AdminTestLabPage() {
           </div>
         </div>
       )}
+
+      {/* Game Invite Test Lab */}
+      {user && <GameInviteTestLab />}
 
       {/* Business Access Test Lab */}
       {user && <BusinessAccessTestLab />}
