@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
 import { adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
-import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import { MediaItem as StandardMediaItem } from '@/types/media';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
@@ -22,13 +19,13 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
+import { MediaItem } from '@/types/media';
+
 interface CourseMediaTabProps {
   courseId: string;
   courseName?: string;
   portalTarget?: HTMLElement | null;
 }
-
-import { MediaItem } from '@/types/media';
 
 interface LocalMediaItem {
   id: string;
@@ -51,16 +48,8 @@ interface LocalMediaItem {
 const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabProps) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
-  const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
   const hasPreloadedFirst = useRef(false);
-
-  // Get portal target for fullscreen modal
-  useEffect(() => {
-    const target = document.getElementById('modal-portal');
-    setModalPortalTarget(target);
-  }, []);
 
   // Phase 1 Fix #2: Use shared hook - single query for all media consumers
   const { data: mediaResp, isLoading, isError, refetch } = useClubMedia(courseId, 30);
@@ -163,18 +152,24 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     estimatedRowHeight: 150, // Smaller tiles = shorter rows
   });
 
-  // Phase 1 Fix #4: Memoized click handler
+  // Use unified fullscreen player for course media
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+    onComment: (itemId) => {
+      console.log('Comment from course media:', itemId);
+    },
+    onShare: (itemId) => {
+      console.log('Share from course media:', itemId);
+    },
+  });
+
+  // Phase 1 Fix #4: Memoized click handler - opens unified fullscreen
   const handleMediaClick = useCallback((item: NewMediaItem) => {
     const index = filteredItems.findIndex(media => media.id === item.id);
     if (index !== -1) {
-      setSelectedMediaIndex(index);
+      openFullscreen(filteredItems, index);
     }
-  }, [filteredItems]);
-
-  // F2: Clear transformed media arrays on lightbox close
-  const handleLightboxClose = useCallback(() => {
-    setSelectedMediaIndex(null);
-  }, []);
+  }, [filteredItems, openFullscreen]);
 
   // Loading state with proper skeleton placeholders
   if (isLoading) {
@@ -227,75 +222,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   }
 
   // Empty state and filtered state are handled inline in the main render
-
-
-  // A1: Lazy window transformation for lightbox performance
-  const renderFullscreenModal = () => {
-    if (selectedMediaIndex === null || !filteredItems[selectedMediaIndex]) return null;
-
-    // Transform only visible window (current + 1 neighbor on each side)
-    const transformWindow = (centerIdx: number, radius = 1): StandardMediaItem[] => {
-      const start = Math.max(0, centerIdx - radius);
-      const end = Math.min(filteredItems.length, centerIdx + radius + 1);
-      
-      return filteredItems.slice(start, end).map((item, localIdx) => {
-        const absoluteIdx = start + localIdx;
-        
-        if (item.type === 'video') {
-          const streamId = getStreamIdFromUrl(item.src);
-          return {
-            id: item.id,
-            type: 'video' as const,
-            url: item.src,
-            streamId,
-            posterUrl: getStreamPoster(item.src, '1s') ?? undefined,
-            alt: item.title || 'Video'
-          };
-        }
-        return {
-          id: item.id,
-          type: 'image' as const,
-          url: item.src,
-          alt: item.title || 'Photo'
-        };
-      });
-    };
-
-    // Start with initial window
-    const standardizedMediaItems = transformWindow(selectedMediaIndex, 2);
-    
-    // Build full arrays for lightbox (will lazy-load on swipe)
-    const allItems: StandardMediaItem[] = filteredItems.map(item => ({
-      id: item.id,
-      type: item.type as 'image' | 'video',
-      url: item.src,
-      alt: item.title || (item.type === 'video' ? 'Video' : 'Photo'),
-      streamId: item.type === 'video' ? getStreamIdFromUrl(item.src) : undefined,
-      posterUrl: item.type === 'video' ? getStreamPoster(item.src, '1s') ?? undefined : undefined,
-    }));
-
-    const currentItem = filteredItems[selectedMediaIndex];
-    const mediaUrls = allItems.map(item => item.url);
-    const mediaTypes = allItems.map(item => item.type);
-
-    const modalContent = (
-      <FullscreenMediaModal
-        isOpen={true}
-        onClose={handleLightboxClose}
-        mediaUrl={mediaUrls}
-        mediaType={mediaTypes}
-        initialIndex={selectedMediaIndex}
-        user={currentItem.user ? {
-          id: currentItem.user.id,
-          profile_photo_url: currentItem.user.avatar
-        } : undefined}
-        displayName={currentItem.user?.name}
-      />
-    );
-
-    // Use modal portal target for proper z-index stacking
-    return modalPortalTarget ? createPortal(modalContent, modalPortalTarget) : modalContent;
-  };
 
   // Calculate overflow count for "+X" indicator on last visible tile
   const totalMediaCount = exploreItems.length;
@@ -419,8 +345,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         </section>
       )}
 
-      {/* Phase 2 Fix #5: Single lightbox implementation only */}
-      {renderFullscreenModal()}
+      {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
     </div>
   );
 };
