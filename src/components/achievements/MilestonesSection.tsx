@@ -13,12 +13,12 @@ export const MilestonesSection: React.FC<MilestonesSectionProps> = ({
   const currentClub = getTop100Club(totalTop100Played);
 
   return (
-    <section className="mb-6 md:mb-8">
+    <section className="mb-6 md:mb-8 overflow-hidden">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-base md:text-lg font-semibold">Top 100 Milestones</h2>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full">
         {MILESTONE_ACHIEVEMENTS.map((milestone) => {
           const threshold = milestone.threshold ?? 0;
           const isUnlocked = totalTop100Played >= threshold;
