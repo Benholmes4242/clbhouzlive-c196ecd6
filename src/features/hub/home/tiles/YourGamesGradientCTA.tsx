@@ -63,7 +63,7 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)',
+          boxShadow: 'var(--hub-shadow-tile)', // Medium shadow for primary tile
           minHeight: '90px',
         }}
       >
@@ -75,7 +75,7 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           }}
         />
 
-        {/* Header row */}
+        {/* Header row - stronger hierarchy */}
         <div className="flex items-center gap-3 px-4 pt-3.5 pb-2 flex-shrink-0 relative z-10">
           {/* V2 Icon - rounded square */}
           <div 
@@ -89,16 +89,16 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           
           <div className="flex-1 text-left min-w-0">
             <div 
-              className="text-[14px] font-semibold"
+              className="text-[15px] font-semibold" // Stronger header
               style={{ color: 'var(--hub-text)' }}
             >
               Your Games and Trips
             </div>
           </div>
 
-          {/* V2 View all pill button */}
+          {/* V2 View all pill button - slightly smaller */}
           <div 
-            className="flex items-center gap-0.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+            className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-medium"
             style={{ 
               background: 'var(--hub-surface)',
               border: '1px solid var(--hub-stroke)',
@@ -110,15 +110,15 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           </div>
         </div>
 
-        {/* Diary entries */}
+        {/* Diary entries - with pressable row styling */}
         <div className="px-4 pb-2 flex flex-col gap-1.5 relative z-10">
           {hasItems ? (
             displayItems.map((item, idx) => (
               <div 
                 key={idx}
-                className="flex items-center gap-2.5 py-2 px-3 rounded-[12px]"
+                className="flex items-center gap-2.5 py-2 px-3 rounded-[12px] transition-all duration-150 hover:shadow-[0_6px_18px_rgba(2,6,23,0.06)]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.75)',
+                  background: 'rgba(255, 255, 255, 0.92)',
                   border: '1px solid rgba(255, 255, 255, 0.5)',
                 }}
               >
@@ -169,14 +169,14 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           )}
         </div>
         
-        {/* V2 Summary - dashed pill (like "Add another course") */}
+        {/* V2 Summary - lighter + tighter dashed pill */}
         {summaryText ? (
           <div className="px-4 pb-3 flex justify-center relative z-10">
             <div 
-              className="text-[11px] px-3 py-1 rounded-full line-clamp-1"
+              className="text-[12px] px-2.5 py-1 rounded-full line-clamp-1"
               style={{
                 background: 'transparent',
-                border: '1px dashed var(--hub-stroke-mid)',
+                border: '1px dashed rgba(15, 23, 42, 0.10)',
                 color: 'var(--hub-text-dim)',
               }}
             >
@@ -186,10 +186,10 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
         ) : !hasItems && (
           <div className="px-4 pb-3 flex justify-center relative z-10">
             <div 
-              className="flex items-center gap-1 text-[11px] px-3 py-1 rounded-full"
+              className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-full"
               style={{
                 background: 'transparent',
-                border: '1px dashed var(--hub-stroke-mid)',
+                border: '1px dashed rgba(15, 23, 42, 0.10)',
                 color: 'var(--hub-text-dim)',
               }}
             >

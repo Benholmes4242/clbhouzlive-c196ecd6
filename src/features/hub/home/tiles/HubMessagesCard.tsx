@@ -52,7 +52,7 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)',
+          boxShadow: 'var(--hub-shadow-tile)', // Medium shadow for primary tile
           minHeight: '60px',
         }}
       >
@@ -93,24 +93,25 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
             </div>
           </div>
 
-          {/* V2 Warm badge pill - not a harsh circle */}
-          {hasMessages ? (
-            <div 
-              className="h-6 min-w-[24px] px-2 rounded-full flex items-center justify-center text-[11px] font-bold"
-              style={{
-                background: 'var(--hub-badge-warm-bg)',
-                color: 'var(--hub-badge-warm-text)',
-                border: '1px solid var(--hub-badge-warm-border)',
-              }}
-            >
-              {messages.unreadCount}
-            </div>
-          ) : (
+          {/* V2 Badge + Chevron - tighter spacing */}
+          <div className="flex items-center gap-2 flex-shrink-0 ml-1">
+            {hasMessages && (
+              <div 
+                className="h-[22px] min-w-[22px] px-2 rounded-full flex items-center justify-center text-[11px] font-bold"
+                style={{
+                  background: 'rgba(255, 142, 61, 0.18)',
+                  color: 'rgba(255, 142, 61, 0.95)',
+                  border: '1px solid rgba(255, 142, 61, 0.18)',
+                }}
+              >
+                {messages.unreadCount}
+              </div>
+            )}
             <ChevronRight 
               className="w-4 h-4 flex-shrink-0" 
               style={{ color: 'var(--hub-text-dimmer)' }} 
             />
-          )}
+          </div>
         </div>
       </button>
       

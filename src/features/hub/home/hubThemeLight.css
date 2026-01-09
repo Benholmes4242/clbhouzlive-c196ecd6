@@ -93,15 +93,20 @@
   --hub-stroke-divider: rgba(15, 23, 42, 0.05);
 
   /* ========================================
-     V2 SHADOWS & DEPTH (Premium)
+     V2 SHADOWS & DEPTH (Premium Hierarchy)
      ======================================== */
+  /* Hero - strongest */
+  --hub-shadow-hero: 0 16px 40px rgba(2, 6, 23, 0.10);
+  
+  /* Primary tiles (Messages, Diary) - medium */
   --hub-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
-  --hub-shadow-soft: 0 4px 14px rgba(2, 6, 23, 0.06);
+  --hub-shadow-tile: 0 6px 18px rgba(2, 6, 23, 0.07);
+  --hub-shadow-tile-hover: 0 8px 24px rgba(2, 6, 23, 0.10);
+  
+  /* Secondary tiles (2-up) - soft */
+  --hub-shadow-soft: 0 4px 14px rgba(2, 6, 23, 0.05);
   --hub-shadow-main: 0 4px 24px rgba(31, 36, 40, 0.08);
-  --hub-shadow-tile: 0 4px 16px rgba(2, 6, 23, 0.06);
-  --hub-shadow-tile-hover: 0 6px 20px rgba(2, 6, 23, 0.10);
   --hub-shadow-tile-inset: inset 0 0 0 1px rgba(31, 36, 40, 0.04);
-  --hub-shadow-hero: 0 8px 28px rgba(0, 0, 0, 0.14);
   --hub-top-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
   /* ========================================

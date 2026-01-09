@@ -199,10 +199,10 @@ export function HubHomePage() {
         <div 
           className="flex-1 flex flex-col overflow-hidden"
           style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)', // Reduced from 8px
           }}
         >
-          <div className="px-5 flex flex-col gap-2.5 flex-1">
+          <div className="px-5 flex flex-col gap-[12px] flex-1"> {/* Standardized to 12px gap */}
             {/* Show skeleton while loading, real content when ready */}
             {!isDataReady ? (
               <HubContentSkeleton />
@@ -218,7 +218,7 @@ export function HubHomePage() {
                 <HubMessagesCard />
 
                 {/* Zone 4: 2-up Grid - Active Games + Echo (fixed height) */}
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-[12px]">
                   <ActiveGamesNearYouTile />
                   <EchoTile />
                 </div>
