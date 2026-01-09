@@ -40,7 +40,7 @@ export function EchoTile() {
         {/* Text content */}
         <div className="flex-1 flex flex-col">
           <div 
-            className="text-[15px] font-semibold leading-tight" // Slightly larger title
+            className="text-[15.5px] font-bold leading-tight" // Feature-level presence
             style={{ color: 'var(--hub-text)' }}
           >
             Echo
