@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-import { MapPin } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 import { useNextUserGame } from '../hooks/useNextUserGame';
 import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
 import { haptic } from '@/utils/haptics';
@@ -65,6 +65,9 @@ export function UpNextHeroTile() {
 
   // With upcoming game - show hero with course image (10% taller: 165px)
   const courseName = nextGame.course?.name || nextGame.courseName || 'Course TBD';
+  const playersFilled = (nextGame.slotsTotal ?? 4) - (nextGame.slotsOpen ?? 0);
+  const playersTotal = nextGame.slotsTotal ?? 4;
+  const isFull = nextGame.slotsOpen === 0;
 
   return (
     <>
@@ -117,6 +120,20 @@ export function UpNextHeroTile() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Players pill - bottom right */}
+        <div 
+          className="absolute bottom-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{
+            background: isFull ? 'rgba(34, 197, 94, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <Users className={`w-4 h-4 ${isFull ? 'text-white' : 'text-slate-700'}`} strokeWidth={2} />
+          <span className={`text-[13px] font-semibold ${isFull ? 'text-white' : 'text-slate-700'}`}>
+            {playersFilled}/{playersTotal}
+          </span>
         </div>
       </button>
 
