@@ -62,7 +62,7 @@ function ProgressPill({ text }: { text: string }) {
   );
 }
 
-// Game Variant
+// Game Variant - with RSVP summary
 function GameHeroContent({ data }: { data: HeroGameData }) {
   return (
     <>
@@ -76,8 +76,20 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
         <div className="text-[14px] font-medium mt-1 opacity-95 drop-shadow-sm">
           {formatGameDate(data.startTimeISO)}
         </div>
-        <div className="mt-2">
+        <div className="flex items-center gap-2 mt-2">
           <ProgressPill text={`${data.slotsTotal - data.slotsOpen}/${data.slotsTotal}`} />
+          {/* RSVP summary - compact for hero tile */}
+          {data.goingCount !== undefined && data.goingCount > 0 && (
+            <span 
+              className="text-[11px] font-medium"
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.85)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              }}
+            >
+              👥 {data.goingCount} going
+            </span>
+          )}
         </div>
       </div>
     </>

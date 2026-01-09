@@ -137,6 +137,26 @@ export function useTripTimeline(tripId: string | undefined) {
       
       if (gamesError) throw gamesError;
       
+      // Fetch RSVP counts for all games in this trip
+      const gameIds = games?.map(g => g.id) || [];
+      let rsvpCountsMap = new Map<string, { going: number; maybe: number; declined: number }>();
+      
+      if (gameIds.length > 0) {
+        const { data: participants } = await supabase
+          .from('game_participants')
+          .select('game_id, rsvp_status')
+          .in('game_id', gameIds);
+        
+        // Calculate counts per game
+        participants?.forEach(p => {
+          const counts = rsvpCountsMap.get(p.game_id) || { going: 0, maybe: 0, declined: 0 };
+          if (p.rsvp_status === 'going') counts.going++;
+          else if (p.rsvp_status === 'maybe') counts.maybe++;
+          else if (p.rsvp_status === 'declined') counts.declined++;
+          rsvpCountsMap.set(p.game_id, counts);
+        });
+      }
+      
       const items: TripTimelineItem[] = [];
       let currentDay: string | null = null;
       
@@ -159,8 +179,10 @@ export function useTripTimeline(tripId: string | undefined) {
           });
         }
         
-        // Add game item
+        // Add game item with RSVP counts
         const course = game.golf_courses as any;
+        const gameCounts = rsvpCountsMap.get(game.id);
+        
         items.push({
           id: game.id,
           type: 'game',
@@ -174,6 +196,7 @@ export function useTripTimeline(tripId: string | undefined) {
           courseName: course?.name,
           courseThumbnail: course?.hero_image_url,
           gameId: game.id,
+          rsvpCounts: gameCounts || { going: 1, maybe: 0, declined: 0 }, // Default 1 for host
         });
       }
       

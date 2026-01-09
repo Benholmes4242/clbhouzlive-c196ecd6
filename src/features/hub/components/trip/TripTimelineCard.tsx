@@ -1,9 +1,10 @@
 /**
  * TripTimelineCard - Individual timeline item card
+ * V2.1: Added RSVP summary line for game items
  */
 
 import React from 'react';
-import { MapPin, Clock, Users } from 'lucide-react';
+import { Clock, Users } from 'lucide-react';
 import type { TripTimelineItem } from '../../hooks/useTripTimeline';
 
 interface TripTimelineCardProps {
@@ -52,21 +53,24 @@ export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
           {item.title}
         </h4>
 
-        {/* Meta */}
-        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-          {item.subtitle && (
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {item.subtitle}
-            </span>
-          )}
-          {item.rsvpCounts && (
-            <span className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              {item.rsvpCounts.going} going
-            </span>
-          )}
-        </div>
+        {/* Time */}
+        {item.subtitle && (
+          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+            <Clock className="w-3 h-3" />
+            {item.subtitle}
+          </div>
+        )}
+
+        {/* RSVP Summary - compact variant */}
+        {item.rsvpCounts && (
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+            <Users className="w-3 h-3" />
+            <span>{item.rsvpCounts.going} going</span>
+            {item.rsvpCounts.maybe > 0 && (
+              <span className="opacity-70">· {item.rsvpCounts.maybe} maybe</span>
+            )}
+          </div>
+        )}
       </div>
     </button>
   );
