@@ -383,25 +383,22 @@ export function HubCreateGameTripSheet({
                     }}
                     className="w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all active:scale-[0.99] active:opacity-90"
                     style={{
-                      background: mode === 'game' 
-                        ? 'linear-gradient(135deg, rgba(110, 146, 119, 0.06) 0%, rgba(130, 166, 139, 0.03) 100%)'
-                        : 'linear-gradient(135deg, rgba(180, 130, 80, 0.06) 0%, rgba(200, 150, 100, 0.03) 100%)',
+                      background: 'linear-gradient(135deg, rgba(255, 140, 60, 0.06) 0%, rgba(255, 180, 100, 0.03) 100%)',
                       border: '1px solid rgba(0, 0, 0, 0.04)',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
+                      boxShadow: '0 2px 8px rgba(255, 140, 60, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03)',
                     }}
                   >
                     <div 
                       className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ 
-                        background: mode === 'game'
-                          ? 'rgba(110, 146, 119, 0.1)'
-                          : 'rgba(180, 130, 80, 0.1)',
+                        background: 'linear-gradient(135deg, rgba(255, 140, 60, 0.14) 0%, rgba(255, 160, 90, 0.08) 100%)',
+                        border: '1px solid rgba(0, 0, 0, 0.04)',
                       }}
                     >
                       {mode === 'game' ? (
-                        <MapPin className="w-[18px] h-[18px]" style={{ color: 'var(--hub-accent)' }} />
+                        <MapPin className="w-[18px] h-[18px]" style={{ color: 'rgba(180, 90, 30, 0.85)' }} />
                       ) : (
-                        <Plane className="w-[18px] h-[18px]" style={{ color: '#B4824F' }} />
+                        <Plane className="w-[18px] h-[18px]" style={{ color: 'rgba(180, 90, 30, 0.85)' }} />
                       )}
                     </div>
                     <span 
@@ -453,7 +450,8 @@ export function HubCreateGameTripSheet({
                               key={player.id}
                               className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-full"
                               style={{
-                                background: 'rgba(0, 0, 0, 0.05)',
+                                background: 'rgba(16, 185, 129, 0.15)',
+                                border: '1px solid rgba(16, 185, 129, 0.3)',
                               }}
                             >
                               {player.profile_photo_url ? (
@@ -465,20 +463,20 @@ export function HubCreateGameTripSheet({
                               ) : (
                                 <div 
                                   className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium"
-                                  style={{ background: 'rgba(0, 0, 0, 0.08)', color: 'var(--hub-text-dim)' }}
+                                  style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10B981' }}
                                 >
                                   {(player.display_name || player.name || '?').charAt(0).toUpperCase()}
                                 </div>
                               )}
-                              <span className="text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
+                              <span className="text-[13px] font-semibold" style={{ color: '#10B981' }}>
                                 {player.display_name || player.name}
                               </span>
                               <button
                                 onClick={() => handleRemovePlayer(player.id)}
                                 className="w-4 h-4 rounded-full flex items-center justify-center transition-colors"
-                                style={{ background: 'rgba(0, 0, 0, 0.08)' }}
+                                style={{ background: 'rgba(16, 185, 129, 0.2)' }}
                               >
-                                <X className="w-2.5 h-2.5" style={{ color: 'var(--hub-text-sub)' }} />
+                                <X className="w-2.5 h-2.5" style={{ color: '#10B981' }} />
                               </button>
                             </div>
                           ))}
@@ -540,7 +538,7 @@ export function HubCreateGameTripSheet({
                           className="px-3.5 py-2 rounded-full text-[13px] font-medium transition-all active:scale-[0.96]"
                           style={{
                             background: visibility === option.value 
-                              ? 'rgba(0, 0, 0, 0.08)' 
+                              ? '#F8FAFC' 
                               : 'rgba(255, 255, 255, 0.8)',
                             border: visibility === option.value
                               ? '1px solid rgba(0, 0, 0, 0.08)'
@@ -688,7 +686,7 @@ export function HubCreateGameTripSheet({
                                     className="px-4 py-2 rounded-full text-[13px] font-medium transition-all active:scale-[0.96]"
                                     style={{
                                       background: holeCount === num 
-                                        ? 'rgba(0, 0, 0, 0.08)' 
+                                        ? '#F8FAFC' 
                                         : 'rgba(255, 255, 255, 0.8)',
                                       border: '1px solid rgba(0, 0, 0, 0.04)',
                                       color: holeCount === num 
@@ -713,7 +711,7 @@ export function HubCreateGameTripSheet({
                                     className="px-4 py-2 rounded-full text-[13px] font-medium transition-all capitalize active:scale-[0.96]"
                                     style={{
                                       background: gameType === type 
-                                        ? 'rgba(0, 0, 0, 0.08)' 
+                                        ? '#F8FAFC' 
                                         : 'rgba(255, 255, 255, 0.8)',
                                       border: '1px solid rgba(0, 0, 0, 0.04)',
                                       color: gameType === type 
@@ -826,10 +824,10 @@ export function HubCreateGameTripSheet({
                 className="w-full py-3.5 rounded-2xl text-[15px] font-semibold transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{
                   background: isValid 
-                    ? 'linear-gradient(135deg, #6E9277 0%, #7FA888 100%)'
+                    ? '#64748B'
                     : 'rgba(0, 0, 0, 0.06)',
                   color: isValid ? 'white' : 'var(--hub-text-muted)',
-                  boxShadow: isValid ? '0 4px 16px rgba(110, 146, 119, 0.25)' : 'none',
+                  boxShadow: isValid ? '0 4px 16px rgba(100, 116, 139, 0.25)' : 'none',
                   opacity: isSubmitting ? 0.7 : 1,
                 }}
               >
@@ -868,55 +866,70 @@ export function HubCreateGameTripSheet({
                   animate={{ y: 0 }}
                   exit={{ y: '100%' }}
                   transition={{ type: 'tween', duration: 0.2 }}
-                  className="fixed inset-x-0 bottom-0 z-[10006] rounded-t-[24px] p-5"
+                  className="fixed inset-x-0 bottom-0 z-[10006] rounded-t-[24px]"
                   style={{
-                    background: 'white',
+                    background: '#F8FAFC',
                     maxHeight: '60vh',
                     overflowY: 'auto',
                     paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
                   }}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text)' }}>
-                      Add Players
-                    </h3>
+                  {/* Grabber handle */}
+                  <div className="flex justify-center pt-2.5 pb-1.5">
+                    <div 
+                      className="w-8 h-[3px] rounded-full"
+                      style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+                    />
+                  </div>
+
+                  <div className="px-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text)' }}>
+                        Add Players
+                      </h3>
+                      <button
+                        onClick={() => setPlayerPickerOpen(false)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+                      >
+                        <X className="w-4 h-4" style={{ color: 'var(--hub-text-sub)' }} />
+                      </button>
+                    </div>
+                    
+                    <div 
+                      className="rounded-xl mb-4"
+                      style={{ background: 'white' }}
+                    >
+                      <UserSearchTypeahead
+                        selectedUsers={selectedPlayers.map(p => ({
+                          id: p.id,
+                          display_name: p.display_name || p.name,
+                          profile_photo_url: p.profile_photo_url,
+                        }))}
+                        onUserAdd={(user) => {
+                          handleAddPlayer({
+                            id: user.id,
+                            name: user.display_name || '',
+                            display_name: user.display_name,
+                            profile_photo_url: user.profile_photo_url,
+                          });
+                        }}
+                        onUserRemove={(userId) => handleRemovePlayer(userId)}
+                        maxUsers={mode === 'game' ? MAX_PLAYERS - 1 : 100}
+                      />
+                    </div>
+                    
                     <button
                       onClick={() => setPlayerPickerOpen(false)}
-                      className="w-8 h-8 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+                      className="w-full py-3 rounded-xl text-[15px] font-medium"
+                      style={{
+                        background: '#64748B',
+                        color: 'white',
+                      }}
                     >
-                      <X className="w-4 h-4" style={{ color: 'var(--hub-text-sub)' }} />
+                      Done
                     </button>
                   </div>
-                  
-                  <UserSearchTypeahead
-                    selectedUsers={selectedPlayers.map(p => ({
-                      id: p.id,
-                      display_name: p.display_name || p.name,
-                      profile_photo_url: p.profile_photo_url,
-                    }))}
-                    onUserAdd={(user) => {
-                      handleAddPlayer({
-                        id: user.id,
-                        name: user.display_name || '',
-                        display_name: user.display_name,
-                        profile_photo_url: user.profile_photo_url,
-                      });
-                    }}
-                    onUserRemove={(userId) => handleRemovePlayer(userId)}
-                    maxUsers={mode === 'game' ? MAX_PLAYERS - 1 : 100}
-                  />
-                  
-                  <button
-                    onClick={() => setPlayerPickerOpen(false)}
-                    className="w-full mt-4 py-3 rounded-xl text-[15px] font-medium"
-                    style={{
-                      background: 'var(--hub-accent)',
-                      color: 'white',
-                    }}
-                  >
-                    Done
-                  </button>
                 </motion.div>
               </>
             )}

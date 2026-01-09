@@ -150,7 +150,7 @@ export function CourseSearchSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1200] touch-none"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[10010] touch-none"
             onClick={onClose}
             onTouchMove={(e) => e.preventDefault()}
             style={{ WebkitTouchCallout: 'none' }}
@@ -167,7 +167,7 @@ export function CourseSearchSheet({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className={`
-              fixed z-[1201] overflow-hidden
+              fixed z-[10011] overflow-hidden
               ${isMobile 
                 ? 'left-0 right-0 bottom-0 max-h-[80vh] rounded-t-2xl' 
                 : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] rounded-xl'
