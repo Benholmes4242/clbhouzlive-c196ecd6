@@ -95,7 +95,7 @@ function VideosGridWrapper({
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
-  onMediaClick: (item: any) => void;
+  onMediaClick: (item: any, index?: number) => void;
   searchQuery?: string;
   selectedTags?: string[];
 }
@@ -575,7 +575,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           isLoading={loading && !content}
           onWatch={(item) => {
             const originalItem = content?.find(c => c.id === item.id);
-            if (originalItem) onMediaClick(originalItem);
+            const index = content?.findIndex(c => c.id === item.id) ?? 0;
+            if (originalItem) onMediaClick(originalItem, index);
           }}
         />
         
@@ -589,9 +590,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         {/* Feed Grid - uses new WatchGridV2 with ActivityGrid layout */}
         <WatchGridV2 
           onMediaClick={(item, index) => {
-            // Find original item for compatibility with existing onMediaClick
+            // Find original item and pass with index for unified fullscreen
             const originalItem = content?.find(c => c.id === item.postId);
-            if (originalItem) onMediaClick(originalItem);
+            const originalIndex = content?.findIndex(c => c.id === item.postId) ?? index;
+            if (originalItem) onMediaClick(originalItem, originalIndex);
           }}
         />
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, lazy, Suspense, useEffect } from 'react';
+import React, { useState, useMemo, lazy, Suspense, useEffect, useCallback } from 'react';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -18,13 +18,12 @@ import { ContinueWatchingSection } from '@/components/videos/ContinueWatchingSec
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import { MediaItem } from '@/types/media';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import type { ExploreContentItem } from '@/components/explore/types';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { useUserTop100Intent } from '@/hooks/useUserTop100Intent';
 import { useTop100DiscoverRecommendations } from '@/hooks/useTop100DiscoverRecommendations';
@@ -45,8 +44,6 @@ type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
   const navigate = useNavigate();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
@@ -158,38 +155,22 @@ const Discover = () => {
     return [...optimisticPosts, ...(content || [])];
   }, [optimisticPosts, content]);
 
-  // Transform content to MediaItem[] for FullscreenMediaModal - use allContent
-  const mediaItems: MediaItem[] = useMemo(() => {
-    const currentContent = allContent || [];
-    return currentContent.flatMap((post, postIndex) => {
-      // Handle posts with media array vs single media
-      const mediaArray = post.media && post.media.length > 0 ? post.media : [{ 
-        id: `${post.id}-single`, 
-        media_type: post.type, 
-        media_url: post.src 
-      }];
-      
-      return mediaArray.map((media, mediaIndex) => {
-        if (media.media_type === 'video') {
-          const streamId = getStreamIdFromUrl(media.media_url);
-          return {
-            id: `${post.id}-${mediaIndex}`,
-            type: 'video' as const,
-            url: media.media_url,
-            streamId,
-            posterUrl: getStreamPoster(media.media_url, '1s') ?? undefined,
-            alt: post.title || 'Video'
-          };
-        }
-        return {
-          id: `${post.id}-${mediaIndex}`,
-          type: 'image' as const,
-          url: media.media_url,
-          alt: post.title || 'Photo'
-        };
-      });
-    });
-  }, [allContent]);
+  // Use unified fullscreen player for Watch/Discover content
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+    onLike: (itemId) => {
+      console.log('Like from fullscreen:', itemId);
+      // TODO: Add actual like mutation
+    },
+    onComment: (itemId) => {
+      console.log('Comment from fullscreen:', itemId);
+    },
+    onShare: (itemId) => {
+      console.log('Share from fullscreen:', itemId);
+    },
+    onLoadMore: hasMore ? loadMore : undefined,
+    hasMore,
+  });
 
   // Show skeleton during rehydration (MUST be after all hooks)
   if (isRehydrating) {
@@ -209,16 +190,33 @@ const Discover = () => {
     // For now, this is just visual feedback
   };
 
-  const handleMediaClick = (item: any) => {
-    // Find the index of the clicked item in our flattened media array
-    const clickedIndex = mediaItems.findIndex(mediaItem => 
-      mediaItem.url === item.src || mediaItem.id === item.id
-    );
+  // Handle media click from DiscoverContent - opens unified fullscreen player
+  const handleMediaClick = useCallback((item: ExploreContentItem, index?: number) => {
+    // Find the index if not provided
+    const clickedIndex = index ?? allContent.findIndex(c => c.id === item.id);
     if (clickedIndex !== -1) {
-      setModalStartIndex(clickedIndex);
-      setModalOpen(true);
+      openFullscreen(allContent, clickedIndex);
     }
-  };
+  }, [allContent, openFullscreen]);
+
+  // Handle video click from VideosTab (receives just string id)
+  const handleVideoClick = useCallback((id: string) => {
+    const clickedIndex = allContent.findIndex(c => c.id === id);
+    if (clickedIndex !== -1) {
+      openFullscreen(allContent, clickedIndex);
+    } else {
+      // Fallback: navigate to video page if not found in current content
+      navigate(`/video/${id}`);
+    }
+  }, [allContent, openFullscreen, navigate]);
+
+  // Handle media click from CommunityFeed (receives any item shape)
+  const handleCommunityMediaClick = useCallback((item: any) => {
+    const clickedIndex = allContent.findIndex(c => c.id === item.id);
+    if (clickedIndex !== -1) {
+      openFullscreen(allContent, clickedIndex);
+    }
+  }, [allContent, openFullscreen]);
 
   const handleUserFollow = (userId: string) => {
     console.log('User followed:', userId);
@@ -256,7 +254,7 @@ const Discover = () => {
                 if (key === 'channels') {
                   return (
                     <Suspense fallback={null}>
-                      <ExploreTab onMediaClick={handleMediaClick} />
+                      <ExploreTab onMediaClick={handleCommunityMediaClick} />
                     </Suspense>
                   );
                 }
@@ -264,7 +262,7 @@ const Discover = () => {
                   return (
                     <div className="md:container md:mx-auto md:px-0">
                       <Suspense fallback={null}>
-                        <CommunityFeed onMediaClick={handleMediaClick} />
+                        <CommunityFeed onMediaClick={handleCommunityMediaClick} />
                       </Suspense>
                     </div>
                   );
@@ -272,7 +270,7 @@ const Discover = () => {
                 if (key === 'videos') {
                   return (
                     <Suspense fallback={null}>
-                      <VideosTab onVideoClick={handleMediaClick} />
+                      <VideosTab onVideoClick={handleVideoClick} />
                     </Suspense>
                   );
                 }
@@ -299,14 +297,7 @@ const Discover = () => {
       </FadeInContent>
 
 
-        {/* Fullscreen Media Modal */}
-        <FullscreenMediaModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          mediaUrl={mediaItems.map(item => item.url)}
-          mediaType={mediaItems.map(item => item.type)}
-          initialIndex={modalStartIndex}
-        />
+        {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
 
         <style>{`
           .scrollbar-hide {
