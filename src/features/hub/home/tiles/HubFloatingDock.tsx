@@ -1,6 +1,7 @@
 /**
  * HubFloatingDock - Bottom-anchored dock with center camera button
  * Links to create moment modal
+ * Supports time-of-day theming for glass effect
  */
 
 import React, { useState } from 'react';
@@ -13,6 +14,7 @@ import { HubEchoSheet } from '../../components/HubEchoSheet';
 import { HubGamesTripsSheet } from '../../components/HubGamesTripsSheet';
 import { CreateGameTripSheetV2 } from '../../components/create-game-trip-v2';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
+import { useHubTimeOfDay } from '../hooks/useHubTimeOfDay';
 
 interface DockItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -60,10 +62,14 @@ export function HubFloatingDock() {
   const navigate = useNavigate();
   const location = useLocation();
   const { close } = useHub();
+  const theme = useHubTimeOfDay();
   const [isEchoSheetOpen, setIsEchoSheetOpen] = useState(false);
   const [isGamesTripsHubOpen, setIsGamesTripsHubOpen] = useState(false);
   const [isCreateGameTripOpen, setIsCreateGameTripOpen] = useState(false);
   const [isCreateMomentOpen, setIsCreateMomentOpen] = useState(false);
+
+  // Only apply themed dock on /hub route
+  const isHubRoute = location.pathname === '/hub';
 
   const handleNavigate = (path: string, external = false) => {
     haptic('light');
@@ -100,7 +106,7 @@ export function HubFloatingDock() {
 
   return (
     <>
-      {/* Anchored dock - full width at bottom, premium gradient + hairline */}
+      {/* Anchored dock - full width at bottom, time-of-day glass effect */}
       <nav 
         className="sticky bottom-0 left-0 right-0 z-[10000] w-full"
         style={{ 
@@ -108,14 +114,21 @@ export function HubFloatingDock() {
         }}
       >
         <div 
-          className="w-full h-[55px] flex items-center justify-around"
+          className="relative w-full h-[55px] flex items-center justify-around"
           style={{
-            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.98) 100%)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(15, 23, 42, 0.06)', // V2 hairline
+            background: isHubRoute ? theme.dockBg : 'rgba(255, 255, 255, 0.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            borderTop: `1px solid ${isHubRoute ? theme.dockBorder : 'rgba(0, 0, 0, 0.08)'}`,
+            boxShadow: isHubRoute ? theme.dockShadow : '0 -8px 24px rgba(0,0,0,0.10)',
           }}
         >
+          {/* Premium top glow hairline */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+            style={{ background: 'rgba(255,255,255,0.35)' }}
+          />
+
           {/* Left items: Home (goes to Clubhouse), Search */}
           <DockItem 
             icon={Home} 
