@@ -17,7 +17,6 @@ import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
 import { ActiveGamesNearYouTile } from '../home/tiles/ActiveGamesNearYouTile';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { YourGamesGradientCTA } from '../home/tiles/YourGamesGradientCTA';
-import { CourseLegacyMiniTile } from '../home/tiles/CourseLegacyMiniTile';
 import { HubFloatingDock } from '../home/tiles/HubFloatingDock';
 
 import '../home/hubThemeLight.css';
@@ -221,10 +220,6 @@ export function HubHomePage() {
               <YourGamesGradientCTA />
             </div>
 
-            {/* Zone 6: Course Legacy Mini Tile */}
-            <div className="mt-4">
-              <CourseLegacyMiniTile />
-            </div>
           </div>
         </div>
 
