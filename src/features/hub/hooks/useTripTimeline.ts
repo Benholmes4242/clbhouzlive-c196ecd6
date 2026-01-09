@@ -1,20 +1,31 @@
 /**
  * useTripTimeline - Fetches trip data and timeline items
- * V2: Includes notes, day markers with Day N, proper ordering
+ * V2+: Tour-grade with per-day aggregates, game position badges, country
  */
 
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, isToday, startOfDay } from 'date-fns';
+
+// Per-day aggregate data
+export interface DayAggregate {
+  dayKey: string;
+  gamesCount: number;
+  notesCount: number;
+  country?: string;
+  dayNumber?: number;
+  isToday: boolean;
+}
 
 export interface TripTimelineItem {
   id: string;
   type: 'game' | 'day_marker' | 'note';
   title: string;
   subtitle?: string;
-  meta?: string; // For day markers: "2 games"
+  meta?: string;
   occurredAt: Date;
-  dayNumber?: number; // Day N for day markers
+  dayNumber?: number;
   courseId?: string;
   courseName?: string;
   courseThumbnail?: string;
@@ -27,6 +38,12 @@ export interface TripTimelineItem {
   userRsvp?: 'going' | 'maybe' | 'declined' | 'invited' | null;
   noteId?: string;
   canEdit?: boolean;
+  // V2+ additions
+  dayAggregate?: DayAggregate;
+  gamePosition?: 'first' | 'last' | 'only' | null; // For micro-badge
+  isFirstOfDay?: boolean;
+  isLastOfDay?: boolean;
+  dayKey?: string;
 }
 
 export interface TripData {
@@ -50,6 +67,15 @@ export interface TripParticipant {
     displayName: string;
     profilePhotoUrl?: string;
   };
+}
+
+// Helper to detect note keywords for decorative prefixes
+function getNotePrefix(text: string): string | null {
+  const lower = text.toLowerCase();
+  if (lower.includes('dinner') || lower.includes('lunch') || lower.includes('breakfast') || lower.includes('meal')) return '🍽️';
+  if (lower.includes('travel') || lower.includes('transfer') || lower.includes('drive') || lower.includes('flight')) return '🚐';
+  if (lower.includes('meeting') || lower.includes('meet')) return '📍';
+  return null;
 }
 
 export function useTripTimeline(tripId: string | undefined) {
@@ -197,7 +223,8 @@ export function useTripTimeline(tripId: string | undefined) {
         bucket: number; // 0 = timed note, 1 = game, 2 = untimed note
         timeKey: string;
         createdAt: string;
-        item: Omit<TripTimelineItem, 'dayNumber'>;
+        item: Omit<TripTimelineItem, 'dayNumber' | 'dayAggregate' | 'gamePosition' | 'isFirstOfDay' | 'isLastOfDay'>;
+        country?: string;
       }
       
       const sortableItems: SortableItem[] = [];
@@ -216,6 +243,7 @@ export function useTripTimeline(tripId: string | undefined) {
           bucket: 1,
           timeKey,
           createdAt: game.start_time,
+          country: course?.country,
           item: {
             id: game.id,
             type: 'game',
@@ -228,6 +256,7 @@ export function useTripTimeline(tripId: string | undefined) {
             gameId: game.id,
             rsvpCounts: gameCounts,
             userRsvp,
+            dayKey,
           },
         });
       }
@@ -254,6 +283,10 @@ export function useTripTimeline(tripId: string | undefined) {
           occurredAt = createdDate;
         }
         
+        // Get decorative prefix
+        const prefix = getNotePrefix(note.text);
+        const displayText = prefix ? `${prefix} ${note.text}` : note.text;
+        
         sortableItems.push({
           dayKey,
           bucket,
@@ -262,11 +295,12 @@ export function useTripTimeline(tripId: string | undefined) {
           item: {
             id: note.id,
             type: 'note',
-            title: note.text,
+            title: displayText,
             subtitle: note.occurs_at ? format(new Date(note.occurs_at), 'h:mm a') : undefined,
             occurredAt,
             noteId: note.id,
             canEdit: user ? note.created_by === user.id : false,
+            dayKey,
           },
         });
       }
@@ -283,53 +317,125 @@ export function useTripTimeline(tripId: string | undefined) {
         return a.createdAt.localeCompare(b.createdAt);
       });
       
+      // Compute per-day aggregates
+      const dayAggregates = new Map<string, DayAggregate>();
+      const gamesPerDay = new Map<string, string[]>(); // dayKey -> gameIds
+      
+      for (const si of sortableItems) {
+        const existing = dayAggregates.get(si.dayKey) || {
+          dayKey: si.dayKey,
+          gamesCount: 0,
+          notesCount: 0,
+          country: undefined,
+          dayNumber: undefined,
+          isToday: isToday(new Date(si.dayKey + 'T12:00:00')),
+        };
+        
+        if (si.item.type === 'game') {
+          existing.gamesCount++;
+          if (!existing.country && si.country) {
+            existing.country = si.country;
+          }
+          const gamesList = gamesPerDay.get(si.dayKey) || [];
+          gamesList.push(si.item.id);
+          gamesPerDay.set(si.dayKey, gamesList);
+        } else if (si.item.type === 'note') {
+          existing.notesCount++;
+        }
+        
+        // Calculate Day N
+        if (tripStartDate && existing.dayNumber === undefined) {
+          const dayDate = new Date(si.dayKey + 'T00:00:00');
+          existing.dayNumber = differenceInDays(dayDate, startOfDay(tripStartDate)) + 1;
+        }
+        
+        dayAggregates.set(si.dayKey, existing);
+      }
+      
       // Build final items with day markers
       const items: TripTimelineItem[] = [];
       let currentDay: string | null = null;
-      const itemsByDay = new Map<string, number>();
       
-      // Count items per day first (for meta)
-      for (const si of sortableItems) {
-        itemsByDay.set(si.dayKey, (itemsByDay.get(si.dayKey) || 0) + 1);
-      }
-      
-      for (const si of sortableItems) {
+      for (let i = 0; i < sortableItems.length; i++) {
+        const si = sortableItems[i];
+        const dayAgg = dayAggregates.get(si.dayKey);
+        
         // Add day marker if new day
         if (si.dayKey !== currentDay) {
           currentDay = si.dayKey;
           const dayDate = new Date(si.dayKey + 'T00:00:00');
           
-          // Calculate Day N if trip has start date
-          let dayNumber: number | undefined;
-          if (tripStartDate) {
-            dayNumber = differenceInDays(dayDate, tripStartDate) + 1;
-          }
-          
           // Format title
-          const title = dayNumber !== undefined
-            ? `Day ${dayNumber} · ${format(dayDate, 'EEE d MMM')}`
+          const title = dayAgg?.dayNumber !== undefined
+            ? `Day ${dayAgg.dayNumber} · ${format(dayDate, 'EEEE d MMM')}`
             : format(dayDate, 'EEEE, d MMM');
-          
-          const itemCount = itemsByDay.get(si.dayKey) || 0;
-          const gameCount = sortableItems.filter(s => s.dayKey === si.dayKey && s.item.type === 'game').length;
           
           items.push({
             id: `day-${si.dayKey}`,
             type: 'day_marker',
             title,
-            meta: gameCount > 0 ? `${gameCount} game${gameCount > 1 ? 's' : ''}` : undefined,
             occurredAt: dayDate,
-            dayNumber,
+            dayNumber: dayAgg?.dayNumber,
+            dayAggregate: dayAgg,
+            dayKey: si.dayKey,
           });
         }
         
-        items.push(si.item as TripTimelineItem);
+        // Determine if this is first/last item of the day
+        const dayItems = sortableItems.filter(s => s.dayKey === si.dayKey);
+        const indexInDay = dayItems.indexOf(si);
+        const isFirstOfDay = indexInDay === 0;
+        const isLastOfDay = indexInDay === dayItems.length - 1;
+        
+        // Determine game position for badges
+        let gamePosition: 'first' | 'last' | 'only' | null = null;
+        if (si.item.type === 'game') {
+          const dayGameIds = gamesPerDay.get(si.dayKey) || [];
+          if (dayGameIds.length === 1) {
+            gamePosition = 'only';
+          } else {
+            const gameIndex = dayGameIds.indexOf(si.item.id);
+            if (gameIndex === 0) gamePosition = 'first';
+            else if (gameIndex === dayGameIds.length - 1) gamePosition = 'last';
+          }
+        }
+        
+        items.push({
+          ...si.item,
+          dayNumber: dayAgg?.dayNumber,
+          dayAggregate: dayAgg,
+          gamePosition,
+          isFirstOfDay,
+          isLastOfDay,
+        } as TripTimelineItem);
       }
       
       return items;
     },
     enabled: !!tripId,
   });
+
+  // Memoize today's day number for sticky pill
+  const todayDayNumber = useMemo(() => {
+    const items = timelineQuery.data || [];
+    const todayMarker = items.find(item => 
+      item.type === 'day_marker' && item.dayAggregate?.isToday
+    );
+    return todayMarker?.dayNumber;
+  }, [timelineQuery.data]);
+
+  // Check if trip spans multiple days
+  const hasMultipleDays = useMemo(() => {
+    const items = timelineQuery.data || [];
+    const dayMarkers = items.filter(item => item.type === 'day_marker');
+    return dayMarkers.length > 1;
+  }, [timelineQuery.data]);
+
+  // Check if today exists in trip
+  const hasTodayInTrip = useMemo(() => {
+    const items = timelineQuery.data || [];
+    return items.some(item => item.dayAggregate?.isToday);
+  }, [timelineQuery.data]);
 
   // Check if current user is trip host
   const isHost = tripQuery.data?.createdBy === participantsQuery.data?.find(p => p.role === 'host')?.userId || 
@@ -341,6 +447,9 @@ export function useTripTimeline(tripId: string | undefined) {
     timeline: timelineQuery.data || [],
     isLoading: tripQuery.isLoading || participantsQuery.isLoading || timelineQuery.isLoading,
     error: tripQuery.error || participantsQuery.error || timelineQuery.error,
-    isHost: tripQuery.data ? true : false, // Simplified: trip creator is host
+    isHost: tripQuery.data ? true : false,
+    todayDayNumber,
+    hasMultipleDays,
+    hasTodayInTrip,
   };
 }

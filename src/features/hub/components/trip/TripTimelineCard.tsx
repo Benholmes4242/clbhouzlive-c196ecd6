@@ -1,46 +1,40 @@
 /**
  * TripTimelineCard - Individual timeline item card
- * V2: Upgraded day markers, note type support, consistent RSVP display
+ * V2+: Tour-grade with position badges, visual rhythm, tour director notes
  */
 
 import React from 'react';
 import { Clock, StickyNote } from 'lucide-react';
 import type { TripTimelineItem } from '../../hooks/useTripTimeline';
 import { GameRsvpSummary } from '../rsvp/GameRsvpSummary';
+import { TourDayHeader } from './TourDayHeader';
 
 interface TripTimelineCardProps {
   item: TripTimelineItem;
   onTap?: () => void;
 }
 
+// Game position badge labels
+const POSITION_BADGES: Record<string, string> = {
+  first: 'FIRST TEE',
+  last: 'FINAL ROUND',
+  only: 'MAIN ROUND',
+};
+
 export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
-  // V2 Day Marker - glass pill style
+  // V2+ Day Marker - Tour Day Header
   if (item.type === 'day_marker') {
     return (
-      <div className="flex items-center justify-between py-3 px-1">
-        <div 
-          className="flex items-center gap-2 px-4 py-2 rounded-full"
-          style={{
-            background: 'rgba(255, 255, 255, 0.6)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            border: '1px solid rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <span className="text-[13px] font-semibold text-foreground">
-            {item.title}
-          </span>
-        </div>
-        {item.meta && (
-          <span className="text-[12px] text-slate-500 pr-1">
-            {item.meta}
-          </span>
-        )}
-      </div>
+      <TourDayHeader
+        title={item.title}
+        gamesCount={item.dayAggregate?.gamesCount}
+        notesCount={item.dayAggregate?.notesCount}
+        country={item.dayAggregate?.country}
+      />
     );
   }
 
-  // Note item
+  // Note item - Tour Director voice
   if (item.type === 'note') {
     return (
       <div
@@ -52,22 +46,25 @@ export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
           border: '1px solid rgba(0, 0, 0, 0.08)',
         }}
       >
-        {/* Timeline dot - note icon */}
+        {/* Timeline dot - hollow ring for notes */}
         <div className="flex flex-col items-center pt-0.5">
           <div 
             className="w-7 h-7 rounded-full flex items-center justify-center"
             style={{
-              background: 'rgba(251, 191, 36, 0.15)',
-              border: '1px solid rgba(251, 191, 36, 0.3)',
+              background: 'transparent',
+              border: '2px solid rgba(251, 191, 36, 0.5)',
             }}
           >
-            <StickyNote className="w-3.5 h-3.5 text-amber-600" />
+            <StickyNote className="w-3.5 h-3.5 text-amber-500" />
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content - Tour Director voice */}
         <div className="flex-1 min-w-0">
-          <p className="text-[14px] text-foreground line-clamp-2">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Tour note
+          </span>
+          <p className="text-[14px] text-foreground line-clamp-2 mt-0.5">
             {item.title}
           </p>
           {item.subtitle && (
@@ -81,8 +78,9 @@ export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
     );
   }
 
-  // Game item - show RSVP if counts exist OR if userRsvp exists
+  // Game item - Tee Time Card with position badge
   const showRsvp = item.rsvpCounts !== undefined || item.userRsvp !== undefined;
+  const positionBadge = item.gamePosition ? POSITION_BADGES[item.gamePosition] : null;
 
   return (
     <button
@@ -95,29 +93,70 @@ export function TripTimelineCard({ item, onTap }: TripTimelineCardProps) {
         border: '1px solid rgba(0, 0, 0, 0.08)',
       }}
     >
-      {/* Timeline dot */}
+      {/* Timeline dot - solid for games, larger if first of day */}
       <div className="flex flex-col items-center pt-1">
-        <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-        <div className="flex-1 w-px bg-border/50 mt-2" />
+        <div 
+          className={`rounded-full bg-primary ${item.isFirstOfDay ? 'w-3.5 h-3.5' : 'w-2.5 h-2.5'}`}
+          style={item.isFirstOfDay ? { 
+            boxShadow: '0 0 0 3px rgba(var(--primary), 0.15)' 
+          } : undefined}
+        />
+        {!item.isLastOfDay && (
+          <div 
+            className="flex-1 w-px mt-2"
+            style={{
+              background: item.isLastOfDay 
+                ? 'linear-gradient(to bottom, hsl(var(--border) / 0.5), transparent)'
+                : 'hsl(var(--border) / 0.5)',
+            }}
+          />
+        )}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         {/* Course thumbnail */}
         {item.courseThumbnail && (
-          <div className="w-full h-24 rounded-lg overflow-hidden mb-2 bg-muted">
+          <div className="relative w-full h-24 rounded-lg overflow-hidden mb-2 bg-muted">
             <img
               src={item.courseThumbnail}
               alt={item.courseName}
               className="w-full h-full object-cover"
             />
+            {/* Position badge overlay */}
+            {positionBadge && (
+              <div 
+                className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(4px)',
+                  WebkitBackdropFilter: 'blur(4px)',
+                  color: 'hsl(var(--foreground))',
+                }}
+              >
+                {positionBadge}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Title */}
-        <h4 className="font-medium text-foreground truncate">
-          {item.title}
-        </h4>
+        {/* Title row with badge if no thumbnail */}
+        <div className="flex items-start justify-between gap-2">
+          <h4 className="font-medium text-foreground truncate">
+            {item.title}
+          </h4>
+          {!item.courseThumbnail && positionBadge && (
+            <span 
+              className="shrink-0 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium"
+              style={{
+                background: 'rgba(0, 0, 0, 0.05)',
+                color: 'hsl(var(--muted-foreground))',
+              }}
+            >
+              {positionBadge}
+            </span>
+          )}
+        </div>
 
         {/* Time - spacing 4px from title */}
         {item.subtitle && (

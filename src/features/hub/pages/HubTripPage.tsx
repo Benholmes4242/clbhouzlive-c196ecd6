@@ -28,7 +28,7 @@ export default function HubTripPage() {
   const activeTab = searchParams.get('tab') || 'timeline';
   const { user } = useSupabaseSession();
 
-  const { trip, participants, timeline, isLoading, error, isHost } = useTripTimeline(tripId);
+  const { trip, participants, timeline, isLoading, error, isHost, todayDayNumber, hasMultipleDays, hasTodayInTrip } = useTripTimeline(tripId);
   
   // Game detail sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -155,6 +155,9 @@ export default function HubTripPage() {
               items={timeline} 
               isLoading={false}
               onGameTap={handleGameTap}
+              todayDayNumber={todayDayNumber}
+              hasMultipleDays={hasMultipleDays}
+              hasTodayInTrip={hasTodayInTrip}
             />
           </TabsContent>
 
