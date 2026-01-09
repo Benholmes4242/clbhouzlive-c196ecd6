@@ -421,26 +421,26 @@ export function HubCreateGameTripSheet({
                       haptic('light');
                       setPlayerPickerOpen(true);
                     }}
-                    className="w-full p-3 rounded-2xl text-left transition-all active:scale-[0.99] active:opacity-90"
+                    className="w-full p-3 rounded-2xl text-left transition-all active:scale-[0.98] active:opacity-90"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.6)',
-                      border: '1px solid rgba(0, 0, 0, 0.03)',
+                      background: 'rgba(100, 116, 139, 0.08)',
+                      border: '1px solid rgba(100, 116, 139, 0.15)',
                     }}
                   >
                     <div className="flex items-center gap-3">
                       <div 
                         className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                        style={{ background: 'rgba(100, 116, 139, 0.12)' }}
                       >
-                        <Users className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+                        <Users className="w-[18px] h-[18px]" style={{ color: '#64748b' }} />
                       </div>
                       <span 
-                        className="flex-1 text-[15px]"
-                        style={{ color: 'var(--hub-text-muted)' }}
+                        className="flex-1 text-[15px] font-medium"
+                        style={{ color: '#475569' }}
                       >
                         {mode === 'game' ? "Who's playing?" : "Who's attending?"}
                       </span>
-                      <Plus className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                      <Plus className="w-4 h-4" style={{ color: '#64748b' }} />
                     </div>
                   </button>
                 ) : (
