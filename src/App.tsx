@@ -177,6 +177,7 @@ const HubEchoTagsPage = lazy(() => import("./features/hub/pages/HubEchoTagsPage"
 const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHistoryPage").then(m => ({ default: m.HubSwingHistoryPage })));
 const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
+const HubTripPage = lazy(() => import("./features/hub/pages/HubTripPage"));
 
 // Public Echo Share Page
 const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
@@ -449,6 +450,7 @@ function AppRoutes() {
           <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
           <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
+          <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
           </>
         )}
         
@@ -474,6 +476,7 @@ function AppRoutes() {
           <Route path="/hub/echo/tags" element={<HubEchoTagsPage />} />
           <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
+          <Route path="/hub/trip/:tripId" element={<HubTripPage />} />
         </Routes>
       )}
       
