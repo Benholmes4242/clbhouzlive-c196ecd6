@@ -8,7 +8,7 @@ import { TripTimelineCard } from './TripTimelineCard';
 import { StickyTodayPill } from './StickyTodayPill';
 import { EndOfDayDivider } from './EndOfDayDivider';
 import type { TripTimelineItem } from '../../hooks/useTripTimeline';
-import { Loader2, Flag, StickyNote } from 'lucide-react';
+import { Loader2, Flag } from 'lucide-react';
 
 interface TripTimelineProps {
   items: TripTimelineItem[];
@@ -32,22 +32,48 @@ export function TripTimeline({
   const [showTodayPill, setShowTodayPill] = useState(false);
 
   // Track scroll position to show/hide Today pill
-  const handleScroll = useCallback(() => {
-    if (!hasMultipleDays || !hasTodayInTrip || !todaySectionRef.current) {
+  // Bind to containerRef or window, depending on what's scrolling
+  useEffect(() => {
+    if (!hasMultipleDays || !hasTodayInTrip) {
       setShowTodayPill(false);
       return;
     }
 
-    const rect = todaySectionRef.current.getBoundingClientRect();
-    // Show pill if today section is not visible in viewport
-    const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-    setShowTodayPill(!isVisible);
-  }, [hasMultipleDays, hasTodayInTrip]);
+    const checkVisibility = () => {
+      if (!todaySectionRef.current) {
+        setShowTodayPill(false);
+        return;
+      }
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+      const rect = todaySectionRef.current.getBoundingClientRect();
+      // Show pill if today section is not visible in viewport
+      const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      setShowTodayPill(!isVisible);
+    };
+
+    // Determine scroll container: use containerRef's scrollable parent or window
+    const getScrollParent = (element: HTMLElement | null): HTMLElement | Window => {
+      if (!element) return window;
+      
+      let parent = element.parentElement;
+      while (parent) {
+        const overflow = getComputedStyle(parent).overflow;
+        if (overflow.includes('scroll') || overflow.includes('auto')) {
+          return parent;
+        }
+        parent = parent.parentElement;
+      }
+      return window;
+    };
+
+    const scrollContainer = getScrollParent(containerRef.current);
+    
+    scrollContainer.addEventListener('scroll', checkVisibility, { passive: true });
+    // Initial check
+    checkVisibility();
+
+    return () => scrollContainer.removeEventListener('scroll', checkVisibility);
+  }, [hasMultipleDays, hasTodayInTrip]);
 
   // Scroll to today section
   const scrollToToday = useCallback(() => {
@@ -131,8 +157,6 @@ export function TripTimeline({
         </div>
       ))}
 
-      {/* Empty day states would be handled per-day if needed */}
-      
       {/* Sticky Today pill */}
       <StickyTodayPill
         visible={showTodayPill}
