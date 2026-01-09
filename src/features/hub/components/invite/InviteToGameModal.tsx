@@ -13,11 +13,18 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useInviteSearch, InvitableUser } from '../../hooks/useInviteSearch';
 import { toast } from 'sonner';
+import { 
+  useSendGameInviteNotification, 
+  formatGameDateForNotification, 
+  formatGameTimeForNotification 
+} from '../../hooks/useGameNotifications';
 
 interface InviteToGameModalProps {
   isOpen: boolean;
   onClose: () => void;
   gameId: string;
+  courseName?: string;
+  startTime?: string | Date;
   onInviteSuccess?: () => void;
 }
 
@@ -25,11 +32,14 @@ export function InviteToGameModal({
   isOpen,
   onClose,
   gameId,
+  courseName,
+  startTime,
   onInviteSuccess,
 }: InviteToGameModalProps) {
   const { searchInput, setSearchInput, users, isLoading } = useInviteSearch(gameId);
   const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
   const [invitingId, setInvitingId] = useState<string | null>(null);
+  const sendGameInviteNotification = useSendGameInviteNotification();
 
   // Lock body scroll
   useEffect(() => {
@@ -89,6 +99,19 @@ export function InviteToGameModal({
       } else {
         setInvitedIds(prev => new Set([...prev, user.id]));
         toast.success(`Invited ${user.displayName}`);
+        
+        // Send game invite notification
+        if (courseName && startTime) {
+          const startDate = typeof startTime === 'string' ? new Date(startTime) : startTime;
+          sendGameInviteNotification.mutate({
+            gameId,
+            invitedUserIds: [user.id],
+            courseName,
+            date: formatGameDateForNotification(startDate),
+            time: formatGameTimeForNotification(startDate),
+          });
+        }
+        
         onInviteSuccess?.();
       }
     } catch (error) {
@@ -97,7 +120,7 @@ export function InviteToGameModal({
     } finally {
       setInvitingId(null);
     }
-  }, [gameId, onInviteSuccess]);
+  }, [gameId, courseName, startTime, onInviteSuccess, sendGameInviteNotification]);
 
   if (!isOpen) return null;
 

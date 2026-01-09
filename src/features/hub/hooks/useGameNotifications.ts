@@ -88,19 +88,30 @@ function getNotificationTitle(type: GameNotificationType, data?: SendGameNotific
 }
 
 // Get message/subcopy based on notification type
+// Format: game = "Course · Date · Time", trip = "TripName · DateRange" or "TripName · Course"
 function getNotificationMessage(type: GameNotificationType, data?: SendGameNotificationParams['data']): string | null {
-  const parts: string[] = [];
-  
-  if (data?.course_name) parts.push(data.course_name);
-  if (data?.trip_name && type.startsWith('trip_')) parts.push(data.trip_name);
-  if (data?.date) parts.push(data.date);
-  if (data?.time) parts.push(data.time);
-  if (data?.new_time && type === 'game_updated') {
+  // Trip notifications
+  if (type.startsWith('trip_')) {
+    const tripName = data?.trip_name || 'Trip';
+    if (data?.date_range) {
+      return `${tripName} · ${data.date_range}`;
+    }
+    if (data?.course_name) {
+      return `${tripName} · ${data.course_name}`;
+    }
+    return tripName;
+  }
+
+  // Game notifications: Course · Date · Time
+  if (type === 'game_updated' && data?.new_time) {
     return `${data.course_name || 'Game'} · New tee time: ${data.new_time}`;
   }
-  if (data?.date_range && type === 'trip_created') {
-    return `${data.trip_name || 'Trip'} · ${data.date_range}`;
-  }
+
+  // Standard game format: Course · Date · Time
+  const parts: string[] = [];
+  if (data?.course_name) parts.push(data.course_name);
+  if (data?.date) parts.push(data.date);
+  if (data?.time) parts.push(data.time);
   
   return parts.length > 0 ? parts.join(' · ') : null;
 }
