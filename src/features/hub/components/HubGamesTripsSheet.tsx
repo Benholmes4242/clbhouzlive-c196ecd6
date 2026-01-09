@@ -2,11 +2,11 @@
  * HubGamesTripsSheet - Half-height Hub Sheet
  * 
  * Simple 3-card menu for Games & Trips
- * Opens to 50% height, no internal scroll
- * Matches Hub design language
+ * Opens to ~45% height (visually halfway up hero)
+ * No internal scroll, matches Hub design language
  */
 
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search, CalendarDays, Plus, ChevronRight } from 'lucide-react';
@@ -33,20 +33,20 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all duration-150 active:scale-[0.98]"
+      className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all duration-150 active:scale-[0.98]"
       style={{
         background: isPrimary 
-          ? 'linear-gradient(135deg, rgba(110, 146, 119, 0.08) 0%, rgba(137, 167, 140, 0.04) 100%)'
+          ? 'linear-gradient(135deg, rgba(110, 146, 119, 0.06) 0%, rgba(137, 167, 140, 0.03) 100%)'
           : 'var(--hub-glass-bg)',
         border: isPrimary 
-          ? '1px solid rgba(110, 146, 119, 0.25)'
+          ? '1px solid rgba(110, 146, 119, 0.2)'
           : '1px solid var(--hub-stroke-subtle)',
         boxShadow: 'var(--hub-shadow-tile)',
       }}
     >
-      {/* Icon circle */}
+      {/* Icon circle - matched to Hub tile sizing */}
       <div 
-        className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
         style={{
           background: isPrimary 
             ? 'linear-gradient(135deg, #6E9277 0%, #89A78C 100%)'
@@ -73,9 +73,9 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
         </div>
       </div>
 
-      {/* Chevron */}
+      {/* Chevron - subtle */}
       <ChevronRight 
-        className="flex-shrink-0 w-5 h-5"
+        className="flex-shrink-0 w-5 h-5 opacity-40"
         style={{ color: 'var(--hub-text-dim)' }}
       />
     </button>
@@ -119,7 +119,6 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   const handleDiscoverGames = () => {
     haptic('light');
     onClose();
-    // Navigate to discover games
     closeHub();
     navigate('/nearby');
   };
@@ -127,7 +126,6 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   const handleYourGamesTrips = () => {
     haptic('light');
     onClose();
-    // Navigate to diary
     closeHub();
     navigate('/diary');
   };
@@ -155,7 +153,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             onClick={onClose}
           />
 
-          {/* Sheet - 50% height snap point */}
+          {/* Sheet - ~45% height to sit visually halfway up hero */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -163,9 +161,10 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[26px] overflow-hidden flex flex-col"
             style={{
-              height: '50vh',
+              height: '45vh',
               background: 'var(--hub-bg-start)',
               boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
+              overscrollBehavior: 'contain',
             }}
             onClick={handleSheetClick}
           >
