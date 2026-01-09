@@ -39,7 +39,7 @@ export function HubHeaderToday() {
   };
 
   return (
-    <header className="mb-1">
+    <header className="pt-2">
       <div className="flex items-center justify-between gap-3">
         {/* Greeting - responsive sizing, allows wrap for long names */}
         <h1 

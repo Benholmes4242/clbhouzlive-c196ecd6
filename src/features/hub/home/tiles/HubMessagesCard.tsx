@@ -65,7 +65,7 @@ export function HubMessagesCard() {
               >
                 {hasMessages
                   ? (messages.latestSnippet ?? 'You have new messages')
-                  : 'Group chats, game invites, and messages with golfers – all in one place.'}
+                  : 'Game chats, invites, and messages with golfers — all in one place.'}
               </div>
             </div>
           </div>

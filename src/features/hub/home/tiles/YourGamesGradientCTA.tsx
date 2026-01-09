@@ -20,7 +20,7 @@ export function YourGamesGradientCTA() {
     <>
       <button
         onClick={openYourGames}
-        className="w-full rounded-[22px] overflow-hidden relative flex items-center gap-4 px-4 py-3 transition-all active:scale-[0.98]"
+        className="w-full rounded-[22px] overflow-hidden relative flex items-center gap-4 px-5 py-[18px] transition-all active:scale-[0.98]"
         style={{
           background: `
             radial-gradient(1200px 300px at 10% 0%, rgba(255, 140, 60, 0.20), transparent 60%),
@@ -53,7 +53,7 @@ export function YourGamesGradientCTA() {
             className="text-[13px] mt-0.5"
             style={{ color: 'var(--hub-text-muted)' }}
           >
-            Trips, matches, games, and getaways – your golf diary for every upcoming round.
+            View invites, hosts, and your upcoming rounds
           </div>
         </div>
       </button>
