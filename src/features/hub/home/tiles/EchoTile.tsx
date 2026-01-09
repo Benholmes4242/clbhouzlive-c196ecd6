@@ -20,7 +20,7 @@ export function EchoTile() {
     <>
       <button
         onClick={openEcho}
-        className="w-full h-[140px] rounded-[22px] p-4 flex flex-col items-start justify-between transition-all active:scale-[0.98]"
+        className="w-full h-[140px] rounded-[22px] p-4 flex flex-col items-start transition-all active:scale-[0.98]"
         style={{
           background: 'var(--hub-glass-bg)',
           border: '1px solid var(--hub-stroke)',
@@ -35,8 +35,8 @@ export function EchoTile() {
           <Sparkles className="h-4 w-4" style={{ color: '#FBBF24' }} />
         </div>
         
-        {/* Text content */}
-        <div className="mt-auto">
+        {/* Text content - centered in remaining space */}
+        <div className="flex-1 flex flex-col justify-center -mt-2">
           <div 
             className="text-[15px] font-extrabold leading-tight"
             style={{ color: 'var(--hub-text)' }}

@@ -54,6 +54,7 @@ export const MOCK_MESSAGES = {
   unreadCount: 3,
   groupChatsCount: 2,
   latestSnippet: 'Tee time confirmed for Sunday',
+  senderNames: ['Ben', 'Tom', 'Sarah', 'James', 'Mike'],
 };
 
 // D) Active Games Near You (filled state)
