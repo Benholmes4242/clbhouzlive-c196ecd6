@@ -1,0 +1,377 @@
+/**
+ * useUserGamesTrips - Hooks for fetching user's games and trips
+ */
+
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+export type RsvpStatus = 'going' | 'maybe' | 'declined' | 'invited';
+export type GameStatus = 'scheduled' | 'live' | 'completed' | 'canceled';
+
+export interface UserGame {
+  id: string;
+  courseName: string;
+  courseId?: string;
+  startsAt: string;
+  endsAt?: string;
+  status: GameStatus;
+  tripId?: string;
+  visibility: 'public' | 'friends' | 'club';
+  // Current user's RSVP
+  currentUserRsvp: RsvpStatus | null;
+  // Counts
+  goingCount: number;
+  maybeCount: number;
+  declinedCount: number;
+  invitedCount: number;
+  // Host info
+  hostUserId: string;
+  isHost: boolean;
+  // Reminders
+  remindersEnabled: boolean;
+}
+
+export interface UserTrip {
+  id: string;
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+  visibility: string;
+  coverImageUrl?: string;
+  createdBy: string;
+  isCreator: boolean;
+  // Derived counts
+  gamesCount: number;
+}
+
+export function useUserUpcomingGames() {
+  return useQuery({
+    queryKey: ['user-games', 'upcoming'],
+    queryFn: async (): Promise<UserGame[]> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Games where user is host OR participant
+      const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+
+      // First get games where user is host
+      const { data: hostedGames, error: hostError } = await supabase
+        .from('games')
+        .select(`
+          id,
+          course_name,
+          course_id,
+          start_time,
+          ends_at,
+          status,
+          trip_id,
+          visibility,
+          host_user_id
+        `)
+        .eq('host_user_id', user.id)
+        .in('status', ['active', 'scheduled', 'live'])
+        .gte('start_time', sixHoursAgo)
+        .order('start_time', { ascending: true })
+        .limit(30);
+
+      if (hostError) throw hostError;
+
+      // Then get games where user is participant
+      const { data: participantGames, error: partError } = await supabase
+        .from('game_participants')
+        .select(`
+          game_id,
+          games!inner (
+            id,
+            course_name,
+            course_id,
+            start_time,
+            ends_at,
+            status,
+            trip_id,
+            visibility,
+            host_user_id
+          )
+        `)
+        .eq('user_id', user.id)
+        .in('games.status', ['active', 'scheduled', 'live'])
+        .gte('games.start_time', sixHoursAgo)
+        .limit(30);
+
+      if (partError) throw partError;
+
+      // Merge and dedupe
+      const gameMap = new Map<string, any>();
+      
+      hostedGames?.forEach(g => gameMap.set(g.id, g));
+      participantGames?.forEach(p => {
+        const g = p.games as any;
+        if (g && !gameMap.has(g.id)) {
+          gameMap.set(g.id, g);
+        }
+      });
+
+      const allGameIds = Array.from(gameMap.keys());
+      if (allGameIds.length === 0) return [];
+
+      // Get participant counts for all games
+      const { data: participants, error: countsError } = await supabase
+        .from('game_participants')
+        .select('game_id, user_id, rsvp_status')
+        .in('game_id', allGameIds);
+
+      if (countsError) throw countsError;
+
+      // Get reminders for current user
+      const { data: reminders, error: remindersError } = await supabase
+        .from('game_reminders')
+        .select('game_id, enabled')
+        .eq('user_id', user.id)
+        .in('game_id', allGameIds);
+
+      if (remindersError) throw remindersError;
+
+      const reminderMap = new Map(reminders?.map(r => [r.game_id, r.enabled]) || []);
+
+      // Build final result
+      const games: UserGame[] = Array.from(gameMap.values())
+        .map((g): UserGame => {
+          const gameParticipants = participants?.filter(p => p.game_id === g.id) || [];
+          const myParticipant = gameParticipants.find(p => p.user_id === user.id);
+          
+          const goingCount = gameParticipants.filter(p => p.rsvp_status === 'going').length;
+          const maybeCount = gameParticipants.filter(p => p.rsvp_status === 'maybe').length;
+          const declinedCount = gameParticipants.filter(p => p.rsvp_status === 'declined').length;
+          const invitedCount = gameParticipants.filter(p => p.rsvp_status === 'invited').length;
+
+          // Map status
+          let status: GameStatus = 'scheduled';
+          const now = new Date();
+          const startTime = new Date(g.start_time);
+          const endsAt = g.ends_at ? new Date(g.ends_at) : null;
+          
+          if (g.status === 'completed') {
+            status = 'completed';
+          } else if (g.status === 'canceled') {
+            status = 'canceled';
+          } else if (startTime <= now && (!endsAt || endsAt > now)) {
+            status = 'live';
+          }
+
+          return {
+            id: g.id,
+            courseName: g.course_name || 'Unknown Course',
+            courseId: g.course_id,
+            startsAt: g.start_time,
+            endsAt: g.ends_at,
+            status,
+            tripId: g.trip_id,
+            visibility: g.visibility || 'friends',
+            currentUserRsvp: myParticipant?.rsvp_status as RsvpStatus || (g.host_user_id === user.id ? 'going' : null),
+            goingCount: goingCount + (g.host_user_id === user.id ? 1 : 0), // Host is always going
+            maybeCount,
+            declinedCount,
+            invitedCount,
+            hostUserId: g.host_user_id,
+            isHost: g.host_user_id === user.id,
+            remindersEnabled: reminderMap.get(g.id) || false,
+          };
+        })
+        .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+
+      return games;
+    },
+    staleTime: 30000,
+    refetchInterval: 60000,
+  });
+}
+
+export function useUserPastGames() {
+  return useQuery({
+    queryKey: ['user-games', 'past'],
+    queryFn: async (): Promise<UserGame[]> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+
+      // Get completed games where user is host
+      const { data: hostedGames, error: hostError } = await supabase
+        .from('games')
+        .select(`
+          id,
+          course_name,
+          course_id,
+          start_time,
+          ends_at,
+          status,
+          trip_id,
+          visibility,
+          host_user_id
+        `)
+        .eq('host_user_id', user.id)
+        .or(`status.eq.completed,start_time.lt.${sixHoursAgo}`)
+        .order('start_time', { ascending: false })
+        .limit(30);
+
+      if (hostError) throw hostError;
+
+      // Get games where user is participant
+      const { data: participantGames, error: partError } = await supabase
+        .from('game_participants')
+        .select(`
+          game_id,
+          games!inner (
+            id,
+            course_name,
+            course_id,
+            start_time,
+            ends_at,
+            status,
+            trip_id,
+            visibility,
+            host_user_id
+          )
+        `)
+        .eq('user_id', user.id)
+        .limit(50);
+
+      if (partError) throw partError;
+
+      // Filter and merge
+      const gameMap = new Map<string, any>();
+      
+      hostedGames?.forEach(g => gameMap.set(g.id, g));
+      participantGames?.forEach(p => {
+        const g = p.games as any;
+        if (g && !gameMap.has(g.id)) {
+          const startTime = new Date(g.start_time);
+          const now = new Date();
+          if (g.status === 'completed' || startTime < new Date(Date.now() - 6 * 60 * 60 * 1000)) {
+            gameMap.set(g.id, g);
+          }
+        }
+      });
+
+      const games: UserGame[] = Array.from(gameMap.values())
+        .map((g): UserGame => ({
+          id: g.id,
+          courseName: g.course_name || 'Unknown Course',
+          courseId: g.course_id,
+          startsAt: g.start_time,
+          endsAt: g.ends_at,
+          status: 'completed',
+          tripId: g.trip_id,
+          visibility: g.visibility || 'friends',
+          currentUserRsvp: null,
+          goingCount: 0,
+          maybeCount: 0,
+          declinedCount: 0,
+          invitedCount: 0,
+          hostUserId: g.host_user_id,
+          isHost: g.host_user_id === user.id,
+          remindersEnabled: false,
+        }))
+        .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());
+
+      return games;
+    },
+    staleTime: 60000,
+  });
+}
+
+export function useUserTrips() {
+  return useQuery({
+    queryKey: ['user-trips'],
+    queryFn: async (): Promise<UserTrip[]> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Get trips created by user
+      const { data: createdTrips, error: createdError } = await supabase
+        .from('trips')
+        .select(`
+          id,
+          name,
+          description,
+          start_date,
+          end_date,
+          visibility,
+          cover_image_url,
+          created_by
+        `)
+        .eq('created_by', user.id)
+        .order('start_date', { ascending: false })
+        .limit(30);
+
+      if (createdError) throw createdError;
+
+      // Get trips where user is participant
+      const { data: participantTrips, error: partError } = await supabase
+        .from('trip_participants')
+        .select(`
+          trip_id,
+          trips!inner (
+            id,
+            name,
+            description,
+            start_date,
+            end_date,
+            visibility,
+            cover_image_url,
+            created_by
+          )
+        `)
+        .eq('user_id', user.id)
+        .limit(30);
+
+      if (partError) throw partError;
+
+      // Merge and dedupe
+      const tripMap = new Map<string, any>();
+      createdTrips?.forEach(t => tripMap.set(t.id, t));
+      participantTrips?.forEach(p => {
+        const t = p.trips as any;
+        if (t && !tripMap.has(t.id)) {
+          tripMap.set(t.id, t);
+        }
+      });
+
+      const allTripIds = Array.from(tripMap.keys());
+      
+      // Get game counts for trips
+      const { data: gamesData, error: gamesError } = await supabase
+        .from('games')
+        .select('trip_id')
+        .in('trip_id', allTripIds.length > 0 ? allTripIds : ['no-match']);
+
+      if (gamesError) throw gamesError;
+
+      const gameCountMap = new Map<string, number>();
+      gamesData?.forEach(g => {
+        if (g.trip_id) {
+          gameCountMap.set(g.trip_id, (gameCountMap.get(g.trip_id) || 0) + 1);
+        }
+      });
+
+      const trips: UserTrip[] = Array.from(tripMap.values())
+        .map((t): UserTrip => ({
+          id: t.id,
+          name: t.name || 'Untitled Trip',
+          description: t.description,
+          startDate: t.start_date,
+          endDate: t.end_date,
+          visibility: t.visibility || 'invite',
+          coverImageUrl: t.cover_image_url,
+          createdBy: t.created_by,
+          isCreator: t.created_by === user.id,
+          gamesCount: gameCountMap.get(t.id) || 0,
+        }))
+        .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+
+      return trips;
+    },
+    staleTime: 60000,
+  });
+}
