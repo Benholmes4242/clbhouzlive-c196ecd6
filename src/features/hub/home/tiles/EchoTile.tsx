@@ -1,6 +1,6 @@
 /**
- * EchoTile - Square tile for 2-up grid
- * Opens Echo assistant
+ * EchoTile V2 - Premium tile for 2-up grid
+ * Matching style with ActiveGamesNearYouTile, subtle gradient behind icon
  */
 
 import React, { useState } from 'react';
@@ -20,31 +20,33 @@ export function EchoTile() {
     <>
       <button
         onClick={openEcho}
-        className="w-full h-[140px] rounded-[22px] p-4 flex flex-col items-start transition-all active:scale-[0.98]"
+        className="w-full h-[140px] rounded-[18px] p-4 flex flex-col items-start transition-all duration-150 active:scale-[0.99]"
         style={{
-          background: 'var(--hub-glass-bg)',
-          border: '1px solid var(--hub-stroke)',
+          background: 'var(--hub-card)',
+          border: '1px solid var(--hub-card-border)',
           boxShadow: 'var(--hub-shadow-tile)',
         }}
       >
-        {/* Icon - yellow sparkles */}
+        {/* V2 Icon - rounded square with subtle warm gradient */}
         <div 
-          className="h-9 w-9 rounded-full flex items-center justify-center"
-          style={{ background: 'var(--hub-glass-bg-input)' }}
+          className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(255, 142, 61, 0.12) 0%, rgba(255, 180, 100, 0.08) 100%)',
+          }}
         >
-          <Sparkles className="h-4 w-4" style={{ color: '#FBBF24' }} />
+          <Sparkles className="h-4 w-4" style={{ color: '#F59E0B' }} />
         </div>
         
-        {/* Text content - centered in remaining space */}
-        <div className="flex-1 flex flex-col justify-center -mt-2">
+        {/* Text content */}
+        <div className="flex-1 flex flex-col">
           <div 
-            className="text-[15px] font-extrabold leading-tight"
+            className="text-[14px] font-semibold leading-tight"
             style={{ color: 'var(--hub-text)' }}
           >
             Echo
           </div>
           <div 
-            className="text-[12px] mt-1 leading-snug line-clamp-2"
+            className="text-[11px] mt-1.5 leading-snug line-clamp-2"
             style={{ color: 'var(--hub-text-muted)' }}
           >
             Ask Echo anything – plan trips, courses, rules, gear.
