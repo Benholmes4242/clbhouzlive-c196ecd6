@@ -194,7 +194,7 @@ export function HubHomePage() {
             paddingBottom: `calc(${DOCK_HEIGHT}px + ${DOCK_GAP}px + env(safe-area-inset-bottom, 0px))`,
           }}
         >
-          <div className="px-5 pb-5 flex flex-col gap-3 flex-1 min-h-0">
+          <div className="px-5 flex flex-col gap-3 flex-1 min-h-0">
             {/* Zone 1: Header - Greeting + Right Button */}
             <HubHeaderToday />
 
