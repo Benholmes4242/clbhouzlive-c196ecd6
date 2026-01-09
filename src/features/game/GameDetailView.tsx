@@ -19,7 +19,26 @@ import { RsvpStrip } from '@/features/hub/components/rsvp/RsvpStrip';
 import { InviteToGameModal } from '@/features/hub/components/invite/InviteToGameModal';
 import { GameRemindersSheet } from '@/features/hub/components/reminders/GameRemindersSheet';
 import { EndGameSheet } from '@/features/hub/components/game/EndGameSheet';
-import { useGameRsvp } from '@/features/hub/hooks/useGameRsvp';
+import { useGameRsvp, RsvpStatus } from '@/features/hub/hooks/useGameRsvp';
+
+// RSVP status label component
+function RsvpStatusLabel({ status }: { status: RsvpStatus | string | null }) {
+  const labels: Record<string, { text: string; color: string }> = {
+    going: { text: 'Going', color: 'text-green-600' },
+    maybe: { text: 'Maybe', color: 'text-yellow-600' },
+    declined: { text: 'Declined', color: 'text-red-500' },
+    invited: { text: 'Invited', color: 'text-blue-500' },
+  };
+  
+  const config = status ? labels[status] : null;
+  if (!config) return null;
+  
+  return (
+    <span className={`text-xs font-medium ${config.color}`}>
+      {config.text}
+    </span>
+  );
+}
 
 export default function GameDetailView() {
   const { id } = useParams<{ id: string }>();
@@ -248,9 +267,7 @@ export default function GameDetailView() {
                       <div className="text-sm text-muted-foreground">@{profile.username}</div>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {participant.state}
-                  </div>
+                  <RsvpStatusLabel status={(participant as any).rsvp_status} />
                 </div>
               );
             })

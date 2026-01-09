@@ -44,14 +44,14 @@ export function useGameDetail(gameId: string | null) {
           game_id, 
           user_id, 
           role, 
-          state, 
+          state,
+          rsvp_status,
           reserves_slot, 
           joined_at, 
           created_at, 
           updated_at
         `)
         .eq('game_id', gameId)
-        .eq('state', 'accepted')
         .order('role', { ascending: true })
         .order('joined_at', { ascending: true });
 
