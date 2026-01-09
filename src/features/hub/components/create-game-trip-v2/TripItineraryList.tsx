@@ -1,10 +1,10 @@
 /**
  * TripItineraryList - Timeline list of courses on the trip
- * Day labels, reorder handle (UI only), + Add another course
+ * Day badges as soft green pills, drag handle, course cards with hover lift
  */
 
 import React from 'react';
-import { MapPin, Plus, GripVertical, ChevronRight } from 'lucide-react';
+import { Plus, GripVertical, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
@@ -27,14 +27,14 @@ export function TripItineraryList({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
       className="space-y-3"
     >
       <span 
-        className="text-[12px] font-medium tracking-wide block px-1"
-        style={{ color: 'var(--hub-text-dim)' }}
+        className="text-[12px] font-medium tracking-wide uppercase block px-1"
+        style={{ color: '#94a3b8' }}
       >
         Courses on this trip
       </span>
@@ -46,7 +46,7 @@ export function TripItineraryList({
         className="space-y-2"
       >
         <AnimatePresence mode="popLayout">
-          {itinerary.map((stop, index) => (
+          {itinerary.map((stop) => (
             <Reorder.Item
               key={stop.id}
               value={stop}
@@ -54,15 +54,16 @@ export function TripItineraryList({
             >
               <motion.button
                 whileTap={{ scale: 0.98 }}
+                whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}
                 onClick={() => {
                   haptic('light');
                   onEditCourse(stop);
                 }}
                 className="w-full flex items-center gap-3 p-3.5 rounded-xl text-left transition-all"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
+                  background: '#FFFFFF',
                   border: '1px solid rgba(0, 0, 0, 0.05)',
-                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
                 }}
               >
                 {/* Drag handle */}
@@ -70,20 +71,20 @@ export function TripItineraryList({
                   className="flex-shrink-0 cursor-grab active:cursor-grabbing"
                   style={{ touchAction: 'none' }}
                 >
-                  <GripVertical className="w-4 h-4" style={{ color: 'var(--hub-text-dimmer)' }} />
+                  <GripVertical className="w-4 h-4" style={{ color: '#cbd5e1' }} />
                 </div>
 
-                {/* Day badge */}
+                {/* Day badge - soft green pill */}
                 <div 
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="px-2.5 py-1.5 rounded-full flex-shrink-0"
                   style={{ 
-                    background: 'linear-gradient(135deg, rgba(110, 146, 119, 0.12) 0%, rgba(110, 146, 119, 0.06) 100%)',
-                    border: '1px solid rgba(110, 146, 119, 0.15)',
+                    background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.06) 100%)',
+                    border: '1px solid rgba(34, 197, 94, 0.2)',
                   }}
                 >
                   <span 
                     className="text-[11px] font-bold"
-                    style={{ color: '#6E9277' }}
+                    style={{ color: '#16a34a' }}
                   >
                     Day {stop.dayIndex + 1}
                   </span>
@@ -93,7 +94,7 @@ export function TripItineraryList({
                 <div className="flex-1 min-w-0">
                   <div 
                     className="text-[14px] font-semibold truncate"
-                    style={{ color: 'var(--hub-text)' }}
+                    style={{ color: '#1e293b' }}
                   >
                     {stop.courseName}
                   </div>
@@ -101,17 +102,17 @@ export function TripItineraryList({
                     {stop.courseLocation && (
                       <span 
                         className="text-[12px] truncate"
-                        style={{ color: 'var(--hub-text-dim)' }}
+                        style={{ color: '#64748b' }}
                       >
                         {stop.courseLocation}
                       </span>
                     )}
                     {stop.playDateTime && (
                       <>
-                        <span style={{ color: 'var(--hub-text-dimmer)' }}>•</span>
+                        <span style={{ color: '#cbd5e1' }}>•</span>
                         <span 
                           className="text-[12px]"
-                          style={{ color: 'var(--hub-text-dim)' }}
+                          style={{ color: '#64748b' }}
                         >
                           {format(stop.playDateTime, 'h:mm a')}
                         </span>
@@ -120,29 +121,29 @@ export function TripItineraryList({
                   </div>
                 </div>
 
-                <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dimmer)' }} />
+                <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#cbd5e1' }} />
               </motion.button>
             </Reorder.Item>
           ))}
         </AnimatePresence>
       </Reorder.Group>
 
-      {/* Add another course */}
+      {/* Add another course - center aligned, dashed border, larger icon */}
       <button
         onClick={() => {
           haptic('light');
           onAddCourse();
         }}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl transition-all active:scale-[0.98]"
+        className="w-full flex items-center justify-center gap-2.5 py-4 rounded-xl transition-all active:scale-[0.98] hover:bg-white/80"
         style={{
-          border: '1px dashed rgba(0, 0, 0, 0.12)',
+          border: '2px dashed rgba(0, 0, 0, 0.1)',
           background: 'rgba(255, 255, 255, 0.5)',
         }}
       >
-        <Plus className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+        <Plus className="w-5 h-5" style={{ color: '#64748b' }} />
         <span 
-          className="text-[13px] font-medium"
-          style={{ color: 'var(--hub-text-sub)' }}
+          className="text-[14px] font-medium"
+          style={{ color: '#64748b' }}
         >
           Add another course
         </span>

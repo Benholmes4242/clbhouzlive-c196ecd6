@@ -270,17 +270,22 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - only backdrop should blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]"
+            className="fixed inset-0 z-[9999]"
+            style={{
+              background: 'rgba(0, 0, 0, 0.25)',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+            }}
             onClick={onClose}
           />
           
-          {/* Sheet */}
+          {/* Sheet - fully opaque surface */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -298,7 +303,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             style={{
               height: '80svh',
               maxHeight: '80svh',
-              backgroundColor: '#F8FAFC',
+              backgroundColor: '#F9FAFB',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
             }}
           >
@@ -306,7 +311,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div 
                 className="w-10 h-1 rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.1)' }}
+                style={{ background: 'rgba(0, 0, 0, 0.12)' }}
               />
             </div>
             
@@ -315,10 +320,15 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
               className="flex-1 overflow-y-auto overscroll-contain px-5 pb-32"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
-              {/* Title */}
+              {/* Title - locked height, increased weight */}
               <h2 
-                className="text-xl font-semibold mb-4"
-                style={{ color: 'hsl(var(--hub-text, 220 20% 20%))' }}
+                className="h-8 flex items-center mb-4"
+                style={{ 
+                  color: '#1e293b',
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  letterSpacing: '-0.01em',
+                }}
               >
                 {mode === 'game' ? 'Create a Game' : 'Create a Trip'}
               </h2>
@@ -342,154 +352,100 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
                 />
               </div>
               
-              {/* Progressive reveal content */}
+              {/* Progressive reveal content - 180ms ease-out animations */}
               <AnimatePresence mode="wait">
                 {mode === 'game' && hasCourseSelected && (
                   <motion.div
                     key="game-content"
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, staggerChildren: 0.1 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
                     className="space-y-4 mt-5"
                   >
                     {/* Who's playing */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.05 }}
-                    >
-                      <PlayersCard
-                        mode="game"
-                        players={gamePlayers}
-                        maxPlayers={maxPlayers}
-                        onOpenPicker={handleAddPlayers}
-                        onRemovePlayer={handleRemovePlayer}
-                      />
-                    </motion.div>
+                    <PlayersCard
+                      mode="game"
+                      players={gamePlayers}
+                      maxPlayers={maxPlayers}
+                      onOpenPicker={handleAddPlayers}
+                      onRemovePlayer={handleRemovePlayer}
+                    />
                     
                     {/* Players counter */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
-                      <PlayersCounter current={currentPlayers} max={maxPlayers} />
-                    </motion.div>
+                    <PlayersCounter current={currentPlayers} max={maxPlayers} />
                     
                     {/* Visibility */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.15 }}
-                    >
-                      <VisibilityChips
-                        mode="game"
-                        visibility={gameVisibility}
-                        onVisibilityChange={(v) => setGameVisibility(v as GameVisibility)}
-                      />
-                    </motion.div>
+                    <VisibilityChips
+                      mode="game"
+                      visibility={gameVisibility}
+                      onVisibilityChange={(v) => setGameVisibility(v as GameVisibility)}
+                    />
                     
                     {/* Add Details */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                    >
-                      <GameDetailsSection
-                        isExpanded={gameDetailsExpanded}
-                        onToggle={() => setGameDetailsExpanded(!gameDetailsExpanded)}
-                        gameDate={gameDate}
-                        onGameDateChange={setGameDate}
-                        gameTime={gameTime}
-                        onGameTimeChange={setGameTime}
-                        holeCount={gameHoles}
-                        onHoleCountChange={setGameHoles}
-                        gameType={gameType}
-                        onGameTypeChange={setGameType}
-                        notes={gameNotes}
-                        onNotesChange={setGameNotes}
-                      />
-                    </motion.div>
+                    <GameDetailsSection
+                      isExpanded={gameDetailsExpanded}
+                      onToggle={() => setGameDetailsExpanded(!gameDetailsExpanded)}
+                      gameDate={gameDate}
+                      onGameDateChange={setGameDate}
+                      gameTime={gameTime}
+                      onGameTimeChange={setGameTime}
+                      holeCount={gameHoles}
+                      onHoleCountChange={setGameHoles}
+                      gameType={gameType}
+                      onGameTypeChange={setGameType}
+                      notes={gameNotes}
+                      onNotesChange={setGameNotes}
+                    />
                   </motion.div>
                 )}
                 
                 {mode === 'trip' && hasCourseSelected && (
                   <motion.div
                     key="trip-content"
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
                     className="space-y-4 mt-5"
                   >
                     {/* Trip Dates */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.05 }}
-                    >
-                      <TripDatesCard
-                        startDate={tripStartDate}
-                        endDate={tripEndDate}
-                        onOpenPicker={() => setShowTripDatesPicker(true)}
-                      />
-                    </motion.div>
+                    <TripDatesCard
+                      startDate={tripStartDate}
+                      endDate={tripEndDate}
+                      onOpenPicker={() => setShowTripDatesPicker(true)}
+                    />
                     
                     {/* Trip Itinerary */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
-                      <TripItineraryList
-                        itinerary={tripItinerary}
-                        onAddCourse={handleAddTripCourse}
-                        onEditCourse={handleEditTripCourse}
-                        onReorder={(newItinerary) => setTripItinerary(newItinerary)}
-                      />
-                    </motion.div>
+                    <TripItineraryList
+                      itinerary={tripItinerary}
+                      onAddCourse={handleAddTripCourse}
+                      onEditCourse={handleEditTripCourse}
+                      onReorder={(newItinerary) => setTripItinerary(newItinerary)}
+                    />
                     
                     {/* Who's attending */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.15 }}
-                    >
-                      <PlayersCard
-                        mode="trip"
-                        players={tripAttendees}
-                        onOpenPicker={handleAddPlayers}
-                        onRemovePlayer={handleRemovePlayer}
-                      />
-                    </motion.div>
+                    <PlayersCard
+                      mode="trip"
+                      players={tripAttendees}
+                      onOpenPicker={handleAddPlayers}
+                      onRemovePlayer={handleRemovePlayer}
+                    />
                     
                     {/* Visibility */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                    >
-                      <VisibilityChips
-                        mode="trip"
-                        visibility={tripVisibility}
-                        onVisibilityChange={(v) => setTripVisibility(v as TripVisibility)}
-                      />
-                    </motion.div>
+                    <VisibilityChips
+                      mode="trip"
+                      visibility={tripVisibility}
+                      onVisibilityChange={(v) => setTripVisibility(v as TripVisibility)}
+                    />
                     
                     {/* Add Details */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.25 }}
-                    >
-                      <TripDetailsSection
-                        isExpanded={tripDetailsExpanded}
-                        onToggle={() => setTripDetailsExpanded(!tripDetailsExpanded)}
-                        notes={tripNotes}
-                        onNotesChange={setTripNotes}
-                      />
-                    </motion.div>
+                    <TripDetailsSection
+                      isExpanded={tripDetailsExpanded}
+                      onToggle={() => setTripDetailsExpanded(!tripDetailsExpanded)}
+                      notes={tripNotes}
+                      onNotesChange={setTripNotes}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

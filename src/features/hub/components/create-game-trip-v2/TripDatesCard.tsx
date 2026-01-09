@@ -19,8 +19,9 @@ export function TripDatesCard({ startDate, endDate, onOpenPicker }: TripDatesCar
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
       whileTap={{ scale: 0.98, opacity: 0.9 }}
       onClick={() => {
         haptic('light');
@@ -29,11 +30,11 @@ export function TripDatesCard({ startDate, endDate, onOpenPicker }: TripDatesCar
       className="w-full p-4 rounded-2xl text-left transition-all"
       style={{
         background: hasRange 
-          ? 'rgba(255, 255, 255, 0.95)'
+          ? 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,1) 100%)'
           : 'rgba(100, 116, 139, 0.06)',
         border: hasRange 
-          ? '1px solid rgba(0, 0, 0, 0.06)'
-          : '1px solid rgba(100, 116, 139, 0.12)',
+          ? '1px solid rgba(0, 0, 0, 0.05)'
+          : '1px solid rgba(100, 116, 139, 0.1)',
         boxShadow: hasRange 
           ? '0 2px 12px rgba(0, 0, 0, 0.04)'
           : 'none',
@@ -44,14 +45,14 @@ export function TripDatesCard({ startDate, endDate, onOpenPicker }: TripDatesCar
           className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ 
             background: hasRange 
-              ? 'linear-gradient(135deg, rgba(110, 146, 119, 0.12) 0%, rgba(110, 146, 119, 0.06) 100%)'
-              : 'rgba(100, 116, 139, 0.10)',
-            border: hasRange ? '1px solid rgba(110, 146, 119, 0.15)' : 'none',
+              ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.06) 100%)'
+              : 'rgba(100, 116, 139, 0.08)',
+            border: hasRange ? '1px solid rgba(34, 197, 94, 0.2)' : 'none',
           }}
         >
           <Calendar 
             className="w-5 h-5" 
-            style={{ color: hasRange ? '#6E9277' : '#64748b' }} 
+            style={{ color: hasRange ? '#16a34a' : '#64748b' }} 
           />
         </div>
         
@@ -60,13 +61,13 @@ export function TripDatesCard({ startDate, endDate, onOpenPicker }: TripDatesCar
             <>
               <div 
                 className="text-[15px] font-semibold"
-                style={{ color: 'var(--hub-text)' }}
+                style={{ color: '#1e293b' }}
               >
                 {format(startDate, 'd MMM')} → {format(endDate, 'd MMM yyyy')}
               </div>
               <div 
                 className="text-[13px] mt-0.5"
-                style={{ color: 'var(--hub-text-dim)' }}
+                style={{ color: '#64748b' }}
               >
                 Trip dates
               </div>
@@ -82,10 +83,10 @@ export function TripDatesCard({ startDate, endDate, onOpenPicker }: TripDatesCar
         </div>
         
         <div 
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+          className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ background: 'rgba(0, 0, 0, 0.04)' }}
         >
-          <ChevronRight className="w-4 h-4" style={{ color: 'var(--hub-text-dim)', opacity: 0.6 }} />
+          <ChevronRight className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
         </div>
       </div>
     </motion.button>

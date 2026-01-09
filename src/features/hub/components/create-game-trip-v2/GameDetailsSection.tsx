@@ -1,6 +1,6 @@
 /**
  * GameDetailsSection - Expandable details for Game mode
- * Date, Time, 9/18 holes, Game type, Notes
+ * Chevron rotates on expand, section background tinted, inputs card-like
  */
 
 import React from 'react';
@@ -42,9 +42,9 @@ export function GameDetailsSection({
 }: GameDetailsSectionProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
     >
       {/* Toggle header */}
       <button
@@ -55,27 +55,31 @@ export function GameDetailsSection({
         className="w-full flex items-center justify-between py-3 text-left transition-all"
       >
         <div className="flex items-center gap-2">
-          <Plus 
-            className={cn(
-              "w-4 h-4 transition-transform duration-200",
-              isExpanded && "rotate-45"
-            )}
-            style={{ color: 'var(--hub-text-dim)' }}
-          />
+          <motion.div
+            animate={{ rotate: isExpanded ? 45 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Plus 
+              className="w-4 h-4"
+              style={{ color: '#94a3b8' }}
+            />
+          </motion.div>
           <span 
             className="text-[14px]"
-            style={{ color: 'var(--hub-text-sub)' }}
+            style={{ color: '#64748b' }}
           >
             Add details (optional)
           </span>
         </div>
-        <ChevronDown 
-          className={cn(
-            "w-4 h-4 transition-transform duration-200",
-            isExpanded && "rotate-180"
-          )}
-          style={{ color: 'var(--hub-text-dim)', opacity: 0.5 }}
-        />
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown 
+            className="w-4 h-4"
+            style={{ color: '#94a3b8' }}
+          />
+        </motion.div>
       </button>
 
       <AnimatePresence>
@@ -87,40 +91,45 @@ export function GameDetailsSection({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="pt-2 pb-1 space-y-4">
-              {/* Date & Time */}
+            <div 
+              className="pt-3 pb-2 px-3 space-y-4 rounded-xl"
+              style={{ background: 'rgba(248, 250, 252, 0.8)' }}
+            >
+              {/* Date & Time - combined visually into one row */}
               <div className="flex gap-2">
                 <div
-                  className="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl"
+                  className="flex-1 flex items-center gap-2.5 px-4 py-3.5 rounded-xl"
                   style={{ 
-                    background: 'rgba(255, 255, 255, 0.85)',
+                    background: '#FFFFFF',
                     border: '1px solid rgba(0, 0, 0, 0.05)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
                   }}
                 >
-                  <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
+                  <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
                   <input
                     type="date"
                     value={gameDate ? format(gameDate, 'yyyy-MM-dd') : ''}
                     onChange={(e) => onGameDateChange(e.target.value ? new Date(e.target.value) : null)}
                     className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none"
-                    style={{ color: gameDate ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
+                    style={{ color: gameDate ? '#1e293b' : '#94a3b8' }}
                     placeholder="Date"
                   />
                 </div>
                 <div
-                  className="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl"
+                  className="flex-1 flex items-center gap-2.5 px-4 py-3.5 rounded-xl"
                   style={{ 
-                    background: 'rgba(255, 255, 255, 0.85)',
+                    background: '#FFFFFF',
                     border: '1px solid rgba(0, 0, 0, 0.05)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
                   }}
                 >
-                  <Clock className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--hub-text-dim)' }} />
+                  <Clock className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
                   <input
                     type="time"
                     value={gameTime}
                     onChange={(e) => onGameTimeChange(e.target.value)}
                     className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none"
-                    style={{ color: gameTime ? 'var(--hub-text)' : 'var(--hub-text-muted)' }}
+                    style={{ color: gameTime ? '#1e293b' : '#94a3b8' }}
                     placeholder="Time"
                   />
                 </div>
@@ -129,60 +138,62 @@ export function GameDetailsSection({
               {/* Holes */}
               <div className="flex gap-2">
                 {([9, 18] as HoleCount[]).map(num => (
-                  <button
+                  <motion.button
                     key={num}
                     onClick={() => {
                       haptic('light');
                       onHoleCountChange(num);
                     }}
-                    className="flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all active:scale-[0.97]"
+                    whileTap={{ scale: 0.97 }}
+                    className="flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all"
                     style={{
                       background: holeCount === num 
-                        ? 'rgba(255, 255, 255, 0.98)' 
-                        : 'rgba(255, 255, 255, 0.7)',
+                        ? '#FFFFFF' 
+                        : 'transparent',
                       border: holeCount === num
                         ? '1px solid rgba(0, 0, 0, 0.08)'
-                        : '1px solid rgba(0, 0, 0, 0.04)',
+                        : '1px solid rgba(0, 0, 0, 0.06)',
                       color: holeCount === num 
-                        ? 'var(--hub-text)' 
-                        : 'var(--hub-text-muted)',
+                        ? '#1e293b' 
+                        : '#94a3b8',
                       boxShadow: holeCount === num
                         ? '0 2px 6px rgba(0, 0, 0, 0.04)'
                         : 'none',
                     }}
                   >
                     {num} holes
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
               {/* Game type */}
               <div className="flex gap-2">
                 {(['casual', 'practice', 'match'] as GameType[]).map(type => (
-                  <button
+                  <motion.button
                     key={type}
                     onClick={() => {
                       haptic('light');
                       onGameTypeChange(type);
                     }}
-                    className="flex-1 py-3 rounded-xl text-[13px] font-semibold capitalize transition-all active:scale-[0.97]"
+                    whileTap={{ scale: 0.97 }}
+                    className="flex-1 py-3 rounded-xl text-[13px] font-semibold capitalize transition-all"
                     style={{
                       background: gameType === type 
-                        ? 'rgba(255, 255, 255, 0.98)' 
-                        : 'rgba(255, 255, 255, 0.7)',
+                        ? '#FFFFFF' 
+                        : 'transparent',
                       border: gameType === type
                         ? '1px solid rgba(0, 0, 0, 0.08)'
-                        : '1px solid rgba(0, 0, 0, 0.04)',
+                        : '1px solid rgba(0, 0, 0, 0.06)',
                       color: gameType === type 
-                        ? 'var(--hub-text)' 
-                        : 'var(--hub-text-muted)',
+                        ? '#1e293b' 
+                        : '#94a3b8',
                       boxShadow: gameType === type
                         ? '0 2px 6px rgba(0, 0, 0, 0.04)'
                         : 'none',
                     }}
                   >
                     {type}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
@@ -194,9 +205,10 @@ export function GameDetailsSection({
                 rows={3}
                 className="w-full px-4 py-3 rounded-xl text-[14px] resize-none outline-none"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.85)',
+                  background: '#FFFFFF',
                   border: '1px solid rgba(0, 0, 0, 0.05)',
-                  color: 'var(--hub-text)',
+                  color: '#1e293b',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
                 }}
               />
             </div>

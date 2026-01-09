@@ -1,6 +1,6 @@
 /**
  * ModeToggle - Segmented pill toggle for Game/Trip mode
- * Glass container, raised selected state
+ * Glass container, raised selected state, animated sliding pill
  */
 
 import React from 'react';
@@ -24,7 +24,7 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
     <div
       className="inline-flex rounded-2xl p-1 w-full relative"
       style={{
-        background: 'rgba(0, 0, 0, 0.04)',
+        background: 'rgba(0, 0, 0, 0.05)',
       }}
     >
       {/* Sliding indicator */}
@@ -32,9 +32,9 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
         className="absolute top-1 bottom-1 rounded-xl"
         style={{
           width: 'calc(50% - 4px)',
-          background: 'rgba(255, 255, 255, 0.98)',
-          border: '1px solid rgba(0, 0, 0, 0.05)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+          background: '#FFFFFF',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
         }}
         animate={{
           left: mode === 'game' ? '4px' : 'calc(50% + 0px)',
@@ -46,12 +46,17 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
         <button
           key={m}
           onClick={() => handleChange(m)}
-          className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-[14px] font-semibold transition-colors capitalize"
+          className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-[14px] font-semibold transition-all duration-200 capitalize"
           style={{
-            color: mode === m ? 'var(--hub-text)' : 'var(--hub-text-muted)',
+            color: mode === m ? '#1e293b' : 'rgba(100, 116, 139, 0.6)',
           }}
         >
-          {m}
+          <motion.span
+            animate={{ opacity: mode === m ? 1 : 0.6 }}
+            transition={{ duration: 0.15 }}
+          >
+            {m}
+          </motion.span>
         </button>
       ))}
     </div>
