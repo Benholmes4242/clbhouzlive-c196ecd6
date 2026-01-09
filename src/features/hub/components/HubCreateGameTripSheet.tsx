@@ -260,7 +260,7 @@ export function HubCreateGameTripSheet({
             className="fixed inset-x-0 bottom-0 z-[10004] rounded-t-[28px] overflow-hidden flex flex-col"
             style={{
               height: '78vh',
-              background: 'linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%)',
+              background: '#F8FAFC',
               boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.08), 0 -1px 0 rgba(255, 255, 255, 0.5) inset',
               borderTop: '1px solid rgba(255, 255, 255, 0.8)',
               overscrollBehavior: 'contain',

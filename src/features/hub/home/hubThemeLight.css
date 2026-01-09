@@ -30,8 +30,8 @@
      BACKGROUNDS & SURFACES (Light Slate)
      ======================================== */
   /* Main Hub container - Light background */
-  --hub-bg-start: #EDEFF2;
-  --hub-bg-end: #EDEFF2;
+  --hub-bg-start: #F8FAFC;
+  --hub-bg-end: #F8FAFC;
   
   /* Backdrop overlay - subtle dim, no blur */
   --hub-backdrop: rgba(31, 36, 40, 0.35);
