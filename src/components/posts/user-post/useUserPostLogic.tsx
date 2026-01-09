@@ -4,7 +4,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
-import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { UserPostData, GolfCourse } from './types';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { hasGolfCourseReference, getRawCourseId } from '@/utils/resolveGolfCourse';
@@ -26,8 +25,6 @@ export const useUserPostLogic = ({
   const { user } = useSupabaseSession();
   const [golfCourse, setGolfCourse] = useState<GolfCourse | null>(null);
   const { deletePost } = usePostDeletion();
-  
-  const { isOpen: isFullscreenOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   // Computed values - resolve actor (business or personal)
   const isBusinessPost = post.actor_type === 'business' && post.business;
@@ -112,11 +109,6 @@ export const useUserPostLogic = ({
     navigate(profilePath);
   };
 
-  const handlePostClick = () => {
-    // Now handled directly by UserPost component using FullscreenMediaModal
-    // This method can be removed or simplified based on the component's needs
-  };
-
   // Get raw course ID for UI safety net
   const rawCourseId = getRawCourseId(post);
   
@@ -130,11 +122,6 @@ export const useUserPostLogic = ({
     golfCourse,
     rawCourseId,
     handleDeletePost,
-    handleProfileClick,
-    handlePostClick,
-    isFullscreenOpen,
-    currentMedia,
-    openMedia,
-    closeMedia
+    handleProfileClick
   };
 };
