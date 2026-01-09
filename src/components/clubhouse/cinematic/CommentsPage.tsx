@@ -1157,8 +1157,8 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                       <motion.div 
                         className="relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity"
                         animate={{
-                          width: headerCompressed ? 70 : 100,
-                          height: headerCompressed ? 90 : 130,
+                          width: headerCompressed ? 80 : 110,
+                          height: headerCompressed ? 100 : 140,
                         }}
                         transition={{ duration: 0.25, ease: 'easeOut' }}
                         onClick={onClose}
@@ -1172,6 +1172,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               src={videoThumbnail}
                               alt="Post thumbnail"
                               className="absolute inset-0 w-full h-full object-cover"
+                              style={{ objectPosition: 'center center' }}
                             />
                             {/* Review badge overlay for portrait */}
                             {isReview && reviewRating && (
@@ -1211,7 +1212,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                               <img
                                 src={videoThumbnail}
                                 alt="Post thumbnail"
-                                className="w-full h-auto max-h-[75%] object-contain"
+                                className="w-full h-auto max-h-[60%] object-contain"
                               />
                             </div>
                             {/* Review badge overlay for landscape */}
