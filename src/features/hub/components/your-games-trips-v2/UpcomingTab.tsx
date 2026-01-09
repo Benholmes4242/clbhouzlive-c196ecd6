@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GameCard } from './GameCard';
 import { EmptyState } from './EmptyState';
@@ -13,11 +12,10 @@ import { useUserUpcomingGames, type UserGame } from '../../hooks/useUserGamesTri
 interface UpcomingTabProps {
   searchQuery: string;
   onCreateGame: () => void;
-  onClose: () => void;
+  onGameTap: (gameId: string) => void;
 }
 
-export function UpcomingTab({ searchQuery, onCreateGame, onClose }: UpcomingTabProps) {
-  const navigate = useNavigate();
+export function UpcomingTab({ searchQuery, onCreateGame, onGameTap }: UpcomingTabProps) {
   const { data: games, isLoading } = useUserUpcomingGames();
 
   // Filter by search
@@ -35,8 +33,7 @@ export function UpcomingTab({ searchQuery, onCreateGame, onClose }: UpcomingTabP
   const upcomingList = filtered.slice(1);
 
   const handleGameTap = (game: UserGame) => {
-    onClose();
-    navigate(`/game/${game.id}?tab=overview`);
+    onGameTap(game.id);
   };
 
   if (isLoading) {

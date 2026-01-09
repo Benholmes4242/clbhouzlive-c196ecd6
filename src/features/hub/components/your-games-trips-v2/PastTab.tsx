@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GameCard } from './GameCard';
 import { EmptyState } from './EmptyState';
@@ -12,11 +11,10 @@ import { useUserPastGames, type UserGame } from '../../hooks/useUserGamesTrips';
 
 interface PastTabProps {
   searchQuery: string;
-  onClose: () => void;
+  onGameTap: (gameId: string) => void;
 }
 
-export function PastTab({ searchQuery, onClose }: PastTabProps) {
-  const navigate = useNavigate();
+export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
   const { data: games, isLoading } = useUserPastGames();
 
   // Filter by search
@@ -31,8 +29,7 @@ export function PastTab({ searchQuery, onClose }: PastTabProps) {
   }, [games, searchQuery]);
 
   const handleGameTap = (game: UserGame) => {
-    onClose();
-    navigate(`/game/${game.id}?tab=overview`);
+    onGameTap(game.id);
   };
 
   if (isLoading) {
