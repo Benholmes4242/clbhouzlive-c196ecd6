@@ -21,6 +21,7 @@ export type HeroGameData = {
   courseName: string;
   courseImageUrl: string | null;
   isHost: boolean;
+  goingCount?: number;
 };
 
 export type HeroTripData = {
@@ -106,6 +107,13 @@ async function fetchNextGame(userId: string): Promise<HeroGameData | null> {
     courseImageUrl = course?.thumbnail_image || null;
   }
 
+  // Fetch going count for this game
+  const { count: goingCount } = await supabase
+    .from('game_participants')
+    .select('*', { count: 'exact', head: true })
+    .eq('game_id', nextGame.id)
+    .eq('rsvp_status', 'going');
+
   return {
     type: 'game',
     gameId: nextGame.id,
@@ -115,6 +123,7 @@ async function fetchNextGame(userId: string): Promise<HeroGameData | null> {
     courseName: nextGame.course_name || 'Course TBD',
     courseImageUrl: courseImageUrl || FALLBACK_HERO_IMAGE,
     isHost: nextGame.host_user_id === userId,
+    goingCount: (goingCount || 0) + 1, // +1 for host who is always going
   };
 }
 
