@@ -6,6 +6,8 @@
  * - Premium spacing
  * - No bounce animation
  * - No background scroll jump
+ * 
+ * Opens GameDetailSheetV2 on game tap (no route change)
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -19,6 +21,7 @@ import { SearchInput } from './SearchInput';
 import { UpcomingTab } from './UpcomingTab';
 import { PastTab } from './PastTab';
 import { TripsTab } from './TripsTab';
+import { GameDetailSheetV2 } from '../game-detail-v2';
 import type { SheetTab } from './types';
 
 interface YourGamesTripsSheetV2Props {
@@ -38,6 +41,10 @@ export function YourGamesTripsSheetV2({
 }: YourGamesTripsSheetV2Props) {
   const [activeTab, setActiveTab] = useState<SheetTab>(defaultTab);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Game detail sheet state
+  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
+  const [gameSheetOpen, setGameSheetOpen] = useState(false);
   
   // Scroll lock refs
   const scrollYRef = useRef(0);
@@ -90,10 +97,25 @@ export function YourGamesTripsSheetV2({
       const timer = setTimeout(() => {
         setActiveTab(defaultTab);
         setSearchQuery('');
+        setSelectedGameId(null);
+        setGameSheetOpen(false);
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen, defaultTab]);
+
+  // Handler for opening game detail sheet (no navigation)
+  const handleOpenGameDetail = useCallback((gameId: string) => {
+    haptic('light');
+    setSelectedGameId(gameId);
+    setGameSheetOpen(true);
+  }, []);
+
+  const handleCloseGameDetail = useCallback(() => {
+    setGameSheetOpen(false);
+    // Keep selectedGameId for animation, clear after close
+    setTimeout(() => setSelectedGameId(null), 300);
+  }, []);
 
   const handleClose = useCallback(() => {
     haptic('light');
@@ -214,13 +236,13 @@ export function YourGamesTripsSheetV2({
                 <UpcomingTab
                   searchQuery={searchQuery}
                   onCreateGame={handleCreateGame}
-                  onClose={onClose}
+                  onGameTap={handleOpenGameDetail}
                 />
               )}
               {activeTab === 'past' && (
                 <PastTab
                   searchQuery={searchQuery}
-                  onClose={onClose}
+                  onGameTap={handleOpenGameDetail}
                 />
               )}
               {activeTab === 'trips' && (
@@ -232,6 +254,15 @@ export function YourGamesTripsSheetV2({
               )}
             </div>
           </motion.div>
+
+          {/* Game Detail Sheet (stacked) */}
+          {selectedGameId && (
+            <GameDetailSheetV2
+              isOpen={gameSheetOpen}
+              onClose={handleCloseGameDetail}
+              gameId={selectedGameId}
+            />
+          )}
         </>
       )}
     </AnimatePresence>,
