@@ -48,7 +48,7 @@ export function HubHeaderToday() {
             color: 'var(--hub-text)',
             fontSize: 'clamp(18px, 5vw, 22px)',
             maxWidth: '75%',
-            lineHeight: '1.05',
+            lineHeight: '1.25', // Allow room for descenders (g, y, p, etc.)
             letterSpacing: '-0.2px',
           }}
         >
