@@ -8,6 +8,9 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 import { CreatorProfileSection } from './CreatorProfileSection';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { usePostEngagement } from '@/hooks/usePostEngagement';
+import { useCreatorEngagement } from '@/hooks/useCreatorEngagement';
+import { toast } from 'sonner';
 
 interface ActivityFeedProps {
   userId: string;
@@ -41,6 +44,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
+  
+  // Track current fullscreen post and creator
+  const [currentFullscreenPostId, setCurrentFullscreenPostId] = useState<string | null>(null);
+  const [currentCreatorId, setCurrentCreatorId] = useState<string | null>(null);
 
   // Filter items based on active filter
   const filteredItems = useMemo(() => {
@@ -56,19 +63,70 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     }
   }, [items, filters.type]);
 
+  // Engagement hooks for fullscreen
+  const { toggleLike } = usePostEngagement(currentFullscreenPostId);
+  const { toggleFollow } = useCreatorEngagement(currentCreatorId);
+
+  // Share handler
+  const handleSharePost = useCallback((postId: string) => {
+    const shareUrl = `${window.location.origin}/post/${postId}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Check out this post',
+        url: shareUrl,
+      }).catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+        }
+      });
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast.success('Link copied to clipboard!');
+      }).catch(() => {
+        toast.error('Failed to copy link');
+      });
+    }
+  }, []);
+
   // Use unified fullscreen player for activity items
   const { openFullscreen } = useUnifiedFullscreen('unified', {
     allowLandscape: true,
+    
+    // Track current post and creator when user swipes
+    onIndexChange: (index) => {
+      const currentItem = filteredItems[index];
+      setCurrentFullscreenPostId(currentItem?.postId || currentItem?.id || null);
+      setCurrentCreatorId(currentItem?.creator?.id || null);
+    },
+    
+    // Like handler
     onLike: (itemId) => {
-      console.log('Like from profile fullscreen:', itemId);
-      // TODO: Add actual like mutation
+      toggleLike();
     },
+    
+    // Follow handler
+    onFollow: (creatorId) => {
+      toggleFollow(creatorId);
+    },
+    
+    // Comment handler
     onComment: (itemId) => {
-      console.log('Comment from profile fullscreen:', itemId);
+      // CommentsPage opens automatically
     },
+    
+    // Share handler
     onShare: (itemId) => {
-      console.log('Share from profile fullscreen:', itemId);
+      handleSharePost(itemId);
     },
+    
+    // Close handler
+    onClose: () => {
+      setCurrentFullscreenPostId(null);
+      setCurrentCreatorId(null);
+    },
+    
+    // Infinite scroll
     onLoadMore: hasMore ? fetchNextPage : undefined,
     hasMore,
     isLoadingMore: isFetchingNextPage,
@@ -76,6 +134,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   // Handle item click - open unified fullscreen player
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
+    setCurrentFullscreenPostId(item.postId || item.id || null);
+    setCurrentCreatorId(item.creator?.id || null);
     openFullscreen(filteredItems, index);
   }, [filteredItems, openFullscreen]);
 

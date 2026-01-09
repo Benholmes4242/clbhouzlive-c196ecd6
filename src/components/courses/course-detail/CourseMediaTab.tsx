@@ -4,6 +4,7 @@ import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExp
 import { adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { usePostEngagement } from '@/hooks/usePostEngagement';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
@@ -18,6 +19,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { toast } from 'sonner';
 
 import { MediaItem } from '@/types/media';
 
@@ -50,6 +52,9 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   const navigate = useNavigate();
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
   const hasPreloadedFirst = useRef(false);
+  
+  // Track current fullscreen post for engagement
+  const [currentFullscreenPostId, setCurrentFullscreenPostId] = useState<string | null>(null);
 
   // Phase 1 Fix #2: Use shared hook - single query for all media consumers
   const { data: mediaResp, isLoading, isError, refetch } = useClubMedia(courseId, 30);
@@ -152,14 +157,59 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     estimatedRowHeight: 150, // Smaller tiles = shorter rows
   });
 
+  // Engagement hook for fullscreen
+  const { toggleLike } = usePostEngagement(currentFullscreenPostId);
+
+  // Share handler
+  const handleShareReview = useCallback((reviewId: string) => {
+    const shareUrl = `${window.location.origin}/courses/${courseId}?review=${reviewId}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Review on ${courseName || 'course'}`,
+        url: shareUrl,
+      }).catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+        }
+      });
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast.success('Link copied to clipboard!');
+      }).catch(() => {
+        toast.error('Failed to copy link');
+      });
+    }
+  }, [courseId, courseName]);
+
   // Use unified fullscreen player for course media
   const { openFullscreen } = useUnifiedFullscreen('explore', {
     allowLandscape: true,
-    onComment: (itemId) => {
-      console.log('Comment from course media:', itemId);
+    
+    // Track current post when user swipes
+    onIndexChange: (index) => {
+      const currentItem = filteredItems[index];
+      setCurrentFullscreenPostId(currentItem?.id || null);
     },
+    
+    // Like handler
+    onLike: (itemId) => {
+      toggleLike();
+    },
+    
+    // Comment handler
+    onComment: (itemId) => {
+      // CommentsPage opens automatically
+    },
+    
+    // Share handler
     onShare: (itemId) => {
-      console.log('Share from course media:', itemId);
+      handleShareReview(itemId);
+    },
+    
+    // Close handler
+    onClose: () => {
+      setCurrentFullscreenPostId(null);
     },
   });
 
@@ -167,6 +217,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   const handleMediaClick = useCallback((item: NewMediaItem) => {
     const index = filteredItems.findIndex(media => media.id === item.id);
     if (index !== -1) {
+      setCurrentFullscreenPostId(item.id); // Set initial post
       openFullscreen(filteredItems, index);
     }
   }, [filteredItems, openFullscreen]);

@@ -137,6 +137,12 @@ export function usePostEngagement(postId: string | null) {
       // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Invalidate all feed queries to update like counts across pages
+      queryClient.invalidateQueries({ queryKey: ['explore-content'] });
+      queryClient.invalidateQueries({ queryKey: ['watch-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['course-media'] });
+      queryClient.invalidateQueries({ queryKey: ['user-posts'] });
     },
   });
 
