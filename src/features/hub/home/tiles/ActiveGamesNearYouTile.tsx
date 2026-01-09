@@ -71,14 +71,15 @@ export function ActiveGamesNearYouTile() {
           boxShadow: 'var(--hub-shadow-tile)',
         }}
       >
-        {/* Games count badge - top right (shows total, not current index) - emerald green like verified pill */}
+        {/* Games count badge - top right - consistent size with Messages badge */}
         {gamesCount > 0 && (
           <div 
-            className="absolute top-3 right-3 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold z-10"
+            className="absolute top-3 right-3 h-[18px] min-w-[18px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold z-10"
             style={{
               background: 'rgba(16, 185, 129, 0.15)',
               color: '#10B981',
               border: '1px solid rgba(16, 185, 129, 0.3)',
+              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)',
             }}
           >
             {gamesCount}
@@ -143,15 +144,17 @@ export function ActiveGamesNearYouTile() {
           )}
         </div>
 
-        {/* Carousel dots - tiny, only show if 2+ games - emerald green */}
+        {/* Carousel dots - subtle, matching hero dot style */}
         {hasCarousel && (
-          <div className="absolute bottom-3 right-3 flex gap-1">
+          <div className="absolute bottom-3 right-3 flex gap-0.5">
             {allGames.map((_, idx) => (
               <div
                 key={idx}
-                className="w-1 h-1 rounded-full transition-all"
+                className="rounded-full transition-all duration-300"
                 style={{
-                  background: idx === activeIndex ? '#10B981' : 'rgba(16, 185, 129, 0.3)',
+                  width: idx === activeIndex ? '8px' : '4px',
+                  height: '4px',
+                  background: idx === activeIndex ? '#10B981' : 'rgba(16, 185, 129, 0.25)',
                 }}
               />
             ))}
