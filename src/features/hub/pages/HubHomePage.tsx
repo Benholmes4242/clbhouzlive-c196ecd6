@@ -200,7 +200,6 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-            paddingBottom: '16px',
           }}
         >
           <div className="px-5 flex flex-col gap-2.5 flex-1">
@@ -224,8 +223,10 @@ export function HubHomePage() {
                   <EchoTile />
                 </div>
 
-                {/* Zone 5: Full-width "Your Games" Gradient CTA */}
-                <YourGamesGradientCTA />
+                {/* Zone 5: Full-width "Your Games" Gradient CTA - flex grow to fill remaining space */}
+                <div className="flex-1 flex flex-col min-h-0 pb-3">
+                  <YourGamesGradientCTA className="flex-1" />
+                </div>
               </>
             )}
           </div>
