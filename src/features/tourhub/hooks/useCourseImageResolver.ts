@@ -118,18 +118,21 @@ export function useCourseImageResolver(venues: VenueInput[]) {
         
         if (courses) {
           for (const venue of uncached) {
-            const searchName = venue.venueCourseName || venue.venueName;
-            const searchBase = courseBaseName(searchName);
+            // Build search name: prefer "VenueName - CourseName" format, or just venue name
+            const searchName = venue.venueCourseName 
+              ? `${venue.venueName} - ${venue.venueCourseName}`
+              : venue.venueName;
+            const searchBase = courseBaseName(venue.venueName); // Always use venue base for matching
             const searchNorm = courseNormalize(searchBase);
             
             // Debug logging for key venues
-            if (searchName.toLowerCase().includes('tiburon') || searchName.toLowerCase().includes('torrey')) {
-              console.log(`[CourseResolver] Resolving: "${searchName}"`);
+            if (venue.venueName.toLowerCase().includes('tiburon') || venue.venueName.toLowerCase().includes('torrey')) {
+              console.log(`[CourseResolver] Resolving: "${searchName}" (venue: "${venue.venueName}", course: "${venue.venueCourseName}")`);
               console.log(`  Base: "${searchBase}", Normalized: "${searchNorm}"`);
             }
             
             // Find best match
-            let bestMatch: { course: typeof courses[0]; score: number; boost: number; exactMatch: boolean; countryMatch: boolean } | null = null;
+            let bestMatch: { course: typeof courses[0]; score: number; boost: number; exactMatch: boolean; countryMatch: boolean; variantMatch: boolean } | null = null;
             const candidates: { name: string; score: number; boost: number }[] = [];
             
             for (const course of courses) {
@@ -137,7 +140,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
               const countryMatch = !venue.country || course.country === venue.country;
               
               const courseBase = courseBaseName(course.name);
-              const score = calculateSimilarity(searchName, course.name);
+              const score = calculateSimilarity(venue.venueName, course.name); // Use venue name for base matching
               const boost = getVariantBoost(course.name);
               
               // Also try direct base name comparison
@@ -150,24 +153,36 @@ export function useCourseImageResolver(venues: VenueInput[]) {
               
               candidates.push({ name: course.name, score: finalScore, boost });
               
-              // Combined score: similarity * 100 + variant boost + exact match bonus + country bonus
+              // Boost for matching the specific course variant (Gold, Black, etc.)
+              let variantMatchBonus = 0;
+              if (venue.venueCourseName) {
+                const vcNorm = venue.venueCourseName.toLowerCase();
+                const cNorm = course.name.toLowerCase();
+                if (cNorm.includes(vcNorm) || vcNorm.includes(cNorm.split(' - ')[1] || '')) {
+                  variantMatchBonus = 150; // Strong bonus for exact variant match
+                }
+              }
+              
+              // Combined score: similarity * 100 + variant boost + exact match bonus + country bonus + variant match
               const countryBonus = countryMatch ? 10 : 0;
-              const combinedScore = finalScore * 100 + boost + exactBonus + countryBonus;
-              const bestCombined = bestMatch ? (bestMatch.score * 100 + bestMatch.boost + (bestMatch.exactMatch ? 50 : 0) + (bestMatch.countryMatch ? 10 : 0)) : 0;
+              const combinedScore = finalScore * 100 + boost + exactBonus + countryBonus + variantMatchBonus;
+              const bestCombined = bestMatch 
+                ? (bestMatch.score * 100 + bestMatch.boost + (bestMatch.exactMatch ? 50 : 0) + (bestMatch.countryMatch ? 10 : 0) + (bestMatch.variantMatch ? 150 : 0)) 
+                : 0;
               
               if (combinedScore > bestCombined && finalScore >= 0.35) {
-                bestMatch = { course, score: finalScore, boost, exactMatch: exactBaseMatch, countryMatch };
+                bestMatch = { course, score: finalScore, boost, exactMatch: exactBaseMatch, countryMatch, variantMatch: variantMatchBonus > 0 };
               }
             }
             
             // Debug logging
-            if (searchName.toLowerCase().includes('tiburon') || searchName.toLowerCase().includes('torrey')) {
+            if (venue.venueName.toLowerCase().includes('tiburon') || venue.venueName.toLowerCase().includes('torrey')) {
               const topCandidates = candidates
                 .sort((a, b) => (b.score * 100 + b.boost) - (a.score * 100 + a.boost))
                 .slice(0, 5);
               console.log(`  Top 5 candidates:`, topCandidates);
               if (bestMatch) {
-                console.log(`  ✓ Matched: "${bestMatch.course.name}" (score: ${bestMatch.score.toFixed(2)}, image: ${bestMatch.course.thumbnail_image ? 'YES' : 'NO'})`);
+                console.log(`  ✓ Matched: "${bestMatch.course.name}" (score: ${bestMatch.score.toFixed(2)}, variant: ${bestMatch.variantMatch}, image: ${bestMatch.course.thumbnail_image ? 'YES' : 'NO'})`);
               } else {
                 console.log(`  ✗ No match found`);
               }
