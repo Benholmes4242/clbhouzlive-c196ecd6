@@ -96,12 +96,13 @@ export function HubFloatingDock() {
         }}
       >
         <div 
-          className="w-full h-[72px] flex items-center justify-between px-4"
+          className="w-full h-[72px] flex items-center justify-between px-4 rounded-t-[28px]"
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.05)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
+            borderBottom: 'none',
           }}
         >
           {/* Left items: Create Game, Search */}
