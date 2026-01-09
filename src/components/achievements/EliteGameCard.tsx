@@ -400,7 +400,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       style={{
         background: config.cardBg,
         boxShadow: earned && !isGhost 
-          ? `0 0 16px ${config.cardGlow}, 0 3px 12px rgba(0,0,0,0.25)` 
+          ? `0 0 30px ${config.cardGlow}, 0 0 60px ${config.cardGlow}50, 0 4px 20px rgba(0,0,0,0.4)` 
           : '0 2px 8px rgba(0,0,0,0.2)',
       }}
       onClick={onClick}
@@ -409,103 +409,144 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       whileTap={animationsAllowed && onClick ? { scale: 0.99 } : {}}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
     >
-      {/* ═══ CHANGE 1: Atmosphere Layer - Nebula/depth for ALL earned cards ═══ */}
-      {earned && !isGhost && !isLowQuality && (
+      {/* ═══ LUMINOUS BACKGROUND - Rich nebula with visible color ═══ */}
+      {earned && !isGhost && (
         <>
-          {/* Deep space gradient base - intensity scales with tier */}
+          {/* Primary color wash - gives the card its signature color */}
           <div 
-            className="absolute inset-0 pointer-events-none rounded-xl"
+            className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
             style={{
               background: `
-                radial-gradient(ellipse 120% 80% at 20% 50%, ${config.badgeGlow} 0%, transparent 50%),
-                radial-gradient(ellipse 80% 100% at 80% 30%, ${config.cardGlow} 0%, transparent 40%),
-                radial-gradient(ellipse 60% 60% at 60% 70%, rgba(255,255,255,0.03) 0%, transparent 50%)
+                radial-gradient(ellipse 150% 100% at 15% 50%, ${config.badgeGlow} 0%, transparent 45%),
+                radial-gradient(ellipse 100% 120% at 85% 20%, ${config.cardGlow} 0%, transparent 35%)
               `,
-              opacity: threshold >= 300 ? 0.35 : threshold >= 150 ? 0.25 : threshold >= 50 ? 0.18 : 0.12,
+              opacity: threshold >= 150 ? 0.6 : threshold >= 50 ? 0.45 : 0.35,
             }}
           />
-          {/* Star dust particles - static CSS, scales with tier */}
+          
+          {/* Light rays emanating from badge area */}
+          <div 
+            className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+            style={{
+              background: `
+                linear-gradient(25deg, transparent 0%, ${config.badgeGlow}40 15%, transparent 30%),
+                linear-gradient(-15deg, transparent 0%, ${config.badgeGlow}30 20%, transparent 40%),
+                linear-gradient(45deg, transparent 0%, ${config.badgeGlow}20 10%, transparent 25%)
+              `,
+              opacity: threshold >= 150 ? 0.8 : threshold >= 50 ? 0.6 : 0.4,
+            }}
+          />
+          
+          {/* Star dust particles - more visible */}
           <div 
             className="absolute inset-0 pointer-events-none rounded-xl"
             style={{
               backgroundImage: `
-                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.25) 0%, transparent 100%),
-                radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.18) 0%, transparent 100%),
-                radial-gradient(1.5px 1.5px at 45% 15%, rgba(255,255,255,0.2) 0%, transparent 100%),
-                radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.15) 0%, transparent 100%),
-                radial-gradient(1px 1px at 85% 40%, rgba(255,255,255,0.18) 0%, transparent 100%),
-                radial-gradient(1.5px 1.5px at 55% 45%, rgba(255,255,255,0.12) 0%, transparent 100%),
-                radial-gradient(0.5px 0.5px at 30% 35%, rgba(255,255,255,0.2) 0%, transparent 100%),
-                radial-gradient(0.5px 0.5px at 65% 25%, rgba(255,255,255,0.15) 0%, transparent 100%)
+                radial-gradient(1.5px 1.5px at 8% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+                radial-gradient(1px 1px at 22% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+                radial-gradient(2px 2px at 42% 12%, rgba(255,255,255,0.45) 0%, transparent 100%),
+                radial-gradient(1px 1px at 68% 75%, rgba(255,255,255,0.35) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 82% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 55% 42%, rgba(255,255,255,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 35% 28%, rgba(255,255,255,0.35) 0%, transparent 100%),
+                radial-gradient(0.5px 0.5px at 75% 58%, rgba(255,255,255,0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 15% 72%, rgba(255,255,255,0.3) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 90% 65%, rgba(255,255,255,0.35) 0%, transparent 100%)
               `,
-              opacity: threshold >= 300 ? 1 : threshold >= 150 ? 0.85 : threshold >= 50 ? 0.65 : 0.5,
             }}
           />
         </>
       )}
       
-      {/* ═══ CHANGE 2: Glass Sheen - Top edge highlight for glossy look ═══ */}
-      {earned && !isGhost && !isLowQuality && (
-        <div 
-          className="absolute inset-x-0 top-0 h-[45%] pointer-events-none rounded-t-xl"
-          style={{
-            background: threshold >= 150 
-              ? 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, transparent 100%)'
-              : 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 40%, transparent 100%)',
-          }}
-        />
+      {/* ═══ TOP SPECULAR HIGHLIGHT - Bright edge shine ═══ */}
+      {earned && !isGhost && (
+        <>
+          {/* Sharp top edge highlight line */}
+          <div 
+            className="absolute inset-x-0 top-0 h-[2px] pointer-events-none rounded-t-xl"
+            style={{
+              background: `linear-gradient(90deg, transparent 5%, ${config.badgeBorderColor}80 20%, ${config.badgeBorderColor} 50%, ${config.badgeBorderColor}80 80%, transparent 95%)`,
+              opacity: threshold >= 150 ? 1 : 0.7,
+            }}
+          />
+          {/* Soft glow below the edge */}
+          <div 
+            className="absolute inset-x-0 top-0 h-[25%] pointer-events-none rounded-t-xl"
+            style={{
+              background: `linear-gradient(180deg, ${config.badgeBorderColor}30 0%, ${config.badgeBorderColor}10 30%, transparent 100%)`,
+              opacity: threshold >= 150 ? 0.8 : 0.5,
+            }}
+          />
+        </>
       )}
       
-      {/* Subtle animated background gradient (CSS-only style, framer for perf) */}
+      {/* Subtle animated background pulse */}
       {shouldAnimate && !isLowQuality && (
         <motion.div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none rounded-xl"
           style={{ 
-            background: 'radial-gradient(ellipse at 25% 50%, rgba(255,255,255,0.02) 0%, transparent 50%)',
+            background: `radial-gradient(ellipse at 20% 50%, ${config.badgeGlow}40 0%, transparent 50%)`,
           }}
-          animate={{ opacity: [0.4, 0.7, 0.4] }}
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: config.animationSpeed, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
       
-      {/* Particles - ONLY in high quality mode for focus views */}
+      {/* Particles - visible in all modes */}
       {showParticles && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[0, 1, 2, 3].map((i) => (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute w-0.5 h-0.5 rounded-full bg-white/15"
-              style={{ left: `${20 + i * 18}%`, top: `${30 + (i % 2) * 25}%` }}
-              animate={{ y: [0, -6, 0], opacity: [0.15, 0.35, 0.15] }}
-              transition={{ duration: 4 + i * 0.5, delay: i * 0.3, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute rounded-full"
+              style={{ 
+                left: `${12 + i * 15}%`, 
+                top: `${20 + (i % 3) * 25}%`,
+                width: i % 2 === 0 ? '2px' : '1.5px',
+                height: i % 2 === 0 ? '2px' : '1.5px',
+                background: `${config.badgeBorderColor}`,
+                boxShadow: `0 0 4px ${config.badgeGlow}`,
+              }}
+              animate={{ y: [0, -8, 0], opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 3 + i * 0.4, delay: i * 0.2, repeat: Infinity, ease: 'easeInOut' }}
             />
           ))}
         </div>
       )}
       
-      {/* Border - static, premium */}
+      {/* ═══ GLOWING BORDER - Much more prominent ═══ */}
       <div
         className="absolute inset-0 rounded-xl pointer-events-none"
         style={{
-          padding: '1px',
+          padding: earned ? '1.5px' : '1px',
           background: earned && !isGhost ? config.cardBorder : LOCKED_CONFIG.cardBorder,
           WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           WebkitMaskComposite: 'xor',
           maskComposite: 'exclude',
-          opacity: earned ? 1 : 0.7,
+          opacity: earned ? 1 : 0.6,
         }}
       />
+      {/* Border glow effect */}
+      {earned && !isGhost && (
+        <div
+          className="absolute -inset-[1px] rounded-xl pointer-events-none"
+          style={{
+            boxShadow: `inset 0 0 8px ${config.badgeGlow}60, 0 0 12px ${config.badgeGlow}40`,
+            opacity: threshold >= 150 ? 1 : 0.7,
+          }}
+        />
+      )}
       
-      {/* Border sweep animation - subtle, only on earned + high quality */}
+      {/* Border sweep animation */}
       {shouldAnimate && config.hasAnimatedBorder && isHighQuality && (
         <motion.div
-          className="absolute inset-0 rounded-xl pointer-events-none"
+          className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden"
           style={{ 
-            background: `linear-gradient(90deg, transparent 0%, ${config.badgeGlow} 50%, transparent 100%)`, 
-            opacity: 0.15,
+            background: `linear-gradient(90deg, transparent 0%, ${config.badgeBorderColor} 50%, transparent 100%)`, 
+            opacity: 0.25,
           }}
           animate={{ x: ['-100%', '200%'] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'linear', repeatDelay: 4 }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'linear', repeatDelay: 3 }}
         />
       )}
       
@@ -513,46 +554,51 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       <div className={cn('relative z-10 h-full flex items-center gap-3', compact ? 'px-2.5' : 'px-3.5')}>
         {/* Badge with pedestal - coin on plinth style */}
         <div className="relative flex-shrink-0 flex flex-col items-center">
-          {/* ═══ CHANGE 3: Enhanced Badge Halo - ALL tiers get glow, Elite+ gets extra ═══ */}
-          {earned && !isGhost && !isLowQuality && (
+          {/* ═══ POWERFUL BADGE HALO - Visible, luminous, impressive ═══ */}
+          {earned && !isGhost && (
             <>
-              {/* Primary glow - all tiers, intensity scales */}
+              {/* Outer glow field - creates the "powered" atmosphere */}
               <div
-                className="absolute inset-0 rounded-full pointer-events-none"
+                className="absolute rounded-full pointer-events-none"
                 style={{ 
-                  background: `radial-gradient(circle, ${config.badgeGlow} 0%, transparent 60%)`, 
-                  transform: threshold >= 150 ? 'scale(2.4)' : threshold >= 50 ? 'scale(2.0)' : 'scale(1.8)', 
-                  filter: threshold >= 150 ? 'blur(12px)' : threshold >= 50 ? 'blur(8px)' : 'blur(6px)',
-                  opacity: threshold >= 150 ? config.glowIntensity * 1.6 : threshold >= 50 ? config.glowIntensity * 1.3 : config.glowIntensity * 1.1,
-                  top: '-10%',
+                  width: compact ? '80px' : '100px',
+                  height: compact ? '80px' : '100px',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  background: `radial-gradient(circle, ${config.badgeGlow} 0%, ${config.badgeGlow}60 30%, transparent 70%)`, 
+                  filter: threshold >= 150 ? 'blur(15px)' : threshold >= 50 ? 'blur(12px)' : 'blur(10px)',
+                  opacity: threshold >= 150 ? 0.9 : threshold >= 50 ? 0.7 : 0.5,
                 }}
               />
-              {/* Secondary halo ring - 50+ tiers */}
-              {threshold >= 50 && (
-                <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{ 
-                    background: `radial-gradient(circle, transparent 45%, ${config.badgeGlow} 65%, transparent 85%)`, 
-                    transform: threshold >= 150 ? 'scale(2.8)' : 'scale(2.3)', 
-                    filter: 'blur(5px)',
-                    opacity: threshold >= 300 ? 0.5 : threshold >= 150 ? 0.4 : 0.25,
-                    top: '-10%',
-                  }}
-                />
-              )}
-              {/* Tertiary outer ring - Elite+ only for that "powered" look */}
-              {threshold >= 150 && (
-                <div
-                  className="absolute inset-0 rounded-full pointer-events-none"
-                  style={{ 
-                    background: `radial-gradient(circle, transparent 60%, ${config.badgeGlow}30 80%, transparent 95%)`, 
-                    transform: 'scale(3.2)', 
-                    filter: 'blur(8px)',
-                    opacity: threshold >= 300 ? 0.4 : 0.25,
-                    top: '-10%',
-                  }}
-                />
-              )}
+              {/* Mid glow - more concentrated */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{ 
+                  width: compact ? '60px' : '75px',
+                  height: compact ? '60px' : '75px',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  background: `radial-gradient(circle, ${config.badgeGlow} 0%, transparent 60%)`, 
+                  filter: threshold >= 150 ? 'blur(8px)' : 'blur(6px)',
+                  opacity: threshold >= 150 ? 1 : 0.8,
+                }}
+              />
+              {/* Halo ring effect */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{ 
+                  width: compact ? '70px' : '90px',
+                  height: compact ? '70px' : '90px',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  background: `radial-gradient(circle, transparent 40%, ${config.badgeBorderColor}50 55%, ${config.badgeBorderColor}30 65%, transparent 75%)`, 
+                  filter: 'blur(3px)',
+                  opacity: threshold >= 150 ? 0.8 : threshold >= 50 ? 0.6 : 0.4,
+                }}
+              />
             </>
           )}
           
