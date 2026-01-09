@@ -123,21 +123,12 @@ export function HubFloatingDock() {
             onClick={() => handleNavigate('/discover', true)}
           />
 
-          {/* Center orange glass camera button */}
-          <button
-            className="h-14 w-14 rounded-full flex items-center justify-center -mt-3 transition-transform active:scale-95"
-            style={{
-              background: 'radial-gradient(circle at 30% 25%, rgba(255, 170, 90, 0.85), rgba(255, 120, 40, 0.55))',
-              border: '1px solid rgba(255, 255, 255, 0.45)',
-              boxShadow: '0 14px 30px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-            }}
+          {/* Center camera icon - same style as other dock items */}
+          <DockItem 
+            icon={Camera} 
+            label="Moment" 
             onClick={handleCreateMoment}
-            aria-label="Create Moment"
-          >
-            <Camera className="h-5 w-5" style={{ color: 'var(--hub-primary-text)' }} strokeWidth={2} />
-          </button>
+          />
 
           {/* Right items: Create Game, Profile */}
           <DockItem 
