@@ -1,10 +1,10 @@
 /**
- * YourGamesGradientCTA - Full-width gradient "Your Games and Trips" diary card
- * Shows 2 items max (1 game + 1 trip preferred) with summary pill
+ * YourGamesGradientCTA V2 - Premium "Your Games and Trips" diary card
+ * V2 itinerary list style, View all pill button, dashed footer
  */
 
 import React, { useState } from 'react';
-import { Calendar, MapPin, Plane, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, Plane, ChevronRight, Plus } from 'lucide-react';
 import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
@@ -23,14 +23,11 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
     setGamesHubOpen(true);
   };
 
-  // Get diary items from demo config or empty array
   const allItems = HUB_DEMO_MODE ? MOCK_DIARY_ITEMS : [];
   
-  // Separate games and trips
   const games = allItems.filter(item => item.type === 'game');
   const trips = allItems.filter(item => item.type === 'trip');
   
-  // Pick 2 items: prefer 1 game + 1 trip if both exist
   const displayItems: typeof allItems = [];
   if (games.length > 0 && trips.length > 0) {
     displayItems.push(games[0], trips[0]);
@@ -39,17 +36,14 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
   } else if (trips.length >= 2) {
     displayItems.push(trips[0], trips[1]);
   } else {
-    // Less than 2 total items
     displayItems.push(...games.slice(0, 1), ...trips.slice(0, 1));
   }
   
-  // Calculate remaining counts
   const shownGames = displayItems.filter(i => i.type === 'game').length;
   const shownTrips = displayItems.filter(i => i.type === 'trip').length;
   const moreGames = games.length - shownGames;
   const moreTrips = trips.length - shownTrips;
   
-  // Build summary text
   let summaryText = '';
   if (moreGames > 0 && moreTrips > 0) {
     summaryText = `+${moreGames} game${moreGames > 1 ? 's' : ''} and ${moreTrips} trip${moreTrips > 1 ? 's' : ''} to come`;
@@ -59,74 +53,88 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
     summaryText = `+${moreTrips} more trip${moreTrips > 1 ? 's' : ''} to come`;
   }
 
+  const hasItems = displayItems.length > 0;
+
   return (
     <>
       <button
         onClick={openYourGames}
-        className={`w-full rounded-[22px] overflow-hidden relative flex flex-col transition-all active:scale-[0.98] mb-3 ${className || ''}`}
+        className={`w-full rounded-[18px] overflow-hidden relative flex flex-col transition-all duration-150 active:scale-[0.99] mb-3 ${className || ''}`}
         style={{
-          background: `
-            radial-gradient(800px 200px at 10% 0%, rgba(255, 140, 60, 0.14), transparent 50%),
-            linear-gradient(135deg, rgba(255, 140, 60, 0.08), rgba(255, 180, 100, 0.03))
-          `,
-          border: '1px solid rgba(255, 255, 255, 0.5)',
-          boxShadow: '0 8px 24px rgba(255, 140, 60, 0.06), 0 4px 12px rgba(0,0,0,0.04)',
+          background: 'var(--hub-card)',
+          border: '1px solid var(--hub-card-border)',
+          boxShadow: 'var(--hub-shadow-tile)',
           minHeight: '90px',
         }}
       >
-        {/* Fixed header row */}
-        <div className="flex items-center gap-3 px-4 pt-3 pb-2 flex-shrink-0">
+        {/* Subtle warm gradient overlay at top */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(600px 150px at 10% 0%, rgba(255, 140, 60, 0.06), transparent 50%)',
+          }}
+        />
+
+        {/* Header row */}
+        <div className="flex items-center gap-3 px-4 pt-3.5 pb-2 flex-shrink-0 relative z-10">
+          {/* V2 Icon - rounded square */}
           <div 
-            className="h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0"
+            className="h-8 w-8 rounded-[10px] flex items-center justify-center flex-shrink-0"
             style={{ 
-              background: 'linear-gradient(135deg, rgba(255, 140, 60, 0.18) 0%, rgba(255, 160, 90, 0.12) 100%)',
-              border: '1px solid rgba(255, 140, 60, 0.15)',
+              background: 'linear-gradient(135deg, rgba(255, 140, 60, 0.12) 0%, rgba(255, 160, 90, 0.08) 100%)',
             }}
           >
-            <Calendar className="h-3.5 w-3.5" style={{ color: 'rgba(180, 90, 30, 0.9)' }} />
+            <Calendar className="h-3.5 w-3.5" style={{ color: '#D97706' }} />
           </div>
           
           <div className="flex-1 text-left min-w-0">
             <div 
-              className="text-[15px] font-extrabold"
+              className="text-[14px] font-semibold"
               style={{ color: 'var(--hub-text)' }}
             >
               Your Games and Trips
             </div>
           </div>
 
-          {/* View all affordance */}
-          <div className="flex items-center gap-0.5" style={{ color: 'var(--hub-text-muted)' }}>
-            <span className="text-[11px]">View all</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+          {/* V2 View all pill button */}
+          <div 
+            className="flex items-center gap-0.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+            style={{ 
+              background: 'var(--hub-surface)',
+              border: '1px solid var(--hub-stroke)',
+              color: 'var(--hub-text-dim)',
+            }}
+          >
+            View all
+            <ChevronRight className="w-3 h-3" />
           </div>
         </div>
 
-        {/* Diary entries - 2 items max */}
-        <div className="px-4 pb-2 flex flex-col gap-2">
-          {displayItems.length > 0 ? (
+        {/* Diary entries */}
+        <div className="px-4 pb-2 flex flex-col gap-1.5 relative z-10">
+          {hasItems ? (
             displayItems.map((item, idx) => (
               <div 
                 key={idx}
-                className="flex items-center gap-2.5 py-2 px-3 rounded-xl"
+                className="flex items-center gap-2.5 py-2 px-3 rounded-[12px]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.5)',
-                  border: '1px solid rgba(255, 255, 255, 0.6)',
+                  background: 'rgba(255, 255, 255, 0.75)',
+                  border: '1px solid rgba(255, 255, 255, 0.5)',
                 }}
               >
-                {/* Icon in circular background */}
+                {/* V2 Icon badge */}
                 <div 
-                  className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-6 h-6 rounded-[8px] flex items-center justify-center flex-shrink-0"
                   style={{ 
                     background: item.type === 'game' 
-                      ? 'rgba(16, 185, 129, 0.12)' 
+                      ? 'var(--hub-badge-green-bg)' 
                       : 'rgba(59, 130, 246, 0.12)',
                   }}
                 >
                   {item.type === 'game' ? (
                     <MapPin 
                       className="w-3 h-3" 
-                      style={{ color: '#10B981' }} 
+                      style={{ color: 'var(--hub-badge-green-text)' }} 
                     />
                   ) : (
                     <Plane 
@@ -136,15 +144,13 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
                   )}
                 </div>
                 
-                {/* Primary text - bold */}
                 <span 
-                  className="text-[13px] font-semibold line-clamp-1 flex-1"
+                  className="text-[13px] font-medium line-clamp-1 flex-1"
                   style={{ color: 'var(--hub-text)' }}
                 >
                   {item.title}
                 </span>
                 
-                {/* Subtitle - lighter and smaller */}
                 <span 
                   className="text-[11px] flex-shrink-0 whitespace-nowrap"
                   style={{ color: 'var(--hub-text-muted)' }}
@@ -163,18 +169,32 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           )}
         </div>
         
-        {/* Summary pill - only show if there are more items */}
-        {summaryText && (
-          <div className="px-4 pb-3 flex justify-center">
+        {/* V2 Summary - dashed pill (like "Add another course") */}
+        {summaryText ? (
+          <div className="px-4 pb-3 flex justify-center relative z-10">
             <div 
               className="text-[11px] px-3 py-1 rounded-full line-clamp-1"
               style={{
-                background: 'rgba(255, 255, 255, 0.4)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
-                color: 'var(--hub-text-muted)',
+                background: 'transparent',
+                border: '1px dashed var(--hub-stroke-mid)',
+                color: 'var(--hub-text-dim)',
               }}
             >
               {summaryText}
+            </div>
+          </div>
+        ) : !hasItems && (
+          <div className="px-4 pb-3 flex justify-center relative z-10">
+            <div 
+              className="flex items-center gap-1 text-[11px] px-3 py-1 rounded-full"
+              style={{
+                background: 'transparent',
+                border: '1px dashed var(--hub-stroke-mid)',
+                color: 'var(--hub-text-dim)',
+              }}
+            >
+              <Plus className="w-3 h-3" />
+              Add a game or trip
             </div>
           </div>
         )}

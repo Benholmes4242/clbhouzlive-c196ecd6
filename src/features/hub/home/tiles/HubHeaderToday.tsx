@@ -1,6 +1,6 @@
 /**
- * HubHeaderToday - Thicker greeting with right circle button
- * No subtitle - just the greeting
+ * HubHeaderToday V2 - Premium greeting with V2 pill-style home button
+ * Tighter spacing, responsive sizing
  */
 
 import React from 'react';
@@ -39,32 +39,32 @@ export function HubHeaderToday() {
   };
 
   return (
-    <header>
+    <header className="pt-1 pb-1">
       <div className="flex items-center justify-between gap-3">
-        {/* Greeting - responsive sizing, allows wrap for long names */}
+        {/* Greeting - V2 responsive sizing with tighter tracking */}
         <h1 
-          className="font-extrabold leading-[1.05] tracking-[-0.02em]"
+          className="font-semibold leading-[1.1] tracking-tight truncate"
           style={{ 
             color: 'var(--hub-text)',
-            fontSize: 'clamp(22px, 5.6vw, 32px)',
-            maxWidth: '80%',
+            fontSize: 'clamp(18px, 5vw, 22px)',
+            maxWidth: '75%',
           }}
         >
           {greeting}, {firstName}
         </h1>
 
-        {/* Right circle button */}
+        {/* V2 Pill-style home button - soft surface + subtle border + shadow */}
         <button
-          className="h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center transition-all active:scale-95"
+          className="h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center transition-all duration-150 active:scale-[0.97]"
           style={{
-            background: 'rgba(255, 255, 255, 0.85)',
-            border: '1px solid rgba(0, 0, 0, 0.06)',
-            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.10)',
+            background: 'var(--hub-surface)',
+            border: '1px solid var(--hub-stroke)',
+            boxShadow: 'var(--hub-shadow-soft)',
           }}
           onClick={handleHomeAction}
           aria-label="Home"
         >
-          <Home className="h-5 w-5" style={{ color: 'var(--hub-text)' }} />
+          <Home className="h-[18px] w-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
         </button>
       </div>
     </header>

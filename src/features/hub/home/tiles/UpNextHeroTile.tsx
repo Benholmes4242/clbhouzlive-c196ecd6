@@ -1,6 +1,6 @@
 /**
- * UpNextHeroTile - "What's Up Next" Hero Card
- * Supports Game, Trip, and Fallback variants with carousel
+ * UpNextHeroTile V2 - Premium "What's Up Next" Hero Card
+ * Stronger shadow, bottom fade gradient, glass pill badge
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
@@ -12,10 +12,7 @@ import { SlotsPill } from '@/features/nearby/components/your-games/SlotsPill';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 
-// Carousel auto-rotate interval (ms)
 const CAROUSEL_INTERVAL = 4500;
-
-// Fallback hero image
 const FALLBACK_HERO = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop&q=80';
 
 function formatGameDate(isoDate: string): string {
@@ -31,87 +28,112 @@ function formatTripDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'd')}–${format(end, 'd MMM')}`;
 }
 
-// =========================================
+// V2 Glass icon chip - top left
+function IconChip({ icon: Icon }: { icon: typeof MapPin }) {
+  return (
+    <div 
+      className="h-8 w-8 rounded-full flex items-center justify-center"
+      style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      }}
+    >
+      <Icon className="w-4 h-4 text-slate-700" />
+    </div>
+  );
+}
+
+// V2 Progress pill
+function ProgressPill({ text }: { text: string }) {
+  return (
+    <div
+      className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-semibold"
+      style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        color: 'var(--hub-text)',
+        border: '1px solid var(--hub-card-border)',
+      }}
+    >
+      {text}
+    </div>
+  );
+}
+
 // Game Variant
-// =========================================
 function GameHeroContent({ data }: { data: HeroGameData }) {
   return (
-    <div className="absolute left-4 top-4 right-4 text-white">
-      <div className="flex items-start gap-2">
-        <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
-        <div>
-          <div className="text-[22px] font-extrabold leading-tight line-clamp-1">
-            {data.courseName}
-          </div>
-          <div className="text-[15px] font-medium mt-1 opacity-95">
-            {formatGameDate(data.startTimeISO)}
-          </div>
-          <SlotsPill 
-            slotsOpen={data.slotsOpen} 
-            slotsTotal={data.slotsTotal}
-            className="mt-2"
-          />
+    <>
+      <div className="absolute left-4 top-4">
+        <IconChip icon={MapPin} />
+      </div>
+      <div className="absolute left-4 bottom-4 right-4 text-white">
+        <div className="text-[20px] font-bold leading-tight line-clamp-1 drop-shadow-sm">
+          {data.courseName}
+        </div>
+        <div className="text-[14px] font-medium mt-1 opacity-95 drop-shadow-sm">
+          {formatGameDate(data.startTimeISO)}
+        </div>
+        <div className="mt-2">
+          <ProgressPill text={`${data.slotsTotal - data.slotsOpen}/${data.slotsTotal}`} />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
-// =========================================
 // Trip Variant
-// =========================================
 function TripHeroContent({ data }: { data: HeroTripData }) {
   return (
-    <div className="absolute left-4 top-4 right-4 text-white">
-      <div className="flex items-start gap-2">
-        <Plane className="w-5 h-5 mt-0.5 flex-shrink-0" />
-        <div>
-          <div className="text-[22px] font-extrabold leading-tight line-clamp-1">
-            {data.tripName}
-          </div>
-          <div className="text-[15px] font-medium mt-1 opacity-95">
-            {formatTripDateRange(data.startDate, data.endDate)}
-          </div>
-          {/* No player pill for trips */}
+    <>
+      <div className="absolute left-4 top-4">
+        <IconChip icon={Plane} />
+      </div>
+      <div className="absolute left-4 bottom-4 right-4 text-white">
+        <div className="text-[20px] font-bold leading-tight line-clamp-1 drop-shadow-sm">
+          {data.tripName}
+        </div>
+        <div className="text-[14px] font-medium mt-1 opacity-95 drop-shadow-sm">
+          {formatTripDateRange(data.startDate, data.endDate)}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
-// =========================================
 // Fallback Variant
-// =========================================
 function FallbackHeroContent({ data }: { data: HeroFallbackData }) {
   return (
-    <div className="absolute left-4 top-4 right-4 text-white">
-      <div>
-        <div className="text-[14px] font-semibold opacity-80 mb-1">
+    <>
+      <div className="absolute left-4 top-4">
+        <IconChip icon={MapPin} />
+      </div>
+      <div className="absolute left-4 bottom-4 right-4 text-white">
+        <div className="text-[12px] font-semibold opacity-80 mb-1 drop-shadow-sm">
           #{data.rank} Course in the World
         </div>
-        <div className="text-[22px] font-extrabold leading-tight line-clamp-1">
+        <div className="text-[20px] font-bold leading-tight line-clamp-1 drop-shadow-sm">
           {data.courseName}
         </div>
         {data.courseLocation && (
-          <div className="text-[14px] font-medium mt-1 opacity-90">
+          <div className="text-[13px] font-medium mt-1 opacity-90 drop-shadow-sm">
             {data.courseLocation}
           </div>
         )}
       </div>
-      {/* CTA overlay at bottom */}
       <div 
-        className="absolute bottom-4 left-4 right-4 text-center text-[13px] font-medium opacity-75"
+        className="absolute bottom-4 right-4 text-[12px] font-medium text-white/70"
         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
       >
-        Plan a game or golf trip to see it here.
+        Plan a game →
       </div>
-    </div>
+    </>
   );
 }
 
-// =========================================
 // Hero Card Slide
-// =========================================
 interface HeroSlideProps {
   data: HeroGameData | HeroTripData | HeroFallbackData;
   onClick: () => void;
@@ -161,11 +183,19 @@ function HeroSlide({ data, onClick, isActive }: HeroSlideProps) {
         />
       )}
 
-      {/* Gradient overlay */}
+      {/* V2 Bottom fade gradient */}
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)',
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%)',
+        }}
+      />
+      
+      {/* Left gradient for text readability */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 40%, transparent 70%)',
         }}
       />
 
@@ -177,9 +207,7 @@ function HeroSlide({ data, onClick, isActive }: HeroSlideProps) {
   );
 }
 
-// =========================================
 // Carousel Dots
-// =========================================
 function CarouselDots({ 
   count, 
   activeIndex, 
@@ -192,7 +220,7 @@ function CarouselDots({
   if (count <= 1) return null;
   
   return (
-    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-20">
+    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
       {Array.from({ length: count }).map((_, i) => (
         <button
           key={i}
@@ -202,9 +230,9 @@ function CarouselDots({
           }}
           className="rounded-full transition-all duration-300"
           style={{
-            width: i === activeIndex ? '12px' : '6px',
+            width: i === activeIndex ? '14px' : '6px',
             height: '6px',
-            background: i === activeIndex ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.4)',
+            background: i === activeIndex ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.45)',
           }}
           aria-label={`Go to slide ${i + 1}`}
         />
@@ -213,9 +241,7 @@ function CarouselDots({
   );
 }
 
-// =========================================
 // Main Component
-// =========================================
 export function UpNextHeroTile() {
   const { data: heroData, isLoading } = useHubHeroData();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -224,7 +250,6 @@ export function UpNextHeroTile() {
   const touchStartX = useRef<number | null>(null);
   const autoRotateTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Build slides array
   const slides = React.useMemo(() => {
     if (!heroData?.primary) return [];
     const arr = [heroData.primary];
@@ -232,7 +257,6 @@ export function UpNextHeroTile() {
     return arr;
   }, [heroData]);
 
-  // Auto-rotate carousel
   useEffect(() => {
     if (!heroData?.hasCarousel || slides.length <= 1) return;
 
@@ -251,7 +275,6 @@ export function UpNextHeroTile() {
     };
   }, [heroData?.hasCarousel, slides.length]);
 
-  // Reset auto-rotate on manual interaction
   const resetAutoRotate = useCallback(() => {
     if (autoRotateTimer.current) {
       clearInterval(autoRotateTimer.current);
@@ -261,7 +284,6 @@ export function UpNextHeroTile() {
     }
   }, [slides.length]);
 
-  // Handle swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -274,10 +296,8 @@ export function UpNextHeroTile() {
     
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
-        // Swipe left - next
         setActiveIndex(prev => (prev + 1) % slides.length);
       } else {
-        // Swipe right - prev
         setActiveIndex(prev => (prev - 1 + slides.length) % slides.length);
       }
       resetAutoRotate();
@@ -296,11 +316,9 @@ export function UpNextHeroTile() {
       setGamesHubInitialTab('yours');
       setGamesHubOpen(true);
     } else if (currentSlide.type === 'trip') {
-      // TODO: Open trip details when trips feature exists
       setGamesHubInitialTab('yours');
       setGamesHubOpen(true);
     } else if (currentSlide.type === 'fallback') {
-      // Open create game modal
       setGamesHubInitialTab('discover');
       setGamesHubOpen(true);
     }
@@ -311,13 +329,13 @@ export function UpNextHeroTile() {
     resetAutoRotate();
   };
 
-  // Loading skeleton
   if (isLoading) {
     return (
       <div 
-        className="relative rounded-[26px] overflow-hidden"
+        className="relative overflow-hidden"
         style={{
           height: '150px',
+          borderRadius: 'var(--hub-radius-xl)',
           background: 'var(--hub-skeleton-base)',
         }}
       >
@@ -326,7 +344,6 @@ export function UpNextHeroTile() {
     );
   }
 
-  // No data at all (shouldn't happen with fallback)
   if (slides.length === 0) {
     return null;
   }
@@ -334,10 +351,11 @@ export function UpNextHeroTile() {
   return (
     <>
       <div 
-        className="relative w-full rounded-[26px] overflow-hidden"
+        className="relative w-full overflow-hidden transition-shadow duration-200"
         style={{
           height: '150px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+          borderRadius: 'var(--hub-radius-xl)',
+          boxShadow: 'var(--hub-shadow-hero)',
         }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -351,7 +369,6 @@ export function UpNextHeroTile() {
           />
         ))}
 
-        {/* Carousel dots */}
         <CarouselDots 
           count={slides.length} 
           activeIndex={activeIndex} 

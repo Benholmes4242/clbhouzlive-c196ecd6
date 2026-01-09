@@ -1,15 +1,14 @@
 /**
- * HubMessagesCard - Compact Messages Tile
- * Shorter height, cleaner layout matching Golf OS mock
+ * HubMessagesCard V2 - Premium tapable row
+ * Soft warm badge, subtle press state
  */
 
 import React, { useState } from 'react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, ChevronRight } from 'lucide-react';
 import { HubMessagesSheet } from '../../components/HubMessagesSheet';
 import { haptic } from '@/utils/haptics';
 import { HUB_DEMO_MODE, MOCK_MESSAGES } from '../hubDemoConfig';
 
-// Hook for messages data - uses demo data when flag is on
 const useMessagesData = () => {
   if (HUB_DEMO_MODE) {
     return {
@@ -20,7 +19,6 @@ const useMessagesData = () => {
     };
   }
   
-  // Real data - currently empty
   return {
     unreadCount: 0,
     groupChatsCount: 0,
@@ -50,44 +48,29 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
     <>
       <button 
         onClick={openSheet}
-        className={`w-full rounded-[22px] p-3 text-left transition-all active:scale-[0.98] relative ${className || ''}`}
+        className={`w-full rounded-[18px] p-3.5 text-left transition-all duration-150 active:scale-[0.99] relative ${className || ''}`}
         style={{
-          background: 'var(--hub-glass-bg)',
-          border: '1px solid var(--hub-stroke)',
+          background: 'var(--hub-card)',
+          border: '1px solid var(--hub-card-border)',
           boxShadow: 'var(--hub-shadow-tile)',
-          minHeight: '64px',
+          minHeight: '60px',
         }}
       >
-        {/* Orange badge - top right - consistent with Active Games badge */}
-        {hasMessages && (
-          <div 
-            className="absolute top-3 right-3 h-[18px] min-w-[18px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold"
-            style={{
-              background: 'rgba(247, 158, 27, 0.15)',
-              color: '#F79E1B',
-              border: '1px solid rgba(247, 158, 27, 0.3)',
-              boxShadow: '0 2px 8px rgba(247, 158, 27, 0.1)',
-            }}
-          >
-            {messages.unreadCount}
-          </div>
-        )}
-
         <div className="flex items-center gap-3">
-          {/* Icon bubble */}
+          {/* V2 Icon container - rounded square */}
           <div 
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'var(--hub-glass-bg-input)' }}
+            className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
+            style={{ background: 'var(--hub-surface-2)' }}
           >
             <MessageSquare 
-              className="w-4 h-4" 
+              className="w-[18px] h-[18px]" 
               style={{ color: 'var(--hub-text-dim)' }} 
             />
           </div>
           
-          <div className="flex-1 min-w-0 pr-6">
+          <div className="flex-1 min-w-0">
             <div 
-              className="text-[15px] font-extrabold"
+              className="text-[15px] font-semibold"
               style={{ color: 'var(--hub-text)' }}
             >
               Messages
@@ -109,6 +92,25 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
                 : 'Group chats, game invites, and messages.'}
             </div>
           </div>
+
+          {/* V2 Warm badge pill - not a harsh circle */}
+          {hasMessages ? (
+            <div 
+              className="h-6 min-w-[24px] px-2 rounded-full flex items-center justify-center text-[11px] font-bold"
+              style={{
+                background: 'var(--hub-badge-warm-bg)',
+                color: 'var(--hub-badge-warm-text)',
+                border: '1px solid var(--hub-badge-warm-border)',
+              }}
+            >
+              {messages.unreadCount}
+            </div>
+          ) : (
+            <ChevronRight 
+              className="w-4 h-4 flex-shrink-0" 
+              style={{ color: 'var(--hub-text-dimmer)' }} 
+            />
+          )}
         </div>
       </button>
       

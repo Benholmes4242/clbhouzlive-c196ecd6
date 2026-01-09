@@ -1,6 +1,6 @@
 /**
- * ActiveGamesNearYouTile - Compact tile for 2-up grid
- * Shows nearby game info with auto-rotating carousel when 2+ games
+ * ActiveGamesNearYouTile V2 - Premium tile for 2-up grid
+ * Matching heights, consistent radius, V2 icon styling
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -12,7 +12,7 @@ import { haptic } from '@/utils/haptics';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { HUB_DEMO_MODE, MOCK_NEARBY_GAMES } from '../hubDemoConfig';
 
-const CAROUSEL_INTERVAL = 4000; // 4 seconds
+const CAROUSEL_INTERVAL = 4000;
 
 function formatShortDate(isoDate: string): string {
   const date = new Date(isoDate);
@@ -28,16 +28,13 @@ export function ActiveGamesNearYouTile() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Use demo data when flag is on
   const allGames = HUB_DEMO_MODE ? MOCK_NEARBY_GAMES : realGames;
   const isLoading = HUB_DEMO_MODE ? false : realLoading;
   const gamesCount = allGames.length;
   const hasCarousel = gamesCount >= 2;
   
-  // Get the current game to display
   const nearbyGame = allGames[activeIndex] || allGames[0];
 
-  // Auto-rotate carousel
   const advanceCarousel = useCallback(() => {
     if (!hasCarousel) return;
     setIsTransitioning(true);
@@ -66,35 +63,42 @@ export function ActiveGamesNearYouTile() {
     <>
       <button
         onClick={openGamesHub}
-        className="w-full h-[140px] rounded-[22px] p-4 text-left transition-all active:scale-[0.98] flex flex-col relative overflow-hidden"
+        className="w-full h-[140px] rounded-[18px] p-4 text-left transition-all duration-150 active:scale-[0.99] flex flex-col relative overflow-hidden"
         style={{
-          background: 'var(--hub-glass-bg)',
-          border: '1px solid var(--hub-stroke)',
+          background: 'var(--hub-card)',
+          border: '1px solid var(--hub-card-border)',
           boxShadow: 'var(--hub-shadow-tile)',
         }}
       >
-        {/* Games count badge - top right - consistent size with Messages badge */}
+        {/* V2 Top icon - rounded square background */}
+        <div 
+          className="w-9 h-9 rounded-[10px] flex items-center justify-center mb-2"
+          style={{ background: 'var(--hub-badge-green-bg)' }}
+        >
+          <MapPin className="w-4 h-4" style={{ color: 'var(--hub-badge-green-text)' }} />
+        </div>
+
+        {/* Title */}
+        <div 
+          className="text-[14px] font-semibold leading-[1.2]"
+          style={{ color: 'var(--hub-text)' }}
+        >
+          Active Games<br/>Near You
+        </div>
+
+        {/* V2 Badge - top right */}
         {gamesCount > 0 && (
           <div 
-            className="absolute top-3 right-3 h-[18px] min-w-[18px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold z-10"
+            className="absolute top-3 right-3 h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold"
             style={{
-              background: 'rgba(16, 185, 129, 0.15)',
-              color: '#10B981',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)',
+              background: 'var(--hub-badge-green-bg)',
+              color: 'var(--hub-badge-green-text)',
+              border: '1px solid var(--hub-badge-green-border)',
             }}
           >
             {gamesCount}
           </div>
         )}
-
-        {/* Title - single line with line break */}
-        <div 
-          className="text-[15px] font-extrabold leading-[1.15]"
-          style={{ color: 'var(--hub-text)' }}
-        >
-          Active Games<br/>Near You
-        </div>
 
         <div className="mt-auto">
           {isLoading ? (
@@ -107,30 +111,28 @@ export function ActiveGamesNearYouTile() {
               className="transition-opacity duration-150"
               style={{ opacity: isTransitioning ? 0 : 1 }}
             >
-              {/* Course name - single line */}
+              {/* Course name */}
               <div 
-                className="text-[11px] leading-tight italic line-clamp-1"
+                className="text-[11px] leading-tight line-clamp-1"
                 style={{ color: 'var(--hub-text-dim)' }}
               >
                 {nearbyGame.course_name || 'Golf Course'}
               </div>
               
-              {/* Date/time - single line, tighter */}
+              {/* Date/time */}
               <div 
-                className="flex items-center gap-1 text-[11px] leading-tight mt-0.5"
-                style={{ color: 'var(--hub-text-dim)' }}
+                className="text-[11px] leading-tight mt-0.5"
+                style={{ color: 'var(--hub-text-dimmer)' }}
               >
-                <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
-                <span className="line-clamp-1">{formatShortDate(nearbyGame.start_time)}</span>
+                {formatShortDate(nearbyGame.start_time)}
               </div>
 
-              {/* Slots pill - pinned at bottom - emerald green */}
+              {/* V2 Slots mini-pill */}
               <div 
-                className="inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold mt-2"
+                className="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-1.5"
                 style={{
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  color: '#10B981',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  background: 'var(--hub-badge-green-bg)',
+                  color: 'var(--hub-badge-green-text)',
                 }}
               >
                 {slotsLabel}
@@ -146,7 +148,7 @@ export function ActiveGamesNearYouTile() {
           )}
         </div>
 
-        {/* Carousel dots - subtle, matching hero dot style */}
+        {/* Carousel dots */}
         {hasCarousel && (
           <div className="absolute bottom-3 right-3 flex gap-0.5">
             {allGames.map((_, idx) => (
@@ -156,7 +158,9 @@ export function ActiveGamesNearYouTile() {
                 style={{
                   width: idx === activeIndex ? '8px' : '4px',
                   height: '4px',
-                  background: idx === activeIndex ? '#10B981' : 'rgba(16, 185, 129, 0.25)',
+                  background: idx === activeIndex 
+                    ? 'var(--hub-badge-green-text)' 
+                    : 'var(--hub-badge-green-bg)',
                 }}
               />
             ))}
