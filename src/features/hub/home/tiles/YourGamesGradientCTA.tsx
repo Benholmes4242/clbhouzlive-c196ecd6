@@ -57,7 +57,7 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
             className="text-[13px] mt-0.5"
             style={{ color: 'var(--hub-text-muted)' }}
           >
-            Trips, matches, games, and getaways – your golf diary for every upcoming round.
+            Trips, matches, games, and getaways – your golf diary for everything ahead.
           </div>
         </div>
       </button>

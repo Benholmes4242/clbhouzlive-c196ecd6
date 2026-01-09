@@ -43,8 +43,8 @@ export function HubContentSkeleton() {
         <SkeletonCircle size="h-10 w-10" />
       </div>
 
-      {/* Hero tile skeleton */}
-      <SkeletonBlock className="h-[140px]" />
+      {/* Hero tile skeleton - matches 165px height */}
+      <SkeletonBlock className="h-[165px]" />
 
       {/* Messages card skeleton */}
       <div 

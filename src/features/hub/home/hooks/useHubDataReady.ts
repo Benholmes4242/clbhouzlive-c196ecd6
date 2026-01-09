@@ -3,17 +3,17 @@
  * Used to show skeleton vs real content
  */
 
-import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useHubHeroData } from './useHubHeroData';
 
 export function useHubDataReady(): boolean {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { isLoading: profileLoading } = useUserProfile(user?.id);
-  const { isLoading: gamesLoading } = useGamesQuery();
+  const { isLoading: heroLoading } = useHubHeroData();
   
-  // Ready when session + profile have loaded (games can load async)
-  const isReady = !sessionLoading && !profileLoading;
+  // Ready when session + profile + hero data have loaded
+  const isReady = !sessionLoading && !profileLoading && !heroLoading;
   
   return isReady;
 }
