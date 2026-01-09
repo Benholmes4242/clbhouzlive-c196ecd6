@@ -113,130 +113,159 @@ interface TierVisualConfig {
   hasAnimatedBorder: boolean;
   hasParticles: boolean;
   animationSpeed: number;
+  // Unique effect type for each tier
+  effectType: 'sunrise' | 'mist' | 'shimmer' | 'ember' | 'obsidian' | 'aurora' | 'crystal' | 'nebula' | 'divine' | 'emerald' | 'royal' | 'crimson' | 'cosmic';
 }
 
 // Base tier configs - stable references
 const ENTRY_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.12, hasAnimatedBorder: false, hasParticles: false, animationSpeed: 0,
-  titleColor: '#E8E6E1', clubLabelColor: '#C9A94A', descriptorColor: '#9CA3AF',
+  glowIntensity: 0.2, hasAnimatedBorder: false, hasParticles: false, animationSpeed: 0,
+  titleColor: '#F5F5F0', clubLabelColor: '#E8DCC8', descriptorColor: '#A0A0A0',
 };
 
 const PROGRESSION_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.2, hasAnimatedBorder: true, hasParticles: false, animationSpeed: 12,
-  titleColor: '#F5F5F0', clubLabelColor: '#D4AF37', descriptorColor: '#A1A7B0',
+  glowIntensity: 0.3, hasAnimatedBorder: true, hasParticles: false, animationSpeed: 12,
+  titleColor: '#FFFFFF', clubLabelColor: '#FFE4A0', descriptorColor: '#B0B0B0',
 };
 
 const ELITE_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.28, hasAnimatedBorder: true, hasParticles: true, animationSpeed: 10,
-  titleColor: '#FFFFFF', clubLabelColor: '#E5C158', descriptorColor: '#B8BFC8',
+  glowIntensity: 0.4, hasAnimatedBorder: true, hasParticles: true, animationSpeed: 10,
+  titleColor: '#FFFFFF', clubLabelColor: '#A8E6CF', descriptorColor: '#C0C0C0',
 };
 
 const LEGENDARY_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.35, hasAnimatedBorder: true, hasParticles: true, animationSpeed: 8,
-  titleColor: '#FFFFFF', clubLabelColor: '#F0D264', descriptorColor: '#C8CED6',
+  glowIntensity: 0.5, hasAnimatedBorder: true, hasParticles: true, animationSpeed: 8,
+  titleColor: '#FFFFFF', clubLabelColor: '#FFD700', descriptorColor: '#D0D0D0',
 };
 
-// Milestone tier configs - memoized at module level
+// Milestone tier configs - LIGHTER, MORE VIBRANT, UNIQUE THEMES
 const MILESTONE_CONFIGS: Record<number, TierVisualConfig> = {
+  // 5 CLUB - Warm Sunrise: Copper/peach tones, hopeful morning light
   5: {
     ...ENTRY_BASE as TierVisualConfig,
-    badgeGradient: 'linear-gradient(145deg, #9B8B72 0%, #7A6A55 50%, #5A4A38 100%)',
-    badgeGlow: 'rgba(155, 139, 114, 0.35)', badgeTextColor: '#E8DCC8', badgeBorderColor: '#B09070',
-    cardBg: 'linear-gradient(135deg, #1C1915 0%, #242220 50%, #1A1816 100%)',
-    cardBorder: 'linear-gradient(135deg, #9B8B72 0%, #7A6A55 100%)', cardGlow: 'rgba(155, 139, 114, 0.15)',
+    effectType: 'sunrise',
+    badgeGradient: 'linear-gradient(145deg, #D4A574 0%, #C08050 50%, #A06030 100%)',
+    badgeGlow: 'rgba(220, 160, 100, 0.6)', badgeTextColor: '#FFF5E8', badgeBorderColor: '#E8B080',
+    cardBg: 'linear-gradient(135deg, #2A2420 0%, #352D28 50%, #3D332C 100%)',
+    cardBorder: 'linear-gradient(135deg, #E8B080 0%, #C08050 100%)', cardGlow: 'rgba(220, 160, 100, 0.35)',
   },
+  // 10 CLUB - Cool Mist: Clean silver with morning dew/mist feel
   10: {
     ...ENTRY_BASE as TierVisualConfig,
-    badgeGradient: 'linear-gradient(145deg, #B8B8B8 0%, #909090 50%, #707070 100%)',
-    badgeGlow: 'rgba(184, 184, 184, 0.35)', badgeTextColor: '#F0F0F0', badgeBorderColor: '#C0C0C0',
-    cardBg: 'linear-gradient(135deg, #1A1A1C 0%, #222226 50%, #18181A 100%)',
-    cardBorder: 'linear-gradient(135deg, #B8B8B8 0%, #808080 100%)', cardGlow: 'rgba(184, 184, 184, 0.15)',
+    effectType: 'mist',
+    badgeGradient: 'linear-gradient(145deg, #C8D0D8 0%, #A8B4C0 50%, #8898A8 100%)',
+    badgeGlow: 'rgba(180, 200, 220, 0.6)', badgeTextColor: '#FFFFFF', badgeBorderColor: '#B8C8D8',
+    cardBg: 'linear-gradient(135deg, #1E2428 0%, #2A3238 50%, #323C44 100%)',
+    cardBorder: 'linear-gradient(135deg, #B8C8D8 0%, #8898A8 100%)', cardGlow: 'rgba(180, 200, 220, 0.35)',
   },
+  // 20 CLUB - Golden Shimmer: Rich champagne gold, elegant
   20: {
-    ...ENTRY_BASE as TierVisualConfig, glowIntensity: 0.15,
-    badgeGradient: 'linear-gradient(145deg, #E5C158 0%, #D4AF37 50%, #B89B28 100%)',
-    badgeGlow: 'rgba(229, 193, 88, 0.4)', badgeTextColor: '#FFFAE0', badgeBorderColor: '#F0D264',
-    cardBg: 'linear-gradient(135deg, #1C1A15 0%, #252318 50%, #1A1815 100%)',
-    cardBorder: 'linear-gradient(135deg, #E5C158 0%, #B89B28 100%)', cardGlow: 'rgba(229, 193, 88, 0.18)',
+    ...ENTRY_BASE as TierVisualConfig, glowIntensity: 0.25,
+    effectType: 'shimmer',
+    badgeGradient: 'linear-gradient(145deg, #F0D890 0%, #E5C158 50%, #D4AF37 100%)',
+    badgeGlow: 'rgba(240, 210, 120, 0.65)', badgeTextColor: '#FFFAE0', badgeBorderColor: '#F5D870',
+    cardBg: 'linear-gradient(135deg, #282418 0%, #342C1E 50%, #3C3424 100%)',
+    cardBorder: 'linear-gradient(135deg, #F5D870 0%, #D4AF37 100%)', cardGlow: 'rgba(240, 210, 120, 0.4)',
   },
+  // 50 CLUB - Warm Ember: Deep amber/whiskey with firelight
   50: {
     ...PROGRESSION_BASE as TierVisualConfig,
-    badgeGradient: 'linear-gradient(145deg, #FFD700 0%, #E5B800 50%, #CC9F00 100%)',
-    badgeGlow: 'rgba(255, 215, 0, 0.45)', badgeTextColor: '#FFFAE0', badgeBorderColor: '#FFE55C',
-    cardBg: 'linear-gradient(135deg, #1A1814 0%, #222016 50%, #181612 100%)',
-    cardBorder: 'linear-gradient(135deg, #FFD700 0%, #CC9F00 100%)', cardGlow: 'rgba(255, 215, 0, 0.22)',
+    effectType: 'ember',
+    badgeGradient: 'linear-gradient(145deg, #FFB347 0%, #FF8C00 50%, #E07000 100%)',
+    badgeGlow: 'rgba(255, 160, 60, 0.7)', badgeTextColor: '#FFF8E0', badgeBorderColor: '#FFB040',
+    cardBg: 'linear-gradient(135deg, #2C2018 0%, #3A2A1E 50%, #443222 100%)',
+    cardBorder: 'linear-gradient(135deg, #FFB040 0%, #E07000 100%)', cardGlow: 'rgba(255, 160, 60, 0.45)',
   },
+  // 100 CLUB - Obsidian Prestige: Sleek black & gold, premium contrast
   100: {
-    ...PROGRESSION_BASE as TierVisualConfig, glowIntensity: 0.25,
-    badgeGradient: 'linear-gradient(145deg, #1A1A1A 0%, #2D2D2D 50%, #0F0F0F 100%)',
-    badgeGlow: 'rgba(212, 175, 55, 0.45)', badgeTextColor: '#D4AF37', badgeBorderColor: '#D4AF37',
-    cardBg: 'linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 50%, #0A0A0A 100%)',
-    cardBorder: 'linear-gradient(135deg, #D4AF37 0%, #8B7355 100%)', cardGlow: 'rgba(212, 175, 55, 0.25)',
+    ...PROGRESSION_BASE as TierVisualConfig, glowIntensity: 0.35,
+    effectType: 'obsidian',
+    badgeGradient: 'linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 50%, #0A0A0A 100%)',
+    badgeGlow: 'rgba(212, 175, 55, 0.7)', badgeTextColor: '#FFD700', badgeBorderColor: '#D4AF37',
+    cardBg: 'linear-gradient(135deg, #151515 0%, #1E1E1E 50%, #252525 100%)',
+    cardBorder: 'linear-gradient(135deg, #D4AF37 0%, #AA8822 50%, #D4AF37 100%)', cardGlow: 'rgba(212, 175, 55, 0.5)',
   },
+  // 150 CLUB - Aurora Emerald: Northern lights with emerald green
   150: {
     ...ELITE_BASE as TierVisualConfig,
-    badgeGradient: 'linear-gradient(145deg, #0D2820 0%, #143830 50%, #0A1C18 100%)',
-    badgeGlow: 'rgba(34, 197, 94, 0.5)', badgeTextColor: '#A8E6CF', badgeBorderColor: '#22C55E',
-    cardBg: 'linear-gradient(135deg, #0A1510 0%, #0F251A 50%, #081210 100%)',
-    cardBorder: 'linear-gradient(135deg, #22C55E 0%, #D4AF37 100%)', cardGlow: 'rgba(34, 197, 94, 0.3)',
+    effectType: 'aurora',
+    badgeGradient: 'linear-gradient(145deg, #50C878 0%, #2E8B57 50%, #228B22 100%)',
+    badgeGlow: 'rgba(80, 200, 120, 0.75)', badgeTextColor: '#E0FFE8', badgeBorderColor: '#60D880',
+    cardBg: 'linear-gradient(135deg, #0E1F18 0%, #162820 50%, #1E3428 100%)',
+    cardBorder: 'linear-gradient(135deg, #60D880 0%, #2E8B57 100%)', cardGlow: 'rgba(80, 200, 120, 0.5)',
   },
+  // 200 CLUB - Crystal Sapphire: Ice blue with crystalline shimmer
   200: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.32,
-    badgeGradient: 'linear-gradient(145deg, #0D1830 0%, #152848 50%, #0A1020 100%)',
-    badgeGlow: 'rgba(59, 130, 246, 0.5)', badgeTextColor: '#93C5FD', badgeBorderColor: '#3B82F6',
-    cardBg: 'linear-gradient(135deg, #0A0F18 0%, #101828 50%, #080C14 100%)',
-    cardBorder: 'linear-gradient(135deg, #3B82F6 0%, #D4AF37 100%)', cardGlow: 'rgba(59, 130, 246, 0.3)',
+    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.45,
+    effectType: 'crystal',
+    badgeGradient: 'linear-gradient(145deg, #60A0E0 0%, #3080D0 50%, #2060A0 100%)',
+    badgeGlow: 'rgba(100, 160, 240, 0.75)', badgeTextColor: '#E8F4FF', badgeBorderColor: '#70B0F0',
+    cardBg: 'linear-gradient(135deg, #101828 0%, #182030 50%, #202838 100%)',
+    cardBorder: 'linear-gradient(135deg, #70B0F0 0%, #3080D0 100%)', cardGlow: 'rgba(100, 160, 240, 0.5)',
   },
+  // 300 CLUB - Royal Nebula: Deep purple with cosmic energy
   300: {
     ...LEGENDARY_BASE as TierVisualConfig,
-    badgeGradient: 'linear-gradient(145deg, #E5C158 0%, #D4AF37 50%, #C5A028 100%)',
-    badgeGlow: 'rgba(229, 193, 88, 0.55)', badgeTextColor: '#FFFAE0', badgeBorderColor: '#F0D264',
-    cardBg: 'linear-gradient(135deg, #141210 0%, #1E1A16 50%, #100E0C 100%)',
-    cardBorder: 'linear-gradient(135deg, #E5C158 0%, #F0D264 100%)', cardGlow: 'rgba(229, 193, 88, 0.35)',
+    effectType: 'nebula',
+    badgeGradient: 'linear-gradient(145deg, #B060D0 0%, #8040A0 50%, #602080 100%)',
+    badgeGlow: 'rgba(160, 100, 200, 0.8)', badgeTextColor: '#F8E8FF', badgeBorderColor: '#C080E0',
+    cardBg: 'linear-gradient(135deg, #1A1020 0%, #241830 50%, #2E2040 100%)',
+    cardBorder: 'linear-gradient(135deg, #C080E0 0%, #8040A0 100%)', cardGlow: 'rgba(160, 100, 200, 0.55)',
   },
+  // 400 CLUB - Divine Gold: Pure radiant gold with heavenly light
   400: {
-    ...LEGENDARY_BASE as TierVisualConfig, glowIntensity: 0.4,
-    badgeGradient: 'linear-gradient(145deg, #F0E0B0 0%, #E5C158 30%, #D4AF37 70%, #E5C158 100%)',
-    badgeGlow: 'rgba(240, 224, 176, 0.6)', badgeTextColor: '#FFF8E8', badgeBorderColor: '#F5E6C0',
-    cardBg: 'linear-gradient(135deg, #18140E 0%, #221C14 50%, #14100A 100%)',
-    cardBorder: 'linear-gradient(135deg, #F0E0B0 0%, #E5C158 50%, #F5E6C0 100%)', cardGlow: 'rgba(240, 224, 176, 0.4)',
+    ...LEGENDARY_BASE as TierVisualConfig, glowIntensity: 0.6,
+    effectType: 'divine',
+    badgeGradient: 'linear-gradient(145deg, #FFE878 0%, #FFD700 30%, #F0C000 70%, #FFD700 100%)',
+    badgeGlow: 'rgba(255, 220, 80, 0.85)', badgeTextColor: '#FFFEF0', badgeBorderColor: '#FFE040',
+    cardBg: 'linear-gradient(135deg, #1E1A0E 0%, #2A2414 50%, #342C1A 100%)',
+    cardBorder: 'linear-gradient(135deg, #FFE040 0%, #FFD700 50%, #FFE878 100%)', cardGlow: 'rgba(255, 220, 80, 0.6)',
   },
 };
 
-// Regional tier configs - first-class visual treatment matching milestone cards
+// Regional tier configs - unique themes for each region
 const REGIONAL_CONFIGS: Record<string, TierVisualConfig> = {
+  // GBI - Emerald Isle: Rich green with Celtic heritage feel
   GBI: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.25,
-    badgeGradient: 'linear-gradient(145deg, #0D2818 0%, #143820 50%, #0A1C10 100%)',
-    badgeGlow: 'rgba(74, 124, 89, 0.5)', badgeTextColor: '#A8D5B8', badgeBorderColor: '#4A7C59',
-    cardBg: 'linear-gradient(135deg, #0A1812 0%, #0F2518 50%, #081410 100%)',
-    cardBorder: 'linear-gradient(135deg, #4A7C59 0%, #3A6449 100%)', cardGlow: 'rgba(74, 124, 89, 0.28)',
+    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.4,
+    effectType: 'emerald',
+    badgeGradient: 'linear-gradient(145deg, #40A060 0%, #2E8B57 50%, #1E6040 100%)',
+    badgeGlow: 'rgba(60, 160, 90, 0.7)', badgeTextColor: '#E0FFE8', badgeBorderColor: '#50B070',
+    cardBg: 'linear-gradient(135deg, #0E1E14 0%, #162820 50%, #1E3428 100%)',
+    cardBorder: 'linear-gradient(135deg, #50B070 0%, #2E8B57 100%)', cardGlow: 'rgba(60, 160, 90, 0.45)',
   },
+  // EU - Royal Blue: Continental elegance with European flair
   EU: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.25,
-    badgeGradient: 'linear-gradient(145deg, #0D1838 0%, #152850 50%, #0A1028 100%)',
-    badgeGlow: 'rgba(91, 126, 192, 0.5)', badgeTextColor: '#B8C8E8', badgeBorderColor: '#5B7EC0',
-    cardBg: 'linear-gradient(135deg, #0A1018 0%, #101825 50%, #080C14 100%)',
-    cardBorder: 'linear-gradient(135deg, #5B7EC0 0%, #4A6AA0 100%)', cardGlow: 'rgba(91, 126, 192, 0.28)',
+    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.4,
+    effectType: 'royal',
+    badgeGradient: 'linear-gradient(145deg, #4080C0 0%, #2E5B9C 50%, #1E4080 100%)',
+    badgeGlow: 'rgba(80, 130, 200, 0.7)', badgeTextColor: '#E8F0FF', badgeBorderColor: '#5090D0',
+    cardBg: 'linear-gradient(135deg, #101820 0%, #182030 50%, #202838 100%)',
+    cardBorder: 'linear-gradient(135deg, #5090D0 0%, #2E5B9C 100%)', cardGlow: 'rgba(80, 130, 200, 0.45)',
   },
+  // USA - Crimson Spirit: Bold red with American confidence
   USA: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.25,
-    badgeGradient: 'linear-gradient(145deg, #301818 0%, #402828 50%, #200A0A 100%)',
-    badgeGlow: 'rgba(199, 91, 91, 0.5)', badgeTextColor: '#F0C0C0', badgeBorderColor: '#C75B5B',
-    cardBg: 'linear-gradient(135deg, #1A1012 0%, #251518 50%, #140A0C 100%)',
-    cardBorder: 'linear-gradient(135deg, #C75B5B 0%, #A04848 100%)', cardGlow: 'rgba(199, 91, 91, 0.28)',
+    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.4,
+    effectType: 'crimson',
+    badgeGradient: 'linear-gradient(145deg, #E04040 0%, #C02020 50%, #901010 100%)',
+    badgeGlow: 'rgba(220, 80, 80, 0.7)', badgeTextColor: '#FFE8E8', badgeBorderColor: '#E05050',
+    cardBg: 'linear-gradient(135deg, #201414 0%, #2C1A1A 50%, #382020 100%)',
+    cardBorder: 'linear-gradient(135deg, #E05050 0%, #C02020 100%)', cardGlow: 'rgba(220, 80, 80, 0.45)',
   },
+  // WORLD - Cosmic Infinity: Universal purple/gold with global prestige
   WORLD: {
-    ...LEGENDARY_BASE as TierVisualConfig, glowIntensity: 0.35,
-    badgeGradient: 'linear-gradient(145deg, #1A1838 0%, #282548 50%, #141028 100%)',
-    badgeGlow: 'rgba(122, 143, 192, 0.55)', badgeTextColor: '#D0D8F0', badgeBorderColor: '#7A8FC0',
-    cardBg: 'linear-gradient(135deg, #101018 0%, #181825 50%, #0C0C14 100%)',
-    cardBorder: 'linear-gradient(135deg, #7A8FC0 0%, #D4AF37 100%)', cardGlow: 'rgba(122, 143, 192, 0.35)',
+    ...LEGENDARY_BASE as TierVisualConfig, glowIntensity: 0.5,
+    effectType: 'cosmic',
+    badgeGradient: 'linear-gradient(145deg, #8060C0 0%, #6040A0 50%, #402080 100%)',
+    badgeGlow: 'rgba(130, 100, 200, 0.8)', badgeTextColor: '#F0E8FF', badgeBorderColor: '#9070D0',
+    cardBg: 'linear-gradient(135deg, #141020 0%, #1C1830 50%, #242040 100%)',
+    cardBorder: 'linear-gradient(135deg, #9070D0 0%, #FFD700 100%)', cardGlow: 'rgba(130, 100, 200, 0.55)',
   },
 };
 
 // Locked state config - desaturated 70%, badge hollow/etched, same layout
 const LOCKED_CONFIG: TierVisualConfig = {
+  effectType: 'mist',
   badgeGradient: 'linear-gradient(145deg, #3A3A40 0%, #252530 50%, #1A1A22 100%)',
   badgeGlow: 'rgba(80, 80, 95, 0.15)', badgeTextColor: '#5A5A68', badgeBorderColor: '#4A4A58',
   cardBg: 'linear-gradient(135deg, #151518 0%, #1E1E24 50%, #131316 100%)',
@@ -409,50 +438,217 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
       whileTap={animationsAllowed && onClick ? { scale: 0.99 } : {}}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
     >
-      {/* ═══ LUMINOUS BACKGROUND - Rich nebula with visible color ═══ */}
+      {/* ═══ UNIQUE BACKGROUND EFFECTS - Different for each tier ═══ */}
       {earned && !isGhost && (
         <>
-          {/* Primary color wash - gives the card its signature color */}
+          {/* Primary ambient glow - warm and inviting */}
           <div 
             className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
             style={{
               background: `
-                radial-gradient(ellipse 150% 100% at 15% 50%, ${config.badgeGlow} 0%, transparent 45%),
-                radial-gradient(ellipse 100% 120% at 85% 20%, ${config.cardGlow} 0%, transparent 35%)
+                radial-gradient(ellipse 140% 100% at 10% 50%, ${config.badgeGlow} 0%, transparent 50%),
+                radial-gradient(ellipse 100% 100% at 90% 30%, ${config.cardGlow} 0%, transparent 40%)
               `,
-              opacity: threshold >= 150 ? 0.6 : threshold >= 50 ? 0.45 : 0.35,
+              opacity: 0.7,
             }}
           />
           
-          {/* Light rays emanating from badge area */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-            style={{
-              background: `
-                linear-gradient(25deg, transparent 0%, ${config.badgeGlow}40 15%, transparent 30%),
-                linear-gradient(-15deg, transparent 0%, ${config.badgeGlow}30 20%, transparent 40%),
-                linear-gradient(45deg, transparent 0%, ${config.badgeGlow}20 10%, transparent 25%)
-              `,
-              opacity: threshold >= 150 ? 0.8 : threshold >= 50 ? 0.6 : 0.4,
-            }}
-          />
+          {/* SUNRISE effect - warm diagonal rays */}
+          {config.effectType === 'sunrise' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(135deg, rgba(255,200,150,0.3) 0%, transparent 40%),
+                  linear-gradient(160deg, rgba(255,180,100,0.2) 10%, transparent 50%)
+                `,
+              }}
+            />
+          )}
           
-          {/* Star dust particles - more visible */}
+          {/* MIST effect - soft horizontal layers */}
+          {config.effectType === 'mist' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(180deg, rgba(200,220,240,0.15) 0%, transparent 30%),
+                  linear-gradient(0deg, rgba(180,200,220,0.1) 0%, transparent 40%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* SHIMMER effect - diagonal golden streaks */}
+          {config.effectType === 'shimmer' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(120deg, transparent 20%, rgba(255,220,100,0.25) 40%, transparent 60%),
+                  linear-gradient(60deg, transparent 30%, rgba(255,200,80,0.15) 50%, transparent 70%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* EMBER effect - warm flickering glow */}
+          {config.effectType === 'ember' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 80% 60% at 20% 60%, rgba(255,120,40,0.35) 0%, transparent 50%),
+                  radial-gradient(ellipse 60% 80% at 70% 40%, rgba(255,80,20,0.2) 0%, transparent 40%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* OBSIDIAN effect - sleek black with gold edges */}
+          {config.effectType === 'obsidian' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(135deg, rgba(212,175,55,0.15) 0%, transparent 20%),
+                  linear-gradient(-45deg, rgba(212,175,55,0.15) 100%, transparent 80%),
+                  radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* AURORA effect - flowing green waves */}
+          {config.effectType === 'aurora' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(170deg, rgba(80,200,120,0.4) 0%, transparent 30%),
+                  linear-gradient(190deg, rgba(40,160,80,0.25) 20%, transparent 50%),
+                  linear-gradient(160deg, transparent 40%, rgba(60,180,100,0.2) 60%, transparent 80%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* CRYSTAL effect - icy blue facets */}
+          {config.effectType === 'crystal' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  linear-gradient(120deg, rgba(150,200,255,0.35) 0%, transparent 25%),
+                  linear-gradient(60deg, transparent 50%, rgba(100,180,255,0.25) 70%, transparent 85%),
+                  linear-gradient(180deg, rgba(180,220,255,0.15) 0%, transparent 40%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* NEBULA effect - cosmic purple swirls */}
+          {config.effectType === 'nebula' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 100% 80% at 30% 30%, rgba(160,100,200,0.4) 0%, transparent 40%),
+                  radial-gradient(ellipse 80% 100% at 70% 70%, rgba(120,80,180,0.3) 0%, transparent 40%),
+                  linear-gradient(45deg, rgba(200,120,255,0.15) 0%, transparent 50%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* DIVINE effect - heavenly golden rays */}
+          {config.effectType === 'divine' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 120% 80% at 20% 50%, rgba(255,220,80,0.5) 0%, transparent 40%),
+                  linear-gradient(30deg, transparent 0%, rgba(255,240,150,0.3) 20%, transparent 40%),
+                  linear-gradient(-20deg, transparent 0%, rgba(255,230,100,0.25) 15%, transparent 35%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* EMERALD effect - lush green depth */}
+          {config.effectType === 'emerald' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 100% 100% at 25% 50%, rgba(60,160,90,0.45) 0%, transparent 45%),
+                  linear-gradient(150deg, rgba(80,180,100,0.2) 0%, transparent 40%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* ROYAL effect - majestic blue elegance */}
+          {config.effectType === 'royal' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 100% 100% at 25% 50%, rgba(80,130,200,0.45) 0%, transparent 45%),
+                  linear-gradient(135deg, rgba(100,150,220,0.2) 0%, transparent 30%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* CRIMSON effect - bold red power */}
+          {config.effectType === 'crimson' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 100% 100% at 25% 50%, rgba(220,80,80,0.45) 0%, transparent 45%),
+                  linear-gradient(160deg, rgba(200,60,60,0.2) 0%, transparent 40%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* COSMIC effect - universal purple/gold fusion */}
+          {config.effectType === 'cosmic' && (
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+              style={{
+                background: `
+                  radial-gradient(ellipse 100% 80% at 30% 40%, rgba(130,100,200,0.45) 0%, transparent 40%),
+                  radial-gradient(ellipse 60% 60% at 75% 60%, rgba(255,200,60,0.25) 0%, transparent 35%),
+                  linear-gradient(45deg, rgba(160,120,220,0.15) 0%, transparent 50%)
+                `,
+              }}
+            />
+          )}
+          
+          {/* Sparkle particles - varied by effect type */}
           <div 
             className="absolute inset-0 pointer-events-none rounded-xl"
             style={{
-              backgroundImage: `
-                radial-gradient(1.5px 1.5px at 8% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
-                radial-gradient(1px 1px at 22% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
-                radial-gradient(2px 2px at 42% 12%, rgba(255,255,255,0.45) 0%, transparent 100%),
-                radial-gradient(1px 1px at 68% 75%, rgba(255,255,255,0.35) 0%, transparent 100%),
-                radial-gradient(1.5px 1.5px at 82% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
-                radial-gradient(1px 1px at 55% 42%, rgba(255,255,255,0.3) 0%, transparent 100%),
-                radial-gradient(1px 1px at 35% 28%, rgba(255,255,255,0.35) 0%, transparent 100%),
-                radial-gradient(0.5px 0.5px at 75% 58%, rgba(255,255,255,0.4) 0%, transparent 100%),
-                radial-gradient(1px 1px at 15% 72%, rgba(255,255,255,0.3) 0%, transparent 100%),
-                radial-gradient(1.5px 1.5px at 90% 65%, rgba(255,255,255,0.35) 0%, transparent 100%)
-              `,
+              backgroundImage: ['aurora', 'crystal', 'nebula', 'divine', 'cosmic'].includes(config.effectType)
+                ? `
+                  radial-gradient(2px 2px at 12% 18%, ${config.badgeBorderColor}90 0%, transparent 100%),
+                  radial-gradient(1.5px 1.5px at 28% 52%, ${config.badgeBorderColor}70 0%, transparent 100%),
+                  radial-gradient(2px 2px at 45% 15%, ${config.badgeBorderColor}80 0%, transparent 100%),
+                  radial-gradient(1px 1px at 72% 72%, ${config.badgeBorderColor}60 0%, transparent 100%),
+                  radial-gradient(2px 2px at 85% 38%, ${config.badgeBorderColor}75 0%, transparent 100%),
+                  radial-gradient(1.5px 1.5px at 58% 45%, ${config.badgeBorderColor}50 0%, transparent 100%),
+                  radial-gradient(1px 1px at 18% 78%, ${config.badgeBorderColor}55 0%, transparent 100%),
+                  radial-gradient(1.5px 1.5px at 92% 62%, ${config.badgeBorderColor}65 0%, transparent 100%)
+                `
+                : `
+                  radial-gradient(1.5px 1.5px at 15% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+                  radial-gradient(1px 1px at 35% 60%, rgba(255,255,255,0.35) 0%, transparent 100%),
+                  radial-gradient(1px 1px at 65% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+                  radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.3) 0%, transparent 100%)
+                `,
             }}
           />
         </>
@@ -465,16 +661,14 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
           <div 
             className="absolute inset-x-0 top-0 h-[2px] pointer-events-none rounded-t-xl"
             style={{
-              background: `linear-gradient(90deg, transparent 5%, ${config.badgeBorderColor}80 20%, ${config.badgeBorderColor} 50%, ${config.badgeBorderColor}80 80%, transparent 95%)`,
-              opacity: threshold >= 150 ? 1 : 0.7,
+              background: `linear-gradient(90deg, transparent 5%, ${config.badgeBorderColor}90 20%, ${config.badgeBorderColor} 50%, ${config.badgeBorderColor}90 80%, transparent 95%)`,
             }}
           />
           {/* Soft glow below the edge */}
           <div 
-            className="absolute inset-x-0 top-0 h-[25%] pointer-events-none rounded-t-xl"
+            className="absolute inset-x-0 top-0 h-[30%] pointer-events-none rounded-t-xl"
             style={{
-              background: `linear-gradient(180deg, ${config.badgeBorderColor}30 0%, ${config.badgeBorderColor}10 30%, transparent 100%)`,
-              opacity: threshold >= 150 ? 0.8 : 0.5,
+              background: `linear-gradient(180deg, ${config.badgeBorderColor}40 0%, ${config.badgeBorderColor}15 30%, transparent 100%)`,
             }}
           />
         </>
