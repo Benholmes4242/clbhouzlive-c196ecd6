@@ -153,26 +153,23 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             onClick={onClose}
           />
 
-          {/* Sheet - ~45% height to sit visually halfway up hero */}
+          {/* Sheet - anchored to bottom, auto height based on content */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[26px] overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[26px] overflow-hidden"
             style={{
-              height: '45vh',
               background: 'var(--hub-bg-start)',
               boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
               overscrollBehavior: 'contain',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
             onClick={handleSheetClick}
           >
             {/* Header */}
-            <div 
-              className="flex-shrink-0"
-              style={{ background: 'var(--hub-bg-start)' }}
-            >
+            <div style={{ background: 'var(--hub-bg-start)' }}>
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-2">
                 <div 
@@ -198,8 +195,8 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
               </div>
             </div>
 
-            {/* Cards - no scroll needed */}
-            <div className="flex-1 px-5 pb-6 flex flex-col gap-3">
+            {/* Cards */}
+            <div className="px-5 pb-6 flex flex-col gap-3">
               <MenuCard
                 icon={<Search className="w-5 h-5" style={{ color: 'var(--hub-text-sub)' }} />}
                 title="Discover Games"
@@ -222,12 +219,6 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
                 isPrimary
               />
             </div>
-
-            {/* Safe area padding */}
-            <div 
-              className="flex-shrink-0"
-              style={{ height: 'env(safe-area-inset-bottom, 0px)' }}
-            />
           </motion.div>
         </>
       )}
