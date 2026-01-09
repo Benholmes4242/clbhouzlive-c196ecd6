@@ -4,7 +4,7 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TourHubHeader } from '../components/TourHubHeader';
 import { TourHubTabs, type TourHubTab } from '../components/TourHubTabs';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { OverviewTab, ScheduleTab, PlayersTab, PlayerStatsTab } from '../components/tabs';
+import { OverviewTab, ScheduleTab, PlayersTab, PlayerStatsTab, LeadersTab } from '../components/tabs';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,7 +34,7 @@ export function TourHubMainPage() {
       case 'player-stats':
         return <PlayerStatsTab />;
       case 'leaderboards':
-        return <TourHubEmptyState variant="leaderboard" />;
+        return <LeadersTab />;
       case 'summary':
         return <TourHubEmptyState variant="summary" />;
       case 'tee-times':
