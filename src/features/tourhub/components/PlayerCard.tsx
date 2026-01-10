@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom';
-import { User, MapPin, GraduationCap, Calendar } from 'lucide-react';
+import { MapPin, GraduationCap, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourPlayer } from '../hooks/useTourHubData';
+import type { CollegeMedia } from '../hooks/useCollegeMedia';
+import { CollegeDisplay } from './CollegeLogo';
 
 interface PlayerCardProps {
   player: TourPlayer;
+  /** Pre-resolved college media for efficient rendering */
+  college?: CollegeMedia | null;
   className?: string;
 }
 
-export function PlayerCard({ player, className }: PlayerCardProps) {
+export function PlayerCard({ player, college, className }: PlayerCardProps) {
   const initials = player.full_name
     .split(' ')
     .map(n => n[0])
@@ -50,9 +54,13 @@ export function PlayerCard({ player, className }: PlayerCardProps) {
           )}
           
           {player.college && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1 truncate">
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <GraduationCap className="w-3 h-3 shrink-0" />
-              <span className="truncate">{player.college}</span>
+              <CollegeDisplay 
+                collegeName={player.college} 
+                college={college || null}
+                size="xs"
+              />
             </p>
           )}
           

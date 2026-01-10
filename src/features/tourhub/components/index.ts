@@ -7,3 +7,4 @@ export * from './MiniLeaderboard';
 export * from './PremiumEmptyState';
 export * from './ErrorState';
 export * from './skeletons';
+export * from './CollegeLogo';

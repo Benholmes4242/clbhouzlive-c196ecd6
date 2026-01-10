@@ -2,17 +2,21 @@
  * PlayerRow - Editorial flat row for player list
  * Inspired by Apple Music / PGA leaderboard rows
  * 
- * Layout: Avatar | Name + Country (line 2) + Context (line 3) | Stat
+ * Layout: Avatar | Name + Country (line 2) + Context with college logo (line 3) | Stat
  */
 
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
+import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import { PlayerAvatar } from '../PlayerAvatar';
+import { CollegeDisplay } from '../CollegeLogo';
 
 interface PlayerRowProps {
   player: TourPlayer;
   stats?: TourPlayerStatistics & { worldRank?: number | null };
+  /** Pre-resolved college media for efficient rendering */
+  college?: CollegeMedia | null;
   statDisplay?: 'rank' | 'events' | 'wins';
   className?: string;
 }
@@ -28,22 +32,9 @@ function toTitleCase(str: string): string {
     .join(' ');
 }
 
-export function PlayerRow({ player, stats, statDisplay = 'rank', className }: PlayerRowProps) {
+export function PlayerRow({ player, stats, college, statDisplay = 'rank', className }: PlayerRowProps) {
   // Format country in Title Case
   const formattedCountry = player.country ? toTitleCase(player.country) : null;
-
-  // Determine context line with label (College OR Turned Pro, never both)
-  const getContextLine = () => {
-    if (player.college) {
-      return `College: ${player.college}`;
-    }
-    if (player.turned_pro) {
-      return `Turned Pro: ${player.turned_pro}`;
-    }
-    return null;
-  };
-
-  const contextLine = getContextLine();
 
   // Determine stat to display on the right
   const getStatValue = () => {
@@ -99,12 +90,22 @@ export function PlayerRow({ player, stats, statDisplay = 'rank', className }: Pl
           </p>
         )}
         
-        {/* Line 3: Context with label */}
-        {contextLine && (
-          <p className="text-[13px] text-muted-foreground/60 truncate">
-            {contextLine}
+        {/* Line 3: College with logo OR Turned Pro */}
+        {player.college ? (
+          <p className="text-[13px] text-muted-foreground/60 flex items-center gap-1 truncate">
+            <span className="shrink-0">College:</span>
+            <CollegeDisplay 
+              collegeName={player.college} 
+              college={college || null}
+              size="xs"
+              className="text-muted-foreground/60"
+            />
           </p>
-        )}
+        ) : player.turned_pro ? (
+          <p className="text-[13px] text-muted-foreground/60 truncate">
+            Turned Pro: {player.turned_pro}
+          </p>
+        ) : null}
       </div>
 
       {/* Stat */}
