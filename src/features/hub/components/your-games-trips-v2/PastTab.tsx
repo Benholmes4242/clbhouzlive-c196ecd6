@@ -1,6 +1,6 @@
 /**
  * PastTab - Shows past/completed games
- * V2: Consistent spacing with UpcomingTab, with trash icon to archive
+ * V2: Red trash icon to remove with confirm dialog
  */
 
 import React, { useState } from 'react';
@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 interface PastTabProps {
   searchQuery: string;
@@ -51,6 +52,7 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
     if (gameToRemove) {
       archiveGame(gameToRemove.id);
       setGameToRemove(null);
+      toast.success('Removed');
     }
   };
 
@@ -80,7 +82,7 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
                 variant="row"
                 onTap={() => handleGameTap(game)}
               />
-              {/* Trash icon overlay */}
+              {/* Red trash icon */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -104,10 +106,9 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
       <AlertDialog open={!!gameToRemove} onOpenChange={() => setGameToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove from your list?</AlertDialogTitle>
+            <AlertDialogTitle>Remove this game?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove "{gameToRemove?.courseName}" from your past games. 
-              You can still find it if you search for it later.
+              This will remove it from your list. Other players won't be notified.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

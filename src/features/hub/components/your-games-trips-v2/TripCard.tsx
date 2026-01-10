@@ -102,7 +102,7 @@ export function TripCard({ trip, variant, onTap }: TripCardProps) {
         >
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5" />
-            {trip.participantCount} going
+            {trip.participantCount} joined
           </span>
           <span>·</span>
           <span>{trip.gamesCount} round{trip.gamesCount !== 1 ? 's' : ''}</span>
@@ -160,7 +160,7 @@ export function TripCard({ trip, variant, onTap }: TripCardProps) {
       >
         <span className="flex items-center gap-1">
           <Users className="w-3 h-3" />
-          {trip.participantCount} going
+          {trip.participantCount} joined
         </span>
         <span>·</span>
         <span>{trip.gamesCount} round{trip.gamesCount !== 1 ? 's' : ''}</span>

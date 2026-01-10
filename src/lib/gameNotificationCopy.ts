@@ -3,6 +3,8 @@
  * Centralized copy for all game/trip notification types
  */
 
+import { RSVP_LABELS } from './rsvpLabels';
+
 export const GAME_NOTIFICATION_COPY = {
   // A. Game Invites
   game_invite: {
@@ -11,9 +13,9 @@ export const GAME_NOTIFICATION_COPY = {
       `${courseName} · ${date} · ${time}`,
   },
 
-  // B. RSVP Updates (friends only, going only)
+  // B. RSVP Updates (friends only, joined only)
   rsvp_update: {
-    getTitle: (playerName: string) => `${playerName} is going`,
+    getTitle: (playerName: string) => `${playerName} ${RSVP_LABELS.going.toLowerCase()}`,
     getSubcopy: (courseName: string, date: string) => 
       `${courseName} · ${date}`,
   },

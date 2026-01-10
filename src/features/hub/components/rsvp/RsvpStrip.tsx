@@ -8,6 +8,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, HelpCircle, X, Users } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
+import { RSVP_LABELS, formatRsvpCount } from '@/lib/rsvpLabels';
 import type { RsvpStatus, RsvpCounts } from '../../hooks/useGameRsvp';
 
 interface RsvpStripProps {
@@ -21,21 +22,21 @@ interface RsvpStripProps {
 const RSVP_OPTIONS: { status: RsvpStatus; label: string; icon: React.ReactNode; activeColor: string; activeBg: string }[] = [
   { 
     status: 'going', 
-    label: 'Going', 
+    label: RSVP_LABELS.going, 
     icon: <Check className="w-4 h-4" />,
     activeColor: 'rgba(34, 197, 94, 0.9)',
     activeBg: 'rgba(34, 197, 94, 0.12)',
   },
   { 
     status: 'maybe', 
-    label: 'Maybe', 
+    label: RSVP_LABELS.maybe, 
     icon: <HelpCircle className="w-4 h-4" />,
     activeColor: 'rgba(234, 179, 8, 0.9)',
     activeBg: 'rgba(234, 179, 8, 0.12)',
   },
   { 
     status: 'declined', 
-    label: "Can't go", 
+    label: RSVP_LABELS.declined, 
     icon: <X className="w-4 h-4" />,
     activeColor: 'rgba(239, 68, 68, 0.8)',
     activeBg: 'rgba(239, 68, 68, 0.1)',
@@ -58,7 +59,7 @@ export function RsvpStrip({ currentStatus, counts, isHost, isUpdating, onStatusC
       >
         <Users className="w-3.5 h-3.5" />
         <span>
-          {counts.going} going
+          {formatRsvpCount(counts.going, 'going')}
           {counts.maybe > 0 && ` · ${counts.maybe} maybe`}
           {counts.invited > 0 && ` · ${counts.invited} invited`}
         </span>
@@ -116,22 +117,22 @@ export function RsvpPill({ status, size = 'sm' }: RsvpPillProps) {
 
   const config: Record<RsvpStatus, { label: string; bg: string; color: string }> = {
     going: { 
-      label: 'Going', 
+      label: RSVP_LABELS.going, 
       bg: 'rgba(34, 197, 94, 0.12)', 
       color: 'rgba(34, 197, 94, 0.9)' 
     },
     maybe: { 
-      label: 'Maybe', 
+      label: RSVP_LABELS.maybe, 
       bg: 'rgba(234, 179, 8, 0.12)', 
       color: 'rgba(180, 140, 8, 0.9)' 
     },
     declined: { 
-      label: "Can't go", 
+      label: RSVP_LABELS.declined, 
       bg: 'rgba(239, 68, 68, 0.1)', 
       color: 'rgba(220, 60, 60, 0.85)' 
     },
     invited: { 
-      label: 'Invited', 
+      label: RSVP_LABELS.invited, 
       bg: 'rgba(59, 130, 246, 0.1)', 
       color: 'rgba(37, 99, 235, 0.8)' 
     },

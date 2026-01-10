@@ -7,6 +7,7 @@ import { Calendar, Users, Globe, Lock, UserCheck } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import type { TripData, TripParticipant } from '../../hooks/useTripTimeline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { formatRsvpCount } from '@/lib/rsvpLabels';
 
 interface TripHeaderProps {
   trip: TripData;
@@ -15,7 +16,7 @@ interface TripHeaderProps {
 
 export function TripHeader({ trip, participants }: TripHeaderProps) {
   const dayCount = differenceInDays(trip.endDate, trip.startDate) + 1;
-  const goingCount = participants.filter(p => p.rsvpStatus === 'going').length;
+  const joinedCount = participants.filter(p => p.rsvpStatus === 'going').length;
   
   const visibilityIcon = trip.visibility === 'invite' ? Lock : 
                          trip.visibility === 'friends' ? UserCheck : Globe;
@@ -71,8 +72,8 @@ export function TripHeader({ trip, participants }: TripHeaderProps) {
           ))}
         </div>
         <span className="text-sm text-muted-foreground">
-          {goingCount} going
-          {participants.length > goingCount && ` · ${participants.length - goingCount} invited`}
+          {formatRsvpCount(joinedCount, 'going')}
+          {participants.length > joinedCount && ` · ${participants.length - joinedCount} invited`}
         </span>
       </div>
     </div>
