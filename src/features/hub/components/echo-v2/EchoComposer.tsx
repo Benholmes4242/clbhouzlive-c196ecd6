@@ -7,6 +7,7 @@ import React, { useEffect, useCallback, forwardRef } from 'react';
 import { Send, StopCircle, Loader2 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
+import { ECHO_ORANGE } from './echoStyles';
 
 interface EchoComposerProps {
   value: string;
@@ -103,23 +104,22 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
             type="button"
             onClick={handleSend}
             disabled={!canSend}
-            className={cn(
-              "h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0",
-              "transition-all active:scale-95",
-              canSend ? "opacity-100" : "opacity-30"
-            )}
+            className="h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95"
             style={{
               background: canSend 
-                ? 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%)) 0%, hsl(var(--echo-accent-dark, 262 83% 58%)) 100%)'
-                : 'rgb(226, 232, 240)',
-              boxShadow: canSend ? '0 2px 8px hsl(var(--echo-accent, 270 60% 60%) / 0.35)' : 'none',
+                ? `${ECHO_ORANGE}24`
+                : 'rgba(0,0,0,0.04)',
+              border: canSend 
+                ? `1px solid ${ECHO_ORANGE}4D`
+                : '1px solid rgba(0,0,0,0.08)',
+              opacity: canSend ? 1 : 0.55,
             }}
             aria-label="Send"
           >
             {isSending ? (
-              <Loader2 className="w-4 h-4 text-white animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" style={{ color: ECHO_ORANGE }} />
             ) : (
-              <Send className="w-4 h-4" style={{ color: canSend ? 'white' : 'rgb(148, 163, 184)' }} />
+              <Send className="w-4 h-4" style={{ color: canSend ? ECHO_ORANGE : 'rgba(15, 23, 42, 0.45)' }} />
             )}
           </button>
         )}

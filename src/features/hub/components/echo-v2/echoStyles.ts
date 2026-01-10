@@ -3,6 +3,9 @@
  * Explicit light-glass surfaces to match other Hub sheets
  */
 
+// Echo brand color - matches Hub Echo tile orange
+export const ECHO_ORANGE = '#F59E0B';
+
 // Main sheet container (frosted light glass)
 export const HUB_SHEET = 
   "bg-white/90 backdrop-blur-xl border border-black/10 shadow-[0_16px_60px_rgba(0,0,0,0.18)]";
