@@ -197,10 +197,10 @@ export function TripDetailContent({
       {/* Tab content */}
       <div className="flex-1 overflow-y-auto px-5 pb-24">
         {activeTab === 'details' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Cover image */}
             {trip.coverImageUrl && (
-              <div className="w-full h-40 rounded-2xl overflow-hidden bg-muted -mt-1">
+              <div className="w-full h-40 rounded-2xl overflow-hidden bg-muted -mt-1 mb-4">
                 <img
                   src={trip.coverImageUrl}
                   alt={trip.name}
@@ -209,38 +209,60 @@ export function TripDetailContent({
               </div>
             )}
 
-            {/* Trip info summary row */}
-            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
-                {format(trip.startDate, 'MMM d')} – {format(trip.endDate, 'MMM d, yyyy')}
-              </span>
-              <span className="text-muted-foreground/40">•</span>
-              <span>{dayCount} {dayCount === 1 ? 'day' : 'days'}</span>
-              <span className="text-muted-foreground/40">•</span>
-              <span className="flex items-center gap-1">
-                {React.createElement(visibilityIcon, { className: "w-3.5 h-3.5" })}
-                {visibilityLabel}
-              </span>
-            </div>
+            {/* Date & Duration Card */}
+            <DetailCard
+              icon={Calendar}
+              title={`${format(trip.startDate, 'EEEE, MMMM d')} – ${format(trip.endDate, 'MMMM d, yyyy')}`}
+              subtitle={`${dayCount} ${dayCount === 1 ? 'day' : 'days'}`}
+              accent
+            />
+
+            {/* Players Card */}
+            <DetailCard
+              icon={Users}
+              title={`${joinedCount} ${joinedCount === 1 ? 'player' : 'players'} joined`}
+              subtitle={participants.length > joinedCount ? `${participants.length - joinedCount} invited` : undefined}
+            />
+
+            {/* Visibility Card */}
+            <DetailCard
+              icon={visibilityIcon}
+              title={visibilityLabel}
+              subtitle="Trip visibility"
+            />
 
             {/* Description/Note */}
             {trip.description && (
-              <p 
-                className="text-sm text-muted-foreground"
-                style={{ color: 'rgba(100, 116, 139, 0.8)' }}
+              <div 
+                className="p-4 rounded-2xl"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
+                  border: '1px solid rgba(0, 0, 0, 0.03)',
+                }}
               >
-                {trip.description}
-              </p>
+                <div 
+                  className="text-[11px] font-medium uppercase tracking-wide mb-1.5"
+                  style={{ color: 'rgba(30, 41, 59, 0.4)' }}
+                >
+                  Trip description
+                </div>
+                <p 
+                  className="text-[14px] leading-relaxed"
+                  style={{ color: '#1e293b' }}
+                >
+                  {trip.description}
+                </p>
+              </div>
             )}
 
-            {/* Timeline section - THE MAIN CONTENT */}
-            <div className="pt-2">
+            {/* Timeline section */}
+            <div className="pt-3">
               <div 
                 className="text-[11px] font-semibold uppercase tracking-wider mb-3"
                 style={{ color: 'rgba(100, 116, 139, 0.5)' }}
               >
-                Timeline
+                Rounds
               </div>
               <TripTimeline 
                 items={timeline} 
