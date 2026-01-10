@@ -1,11 +1,11 @@
 /**
- * DiscoverGamesBottomSheetV2 - Bottom sheet for discovering games
+ * DiscoverGamesBottomSheetV2 - Bottom sheet for discovering games & trips
  * 
- * Matches V2 design language:
- * - Frosted glass sheet container
- * - Premium header with gradient divider
- * - Filter chips + tabs
- * - Opens GameDetailSheetV2 as stacked sheet
+ * Updated V2 design:
+ * - Games | Trips tabs (removed Recommended/Upcoming)
+ * - Anonymous host blurbs (no identity leaks)
+ * - Request to join CTA with proper states
+ * - Excludes games where user was declined
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -14,13 +14,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 
-import { useDiscoverGames, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '../../hooks/useDiscoverGames';
-import { GameCard } from '../your-games-trips-v2/GameCard';
+import { useDiscoverGamesV2, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '../../hooks/useDiscoverGamesV2';
+import { useDiscoverTrips } from '../../hooks/useDiscoverTrips';
 import { GameDetailSheetV2 } from '../game-detail-v2';
 import { DiscoverSearchInput } from './DiscoverSearchInput';
 import { DiscoverFilterChips } from './DiscoverFilterChips';
 import { DiscoverTabPills, type DiscoverTab } from './DiscoverTabPills';
 import { DiscoverEmptyState } from './DiscoverEmptyState';
+import { GameDiscoverCard } from './GameDiscoverCard';
+import { TripDiscoverCard } from './TripDiscoverCard';
+import { useJoinGame } from '@/features/nearby/hooks/useJoinGame';
 
 interface DiscoverGamesBottomSheetV2Props {
   isOpen: boolean;
@@ -35,11 +38,14 @@ export function DiscoverGamesBottomSheetV2({
   const [search, setSearch] = useState('');
   const [when, setWhen] = useState<DiscoverWhen>('any');
   const [visibility, setVisibility] = useState<DiscoverVisibility>('all');
-  const [activeTab, setActiveTab] = useState<DiscoverTab>('upcoming');
+  const [activeTab, setActiveTab] = useState<DiscoverTab>('games');
 
   // Game detail sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [gameSheetOpen, setGameSheetOpen] = useState(false);
+  
+  // Join request state
+  const [requestingGameId, setRequestingGameId] = useState<string | null>(null);
 
   // Scroll lock refs
   const scrollYRef = useRef(0);
@@ -53,34 +59,37 @@ export function DiscoverGamesBottomSheetV2({
     visibility,
   };
 
-  // Query
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useDiscoverGames(filters);
+  // Query games
+  const gamesQuery = useDiscoverGamesV2(filters);
+  const games = gamesQuery.data?.pages.flatMap((p) => p.games) ?? [];
 
-  // Flatten pages
-  const games = data?.pages.flatMap((p) => p.games) ?? [];
+  // Query trips
+  const tripsQuery = useDiscoverTrips(filters);
+  const trips = tripsQuery.data?.pages.flatMap((p) => p.trips) ?? [];
 
-  // Sort by tab
-  const sortedGames = React.useMemo(() => {
-    if (activeTab === 'recommended') {
-      // Sort by participant count desc, then by start_time asc
-      return [...games].sort((a, b) => {
-        const aCount = a.goingCount + a.maybeCount;
-        const bCount = b.goingCount + b.maybeCount;
-        if (bCount !== aCount) return bCount - aCount;
-        return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
-      });
+  const isLoading = activeTab === 'games' ? gamesQuery.isLoading : tripsQuery.isLoading;
+  const isError = activeTab === 'games' ? gamesQuery.isError : tripsQuery.isError;
+
+  // Join game hook
+  const joinGame = useJoinGame(requestingGameId || '');
+
+  const handleRequestJoin = useCallback((gameId: string) => {
+    setRequestingGameId(gameId);
+  }, []);
+
+  // Trigger join when requestingGameId changes
+  useEffect(() => {
+    if (requestingGameId) {
+      joinGame.requestJoin();
     }
-    // Upcoming - already sorted by start_time from query
-    return games;
-  }, [games, activeTab]);
+  }, [requestingGameId]);
+
+  // Reset requesting state when join completes
+  useEffect(() => {
+    if (joinGame.state === 'requested' || joinGame.state === 'error') {
+      setTimeout(() => setRequestingGameId(null), 300);
+    }
+  }, [joinGame.state]);
 
   // Lock body scroll
   useEffect(() => {
@@ -122,9 +131,10 @@ export function DiscoverGamesBottomSheetV2({
         setSearch('');
         setWhen('any');
         setVisibility('all');
-        setActiveTab('upcoming');
+        setActiveTab('games');
         setSelectedGameId(null);
         setGameSheetOpen(false);
+        setRequestingGameId(null);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -132,12 +142,21 @@ export function DiscoverGamesBottomSheetV2({
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
-    if (!listRef.current || !hasNextPage || isFetchingNextPage) return;
+    if (!listRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-    if (scrollHeight - scrollTop - clientHeight < 200) {
-      fetchNextPage();
+    
+    if (activeTab === 'games') {
+      if (!gamesQuery.hasNextPage || gamesQuery.isFetchingNextPage) return;
+      if (scrollHeight - scrollTop - clientHeight < 200) {
+        gamesQuery.fetchNextPage();
+      }
+    } else {
+      if (!tripsQuery.hasNextPage || tripsQuery.isFetchingNextPage) return;
+      if (scrollHeight - scrollTop - clientHeight < 200) {
+        tripsQuery.fetchNextPage();
+      }
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [activeTab, gamesQuery, tripsQuery]);
 
   const handleClose = useCallback(() => {
     haptic('light');
@@ -226,13 +245,13 @@ export function DiscoverGamesBottomSheetV2({
                   className="text-[18px] font-semibold leading-tight"
                   style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
                 >
-                  Discover Games
+                  Discover
                 </h2>
                 <p 
                   className="text-[12px] mt-0.5"
                   style={{ color: 'rgba(100, 116, 139, 0.8)' }}
                 >
-                  Find games to join near you
+                  Find games and trips to join near you
                 </p>
               </div>
               
@@ -255,8 +274,16 @@ export function DiscoverGamesBottomSheetV2({
               }}
             />
 
-            {/* Search */}
+            {/* Tabs */}
             <div className="px-5 pt-4 pb-2 flex-shrink-0">
+              <DiscoverTabPills
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+              />
+            </div>
+
+            {/* Search */}
+            <div className="px-5 pb-2 flex-shrink-0">
               <DiscoverSearchInput
                 value={search}
                 onChange={setSearch}
@@ -264,20 +291,12 @@ export function DiscoverGamesBottomSheetV2({
             </div>
 
             {/* Filter chips */}
-            <div className="px-5 pb-2 flex-shrink-0">
+            <div className="px-5 pb-3 flex-shrink-0">
               <DiscoverFilterChips
                 when={when}
                 visibility={visibility}
                 onWhenChange={setWhen}
                 onVisibilityChange={setVisibility}
-              />
-            </div>
-
-            {/* Tabs */}
-            <div className="px-5 pb-3 flex-shrink-0">
-              <DiscoverTabPills
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
               />
             </div>
 
@@ -295,27 +314,50 @@ export function DiscoverGamesBottomSheetV2({
               ) : isError ? (
                 <DiscoverEmptyState 
                   type="error"
-                  onRetry={() => refetch()}
+                  onRetry={() => activeTab === 'games' ? gamesQuery.refetch() : tripsQuery.refetch()}
                 />
-              ) : sortedGames.length === 0 ? (
-                <DiscoverEmptyState type="empty" />
-              ) : (
-                <div className="space-y-2">
-                  {sortedGames.map((game) => (
-                    <GameCard
-                      key={game.id}
-                      game={game}
-                      variant="row"
-                      onTap={() => handleOpenGameDetail(game.id)}
-                    />
-                  ))}
+              ) : activeTab === 'games' ? (
+                games.length === 0 ? (
+                  <DiscoverEmptyState type="empty" />
+                ) : (
+                  <div className="space-y-3">
+                    {games.map((game) => (
+                      <GameDiscoverCard
+                        key={game.id}
+                        game={game}
+                        onTap={() => handleOpenGameDetail(game.id)}
+                        onRequestJoin={() => handleRequestJoin(game.id)}
+                        isRequesting={requestingGameId === game.id && joinGame.isPending}
+                      />
+                    ))}
 
-                  {isFetchingNextPage && (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />
-                    </div>
-                  )}
-                </div>
+                    {gamesQuery.isFetchingNextPage && (
+                      <div className="flex justify-center py-4">
+                        <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />
+                      </div>
+                    )}
+                  </div>
+                )
+              ) : (
+                trips.length === 0 ? (
+                  <DiscoverEmptyState type="empty" />
+                ) : (
+                  <div className="space-y-3">
+                    {trips.map((trip) => (
+                      <TripDiscoverCard
+                        key={trip.id}
+                        trip={trip}
+                        onTap={() => {}}
+                      />
+                    ))}
+
+                    {tripsQuery.isFetchingNextPage && (
+                      <div className="flex justify-center py-4">
+                        <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />
+                      </div>
+                    )}
+                  </div>
+                )
               )}
             </div>
           </motion.div>

@@ -4,6 +4,8 @@
  * Canonical route: /games/discover
  * - Mobile: Renders as bottom sheet over previous page
  * - Desktop: Renders as full page
+ * 
+ * Now uses Games | Trips tabs with anonymous host blurbs
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -13,14 +15,17 @@ import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-import { useDiscoverGames, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '@/features/hub/hooks/useDiscoverGames';
-import { GameCard } from '@/features/hub/components/your-games-trips-v2/GameCard';
+import { useDiscoverGamesV2, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '@/features/hub/hooks/useDiscoverGamesV2';
+import { useDiscoverTrips, type DiscoverTripsFilters } from '@/features/hub/hooks/useDiscoverTrips';
 import { GameDetailSheetV2 } from '@/features/hub/components/game-detail-v2';
 import { DiscoverSearchInput } from '@/features/hub/components/discover-games/DiscoverSearchInput';
 import { DiscoverFilterChips } from '@/features/hub/components/discover-games/DiscoverFilterChips';
 import { DiscoverTabPills, type DiscoverTab } from '@/features/hub/components/discover-games/DiscoverTabPills';
 import { DiscoverEmptyState } from '@/features/hub/components/discover-games/DiscoverEmptyState';
 import { DiscoverGamesBottomSheetV2 } from '@/features/hub/components/discover-games';
+import { GameDiscoverCard } from '@/features/hub/components/discover-games/GameDiscoverCard';
+import { TripDiscoverCard } from '@/features/hub/components/discover-games/TripDiscoverCard';
+import { useJoinGame } from '@/features/nearby/hooks/useJoinGame';
 
 export function DiscoverGamesPage() {
   const navigate = useNavigate();
@@ -30,7 +35,7 @@ export function DiscoverGamesPage() {
   const [search, setSearch] = useState('');
   const [when, setWhen] = useState<DiscoverWhen>('any');
   const [visibility, setVisibility] = useState<DiscoverVisibility>('all');
-  const [activeTab, setActiveTab] = useState<DiscoverTab>('upcoming');
+  const [activeTab, setActiveTab] = useState<DiscoverTab>('games');
 
   // Game detail sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -45,43 +50,34 @@ export function DiscoverGamesPage() {
     visibility,
   };
 
-  // Query
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useDiscoverGames(filters);
+  // Query games
+  const gamesQuery = useDiscoverGamesV2(filters);
+  const games = gamesQuery.data?.pages.flatMap((p) => p.games) ?? [];
 
-  // Flatten pages
-  const games = data?.pages.flatMap((p) => p.games) ?? [];
+  // Query trips
+  const tripsQuery = useDiscoverTrips(filters);
+  const trips = tripsQuery.data?.pages.flatMap((p) => p.trips) ?? [];
 
-  // Sort by tab
-  const sortedGames = React.useMemo(() => {
-    if (activeTab === 'recommended') {
-      // Sort by participant count desc, then by start_time asc
-      return [...games].sort((a, b) => {
-        const aCount = a.goingCount + a.maybeCount;
-        const bCount = b.goingCount + b.maybeCount;
-        if (bCount !== aCount) return bCount - aCount;
-        return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
-      });
-    }
-    // Upcoming - already sorted by start_time from query
-    return games;
-  }, [games, activeTab]);
+  const isLoading = activeTab === 'games' ? gamesQuery.isLoading : tripsQuery.isLoading;
+  const isError = activeTab === 'games' ? gamesQuery.isError : tripsQuery.isError;
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
-    if (!listRef.current || !hasNextPage || isFetchingNextPage) return;
+    if (!listRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-    if (scrollHeight - scrollTop - clientHeight < 200) {
-      fetchNextPage();
+    
+    if (activeTab === 'games') {
+      if (!gamesQuery.hasNextPage || gamesQuery.isFetchingNextPage) return;
+      if (scrollHeight - scrollTop - clientHeight < 200) {
+        gamesQuery.fetchNextPage();
+      }
+    } else {
+      if (!tripsQuery.hasNextPage || tripsQuery.isFetchingNextPage) return;
+      if (scrollHeight - scrollTop - clientHeight < 200) {
+        tripsQuery.fetchNextPage();
+      }
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [activeTab, gamesQuery, tripsQuery]);
 
   const handleBack = useCallback(() => {
     haptic('light');
@@ -109,8 +105,12 @@ export function DiscoverGamesPage() {
   }, []);
 
   const handleRetry = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    if (activeTab === 'games') {
+      gamesQuery.refetch();
+    } else {
+      tripsQuery.refetch();
+    }
+  }, [activeTab, gamesQuery, tripsQuery]);
 
   // Mobile: render as bottom sheet
   if (isMobile) {
@@ -141,17 +141,25 @@ export function DiscoverGamesPage() {
           
           <div className="flex-1">
             <h1 className="text-lg font-semibold text-foreground tracking-tight">
-              Discover Games
+              Discover
             </h1>
             <p className="text-xs text-muted-foreground">
-              Find games to join near you
+              Find games and trips to join near you
             </p>
           </div>
         </div>
       </motion.header>
 
-      {/* Search */}
+      {/* Tabs */}
       <div className="px-4 pt-4 pb-2">
+        <DiscoverTabPills
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
+      </div>
+
+      {/* Search */}
+      <div className="px-4 pb-2">
         <DiscoverSearchInput
           value={search}
           onChange={setSearch}
@@ -159,20 +167,12 @@ export function DiscoverGamesPage() {
       </div>
 
       {/* Filter chips */}
-      <div className="px-4 pb-2">
+      <div className="px-4 pb-3">
         <DiscoverFilterChips
           when={when}
           visibility={visibility}
           onWhenChange={setWhen}
           onVisibilityChange={setVisibility}
-        />
-      </div>
-
-      {/* Tabs */}
-      <div className="px-4 pb-3">
-        <DiscoverTabPills
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
         />
       </div>
 
@@ -192,25 +192,46 @@ export function DiscoverGamesPage() {
             type="error"
             onRetry={handleRetry}
           />
-        ) : sortedGames.length === 0 ? (
-          <DiscoverEmptyState type="empty" />
-        ) : (
-          <div className="space-y-2">
-            {sortedGames.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                variant="row"
-                onTap={() => handleOpenGameDetail(game.id)}
-              />
-            ))}
+        ) : activeTab === 'games' ? (
+          games.length === 0 ? (
+            <DiscoverEmptyState type="empty" />
+          ) : (
+            <div className="space-y-3">
+              {games.map((game) => (
+                <GameDiscoverCard
+                  key={game.id}
+                  game={game}
+                  onTap={() => handleOpenGameDetail(game.id)}
+                />
+              ))}
 
-            {isFetchingNextPage && (
-              <div className="flex justify-center py-4">
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/40" />
-              </div>
-            )}
-          </div>
+              {gamesQuery.isFetchingNextPage && (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/40" />
+                </div>
+              )}
+            </div>
+          )
+        ) : (
+          trips.length === 0 ? (
+            <DiscoverEmptyState type="empty" />
+          ) : (
+            <div className="space-y-3">
+              {trips.map((trip) => (
+                <TripDiscoverCard
+                  key={trip.id}
+                  trip={trip}
+                  onTap={() => {}}
+                />
+              ))}
+
+              {tripsQuery.isFetchingNextPage && (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/40" />
+                </div>
+              )}
+            </div>
+          )
         )}
       </div>
 

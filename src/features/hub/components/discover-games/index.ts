@@ -3,4 +3,6 @@ export { DiscoverSearchInput } from './DiscoverSearchInput';
 export { DiscoverFilterChips } from './DiscoverFilterChips';
 export { DiscoverTabPills } from './DiscoverTabPills';
 export { DiscoverEmptyState } from './DiscoverEmptyState';
+export { GameDiscoverCard } from './GameDiscoverCard';
+export { TripDiscoverCard } from './TripDiscoverCard';
 export type { DiscoverTab } from './DiscoverTabPills';
