@@ -5,8 +5,9 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight } from 'lucide-react';
+import { X, ChevronRight, GraduationCap } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { WorldRankingsCarousel } from './WorldRankingsCarousel';
 import type { TourHubTab } from './TourHubTabs';
@@ -17,6 +18,15 @@ interface NavItem {
   subtitle: string;
 }
 
+interface LinkItem {
+  id: string;
+  label: string;
+  subtitle: string;
+  path: string;
+  icon?: React.ReactNode;
+  badge?: string;
+}
+
 const NAV_ITEMS: NavItem[] = [
   { value: 'overview', label: 'Overview', subtitle: 'Season snapshot' },
   { value: 'schedule', label: 'Schedule', subtitle: 'All events' },
@@ -25,6 +35,17 @@ const NAV_ITEMS: NavItem[] = [
   { value: 'summary', label: 'Summary', subtitle: 'Tournament recap' },
   { value: 'tee-times', label: 'Tee Times', subtitle: 'Starting times' },
   { value: 'hole-stats', label: 'Holes', subtitle: 'Course analytics' },
+];
+
+const LINK_ITEMS: LinkItem[] = [
+  { 
+    id: 'college-golf', 
+    label: 'College Golf', 
+    subtitle: 'Alumni on Tour',
+    path: '/tourhub/college-golf',
+    icon: <GraduationCap className="w-4 h-4" />,
+    badge: 'New',
+  },
 ];
 
 // Clbhouz brand orange
@@ -43,6 +64,7 @@ export function TourHubNavOverlay({
   activeTab, 
   onNavigate 
 }: TourHubNavOverlayProps) {
+  const navigate = useNavigate();
   
   // Lock body scroll when open
   useEffect(() => {
@@ -76,6 +98,13 @@ export function TourHubNavOverlay({
     // Scroll to top on section change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [onNavigate, onClose]);
+
+  const handleLinkClick = useCallback((path: string) => {
+    haptic('light');
+    onClose();
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [onClose, navigate]);
 
   const handleViewAllRankings = useCallback(() => {
     haptic('light');
@@ -247,6 +276,78 @@ export function TourHubNavOverlay({
                     </motion.button>
                   );
                 })}
+              </div>
+
+              {/* Divider before special links */}
+              <div 
+                className="h-px my-4"
+                style={{ background: 'rgba(0, 0, 0, 0.06)' }}
+              />
+
+              {/* Special Link Items (College Golf, etc.) */}
+              <div className="space-y-2">
+                {LINK_ITEMS.map((item, index) => (
+                  <motion.button
+                    key={item.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      delay: 0.15 + (NAV_ITEMS.length + index) * 0.03,
+                      duration: 0.25,
+                      ease: [0.2, 0.8, 0.2, 1],
+                    }}
+                    onClick={() => handleLinkClick(item.path)}
+                    className="w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.6)',
+                      border: '1px solid rgba(0, 0, 0, 0.04)',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+                    }}
+                  >
+                    {/* Icon */}
+                    <div 
+                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(249, 115, 22, 0.1)', color: CLBHOUZ_ORANGE }}
+                    >
+                      {item.icon}
+                    </div>
+                    
+                    {/* Text content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className="text-[16px] font-semibold"
+                          style={{ color: '#475569' }}
+                        >
+                          {item.label}
+                        </span>
+                        {item.badge && (
+                          <span 
+                            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase"
+                            style={{ 
+                              background: CLBHOUZ_ORANGE, 
+                              color: 'white',
+                            }}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div 
+                        className="text-[13px] mt-0.5"
+                        style={{ color: '#94a3b8' }}
+                      >
+                        {item.subtitle}
+                      </div>
+                    </div>
+                    
+                    {/* Chevron */}
+                    <ChevronRight 
+                      className="w-5 h-5 flex-shrink-0"
+                      style={{ color: '#CBD5E1' }}
+                    />
+                  </motion.button>
+                ))}
               </div>
             </div>
           </motion.div>
