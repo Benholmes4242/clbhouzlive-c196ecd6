@@ -1,15 +1,17 @@
 /**
- * DiscoverGamesPage - Full page for discovering games
+ * DiscoverGamesPage - Route-driven discover games
  * 
  * Canonical route: /games/discover
- * Uses the same components as DiscoverGamesBottomSheetV2 but as a page
+ * - Mobile: Renders as bottom sheet over previous page
+ * - Desktop: Renders as full page
  */
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { useDiscoverGames, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '@/features/hub/hooks/useDiscoverGames';
 import { GameCard } from '@/features/hub/components/your-games-trips-v2/GameCard';
@@ -18,9 +20,11 @@ import { DiscoverSearchInput } from '@/features/hub/components/discover-games/Di
 import { DiscoverFilterChips } from '@/features/hub/components/discover-games/DiscoverFilterChips';
 import { DiscoverTabPills, type DiscoverTab } from '@/features/hub/components/discover-games/DiscoverTabPills';
 import { DiscoverEmptyState } from '@/features/hub/components/discover-games/DiscoverEmptyState';
+import { DiscoverGamesBottomSheetV2 } from '@/features/hub/components/discover-games';
 
 export function DiscoverGamesPage() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // Filter state
   const [search, setSearch] = useState('');
@@ -81,7 +85,11 @@ export function DiscoverGamesPage() {
 
   const handleBack = useCallback(() => {
     haptic('light');
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/hub');
+    }
   }, [navigate]);
 
   const handleOpenGameDetail = useCallback((gameId: string) => {
@@ -104,6 +112,17 @@ export function DiscoverGamesPage() {
     refetch();
   }, [refetch]);
 
+  // Mobile: render as bottom sheet
+  if (isMobile) {
+    return (
+      <DiscoverGamesBottomSheetV2
+        isOpen={true}
+        onClose={handleBack}
+      />
+    );
+  }
+
+  // Desktop: render as full page
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
