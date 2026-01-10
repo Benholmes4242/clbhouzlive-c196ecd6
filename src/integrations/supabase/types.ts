@@ -8981,6 +8981,7 @@ export type Database = {
         Args: { p_game_id: string; p_user_id: string }
         Returns: boolean
       }
+      can_view_trip: { Args: { check_trip_id: string }; Returns: boolean }
       can_view_trip_participant: {
         Args: { check_trip_id: string; check_user_id: string }
         Returns: boolean
