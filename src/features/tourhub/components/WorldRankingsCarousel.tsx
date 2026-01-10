@@ -1,57 +1,20 @@
 /**
  * WorldRankingsCarousel - Horizontal carousel showing top 5 world ranked players
- * PGA-style header module for the Tour Hub nav overlay
+ * Uses unified useWorldRankings hook for consistent data across all surfaces
  */
 
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Trophy } from 'lucide-react';
-import { useTourSeason, useTourPlayerStatistics } from '../hooks/useTourHubData';
+import { ChevronRight } from 'lucide-react';
+import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
 
 interface WorldRankingsCarouselProps {
   onViewAll?: () => void;
 }
 
-// Format country name to title case
-function toTitleCase(str: string | null | undefined): string {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
-// Get initials from name
-function getInitials(name: string): string {
-  const parts = name.split(' ');
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-}
-
 export function WorldRankingsCarousel({ onViewAll }: WorldRankingsCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { data: season } = useTourSeason();
-  const { data: playerStats, isLoading } = useTourPlayerStatistics(season?.id);
-
-  // Get top 5 players by world rank
-  const topPlayers = React.useMemo(() => {
-    if (!playerStats) return [];
-    
-    return playerStats
-      .filter(stat => {
-        const worldRank = (stat as any).raw_data?.statistics?.world_rank;
-        return worldRank && worldRank > 0;
-      })
-      .sort((a, b) => {
-        const aRank = (a as any).raw_data?.statistics?.world_rank || 9999;
-        const bRank = (b as any).raw_data?.statistics?.world_rank || 9999;
-        return aRank - bRank;
-      })
-      .slice(0, 5);
-  }, [playerStats]);
+  const { data: topPlayers, isLoading } = useTopWorldRanked(5);
 
   if (isLoading) {
     return (
@@ -120,15 +83,15 @@ export function WorldRankingsCarousel({ onViewAll }: WorldRankingsCarouselProps)
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {topPlayers.map((stat, index) => {
-          const player = stat.player;
-          const worldRank = (stat as any).raw_data?.statistics?.world_rank;
-          const playerName = player?.full_name || 'Unknown';
-          const country = toTitleCase(player?.country);
+        {topPlayers.map((rankedPlayer, index) => {
+          const playerName = rankedPlayer.playerName;
+          const country = toTitleCase(rankedPlayer.country);
+          const worldRank = rankedPlayer.worldRank;
+          const photoUrl = rankedPlayer.photoUrl;
           
           return (
             <motion.div
-              key={stat.id}
+              key={rankedPlayer.playerId}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
@@ -189,9 +152,9 @@ export function WorldRankingsCarousel({ onViewAll }: WorldRankingsCarouselProps)
                     background: 'rgba(100, 116, 139, 0.1)',
                   }}
                 >
-                  {player?.photo_url ? (
+                  {photoUrl ? (
                     <img 
-                      src={player.photo_url} 
+                      src={photoUrl} 
                       alt={playerName}
                       className="w-full h-full rounded-full object-cover"
                       onError={(e) => {
@@ -201,7 +164,7 @@ export function WorldRankingsCarousel({ onViewAll }: WorldRankingsCarouselProps)
                     />
                   ) : null}
                   <span 
-                    className={`text-xs font-semibold ${player?.photo_url ? 'hidden' : ''}`}
+                    className={`text-xs font-semibold ${photoUrl ? 'hidden' : ''}`}
                     style={{ color: '#64748B' }}
                   >
                     {getInitials(playerName)}

@@ -15,6 +15,7 @@ import { Search, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
+import { useWorldRankings } from '../../hooks/useWorldRankings';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import {
   FeaturedPlayersCarousel,
@@ -37,7 +38,7 @@ const TAB_CONTEXT: Record<PlayerFilterType, { description: string; tooltip: stri
   },
   'top-ranked': {
     description: 'Players ranked highest in the Official World Golf Ranking.',
-    tooltip: 'Top 50 players by FedEx Cup ranking.',
+    tooltip: 'Top 50 players by Official World Golf Ranking.',
   },
   'most-active': {
     description: 'Players with the most tournament appearances this season.',
@@ -58,14 +59,29 @@ export function PlayersTab() {
   const { data: season } = useTourSeason();
   const { data: players, isLoading: playersLoading } = useTourPlayers();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
+  const { rankedOnly: worldRankedPlayers, isLoading: worldRankLoading } = useWorldRankings();
 
-  const isLoading = playersLoading || statsLoading;
+  const isLoading = playersLoading || statsLoading || worldRankLoading;
 
-  // Create stats lookup map
+  // Create stats lookup map with world rank data
   const statsMap = useMemo(() => {
-    if (!playerStats) return new Map<string, TourPlayerStatistics>();
-    return new Map(playerStats.map(s => [s.player_id, s]));
-  }, [playerStats]);
+    if (!playerStats) return new Map<string, TourPlayerStatistics & { worldRank?: number | null }>();
+    
+    // Create a map of player IDs to their world rank from unified hook
+    const worldRankMap = new Map(
+      worldRankedPlayers.map(p => [p.playerId, p.worldRank])
+    );
+    
+    return new Map(
+      playerStats.map(s => [
+        s.player_id, 
+        { 
+          ...s, 
+          worldRank: worldRankMap.get(s.player_id) ?? null 
+        }
+      ])
+    );
+  }, [playerStats, worldRankedPlayers]);
 
   // Filter and sort players
   const processedPlayers = useMemo(() => {
@@ -91,9 +107,11 @@ export function PlayersTab() {
     // Apply category filter
     switch (filter) {
       case 'top-ranked':
+        // Use world rank from unified hook - filter for valid ranks (>= 1)
         filtered = filtered.filter(p => {
           const stats = statsMap.get(p.id);
-          return stats?.fedex_rank && stats.fedex_rank <= 50;
+          const worldRank = stats?.worldRank;
+          return typeof worldRank === 'number' && worldRank >= 1 && worldRank <= 100;
         });
         break;
       case 'most-active':
@@ -116,10 +134,17 @@ export function PlayersTab() {
         filtered.sort((a, b) => a.full_name.localeCompare(b.full_name));
         break;
       case 'world-rank':
+        // Sort by world rank (valid ranks first ascending, then unranked)
         filtered.sort((a, b) => {
-          const aRank = statsMap.get(a.id)?.fedex_rank || 9999;
-          const bRank = statsMap.get(b.id)?.fedex_rank || 9999;
-          return aRank - bRank;
+          const aRank = statsMap.get(a.id)?.worldRank;
+          const bRank = statsMap.get(b.id)?.worldRank;
+          const aValid = typeof aRank === 'number' && aRank >= 1;
+          const bValid = typeof bRank === 'number' && bRank >= 1;
+          
+          if (aValid && bValid) return (aRank || 9999) - (bRank || 9999);
+          if (aValid) return -1;
+          if (bValid) return 1;
+          return a.full_name.localeCompare(b.full_name);
         });
         break;
       case 'most-active':
