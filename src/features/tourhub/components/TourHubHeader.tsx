@@ -1,6 +1,6 @@
 /**
- * TourHubHeader - Clean header with 9-dot menu trigger
- * Shows title and optional current section label
+ * TourHubHeader - Clean header with 9-dot menu trigger on the left
+ * Premium intro line instead of section label
  */
 
 import React from 'react';
@@ -8,18 +8,6 @@ import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { NineDotsIcon } from './NineDotsIcon';
 import type { TourHubTab } from './TourHubTabs';
-
-// Map tab values to display labels
-const TAB_LABELS: Record<TourHubTab, string> = {
-  'overview': 'Overview',
-  'schedule': 'Schedule',
-  'players': 'Players',
-  'player-stats': 'Stats',
-  'leaderboards': 'Leaders',
-  'summary': 'Summary',
-  'tee-times': 'Tee Times',
-  'hole-stats': 'Holes',
-};
 
 interface TourHubHeaderProps {
   activeTab?: TourHubTab;
@@ -33,40 +21,37 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   };
   
   return (
-    <header className="pt-4 pb-3">
-      {/* Top row: Title + 9-dot icon */}
+    <header className="pt-4 pb-4">
+      {/* Top row: 9-dot icon (left) + Title (center) */}
       <div className="flex items-center justify-between">
-        {/* Left spacer for balance */}
-        <div className="w-10" />
+        {/* Left: 9-dot menu button - no visible container */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={handleMenuClick}
+          className="w-11 h-11 flex items-center justify-center rounded-xl transition-all -ml-1"
+          aria-label="Open navigation menu"
+          aria-haspopup="dialog"
+        >
+          <NineDotsIcon className="text-foreground/60" size={20} />
+        </motion.button>
         
         {/* Center: Title */}
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Tour Hub
         </h1>
         
-        {/* Right: 9-dot menu button */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={handleMenuClick}
-          className="w-10 h-10 flex items-center justify-center rounded-xl transition-all"
-          style={{
-            background: 'rgba(0, 0, 0, 0.04)',
-          }}
-          aria-label="Open navigation menu"
-          aria-haspopup="dialog"
-        >
-          <NineDotsIcon className="text-foreground/70" size={18} />
-        </motion.button>
+        {/* Right spacer for balance */}
+        <div className="w-11" />
       </div>
       
-      {/* Second row: Current section breadcrumb */}
-      <div className="mt-2 text-center">
-        <span 
-          className="text-sm font-medium"
+      {/* Second row: Premium intro line */}
+      <div className="mt-3 text-center px-4">
+        <p 
+          className="text-[13px] leading-relaxed max-w-[320px] mx-auto"
           style={{ color: 'hsl(var(--muted-foreground))' }}
         >
-          {TAB_LABELS[activeTab]}
-        </span>
+          Your home for pro golf: leaderboards, stats, schedules, and the latest storylines.
+        </p>
       </div>
     </header>
   );
