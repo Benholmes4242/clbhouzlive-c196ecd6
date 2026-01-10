@@ -115,54 +115,65 @@ serve(async (req) => {
 
     const existingWinnerIds = new Set((existingWinners || []).map((w: any) => w.tournament_id));
 
-    // Get leaderboard data for winners
+    // Seed event_winners for tournaments that don't have one
+    // Since sr_leaderboards may be empty, create placeholder winners
     for (const tournament of closedTournaments || []) {
       if (existingWinnerIds.has(tournament.id)) {
         results.eventWinners.skipped++;
         continue;
       }
 
-      // Get leader from leaderboard
+      // Try to get leader from leaderboard first
       const { data: leaderboard } = await supabase
         .from("sr_leaderboards")
         .select(`
           player_id,
           position,
           score,
-          total,
+          strokes,
           player:sr_players(id, full_name)
         `)
         .eq("tournament_id", tournament.id)
         .order("position", { ascending: true })
         .limit(3);
 
-      if (!leaderboard || leaderboard.length === 0) {
-        results.eventWinners.skipped++;
-        continue;
-      }
-
-      const winner = leaderboard[0] as any;
-      const runnerUp = leaderboard[1] as any;
+      let winnerData: any;
       
-      // Calculate margin
-      const margin = runnerUp ? 
-        (winner.total || winner.score || 0) - (runnerUp.total || runnerUp.score || 0) : 
-        null;
+      if (leaderboard && leaderboard.length > 0) {
+        // We have leaderboard data - use actual winner
+        const winner = leaderboard[0] as any;
+        const runnerUp = leaderboard[1] as any;
+        const margin = runnerUp ? 
+          (winner.strokes || winner.score || 0) - (runnerUp.strokes || runnerUp.score || 0) : 
+          null;
 
-      const winnerData = {
-        tournament_id: tournament.id,
-        player_id: winner.player_id,
-        score_to_par: winner.score || null,
-        winning_score: winner.total || null,
-        margin: margin ? Math.abs(margin) : null,
-        is_playoff: margin === 0,
-        headline: `${winner.player?.full_name || 'Winner'} claims ${tournament.name} title`,
-        narrative: margin === 0 
-          ? `Won in a playoff` 
-          : margin && margin > 0 
-            ? `Won by ${Math.abs(margin)} stroke${Math.abs(margin) > 1 ? 's' : ''}`
-            : `Captured the title`,
-      };
+        winnerData = {
+          tournament_id: tournament.id,
+          player_id: winner.player_id,
+          score_to_par: winner.score || null,
+          winning_score: winner.strokes || null,
+          margin: margin ? Math.abs(margin) : null,
+          is_playoff: margin === 0,
+          headline: `${winner.player?.full_name || 'Winner'} claims ${tournament.name} title`,
+          narrative: margin === 0 
+            ? `Won in a playoff` 
+            : margin && margin > 0 
+              ? `Won by ${Math.abs(margin)} stroke${Math.abs(margin) > 1 ? 's' : ''}`
+              : `Captured the title`,
+        };
+      } else {
+        // No leaderboard data - create placeholder winner (premium pending state)
+        winnerData = {
+          tournament_id: tournament.id,
+          player_id: null,  // No player linked yet
+          score_to_par: null,
+          winning_score: null,
+          margin: null,
+          is_playoff: false,
+          headline: `Champion crowned at ${tournament.name}`,
+          narrative: `Official results coming soon`,
+        };
+      }
 
       const { error: winnerError } = await supabase
         .from("event_winners")

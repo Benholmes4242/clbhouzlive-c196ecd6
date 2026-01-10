@@ -38,8 +38,60 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
     );
   }
   
-  if (!winner || !winner.player) {
-    return null;
+  // Premium pending state when no winner data yet
+  if (!winner) {
+    return (
+      <div className={cn("", className)}>
+        <div className="flex items-center gap-2 mb-3">
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Champion
+          </span>
+        </div>
+        
+        <div className="p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/30 dark:from-slate-100/10 dark:to-slate-200/5 rounded-xl border border-slate-600/20 dark:border-slate-400/20">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-slate-700/30 dark:bg-slate-300/20 flex items-center justify-center">
+              <Trophy className="w-7 h-7 text-amber-500/60" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground/80">Champion unlocking soon</h3>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Official results will appear once the event concludes
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Winner exists but no player linked (pending data)
+  if (!winner.player) {
+    return (
+      <div className={cn("", className)}>
+        <div className="flex items-center gap-2 mb-3">
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Champion
+          </span>
+        </div>
+        
+        <div className="p-5 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/20">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+              <Trophy className="w-6 h-6 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground">{winner.headline || 'Champion crowned'}</h3>
+              {winner.narrative && (
+                <p className="text-sm text-muted-foreground mt-0.5">{winner.narrative}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   return (
