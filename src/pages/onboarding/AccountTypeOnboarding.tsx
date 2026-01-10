@@ -93,7 +93,12 @@ const AccountTypeOnboarding: React.FC = () => {
 
       if (error) throw error;
 
-      toast.success('Profile set up successfully!');
+      // Show appropriate success message
+      if (selectedType === 'individual' && selectedCollege) {
+        toast.success('College badge added');
+      } else {
+        toast.success('Profile set up successfully!');
+      }
       
       // Navigate to profile page
       navigate('/profile', { replace: true });
@@ -153,18 +158,18 @@ const AccountTypeOnboarding: React.FC = () => {
 
             {/* College search dropdown */}
             <div className="pt-4">
+              <label className="block text-sm font-medium text-foreground mb-2">
+                College <span className="text-muted-foreground font-normal">(optional)</span>
+              </label>
               <CollegeSearchDropdown
                 value={selectedCollege}
                 onChange={setSelectedCollege}
-                placeholder="Search for your college..."
+                placeholder="Start typing your college…"
               />
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                This is optional — you can skip or add it later.
-              </p>
             </div>
 
             {/* Action buttons */}
-            <div className="pt-4 space-y-3">
+            <div className="pt-6 space-y-3">
               <Button
                 onClick={handleFinalSubmit}
                 disabled={submitting}
@@ -174,6 +179,12 @@ const AccountTypeOnboarding: React.FC = () => {
               >
                 {submitting ? 'Setting up...' : selectedCollege ? 'Continue' : 'Skip for now'}
               </Button>
+              
+              {!selectedCollege && (
+                <p className="text-xs text-muted-foreground text-center">
+                  You can add this later in Edit Profile.
+                </p>
+              )}
             </div>
           </div>
         </main>
