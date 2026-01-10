@@ -2753,6 +2753,7 @@ export type Database = {
       game_participants: {
         Row: {
           added_by_user_id: string | null
+          archived_at: string | null
           created_at: string
           game_id: string
           guest_name: string | null
@@ -2769,6 +2770,7 @@ export type Database = {
         }
         Insert: {
           added_by_user_id?: string | null
+          archived_at?: string | null
           created_at?: string
           game_id: string
           guest_name?: string | null
@@ -2785,6 +2787,7 @@ export type Database = {
         }
         Update: {
           added_by_user_id?: string | null
+          archived_at?: string | null
           created_at?: string
           game_id?: string
           guest_name?: string | null
