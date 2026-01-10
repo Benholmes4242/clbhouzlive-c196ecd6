@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Calendar, MapPin, DollarSign, Trophy, Flag, Users, Ruler, Globe } from 'lucide-react';
 import { format } from 'date-fns';
@@ -6,6 +6,10 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TournamentDetailTabs, type TournamentDetailTab } from '../components/TourHubTabs';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
+import { usePlayerHeadshots } from '../hooks/usePlayerMedia';
+import { EventWinnerCard } from '../components/EventWinnerCard';
+import { EventMomentsList } from '../components/EventMomentsList';
+import { BatchPlayerAvatar } from '../components/PlayerAvatar';
 import { cn } from '@/lib/utils';
 
 function StatusBadge({ status }: { status: string }) {
@@ -25,19 +29,25 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// Leaderboard row component
+// Leaderboard row component with avatar
 function LeaderboardRow({ 
   position, 
+  playerId,
   playerName, 
+  playerPhotoUrl,
   score, 
   toPar, 
-  isTop3 = false 
+  isTop3 = false,
+  headshotMap,
 }: { 
   position: number; 
+  playerId: string;
   playerName: string; 
+  playerPhotoUrl?: string | null;
   score: number | string; 
   toPar: string;
   isTop3?: boolean;
+  headshotMap?: Map<string, string>;
 }) {
   const positionColors: Record<number, string> = {
     1: 'text-amber-600 bg-amber-500/10',
@@ -46,16 +56,29 @@ function LeaderboardRow({
   };
   
   return (
-    <div className={cn(
-      "flex items-center gap-4 py-3 border-b border-border/30 last:border-0",
-      isTop3 && "py-4"
-    )}>
+    <Link
+      to={`/tourhub/player/${playerId}`}
+      className={cn(
+        "flex items-center gap-4 py-3 border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors rounded-lg -mx-2 px-2",
+        isTop3 && "py-4"
+      )}
+    >
       <div className={cn(
         "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
         isTop3 ? positionColors[position] : "text-muted-foreground"
       )}>
         {position}
       </div>
+      
+      {/* Avatar */}
+      <BatchPlayerAvatar
+        playerId={playerId}
+        playerName={playerName}
+        fallbackPhotoUrl={playerPhotoUrl}
+        headshotMap={headshotMap}
+        size="sm"
+      />
+      
       <div className="flex-1 min-w-0">
         <p className={cn(
           "font-medium truncate",
@@ -72,7 +95,7 @@ function LeaderboardRow({
           {toPar}
         </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -81,6 +104,16 @@ export function TournamentDetailPage() {
   const [activeTab, setActiveTab] = useState<TournamentDetailTab>('overview');
   const { data: tournament, isLoading } = useTourTournament(tournamentId || '');
   const { data: leaderboard } = useTourLeaderboard(tournamentId || '');
+  
+  // Extract player IDs for batch headshot fetching
+  const playerIds = useMemo(() => {
+    if (!leaderboard) return [];
+    return leaderboard
+      .map((entry: any) => entry.player?.id)
+      .filter(Boolean) as string[];
+  }, [leaderboard]);
+  
+  const { data: headshotMap } = usePlayerHeadshots(playerIds);
   
   if (isLoading) {
     return (
@@ -109,12 +142,23 @@ export function TournamentDetailPage() {
   }
 
   const hasLeaderboard = leaderboard && leaderboard.length > 0;
+  const isCompleted = tournament.status === 'closed';
   
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
         return (
           <div className="space-y-8">
+            {/* Event Winner (for completed tournaments) */}
+            {isCompleted && tournamentId && (
+              <EventWinnerCard tournamentId={tournamentId} />
+            )}
+            
+            {/* Event Moments (for completed tournaments) */}
+            {isCompleted && tournamentId && (
+              <EventMomentsList tournamentId={tournamentId} limit={5} />
+            )}
+            
             {/* Tournament Details - Background first */}
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">Tournament Details</h3>
@@ -190,10 +234,13 @@ export function TournamentDetailPage() {
                     <LeaderboardRow
                       key={entry.id}
                       position={entry.position || index + 1}
+                      playerId={entry.player?.id || ''}
                       playerName={entry.player?.full_name || 'Unknown'}
+                      playerPhotoUrl={entry.player?.photo_url}
                       score={entry.total || '—'}
                       toPar={entry.total != null ? String(entry.total) : '—'}
                       isTop3={index < 3}
+                      headshotMap={headshotMap}
                     />
                   ))}
                 </div>
@@ -255,9 +302,12 @@ export function TournamentDetailPage() {
                     <LeaderboardRow
                       key={entry.id}
                       position={entry.position || index + 4}
+                      playerId={entry.player?.id || ''}
                       playerName={entry.player?.full_name || 'Unknown'}
+                      playerPhotoUrl={entry.player?.photo_url}
                       score={entry.total || '—'}
                       toPar={entry.total != null ? String(entry.total) : '—'}
+                      headshotMap={headshotMap}
                     />
                   ))}
                 </div>

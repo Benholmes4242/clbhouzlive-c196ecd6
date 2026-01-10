@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Calendar, GraduationCap, Building, Award, Trophy, Gl
 import { TourHubShell } from '../components/TourHubShell';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourPlayer, useTourPlayerStatistics, useTourSeason, useTourTournaments } from '../hooks/useTourHubData';
+import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -85,6 +86,7 @@ function TournamentResultItem({ name, result, date }: { name: string; result: st
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
   const { data: player, isLoading: playerLoading } = useTourPlayer(playerId || '');
+  const { data: headshot } = usePlayerHeadshot(playerId);
   const { data: season } = useTourSeason();
   const { data: allStats } = useTourPlayerStatistics(season?.id);
   const { data: tournaments } = useTourTournaments(season?.id);
@@ -103,6 +105,9 @@ export function PlayerProfilePage() {
       .slice(-5)
       .reverse();
   }, [tournaments]);
+  
+  // Use headshot from player_media if available, fallback to sr_players.photo_url
+  const photoUrl = headshot || player?.photo_url;
   
   const isLoading = playerLoading;
   
@@ -166,9 +171,9 @@ export function PlayerProfilePage() {
                 {/* Avatar with initials watermark */}
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-700 shadow-lg">
-                    {player.photo_url ? (
+                    {photoUrl ? (
                       <img 
-                        src={player.photo_url} 
+                        src={photoUrl} 
                         alt={player.full_name}
                         className="w-24 h-24 object-cover"
                       />
