@@ -26,6 +26,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
   const queryClient = useQueryClient();
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [optimisticallyRemovedIds, setOptimisticallyRemovedIds] = useState<Set<string>>(new Set());
   
   const scrollYRef = useRef(0);
   const wasOpenRef = useRef(false);
@@ -72,6 +73,9 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
     haptic('medium');
     setProcessingId(request.id);
     
+    // Optimistically remove from list immediately
+    setOptimisticallyRemovedIds(prev => new Set(prev).add(request.id));
+    
     try {
       if (request.type === 'game') {
         // Update game_participants rsvp_status to 'going'
@@ -99,7 +103,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             .eq('id', request.game_id);
         }
 
-        toast({ title: "They're in 👍", description: "Player added to your game." });
+        toast({ title: "Added to your game 👍" });
       } else {
         // Update trip_participants rsvp_status to 'going'
         const { error } = await supabase
@@ -112,7 +116,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
 
         if (error) throw error;
 
-        toast({ title: "They're in 👍", description: "Player added to your trip." });
+        toast({ title: "Added to your trip 👍" });
       }
 
       // Invalidate relevant queries
@@ -123,6 +127,12 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
       refetch();
     } catch (error) {
       console.error('Error accepting request:', error);
+      // Revert optimistic removal on error
+      setOptimisticallyRemovedIds(prev => {
+        const next = new Set(prev);
+        next.delete(request.id);
+        return next;
+      });
       toast({
         title: "Error",
         description: "Failed to accept request. Please try again.",
@@ -136,6 +146,9 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
   const handleDecline = useCallback(async (request: PendingRequest) => {
     haptic('light');
     setProcessingId(request.id);
+    
+    // Optimistically remove from list immediately
+    setOptimisticallyRemovedIds(prev => new Set(prev).add(request.id));
     
     try {
       if (request.type === 'game') {
@@ -163,10 +176,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
       }
 
       // Generic message (anonymity-preserving)
-      toast({ 
-        title: "Request handled", 
-        description: "We've let them know all slots are taken." 
-      });
+      toast({ title: "Let them know it's full" });
 
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['hostPendingRequests'] });
@@ -175,6 +185,12 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
       refetch();
     } catch (error) {
       console.error('Error declining request:', error);
+      // Revert optimistic removal on error
+      setOptimisticallyRemovedIds(prev => {
+        const next = new Set(prev);
+        next.delete(request.id);
+        return next;
+      });
       toast({
         title: "Error",
         description: "Failed to decline request. Please try again.",
@@ -185,12 +201,14 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
     }
   }, [queryClient, refetch]);
 
-  // Filter requests based on active tab
-  const displayedRequests = activeTab === 'all' 
+  // Filter requests based on active tab and optimistic removals
+  const baseRequests = activeTab === 'all' 
     ? requests 
     : activeTab === 'games' 
       ? gameRequests 
       : tripRequests;
+  
+  const displayedRequests = baseRequests.filter(r => !optimisticallyRemovedIds.has(r.id));
 
   if (!isOpen) return null;
 
