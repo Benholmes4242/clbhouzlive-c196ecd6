@@ -1,6 +1,6 @@
 /**
  * ScheduleFilterPills - Tab-style filters matching Discover page
- * Uses underline active state like Explore, Top 100, Friends tabs
+ * Uses underline active state with orange accent like Explore, Top 100, Friends tabs
  */
 
 import { cn } from '@/lib/utils';
@@ -34,7 +34,7 @@ export function ScheduleFilterPills({
     { value: 'all', label: 'All' },
     { value: 'upcoming', label: 'Upcoming' },
     { value: 'live', label: 'Live', hasLiveIndicator: true },
-    { value: 'completed', label: 'Completed' },
+    { value: 'completed', label: `Completed · ${counts.completed}` },
   ];
 
   const showLiveDot = counts.live > 0;
@@ -62,14 +62,14 @@ export function ScheduleFilterPills({
                   "active:scale-[0.97] motion-reduce:active:scale-100",
                   "flex items-center justify-center gap-1.5",
                   isActive 
-                    ? "active text-primary" 
-                    : "text-secondary hover:text-primary/80 motion-reduce:transition-none"
+                    ? "active text-foreground" 
+                    : "text-muted-foreground hover:text-foreground/80 motion-reduce:transition-none"
                 )}
               >
                 <span>{option.label}</span>
                 
                 {option.hasLiveIndicator && showLiveDot && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 )}
               </button>
             );
