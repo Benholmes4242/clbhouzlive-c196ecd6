@@ -1,6 +1,8 @@
 /**
  * useRequestJoinGame - Refactored join mutation with proper mutation pattern
  * 
+ * Uses predicate-based invalidation for all discover-games query variants
+ * 
  * Usage: const { mutate } = useRequestJoinGame();
  *        mutate({ gameId: 'xxx' });
  */
@@ -52,11 +54,19 @@ export function useRequestJoinGame() {
       toast.success('Request sent to host ✅');
       haptic('light');
       
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ['discover-games-v2'] });
+      // Predicate-based invalidation: catch all discover-games variants
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return key === 'discover-games' || key === 'discover-games-v2';
+        },
+      });
+      
+      // Also invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['game-detail', gameId] });
       queryClient.invalidateQueries({ queryKey: ['host-pending-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['userGames'] });
+      queryClient.invalidateQueries({ queryKey: ['user-games'] });
+      queryClient.invalidateQueries({ queryKey: ['your-games-trips'] });
     },
     onError: (error: Error) => {
       haptic('heavy');
