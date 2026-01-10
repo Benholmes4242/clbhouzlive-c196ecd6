@@ -4,7 +4,7 @@ import { TourHubShell } from '../components/TourHubShell';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourPlayer, useTourPlayerStatistics, useTourSeason, useTourTournaments } from '../hooks/useTourHubData';
 import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -97,8 +97,8 @@ export function PlayerProfilePage() {
     return allStats.find(s => s.player_id === playerId) || null;
   }, [allStats, playerId]);
 
-  // DEBUG LOGGING - Remove after verification
-  useMemo(() => {
+  // DEBUG LOGGING - useEffect (not useMemo) for side effects
+  useEffect(() => {
     if (playerId) {
       console.log('[PlayerProfilePage] Debug:', {
         'Route playerId': playerId,

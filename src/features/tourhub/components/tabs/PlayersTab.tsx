@@ -10,7 +10,7 @@
  * - Human pagination messaging
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -172,7 +172,27 @@ export function PlayersTab() {
     }
     return 'rank' as const;
   }, [filter, sort]);
-
+  
+  // DEBUG: Log Top Ranked filter results
+  useEffect(() => {
+    if (filter === 'top-ranked') {
+      console.log('[PlayersTab] Top Ranked Debug:', {
+        filter,
+        worldRankedPlayersCount: worldRankedPlayers.length,
+        statsMapSize: statsMap.size,
+        processedPlayersCount: processedPlayers.length,
+        sampleWorldRanked: worldRankedPlayers.slice(0, 3).map(p => ({
+          name: p.playerName,
+          worldRank: p.worldRank,
+          playerId: p.playerId,
+        })),
+        sampleStatsMap: Array.from(statsMap.entries()).slice(0, 3).map(([id, s]) => ({
+          id,
+          worldRank: s.worldRank,
+        })),
+      });
+    }
+  }, [filter, worldRankedPlayers, statsMap, processedPlayers]);
   const currentContext = TAB_CONTEXT[filter];
 
   // Loading state

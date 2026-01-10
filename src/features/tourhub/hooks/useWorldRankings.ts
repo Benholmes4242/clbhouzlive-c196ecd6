@@ -142,26 +142,31 @@ export function useWorldRankings(options?: { limit?: number }) {
     return sorted;
   }, [playerStats, options?.limit]);
   
-  // Debug logging for rank issues
-  useMemo(() => {
-    if (playerStats && playerStats.length > 0) {
-      const withRank = rankedPlayers.filter(p => p.isRanked);
-      const withZeroRank = playerStats.filter(s => {
-        const r = extractWorldRank(s);
-        return r === null || r === 0;
-      });
-      
-      console.log('[useWorldRankings] Stats:', {
-        totalRows: playerStats.length,
-        rankedPlayers: withRank.length,
-        unrankedOrZero: withZeroRank.length,
-        top5: rankedPlayers.slice(0, 5).map(p => ({ 
-          name: p.playerName, 
-          rank: p.worldRank 
-        })),
-      });
-    }
+  // Debug logging - moved outside useMemo for proper side effects
+  const debugInfo = useMemo(() => {
+    if (!playerStats || playerStats.length === 0) return null;
+    
+    const withRank = rankedPlayers.filter(p => p.isRanked);
+    const withZeroRank = playerStats.filter(s => {
+      const r = extractWorldRank(s);
+      return r === null || r === 0;
+    });
+    
+    return {
+      totalRows: playerStats.length,
+      rankedPlayers: withRank.length,
+      unrankedOrZero: withZeroRank.length,
+      top5: rankedPlayers.slice(0, 5).map(p => ({ 
+        name: p.playerName, 
+        rank: p.worldRank 
+      })),
+    };
   }, [playerStats, rankedPlayers]);
+  
+  // Log only when debug info changes
+  if (debugInfo) {
+    console.log('[useWorldRankings] Stats:', debugInfo);
+  }
   
   return {
     data: rankedPlayers,
