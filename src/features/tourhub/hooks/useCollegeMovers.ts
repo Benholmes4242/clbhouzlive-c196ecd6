@@ -45,13 +45,18 @@ export function useCollegeWeeklyMovers(options?: {
     queryFn: async () => {
       if (!seasonId) return [];
       
-      // Get current week start (Monday)
-      const today = new Date();
-      const dayOfWeek = today.getUTCDay();
-      const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-      const monday = new Date(today);
-      monday.setUTCDate(today.getUTCDate() - diff);
-      const weekStart = monday.toISOString().split('T')[0];
+      // Fetch the latest available week_start instead of computing it
+      const { data: latestWeek } = await supabase
+        .from('college_weekly_movers')
+        .select('week_start')
+        .eq('season_id', seasonId)
+        .order('week_start', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (!latestWeek?.week_start) return [];
+      
+      const weekStart = latestWeek.week_start;
       
       const deltaColumn = {
         earnings: 'earnings_delta',
