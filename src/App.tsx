@@ -209,6 +209,7 @@ const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m 
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 // Creator Pages
 const CreatorPage = lazy(() => import("./pages/CreatorPage"));
+const CreatorLegacyRedirect = lazy(() => import("./pages/CreatorRoutePage"));
 const CreatorStudioPage = lazy(() => import("./pages/CreatorStudioPage"));
 const CreatorEditPage = lazy(() => import("./pages/CreatorEditPage"));
 const CreatorInsightsPage = lazy(() => import("./pages/CreatorInsightsPage"));
@@ -243,6 +244,30 @@ const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
+
+// Creator page wrapper - handles both UUID (legacy) and slug routes
+function CreatorPageWrapper() {
+  const { userId } = useParams<{ userId: string }>();
+  
+  // Check if it's a UUID (legacy route) or slug (canonical route)
+  const isUUID = userId ? /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId) : false;
+  
+  if (isUUID) {
+    // Legacy route - use redirect component
+    return (
+      <Suspense fallback={<ProfileSkeleton />}>
+        <CreatorLegacyRedirect />
+      </Suspense>
+    );
+  }
+  
+  // Canonical slug route - use main CreatorPage
+  return (
+    <Suspense fallback={<ProfileSkeleton />}>
+      <CreatorPage />
+    </Suspense>
+  );
+}
 
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
@@ -308,7 +333,7 @@ function AppRoutes() {
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
-        <Route path="/creator/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorPage /></Suspense>} />
+        <Route path="/creator/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorPageWrapper /></Suspense>} />
         <Route path="/creators/manage" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorStudioPage /></Suspense>} />
         <Route path="/creator/:slug/edit" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorEditPage /></Suspense>} />
         <Route path="/creator/:slug/insights" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorInsightsPage /></Suspense>} />

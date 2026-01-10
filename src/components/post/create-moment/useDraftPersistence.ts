@@ -16,8 +16,13 @@ export function useDraftPersistence(availableActorIds?: string[]) {
       // Check if actor is still available (for creator/business)
       if (draft.actorType !== 'personal' && draft.actorId && availableActorIds) {
         if (!availableActorIds.includes(draft.actorId)) {
-          // Actor no longer available - fall back to personal
-          toast.info('Creator page is no longer available — switched to personal');
+          // Actor no longer available - fall back to personal with actor-aware message
+          const message = draft.actorType === 'creator'
+            ? 'Creator page is no longer available — switched to personal'
+            : draft.actorType === 'business'
+            ? 'Business profile is no longer available — switched to personal'
+            : 'Selected profile is no longer available — switched to personal';
+          toast.info(message);
           const fallbackDraft = { ...draft, actorType: 'personal' as const, actorId: undefined };
           setDraftData(fallbackDraft);
           setHasDraft(true);
