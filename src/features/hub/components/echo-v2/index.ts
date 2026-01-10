@@ -6,3 +6,5 @@ export { EchoThinkingCard } from './EchoThinkingCard';
 export { EchoComposer } from './EchoComposer';
 export { EchoEmptyState } from './EchoEmptyState';
 export { EchoErrorCard } from './EchoErrorCard';
+export { EchoTabPills, type EchoTab } from './EchoTabPills';
+export * from './echoStyles';

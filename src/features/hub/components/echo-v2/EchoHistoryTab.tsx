@@ -1,5 +1,6 @@
 /**
  * EchoHistoryTab - History view for Echo conversations
+ * Explicit light styling to match Hub sheets
  */
 
 import React, { useState } from 'react';
@@ -8,6 +9,7 @@ import { Search, Pin, Trash2, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
+import { HUB_INPUT, HUB_CARD, HUB_SECTION_HEADER, HUB_ICON_BUTTON } from './echoStyles';
 import {
   useEchoConversations,
   usePinConversation,
@@ -72,7 +74,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
       {/* Search input */}
       <div className="px-5 py-3 flex-shrink-0">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
@@ -80,10 +82,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
             placeholder="Search your chats..."
             className={cn(
               "w-full h-10 pl-9 pr-4 rounded-xl text-[14px]",
-              "bg-muted/50 border border-border/50",
-              "text-foreground placeholder:text-muted-foreground",
-              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30",
-              "transition-all duration-150"
+              HUB_INPUT
             )}
           />
         </div>
@@ -93,17 +92,17 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
       <div className="flex-1 overflow-y-auto px-5 pb-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
           </div>
         ) : !conversations || conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center mb-4">
-              <MessageSquare className="w-7 h-7 text-muted-foreground/40" />
+            <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mb-4", HUB_CARD)}>
+              <MessageSquare className="w-7 h-7 text-slate-400" />
             </div>
-            <p className="text-sm font-medium text-foreground/80">
+            <p className="text-sm font-medium text-slate-800">
               {search ? 'No chats found' : 'No chat history yet'}
             </p>
-            <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+            <p className="text-xs text-slate-500 mt-1 max-w-[200px]">
               {search ? 'Try a different search term' : 'Start a conversation in Chat to see it here'}
             </p>
           </div>
@@ -112,7 +111,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
             {/* Pinned section */}
             {conversations.some(c => c.pinned) && (
               <>
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-1 pt-1">
+                <p className={cn("px-1 pt-1", HUB_SECTION_HEADER)}>
                   Pinned
                 </p>
                 <AnimatePresence mode="popLayout">
@@ -143,7 +142,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
             {conversations.some(c => !c.pinned) && (
               <>
                 {conversations.some(c => c.pinned) && (
-                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-1 pt-3">
+                  <p className={cn("px-1 pt-3", HUB_SECTION_HEADER)}>
                     Recent
                   </p>
                 )}
@@ -222,23 +221,24 @@ function ConversationCard({
     <button
       onClick={onSelect}
       className={cn(
-        "w-full text-left p-3 rounded-xl transition-all duration-150",
-        "bg-card border border-border/50 hover:border-border",
+        "w-full text-left p-3 rounded-2xl transition-all duration-150",
+        HUB_CARD,
+        "hover:bg-white/90",
         "active:scale-[0.99]",
-        isActive && "ring-2 ring-primary/20 border-primary/30"
+        isActive && "ring-2 ring-[hsl(var(--echo-accent,270_60%_60%))]/20 border-[hsl(var(--echo-accent,270_60%_60%))]/30"
       )}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             {conversation.pinned && (
-              <Pin className="w-3 h-3 text-primary flex-shrink-0" />
+              <Pin className="w-3 h-3 text-[hsl(var(--echo-accent,270_60%_60%))] flex-shrink-0" />
             )}
-            <h3 className="text-[14px] font-medium text-foreground truncate">
+            <h3 className="text-[14px] font-medium text-slate-900 truncate">
               {conversation.title || 'Untitled chat'}
             </h3>
           </div>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
+          <p className="text-[12px] text-slate-500 mt-0.5">
             {timeAgo} ago • {messageCount} message{messageCount !== 1 ? 's' : ''}
           </p>
         </div>
@@ -250,15 +250,15 @@ function ConversationCard({
             className={cn(
               "p-1.5 rounded-lg transition-colors",
               conversation.pinned 
-                ? "text-primary hover:bg-primary/10" 
-                : "text-muted-foreground hover:bg-muted"
+                ? "text-[hsl(var(--echo-accent,270_60%_60%))] hover:bg-[hsl(var(--echo-accent,270_60%_60%))]/10" 
+                : "text-slate-400 hover:bg-black/5"
             )}
           >
             <Pin className="w-4 h-4" />
           </button>
           <button
             onClick={onDelete}
-            className="p-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>

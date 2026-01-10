@@ -1,6 +1,6 @@
 /**
  * EchoResponseCard - Premium glass card for assistant responses
- * Uses design tokens and proper markdown rendering
+ * Explicit light styling to match Hub sheets
  */
 
 import React, { useState } from 'react';
@@ -9,6 +9,7 @@ import { Sparkles, Copy, Check, ChevronRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
 import { cn } from '@/lib/utils';
+import { HUB_CARD } from './echoStyles';
 
 interface EchoResponseCardProps {
   content: string;
@@ -64,14 +65,14 @@ export function EchoResponseCard({
       {/* Response card */}
       <div className="flex-1 min-w-0">
         <div
-          className="rounded-2xl rounded-tl-md overflow-hidden bg-card/75 backdrop-blur-xl border border-border/30"
-          style={{
-            boxShadow: '0 2px 12px hsl(var(--foreground) / 0.04), 0 1px 3px hsl(var(--foreground) / 0.02)',
-          }}
+          className={cn(
+            "rounded-2xl rounded-tl-md overflow-hidden",
+            HUB_CARD
+          )}
         >
           {/* Header row */}
           <div 
-            className="flex items-center gap-2 px-3.5 pt-2.5 pb-1 border-b border-border/20"
+            className="flex items-center gap-2 px-3.5 pt-2.5 pb-1 border-b border-black/[0.05]"
           >
             <span className="text-[11px] font-semibold uppercase tracking-wide text-[hsl(var(--echo-accent,270_60%_60%))]">
               Echo
@@ -80,12 +81,12 @@ export function EchoResponseCard({
               <span className="inline-block w-1.5 h-3 bg-[hsl(var(--echo-accent,270_60%_60%))] opacity-70 animate-pulse rounded-sm" />
             )}
             {wasAborted && (
-              <span className="text-[10px] text-muted-foreground">(stopped)</span>
+              <span className="text-[10px] text-slate-500">(stopped)</span>
             )}
           </div>
 
           {/* Content - rendered as markdown */}
-          <div className="px-3.5 py-2.5 text-[14px] leading-[1.6] text-foreground">
+          <div className="px-3.5 py-2.5 text-[14px] leading-[1.6] text-slate-900">
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
@@ -93,7 +94,7 @@ export function EchoResponseCard({
                 p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                 ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
                 ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
-                li: ({ children }) => <li className="text-foreground">{children}</li>,
+                li: ({ children }) => <li className="text-slate-900">{children}</li>,
                 strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
               }}
@@ -104,10 +105,10 @@ export function EchoResponseCard({
 
           {/* Actions row - only show when not streaming */}
           {!isStreaming && (
-            <div className="flex items-center gap-2 px-3 pb-2.5 border-t border-border/20">
+            <div className="flex items-center gap-2 px-3 pb-2.5 border-t border-black/[0.05]">
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all active:scale-95 bg-muted/50 text-muted-foreground hover:bg-muted"
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all active:scale-95 bg-black/[0.04] text-slate-600 hover:bg-black/[0.08]"
               >
                 {copied ? (
                   <>

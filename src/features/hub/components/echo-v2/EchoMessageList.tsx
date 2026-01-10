@@ -170,8 +170,7 @@ export function EchoMessageList({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             onClick={scrollToBottom}
-            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 bg-foreground text-background"
-            style={{ boxShadow: '0 4px 12px hsl(var(--foreground) / 0.2)' }}
+            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 bg-slate-800 text-white shadow-lg"
           >
             <ChevronDown className="w-3.5 h-3.5" />
             New message
