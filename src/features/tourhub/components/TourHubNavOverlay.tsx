@@ -126,13 +126,14 @@ export function TourHubNavOverlay({
             {/* Clbhouz Logo Mark Watermark - large, off-screen right, orange */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.04, scale: 1 }}
+              animate={{ opacity: 0.05, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="absolute pointer-events-none"
               style={{
                 right: '-40%',
-                top: '18%',
+                top: '50%',
+                transform: 'translateY(-50%)',
                 width: '500px',
                 height: '500px',
                 zIndex: 0,
