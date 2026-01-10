@@ -126,7 +126,7 @@ export function TourHubNavOverlay({
             {/* Clbhouz Logo Mark Watermark - large, off-screen right, orange */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.2, scale: 1 }}
+              animate={{ opacity: 0.5, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="absolute pointer-events-none"
@@ -135,15 +135,13 @@ export function TourHubNavOverlay({
                 top: '18%',
                 width: '500px',
                 height: '500px',
+                zIndex: 0,
               }}
             >
               <img 
                 src="/assets/logomark-orange.png"
                 alt=""
                 className="w-full h-full object-contain"
-                style={{ 
-                  opacity: 1,
-                }}
               />
             </motion.div>
             
