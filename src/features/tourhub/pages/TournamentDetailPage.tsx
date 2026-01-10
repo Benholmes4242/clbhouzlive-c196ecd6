@@ -192,7 +192,7 @@ export function TournamentDetailPage() {
                       position={entry.position || index + 1}
                       playerName={entry.player?.full_name || 'Unknown'}
                       score={entry.total || '—'}
-                      toPar={entry.score_to_par != null ? (entry.score_to_par > 0 ? `+${entry.score_to_par}` : entry.score_to_par === 0 ? 'E' : String(entry.score_to_par)) : '—'}
+                      toPar={entry.total != null ? String(entry.total) : '—'}
                       isTop3={index < 3}
                     />
                   ))}
@@ -255,9 +255,9 @@ export function TournamentDetailPage() {
                     <LeaderboardRow
                       key={entry.id}
                       position={entry.position || index + 4}
-                      playerName={(entry.player as any)?.full_name || 'Unknown'}
+                      playerName={entry.player?.full_name || 'Unknown'}
                       score={entry.total || '—'}
-                      toPar={entry.score_to_par != null ? (entry.score_to_par > 0 ? `+${entry.score_to_par}` : entry.score_to_par === 0 ? 'E' : String(entry.score_to_par)) : '—'}
+                      toPar={entry.total != null ? String(entry.total) : '—'}
                     />
                   ))}
                 </div>
