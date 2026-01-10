@@ -2,29 +2,23 @@
  * TripDetailSheetV2 - Bottom sheet for viewing trip details
  * Opens from YourGamesTripsSheet without route change
  * 
- * Matches GameDetailSheetV2 design language:
+ * Matches GameDetailSheetV2 design language EXACTLY:
  * - Glass-lite surface with frosted header
+ * - Same height (92svh), grabber, rounded corners
+ * - Tab pills (Details, Messages, Players)
  * - Premium stacked sheet depth (blur+scale underlying)
  * - No bounce animation
- * 
- * V2: Added Edit/Remove actions with confirmation dialogs
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, MoreVertical, ExternalLink, LogOut, Trash2, Share2, Loader2, Pencil } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,14 +32,16 @@ import {
 
 import { useTripTimeline } from '../../hooks/useTripTimeline';
 import { useCancelTrip, useLeaveTrip } from '../../hooks/useTripActions';
-import { TripHeader } from './TripHeader';
-import { TripTimeline } from './TripTimeline';
+import { TripDetailContent } from './TripDetailContent';
+import { TripDetailSkeleton } from './TripDetailSkeleton';
 import { GameDetailSheetV2 } from '../game-detail-v2/GameDetailSheetV2';
+import type { TripDetailTab } from './TripDetailTabPills';
 
 interface TripDetailSheetV2Props {
   isOpen: boolean;
   onClose: () => void;
   tripId: string;
+  initialTab?: TripDetailTab;
 }
 
 function formatTripDateRange(startDate: Date, endDate: Date): string {
@@ -62,8 +58,10 @@ export function TripDetailSheetV2({
   isOpen,
   onClose,
   tripId,
+  initialTab = 'details',
 }: TripDetailSheetV2Props) {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<TripDetailTab>(initialTab);
   
   // Scroll lock refs
   const scrollYRef = useRef(0);
@@ -128,6 +126,13 @@ export function TripDetailSheetV2({
       }
     };
   }, [isOpen]);
+
+  // Reset tab when sheet opens
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   const handleClose = useCallback(() => {
     haptic('light');
@@ -230,13 +235,13 @@ export function TripDetailSheetV2({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop - blur + dim for premium stacked feel */}
+          {/* Backdrop - blur + dim for premium stacked feel - MATCHES GAME SHEET z-index */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[10100]"
+            className="fixed inset-0 z-[10001]"
             style={{
               background: 'rgba(0, 0, 0, 0.18)',
               backdropFilter: 'blur(6px)',
@@ -245,130 +250,82 @@ export function TripDetailSheetV2({
             onClick={handleClose}
           />
 
-          {/* Stacked depth CSS */}
+          {/* Underlying sheet scale effect - applied via CSS on YourGamesTripsSheet */}
           <style>{`
-            .your-games-trips-sheet-wrapper.trip-stacked-behind {
+            .your-games-trips-sheet-wrapper {
+              transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            }
+            .your-games-trips-sheet-wrapper.stacked-behind {
               transform: scale(0.985);
               opacity: 0.96;
             }
           `}</style>
 
-          {/* Sheet */}
+          {/* Sheet - MATCHES GAME SHEET EXACTLY: height, corners, grabber */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className={`fixed inset-x-0 bottom-0 z-[10200] flex flex-col rounded-t-[28px] overflow-hidden ${gameSheetOpen ? 'trip-sheet-stacked' : ''}`}
+            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
             style={{
-              height: 'calc(100dvh - 16px)',
-              maxHeight: 'calc(100dvh - 16px)',
+              height: '92svh',
+              maxHeight: '92svh',
               backgroundColor: '#F9FAFB',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
             }}
           >
-            {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+            {/* Grabber - MATCHES GAME SHEET: w-9 h-[3px] */}
+            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
               <div 
-                className="w-10 h-[4px] rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.10)' }}
+                className="w-9 h-[3px] rounded-full"
+                style={{ background: 'rgba(0, 0, 0, 0.08)' }}
               />
             </div>
 
-            {/* Header - frosted glass chrome */}
+            {/* Header - frosted glass chrome - MATCHES GAME SHEET */}
             <div 
-              className="flex items-center gap-3 px-4 pb-3 flex-shrink-0 min-h-[72px]"
+              className="flex items-center gap-3 px-4 pt-1 pb-3 flex-shrink-0"
               style={{
                 background: 'rgba(255, 255, 255, 0.7)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
               }}
             >
-              {/* Back button */}
               <button
                 onClick={handleClose}
-                className="h-10 w-10 -ml-2 rounded-full flex items-center justify-center transition-colors hover:bg-black/5 active:bg-black/10"
+                className="p-2 -ml-2 rounded-full transition-colors hover:bg-black/5"
               >
                 <ChevronLeft className="w-5 h-5" style={{ color: 'rgba(30, 41, 59, 0.7)' }} />
               </button>
 
-              {/* Title + date - fixed height */}
-              <div className="flex-1 min-w-0 flex flex-col justify-center">
-                {isLoading ? (
+              {/* Fixed height header to prevent layout jump - MATCHES GAME SHEET */}
+              <div className="flex-1 min-w-0 min-h-[44px] flex flex-col justify-center">
+                {isLoading || !trip ? (
                   <div className="space-y-1.5 animate-pulse">
-                    <div className="h-5 w-40 bg-black/10 rounded-lg" />
-                    <div className="h-3 w-28 bg-black/10 rounded-lg mt-2" />
+                    <div className="h-5 w-36 bg-black/5 rounded-lg" />
+                    <div className="h-3 w-24 bg-black/5 rounded-lg" />
                   </div>
-                ) : trip ? (
+                ) : (
                   <>
                     <h2 
-                      className="text-[17px] font-semibold leading-tight truncate line-clamp-1"
+                      className="text-[17px] font-semibold leading-tight truncate"
                       style={{ color: '#1e293b', letterSpacing: '-0.01em' }}
                     >
                       {trip.name}
                     </h2>
                     <p 
-                      className="text-[12.5px] leading-tight mt-0.5"
-                      style={{ color: 'rgba(100, 116, 139, 0.8)' }}
+                      className="text-[12px]"
+                      style={{ color: 'rgba(30, 41, 59, 0.5)' }}
                     >
                       {formatTripDateRange(trip.startDate, trip.endDate)}
                     </p>
                   </>
-                ) : (
-                  <h2 
-                    className="text-[17px] font-semibold leading-tight"
-                    style={{ color: '#1e293b' }}
-                  >
-                    Trip
-                  </h2>
                 )}
               </div>
-
-              {/* Overflow menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="h-10 w-10 -mr-2 rounded-full flex items-center justify-center transition-colors hover:bg-black/5 active:bg-black/10">
-                    <MoreVertical className="w-5 h-5" style={{ color: 'rgba(30, 41, 59, 0.6)' }} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={handleOpenFullPage} className="gap-2">
-                    <ExternalLink className="w-4 h-4" />
-                    Open full page
-                  </DropdownMenuItem>
-                  {isHost && (
-                    <DropdownMenuItem className="gap-2">
-                      <Pencil className="w-4 h-4" />
-                      Edit trip
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem className="gap-2">
-                    <Share2 className="w-4 h-4" />
-                    Share trip
-                  </DropdownMenuItem>
-                  {!isHost && (
-                    <DropdownMenuItem 
-                      onClick={() => setShowLeaveDialog(true)}
-                      className="gap-2 text-red-600 focus:text-red-600"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Leave trip
-                    </DropdownMenuItem>
-                  )}
-                  {isHost && (
-                    <DropdownMenuItem 
-                      onClick={() => setShowRemoveDialog(true)}
-                      className="gap-2 text-red-600 focus:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Remove trip
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
-            {/* Fading divider */}
+            {/* Fading divider - not hard line - MATCHES GAME SHEET */}
             <div 
               className="h-px flex-shrink-0"
               style={{
@@ -377,14 +334,9 @@ export function TripDetailSheetV2({
             />
 
             {/* Content */}
-            <div 
-              className="flex-1 overflow-y-auto overscroll-contain"
-              style={{ WebkitOverflowScrolling: 'touch' }}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center h-48">
-                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
+            <div className="flex-1 flex flex-col overflow-hidden relative">
+              {isLoading || !trip ? (
+                <TripDetailSkeleton />
               ) : tripNotFound ? (
                 <div className="flex flex-col items-center justify-center h-64 text-center px-6">
                   <h2 className="font-semibold text-foreground mb-1">Trip not found</h2>
@@ -402,29 +354,25 @@ export function TripDetailSheetV2({
                   </p>
                   <Button onClick={() => window.location.reload()}>Retry</Button>
                 </div>
-              ) : trip ? (
-                <div className="px-4 py-4 space-y-4">
-                  <TripHeader trip={trip} participants={participants} />
-                  
-                  <div className="pt-2">
-                    <h3 
-                      className="text-[11px] font-semibold uppercase tracking-wider mb-3"
-                      style={{ color: 'rgba(100, 116, 139, 0.5)' }}
-                    >
-                      Timeline
-                    </h3>
-                    <TripTimeline 
-                      items={timeline} 
-                      isLoading={false}
-                      onGameTap={handleGameTap}
-                      onAddRound={isHost ? handleAddRound : undefined}
-                      todayDayNumber={todayDayNumber}
-                      hasMultipleDays={hasMultipleDays}
-                      hasTodayInTrip={hasTodayInTrip}
-                    />
-                  </div>
-                </div>
-              ) : null}
+              ) : (
+                <TripDetailContent
+                  trip={trip}
+                  participants={participants}
+                  timeline={timeline}
+                  currentUserId={currentUserId}
+                  isHost={isHost}
+                  todayDayNumber={todayDayNumber}
+                  hasMultipleDays={hasMultipleDays}
+                  hasTodayInTrip={hasTodayInTrip}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  onOpenFullPage={handleOpenFullPage}
+                  onAddRound={handleAddRound}
+                  onGameTap={handleGameTap}
+                  onShowRemoveDialog={() => setShowRemoveDialog(true)}
+                  onShowLeaveDialog={() => setShowLeaveDialog(true)}
+                />
+              )}
             </div>
           </motion.div>
 
@@ -501,5 +449,3 @@ export function TripDetailSheetV2({
     portalRoot
   );
 }
-
-export default TripDetailSheetV2;
