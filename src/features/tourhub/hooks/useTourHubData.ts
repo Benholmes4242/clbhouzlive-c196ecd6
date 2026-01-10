@@ -317,6 +317,21 @@ export function useTourPlayerStatistics(seasonId?: string) {
         } as TourPlayerStatistics;
       });
       
+      // Debug: log stats before sorting
+      const withWorldRank = enrichedStats.filter(s => s.world_rank && s.world_rank > 0);
+      const withWins = enrichedStats.filter(s => s.wins && s.wins > 0);
+      console.log('[useTourPlayerStatistics] Data summary:', {
+        totalStats: enrichedStats.length,
+        withWorldRank: withWorldRank.length,
+        withWins: withWins.length,
+        sampleRanked: withWorldRank.slice(0, 3).map(s => ({
+          playerName: s.player?.full_name,
+          worldRank: s.world_rank,
+          wins: s.wins,
+          fedexRank: s.fedex_rank,
+        })),
+      });
+      
       // Sort by world_rank (properly handling 0/null as unranked)
       return enrichedStats.sort((a, b) => {
         const aRank = a.world_rank && a.world_rank > 0 ? a.world_rank : Infinity;
