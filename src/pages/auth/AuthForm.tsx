@@ -236,6 +236,25 @@ const AuthForm: React.FC<AuthFormProps> = ({
         message: `Your account is almost ready. Check ${email} for a verification link, then sign in here.`,
       });
       setSubmitting(false);
+    } else if (data && !data.user) {
+      // Supabase returned success but no user - email confirmation required
+      // This happens when "Confirm email" is enabled in Supabase Auth settings
+      localStorage.setItem('pending_signup_email', email);
+      
+      setIsSignUp(false);
+      setPassword('');
+      setConfirmPassword('');
+      setUsername('');
+      setView('entry');
+      setAuthNotice({
+        type: 'success',
+        message: `Check ${email} for a verification link to complete signup.`,
+      });
+      setSubmitting(false);
+    } else {
+      // Unexpected state - fail gracefully
+      setErrorMsg('Something went wrong. Please try again.');
+      setSubmitting(false);
     }
   };
 
