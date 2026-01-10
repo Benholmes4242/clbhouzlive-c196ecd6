@@ -9,3 +9,7 @@ export { TripAddNoteSheetV2 } from './TripAddNoteSheetV2';
 export { TourDayHeader } from './TourDayHeader';
 export { StickyTodayPill } from './StickyTodayPill';
 export { EndOfDayDivider } from './EndOfDayDivider';
+export { TripDetailTabPills } from './TripDetailTabPills';
+export { TripDetailContent } from './TripDetailContent';
+export { TripDetailSkeleton } from './TripDetailSkeleton';
+export type { TripDetailTab } from './TripDetailTabPills';
