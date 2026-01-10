@@ -35,6 +35,12 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   
   const { sendMessage: sendToAI, abort } = useAIStream();
   const firstUserMessageRef = useRef<string | null>(null);
+  const messagesRef = useRef<EchoMessage[]>([]);
+  
+  // Keep messagesRef in sync
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // Get current user on mount
   useEffect(() => {
@@ -118,9 +124,12 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     const assistantMessageId = nanoid();
     let accumulatedContent = '';
 
+    // Build messages list from ref to avoid stale closure state
+    const currentMessages = [...messagesRef.current, userMessage];
+
     try {
       await sendToAI(
-        [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+        currentMessages.map(m => ({ role: m.role, content: m.content })),
         'default-conversation',
         {
           onChunk: (chunk) => {

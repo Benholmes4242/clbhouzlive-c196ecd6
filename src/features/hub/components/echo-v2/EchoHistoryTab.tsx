@@ -28,9 +28,10 @@ import {
 interface EchoHistoryTabProps {
   onSelectConversation: (conversationId: string) => void;
   currentConversationId: string | null;
+  onDeleteCurrentConversation?: () => void;
 }
 
-export function EchoHistoryTab({ onSelectConversation, currentConversationId }: EchoHistoryTabProps) {
+export function EchoHistoryTab({ onSelectConversation, currentConversationId, onDeleteCurrentConversation }: EchoHistoryTabProps) {
   const [search, setSearch] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -52,6 +53,10 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId }: 
 
   const handleConfirmDelete = () => {
     if (deleteTarget) {
+      // If deleting the currently open conversation, notify parent to reset chat
+      if (deleteTarget === currentConversationId && onDeleteCurrentConversation) {
+        onDeleteCurrentConversation();
+      }
       deleteMutation.mutate(deleteTarget);
       setDeleteTarget(null);
     }
@@ -92,37 +97,79 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId }: 
           </div>
         ) : !conversations || conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageSquare className="w-10 h-10 text-muted-foreground/40 mb-3" />
-            <p className="text-sm text-muted-foreground">
+            <div className="w-16 h-16 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center mb-4">
+              <MessageSquare className="w-7 h-7 text-muted-foreground/40" />
+            </div>
+            <p className="text-sm font-medium text-foreground/80">
               {search ? 'No chats found' : 'No chat history yet'}
             </p>
-            <p className="text-xs text-muted-foreground/70 mt-1">
-              Start a conversation to see it here
+            <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+              {search ? 'Try a different search term' : 'Start a conversation in Chat to see it here'}
             </p>
           </div>
         ) : (
           <div className="space-y-2">
-            <AnimatePresence mode="popLayout">
-              {conversations.map((conv) => (
-                <motion.div
-                  key={conv.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <ConversationCard
-                    conversation={conv}
-                    isActive={conv.id === currentConversationId}
-                    onSelect={() => handleSelect(conv.id)}
-                    onPin={(e) => handlePin(e, conv)}
-                    onDelete={(e) => handleDeleteClick(e, conv.id)}
-                    isPinning={pinMutation.isPending}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {/* Pinned section */}
+            {conversations.some(c => c.pinned) && (
+              <>
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-1 pt-1">
+                  Pinned
+                </p>
+                <AnimatePresence mode="popLayout">
+                  {conversations.filter(c => c.pinned).map((conv) => (
+                    <motion.div
+                      key={conv.id}
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <ConversationCard
+                        conversation={conv}
+                        isActive={conv.id === currentConversationId}
+                        onSelect={() => handleSelect(conv.id)}
+                        onPin={(e) => handlePin(e, conv)}
+                        onDelete={(e) => handleDeleteClick(e, conv.id)}
+                        isPinning={pinMutation.isPending}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </>
+            )}
+
+            {/* Recent section */}
+            {conversations.some(c => !c.pinned) && (
+              <>
+                {conversations.some(c => c.pinned) && (
+                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-1 pt-3">
+                    Recent
+                  </p>
+                )}
+                <AnimatePresence mode="popLayout">
+                  {conversations.filter(c => !c.pinned).map((conv) => (
+                    <motion.div
+                      key={conv.id}
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <ConversationCard
+                        conversation={conv}
+                        isActive={conv.id === currentConversationId}
+                        onSelect={() => handleSelect(conv.id)}
+                        onPin={(e) => handlePin(e, conv)}
+                        onDelete={(e) => handleDeleteClick(e, conv.id)}
+                        isPinning={pinMutation.isPending}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </>
+            )}
           </div>
         )}
       </div>
