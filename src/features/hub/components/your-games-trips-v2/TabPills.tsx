@@ -1,5 +1,6 @@
 /**
- * TabPills - Segmented pill tabs matching V2 design
+ * TabPills - V2 segmented pill tabs
+ * Premium styling: slight elevation on active, breathing room
  */
 
 import React from 'react';
@@ -20,9 +21,9 @@ const TABS: { key: SheetTab; label: string }[] = [
 export function TabPills({ activeTab, onTabChange }: TabPillsProps) {
   return (
     <div 
-      className="flex gap-1.5 p-1 rounded-[14px]"
+      className="flex gap-1.5 p-1.5 rounded-[16px]"
       style={{
-        background: 'rgba(0, 0, 0, 0.04)',
+        background: 'rgba(0, 0, 0, 0.03)',
       }}
     >
       {TABS.map(tab => {
@@ -31,20 +32,20 @@ export function TabPills({ activeTab, onTabChange }: TabPillsProps) {
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className="relative flex-1 py-1.5 px-3 text-[13px] font-medium rounded-[10px] transition-colors duration-150"
+            className="relative flex-1 py-2 px-4 text-[13px] font-medium rounded-[12px] transition-colors duration-150"
             style={{
-              color: isActive ? '#1e293b' : 'rgba(30, 41, 59, 0.55)',
+              color: isActive ? '#1e293b' : 'rgba(100, 116, 139, 0.7)',
             }}
           >
             {isActive && (
               <motion.div
-                layoutId="tab-pill-bg"
-                className="absolute inset-0 rounded-[10px]"
+                layoutId="tab-pill-bg-v2"
+                className="absolute inset-0 rounded-[12px]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)',
                 }}
-                transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                transition={{ type: 'spring', bounce: 0.12, duration: 0.4 }}
               />
             )}
             <span className="relative z-10">{tab.label}</span>

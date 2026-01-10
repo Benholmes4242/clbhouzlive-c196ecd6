@@ -205,10 +205,10 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)',
-            paddingBottom: '65px', // 10px gap to dock (55px dock height + 10px)
+            paddingBottom: 'calc(55px + 10px)', // dock height + 10px gap
           }}
         >
-          <div className="px-5 flex flex-col gap-[8px] flex-1">
+          <div className="px-5 flex flex-col gap-[8px] flex-1 min-h-0">
             {/* Show skeleton while loading, real content when ready */}
             {!isDataReady ? (
               <HubContentSkeleton />
@@ -229,9 +229,9 @@ export function HubHomePage() {
                   <EchoTile />
                 </div>
 
-                {/* Zone 5: Full-width "Your Games" Gradient CTA - flex grow to fill remaining space */}
-                <div className="flex-1 flex flex-col min-h-0">
-                  <YourGamesGradientCTA className="flex-1" />
+                {/* Zone 5: Full-width "Your Games" Gradient CTA - flex grow to fill remaining space with 10px gap to dock */}
+                <div className="flex-1 min-h-0 pb-[10px]">
+                  <YourGamesGradientCTA className="h-full" />
                 </div>
               </>
             )}

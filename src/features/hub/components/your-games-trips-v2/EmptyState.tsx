@@ -1,9 +1,10 @@
 /**
- * EmptyState - Premium empty states for each tab
+ * EmptyState - Premium empty states with warm, tour-grade copy
+ * Soft icon, centered layout, calm tone
  */
 
 import React from 'react';
-import { CalendarPlus, History, Plane, Plus } from 'lucide-react';
+import { CalendarDays, History, Plane } from 'lucide-react';
 import type { SheetTab } from './types';
 
 interface EmptyStateProps {
@@ -16,46 +17,36 @@ const CONFIG: Record<SheetTab, {
   icon: React.ReactNode; 
   title: string; 
   subtitle: string; 
-  cta?: { label: string; action: 'game' | 'trip' } 
 }> = {
   upcoming: {
-    icon: <CalendarPlus className="w-6 h-6" style={{ color: 'rgba(30, 41, 59, 0.3)' }} />,
+    icon: <CalendarDays className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />,
     title: 'No upcoming games yet',
-    subtitle: 'Create one and invite your group.',
-    cta: { label: 'Create Game', action: 'game' },
+    subtitle: 'Games you\'re invited to will appear here',
   },
   past: {
-    icon: <History className="w-6 h-6" style={{ color: 'rgba(30, 41, 59, 0.3)' }} />,
-    title: 'No past games',
-    subtitle: 'Your completed games will show here.',
+    icon: <History className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />,
+    title: 'No completed games',
+    subtitle: 'Past rounds will live here for reference',
   },
   trips: {
-    icon: <Plane className="w-6 h-6" style={{ color: 'rgba(30, 41, 59, 0.3)' }} />,
-    title: 'No trips yet',
-    subtitle: 'Trips keep your games and moments together.',
-    cta: { label: 'Create Trip', action: 'trip' },
+    icon: <Plane className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />,
+    title: 'No trips created yet',
+    subtitle: 'Start planning your next golf adventure',
   },
 };
 
-export function EmptyState({ tab, onCreateGame, onCreateTrip }: EmptyStateProps) {
+export function EmptyState({ tab }: EmptyStateProps) {
   const config = CONFIG[tab];
-  
-  const handleCtaClick = () => {
-    if (config.cta?.action === 'game' && onCreateGame) {
-      onCreateGame();
-    } else if (config.cta?.action === 'trip' && onCreateTrip) {
-      onCreateTrip();
-    }
-  };
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-      {/* Icon container */}
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+      {/* Icon container - soft glass circle */}
       <div 
-        className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+        className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
         style={{
-          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0.02) 100%)',
+          background: 'rgba(255, 255, 255, 0.6)',
           border: '1px solid rgba(0, 0, 0, 0.04)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
         }}
       >
         {config.icon}
@@ -63,35 +54,19 @@ export function EmptyState({ tab, onCreateGame, onCreateTrip }: EmptyStateProps)
 
       {/* Title */}
       <h3 
-        className="text-[16px] font-semibold mb-1"
+        className="text-[15px] font-semibold mb-1.5"
         style={{ color: '#1e293b' }}
       >
         {config.title}
       </h3>
 
-      {/* Subtitle */}
+      {/* Subtitle - warm, calm tone */}
       <p 
-        className="text-[13px] mb-5 max-w-[240px]"
-        style={{ color: 'rgba(30, 41, 59, 0.55)' }}
+        className="text-[13px] max-w-[220px] leading-relaxed"
+        style={{ color: 'rgba(100, 116, 139, 0.7)' }}
       >
         {config.subtitle}
       </p>
-
-      {/* CTA Button */}
-      {config.cta && (
-        <button
-          onClick={handleCtaClick}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-[13px] font-medium transition-all duration-150 active:scale-[0.98]"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 140, 60, 0.12) 0%, rgba(255, 180, 100, 0.08) 100%)',
-            border: '1px solid rgba(255, 140, 60, 0.15)',
-            color: 'rgba(180, 90, 30, 0.9)',
-          }}
-        >
-          <Plus className="w-4 h-4" />
-          {config.cta.label}
-        </button>
-      )}
     </div>
   );
 }

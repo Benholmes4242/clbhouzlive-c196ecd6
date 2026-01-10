@@ -59,11 +59,11 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
     <>
       <button
         onClick={openYourGames}
-        className={`w-full rounded-[18px] overflow-hidden relative flex flex-col transition-all duration-150 active:scale-[0.99] mb-3 ${className || ''}`}
+        className={`w-full rounded-[18px] overflow-hidden relative flex flex-col transition-all duration-150 active:scale-[0.99] ${className || ''}`}
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)', // Medium shadow for primary tile
+          boxShadow: 'var(--hub-shadow-tile)',
           minHeight: '90px',
         }}
       >

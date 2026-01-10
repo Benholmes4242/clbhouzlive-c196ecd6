@@ -1,11 +1,12 @@
 /**
  * YourGamesTripsSheetV2 - Bottom sheet for viewing user's games & trips
  * 
- * Matches CreateGameTripSheetV2 design language:
- * - Glass-lite surface
- * - Premium spacing
- * - No bounce animation
- * - No background scroll jump
+ * V2 Premium Polish:
+ * - Frosted glass sheet container
+ * - Premium header with gradient divider
+ * - Refined search input with inner shadow
+ * - V2 pill tabs with subtle elevation
+ * - No bounce animation, no background jump
  * 
  * Opens GameDetailSheetV2 on game tap (no route change)
  */
@@ -146,7 +147,7 @@ export function YourGamesTripsSheetV2({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - blur + dim */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -154,14 +155,14 @@ export function YourGamesTripsSheetV2({
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[9999]"
             style={{
-              background: 'rgba(0, 0, 0, 0.25)',
-              backdropFilter: 'blur(6px)',
-              WebkitBackdropFilter: 'blur(6px)',
+              background: 'rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
             onClick={handleClose}
           />
 
-          {/* Sheet - add class for stacked depth effect */}
+          {/* Sheet - frosted glass container */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -171,30 +172,32 @@ export function YourGamesTripsSheetV2({
             style={{
               height: '85svh',
               maxHeight: '85svh',
-              backgroundColor: '#F9FAFB',
-              boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
+              background: 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
             }}
           >
-            {/* Grabber */}
+            {/* Grabber - thinner, lighter */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div 
-                className="w-10 h-1 rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+                className="w-9 h-[3px] rounded-full"
+                style={{ background: 'rgba(0, 0, 0, 0.08)' }}
               />
             </div>
 
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-2 flex-shrink-0">
+            {/* Header - premium styling */}
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
               <div>
                 <h2 
-                  className="text-[19px] font-semibold leading-tight"
-                  style={{ color: '#1e293b', letterSpacing: '-0.01em' }}
+                  className="text-[18px] font-semibold leading-tight"
+                  style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
                 >
                   Your Games & Trips
                 </h2>
                 <p 
                   className="text-[12px] mt-0.5"
-                  style={{ color: 'rgba(30, 41, 59, 0.5)' }}
+                  style={{ color: 'rgba(100, 116, 139, 0.8)' }}
                 >
                   Pick up where you left off
                 </p>
@@ -202,34 +205,42 @@ export function YourGamesTripsSheetV2({
               
               <button
                 onClick={handleClose}
-                className="p-2 -mr-2 rounded-full transition-colors hover:bg-black/5"
+                className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
               >
                 <X 
                   className="w-5 h-5"
-                  style={{ color: 'rgba(30, 41, 59, 0.5)' }}
+                  style={{ color: 'rgba(100, 116, 139, 0.6)' }}
                 />
               </button>
             </div>
 
-            {/* Search */}
-            <div className="px-5 pb-3 flex-shrink-0">
+            {/* Gradient divider - soft fade */}
+            <div 
+              className="h-px mx-5 flex-shrink-0"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.06) 20%, rgba(0, 0, 0, 0.06) 80%, transparent 100%)',
+              }}
+            />
+
+            {/* Search - premium styling with inner shadow */}
+            <div className="px-5 pt-4 pb-3 flex-shrink-0">
               <SearchInput
                 value={searchQuery}
                 onChange={setSearchQuery}
               />
             </div>
 
-            {/* Tabs */}
-            <div className="px-5 pb-3 flex-shrink-0">
+            {/* Tabs - V2 pills with breathing room */}
+            <div className="px-5 pb-4 flex-shrink-0">
               <TabPills
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
               />
             </div>
 
-            {/* Content */}
+            {/* Content - scrollable area */}
             <div 
-              className="flex-1 overflow-y-auto overscroll-contain px-5 pb-8"
+              className="flex-1 overflow-y-auto overscroll-contain px-5 pb-10"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               {activeTab === 'upcoming' && (

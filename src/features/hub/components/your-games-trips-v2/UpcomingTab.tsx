@@ -1,5 +1,6 @@
 /**
  * UpcomingTab - Shows upcoming games with "Next Up" hero card
+ * V2: Premium section labels, better vertical spacing
  */
 
 import React from 'react';
@@ -45,13 +46,13 @@ export function UpcomingTab({ searchQuery, onCreateGame, onGameTap }: UpcomingTa
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Next Up section */}
       {nextUp && (
         <div>
           <h4 
-            className="text-[11px] font-medium uppercase tracking-wide mb-2 px-1"
-            style={{ color: 'rgba(30, 41, 59, 0.4)' }}
+            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
           >
             Next Up
           </h4>
@@ -67,12 +68,12 @@ export function UpcomingTab({ searchQuery, onCreateGame, onGameTap }: UpcomingTa
       {upcomingList.length > 0 && (
         <div>
           <h4 
-            className="text-[11px] font-medium uppercase tracking-wide mb-2 px-1"
-            style={{ color: 'rgba(30, 41, 59, 0.4)' }}
+            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
           >
             Upcoming
           </h4>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <AnimatePresence>
               {upcomingList.map((game, index) => (
                 <motion.div

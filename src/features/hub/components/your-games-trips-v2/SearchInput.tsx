@@ -1,5 +1,6 @@
 /**
- * SearchInput - Search field matching V2 design
+ * SearchInput - Premium search field with inner shadow
+ * V2 design: rounded, soft border, subtle focus state
  */
 
 import React from 'react';
@@ -15,25 +16,28 @@ export function SearchInput({ value, onChange, placeholder = 'Search games or tr
   return (
     <div className="relative">
       <Search 
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-        style={{ color: 'rgba(30, 41, 59, 0.35)' }}
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4"
+        style={{ color: 'rgba(100, 116, 139, 0.5)' }}
       />
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-9 pr-4 py-2.5 text-[14px] rounded-[12px] outline-none transition-all duration-150"
+        className="w-full pl-10 pr-4 py-2.5 text-[14px] rounded-[14px] outline-none transition-all duration-200"
         style={{
-          background: 'rgba(255, 255, 255, 0.85)',
+          background: 'rgba(255, 255, 255, 0.7)',
           border: '1px solid rgba(0, 0, 0, 0.06)',
+          boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)',
           color: '#1e293b',
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(100, 116, 139, 0.3)';
+          e.currentTarget.style.borderColor = 'rgba(100, 116, 139, 0.2)';
+          e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.04), 0 0 0 3px rgba(100, 116, 139, 0.06)';
         }}
         onBlur={(e) => {
           e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.06)';
+          e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.04)';
         }}
       />
     </div>

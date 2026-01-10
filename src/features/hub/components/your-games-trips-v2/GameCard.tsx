@@ -1,11 +1,11 @@
 /**
- * GameCard - Card for displaying game info
- * Used for both "Next Up" hero card and list rows
+ * GameCard - V2 Premium game card
  * 
- * V2.1 Design:
- * - Two-line layout (course + date)
- * - RSVP summary on third line
- * - Premium glass styling
+ * V2 Design:
+ * - Glass-style card with soft shadow
+ * - Three-line structure: Course, Date, RSVP
+ * - Subtle hover/tap feedback
+ * - No harsh borders
  */
 
 import React from 'react';
@@ -32,11 +32,11 @@ function formatGameDate(dateStr: string): string {
 function getStatusChip(status: string): { label: string; bg: string; color: string } | null {
   switch (status) {
     case 'live':
-      return { label: 'Live', bg: 'rgba(239, 68, 68, 0.12)', color: 'rgba(220, 38, 38, 0.9)' };
+      return { label: 'Live', bg: 'rgba(239, 68, 68, 0.1)', color: 'rgba(220, 38, 38, 0.85)' };
     case 'scheduled':
-      return { label: 'Scheduled', bg: 'rgba(59, 130, 246, 0.1)', color: 'rgba(37, 99, 235, 0.8)' };
+      return { label: 'Scheduled', bg: 'rgba(59, 130, 246, 0.08)', color: 'rgba(37, 99, 235, 0.75)' };
     case 'completed':
-      return { label: 'Completed', bg: 'rgba(100, 116, 139, 0.1)', color: 'rgba(71, 85, 105, 0.8)' };
+      return { label: 'Completed', bg: 'rgba(100, 116, 139, 0.08)', color: 'rgba(71, 85, 105, 0.75)' };
     default:
       return null;
   }
@@ -49,21 +49,23 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
     return (
       <motion.button
         onClick={onTap}
-        className="w-full text-left rounded-[20px] p-4 transition-all duration-150 active:scale-[0.99]"
+        className="w-full text-left rounded-[18px] p-4 transition-all duration-150 active:scale-[0.99]"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%)',
-          border: '1px solid rgba(0, 0, 0, 0.05)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03)',
         }}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
       >
-        {/* Header row */}
-        <div className="flex items-start justify-between gap-3 mb-2">
+        {/* Header row - Course + Status */}
+        <div className="flex items-start justify-between gap-3 mb-1">
           <div className="flex-1 min-w-0">
             <h3 
-              className="text-[16px] font-semibold truncate leading-tight"
+              className="text-[15px] font-semibold truncate leading-tight"
               style={{ color: '#1e293b' }}
             >
               {game.courseName}
@@ -72,7 +74,7 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
           
           {statusChip && (
             <span 
-              className="flex-shrink-0 px-2.5 py-1 text-[11px] font-medium rounded-full"
+              className="flex-shrink-0 px-2.5 py-0.5 text-[10px] font-medium rounded-full"
               style={{ background: statusChip.bg, color: statusChip.color }}
             >
               {statusChip.label}
@@ -82,15 +84,15 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
 
         {/* Date/time row */}
         <p 
-          className="text-[13px] flex items-center gap-1.5 mb-3"
-          style={{ color: 'rgba(30, 41, 59, 0.6)' }}
+          className="text-[12px] flex items-center gap-1.5 mb-2"
+          style={{ color: 'rgba(100, 116, 139, 0.8)' }}
         >
           <Clock className="w-3.5 h-3.5" />
           {formatGameDate(game.startsAt)}
         </p>
 
-        {/* Bottom row - RSVP summary (expanded variant) */}
-        <div className="flex items-center justify-between">
+        {/* Bottom row - RSVP summary */}
+        <div className="flex items-center justify-between pt-1">
           <GameRsvpSummary
             goingCount={game.goingCount}
             maybeCount={game.maybeCount}
@@ -102,7 +104,7 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
           {game.remindersEnabled && (
             <Bell 
               className="w-4 h-4"
-              style={{ color: 'rgba(234, 179, 8, 0.7)' }}
+              style={{ color: 'rgba(234, 179, 8, 0.6)' }}
             />
           )}
         </div>
@@ -110,15 +112,17 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
     );
   }
 
-  // Row variant - new three-line layout
+  // Row variant - three-line layout
   return (
     <button
       onClick={onTap}
-      className="w-full px-3.5 py-3 rounded-[16px] text-left transition-all duration-150 active:scale-[0.99] active:opacity-90"
+      className="w-full px-3.5 py-3 rounded-[16px] text-left transition-all duration-150 active:scale-[0.99]"
       style={{
-        background: 'rgba(255, 255, 255, 0.75)',
-        border: '1px solid rgba(0, 0, 0, 0.04)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
       }}
     >
       {/* Row 1: Course name + Status chip */}
@@ -144,7 +148,7 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
           {game.remindersEnabled && (
             <Bell 
               className="w-3.5 h-3.5"
-              style={{ color: 'rgba(234, 179, 8, 0.6)' }}
+              style={{ color: 'rgba(234, 179, 8, 0.5)' }}
             />
           )}
           
@@ -159,7 +163,7 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
             >
               <MoreHorizontal 
                 className="w-4 h-4"
-                style={{ color: 'rgba(30, 41, 59, 0.4)' }}
+                style={{ color: 'rgba(100, 116, 139, 0.5)' }}
               />
             </button>
           )}
@@ -169,7 +173,7 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
       {/* Row 2: Date/time */}
       <div 
         className="text-[12px] mb-2"
-        style={{ color: 'rgba(30, 41, 59, 0.55)' }}
+        style={{ color: 'rgba(100, 116, 139, 0.7)' }}
       >
         {formatGameDate(game.startsAt)}
       </div>
