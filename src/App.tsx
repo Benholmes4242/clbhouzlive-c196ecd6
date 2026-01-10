@@ -179,6 +179,9 @@ const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetai
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
 const HubTripPage = lazy(() => import("./features/hub/pages/HubTripPage"));
 
+// Games feature pages
+const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGamesPage"));
+
 // Simple redirect component for /hub/game/:id → /game/:id
 function HubGameRedirect() {
   const { id } = useParams<{ id: string }>();
@@ -427,6 +430,10 @@ function AppRoutes() {
 
         <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
         <Route path="/game/:id" element={<Suspense fallback={<GenericPageSkeleton />}><GameDetailView /></Suspense>} />
+        
+        {/* Games routes */}
+        <Route path="/games/discover" element={<Suspense fallback={<GenericPageSkeleton />}><DiscoverGamesPage /></Suspense>} />
+        <Route path="/nearby" element={<Navigate to="/games/discover" replace />} />
         
         {/* Tour Hub routes */}
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />

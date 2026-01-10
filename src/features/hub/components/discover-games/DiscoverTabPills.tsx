@@ -3,7 +3,8 @@
  */
 
 import React from 'react';
-import type { DiscoverTab } from './DiscoverGamesBottomSheetV2';
+
+export type DiscoverTab = 'recommended' | 'upcoming' | 'friends';
 
 interface DiscoverTabPillsProps {
   activeTab: DiscoverTab;

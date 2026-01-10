@@ -123,7 +123,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
     haptic('light');
     onClose();
     closeHub();
-    navigate('/nearby');
+    navigate('/games/discover');
   };
 
   const handleYourGamesTrips = () => {
