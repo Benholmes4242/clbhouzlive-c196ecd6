@@ -1,5 +1,6 @@
 /**
  * TripsTab - Shows user's trips
+ * V2: Consistent spacing and styling
  */
 
 import React from 'react';
@@ -45,7 +46,7 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <AnimatePresence>
         {filtered.map((trip, index) => (
           <motion.div

@@ -1,5 +1,6 @@
 /**
  * PastTab - Shows past/completed games
+ * V2: Consistent spacing with UpcomingTab
  */
 
 import React from 'react';
@@ -41,7 +42,7 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <AnimatePresence>
         {filtered.map((game, index) => (
           <motion.div
