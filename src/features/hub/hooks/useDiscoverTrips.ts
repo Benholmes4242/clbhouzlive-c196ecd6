@@ -1,13 +1,10 @@
 /**
- * useDiscoverTrips - Hook for fetching discoverable trips
+ * useDiscoverTrips - Uses trip_participants.rsvp_status as single source of truth
  * 
- * Fetches trips visible to current user based on filters:
- * - visibility (public/friends/all)
- * - date range (today/week/month/any)
- * - search by trip name or destination
- * 
- * Excludes trips where user has been rejected
- * Hides host identity until accepted
+ * Key features:
+ * - Excludes trips where user has rsvp_status='rejected'
+ * - Returns anonymous host blurb (no identity)
+ * - Tracks user's request status from trip_participants only
  */
 
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -38,8 +35,8 @@ export interface DiscoverTrip {
     handicap: number | null;
     homeClub: string | null;
   };
-  // User's request status
-  userRequestStatus: 'none' | 'requested' | 'going' | 'rejected';
+  // User's request status from trip_participants.rsvp_status
+  userRequestStatus: 'none' | 'requested' | 'going' | 'invited' | 'rejected';
 }
 
 function startOfTodayISO(): string {
@@ -131,59 +128,65 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
       if (error) throw error;
 
       const trips = (data ?? []) as any[];
-
-      // Get participant counts and user's participation status
       const tripIds = trips.map(t => t.id);
-      
-      let participantData: any[] = [];
-      let userParticipantData: any[] = [];
-      let hostBlurbs: any[] = [];
+      const hostIds = trips.map(t => t.created_by).filter(Boolean);
 
+      // Get all participant data for these trips (for counting)
+      let allParticipantData: any[] = [];
       if (tripIds.length > 0) {
-        // Get participant counts
         const { data: participants } = await supabase
           .from('trip_participants')
           .select('trip_id, user_id, rsvp_status')
           .in('trip_id', tripIds);
-        participantData = participants ?? [];
-
-        // Get user's participation status if logged in
-        if (userId) {
-          userParticipantData = participantData.filter(p => p.user_id === userId);
-        }
-
-        // Get host blurbs (anonymous - no names)
-        const hostIds = trips.map(t => t.created_by).filter(Boolean);
-        if (hostIds.length > 0) {
-          const { data: blurbs } = await supabase
-            .from('public_golfer_blurbs')
-            .select('user_id, handicap, home_club')
-            .in('user_id', hostIds);
-          hostBlurbs = blurbs ?? [];
-        }
+        allParticipantData = participants ?? [];
       }
 
-      // Filter out trips where user has been rejected
+      // Get user's participant rows specifically (single source of truth)
+      let userParticipantRows: any[] = [];
+      if (userId && tripIds.length > 0) {
+        userParticipantRows = allParticipantData.filter(p => p.user_id === userId);
+      }
+
+      // Build set of rejected trip IDs to exclude
       const rejectedTripIds = new Set(
-        userParticipantData
-          .filter(p => p.rsvp_status === 'rejected')
-          .map(p => p.trip_id)
+        userParticipantRows
+          .filter(r => r.rsvp_status === 'rejected')
+          .map(r => r.trip_id)
       );
 
+      // Get host blurbs (anonymous - no names)
+      let hostBlurbs: any[] = [];
+      if (hostIds.length > 0) {
+        const { data: blurbs } = await supabase
+          .from('public_golfer_blurbs')
+          .select('user_id, handicap, home_club')
+          .in('user_id', hostIds);
+        hostBlurbs = blurbs ?? [];
+      }
+
+      // Filter out trips where user was rejected
       const filteredTrips = trips.filter(t => !rejectedTripIds.has(t.id));
 
       // Map to DiscoverTrip shape
       const mapped: DiscoverTrip[] = filteredTrips.map((t) => {
-        const tripParticipants = participantData.filter(p => p.trip_id === t.id);
-        const goingCount = tripParticipants.filter(p => p.rsvp_status === 'going').length + 1; // +1 for creator
+        const tripParticipants = allParticipantData.filter(p => p.trip_id === t.id);
         
-        const userParticipant = userParticipantData.find(p => p.trip_id === t.id);
-        let userRequestStatus: 'none' | 'requested' | 'going' | 'rejected' = 'none';
+        // Calculate going count: participants with rsvp_status='going' + 1 for creator
+        const goingParticipants = tripParticipants.filter(p => p.rsvp_status === 'going').length;
+        const goingCount = goingParticipants + 1; // +1 for creator (consistent rule)
+        
+        // Calculate slots open: capacity - goingCount
+        const slotsOpen = Math.max(0, (t.capacity ?? 20) - goingCount);
+
+        // Get user's request status from trip_participants (single source of truth)
+        let userRequestStatus: 'none' | 'requested' | 'going' | 'invited' | 'rejected' = 'none';
         if (userId === t.created_by) {
           userRequestStatus = 'going';
-        } else if (userParticipant) {
-          if (userParticipant.rsvp_status === 'going') userRequestStatus = 'going';
-          else if (userParticipant.rsvp_status === 'requested') userRequestStatus = 'requested';
+        } else {
+          const userRow = userParticipantRows.find(r => r.trip_id === t.id);
+          if (userRow) {
+            userRequestStatus = userRow.rsvp_status || 'none';
+          }
         }
 
         const hostBlurb = hostBlurbs.find(b => b.user_id === t.created_by);
@@ -197,7 +200,7 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
           visibility: t.visibility ?? 'public',
           coverImageUrl: t.cover_image_url,
           slotsTotal: t.capacity ?? 20,
-          slotsOpen: Math.max(0, (t.capacity ?? 20) - goingCount),
+          slotsOpen,
           participantCount: goingCount,
           hostBlurb: {
             handicap: hostBlurb?.handicap ?? null,

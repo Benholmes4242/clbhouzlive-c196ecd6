@@ -1,3 +1,11 @@
+/**
+ * game-request-decide - Host accepts/declines join request
+ * 
+ * Single source of truth: game_participants.rsvp_status
+ * Accept: rsvp_status -> 'going', decrement slots_open
+ * Decline: rsvp_status -> 'rejected', send generic notification
+ */
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1';
 
 const corsHeaders = {
@@ -23,133 +31,113 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { request_id, decision } = await req.json();
+    const { participant_id, decision } = await req.json();
 
     if (!['accept', 'decline'].includes(decision)) {
       throw new Error('Invalid decision');
     }
 
-    console.log('Processing request decision:', { request_id, decision, user_id: user.id });
+    console.log('Processing request decision:', { participant_id, decision, user_id: user.id });
 
-    // Get the join request and verify host
-    const { data: request, error: requestError } = await supabase
-      .from('game_join_requests')
-      .select('*, games!inner(host_user_id, course_name, start_time, slots_open)')
-      .eq('id', request_id)
+    // Get the participant row with game info
+    const { data: participant, error: partError } = await supabase
+      .from('game_participants')
+      .select('*, games!inner(id, host_user_id, course_name, start_time, slots_open)')
+      .eq('id', participant_id)
       .single();
 
-    if (requestError || !request) {
+    if (partError || !participant) {
       throw new Error('Request not found');
     }
 
-    if (request.games.host_user_id !== user.id) {
+    if (participant.games.host_user_id !== user.id) {
       throw new Error('Not authorized to decide this request');
     }
 
+    if (participant.rsvp_status !== 'requested') {
+      throw new Error('Request already processed');
+    }
+
     if (decision === 'accept') {
-      // Use FOR UPDATE to lock the game row and prevent race conditions
-      const { data: game, error: lockError } = await supabase
-        .from('games')
-        .select('slots_open, course_name')
-        .eq('id', request.game_id)
-        .single();
+      const game = participant.games;
 
-      if (lockError || !game) {
-        throw new Error('Game not found');
-      }
-
-      if (game.slots_open <= 0) {
+      if (game.slots_open !== null && game.slots_open <= 0) {
         return new Response(
           JSON.stringify({ error: 'No open seats (all reserved)' }),
           { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      // Update request to accepted
-      const { error: updateReqError } = await supabase
-        .from('game_join_requests')
-        .update({
-          status: 'accepted',
-          decided_at: new Date().toISOString()
-        })
-        .eq('id', request_id);
-
-      if (updateReqError) throw updateReqError;
-
-      // Add participant
-      const { error: participantError } = await supabase
+      // Update participant status to 'going'
+      const { error: updateError } = await supabase
         .from('game_participants')
-        .insert({
-          game_id: request.game_id,
-          user_id: request.requester_user_id,
-          role: 'player',
+        .update({
+          rsvp_status: 'going',
+          rsvp_updated_at: new Date().toISOString(),
           state: 'accepted',
           reserves_slot: true,
           joined_at: new Date().toISOString()
-        });
+        })
+        .eq('id', participant_id);
 
-      if (participantError) throw participantError;
+      if (updateError) throw updateError;
 
-      // Decrement slots_open
-      const { error: updateGameError } = await supabase
-        .from('games')
-        .update({ slots_open: game.slots_open - 1 })
-        .eq('id', request.game_id);
+      // Decrement slots_open atomically
+      if (game.slots_open !== null) {
+        const { error: updateGameError } = await supabase
+          .from('games')
+          .update({ slots_open: Math.max(0, game.slots_open - 1) })
+          .eq('id', participant.game_id);
 
-      if (updateGameError) throw updateGameError;
+        if (updateGameError) throw updateGameError;
+      }
 
-      console.log('Seat granted, slots_open now:', game.slots_open - 1);
+      console.log('Seat granted, slots_open now:', (game.slots_open || 1) - 1);
 
       // Check if we need to create the thread (first acceptance)
       const { data: existingThread } = await supabase
         .from('game_threads')
         .select('id')
-        .eq('game_id', request.game_id)
+        .eq('game_id', participant.game_id)
         .single();
 
       let threadId = existingThread?.id;
 
       if (!existingThread) {
-        // Create thread
         const { data: thread, error: threadError } = await supabase
           .from('game_threads')
           .insert({
-            game_id: request.game_id,
-            expires_at: request.games.start_time,
+            game_id: participant.game_id,
+            expires_at: game.start_time,
             grace_hours: 12,
             is_closed: false
           })
           .select()
           .single();
 
-        if (threadError) {
-          console.error('Error creating thread:', threadError);
-        } else {
+        if (!threadError && thread) {
           threadId = thread.id;
           console.log('Thread created:', threadId);
 
-          // Add host to thread
           await supabase.from('game_thread_participants').insert({
             thread_id: threadId,
-            user_id: request.games.host_user_id,
+            user_id: game.host_user_id,
             role: 'host'
           });
 
-          // Add system welcome message
           await supabase.from('game_thread_messages').insert({
             thread_id: threadId,
-            sender_id: request.games.host_user_id,
+            sender_id: game.host_user_id,
             text: 'Game chat created! Coordinate your tee time here.',
             is_system: true
           });
         }
       }
 
-      // Add requester to thread
       if (threadId) {
         await supabase.from('game_thread_participants').insert({
           thread_id: threadId,
-          user_id: request.requester_user_id,
+          user_id: participant.user_id,
           role: 'player'
         });
       }
@@ -165,12 +153,12 @@ Deno.serve(async (req) => {
 
       // Notify requester
       await supabase.from('notifications').insert({
-        user_id: request.requester_user_id,
+        user_id: participant.user_id,
         type: 'join_accepted',
         title: "You're in!",
-        message: `${hostName} added you to ${request.games.course_name || 'the game'}. Open group chat to coordinate.`,
+        message: `${hostName} added you to ${game.course_name || 'the game'}. Open group chat to coordinate.`,
         data: {
-          game_id: request.game_id,
+          game_id: participant.game_id,
           thread_id: threadId,
           host_name: hostName,
           first_open: true
@@ -183,27 +171,26 @@ Deno.serve(async (req) => {
       );
 
     } else {
-      // Decline
-      const { error: updateReqError } = await supabase
-        .from('game_join_requests')
+      // Decline - update status to 'rejected'
+      const { error: updateError } = await supabase
+        .from('game_participants')
         .update({
-          status: 'declined',
-          decided_at: new Date().toISOString()
+          rsvp_status: 'rejected',
+          rsvp_updated_at: new Date().toISOString()
         })
-        .eq('id', request_id);
+        .eq('id', participant_id);
 
-      if (updateReqError) throw updateReqError;
+      if (updateError) throw updateError;
 
       // Notify requester with GENERIC message (anonymity-preserving)
-      // Never reveal that they were declined - always say "slots taken"
       await supabase.from('notifications').insert({
-        user_id: request.requester_user_id,
+        user_id: participant.user_id,
         type: 'join_declined',
         title: 'Update on your request',
         message: 'Unfortunately, all slots in this game are now taken.',
         data: {
-          game_id: request.game_id,
-          generic_decline: true // Flag for UI to know it's a generic message
+          game_id: participant.game_id,
+          generic_decline: true
         }
       });
 

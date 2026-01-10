@@ -1,33 +1,51 @@
 /**
  * RequestRow - A single join request with accept/decline actions
+ * Supports both game and trip requests
  */
 
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, X, MapPin, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import type { PendingRequest } from '../../hooks/useHostPendingRequests';
+import type { PendingRequest, PendingGameRequest, PendingTripRequest } from '../../hooks/useHostPendingRequests';
 
 interface RequestRowProps {
   request: PendingRequest;
-  onAccept: (requestId: string, gameId: string) => void;
-  onDecline: (requestId: string) => void;
+  onAccept: (request: PendingRequest) => void;
+  onDecline: (request: PendingRequest) => void;
   isProcessing: boolean;
 }
 
+function isGameRequest(request: PendingRequest): request is PendingGameRequest {
+  return request.type === 'game';
+}
+
 export function RequestRow({ request, onAccept, onDecline, isProcessing }: RequestRowProps) {
-  const { requester, game } = request;
+  const { requester } = request;
   
   const handicapDisplay = requester.eg_handicap_index != null 
     ? `HCP ${requester.eg_handicap_index.toFixed(1)}` 
     : null;
 
-  const gameDate = game.start_time 
-    ? format(new Date(game.start_time), 'EEE d MMM') 
-    : '';
-  
-  const teeTime = game.start_time 
-    ? format(new Date(game.start_time), 'h:mm a')
-    : '';
+  // Get display info based on request type
+  let entityName = '';
+  let dateDisplay = '';
+  let timeDisplay = '';
+  let typeLabel = '';
+
+  if (isGameRequest(request)) {
+    entityName = request.game.course_name || 'Unknown Course';
+    typeLabel = 'Game';
+    if (request.game.start_time) {
+      dateDisplay = format(new Date(request.game.start_time), 'EEE d MMM');
+      timeDisplay = format(new Date(request.game.start_time), 'h:mm a');
+    }
+  } else {
+    entityName = request.trip.name || 'Unknown Trip';
+    typeLabel = 'Trip';
+    if (request.trip.start_date) {
+      dateDisplay = format(new Date(request.trip.start_date), 'EEE d MMM');
+    }
+  }
 
   return (
     <div 
@@ -91,16 +109,25 @@ export function RequestRow({ request, onAccept, onDecline, isProcessing }: Reque
           className="text-[11px] mt-1 flex items-center gap-1.5"
           style={{ color: '#94a3b8' }}
         >
-          <span className="font-medium">{game.course_name}</span>
-          {gameDate && <span>• {gameDate}</span>}
-          {teeTime && <span>• {teeTime}</span>}
+          <span 
+            className="px-1.5 py-0.5 rounded text-[10px] font-medium"
+            style={{ 
+              background: request.type === 'game' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+              color: request.type === 'game' ? '#16a34a' : '#2563eb',
+            }}
+          >
+            {typeLabel}
+          </span>
+          <span className="font-medium truncate">{entityName}</span>
+          {dateDisplay && <span>• {dateDisplay}</span>}
+          {timeDisplay && <span>• {timeDisplay}</span>}
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
-          onClick={() => onDecline(request.id)}
+          onClick={() => onDecline(request)}
           disabled={isProcessing}
           className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
           style={{
@@ -112,7 +139,7 @@ export function RequestRow({ request, onAccept, onDecline, isProcessing }: Reque
           <X className="w-4 h-4" style={{ color: '#ef4444' }} />
         </button>
         <button
-          onClick={() => onAccept(request.id, request.game_id)}
+          onClick={() => onAccept(request)}
           disabled={isProcessing}
           className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
           style={{

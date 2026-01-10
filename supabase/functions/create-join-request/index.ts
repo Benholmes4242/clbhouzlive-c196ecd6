@@ -1,3 +1,10 @@
+/**
+ * create-join-request - Creates a join request using game_participants.rsvp_status
+ * 
+ * Single source of truth: game_participants table with rsvp_status = 'requested'
+ * Blocks re-requests after rejection (rsvp_status = 'rejected')
+ */
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1';
 
 const corsHeaders = {
@@ -6,7 +13,6 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,7 +28,6 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Get the user
     const {
       data: { user },
       error: authError,
@@ -50,7 +55,7 @@ Deno.serve(async (req) => {
     // Fetch game details
     const { data: game, error: gameError } = await supabase
       .from('games')
-      .select('*, game_participants(*)')
+      .select('id, host_user_id, status, start_time, slots_total, slots_open')
       .eq('id', game_id)
       .single();
 
@@ -70,7 +75,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (game.status !== 'active') {
+    if (!['active', 'scheduled'].includes(game.status)) {
       return new Response(
         JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is not available' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -84,47 +89,33 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check if user is already a participant
-    const isParticipant = game.game_participants?.some(
-      (p: any) => p.user_id === user.id
-    );
-
-    if (isParticipant) {
-      return new Response(
-        JSON.stringify({ error: 'ALREADY_JOINED', message: 'Already a participant' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Check slots
-    const confirmedParticipants = game.game_participants?.filter(
-      (p: any) => p.state === 'confirmed' || p.state === 'invited'
-    ).length || 0;
-
-    if (confirmedParticipants >= game.slots_total) {
-      return new Response(
-        JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is full' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Check for existing request (pending OR declined/rejected)
-    const { data: existingRequest } = await supabase
-      .from('game_join_requests')
-      .select('id, status')
+    // Check existing participant row (single source of truth)
+    const { data: existingParticipant } = await supabase
+      .from('game_participants')
+      .select('id, rsvp_status')
       .eq('game_id', game_id)
-      .eq('requester_user_id', user.id)
+      .eq('user_id', user.id)
       .maybeSingle();
 
-    if (existingRequest) {
-      if (existingRequest.status === 'pending') {
+    if (existingParticipant) {
+      const status = existingParticipant.rsvp_status;
+      
+      if (status === 'going' || status === 'invited') {
+        return new Response(
+          JSON.stringify({ error: 'ALREADY_JOINED', message: 'Already a participant' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      if (status === 'requested') {
         return new Response(
           JSON.stringify({ error: 'ALREADY_REQUESTED', message: 'Request already pending' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      // Block re-requests after decline - game disappears from discover
-      if (existingRequest.status === 'declined') {
+      
+      // Block re-requests after rejection - game disappears from discover
+      if (status === 'rejected') {
         return new Response(
           JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is no longer available' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -132,13 +123,23 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Create the join request
-    const { data: joinRequest, error: insertError } = await supabase
-      .from('game_join_requests')
+    // Check slots
+    if (game.slots_open !== null && game.slots_open <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is full' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create participant row with rsvp_status = 'requested'
+    const { data: participant, error: insertError } = await supabase
+      .from('game_participants')
       .insert({
         game_id,
-        requester_user_id: user.id,
-        status: 'pending',
+        user_id: user.id,
+        role: 'player',
+        rsvp_status: 'requested',
+        rsvp_updated_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -151,10 +152,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[create-join-request] Request created successfully:`, joinRequest.id);
+    console.log(`[create-join-request] Request created successfully:`, participant.id);
 
     return new Response(
-      JSON.stringify({ success: true, status: 'pending', request_id: joinRequest.id }),
+      JSON.stringify({ success: true, status: 'requested', participant_id: participant.id }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
