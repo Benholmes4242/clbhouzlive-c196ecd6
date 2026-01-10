@@ -38,6 +38,10 @@
   --hub-accent-blue: #4da3ff;
   --hub-accent-orange: #FF8C32;
   
+  /* Echo AI Accent (Purple) */
+  --echo-accent: 270 60% 60%;
+  --echo-accent-dark: 262 83% 58%;
+
   /* Spacing */
   --hub-blur: 10px;
   --hub-radius: 16px;
