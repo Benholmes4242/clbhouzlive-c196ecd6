@@ -6,6 +6,8 @@
  * - Glass-lite surface with frosted header
  * - Premium stacked sheet depth (blur+scale underlying)
  * - No bounce animation
+ * 
+ * V2: Added Edit/Remove actions with confirmation dialogs
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -16,14 +18,26 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 import { useTripTimeline } from '../../hooks/useTripTimeline';
+import { useCancelTrip, useLeaveTrip } from '../../hooks/useTripActions';
 import { TripHeader } from './TripHeader';
 import { TripTimeline } from './TripTimeline';
 import { GameDetailSheetV2 } from '../game-detail-v2/GameDetailSheetV2';
@@ -63,10 +77,20 @@ export function TripDetailSheetV2({
     isLoading, 
     error, 
     isHost, 
+    currentUserId,
     todayDayNumber, 
     hasMultipleDays, 
     hasTodayInTrip 
   } = useTripTimeline(isOpen ? tripId : undefined);
+
+  // Action hooks
+  const cancelTrip = useCancelTrip();
+  const leaveTrip = useLeaveTrip();
+
+  // Dialog states
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   // Nested game sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -112,7 +136,6 @@ export function TripDetailSheetV2({
 
   const handleOpenFullPage = useCallback(() => {
     onClose();
-    // Small delay to let sheet close animation start
     setTimeout(() => {
       navigate(`/hub/trip/${tripId}?tab=timeline`);
     }, 100);
@@ -129,15 +152,72 @@ export function TripDetailSheetV2({
     setTimeout(() => setSelectedGameId(null), 300);
   }, []);
 
-  // Handler for adding a round (opens create game flow with trip context)
   const handleAddRound = useCallback(() => {
     haptic('light');
-    // Navigate to create game with trip context
     onClose();
     setTimeout(() => {
       navigate(`/create-game?tripId=${tripId}`);
     }, 150);
   }, [onClose, navigate, tripId]);
+
+  // Remove trip (host only)
+  const handleRemoveTrip = useCallback(async () => {
+    if (!trip) return;
+    
+    setIsRemoving(true);
+    haptic('heavy');
+    
+    try {
+      // Get participant user IDs (excluding host)
+      const participantUserIds = participants
+        .filter(p => p.userId !== currentUserId)
+        .map(p => p.userId);
+      
+      await cancelTrip.mutateAsync({
+        tripId,
+        tripName: trip.name,
+        participantUserIds,
+      });
+      
+      toast.success('Trip removed', {
+        description: participantUserIds.length > 0 
+          ? `${participantUserIds.length} participant(s) notified` 
+          : undefined,
+      });
+      
+      setShowRemoveDialog(false);
+      onClose();
+    } catch (error) {
+      console.error('[TripDetailSheetV2] Remove failed:', error);
+      toast.error('Failed to remove trip');
+    } finally {
+      setIsRemoving(false);
+    }
+  }, [trip, tripId, participants, currentUserId, cancelTrip, onClose]);
+
+  // Leave trip (non-host)
+  const handleLeaveTrip = useCallback(async () => {
+    if (!currentUserId) return;
+    
+    setIsRemoving(true);
+    haptic('medium');
+    
+    try {
+      await leaveTrip.mutateAsync({
+        tripId,
+        userId: currentUserId,
+      });
+      
+      toast.success('Left trip');
+      setShowLeaveDialog(false);
+      onClose();
+    } catch (error) {
+      console.error('[TripDetailSheetV2] Leave failed:', error);
+      toast.error('Failed to leave trip');
+    } finally {
+      setIsRemoving(false);
+    }
+  }, [tripId, currentUserId, leaveTrip, onClose]);
 
   if (!isOpen) return null;
 
@@ -267,13 +347,19 @@ export function TripDetailSheetV2({
                     Share trip
                   </DropdownMenuItem>
                   {!isHost && (
-                    <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
+                    <DropdownMenuItem 
+                      onClick={() => setShowLeaveDialog(true)}
+                      className="gap-2 text-red-600 focus:text-red-600"
+                    >
                       <LogOut className="w-4 h-4" />
                       Leave trip
                     </DropdownMenuItem>
                   )}
                   {isHost && (
-                    <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
+                    <DropdownMenuItem 
+                      onClick={() => setShowRemoveDialog(true)}
+                      className="gap-2 text-red-600 focus:text-red-600"
+                    >
                       <Trash2 className="w-4 h-4" />
                       Remove trip
                     </DropdownMenuItem>
@@ -350,6 +436,65 @@ export function TripDetailSheetV2({
               gameId={selectedGameId}
             />
           )}
+
+          {/* Remove Trip Confirmation Dialog */}
+          <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove this trip?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete the trip and all rounds. 
+                  {participants.length > 1 && ` ${participants.length - 1} participant(s) will be notified.`}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleRemoveTrip}
+                  disabled={isRemoving}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  {isRemoving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Removing...
+                    </>
+                  ) : (
+                    'Remove'
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Leave Trip Confirmation Dialog */}
+          <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Leave this trip?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You'll be removed from the trip and won't receive updates.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleLeaveTrip}
+                  disabled={isRemoving}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  {isRemoving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Leaving...
+                    </>
+                  ) : (
+                    'Leave'
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </AnimatePresence>,

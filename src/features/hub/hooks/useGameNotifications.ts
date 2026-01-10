@@ -29,7 +29,9 @@ export type GameNotificationType =
   | 'game_completed'
   | 'trip_created'
   | 'trip_game_added'
-  | 'trip_reminder';
+  | 'trip_reminder'
+  | 'trip_cancelled'
+  | 'trip_updated';
 
 interface SendGameNotificationParams {
   type: GameNotificationType;
@@ -67,7 +69,7 @@ function getNotificationTitle(type: GameNotificationType, data?: SendGameNotific
     case 'game_invite':
       return "You've been invited to a game";
     case 'rsvp_update':
-      return `${data?.player_name || 'Someone'} is going`;
+      return `${data?.player_name || 'Someone'} joined`;
     case 'game_reminder_24h':
       return "You're playing tomorrow";
     case 'game_reminder_2h':
@@ -82,6 +84,10 @@ function getNotificationTitle(type: GameNotificationType, data?: SendGameNotific
       return "New game added to trip";
     case 'trip_reminder':
       return "Trip starts tomorrow";
+    case 'trip_cancelled':
+      return "Trip cancelled";
+    case 'trip_updated':
+      return "Trip updated";
     default:
       return "Game notification";
   }

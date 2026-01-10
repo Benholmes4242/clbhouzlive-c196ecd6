@@ -62,6 +62,14 @@ export const GAME_NOTIFICATION_COPY = {
     title: "Trip starts tomorrow",
     getSubcopy: (tripName: string) => tripName,
   },
+  trip_cancelled: {
+    title: "Trip cancelled",
+    getSubcopy: (tripName: string) => `${tripName} has been cancelled`,
+  },
+  trip_updated: {
+    title: "Trip updated",
+    getSubcopy: (tripName: string) => tripName,
+  },
 } as const;
 
 // Types for notification payloads
@@ -96,6 +104,8 @@ export const GAME_NOTIFICATION_TYPES = new Set([
   'trip_created',
   'trip_game_added',
   'trip_reminder',
+  'trip_cancelled',
+  'trip_updated',
 ]);
 
 // Check if a notification type is game-related
