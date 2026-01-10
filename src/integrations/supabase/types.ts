@@ -435,6 +435,13 @@ export type Database = {
             foreignKeyName: "business_access_requests_decided_by_fkey"
             columns: ["decided_by"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -444,6 +451,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
@@ -839,6 +853,13 @@ export type Database = {
             foreignKeyName: "business_follows_follower_id_fkey"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -929,6 +950,13 @@ export type Database = {
             foreignKeyName: "business_members_user_profile_id_fkey"
             columns: ["user_profile_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -967,6 +995,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_id"]
@@ -1065,6 +1100,13 @@ export type Database = {
             foreignKeyName: "business_team_members_user_profile_id_fkey"
             columns: ["user_profile_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_team_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -1106,6 +1148,13 @@ export type Database = {
           reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_verification_events_business_profile_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "business_verification_events_business_profile_id_fkey"
             columns: ["business_profile_id"]
@@ -1362,6 +1411,13 @@ export type Database = {
             foreignKeyName: "challenges_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "challenges_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -1412,6 +1468,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
@@ -2026,6 +2089,13 @@ export type Database = {
             foreignKeyName: "cosmetic_loadouts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -2234,6 +2304,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "course_ratings_user_id_fkey"
@@ -3144,6 +3221,13 @@ export type Database = {
             foreignKeyName: "game_participants_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "game_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -3923,6 +4007,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "join_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "join_requests_requester_id_fkey"
@@ -5038,6 +5129,13 @@ export type Database = {
             foreignKeyName: "rivals_rival_user_id_fkey"
             columns: ["rival_user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "rivals_rival_user_id_fkey"
+            columns: ["rival_user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -5047,6 +5145,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "rivals_user_id_fkey"
@@ -5107,6 +5212,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "season_pass_tiers_user_id_fkey"
@@ -5295,6 +5407,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
             referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "season_wrap_cards_user_id_fkey"
@@ -6479,6 +6598,13 @@ export type Database = {
             foreignKeyName: "streaks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -7401,6 +7527,13 @@ export type Database = {
             foreignKeyName: "user_bag_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_bag_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -7471,6 +7604,13 @@ export type Database = {
             foreignKeyName: "user_challenge_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_challenge_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -7509,6 +7649,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "season_shop_items"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
@@ -7561,6 +7708,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_course_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_course_tracker_user_id_fkey"
@@ -7730,6 +7884,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_home_clubs_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "user_home_clubs_user_profile_id_fkey"
@@ -8247,6 +8408,13 @@ export type Database = {
             foreignKeyName: "user_season_currency_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_season_currency_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -8636,6 +8804,13 @@ export type Database = {
             foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -8679,6 +8854,13 @@ export type Database = {
           profile_views: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_profile_id"]
@@ -8826,6 +9008,27 @@ export type Database = {
           f_table_schema?: unknown
           srid?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      public_golfer_blurbs: {
+        Row: {
+          handicap: number | null
+          home_club: string | null
+          user_id: string | null
+          visible_handicap: number | null
+        }
+        Insert: {
+          handicap?: number | null
+          home_club?: string | null
+          user_id?: string | null
+          visible_handicap?: never
+        }
+        Update: {
+          handicap?: number | null
+          home_club?: string | null
+          user_id?: string | null
+          visible_handicap?: never
         }
         Relationships: []
       }
@@ -8980,6 +9183,13 @@ export type Database = {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -9051,6 +9261,13 @@ export type Database = {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -9071,6 +9288,13 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]

@@ -108,20 +108,28 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check for existing pending request
+    // Check for existing request (pending OR declined/rejected)
     const { data: existingRequest } = await supabase
       .from('game_join_requests')
-      .select('id')
+      .select('id, status')
       .eq('game_id', game_id)
       .eq('requester_user_id', user.id)
-      .eq('status', 'pending')
       .maybeSingle();
 
     if (existingRequest) {
-      return new Response(
-        JSON.stringify({ error: 'ALREADY_REQUESTED', message: 'Request already pending' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      if (existingRequest.status === 'pending') {
+        return new Response(
+          JSON.stringify({ error: 'ALREADY_REQUESTED', message: 'Request already pending' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      // Block re-requests after decline - game disappears from discover
+      if (existingRequest.status === 'declined') {
+        return new Response(
+          JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is no longer available' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Create the join request

@@ -194,14 +194,16 @@ Deno.serve(async (req) => {
 
       if (updateReqError) throw updateReqError;
 
-      // Notify requester
+      // Notify requester with GENERIC message (anonymity-preserving)
+      // Never reveal that they were declined - always say "slots taken"
       await supabase.from('notifications').insert({
         user_id: request.requester_user_id,
         type: 'join_declined',
-        title: 'Game update',
-        message: 'This round is full. Keep an eye on Nearby Games.',
+        title: 'Update on your request',
+        message: 'Unfortunately, all slots in this game are now taken.',
         data: {
-          game_id: request.game_id
+          game_id: request.game_id,
+          generic_decline: true // Flag for UI to know it's a generic message
         }
       });
 
