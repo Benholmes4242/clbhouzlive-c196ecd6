@@ -89,8 +89,11 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           
           <div className="flex-1 text-left min-w-0">
             <div 
-              className="text-[15px] font-semibold" // Stronger header
-              style={{ color: 'var(--hub-text)' }}
+              className="font-semibold leading-tight"
+              style={{ 
+                color: 'var(--hub-text)',
+                fontSize: 'clamp(13px, 3.5vw, 15px)', // Responsive: 13px min, 15px max
+              }}
             >
               Your Games and Trips
             </div>
