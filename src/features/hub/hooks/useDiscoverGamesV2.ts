@@ -186,9 +186,8 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
       const mapped: DiscoverGame[] = filteredGames.map((g) => {
         const isHost = userId && g.host_user_id === userId;
         
-        // Calculate going count: count all participants with rsvp_status='going' + 1 for host
-        const goingParticipants = participantCounts[g.id] || 0;
-        const goingCount = goingParticipants + 1; // +1 for host (consistent rule)
+        // Host is already in game_participants with rsvp_status='going', no +1 needed
+        const goingCount = participantCounts[g.id] || 0;
         
         // Calculate slots open: slots_total - goingCount
         const slotsOpen = Math.max(0, (g.slots_total || 4) - goingCount);

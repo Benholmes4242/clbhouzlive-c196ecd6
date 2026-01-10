@@ -60,31 +60,42 @@ export function useGameJoinRequests(gameId?: string) {
     fetchUserAcceptedRequests();
   }, []);
 
-  // Realtime listener for instant "You're in 👋" updates
+  // Realtime listener for instant "You're in 👋" updates - filtered by user_id
   useEffect(() => {
-    const channel = supabase
-      .channel('user-game-joins')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'game_participants',
-        },
-        (payload: any) => {
-          if (payload.new?.rsvp_status === 'going') {
-            setAcceptedGameIds(prev => {
-              const next = new Set(prev);
-              next.add(payload.new.game_id);
-              return next;
-            });
+    const setupRealtimeListener = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const channel = supabase
+        .channel('user-game-joins')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'game_participants',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload: any) => {
+            if (payload.new?.rsvp_status === 'going') {
+              setAcceptedGameIds(prev => {
+                const next = new Set(prev);
+                next.add(payload.new.game_id);
+                return next;
+              });
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+
+      return channel;
+    };
+
+    let channel: any;
+    setupRealtimeListener().then(ch => { channel = ch; });
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 
@@ -230,16 +241,35 @@ export function useGameJoinRequests(gameId?: string) {
 
   const acceptRequest = async (requestId: string, targetGameId: string) => {
     try {
-      // Update participant rsvp_status to 'going'
-      const { error } = await supabase
-        .from('game_participants')
-        .update({ 
-          rsvp_status: 'going',
-          rsvp_updated_at: new Date().toISOString(),
-        })
-        .eq('id', requestId);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      // Use edge function for transactional capacity checks
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL || 'https://ybxkehyomcakqjvuhnna.supabase.co'}/functions/v1/game-request-decide`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ participant_id: requestId, decision: 'accept' }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          toast({
+            title: "Game is full",
+            description: "No open seats available.",
+            variant: "destructive",
+          });
+          return;
+        }
+        throw new Error(result.error || 'Failed to accept request');
+      }
 
       // Emit hub event for instant local UI update
       emitHub('game:joined', { gameId: targetGameId, requestId });
@@ -262,16 +292,27 @@ export function useGameJoinRequests(gameId?: string) {
 
   const declineRequest = async (requestId: string) => {
     try {
-      // Update participant rsvp_status to 'rejected'
-      const { error } = await supabase
-        .from('game_participants')
-        .update({ 
-          rsvp_status: 'rejected',
-          rsvp_updated_at: new Date().toISOString(),
-        })
-        .eq('id', requestId);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      // Use edge function for transactional update + generic notification
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL || 'https://ybxkehyomcakqjvuhnna.supabase.co'}/functions/v1/game-request-decide`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ participant_id: requestId, decision: 'decline' }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to decline request');
+      }
 
       toast({
         title: "We've let them know the round is full",
