@@ -14,7 +14,13 @@ export const postingAsCopy = {
   },
   actorLabels: {
     personal: 'Personal profile',
+    creator: 'Creator page',
     business: 'Business',
+  },
+  sectionLabels: {
+    personal: 'Personal',
+    creators: 'Creator Pages',
+    businesses: 'Business Profiles',
   },
   roleChips: {
     owner: 'Owner',
@@ -26,8 +32,18 @@ export const postingAsCopy = {
     body: 'Create one to post and manage your club, coaching, or brand presence.',
     cta: 'Create business profile',
   },
+  creatorEmptyState: {
+    title: 'No creator pages yet',
+    body: 'Create one to share content and build your audience.',
+    cta: 'Create creator page',
+  },
+  managementLinks: {
+    creators: 'Manage creator pages',
+    businesses: 'Manage business profiles',
+  },
   toasts: {
     switchedToBusiness: (name: string) => `Now posting as ${name}`,
+    switchedToCreator: (name: string) => `Now posting as ${name}`,
     switchedToPersonal: (name: string) => `Now posting as ${name}`,
   },
   createPostModal: {

@@ -207,8 +207,11 @@ const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m 
 
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
-// Creator Page (Phase 3)
+// Creator Pages
 const CreatorPage = lazy(() => import("./pages/CreatorPage"));
+const CreatorStudioPage = lazy(() => import("./pages/CreatorStudioPage"));
+const CreatorEditPage = lazy(() => import("./pages/CreatorEditPage"));
+const CreatorInsightsPage = lazy(() => import("./pages/CreatorInsightsPage"));
 // Video Player Modal (Phase 6A-1)
 const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
@@ -306,6 +309,9 @@ function AppRoutes() {
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
         <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
         <Route path="/creator/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorPage /></Suspense>} />
+        <Route path="/creators/manage" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorStudioPage /></Suspense>} />
+        <Route path="/creator/:slug/edit" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorEditPage /></Suspense>} />
+        <Route path="/creator/:slug/insights" element={<Suspense fallback={<GenericPageSkeleton />}><CreatorInsightsPage /></Suspense>} />
         <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
         <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
         
