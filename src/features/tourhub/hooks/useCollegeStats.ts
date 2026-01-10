@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTourSeason } from './useTourHubData';
 
 export interface CollegeSeasonStats {
   id: string;
@@ -18,29 +19,27 @@ export interface CollegeSeasonStats {
   logo_url?: string;
 }
 
-// 2025 Season ID
-const CURRENT_SEASON_ID = '8d78d0da-6a71-4d51-a68c-a6139c9ecfae';
+/**
+ * Hook to get current tour season ID.
+ * Other hooks depend on this to avoid hardcoding season IDs.
+ */
+export function useCurrentSeasonId() {
+  const { data: season } = useTourSeason();
+  return season?.id;
+}
 
 /**
- * Fetches college season stats with college_media joined.
- * Used for leaderboards and college cards.
+ * Fetches ALL college season stats (no limit) for client-side sorting.
+ * Since we only have ~89 colleges, fetching all is efficient and allows
+ * correct metric tab switching without refetching.
  */
-export function useCollegeSeasonStats(options?: {
-  orderBy?: 'earnings' | 'wins' | 'cuts' | 'top10s';
-  limit?: number;
-}) {
-  const { orderBy = 'earnings', limit = 100 } = options || {};
+export function useCollegeSeasonStats() {
+  const seasonId = useCurrentSeasonId();
   
   return useQuery({
-    queryKey: ['college-season-stats', orderBy, limit],
+    queryKey: ['college-season-stats', seasonId],
     queryFn: async () => {
-      // Order column mapping
-      const orderColumn = {
-        earnings: 'earnings_total',
-        wins: 'wins_total',
-        cuts: 'cuts_total',
-        top10s: 'top10_total',
-      }[orderBy];
+      if (!seasonId) return [];
       
       const { data, error } = await supabase
         .from('college_season_stats')
@@ -56,9 +55,7 @@ export function useCollegeSeasonStats(options?: {
           top25_total,
           events_total
         `)
-        .eq('season_id', CURRENT_SEASON_ID)
-        .order(orderColumn, { ascending: false })
-        .limit(limit);
+        .eq('season_id', seasonId);
       
       if (error) {
         console.error('[useCollegeSeasonStats] Error:', error);
@@ -67,6 +64,7 @@ export function useCollegeSeasonStats(options?: {
       
       return data as CollegeSeasonStats[];
     },
+    enabled: !!seasonId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
@@ -75,15 +73,17 @@ export function useCollegeSeasonStats(options?: {
  * Fetches stats for a single college by normalized name.
  */
 export function useCollegeStats(normalizedName: string | undefined) {
+  const seasonId = useCurrentSeasonId();
+  
   return useQuery({
-    queryKey: ['college-stats', normalizedName],
+    queryKey: ['college-stats', normalizedName, seasonId],
     queryFn: async () => {
-      if (!normalizedName) return null;
+      if (!normalizedName || !seasonId) return null;
       
       const { data, error } = await supabase
         .from('college_season_stats')
         .select('*')
-        .eq('season_id', CURRENT_SEASON_ID)
+        .eq('season_id', seasonId)
         .eq('normalized_name', normalizedName)
         .maybeSingle();
       
@@ -94,7 +94,7 @@ export function useCollegeStats(normalizedName: string | undefined) {
       
       return data as CollegeSeasonStats | null;
     },
-    enabled: !!normalizedName,
+    enabled: !!normalizedName && !!seasonId,
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -103,10 +103,12 @@ export function useCollegeStats(normalizedName: string | undefined) {
  * Searches colleges by name/short_name.
  */
 export function useCollegeSearch(searchTerm: string) {
+  const seasonId = useCurrentSeasonId();
+  
   return useQuery({
-    queryKey: ['college-search', searchTerm],
+    queryKey: ['college-search', searchTerm, seasonId],
     queryFn: async () => {
-      if (!searchTerm || searchTerm.length < 2) return [];
+      if (!searchTerm || searchTerm.length < 2 || !seasonId) return [];
       
       // First get matching college_media entries
       const { data: mediaMatches, error: mediaError } = await supabase
@@ -127,7 +129,7 @@ export function useCollegeSearch(searchTerm: string) {
       const { data: stats, error: statsError } = await supabase
         .from('college_season_stats')
         .select('*')
-        .eq('season_id', CURRENT_SEASON_ID)
+        .eq('season_id', seasonId)
         .in('normalized_name', normalizedNames);
       
       if (statsError) {
@@ -143,7 +145,7 @@ export function useCollegeSearch(searchTerm: string) {
         ...(statsMap.get(media.normalized_name) || {}),
       })) as CollegeSeasonStats[];
     },
-    enabled: searchTerm.length >= 2,
+    enabled: searchTerm.length >= 2 && !!seasonId,
     staleTime: 2 * 60 * 1000,
   });
 }
