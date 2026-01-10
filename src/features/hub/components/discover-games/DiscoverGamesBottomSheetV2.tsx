@@ -19,10 +19,8 @@ import { GameCard } from '../your-games-trips-v2/GameCard';
 import { GameDetailSheetV2 } from '../game-detail-v2';
 import { DiscoverSearchInput } from './DiscoverSearchInput';
 import { DiscoverFilterChips } from './DiscoverFilterChips';
-import { DiscoverTabPills } from './DiscoverTabPills';
+import { DiscoverTabPills, type DiscoverTab } from './DiscoverTabPills';
 import { DiscoverEmptyState } from './DiscoverEmptyState';
-
-export type DiscoverTab = 'recommended' | 'upcoming' | 'friends';
 
 interface DiscoverGamesBottomSheetV2Props {
   isOpen: boolean;
@@ -60,6 +58,7 @@ export function DiscoverGamesBottomSheetV2({
     data,
     isLoading,
     isError,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -296,7 +295,7 @@ export function DiscoverGamesBottomSheetV2({
               ) : isError ? (
                 <DiscoverEmptyState 
                   type="error"
-                  onRetry={() => window.location.reload()}
+                  onRetry={() => refetch()}
                 />
               ) : sortedGames.length === 0 ? (
                 <DiscoverEmptyState type="empty" />
