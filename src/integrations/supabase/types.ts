@@ -2517,6 +2517,114 @@ export type Database = {
         }
         Relationships: []
       }
+      event_moments: {
+        Row: {
+          created_at: string
+          description: string | null
+          headline: string
+          id: string
+          moment_type: string
+          player_id: string | null
+          sort_order: number
+          tournament_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          headline: string
+          id?: string
+          moment_type: string
+          player_id?: string | null
+          sort_order?: number
+          tournament_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          headline?: string
+          id?: string
+          moment_type?: string
+          player_id?: string | null
+          sort_order?: number
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_moments_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_moments_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_winners: {
+        Row: {
+          created_at: string
+          final_round_score: number | null
+          headline: string | null
+          id: string
+          is_playoff: boolean | null
+          margin: number | null
+          narrative: string | null
+          player_id: string
+          score_to_par: number | null
+          tournament_id: string
+          updated_at: string
+          winning_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          final_round_score?: number | null
+          headline?: string | null
+          id?: string
+          is_playoff?: boolean | null
+          margin?: number | null
+          narrative?: string | null
+          player_id: string
+          score_to_par?: number | null
+          tournament_id: string
+          updated_at?: string
+          winning_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          final_round_score?: number | null
+          headline?: string | null
+          id?: string
+          is_playoff?: boolean | null
+          margin?: number | null
+          narrative?: string | null
+          player_id?: string
+          score_to_par?: number | null
+          tournament_id?: string
+          updated_at?: string
+          winning_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_winners_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_winners_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       explore_course_themes: {
         Row: {
           course_id: string
@@ -4071,6 +4179,44 @@ export type Database = {
             columns: ["club_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_media: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          headshot_url: string
+          id: string
+          player_id: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          headshot_url: string
+          id?: string
+          player_id: string
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          headshot_url?: string
+          id?: string
+          player_id?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_media_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "sr_players"
             referencedColumns: ["id"]
           },
         ]
