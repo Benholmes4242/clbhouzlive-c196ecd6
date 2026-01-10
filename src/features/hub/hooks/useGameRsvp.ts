@@ -164,8 +164,17 @@ export function useGameRsvp(gameId: string | undefined) {
       return { newStatus, playerName: userProfile?.display_name || 'Someone' };
     },
     onSuccess: ({ newStatus, playerName }) => {
+      // Invalidate game detail data
       queryClient.invalidateQueries({ queryKey: ['game-rsvp', gameId] });
+      
+      // Invalidate user's games lists
       queryClient.invalidateQueries({ queryKey: ['user-games'] });
+      queryClient.invalidateQueries({ queryKey: ['your-games-trips'] });
+      
+      // Invalidate all discover games queries (any filter combination)
+      queryClient.invalidateQueries({
+        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'discover-games',
+      });
       
       const messages: Record<RsvpStatus, string> = {
         going: "You're going! 🏌️",
