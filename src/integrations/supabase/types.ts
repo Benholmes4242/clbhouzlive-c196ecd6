@@ -2521,6 +2521,74 @@ export type Database = {
         }
         Relationships: []
       }
+      echo_conversation_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "echo_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      echo_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          pinned: boolean
+          summary: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          pinned?: boolean
+          summary?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          pinned?: boolean
+          summary?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       echo_events: {
         Row: {
           created_at: string
@@ -9904,6 +9972,7 @@ export type Database = {
           thread_id: string
         }[]
       }
+      echo_purge_old_data: { Args: never; Returns: undefined }
       echo_share_create:
         | { Args: { p_thread: string }; Returns: string }
         | {
