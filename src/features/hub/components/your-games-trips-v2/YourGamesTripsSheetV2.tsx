@@ -199,7 +199,7 @@ export function YourGamesTripsSheetV2({
                   className="text-[12px] mt-0.5"
                   style={{ color: 'rgba(100, 116, 139, 0.8)' }}
                 >
-                  Manage every game and trip in one place.
+                  All your rounds and tours — in one place.
                 </p>
               </div>
               

@@ -162,7 +162,7 @@ export function GameRemindersSheet({ isOpen, onClose, gameId }: GameRemindersShe
                   </div>
 
                   <p className="text-xs text-muted-foreground">
-                    We'll only remind you when you're going to this game.
+                    We'll only remind you when you've joined this game.
                   </p>
                 </>
               )}

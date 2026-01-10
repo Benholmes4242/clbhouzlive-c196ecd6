@@ -1,6 +1,6 @@
 /**
  * GameRsvpSummary - Reusable RSVP summary component
- * Shows user's status pill + going/maybe counts
+ * Shows user's status pill + joined/maybe counts
  * 
  * Used in:
  * - GameCard (hero + row)
@@ -11,6 +11,7 @@
 import React from 'react';
 import { Users } from 'lucide-react';
 import { RsvpPill } from './RsvpStrip';
+import { formatRsvpCount } from '@/lib/rsvpLabels';
 import type { RsvpStatus } from '../your-games-trips-v2/types';
 
 interface GameRsvpSummaryProps {
@@ -41,7 +42,7 @@ export function GameRsvpSummary({
         style={{ color: 'rgba(30, 41, 59, 0.5)' }}
       >
         <Users className="w-3.5 h-3.5" />
-        {goingCount} going
+        {formatRsvpCount(goingCount, 'going')}
         {variant === 'expanded' && maybeCount > 0 && (
           <span className="opacity-80"> · {maybeCount} maybe</span>
         )}

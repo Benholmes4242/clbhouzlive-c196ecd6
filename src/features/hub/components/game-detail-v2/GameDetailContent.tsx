@@ -74,9 +74,9 @@ interface GameDetailContentProps {
 // RSVP status label component
 function RsvpStatusLabel({ status }: { status: RsvpStatus | string | null }) {
   const labels: Record<string, { text: string; color: string }> = {
-    going: { text: 'Going', color: 'text-green-600' },
+    going: { text: 'Joined', color: 'text-green-600' },
     maybe: { text: 'Maybe', color: 'text-yellow-600' },
-    declined: { text: 'Declined', color: 'text-red-500' },
+    declined: { text: "Can't go", color: 'text-red-500' },
     invited: { text: 'Invited', color: 'text-blue-500' },
   };
   

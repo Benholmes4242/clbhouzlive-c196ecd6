@@ -78,8 +78,8 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
         </div>
         <div className="flex items-center gap-2 mt-2">
           <ProgressPill text={`${data.slotsTotal - data.slotsOpen}/${data.slotsTotal}`} />
-          {/* RSVP summary - show if goingCount exists (even 0) */}
-          {data.goingCount !== undefined && (
+          {/* RSVP summary - show if joinedCount exists (even 0) */}
+          {data.joinedCount !== undefined && (
             <span 
               className="flex items-center gap-1 text-[11px] font-medium"
               style={{ 
@@ -88,7 +88,7 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
               }}
             >
               <Users className="w-3 h-3" />
-              {data.goingCount} going
+              {data.joinedCount} joined
             </span>
           )}
         </div>
