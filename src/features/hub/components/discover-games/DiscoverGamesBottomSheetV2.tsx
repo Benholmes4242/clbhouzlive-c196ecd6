@@ -182,9 +182,13 @@ export function DiscoverGamesBottomSheetV2({
         setDateFilter({ mode: 'preset', preset: 'any' });
         setVisibility('all');
         setActiveTab('games');
+        setTimeOfDay('any');
         setSelectedGameId(null);
         setGameSheetOpen(false);
-        setRequestingGameId(null);
+        setSelectedTripId(null);
+        setTripSheetOpen(false);
+        setRequestModalOpen(false);
+        setPendingRequestId(null);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -224,6 +228,17 @@ export function DiscoverGamesBottomSheetV2({
     setTimeout(() => setSelectedGameId(null), 300);
   }, []);
 
+  const handleOpenTripDetail = useCallback((tripId: string) => {
+    haptic('light');
+    setSelectedTripId(tripId);
+    setTripSheetOpen(true);
+  }, []);
+
+  const handleCloseTripDetail = useCallback(() => {
+    setTripSheetOpen(false);
+    setTimeout(() => setSelectedTripId(null), 300);
+  }, []);
+
   const handleTabChange = useCallback((tab: DiscoverTab) => {
     haptic('light');
     setActiveTab(tab);
@@ -232,7 +247,10 @@ export function DiscoverGamesBottomSheetV2({
   if (!isOpen) return null;
 
   const portalRoot = document.getElementById('portal-root') || document.body;
-  const hasStackedSheet = gameSheetOpen;
+  const hasStackedSheet = gameSheetOpen || tripSheetOpen;
+  
+  // Check if time-of-day chips should be disabled (only works with single date, no specific time)
+  const timeChipsDisabled = dateFilter.mode !== 'single' || !!dateFilter.singleTime;
 
   return createPortal(
     <AnimatePresence>
@@ -352,6 +370,17 @@ export function DiscoverGamesBottomSheetV2({
               />
             </div>
 
+            {/* Time-of-day chips */}
+            {dateFilter.mode === 'single' && !dateFilter.singleTime && (
+              <div className="px-5 pb-3 flex-shrink-0">
+                <TimeOfDayChips
+                  value={timeOfDay}
+                  onChange={setTimeOfDay}
+                  disabled={timeChipsDisabled}
+                />
+              </div>
+            )}
+
             {/* Content - scrollable */}
             <div 
               ref={listRef}
@@ -378,8 +407,8 @@ export function DiscoverGamesBottomSheetV2({
                         key={game.id}
                         game={game}
                         onTap={() => handleOpenGameDetail(game.id)}
-                        onRequestJoin={() => handleRequestJoin(game.id)}
-                        isRequesting={requestingGameId === game.id && joinGameMutation.isPending}
+                        onRequestJoin={() => handleOpenGameRequestModal(game.id)}
+                        isRequesting={pendingRequestId === game.id && joinGameMutation.isPending}
                       />
                     ))}
 
@@ -399,7 +428,9 @@ export function DiscoverGamesBottomSheetV2({
                       <TripDiscoverCard
                         key={trip.id}
                         trip={trip}
-                        onTap={() => {}}
+                        onTap={() => handleOpenTripDetail(trip.id)}
+                        onRequestJoin={() => handleOpenTripRequestModal(trip.id)}
+                        isRequesting={pendingRequestId === trip.id && joinTripMutation.isPending}
                       />
                     ))}
 
@@ -422,6 +453,29 @@ export function DiscoverGamesBottomSheetV2({
               gameId={selectedGameId}
             />
           )}
+
+          {/* Trip Detail Sheet (stacked) */}
+          {selectedTripId && (
+            <TripDetailSheetV2
+              isOpen={tripSheetOpen}
+              onClose={handleCloseTripDetail}
+              tripId={selectedTripId}
+              onRequestJoin={() => handleOpenTripRequestModal(selectedTripId)}
+              isRequesting={pendingRequestId === selectedTripId && joinTripMutation.isPending}
+            />
+          )}
+
+          {/* Request Note Modal */}
+          <RequestNoteModal
+            isOpen={requestModalOpen}
+            onClose={() => {
+              setRequestModalOpen(false);
+              setPendingRequestId(null);
+            }}
+            onSubmit={handleSubmitRequest}
+            isSubmitting={joinGameMutation.isPending || joinTripMutation.isPending}
+            entityType={requestModalType}
+          />
         </>
       )}
     </AnimatePresence>,

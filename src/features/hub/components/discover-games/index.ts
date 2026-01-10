@@ -6,4 +6,7 @@ export { DiscoverEmptyState } from './DiscoverEmptyState';
 export { GameDiscoverCard } from './GameDiscoverCard';
 export { TripDiscoverCard } from './TripDiscoverCard';
 export { RequestNoteModal } from './RequestNoteModal';
+export { TimeOfDayChips, getTimeOfDayRange, detectTimeOfDay } from './TimeOfDayChips';
+export { TrustSignals } from './TrustSignals';
 export type { DiscoverTab } from './DiscoverTabPills';
+export type { TimeOfDay } from './TimeOfDayChips';

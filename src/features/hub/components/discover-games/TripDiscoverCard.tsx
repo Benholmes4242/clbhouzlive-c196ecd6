@@ -6,6 +6,7 @@
  * - Slots: "X spots left" / "Full"
  * - Visibility pill
  * - Anonymous host blurb
+ * - Trust signals (verified, handicap hidden, home club hidden)
  * - CTA states: Request to join / Requested / Joined / Full
  */
 
@@ -13,6 +14,7 @@ import React from 'react';
 import { MapPin, Users, Lock, Globe, UserPlus, Calendar } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { TrustSignals } from './TrustSignals';
 import type { DiscoverTrip } from '../../hooks/useDiscoverTrips';
 
 interface TripDiscoverCardProps {
@@ -69,6 +71,10 @@ export function TripDiscoverCard({
   const hostBlurbText = hostBlurbParts.length > 0 
     ? `Host: ${hostBlurbParts.join(' • ')}`
     : 'Host: Golfer';
+
+  // Determine trust signal visibility
+  const showsHandicap = trip.hostBlurb.handicap !== null;
+  const showsHomeClub = !!trip.hostBlurb.homeClub;
 
   const handleRequestJoin = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -181,13 +187,19 @@ export function TripDiscoverCard({
           </span>
         </div>
 
-        {/* Anonymous host blurb */}
-        <p 
-          className="text-[12px] mb-3 truncate"
-          style={{ color: 'rgba(100, 116, 139, 0.7)' }}
-        >
-          {hostBlurbText}
-        </p>
+        {/* Anonymous host blurb + Trust signals */}
+        <div className="mb-3 space-y-1.5">
+          <p 
+            className="text-[12px] truncate"
+            style={{ color: 'rgba(100, 116, 139, 0.7)' }}
+          >
+            {hostBlurbText}
+          </p>
+          <TrustSignals
+            showsHandicap={showsHandicap}
+            showsHomeClub={showsHomeClub}
+          />
+        </div>
 
         {/* CTA Button */}
         <button
