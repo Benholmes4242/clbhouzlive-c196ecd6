@@ -511,6 +511,7 @@ export function useTripTimeline(tripId: string | undefined) {
     isLoading: tripQuery.isLoading || participantsQuery.isLoading || timelineQuery.isLoading,
     error: tripQuery.error || participantsQuery.error || timelineQuery.error,
     isHost,
+    currentUserId: sessionData?.id,
     todayDayNumber,
     hasMultipleDays,
     hasTodayInTrip,

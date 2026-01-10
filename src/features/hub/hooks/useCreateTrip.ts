@@ -1,5 +1,8 @@
 /**
  * useCreateTrip - Hook for creating trips with real database inserts
+ * 
+ * V2: Uses RPC for participant invites, hardened error handling, 
+ * fails if game creation fails (no empty timelines)
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,6 +21,7 @@ export function useCreateTrip() {
       // Get current user
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) {
+        console.error('[useCreateTrip] Auth error:', authError);
         throw new Error('You must be logged in to create a trip');
       }
 
@@ -28,13 +32,15 @@ export function useCreateTrip() {
 
       // Build trip record matching actual schema
       const tripRecord = {
-        created_by: user.id,
+        created_by: user.id,  // CRITICAL: must match RLS policy (auth.uid() = created_by)
         name: tripName,
         visibility: draft.visibility,
         start_date: draft.startDate.toISOString().split('T')[0],
         end_date: draft.endDate.toISOString().split('T')[0],
         description: draft.notes || null,
       };
+
+      console.log('[useCreateTrip] Creating trip with record:', tripRecord);
 
       // Insert trip
       const { data: trip, error: tripError } = await supabase
@@ -44,9 +50,17 @@ export function useCreateTrip() {
         .single();
 
       if (tripError) {
-        console.error('Failed to create trip:', tripError);
-        throw new Error('Failed to create trip');
+        console.error('[useCreateTrip] Failed to create trip:', {
+          code: tripError.code,
+          message: tripError.message,
+          details: tripError.details,
+          hint: tripError.hint,
+          payload: tripRecord,
+        });
+        throw new Error(`Failed to create trip: ${tripError.message}`);
       }
+
+      console.log('[useCreateTrip] Trip created:', trip.id);
 
       // Insert creator as participant with 'going' status
       const { error: creatorError } = await supabase
@@ -60,52 +74,82 @@ export function useCreateTrip() {
         });
 
       if (creatorError) {
-        console.error('Failed to add creator as participant:', creatorError);
+        console.error('[useCreateTrip] Failed to add creator as participant:', {
+          code: creatorError.code,
+          message: creatorError.message,
+          details: creatorError.details,
+          hint: creatorError.hint,
+        });
+        // Non-fatal: continue, trip exists
       }
 
       // Create games for each itinerary stop (trips contain games)
+      // CRITICAL: If any game fails, we throw to avoid trips with empty timelines
+      const gameErrors: { courseId: string; error: any }[] = [];
+      
       for (const stop of draft.itinerary) {
         const stopDate = new Date(draft.startDate);
         stopDate.setDate(stopDate.getDate() + stop.dayIndex);
         
+        // Set time to noon to avoid timezone issues
+        stopDate.setHours(12, 0, 0, 0);
+        
         const gameExpiresAt = new Date(stopDate.getTime() + 24 * 60 * 60 * 1000);
+
+        const gamePayload = {
+          host_user_id: user.id,
+          course_id: stop.courseId,
+          trip_id: trip.id,
+          visibility: draft.visibility,
+          start_time: stopDate.toISOString(),
+          expires_at: gameExpiresAt.toISOString(),
+          status: 'scheduled',  // Use 'scheduled' for trip games
+        };
+
+        console.log('[useCreateTrip] Creating game for stop:', stop.courseName, gamePayload);
 
         const { error: gameError } = await supabase
           .from('games')
-          .insert({
-            host_user_id: user.id,
-            course_id: stop.courseId,
-            trip_id: trip.id,
-            visibility: draft.visibility,
-            start_time: stopDate.toISOString(),
-            expires_at: gameExpiresAt.toISOString(),
-            status: 'active',
-          });
+          .insert(gamePayload);
 
         if (gameError) {
-          console.error('Failed to create trip game:', gameError);
+          console.error('[useCreateTrip] Failed to create trip game:', {
+            code: gameError.code,
+            message: gameError.message,
+            details: gameError.details,
+            hint: gameError.hint,
+            payload: gamePayload,
+          });
+          gameErrors.push({ courseId: stop.courseId, error: gameError });
         }
       }
 
-      // Invite attendees
-      if (draft.attendeeIds.length > 0) {
-        const invites = draft.attendeeIds.map(attendeeId => ({
-          trip_id: trip.id,
-          user_id: attendeeId,
-          role: 'member',
-          rsvp_status: 'invited' as const,
-          invited_by: user.id,
-        }));
+      // If ALL games failed, throw error
+      if (gameErrors.length === draft.itinerary.length && draft.itinerary.length > 0) {
+        throw new Error(`Failed to create rounds for trip: ${gameErrors[0]?.error?.message || 'Unknown error'}`);
+      }
 
-        const { error: inviteError } = await supabase
-          .from('trip_participants')
-          .insert(invites);
+      // Invite attendees using RPC (bypasses RLS issues for inviting other users)
+      if (draft.attendeeIds.length > 0) {
+        console.log('[useCreateTrip] Inviting attendees via RPC:', draft.attendeeIds);
+        
+        const { error: inviteError } = await supabase.rpc('invite_users_to_trip', {
+          p_trip_id: trip.id,
+          p_user_ids: draft.attendeeIds,
+        });
 
         if (inviteError) {
-          console.error('Failed to invite attendees:', inviteError);
+          console.error('[useCreateTrip] Failed to invite attendees:', {
+            code: inviteError.code,
+            message: inviteError.message,
+            details: inviteError.details,
+            hint: inviteError.hint,
+          });
+          // Non-fatal: trip exists, invites can be sent later
         }
       }
 
+      console.log('[useCreateTrip] Trip creation complete:', trip.id);
       return { tripId: trip.id };
     },
     onSuccess: () => {

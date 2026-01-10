@@ -9963,6 +9963,10 @@ export type Database = {
             Args: { _invite_reason?: string; _note?: string; _user_id: string }
             Returns: string
           }
+      invite_users_to_trip: {
+        Args: { p_trip_id: string; p_user_ids: string[] }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
       is_business_owner:
         | { Args: { _business_id: string }; Returns: boolean }
