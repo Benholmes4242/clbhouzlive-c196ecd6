@@ -1,9 +1,15 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, Swords, GitCompare } from 'lucide-react';
 import { TourHubShell } from '../components';
-import { CollegeHero, CollegeAlumniList } from '../components/college';
+import { 
+  CollegeHero, 
+  CollegeAlumniList, 
+  CollegeRivalsCarousel,
+  FollowCollegeButton 
+} from '../components/college';
 import { useCollegeStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { Button } from '@/components/ui/button';
 
 /**
  * College Profile Page - Shows detailed stats and alumni for a specific college.
@@ -41,8 +47,30 @@ export function CollegeProfilePage() {
           </div>
         ) : stats ? (
           <>
-            {/* Hero Section */}
-            <CollegeHero stats={stats} college={college} className="mb-8" />
+            {/* Hero Section with Actions */}
+            <div className="flex items-start justify-between gap-4 mb-2">
+              <CollegeHero stats={stats} college={college} className="flex-1" />
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 mb-8">
+              <FollowCollegeButton normalizedName={collegeSlug || ''} />
+              <Link to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=`}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <GitCompare className="w-4 h-4" />
+                  Compare
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Rivalries */}
+            <section className="mb-8">
+              <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
+                <Swords className="w-5 h-5 text-text-tertiary" />
+                Rivals
+              </h2>
+              <CollegeRivalsCarousel normalizedName={collegeSlug || ''} />
+            </section>
             
             {/* Top Alumni */}
             <section>

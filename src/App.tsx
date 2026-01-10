@@ -203,6 +203,7 @@ const TournamentDetailPage = lazy(() => import("./features/tourhub/pages").then(
 const PlayerProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.PlayerProfilePage })));
 const CollegeGolfHubPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeGolfHubPage })));
 const CollegeProfilePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeProfilePage })));
+const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeComparePage })));
 
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
@@ -446,6 +447,7 @@ function AppRoutes() {
         <Route path="/tourhub/event/:tour/:eventId" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubEventPage /></Suspense>} />
         <Route path="/tourhub/rankings" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubRankingsPage /></Suspense>} />
         <Route path="/tourhub/college-golf" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeGolfHubPage /></Suspense>} />
+        <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeComparePage /></Suspense>} />
         <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeProfilePage /></Suspense>} />
         
         {/* Hub routes - only when NOT using background location */}
