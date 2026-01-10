@@ -1,19 +1,22 @@
 import React from 'react';
 import { useCollegeMediaByName } from '@/hooks/useCollegeMediaSearch';
-import { GraduationCap } from 'lucide-react';
 
 interface CollegeStampProps {
   normalizedName: string;
   className?: string;
+  /** If provided, shows a dot divider before the college stamp */
+  withDivider?: boolean;
 }
 
 /**
  * Displays a small college badge with logo and short name.
- * Shows fallback if logo is missing.
+ * Shows fallback letter if logo is missing.
+ * No "College:" label — keep it premium.
  */
 export const CollegeStamp: React.FC<CollegeStampProps> = ({ 
   normalizedName,
-  className = '' 
+  className = '',
+  withDivider = false,
 }) => {
   const { data: college, isLoading } = useCollegeMediaByName(normalizedName);
 
@@ -23,7 +26,13 @@ export const CollegeStamp: React.FC<CollegeStampProps> = ({
   const firstLetter = displayName?.charAt(0)?.toUpperCase() || 'C';
 
   return (
-    <div className={`flex items-center gap-1.5 ${className}`}>
+    <div 
+      className={`flex items-center gap-1.5 ${className}`}
+      title="College alumni badge"
+    >
+      {withDivider && (
+        <span className="text-muted-foreground/40 mx-1">·</span>
+      )}
       {college.logo_url ? (
         <img 
           src={college.logo_url} 
@@ -32,7 +41,9 @@ export const CollegeStamp: React.FC<CollegeStampProps> = ({
         />
       ) : (
         <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">
-          <GraduationCap className="w-3 h-3 text-muted-foreground" />
+          <span className="text-[10px] font-medium text-muted-foreground">
+            {firstLetter}
+          </span>
         </div>
       )}
       <span className="text-sm profile-text-secondary">{displayName}</span>
