@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-import { Bell, MoreHorizontal, Clock } from 'lucide-react';
+import { Bell, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { UserGame } from '../../hooks/useUserGamesTrips';
 import { GameRsvpSummary } from '../rsvp/GameRsvpSummary';
@@ -150,22 +150,6 @@ export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
               className="w-3.5 h-3.5"
               style={{ color: 'rgba(234, 179, 8, 0.5)' }}
             />
-          )}
-          
-          {/* Kebab menu */}
-          {onKebabTap && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onKebabTap(e);
-              }}
-              className="p-1 -mr-1 rounded-full hover:bg-black/5 transition-colors"
-            >
-              <MoreHorizontal 
-                className="w-4 h-4"
-                style={{ color: 'rgba(100, 116, 139, 0.5)' }}
-              />
-            </button>
           )}
         </div>
       </div>
