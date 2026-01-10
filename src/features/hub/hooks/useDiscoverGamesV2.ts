@@ -18,6 +18,9 @@ export interface DiscoverGamesFilters {
   search?: string;
   visibility?: DiscoverVisibility;
   when?: DiscoverWhen;
+  // Custom date range (takes precedence over 'when')
+  customStartAt?: string;
+  customEndAt?: string;
 }
 
 export interface DiscoverGame {
@@ -69,6 +72,8 @@ function buildFiltersKey(filters: DiscoverGamesFilters): string {
     search: (filters.search ?? '').trim().toLowerCase(),
     visibility: filters.visibility ?? 'all',
     when: filters.when ?? 'any',
+    customStartAt: filters.customStartAt,
+    customEndAt: filters.customEndAt,
   });
 }
 
@@ -84,8 +89,10 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
 
       const nowIso = new Date().toISOString();
       const when = filters.when ?? 'any';
-      const rangeStart = startOfTodayISO();
-      const rangeEnd = endOfRangeISO(when);
+      
+      // Use custom date range if provided, otherwise use preset
+      const rangeStart = filters.customStartAt || startOfTodayISO();
+      const rangeEnd = filters.customEndAt || endOfRangeISO(when);
 
       // Base query - select game fields + all participants for counting
       let q = supabase
@@ -216,7 +223,23 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
       }
 
       // Filter out games where user was rejected
-      const filteredGames = games.filter(g => !rejectedGameIds.has(g.id));
+      let filteredGames = games.filter(g => !rejectedGameIds.has(g.id));
+      
+      // Additional filter: if search is active, also filter by host home_club
+      if (search.length >= 2) {
+        const matchingHostIds = new Set(
+          hostBlurbs
+            .filter(b => b.home_club?.toLowerCase().includes(search.toLowerCase()))
+            .map(b => b.user_id)
+        );
+        
+        // Include games that match course_name OR host home_club
+        filteredGames = filteredGames.filter(g => {
+          const matchesCourse = g.course_name?.toLowerCase().includes(search.toLowerCase());
+          const matchesHostClub = matchingHostIds.has(g.host_user_id);
+          return matchesCourse || matchesHostClub;
+        });
+      }
 
       // Map to DiscoverGame shape
       const mapped: DiscoverGame[] = filteredGames.map((g) => {

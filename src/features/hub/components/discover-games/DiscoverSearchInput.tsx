@@ -28,7 +28,7 @@ export function DiscoverSearchInput({ value, onChange }: DiscoverSearchInputProp
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search course or host..."
+        placeholder="Search course, trip, or club..."
         className="flex-1 bg-transparent text-[14px] placeholder:text-slate-400/60 outline-none"
         style={{ color: '#1e293b' }}
       />

@@ -17,6 +17,9 @@ export interface DiscoverTripsFilters {
   search?: string;
   visibility?: DiscoverVisibility;
   when?: DiscoverWhen;
+  // Custom date range (takes precedence over 'when')
+  customStartAt?: string;
+  customEndAt?: string;
 }
 
 export interface DiscoverTrip {
@@ -69,6 +72,8 @@ function buildFiltersKey(filters: DiscoverTripsFilters): string {
     search: (filters.search ?? '').trim().toLowerCase(),
     visibility: filters.visibility ?? 'all',
     when: filters.when ?? 'any',
+    customStartAt: filters.customStartAt,
+    customEndAt: filters.customEndAt,
   });
 }
 
@@ -83,8 +88,10 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
       const userId = auth.user?.id ?? null;
 
       const when = filters.when ?? 'any';
-      const rangeStart = startOfTodayISO();
-      const rangeEnd = endOfRangeISO(when);
+      
+      // Use custom date range if provided, otherwise use preset
+      const rangeStart = filters.customStartAt || startOfTodayISO();
+      const rangeEnd = filters.customEndAt || endOfRangeISO(when);
 
       // Base query - select trip fields
       let q = supabase
