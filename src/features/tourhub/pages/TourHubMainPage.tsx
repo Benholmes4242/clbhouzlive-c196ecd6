@@ -5,7 +5,7 @@ import { TourHubHeader } from '../components/TourHubHeader';
 import { TourHubNavOverlay } from '../components/TourHubNavOverlay';
 import type { TourHubTab } from '../components/TourHubTabs';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { OverviewTab, ScheduleTab, PlayersTab, PlayerStatsTab, LeadersTab } from '../components/tabs';
+import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,8 +13,15 @@ export function TourHubMainPage() {
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const [isNavOpen, setIsNavOpen] = useState(false);
   
-  // Sync tab with URL
+  // Sync tab with URL + redirect legacy player-stats to leaderboards
   useEffect(() => {
+    // Legacy redirect: player-stats → leaderboards (using string comparison to avoid type error)
+    if (tabParam === ('player-stats' as string)) {
+      setSearchParams({ tab: 'leaderboards' }, { replace: true });
+      setActiveTab('leaderboards');
+      return;
+    }
+    
     if (tabParam && tabParam !== activeTab) {
       setActiveTab(tabParam);
     }
@@ -33,8 +40,6 @@ export function TourHubMainPage() {
         return <ScheduleTab />;
       case 'players':
         return <PlayersTab />;
-      case 'player-stats':
-        return <PlayerStatsTab />;
       case 'leaderboards':
         return <LeadersTab />;
       case 'summary':

@@ -80,10 +80,10 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-foreground text-lg">Top Players</h3>
         <Link 
-          to="/tourhub?tab=player-stats"
+          to="/tourhub?tab=leaderboards"
           className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 transition-colors"
         >
-          View all <ArrowRight className="w-3.5 h-3.5" />
+          All leaders <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 

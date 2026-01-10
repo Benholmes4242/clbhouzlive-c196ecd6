@@ -5,7 +5,6 @@ export type TourHubTab =
   | 'overview' 
   | 'schedule' 
   | 'players' 
-  | 'player-stats'
   | 'leaderboards' 
   | 'summary' 
   | 'tee-times' 
@@ -21,7 +20,6 @@ const tabs: { value: TourHubTab; label: string; shortLabel: string }[] = [
   { value: 'overview', label: 'Overview', shortLabel: 'Overview' },
   { value: 'schedule', label: 'Schedule', shortLabel: 'Schedule' },
   { value: 'players', label: 'Players', shortLabel: 'Players' },
-  { value: 'player-stats', label: 'Player Statistics', shortLabel: 'Stats' },
   { value: 'leaderboards', label: 'Leaderboards', shortLabel: 'Leaders' },
   { value: 'summary', label: 'Tournament Summary', shortLabel: 'Summary' },
   { value: 'tee-times', label: 'Tee Times', shortLabel: 'Tee Times' },

@@ -90,10 +90,10 @@ export function TopPlayersPreview() {
           <h3 className="font-semibold text-foreground">Top Players</h3>
         </div>
         <Link 
-          to="/tourhub?tab=player-stats"
+          to="/tourhub?tab=leaderboards"
           className="text-sm text-primary hover:underline flex items-center gap-1"
         >
-          View all <ArrowRight className="w-3.5 h-3.5" />
+          All leaders <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
