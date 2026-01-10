@@ -35,7 +35,7 @@ interface UpdateTripParams {
 
 /**
  * Hook for cancelling/removing a trip
- * - Deletes the trip (cascades to participants and games)
+ * - Uses soft-cancel: sets status = 'cancelled' (preserves data for notifications/history)
  * - Notifies all participants
  */
 export function useCancelTrip() {
@@ -48,23 +48,28 @@ export function useCancelTrip() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Delete the trip (cascades to trip_participants and games via FK)
-      const { error: deleteError } = await supabase
+      // Soft-cancel: update status instead of hard delete
+      // This preserves data for notifications, deep links, and audit history
+      const { error: updateError } = await supabase
         .from('trips')
-        .delete()
+        .update({
+          status: 'cancelled',
+          cancelled_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', tripId)
-        .eq('created_by', user.id); // Ensure only host can delete
+        .eq('created_by', user.id); // Ensure only host can cancel
 
-      if (deleteError) {
-        console.error('[useCancelTrip] Delete failed:', deleteError);
-        throw new Error(`Failed to remove trip: ${deleteError.message}`);
+      if (updateError) {
+        console.error('[useCancelTrip] Cancel failed:', updateError);
+        throw new Error(`Failed to cancel trip: ${updateError.message}`);
       }
 
-      // Send notifications to participants
+      // Send notifications to participants (trip_cancelled is a first-class type)
       if (participantUserIds.length > 0) {
         try {
           await sendNotification.mutateAsync({
-            type: 'trip_cancelled' as any, // Will fall back to default handling
+            type: 'trip_cancelled',
             recipientUserIds: participantUserIds,
             tripId,
             data: {
@@ -73,7 +78,7 @@ export function useCancelTrip() {
           });
         } catch (e) {
           console.error('[useCancelTrip] Failed to send notifications:', e);
-          // Non-fatal: trip is already deleted
+          // Non-fatal: trip is already cancelled
         }
       }
 

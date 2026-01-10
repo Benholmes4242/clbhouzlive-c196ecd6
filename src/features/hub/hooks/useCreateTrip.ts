@@ -124,9 +124,13 @@ export function useCreateTrip() {
         }
       }
 
-      // If ALL games failed, throw error
-      if (gameErrors.length === draft.itinerary.length && draft.itinerary.length > 0) {
-        throw new Error(`Failed to create rounds for trip: ${gameErrors[0]?.error?.message || 'Unknown error'}`);
+      // CRITICAL: Fail if ANY game fails (not just all) to prevent partial trips
+      if (gameErrors.length > 0) {
+        // Cleanup: delete the orphaned trip to avoid partial trips
+        console.error('[useCreateTrip] Game creation failed, cleaning up trip:', trip.id);
+        await supabase.from('trips').delete().eq('id', trip.id);
+        
+        throw new Error(`Failed to create ${gameErrors.length} round(s): ${gameErrors[0]?.error?.message || 'Unknown error'}`);
       }
 
       // Invite attendees using RPC (bypasses RLS issues for inviting other users)

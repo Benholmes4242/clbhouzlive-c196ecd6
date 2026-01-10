@@ -6982,6 +6982,7 @@ export type Database = {
       }
       trips: {
         Row: {
+          cancelled_at: string | null
           cover_image_url: string | null
           created_at: string
           created_by: string
@@ -6990,10 +6991,12 @@ export type Database = {
           id: string
           name: string
           start_date: string
+          status: string
           updated_at: string
           visibility: string
         }
         Insert: {
+          cancelled_at?: string | null
           cover_image_url?: string | null
           created_at?: string
           created_by: string
@@ -7002,10 +7005,12 @@ export type Database = {
           id?: string
           name: string
           start_date: string
+          status?: string
           updated_at?: string
           visibility?: string
         }
         Update: {
+          cancelled_at?: string | null
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
@@ -7014,6 +7019,7 @@ export type Database = {
           id?: string
           name?: string
           start_date?: string
+          status?: string
           updated_at?: string
           visibility?: string
         }
