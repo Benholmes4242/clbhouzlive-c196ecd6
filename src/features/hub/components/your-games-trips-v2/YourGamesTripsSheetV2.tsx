@@ -14,7 +14,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search } from 'lucide-react';
+import { X } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 
 import { TabPills } from './TabPills';
@@ -24,7 +24,6 @@ import { PastTab } from './PastTab';
 import { TripsTab } from './TripsTab';
 import { GameDetailSheetV2 } from '../game-detail-v2';
 import { TripDetailSheetV2 } from '../trip/TripDetailSheetV2';
-import { DiscoverGamesBottomSheetV2 } from '../discover-games';
 import type { SheetTab } from './types';
 
 interface YourGamesTripsSheetV2Props {
@@ -52,9 +51,6 @@ export function YourGamesTripsSheetV2({
   // Trip detail sheet state
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [tripSheetOpen, setTripSheetOpen] = useState(false);
-
-  // Discover games sheet state
-  const [discoverGamesOpen, setDiscoverGamesOpen] = useState(false);
   
   // Scroll lock refs
   const scrollYRef = useRef(0);
@@ -111,7 +107,6 @@ export function YourGamesTripsSheetV2({
         setGameSheetOpen(false);
         setSelectedTripId(null);
         setTripSheetOpen(false);
-        setDiscoverGamesOpen(false);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -163,21 +158,12 @@ export function YourGamesTripsSheetV2({
     onOpenCreateTrip?.();
   }, [onClose, onOpenCreateTrip]);
 
-  const handleOpenDiscoverGames = useCallback(() => {
-    haptic('light');
-    setDiscoverGamesOpen(true);
-  }, []);
-
-  const handleCloseDiscoverGames = useCallback(() => {
-    setDiscoverGamesOpen(false);
-  }, []);
-
   if (!isOpen) return null;
 
   const portalRoot = document.getElementById('portal-root') || document.body;
   
   // Determine if any nested sheet is open for stacking effect
-  const hasStackedSheet = gameSheetOpen || tripSheetOpen || discoverGamesOpen;
+  const hasStackedSheet = gameSheetOpen || tripSheetOpen;
 
   return createPortal(
     <AnimatePresence>
@@ -239,30 +225,15 @@ export function YourGamesTripsSheetV2({
                 </p>
               </div>
               
-              <div className="flex items-center gap-2">
-                {/* Discover Games button */}
-                <button
-                  onClick={handleOpenDiscoverGames}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
-                  style={{
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    color: 'rgb(37, 99, 235)',
-                  }}
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  Discover
-                </button>
-                
-                <button
-                  onClick={handleClose}
-                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
-                >
-                  <X 
-                    className="w-5 h-5"
-                    style={{ color: 'rgba(100, 116, 139, 0.6)' }}
-                  />
-                </button>
-              </div>
+              <button
+                onClick={handleClose}
+                className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+              >
+                <X 
+                  className="w-5 h-5"
+                  style={{ color: 'rgba(100, 116, 139, 0.6)' }}
+                />
+              </button>
             </div>
 
             {/* Gradient divider - soft fade */}
@@ -334,12 +305,6 @@ export function YourGamesTripsSheetV2({
               tripId={selectedTripId}
             />
           )}
-
-          {/* Discover Games Sheet (stacked) */}
-          <DiscoverGamesBottomSheetV2
-            isOpen={discoverGamesOpen}
-            onClose={handleCloseDiscoverGames}
-          />
         </>
       )}
     </AnimatePresence>,
