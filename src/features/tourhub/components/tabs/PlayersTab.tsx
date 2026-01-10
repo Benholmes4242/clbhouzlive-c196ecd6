@@ -107,12 +107,19 @@ export function PlayersTab() {
     // Apply category filter
     switch (filter) {
       case 'top-ranked':
-        // Use world rank from unified hook - filter for valid ranks (>= 1)
+        // Show top 50 ranked players by world rank (no upper limit restriction)
         filtered = filtered.filter(p => {
           const stats = statsMap.get(p.id);
           const worldRank = stats?.worldRank;
-          return typeof worldRank === 'number' && worldRank >= 1 && worldRank <= 100;
+          return typeof worldRank === 'number' && worldRank >= 1;
         });
+        // Sort by rank and take top 50
+        filtered.sort((a, b) => {
+          const aRank = statsMap.get(a.id)?.worldRank ?? 9999;
+          const bRank = statsMap.get(b.id)?.worldRank ?? 9999;
+          return aRank - bRank;
+        });
+        filtered = filtered.slice(0, 50);
         break;
       case 'most-active':
         filtered = filtered.filter(p => {

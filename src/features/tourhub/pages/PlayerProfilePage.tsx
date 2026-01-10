@@ -97,19 +97,23 @@ export function PlayerProfilePage() {
     return allStats.find(s => s.player_id === playerId) || null;
   }, [allStats, playerId]);
 
-  // DEBUG LOGGING - useEffect (not useMemo) for side effects
+  // DEBUG LOGGING - Render-time stats snapshot
   useEffect(() => {
-    if (playerId) {
-      console.log('[PlayerProfilePage] Debug:', {
-        'Route playerId': playerId,
-        'Stats query key': playerId,
-        'Headshot query key': playerId,
-        'Player found': !!player,
-        'Stats found': !!playerStats,
-        'Stats row count': allStats?.length || 0,
-        'Player world_rank': playerStats?.world_rank ?? 'null',
-        'Player fedex_rank': playerStats?.fedex_rank ?? 'null',
-        'Player wins': playerStats?.wins ?? 'null',
+    if (playerId && playerStats) {
+      console.log('[PlayerProfilePage] Render stats snapshot', {
+        playerId,
+        playerName: player?.full_name,
+        wins: playerStats.wins,
+        fedex_rank: playerStats.fedex_rank,
+        world_rank: playerStats.world_rank,
+        events_played: playerStats.events_played,
+        raw: playerStats,
+      });
+    } else if (playerId && allStats && allStats.length > 0) {
+      console.log('[PlayerProfilePage] Stats NOT found for player', {
+        playerId,
+        allStatsCount: allStats.length,
+        samplePlayerIds: allStats.slice(0, 3).map(s => s.player_id),
       });
     }
   }, [playerId, player, playerStats, allStats]);
