@@ -12,7 +12,7 @@ import { PlayerAvatar } from '../PlayerAvatar';
 
 interface PlayerRowProps {
   player: TourPlayer;
-  stats?: TourPlayerStatistics;
+  stats?: TourPlayerStatistics & { worldRank?: number | null };
   statDisplay?: 'rank' | 'events' | 'wins';
   className?: string;
 }
@@ -51,13 +51,17 @@ export function PlayerRow({ player, stats, statDisplay = 'rank', className }: Pl
     
     switch (statDisplay) {
       case 'rank':
-        return stats.fedex_rank ? `#${stats.fedex_rank}` : null;
+        // Use worldRank (from PlayersTab statsMap) or fall back to world_rank from stats
+        // This is the canonical source (OWGR), NOT fedex_rank
+        const worldRank = stats.worldRank ?? stats.world_rank;
+        return worldRank && worldRank >= 1 ? `#${worldRank}` : null;
       case 'events':
         return stats.events_played ? `${stats.events_played} events` : null;
       case 'wins':
         return stats.wins ? `${stats.wins} win${stats.wins > 1 ? 's' : ''}` : null;
       default:
-        return stats.fedex_rank ? `#${stats.fedex_rank}` : null;
+        const defaultRank = stats.worldRank ?? stats.world_rank;
+        return defaultRank && defaultRank >= 1 ? `#${defaultRank}` : null;
     }
   };
 
