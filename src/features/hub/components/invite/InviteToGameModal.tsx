@@ -163,7 +163,7 @@ export function InviteToGameModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[9999]"
+            className="fixed inset-0 z-[10100]"
             style={{
               background: 'rgba(0, 0, 0, 0.4)',
               backdropFilter: 'blur(4px)',
@@ -178,7 +178,7 @@ export function InviteToGameModal({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-x-0 bottom-0 z-[10000] rounded-t-[20px] overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[10200] rounded-t-[20px] overflow-hidden flex flex-col"
             style={{
               backgroundColor: 'hsl(var(--background))',
               boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.12)',
