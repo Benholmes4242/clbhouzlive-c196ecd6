@@ -320,12 +320,15 @@ export function useTourPlayerStatistics(seasonId?: string) {
       // Debug: log stats before sorting
       const withWorldRank = enrichedStats.filter(s => s.world_rank && s.world_rank > 0);
       const withWins = enrichedStats.filter(s => s.wins && s.wins > 0);
+      const withFedexRank = enrichedStats.filter(s => s.fedex_rank && s.fedex_rank > 0);
       console.log('[useTourPlayerStatistics] Data summary:', {
         totalStats: enrichedStats.length,
         withWorldRank: withWorldRank.length,
         withWins: withWins.length,
-        sampleRanked: withWorldRank.slice(0, 3).map(s => ({
+        withFedexRank: withFedexRank.length,
+        sampleRanked: withWorldRank.slice(0, 5).map(s => ({
           playerName: s.player?.full_name,
+          playerId: s.player_id,
           worldRank: s.world_rank,
           wins: s.wins,
           fedexRank: s.fedex_rank,
