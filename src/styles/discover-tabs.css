@@ -1,11 +1,11 @@
-/* Discover Tabs - Light/Clean Design */
+/* Discover Tabs - Light/Clean Design with Orange Underline */
 
-/* Tokens - using slate for subtle emphasis */
+/* Tokens - using primary (orange) for active underline */
 :root {
   --tab-active-color: hsl(var(--foreground));
   --tab-inactive-color: hsl(var(--muted-foreground));
   --tab-hover-color: hsl(var(--foreground) / 0.8);
-  --tab-underline-color: hsl(var(--foreground));
+  --tab-underline-color: hsl(var(--primary));
 }
 
 /* Tab container - sits directly on page canvas, fully transparent */
@@ -36,7 +36,7 @@
   font-weight: 600;
 }
 
-/* Underline: text-width only, 2px height, slate color, no glow */
+/* Underline: text-width only, 2px height, orange color, no glow */
 .discover-tab.active::after {
   content: '';
   position: absolute;

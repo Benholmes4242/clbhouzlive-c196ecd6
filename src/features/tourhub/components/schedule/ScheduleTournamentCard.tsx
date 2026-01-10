@@ -5,12 +5,12 @@
  * Structure:
  * - Top row: Tournament name (bold) + Status pill
  * - Middle: Dates + Course name + city
- * - Bottom row: Purse, Par, Yardage pills
+ * - Bottom row: Purse (primary), Par, Yardage (secondary)
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, Calendar, Trophy } from 'lucide-react';
+import { MapPin, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
@@ -38,8 +38,8 @@ function StatusBadge({ status }: { status: string }) {
       label: 'Upcoming' 
     },
     closed: { 
-      bg: 'bg-muted', 
-      text: 'text-muted-foreground', 
+      bg: 'bg-muted/60', 
+      text: 'text-muted-foreground/70', 
       label: 'Completed' 
     },
   };
@@ -48,7 +48,7 @@ function StatusBadge({ status }: { status: string }) {
   
   return (
     <span className={cn(
-      'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium',
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
       c.bg, 
       c.text,
       c.pulse && 'animate-pulse'
@@ -78,14 +78,9 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
       {/* Top row: Name + Status */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-foreground leading-tight line-clamp-2">
-              {tournament.name}
-            </h3>
-            {isMajor && (
-              <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
-            )}
-          </div>
+          <h3 className="font-semibold text-foreground leading-tight line-clamp-2">
+            {tournament.name}
+          </h3>
         </div>
         <StatusBadge status={tournament.status} />
       </div>
@@ -109,20 +104,20 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         )}
       </div>
       
-      {/* Bottom row: Stats pills */}
+      {/* Bottom row: Stats pills - Purse primary, Par/Yardage secondary */}
       <div className="flex flex-wrap items-center gap-2">
         {tournament.purse && (
-          <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+          <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
             ${(tournament.purse / 1_000_000).toFixed(1)}M
           </span>
         )}
         {tournament.venue_par && (
-          <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+          <span className="px-2.5 py-1 rounded-full bg-muted/50 text-muted-foreground/70 text-xs font-medium">
             Par {tournament.venue_par}
           </span>
         )}
         {tournament.venue_yardage && (
-          <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+          <span className="px-2.5 py-1 rounded-full bg-muted/50 text-muted-foreground/70 text-xs font-medium">
             {tournament.venue_yardage.toLocaleString()} yds
           </span>
         )}

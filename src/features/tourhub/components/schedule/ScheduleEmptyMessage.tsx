@@ -1,6 +1,6 @@
 /**
  * ScheduleEmptyMessage - Inline empty states for schedule
- * Subtle, informative messages that don't break the flow
+ * Subtle, centered, neutral messages that don't break the flow
  */
 
 import { Calendar, Radio } from 'lucide-react';
@@ -26,7 +26,7 @@ export function ScheduleEmptyMessage({
     },
     'no-results': {
       icon: <Calendar className="w-4 h-4" />,
-      message: 'No tournaments match your search.',
+      message: 'No tournaments match your filter.',
     },
     'season-complete': {
       icon: <Calendar className="w-4 h-4" />,
@@ -39,14 +39,14 @@ export function ScheduleEmptyMessage({
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50 border border-border/50",
+        "flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl bg-muted/30 border border-border/40 text-center",
         className
       )}
     >
-      <div className="text-muted-foreground">
+      <div className="text-muted-foreground/60">
         {icon}
       </div>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground/80">
         {message}
       </p>
     </div>

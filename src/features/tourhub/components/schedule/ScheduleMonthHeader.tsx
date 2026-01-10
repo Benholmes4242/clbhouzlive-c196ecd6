@@ -1,6 +1,6 @@
 /**
  * ScheduleMonthHeader - Premium month section header for timeline
- * Sticky on scroll with subtle backdrop blur
+ * Refined visual weight and alignment
  */
 
 import { cn } from '@/lib/utils';
@@ -24,22 +24,21 @@ export function ScheduleMonthHeader({
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Timeline dot */}
-        <div className="relative">
-          <div className="w-3 h-3 rounded-full bg-primary/30 ring-4 ring-background" />
-          <div className="absolute inset-0 w-3 h-3 rounded-full bg-primary/20 animate-ping" style={{ animationDuration: '3s' }} />
+        {/* Timeline dot - aligned with event dots */}
+        <div className="relative w-2.5 h-2.5 flex items-center justify-center ml-[1px]">
+          <div className="w-2.5 h-2.5 rounded-full bg-primary/40 ring-4 ring-background" />
         </div>
         
-        {/* Month label */}
-        <h3 className="text-lg font-semibold text-foreground tracking-tight">
+        {/* Month label - reduced weight */}
+        <h3 className="text-base font-medium text-foreground tracking-tight">
           {monthLabel}
         </h3>
         
         {/* Divider line */}
-        <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
         
-        {/* Event count */}
-        <span className="text-sm text-muted-foreground font-medium">
+        {/* Event count - lighter still */}
+        <span className="text-sm text-muted-foreground/70 font-normal">
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>

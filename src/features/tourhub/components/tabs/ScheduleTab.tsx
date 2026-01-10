@@ -3,7 +3,7 @@
  * 
  * Features:
  * - Featured hero card (Live > Upcoming > Recent)
- * - Premium pill-style filters, sticky on scroll
+ * - Tab-style filters matching Discover page
  * - Timeline layout grouped by month
  * - Refined tournament cards with visual polish
  * - Smart empty states
@@ -159,16 +159,36 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Featured Hero Card */}
       {featured && filter === 'all' && !search && (
-        <div className="mb-8">
+        <div className="mb-6">
           <ScheduleHeroCard 
             tournament={featured.tournament} 
             type={featured.type}
           />
         </div>
       )}
+
+      {/* Search Bar - reduced gap above, increased below */}
+      <div className="relative max-w-md pt-1 pb-2">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Search tournaments, venues, or cities..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9 bg-background/80 backdrop-blur-sm border-border/60"
+        />
+      </div>
+
+      {/* Filter Tabs - Discover style */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm -mx-1 px-1">
+        <ScheduleFilterPills
+          activeFilter={filter}
+          onFilterChange={setFilter}
+          counts={filterStats}
+        />
+      </div>
 
       {/* No Live Message (if filtering by Live and none exist) */}
       {filter === 'live' && filterStats.live === 0 && (
@@ -177,26 +197,6 @@ export function ScheduleTab() {
           nextTournamentName={nextUpcomingName}
         />
       )}
-
-      {/* Search Bar (moved below hero) */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search tournaments, venues, cities..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-background/80 backdrop-blur-sm border-border/60"
-        />
-      </div>
-
-      {/* Filter Pills */}
-      <div className="sticky top-0 z-20 py-2 -mx-1 px-1 bg-background/95 backdrop-blur-sm">
-        <ScheduleFilterPills
-          activeFilter={filter}
-          onFilterChange={setFilter}
-          counts={filterStats}
-        />
-      </div>
       
       {/* Result Count */}
       <p className="text-sm text-muted-foreground">
@@ -216,21 +216,24 @@ export function ScheduleTab() {
               />
 
               {/* Tournaments Grid with Timeline */}
-              <div className="relative pl-6 border-l-2 border-border/50 ml-1.5 space-y-4">
+              <div className="relative pl-6 border-l border-border/30 ml-[5px] space-y-4">
                 {group.tournaments.map((tournament) => {
                   const dotStatus = getTournamentDotStatus(tournament.status);
                   
                   return (
                     <div key={tournament.id} className="relative">
-                      {/* Timeline Dot */}
+                      {/* Timeline Dot - aligned with month header dot */}
                       <div className={cn(
-                        "absolute -left-[1.875rem] top-5 w-2.5 h-2.5 rounded-full ring-4 ring-background",
+                        "absolute -left-[1.625rem] top-5 w-2 h-2 rounded-full ring-4 ring-background",
                         dotStatus === 'live' ? 'bg-emerald-500' :
-                        dotStatus === 'completed' ? 'bg-muted-foreground/40' :
-                        'bg-transparent border-2 border-primary'
+                        dotStatus === 'completed' ? 'bg-muted-foreground/30' :
+                        'bg-transparent border-[1.5px] border-primary/60'
                       )}>
                         {dotStatus === 'live' && (
-                          <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-500/50 animate-ping" />
+                          <span 
+                            className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-500/40"
+                            style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
+                          />
                         )}
                       </div>
                       
