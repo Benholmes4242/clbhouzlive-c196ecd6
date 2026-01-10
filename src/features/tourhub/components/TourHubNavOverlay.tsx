@@ -21,7 +21,6 @@ const NAV_ITEMS: NavItem[] = [
   { value: 'overview', label: 'Overview', subtitle: 'Season snapshot' },
   { value: 'schedule', label: 'Schedule', subtitle: 'All events' },
   { value: 'players', label: 'Players', subtitle: 'Tour roster' },
-  { value: 'player-stats', label: 'Stats', subtitle: 'Player statistics' },
   { value: 'leaderboards', label: 'Leaders', subtitle: 'Season rankings' },
   { value: 'summary', label: 'Summary', subtitle: 'Tournament recap' },
   { value: 'tee-times', label: 'Tee Times', subtitle: 'Starting times' },
