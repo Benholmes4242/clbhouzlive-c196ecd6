@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight } from 'lucide-react';
+import { X, Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { postingAsCopy } from '@/lib/postingAsCopy';
 
 // ============================================
 // ACCOUNT HUB SHEET - FINAL POLISH PASS
@@ -477,9 +478,15 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
                 useLightTheme={useLightTheme}
               />
               <MenuItem
+                icon={<Sparkles className="w-5 h-5" />}
+                label={postingAsCopy.managementLinks.creators}
+                onClick={() => handleNavigate('/creators/manage')}
+                useLightTheme={useLightTheme}
+              />
+              <MenuItem
                 icon={<Building2 className="w-5 h-5" />}
-                label="Business profiles"
-                onClick={() => handleNavigate('/settings/business')}
+                label={postingAsCopy.managementLinks.businesses}
+                onClick={() => handleNavigate('/businesses/manage')}
                 useLightTheme={useLightTheme}
               />
               <MenuItem

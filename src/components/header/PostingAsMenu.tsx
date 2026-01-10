@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload, X } from 'lucide-react';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload, X, Sparkles } from 'lucide-react';
 import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
 import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -314,101 +314,120 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             </p>
           </div>
           <div className="mt-2 space-y-0.5">
-            {availableActors.map((actor) => {
-              const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
+            {/* Group by actor type with section headers */}
+            {(() => {
+              const personalActors = availableActors.filter(a => a.type === 'personal');
+              const creatorActors = availableActors.filter(a => a.type === 'creator');
+              const businessActors = availableActors.filter(a => a.type === 'business');
               
-              return (
-                <button
-                  key={`${actor.type}-${actor.id}`}
-                  onClick={() => {
-                    if (!isActive) {
-                      setActiveActor(actor);
-                      toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
-                    }
-                    onClose();
-                  }}
-                  className={cn(
-                    "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
-                    "transition-all duration-150 active:scale-[0.98]",
-                    useLightTheme 
-                      ? isActive 
-                        ? "bg-slate-100 border border-slate-200" 
-                        : "hover:bg-slate-50 border border-transparent"
-                      : isActive 
-                        ? "bg-white/10 border border-white/12" 
-                        : "hover:bg-white/5 border border-transparent"
-                  )}
-                >
-                  <SquircleAvatar
-                    size={28}
-                    src={actor.avatarUrl}
-                    alt={actor.name}
-                    fallback={getInitials(actor.name)}
-                    hideRing
-                  />
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className={cn(
-                        "text-xs font-medium truncate",
-                        useLightTheme ? "text-slate-700" : "text-white"
-                      )}>
-                        {actor.name}
+              const renderActorButton = (actor: typeof availableActors[0]) => {
+                const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
+                
+                return (
+                  <button
+                    key={`${actor.type}-${actor.id}`}
+                    onClick={() => {
+                      if (!isActive) {
+                        setActiveActor(actor);
+                        toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
+                      }
+                      onClose();
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
+                      "transition-all duration-150 active:scale-[0.98]",
+                      useLightTheme 
+                        ? isActive 
+                          ? "bg-slate-100 border border-slate-200" 
+                          : "hover:bg-slate-50 border border-transparent"
+                        : isActive 
+                          ? "bg-white/10 border border-white/12" 
+                          : "hover:bg-white/5 border border-transparent"
+                    )}
+                  >
+                    <SquircleAvatar
+                      size={28}
+                      src={actor.avatarUrl}
+                      alt={actor.name}
+                      fallback={getInitials(actor.name)}
+                      hideRing
+                    />
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className={cn(
+                          "text-xs font-medium truncate",
+                          useLightTheme ? "text-slate-700" : "text-white"
+                        )}>
+                          {actor.name}
+                        </span>
+                        {actor.type === 'business' ? (
+                          <Building2 className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
+                        ) : actor.type === 'creator' ? (
+                          <Sparkles className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
+                        ) : (
+                          <User className={cn("h-3 w-3 flex-shrink-0", useLightTheme ? "text-slate-400" : "text-white/40")} />
+                        )}
+                      </div>
+                      <span className={cn("text-[10px]", useLightTheme ? "text-slate-400" : "text-white/40")}>
+                        {actor.type === 'personal' ? postingAsCopy.actorLabels.personal 
+                          : actor.type === 'creator' ? (actor.slug ? `@${actor.slug}` : postingAsCopy.actorLabels.creator)
+                          : postingAsCopy.actorLabels.business}
                       </span>
-                      {actor.type === 'business' ? (
-                        <Building2 className={cn(
-                          "h-3 w-3 flex-shrink-0",
-                          useLightTheme ? "text-slate-400" : "text-white/40"
-                        )} />
-                      ) : (
-                        <User className={cn(
-                          "h-3 w-3 flex-shrink-0",
-                          useLightTheme ? "text-slate-400" : "text-white/40"
-                        )} />
-                      )}
                     </div>
-                    <span className={cn(
-                      "text-[10px]",
-                      useLightTheme ? "text-slate-400" : "text-white/40"
-                    )}>
-                      {actor.type === 'personal' 
-                        ? postingAsCopy.actorLabels.personal 
-                        : postingAsCopy.actorLabels.business}
-                    </span>
-                  </div>
-                  {isActive && (
-                    <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                    {isActive && <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />}
+                  </button>
+                );
+              };
+
+              return (
+                <>
+                  {/* Personal */}
+                  {personalActors.map(renderActorButton)}
+                  
+                  {/* Creators Section */}
+                  {(creatorActors.length > 0 || businessActors.length > 0) && (
+                    <>
+                      <div className={cn("pt-2 pb-1 px-2", useLightTheme ? "text-slate-400" : "text-white/40")}>
+                        <span className="text-[10px] uppercase tracking-wider font-medium">{postingAsCopy.sectionLabels.creators}</span>
+                      </div>
+                      {creatorActors.length > 0 ? creatorActors.map(renderActorButton) : (
+                        <p className={cn("text-[10px] px-3 py-1", useLightTheme ? "text-slate-400" : "text-white/30")}>
+                          No creator pages
+                        </p>
+                      )}
+                      <button
+                        onClick={() => handleNavigate('/creators/manage')}
+                        className={cn("flex items-center gap-1.5 px-3 py-1 text-[10px] font-medium", "text-primary hover:text-primary/80")}
+                      >
+                        <Settings className="h-3 w-3" />
+                        {postingAsCopy.managementLinks.creators}
+                      </button>
+                    </>
                   )}
-                </button>
+                  
+                  {/* Business Section */}
+                  {(creatorActors.length > 0 || businessActors.length > 0) && (
+                    <>
+                      <div className={cn("pt-2 pb-1 px-2", useLightTheme ? "text-slate-400" : "text-white/40")}>
+                        <span className="text-[10px] uppercase tracking-wider font-medium">{postingAsCopy.sectionLabels.businesses}</span>
+                      </div>
+                      {businessActors.length > 0 ? businessActors.map(renderActorButton) : (
+                        <p className={cn("text-[10px] px-3 py-1", useLightTheme ? "text-slate-400" : "text-white/30")}>
+                          No business profiles
+                        </p>
+                      )}
+                      <button
+                        onClick={() => handleNavigate('/businesses/manage')}
+                        className={cn("flex items-center gap-1.5 px-3 py-1 text-[10px] font-medium", "text-primary hover:text-primary/80")}
+                      >
+                        <Settings className="h-3 w-3" />
+                        {postingAsCopy.managementLinks.businesses}
+                      </button>
+                    </>
+                  )}
+                </>
               );
-            })}
-            
-            {/* Empty state when no businesses */}
-            {availableActors.filter(a => a.type === 'business').length === 0 && (
-              <div className={cn(
-                "px-3 py-3 rounded-sq-md border border-dashed mt-2",
-                useLightTheme ? "border-slate-200" : "border-white/10"
-              )}>
-                <p className={cn(
-                  "text-xs font-medium",
-                  useLightTheme ? "text-slate-600" : "text-white/60"
-                )}>
-                  {postingAsCopy.emptyState.title}
-                </p>
-                <p className={cn(
-                  "text-[10px] mt-0.5",
-                  useLightTheme ? "text-slate-400" : "text-white/40"
-                )}>
-                  {postingAsCopy.emptyState.body}
-                </p>
-                <button
-                  onClick={() => handleNavigate('/business/intro')}
-                  className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
-                >
-                  <Plus className="h-3 w-3" />
-                  {postingAsCopy.emptyState.cta}
-                </button>
-              </div>
-            )}
+            })()}
           </div>
         </div>
         
