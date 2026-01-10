@@ -13,7 +13,7 @@ interface TabPillsProps {
 }
 
 const TABS: { key: SheetTab; label: string }[] = [
-  { key: 'upcoming', label: 'Upcoming' },
+  { key: 'upcoming', label: 'Games' },
   { key: 'past', label: 'Past' },
   { key: 'trips', label: 'Trips' },
 ];
