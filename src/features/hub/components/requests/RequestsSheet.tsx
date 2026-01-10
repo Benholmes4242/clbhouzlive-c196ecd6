@@ -1,14 +1,17 @@
 /**
- * RequestsSheet - Bottom sheet showing all pending join requests for host's games
+ * RequestsSheet - Bottom sheet showing all pending join requests for host's games & trips
+ * Uses game_participants and trip_participants as single source of truth
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Inbox } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { haptic } from '@/utils/haptics';
-import { useHostPendingRequests } from '../../hooks/useHostPendingRequests';
-import { useGameJoinRequests } from '@/features/nearby/hooks/useGameJoinRequests';
+import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useHostPendingRequests, type PendingRequest } from '../../hooks/useHostPendingRequests';
 import { RequestRow } from './RequestRow';
 
 interface RequestsSheetProps {
@@ -16,10 +19,13 @@ interface RequestsSheetProps {
   onClose: () => void;
 }
 
+type TabType = 'all' | 'games' | 'trips';
+
 export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
-  const { requests, isLoading, refetch } = useHostPendingRequests();
-  const { acceptRequest, declineRequest } = useGameJoinRequests();
+  const { gameRequests, tripRequests, requests, isLoading, refetch, gameCount, tripCount } = useHostPendingRequests();
+  const queryClient = useQueryClient();
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('all');
   
   const scrollYRef = useRef(0);
   const wasOpenRef = useRef(false);
@@ -62,27 +68,129 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
     onClose();
   }, [onClose]);
 
-  const handleAccept = useCallback(async (requestId: string, gameId: string) => {
+  const handleAccept = useCallback(async (request: PendingRequest) => {
     haptic('medium');
-    setProcessingId(requestId);
+    setProcessingId(request.id);
+    
     try {
-      await acceptRequest(requestId, gameId);
-      refetch();
-    } finally {
-      setProcessingId(null);
-    }
-  }, [acceptRequest, refetch]);
+      if (request.type === 'game') {
+        // Update game_participants rsvp_status to 'going'
+        const { error } = await supabase
+          .from('game_participants')
+          .update({ 
+            rsvp_status: 'going',
+            rsvp_updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
 
-  const handleDecline = useCallback(async (requestId: string) => {
-    haptic('light');
-    setProcessingId(requestId);
-    try {
-      await declineRequest(requestId);
+        if (error) throw error;
+
+        // Update slots_open on the game
+        const { data: game } = await supabase
+          .from('games')
+          .select('slots_open')
+          .eq('id', request.game_id)
+          .single();
+
+        if (game && game.slots_open > 0) {
+          await supabase
+            .from('games')
+            .update({ slots_open: game.slots_open - 1 })
+            .eq('id', request.game_id);
+        }
+
+        toast({ title: "They're in 👍", description: "Player added to your game." });
+      } else {
+        // Update trip_participants rsvp_status to 'going'
+        const { error } = await supabase
+          .from('trip_participants')
+          .update({ 
+            rsvp_status: 'going',
+            rsvp_updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+
+        if (error) throw error;
+
+        toast({ title: "They're in 👍", description: "Player added to your trip." });
+      }
+
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ['hostPendingRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['discover-games-v2'] });
+      queryClient.invalidateQueries({ queryKey: ['discover-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['userGames'] });
       refetch();
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to accept request. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setProcessingId(null);
     }
-  }, [declineRequest, refetch]);
+  }, [queryClient, refetch]);
+
+  const handleDecline = useCallback(async (request: PendingRequest) => {
+    haptic('light');
+    setProcessingId(request.id);
+    
+    try {
+      if (request.type === 'game') {
+        // Update game_participants rsvp_status to 'rejected'
+        const { error } = await supabase
+          .from('game_participants')
+          .update({ 
+            rsvp_status: 'rejected',
+            rsvp_updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+
+        if (error) throw error;
+      } else {
+        // Update trip_participants rsvp_status to 'rejected'
+        const { error } = await supabase
+          .from('trip_participants')
+          .update({ 
+            rsvp_status: 'rejected',
+            rsvp_updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+
+        if (error) throw error;
+      }
+
+      // Generic message (anonymity-preserving)
+      toast({ 
+        title: "Request handled", 
+        description: "We've let them know all slots are taken." 
+      });
+
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ['hostPendingRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['discover-games-v2'] });
+      queryClient.invalidateQueries({ queryKey: ['discover-trips'] });
+      refetch();
+    } catch (error) {
+      console.error('Error declining request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to decline request. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingId(null);
+    }
+  }, [queryClient, refetch]);
+
+  // Filter requests based on active tab
+  const displayedRequests = activeTab === 'all' 
+    ? requests 
+    : activeTab === 'games' 
+      ? gameRequests 
+      : tripRequests;
 
   if (!isOpen) return null;
 
@@ -115,8 +223,8 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
             style={{
-              height: '70svh',
-              maxHeight: '70svh',
+              height: '75svh',
+              maxHeight: '75svh',
               background: 'rgba(248, 250, 252, 0.95)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
@@ -132,7 +240,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-4 flex-shrink-0">
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
               <div>
                 <h2 
                   className="text-[18px] font-semibold leading-tight"
@@ -162,6 +270,34 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
               </button>
             </div>
 
+            {/* Tabs */}
+            {(gameCount > 0 || tripCount > 0) && (
+              <div className="px-5 pb-3 flex-shrink-0">
+                <div className="flex gap-2">
+                  {[
+                    { key: 'all', label: 'All', count: requests.length },
+                    { key: 'games', label: 'Games', count: gameCount },
+                    { key: 'trips', label: 'Trips', count: tripCount },
+                  ].map(({ key, label, count }) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        haptic('light');
+                        setActiveTab(key as TabType);
+                      }}
+                      className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all"
+                      style={{
+                        background: activeTab === key ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                        color: activeTab === key ? '#1e293b' : '#64748b',
+                      }}
+                    >
+                      {label} {count > 0 && `(${count})`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Divider */}
             <div 
               className="h-px mx-5 flex-shrink-0"
@@ -185,7 +321,7 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
                     />
                   ))}
                 </div>
-              ) : requests.length === 0 ? (
+              ) : displayedRequests.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <div 
                     className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -203,12 +339,12 @@ export function RequestsSheet({ isOpen, onClose }: RequestsSheetProps) {
                     className="text-[13px] mt-1 max-w-[240px]"
                     style={{ color: '#94a3b8' }}
                   >
-                    When golfers request to join your games, they'll appear here.
+                    When golfers request to join your games or trips, they'll appear here.
                   </p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2.5">
-                  {requests.map(request => (
+                  {displayedRequests.map(request => (
                     <RequestRow
                       key={request.id}
                       request={request}

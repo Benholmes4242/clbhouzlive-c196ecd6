@@ -1,10 +1,11 @@
 /**
- * useDiscoverGamesV2 - Enhanced hook for discovering games with anonymity
+ * useDiscoverGamesV2 - Uses game_participants.rsvp_status as single source of truth
  * 
  * Key features:
- * - Excludes games where user has been rejected (declined request)
- * - Returns anonymous host blurb instead of identity
- * - Tracks user's request status per game
+ * - Excludes games where user has rsvp_status='rejected'
+ * - Returns anonymous host blurb (no identity)
+ * - Tracks user's request status from game_participants only
+ * - Includes both 'active' and 'scheduled' games
  */
 
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -34,8 +35,8 @@ export interface DiscoverGame {
     handicap: number | null;
     homeClub: string | null;
   };
-  // User's request status
-  userRequestStatus: 'none' | 'requested' | 'going' | 'rejected';
+  // User's request status from game_participants.rsvp_status
+  userRequestStatus: 'none' | 'requested' | 'going' | 'invited' | 'rejected';
 }
 
 function startOfTodayISO(): string {
@@ -86,7 +87,7 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
       const rangeStart = startOfTodayISO();
       const rangeEnd = endOfRangeISO(when);
 
-      // Base query - select game fields + participant counts
+      // Base query - select game fields + all participants for counting
       let q = supabase
         .from('games')
         .select(`
@@ -100,19 +101,18 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
           status,
           visibility,
           slots_total,
-          slots_open,
-          game_participants (
+          game_participants!inner (
             user_id,
             rsvp_status
           )
         `)
-        // Discoverable statuses
+        // Include both active and scheduled (per spec)
         .or('status.eq.active,status.eq.scheduled')
         .gte('expires_at', nowIso)
         .gte('start_time', rangeStart)
         .lte('start_time', rangeEnd)
         .order('start_time', { ascending: true })
-        .limit(30);
+        .limit(50);
 
       // Cursor pagination by start_time
       if (pageParam) {
@@ -132,22 +132,78 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
       }
 
       const { data, error } = await q;
-      if (error) throw error;
+      
+      // Also fetch games without participants
+      let qNoParticipants = supabase
+        .from('games')
+        .select(`
+          id,
+          host_user_id,
+          course_name,
+          course_id,
+          start_time,
+          ends_at,
+          expires_at,
+          status,
+          visibility,
+          slots_total
+        `)
+        .or('status.eq.active,status.eq.scheduled')
+        .gte('expires_at', nowIso)
+        .gte('start_time', rangeStart)
+        .lte('start_time', rangeEnd)
+        .order('start_time', { ascending: true })
+        .limit(50);
+        
+      if (pageParam) {
+        qNoParticipants = qNoParticipants.gt('start_time', pageParam);
+      }
+      if (vis !== 'all') {
+        qNoParticipants = qNoParticipants.eq('visibility', vis);
+      }
+      if (search.length >= 2) {
+        qNoParticipants = qNoParticipants.ilike('course_name', `%${search}%`);
+      }
+      
+      const { data: allGamesData } = await qNoParticipants;
 
-      const games = (data ?? []) as any[];
+      // Merge games from both queries (some may have no participants yet)
+      const gamesWithParticipants = (data ?? []) as any[];
+      const allGames = (allGamesData ?? []) as any[];
+      
+      // Create map of games with participant data
+      const gameParticipantMap = new Map<string, any[]>();
+      for (const g of gamesWithParticipants) {
+        const participants = Array.isArray(g.game_participants) ? g.game_participants : [g.game_participants].filter(Boolean);
+        gameParticipantMap.set(g.id, participants);
+      }
+
+      // Use allGames as base, enrich with participant data
+      const games = allGames.map(g => ({
+        ...g,
+        game_participants: gameParticipantMap.get(g.id) || []
+      }));
+      
       const gameIds = games.map(g => g.id);
       const hostIds = games.map(g => g.host_user_id).filter(Boolean);
 
-      // Get user's join request statuses if logged in
-      let userJoinRequests: any[] = [];
+      // Get user's participant rows for these games (single source of truth)
+      let userParticipantRows: any[] = [];
       if (userId && gameIds.length > 0) {
-        const { data: requests } = await supabase
-          .from('game_join_requests')
-          .select('game_id, status')
-          .eq('requester_user_id', userId)
+        const { data: rows } = await supabase
+          .from('game_participants')
+          .select('game_id, user_id, rsvp_status')
+          .eq('user_id', userId)
           .in('game_id', gameIds);
-        userJoinRequests = requests ?? [];
+        userParticipantRows = rows ?? [];
       }
+
+      // Build set of rejected game IDs to exclude
+      const rejectedGameIds = new Set(
+        userParticipantRows
+          .filter(r => r.rsvp_status === 'rejected')
+          .map(r => r.game_id)
+      );
 
       // Get host blurbs (anonymous - no names)
       let hostBlurbs: any[] = [];
@@ -159,38 +215,30 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
         hostBlurbs = blurbs ?? [];
       }
 
-      // Build map of declined game IDs
-      const declinedGameIds = new Set(
-        userJoinRequests
-          .filter(r => r.status === 'declined')
-          .map(r => r.game_id)
-      );
-
-      // Filter out games where user was declined
-      const filteredGames = games.filter(g => !declinedGameIds.has(g.id));
+      // Filter out games where user was rejected
+      const filteredGames = games.filter(g => !rejectedGameIds.has(g.id));
 
       // Map to DiscoverGame shape
       const mapped: DiscoverGame[] = filteredGames.map((g) => {
         const isHost = userId && g.host_user_id === userId;
         const participants = g.game_participants || [];
         
-        // Calculate going count (host is always going)
-        const goingCount = participants.filter((p: any) => p.rsvp_status === 'going').length + (isHost ? 0 : 1);
+        // Calculate going count: count all participants with rsvp_status='going'
+        // Host is implicitly going (add 1 always for consistent counting)
+        const goingParticipants = participants.filter((p: any) => p.rsvp_status === 'going').length;
+        const goingCount = goingParticipants + 1; // +1 for host (consistent rule)
+        
+        // Calculate slots open: slots_total - goingCount
+        const slotsOpen = Math.max(0, (g.slots_total || 4) - goingCount);
 
-        // Get user's request status
-        let userRequestStatus: 'none' | 'requested' | 'going' | 'rejected' = 'none';
+        // Get user's request status from game_participants (single source of truth)
+        let userRequestStatus: 'none' | 'requested' | 'going' | 'invited' | 'rejected' = 'none';
         if (isHost) {
           userRequestStatus = 'going';
         } else {
-          const userParticipant = participants.find((p: any) => p.user_id === userId);
-          if (userParticipant) {
-            if (userParticipant.rsvp_status === 'going') userRequestStatus = 'going';
-          } else {
-            const joinRequest = userJoinRequests.find(r => r.game_id === g.id);
-            if (joinRequest) {
-              if (joinRequest.status === 'pending') userRequestStatus = 'requested';
-              else if (joinRequest.status === 'accepted') userRequestStatus = 'going';
-            }
+          const userRow = userParticipantRows.find(r => r.game_id === g.id);
+          if (userRow) {
+            userRequestStatus = userRow.rsvp_status || 'none';
           }
         }
 
@@ -205,7 +253,7 @@ export function useDiscoverGamesV2(filters: DiscoverGamesFilters) {
           endsAt: g.ends_at,
           visibility: g.visibility || 'friends',
           slotsTotal: g.slots_total || 4,
-          slotsOpen: g.slots_open || 0,
+          slotsOpen,
           goingCount,
           hostBlurb: {
             handicap: hostBlurb?.handicap ?? null,
