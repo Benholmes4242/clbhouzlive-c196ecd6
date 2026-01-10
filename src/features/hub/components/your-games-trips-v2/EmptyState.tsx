@@ -30,8 +30,8 @@ const CONFIG: Record<SheetTab, {
   },
   trips: {
     icon: <Plane className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.4)' }} />,
-    title: 'No trips created yet',
-    subtitle: 'Start planning your next golf adventure',
+    title: 'No trips yet',
+    subtitle: 'Create a trip to start building your tour.',
   },
 };
 

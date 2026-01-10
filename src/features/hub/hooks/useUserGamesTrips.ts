@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type RsvpStatus = 'going' | 'maybe' | 'declined' | 'invited';
 export type GameStatus = 'scheduled' | 'live' | 'completed' | 'canceled';
+export type TripStatus = 'upcoming' | 'ongoing' | 'completed';
 
 export interface UserGame {
   id: string;
@@ -43,6 +44,9 @@ export interface UserTrip {
   isCreator: boolean;
   // Derived counts
   gamesCount: number;
+  participantCount: number;
+  // Status
+  status: TripStatus;
 }
 
 export function useUserUpcomingGames() {
@@ -305,14 +309,31 @@ export function useUserTrips() {
         .order('start_date', { ascending: false })
         .limit(30);
 
-      if (createdError) throw createdError;
+      if (createdError) {
+        console.error('[useUserTrips] Error fetching created trips:', createdError);
+        throw createdError;
+      }
 
-      // Get trips where user is participant
-      const { data: participantTrips, error: partError } = await supabase
+      // Get trips where user is participant - use two-step approach for robustness
+      const { data: participantData, error: partError } = await supabase
         .from('trip_participants')
-        .select(`
-          trip_id,
-          trips!inner (
+        .select('trip_id')
+        .eq('user_id', user.id)
+        .limit(30);
+
+      if (partError) {
+        console.error('[useUserTrips] Error fetching trip participants:', partError);
+        throw partError;
+      }
+
+      // Get trip details for participant trips
+      const participantTripIds = participantData?.map(p => p.trip_id).filter(Boolean) || [];
+      let participantTrips: any[] = [];
+      
+      if (participantTripIds.length > 0) {
+        const { data: tripData, error: tripError } = await supabase
+          .from('trips')
+          .select(`
             id,
             name,
             description,
@@ -321,32 +342,39 @@ export function useUserTrips() {
             visibility,
             cover_image_url,
             created_by
-          )
-        `)
-        .eq('user_id', user.id)
-        .limit(30);
+          `)
+          .in('id', participantTripIds);
 
-      if (partError) throw partError;
+        if (tripError) {
+          console.error('[useUserTrips] Error fetching participant trip details:', tripError);
+          throw tripError;
+        }
+        
+        participantTrips = tripData || [];
+      }
 
       // Merge and dedupe
       const tripMap = new Map<string, any>();
       createdTrips?.forEach(t => tripMap.set(t.id, t));
-      participantTrips?.forEach(p => {
-        const t = p.trips as any;
+      participantTrips.forEach(t => {
         if (t && !tripMap.has(t.id)) {
           tripMap.set(t.id, t);
         }
       });
 
       const allTripIds = Array.from(tripMap.keys());
+      if (allTripIds.length === 0) return [];
       
       // Get game counts for trips
       const { data: gamesData, error: gamesError } = await supabase
         .from('games')
         .select('trip_id')
-        .in('trip_id', allTripIds.length > 0 ? allTripIds : ['no-match']);
+        .in('trip_id', allTripIds);
 
-      if (gamesError) throw gamesError;
+      if (gamesError) {
+        console.error('[useUserTrips] Error fetching trip games:', gamesError);
+        throw gamesError;
+      }
 
       const gameCountMap = new Map<string, number>();
       gamesData?.forEach(g => {
@@ -355,23 +383,77 @@ export function useUserTrips() {
         }
       });
 
+      // Get participant counts for trips
+      const { data: participantsData, error: participantsError } = await supabase
+        .from('trip_participants')
+        .select('trip_id')
+        .in('trip_id', allTripIds);
+
+      if (participantsError) {
+        console.error('[useUserTrips] Error fetching trip participant counts:', participantsError);
+        // Non-fatal, continue with 0 counts
+      }
+
+      const participantCountMap = new Map<string, number>();
+      participantsData?.forEach(p => {
+        if (p.trip_id) {
+          participantCountMap.set(p.trip_id, (participantCountMap.get(p.trip_id) || 0) + 1);
+        }
+      });
+
+      const now = new Date();
+
       const trips: UserTrip[] = Array.from(tripMap.values())
-        .map((t): UserTrip => ({
-          id: t.id,
-          name: t.name || 'Untitled Trip',
-          description: t.description,
-          startDate: t.start_date,
-          endDate: t.end_date,
-          visibility: t.visibility || 'invite',
-          coverImageUrl: t.cover_image_url,
-          createdBy: t.created_by,
-          isCreator: t.created_by === user.id,
-          gamesCount: gameCountMap.get(t.id) || 0,
-        }))
-        .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+        .map((t): UserTrip => {
+          const startDate = new Date(t.start_date);
+          const endDate = new Date(t.end_date);
+          
+          let status: TripStatus = 'upcoming';
+          if (endDate < now) {
+            status = 'completed';
+          } else if (startDate <= now && endDate >= now) {
+            status = 'ongoing';
+          }
+
+          return {
+            id: t.id,
+            name: t.name || 'Untitled Trip',
+            description: t.description,
+            startDate: t.start_date,
+            endDate: t.end_date,
+            visibility: t.visibility || 'invite',
+            coverImageUrl: t.cover_image_url,
+            createdBy: t.created_by,
+            isCreator: t.created_by === user.id,
+            gamesCount: gameCountMap.get(t.id) || 0,
+            participantCount: (participantCountMap.get(t.id) || 0) + 1, // +1 for creator
+            status,
+          };
+        })
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
       return trips;
     },
     staleTime: 60000,
   });
+}
+
+// Helper hook to get trips separated by status
+export function useUserTripsByStatus() {
+  const { data: trips, isLoading, error } = useUserTrips();
+
+  const upcomingTrips = trips?.filter(t => t.status === 'upcoming' || t.status === 'ongoing') || [];
+  const pastTrips = trips?.filter(t => t.status === 'completed') || [];
+
+  // Sort upcoming by nearest first, past by most recent first
+  upcomingTrips.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  pastTrips.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+
+  return {
+    upcomingTrips,
+    pastTrips,
+    allTrips: trips || [],
+    isLoading,
+    error,
+  };
 }

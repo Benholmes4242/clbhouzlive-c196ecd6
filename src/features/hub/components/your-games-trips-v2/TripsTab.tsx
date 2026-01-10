@@ -1,6 +1,6 @@
 /**
  * TripsTab - Shows user's trips
- * V2: Consistent spacing and styling
+ * V2: Matches Games tab layout with NEXT UP hero + UPCOMING sections
  */
 
 import React from 'react';
@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { TripCard } from './TripCard';
 import { EmptyState } from './EmptyState';
 import { SkeletonList } from './SkeletonLoader';
-import { useUserTrips, type UserTrip } from '../../hooks/useUserGamesTrips';
+import { useUserTripsByStatus, type UserTrip } from '../../hooks/useUserGamesTrips';
 
 interface TripsTabProps {
   searchQuery: string;
@@ -19,18 +19,20 @@ interface TripsTabProps {
 
 export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) {
   const navigate = useNavigate();
-  const { data: trips, isLoading } = useUserTrips();
+  const { upcomingTrips, pastTrips, isLoading } = useUserTripsByStatus();
 
   // Filter by search
-  const filtered = React.useMemo(() => {
-    if (!trips) return [];
-    if (!searchQuery.trim()) return trips;
-    
+  const filteredUpcoming = React.useMemo(() => {
+    if (!searchQuery.trim()) return upcomingTrips;
     const q = searchQuery.toLowerCase();
-    return trips.filter(t => 
-      t.name.toLowerCase().includes(q)
-    );
-  }, [trips, searchQuery]);
+    return upcomingTrips.filter(t => t.name.toLowerCase().includes(q));
+  }, [upcomingTrips, searchQuery]);
+
+  const filteredPast = React.useMemo(() => {
+    if (!searchQuery.trim()) return pastTrips;
+    const q = searchQuery.toLowerCase();
+    return pastTrips.filter(t => t.name.toLowerCase().includes(q));
+  }, [pastTrips, searchQuery]);
 
   const handleTripTap = (trip: UserTrip) => {
     onClose();
@@ -38,34 +40,96 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
   };
 
   if (isLoading) {
-    return <SkeletonList />;
+    return <SkeletonList includeHero />;
   }
 
-  if (filtered.length === 0) {
+  const hasAnyTrips = filteredUpcoming.length > 0 || filteredPast.length > 0;
+
+  if (!hasAnyTrips) {
     return <EmptyState tab="trips" onCreateTrip={onCreateTrip} />;
   }
 
+  const nextUp = filteredUpcoming[0];
+  const upcomingList = filteredUpcoming.slice(1);
+
   return (
-    <div className="space-y-2">
-      <AnimatePresence>
-        {filtered.map((trip, index) => (
-          <motion.div
-            key={trip.id}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.03 }}
+    <div className="space-y-5">
+      {/* Next Up section - hero card for nearest upcoming trip */}
+      {nextUp && (
+        <div>
+          <h4 
+            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
           >
-            <TripCard
-              trip={trip}
-              onTap={() => handleTripTap(trip)}
-              onKebabTap={() => {
-                // TODO: Open action menu
-                console.log('Kebab tapped for trip:', trip.id);
-              }}
-            />
-          </motion.div>
-        ))}
-      </AnimatePresence>
+            Next Up
+          </h4>
+          <TripCard
+            trip={nextUp}
+            variant="hero"
+            onTap={() => handleTripTap(nextUp)}
+          />
+        </div>
+      )}
+
+      {/* Upcoming list */}
+      {upcomingList.length > 0 && (
+        <div>
+          <h4 
+            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+          >
+            Upcoming
+          </h4>
+          <div className="space-y-2">
+            <AnimatePresence>
+              {upcomingList.map((trip, index) => (
+                <motion.div
+                  key={trip.id}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                >
+                  <TripCard
+                    trip={trip}
+                    variant="row"
+                    onTap={() => handleTripTap(trip)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {/* Past trips section */}
+      {filteredPast.length > 0 && (
+        <div>
+          <h4 
+            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+          >
+            Past
+          </h4>
+          <div className="space-y-2">
+            <AnimatePresence>
+              {filteredPast.map((trip, index) => (
+                <motion.div
+                  key={trip.id}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                >
+                  <TripCard
+                    trip={trip}
+                    variant="row"
+                    onTap={() => handleTripTap(trip)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
