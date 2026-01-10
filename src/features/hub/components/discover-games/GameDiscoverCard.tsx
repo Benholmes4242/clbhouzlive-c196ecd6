@@ -186,6 +186,16 @@ export function GameDiscoverCard({
           </span>
         )}
       </button>
+
+      {/* Helper text for requested state */}
+      {isRequested && (
+        <p 
+          className="text-[11px] text-center mt-1.5"
+          style={{ color: 'rgba(100, 116, 139, 0.7)' }}
+        >
+          Waiting for host approval
+        </p>
+      )}
     </div>
   );
 }
