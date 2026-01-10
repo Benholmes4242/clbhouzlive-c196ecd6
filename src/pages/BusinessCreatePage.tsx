@@ -20,17 +20,8 @@ import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { ClaimCoursesStep } from '@/components/business/ClaimCoursesStep';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
-// Categories with icons
-const BUSINESS_CATEGORIES_WITH_ICONS = [
-  { value: 'Golf Club', label: 'Golf Club', icon: Flag },
-  { value: 'Golf Academy', label: 'Golf Academy', icon: GraduationCap },
-  { value: 'Coach / Instructor', label: 'Coach / Instructor', icon: GraduationCap },
-  { value: 'Retailer / Pro Shop', label: 'Retailer / Pro Shop', icon: ShoppingBag },
-  { value: 'Club Fitter', label: 'Club Fitter', icon: Briefcase },
-  { value: 'Resort', label: 'Resort', icon: Building2 },
-  { value: 'Brand / Manufacturer', label: 'Brand / Manufacturer', icon: Briefcase },
-  { value: 'Other', label: 'Other', icon: Building2 },
-];
+// Import shared business categories
+import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
 
 type FlowStep = 'details' | 'claim-courses' | 'success';
 

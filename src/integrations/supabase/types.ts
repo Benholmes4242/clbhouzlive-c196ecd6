@@ -8133,6 +8133,7 @@ export type Database = {
           business_name: string | null
           business_type: Database["public"]["Enums"]["business_type"] | null
           business_website: string | null
+          college_normalized: string | null
           contact_person_name: string | null
           cover_photo_url: string | null
           created_at: string | null
@@ -8229,6 +8230,7 @@ export type Database = {
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           business_website?: string | null
+          college_normalized?: string | null
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
@@ -8325,6 +8327,7 @@ export type Database = {
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           business_website?: string | null
+          college_normalized?: string | null
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null

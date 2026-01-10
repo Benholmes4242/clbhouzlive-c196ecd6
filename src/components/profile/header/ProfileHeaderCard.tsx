@@ -2,6 +2,7 @@ import React from 'react';
 import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import CollegeStamp from '../CollegeStamp';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -9,6 +10,7 @@ interface ProfileHeaderCardProps {
   // Personal profile fields
   homeClub?: string | null;
   handicap?: number | null;
+  collegeNormalized?: string | null;
   // Business profile fields  
   websiteUrl?: string | null;
   location?: string | null;
@@ -32,6 +34,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   username,
   homeClub,
   handicap,
+  collegeNormalized,
   websiteUrl,
   location,
   businessName,
@@ -108,6 +111,12 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           <span className="font-semibold profile-text-primary">{homeClub}</span>
         </div>
       )}
+      
+      {/* Row 3b: College stamp (personal only) */}
+      {isPersonal && collegeNormalized && (
+        <CollegeStamp normalizedName={collegeNormalized} className="justify-center" />
+      )}
+      
       {!isPersonal && effectiveLocation && (
         <div className="flex items-center gap-1 text-sm text-center">
           <MapPin className="w-3.5 h-3.5 profile-text-secondary" />

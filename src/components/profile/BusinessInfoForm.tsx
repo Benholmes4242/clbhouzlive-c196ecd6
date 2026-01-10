@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
 
 interface BusinessInfoFormProps {
   formData: {
@@ -49,11 +49,17 @@ const BusinessInfoForm = ({ formData, onChange, onSelectChange }: BusinessInfoFo
               <SelectValue placeholder="Select business type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="golf_club">Golf Club</SelectItem>
-              <SelectItem value="pro_shop">Pro Shop</SelectItem>
-              <SelectItem value="teaching_academy">Teaching Academy / Coach</SelectItem>
-              <SelectItem value="tour_event">Tour / Event</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              {BUSINESS_CATEGORIES_WITH_ICONS.map((cat) => {
+                const Icon = cat.icon;
+                return (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    <span className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                      <span>{cat.label}</span>
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>

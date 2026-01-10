@@ -48,6 +48,7 @@ interface UserProfile {
   display_name?: string;
   username?: string;
   home_club?: string;
+  college_normalized?: string | null;
   profile_photo_url?: string;
   header_photo_url?: string;
   updated_at?: string;
@@ -388,6 +389,7 @@ const HeroProfileHeader = ({
                 username={username}
                 homeClub={isPersonal ? homeClub : undefined}
                 handicap={isPersonal ? profile?.eg_handicap_index : undefined}
+                collegeNormalized={isPersonal ? profile?.college_normalized : undefined}
                 websiteUrl={isBusiness ? profile?.business_website : profile?.website}
                 location={profile?.location}
                 userType={profile?.user_type}

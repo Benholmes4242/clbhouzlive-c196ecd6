@@ -5,11 +5,14 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { Button } from '@/components/ui/button';
-import { User, Building2, Megaphone, Sparkles } from 'lucide-react';
+import { User, Building2, Megaphone, Sparkles, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
+import CollegeSearchDropdown from '@/components/profile/CollegeSearchDropdown';
+import { CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 
 type AccountType = 'individual' | 'club' | 'brand' | 'creator';
+type OnboardingStep = 'account-type' | 'college';
 
 interface AccountOption {
   type: AccountType;
@@ -46,7 +49,9 @@ const ACCOUNT_OPTIONS: AccountOption[] = [
 ];
 
 const AccountTypeOnboarding: React.FC = () => {
+  const [step, setStep] = useState<OnboardingStep>('account-type');
   const [selectedType, setSelectedType] = useState<AccountType | null>(null);
+  const [selectedCollege, setSelectedCollege] = useState<CollegeMediaResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -54,17 +59,36 @@ const AccountTypeOnboarding: React.FC = () => {
   useHideBottomNav();
   useHideHeader();
 
-  const handleContinue = async () => {
+  const handleAccountTypeContinue = () => {
+    if (!selectedType) return;
+    
+    // For individual accounts, show college step
+    if (selectedType === 'individual') {
+      setStep('college');
+    } else {
+      // For other account types, complete onboarding directly
+      handleFinalSubmit();
+    }
+  };
+
+  const handleFinalSubmit = async () => {
     if (!selectedType || !user) return;
 
     setSubmitting(true);
     try {
+      const updateData: any = {
+        user_type: selectedType,
+        has_completed_onboarding: true,
+      };
+
+      // Add college if selected (only for individual accounts)
+      if (selectedType === 'individual' && selectedCollege) {
+        updateData.college_normalized = selectedCollege.normalized_name;
+      }
+
       const { error } = await supabase
         .from('user_profiles')
-        .update({
-          user_type: selectedType,
-          has_completed_onboarding: true,
-        })
+        .update(updateData)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -81,6 +105,83 @@ const AccountTypeOnboarding: React.FC = () => {
     }
   };
 
+  const handleBack = () => {
+    if (step === 'college') {
+      setStep('account-type');
+    }
+  };
+
+  // College selection step (for individual accounts)
+  if (step === 'college') {
+    return (
+      <PageRoot className="min-h-screen bg-background flex flex-col">
+        {/* Header */}
+        <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="px-4 md:container md:mx-auto">
+            <div className="flex items-center justify-center h-16">
+              <img
+                src="/lovable-uploads/b3fc8551-2b91-49af-b2ef-1dd493276207.png"
+                alt="clbhouz Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 px-4 md:container md:mx-auto py-8 max-w-lg">
+          <div className="space-y-6">
+            {/* Back button */}
+            <button
+              onClick={handleBack}
+              disabled={submitting}
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+
+            {/* Title */}
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Did you play college golf?
+              </h1>
+              <p className="text-muted-foreground">
+                Add your college to connect with alumni and show your affiliation.
+              </p>
+            </div>
+
+            {/* College search dropdown */}
+            <div className="pt-4">
+              <CollegeSearchDropdown
+                value={selectedCollege}
+                onChange={setSelectedCollege}
+                placeholder="Search for your college..."
+              />
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                This is optional — you can skip or add it later.
+              </p>
+            </div>
+
+            {/* Action buttons */}
+            <div className="pt-4 space-y-3">
+              <Button
+                onClick={handleFinalSubmit}
+                disabled={submitting}
+                className="w-full"
+                variant="gradient-primary"
+                size="lg"
+              >
+                {submitting ? 'Setting up...' : selectedCollege ? 'Continue' : 'Skip for now'}
+              </Button>
+            </div>
+          </div>
+        </main>
+      </PageRoot>
+    );
+  }
+
+  // Account type selection step
   return (
     <PageRoot className="min-h-screen bg-background flex flex-col">
       {/* Header */}
@@ -162,7 +263,7 @@ const AccountTypeOnboarding: React.FC = () => {
           {/* Continue button */}
           <div className="pt-4">
             <Button
-              onClick={handleContinue}
+              onClick={handleAccountTypeContinue}
               disabled={!selectedType || submitting}
               className="w-full"
               variant="gradient-primary"
