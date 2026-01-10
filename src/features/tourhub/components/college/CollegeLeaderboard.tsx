@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Trophy, DollarSign, Target, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
+import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { CollegeCard } from './CollegeCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,15 +22,15 @@ interface CollegeLeaderboardProps {
 
 export function CollegeLeaderboard({ limit = 25, className }: CollegeLeaderboardProps) {
   const [activeMetric, setActiveMetric] = useState<MetricTab>('earnings');
-  const { data: stats, isLoading, error } = useCollegeSeasonStats({ 
-    orderBy: activeMetric, 
-    limit 
-  });
+  const { data: allStats, isLoading, error } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
   
-  // Re-sort client-side when metric changes (since we fetch all data)
-  const sortedStats = stats ? [...stats].sort((a, b) => {
-    const getValue = (s: typeof a) => {
+  // Sort ALL colleges by selected metric, then take top N
+  // This ensures correct leaderboard regardless of metric
+  const sortedStats = useMemo(() => {
+    if (!allStats) return [];
+    
+    const getValue = (s: CollegeSeasonStats) => {
       switch (activeMetric) {
         case 'wins': return s.wins_total;
         case 'cuts': return s.cuts_total;
@@ -38,8 +38,11 @@ export function CollegeLeaderboard({ limit = 25, className }: CollegeLeaderboard
         default: return s.earnings_total;
       }
     };
-    return getValue(b) - getValue(a);
-  }) : [];
+    
+    return [...allStats]
+      .sort((a, b) => getValue(b) - getValue(a))
+      .slice(0, limit);
+  }, [allStats, activeMetric, limit]);
   
   return (
     <div className={cn('', className)}>

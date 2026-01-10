@@ -5872,6 +5872,7 @@ export type Database = {
           birth_date: string | null
           birth_place: string | null
           college: string | null
+          college_normalized: string | null
           country: string | null
           country_code: string | null
           created_at: string | null
@@ -5892,6 +5893,7 @@ export type Database = {
           birth_date?: string | null
           birth_place?: string | null
           college?: string | null
+          college_normalized?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string | null
@@ -5912,6 +5914,7 @@ export type Database = {
           birth_date?: string | null
           birth_place?: string | null
           college?: string | null
+          college_normalized?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string | null

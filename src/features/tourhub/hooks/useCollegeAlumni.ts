@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { normalizeCollege } from '@/lib/utils/normalizeCollege';
+import { useCurrentSeasonId } from './useCollegeStats';
 
 export interface CollegeAlumnus {
   id: string;
@@ -17,11 +17,9 @@ export interface CollegeAlumnus {
   top_10s?: number;
 }
 
-// 2025 Season ID
-const CURRENT_SEASON_ID = '8d78d0da-6a71-4d51-a68c-a6139c9ecfae';
-
 /**
  * Fetches alumni for a college by normalized name.
+ * Uses the indexed college_normalized column for efficient queries.
  * Joins with sr_player_statistics for current season stats.
  */
 export function useCollegeAlumni(normalizedName: string | undefined, options?: {
@@ -29,36 +27,32 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
   limit?: number;
 }) {
   const { orderBy = 'earnings', limit = 20 } = options || {};
+  const seasonId = useCurrentSeasonId();
   
   return useQuery({
-    queryKey: ['college-alumni', normalizedName, orderBy, limit],
+    queryKey: ['college-alumni', normalizedName, seasonId, orderBy, limit],
     queryFn: async () => {
-      if (!normalizedName) return [];
+      if (!normalizedName || !seasonId) return [];
       
-      // First get players with this college
+      // Query players directly using the indexed college_normalized column
       const { data: players, error: playersError } = await supabase
         .from('sr_players')
         .select('id, first_name, last_name, country, photo_url, college')
-        .not('college', 'is', null);
+        .eq('college_normalized', normalizedName);
       
       if (playersError) {
         console.error('[useCollegeAlumni] Players error:', playersError);
         throw playersError;
       }
       
-      // Filter by normalized name
-      const matchingPlayers = (players || []).filter(p => 
-        normalizeCollege(p.college || '') === normalizedName
-      );
-      
-      if (!matchingPlayers.length) return [];
+      if (!players?.length) return [];
       
       // Get their stats
-      const playerIds = matchingPlayers.map(p => p.id);
+      const playerIds = players.map(p => p.id);
       const { data: stats, error: statsError } = await supabase
         .from('sr_player_statistics')
         .select('player_id, raw_data')
-        .eq('season_id', CURRENT_SEASON_ID)
+        .eq('season_id', seasonId)
         .in('player_id', playerIds);
       
       if (statsError) {
@@ -68,7 +62,7 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       // Merge stats into players
       const statsMap = new Map(stats?.map(s => [s.player_id, s.raw_data]) || []);
       
-      const alumni: CollegeAlumnus[] = matchingPlayers.map(p => {
+      const alumni: CollegeAlumnus[] = players.map(p => {
         const rawData = statsMap.get(p.id) as Record<string, unknown> | undefined;
         const statistics = (rawData?.statistics || {}) as Record<string, unknown>;
         
@@ -104,7 +98,7 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       
       return alumni.slice(0, limit);
     },
-    enabled: !!normalizedName,
+    enabled: !!normalizedName && !!seasonId,
     staleTime: 5 * 60 * 1000,
   });
 }
