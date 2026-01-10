@@ -16,11 +16,22 @@ import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEchoConversation } from '@/features/echo/hooks/useEchoConversation';
+import { useDeleteConversation } from '@/features/echo/hooks/useEchoHistory';
 import { EchoMessageList } from './EchoMessageList';
 import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
 import { EchoHistoryTab } from './EchoHistoryTab';
 import { EchoTabPills, type EchoTab } from './EchoTabPills';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface EchoSheetV2Props {
   isOpen: boolean;
@@ -41,6 +52,9 @@ export function EchoSheetV2({
   const [input, setInput] = useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [activeTab, setActiveTab] = useState<EchoTab>('chat');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  const deleteMutation = useDeleteConversation();
   
   const {
     conversationId,
@@ -159,6 +173,22 @@ export function EchoSheetV2({
     toast.success('Chat cleared');
   }, [resetConversation]);
 
+  const handleDeleteChatClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    haptic('medium');
+    setShowMenu(false);
+    setShowDeleteDialog(true);
+  }, []);
+
+  const handleConfirmDeleteChat = useCallback(() => {
+    if (conversationId) {
+      deleteMutation.mutate(conversationId);
+      resetConversation();
+      setShowDeleteDialog(false);
+      toast.success('Chat deleted');
+    }
+  }, [conversationId, deleteMutation, resetConversation]);
+
   const handleNewChat = useCallback(() => {
     haptic('light');
     resetConversation();
@@ -270,15 +300,24 @@ export function EchoSheetV2({
                           initial={{ opacity: 0, y: -8, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                          className="absolute right-0 top-full mt-1 w-40 rounded-xl overflow-hidden bg-popover border border-border shadow-lg z-[10003]"
+                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-popover border border-border shadow-lg z-[10003]"
                         >
                           <button
                             onClick={handleClearChat}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-destructive/10 text-destructive"
+                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-muted text-foreground"
                           >
                             <Trash2 className="w-4 h-4" />
                             Clear chat
                           </button>
+                          {conversationId && (
+                            <button
+                              onClick={handleDeleteChatClick}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-destructive/10 text-destructive border-t border-border/50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Delete this chat
+                            </button>
+                          )}
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -339,6 +378,27 @@ export function EchoSheetV2({
               />
             )}
           </motion.div>
+
+          {/* Delete confirmation dialog */}
+          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <AlertDialogContent className="max-w-[320px] rounded-2xl z-[10010]">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete this conversation and all its messages.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleConfirmDeleteChat}
+                  className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </AnimatePresence>,
