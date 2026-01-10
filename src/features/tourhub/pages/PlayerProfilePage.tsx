@@ -97,6 +97,23 @@ export function PlayerProfilePage() {
     return allStats.find(s => s.player_id === playerId) || null;
   }, [allStats, playerId]);
 
+  // DEBUG LOGGING - Remove after verification
+  useMemo(() => {
+    if (playerId) {
+      console.log('[PlayerProfilePage] Debug:', {
+        'Route playerId': playerId,
+        'Stats query key': playerId,
+        'Headshot query key': playerId,
+        'Player found': !!player,
+        'Stats found': !!playerStats,
+        'Stats row count': allStats?.length || 0,
+        'Player world_rank': playerStats?.world_rank ?? 'null',
+        'Player fedex_rank': playerStats?.fedex_rank ?? 'null',
+        'Player wins': playerStats?.wins ?? 'null',
+      });
+    }
+  }, [playerId, player, playerStats, allStats]);
+
   // Get recent completed tournaments (mock historical data since we don't have player-tournament junction yet)
   const recentTournaments = useMemo(() => {
     if (!tournaments) return [];

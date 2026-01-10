@@ -1,93 +1,79 @@
 import { cn } from '@/lib/utils';
-import { FileText, Clock, BarChart3, Globe } from 'lucide-react';
+import { FileText, Clock, BarChart3 } from 'lucide-react';
+import { TourDataPendingState } from './TourDataPendingState';
 
 interface TourHubEmptyStateProps {
   variant: 'leaderboard' | 'tee-times' | 'hole-stats' | 'summary' | 'schedule' | 'players';
   className?: string;
 }
 
-const emptyStateConfig: Record<string, { 
-  icon: typeof FileText; 
-  title: string; 
-  subline: string;
-}> = {
+// Feature-specific config for the premium pending state
+const pendingStateConfig: Partial<Record<string, { title: string; description: string }>> = {
   summary: {
-    icon: FileText,
-    title: "Tournament Summary",
-    subline: "Tournament recaps, course context, and field summaries",
+    title: 'Tournament Summary',
+    description: 'Tournament recaps, course context, and field summaries.',
   },
   'tee-times': {
-    icon: Clock,
-    title: "Tee Times",
-    subline: "Live and round-by-round pairings",
+    title: 'Tee Times',
+    description: 'Live and round-by-round pairings for every tournament.',
   },
   'hole-stats': {
-    icon: BarChart3,
-    title: "Hole-by-Hole Insights",
-    subline: "Hole scoring trends and course analytics",
+    title: 'Hole-by-Hole Insights',
+    description: 'Hole scoring trends, difficulty ratings, and course analytics.',
   },
-  // Fallback variants
+};
+
+// Simple fallback config for truly empty states (not pending data)
+const fallbackConfig: Record<string, { 
+  icon: typeof FileText; 
+  title: string; 
+  message: string;
+}> = {
   leaderboard: {
     icon: BarChart3,
-    title: "Live Leaderboard",
-    subline: "Real-time tournament scoring",
+    title: 'No Leaderboard Available',
+    message: 'Leaderboard data will appear once scoring begins.',
   },
   schedule: {
     icon: Clock,
-    title: "Tournament Schedule",
-    subline: "Upcoming events and dates",
+    title: 'No Events Scheduled',
+    message: 'Tournament schedule will appear as events are announced.',
   },
   players: {
     icon: FileText,
-    title: "Player Profiles",
-    subline: "Tour roster and statistics",
+    title: 'No Players Found',
+    message: 'Player data is being loaded.',
   },
 };
 
 export function TourHubEmptyState({ variant, className }: TourHubEmptyStateProps) {
-  const config = emptyStateConfig[variant] || emptyStateConfig.summary;
+  // Use premium pending state for data integration features
+  const pendingConfig = pendingStateConfig[variant];
+  if (pendingConfig) {
+    return (
+      <TourDataPendingState 
+        featureTitle={pendingConfig.title}
+        featureDescription={pendingConfig.description}
+        className={className}
+      />
+    );
+  }
+  
+  // Simple fallback for other variants
+  const config = fallbackConfig[variant] || fallbackConfig.players;
   const Icon = config.icon;
   
   return (
     <div className={cn("flex items-center justify-center py-16", className)}>
-      <div 
-        className="w-full max-w-[560px] mx-auto p-8 rounded-2xl bg-white border border-black/[0.04] text-center"
-        style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.04)' }}
-      >
-        {/* Top Icon */}
-        <div className="w-10 h-10 mx-auto mb-4 rounded-full bg-black/[0.04] flex items-center justify-center">
-          <Icon className="w-5 h-5 text-slate-500" />
+      <div className="text-center space-y-4">
+        <div className="w-12 h-12 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+          <Icon className="w-6 h-6 text-muted-foreground" />
         </div>
-        
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-foreground mb-1">
-          {config.title}
-        </h3>
-        
-        {/* Subline */}
-        <p className="text-sm text-slate-500 mb-5">
-          {config.subline}
-        </p>
-        
-        {/* Body Copy */}
-        <div className="max-w-[420px] mx-auto text-sm text-slate-600 leading-relaxed space-y-4">
-          <p>
-            We're currently expanding our Tour Hub data through an official integration with SportsRadar, the world's leading provider of professional golf statistics.
+        <div className="space-y-1">
+          <h3 className="text-base font-medium text-foreground">{config.title}</h3>
+          <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
+            {config.message}
           </p>
-          <p>
-            As this partnership progresses, you'll see advanced features roll out here — including live tee times, tournament recaps, field insights, and detailed hole-by-hole performance data.
-          </p>
-          <p className="text-slate-500">
-            Check back soon as new capabilities go live.
-          </p>
-        </div>
-        
-        {/* Partner Badge */}
-        <div className="mt-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 text-xs text-slate-500">
-          <Globe className="w-3 h-3" />
-          <span>Powered by SportsRadar</span>
-          <span className="text-slate-400">·</span>
-          <span className="text-slate-400">integration in progress</span>
         </div>
       </div>
     </div>
