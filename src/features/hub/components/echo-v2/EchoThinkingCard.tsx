@@ -1,10 +1,12 @@
 /**
  * EchoThinkingCard - Shimmer loading state
- * Uses design tokens for theming
+ * Explicit light styling to match Hub sheets
  */
 
 import React from 'react';
 import { Sparkles } from 'lucide-react';
+import { HUB_CARD } from './echoStyles';
+import { cn } from '@/lib/utils';
 
 export function EchoThinkingCard() {
   return (
@@ -22,10 +24,10 @@ export function EchoThinkingCard() {
 
       {/* Thinking card */}
       <div 
-        className="flex-1 rounded-2xl rounded-tl-md px-4 py-3 bg-card/75 backdrop-blur-xl border border-border/30"
-        style={{
-          boxShadow: '0 2px 12px hsl(var(--foreground) / 0.04)',
-        }}
+        className={cn(
+          "flex-1 rounded-2xl rounded-tl-md px-4 py-3",
+          HUB_CARD
+        )}
       >
         {/* Shimmer lines */}
         <div className="space-y-2">

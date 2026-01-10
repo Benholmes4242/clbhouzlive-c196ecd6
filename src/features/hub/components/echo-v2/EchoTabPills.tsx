@@ -1,10 +1,12 @@
 /**
  * EchoTabPills - Tab switcher for Echo Chat/History
+ * Explicit light styling to match Hub sheets
  */
 
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
+import { HUB_TAB_RAIL } from './echoStyles';
 
 export type EchoTab = 'chat' | 'history';
 
@@ -28,8 +30,10 @@ export function EchoTabPills({ activeTab, onTabChange }: EchoTabPillsProps) {
 
   return (
     <div 
-      className="flex items-center gap-1 p-1 rounded-xl"
-      style={{ background: 'hsl(var(--muted) / 0.5)' }}
+      className={cn(
+        "flex items-center gap-1 p-1 rounded-xl",
+        HUB_TAB_RAIL
+      )}
     >
       {tabs.map((tab) => (
         <button
@@ -38,8 +42,8 @@ export function EchoTabPills({ activeTab, onTabChange }: EchoTabPillsProps) {
           className={cn(
             "flex-1 px-4 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150",
             activeTab === tab.id
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-600 hover:text-slate-900"
           )}
         >
           {tab.label}

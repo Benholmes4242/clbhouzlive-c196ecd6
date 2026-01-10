@@ -1,11 +1,13 @@
 /**
  * EchoEmptyState - Hero panel with prompt chips for first-use
- * Uses design tokens for theming
+ * Explicit light glass styling to match Hub sheets
  */
 
 import React from 'react';
 import { Sparkles, ChevronRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
+import { HUB_CARD, HUB_CHIP } from './echoStyles';
+import { cn } from '@/lib/utils';
 
 interface EchoEmptyStateProps {
   onChipClick: (prompt: string) => void;
@@ -38,10 +40,10 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
     >
       {/* Hero glass card */}
       <div 
-        className="w-full max-w-[340px] rounded-3xl p-6 text-center bg-card/75 backdrop-blur-xl border border-border/30"
-        style={{
-          boxShadow: '0 8px 32px hsl(var(--foreground) / 0.06), 0 2px 8px hsl(var(--foreground) / 0.03)',
-        }}
+        className={cn(
+          "w-full max-w-[340px] rounded-3xl p-6 text-center",
+          HUB_CARD
+        )}
       >
         {/* Icon badge */}
         <div className="flex justify-center mb-4">
@@ -58,12 +60,12 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
         </div>
 
         {/* Title */}
-        <h3 className="text-[20px] font-semibold mb-2 text-foreground" style={{ letterSpacing: '-0.02em' }}>
+        <h3 className="text-[20px] font-semibold mb-2 text-slate-900" style={{ letterSpacing: '-0.02em' }}>
           Ask Echo
         </h3>
 
         {/* Subcopy */}
-        <p className="text-[14px] leading-relaxed mb-6 text-muted-foreground">
+        <p className="text-[14px] leading-relaxed mb-6 text-slate-600">
           Instant golf answers — distances, rules, course intel, gear, and trip planning.
         </p>
 
@@ -75,7 +77,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
               <button
                 key={chip.text}
                 onClick={() => handleChipClick(chip.text)}
-                className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 border border-border text-muted-foreground hover:bg-muted"
+                className={cn(HUB_CHIP)}
               >
                 {chip.text}
               </button>
@@ -88,7 +90,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
               <button
                 key={chip.text}
                 onClick={() => handleChipClick(chip.text)}
-                className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 border border-border text-muted-foreground hover:bg-muted"
+                className={cn(HUB_CHIP)}
               >
                 {chip.text}
               </button>
