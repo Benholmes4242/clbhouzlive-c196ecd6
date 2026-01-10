@@ -36,7 +36,12 @@ export function useEchoConversations(search?: string) {
     queryKey: ['echo', 'conversations', search ?? ''],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) {
+        console.log('[useEchoConversations] No user found, returning empty array');
+        return [];
+      }
+
+      console.log('[useEchoConversations] Fetching conversations for user:', user.id);
 
       let q = supabase
         .from('echo_conversations')
@@ -54,6 +59,8 @@ export function useEchoConversations(search?: string) {
         console.error('[useEchoConversations] Error:', error);
         throw error;
       }
+
+      console.log('[useEchoConversations] Fetched conversations:', data?.length ?? 0);
 
       // Get message counts using server-side RPC aggregate
       const conversationIds = (data ?? []).map(c => c.id);
@@ -75,7 +82,8 @@ export function useEchoConversations(search?: string) {
         message_count: messageCounts[c.id] || 0,
       })) as EchoConversationRow[];
     },
-    staleTime: 30_000,
+    staleTime: 0, // Always refetch when queried
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 }
 

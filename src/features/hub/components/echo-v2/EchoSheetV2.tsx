@@ -216,8 +216,9 @@ export function EchoSheetV2({
   const handleTabChange = useCallback((tab: EchoTab) => {
     setActiveTab(tab);
     if (tab === 'history') {
-      // Refresh history when switching to it
+      // Force refetch history when switching to it
       queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
+      queryClient.refetchQueries({ queryKey: ['echo', 'conversations'] });
     }
   }, [queryClient]);
 
