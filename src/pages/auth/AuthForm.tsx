@@ -201,60 +201,100 @@ const AuthForm: React.FC<AuthFormProps> = ({
     }
 
     setSubmitting(true);
+    console.log('[Auth] Starting signup for:', email);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: {
-          username: username.toLowerCase(),
+    // Timeout protection - 30 seconds
+    const timeoutId = setTimeout(() => {
+      console.log('[Auth] Signup timeout reached');
+      setSubmitting(false);
+      setErrorMsg("Signup is taking too long. Please check your connection and try again.");
+    }, 30000);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            username: username.toLowerCase(),
+          }
         }
-      }
-    });
-    
-    if (error) {
-      if (error.message.includes('already registered')) {
-        setEmailError("This email is already registered");
-        setView('email');
+      });
+
+      clearTimeout(timeoutId);
+
+      console.log('[Auth] Signup response:', { 
+        hasError: !!error, 
+        hasUser: !!data?.user,
+        identitiesLength: data?.user?.identities?.length 
+      });
+      
+      if (error) {
+        if (error.message.includes('already registered')) {
+          setEmailError("This email is already registered");
+          setView('email');
+        } else {
+          setErrorMsg(error.message);
+        }
+        setSubmitting(false);
+      } else if (data?.user?.identities?.length === 0) {
+        // Email already registered but not confirmed
+        localStorage.setItem('pending_signup_email', email);
+        setIsSignUp(false);
+        setPassword('');
+        setConfirmPassword('');
+        setUsername('');
+        setView('entry');
+        setAuthNotice({
+          type: 'success',
+          message: `This email is already registered. Check ${email} for a verification link, or try signing in.`,
+        });
+        setSubmitting(false);
+      } else if (data?.user) {
+        // Store email for callback to use
+        localStorage.setItem('pending_signup_email', email);
+        
+        // Switch back to sign-in and show success notice
+        setIsSignUp(false);
+        setPassword('');
+        setConfirmPassword('');
+        setUsername('');
+        setView('entry');
+        setAuthNotice({
+          type: 'success',
+          message: `Your account is almost ready. Check ${email} for a verification link, then sign in here.`,
+        });
+        setSubmitting(false);
+      } else if (data && !data.user) {
+        // Supabase returned success but no user - email confirmation required
+        localStorage.setItem('pending_signup_email', email);
+        
+        setIsSignUp(false);
+        setPassword('');
+        setConfirmPassword('');
+        setUsername('');
+        setView('entry');
+        setAuthNotice({
+          type: 'success',
+          message: `Check ${email} for a verification link to complete signup.`,
+        });
+        setSubmitting(false);
       } else {
-        setErrorMsg(error.message);
+        // Unexpected state - fail gracefully
+        setErrorMsg('Something went wrong. Please try again.');
+        setSubmitting(false);
       }
+    } catch (err) {
+      clearTimeout(timeoutId);
       setSubmitting(false);
-    } else if (data?.user) {
-      // Store email for callback to use
-      localStorage.setItem('pending_signup_email', email);
+      console.error('[Auth] Signup error:', err);
       
-      // Switch back to sign-in and show success notice
-      setIsSignUp(false);
-      setPassword('');
-      setConfirmPassword('');
-      setUsername('');
-      setView('entry');
-      setAuthNotice({
-        type: 'success',
-        message: `Your account is almost ready. Check ${email} for a verification link, then sign in here.`,
-      });
-      setSubmitting(false);
-    } else if (data && !data.user) {
-      // Supabase returned success but no user - email confirmation required
-      // This happens when "Confirm email" is enabled in Supabase Auth settings
-      localStorage.setItem('pending_signup_email', email);
-      
-      setIsSignUp(false);
-      setPassword('');
-      setConfirmPassword('');
-      setUsername('');
-      setView('entry');
-      setAuthNotice({
-        type: 'success',
-        message: `Check ${email} for a verification link to complete signup.`,
-      });
-      setSubmitting(false);
-    } else {
-      // Unexpected state - fail gracefully
-      setErrorMsg('Something went wrong. Please try again.');
-      setSubmitting(false);
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        setErrorMsg("Network error. Please check your connection and try again.");
+      } else {
+        setErrorMsg("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
