@@ -1,24 +1,36 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CreateMomentDraft, GolfCourse } from './types';
+import { toast } from 'sonner';
 
 const DRAFT_KEY = 'clbhouz_create_moment_draft';
 const DRAFT_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-export function useDraftPersistence() {
+export function useDraftPersistence(availableActorIds?: string[]) {
   const [hasDraft, setHasDraft] = useState(false);
   const [draftData, setDraftData] = useState<CreateMomentDraft | null>(null);
 
   // Check for existing draft on mount
   useEffect(() => {
-    const draft = loadDraft();
+    const draft = loadDraftInternal();
     if (draft) {
+      // Check if actor is still available (for creator/business)
+      if (draft.actorType !== 'personal' && draft.actorId && availableActorIds) {
+        if (!availableActorIds.includes(draft.actorId)) {
+          // Actor no longer available - fall back to personal
+          toast.info('Creator page is no longer available — switched to personal');
+          const fallbackDraft = { ...draft, actorType: 'personal' as const, actorId: undefined };
+          setDraftData(fallbackDraft);
+          setHasDraft(true);
+          return;
+        }
+      }
       setHasDraft(true);
       setDraftData(draft);
     }
-  }, []);
+  }, [availableActorIds]);
 
-  // Load draft from localStorage
-  const loadDraft = useCallback((): CreateMomentDraft | null => {
+  // Internal load function
+  const loadDraftInternal = (): CreateMomentDraft | null => {
     try {
       const stored = localStorage.getItem(DRAFT_KEY);
       if (!stored) return null;
@@ -36,6 +48,11 @@ export function useDraftPersistence() {
       console.error('Error loading draft:', error);
       return null;
     }
+  };
+
+  // Public load draft function
+  const loadDraft = useCallback((): CreateMomentDraft | null => {
+    return loadDraftInternal();
   }, []);
 
   // Save draft to localStorage
