@@ -100,26 +100,50 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, history: Ech
   return data.choices?.[0]?.message?.content?.trim() || "Sorry, no response.";
 }
 
-async function callPerplexity(query: string, nowIso: string, history: EchoRequestBody["conversation"] = []) {
+function sanitizeHistoryForSearch(history: EchoRequestBody["conversation"] = []) {
+  const cleaned = (history ?? [])
+    .filter((m: any) => m && typeof m.content === "string")
+    // Perplexity follows OpenAI-like roles; drop any nested system prompts from clients
+    .filter((m: any) => m.role === "user" || m.role === "assistant");
+
+  // Perplexity rejects conversations that start with an assistant message.
+  // Echo often has an assistant "greeting" message at the top, so remove leading assistants.
+  while (cleaned.length > 0 && cleaned[0].role !== "user") cleaned.shift();
+
+  return cleaned;
+}
+
+async function callPerplexity(
+  query: string,
+  nowIso: string,
+  history: EchoRequestBody["conversation"] = []
+): Promise<{ text: string; citations: string[] | null }> {
+  const safeHistory = sanitizeHistoryForSearch(history);
+
   const messages = [
-    { role: "system", content: `You are a live-search golf/general assistant. Ensure facts are up to date as of ${nowIso}. For changing facts (captains/coaches/schedules/prices/weather/results), verify with fresh sources and include "As of ${nowIso.split("T")[0]}".` },
-    ...(history ?? []),
+    {
+      role: "system",
+      content: `You are a live-search golf/general assistant. Ensure facts are up to date as of ${nowIso}. For changing facts (captains/coaches/schedules/prices/weather/results), verify with fresh sources and include "As of ${nowIso.split("T")[0]}".`,
+    },
+    ...safeHistory,
     { role: "user", content: query },
   ];
+
   const resp = await fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${getPerplexityKey()}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
   });
+
   if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
+
   const data = await resp.json();
+  const citations = Array.isArray(data?.citations) ? (data.citations as string[]) : null;
+
   let content = data.choices?.[0]?.message?.content?.trim() || "";
-  
-  // Clean up citation numbers for better readability
-  content = content.replace(/\[\d+\]/g, '');
-  
   if (content && !/as of/i.test(content)) content += `\n\n_As of ${nowIso.split("T")[0]}._`;
-  return content || "Sorry, no live result.";
+
+  return { text: content || "Sorry, no live result.", citations };
 }
 
 async function withTimeout<T>(p: Promise<T>, ms = 15000): Promise<T> {
@@ -382,10 +406,8 @@ Based on the submitted frames, I can see:
     }
 
     async function callPerplexityEnhanced(messages: any[]) {
-      const response = await callPerplexity(message, now, messages);
-      // Perplexity often includes citations in response - preserve them
-      const sources = response.match(/\[(\d+)\]/g) ? 'Available' : null;
-      return { text: response, usage: {}, sources };
+      const result = await callPerplexity(message, now, messages);
+      return { text: result.text, usage: {}, sources: result.citations };
     }
 
     try {
