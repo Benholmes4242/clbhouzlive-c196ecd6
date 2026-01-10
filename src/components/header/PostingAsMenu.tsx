@@ -179,15 +179,15 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // Build profiles array for AccountHubSheet
   const profiles = availableActors.map(actor => ({
     id: actor.id,
-    type: actor.type as 'personal' | 'business',
+    type: actor.type as 'personal' | 'creator' | 'business',
     name: actor.name,
     avatarUrl: actor.avatarUrl,
-    subtitle: actor.type === 'personal' ? email : 'Business',
+    subtitle: actor.type === 'personal' ? email : actor.type === 'creator' ? 'Creator' : 'Business',
   }));
 
   // Current actor for AccountHubSheet
   const currentActorData = {
-    type: (activeActor?.type || 'personal') as 'personal' | 'business',
+    type: (activeActor?.type || 'personal') as 'personal' | 'creator' | 'business',
     id: activeActor?.id || user?.id || '',
     name: activeActor?.name || displayName,
     avatarUrl: activeActor?.avatarUrl,

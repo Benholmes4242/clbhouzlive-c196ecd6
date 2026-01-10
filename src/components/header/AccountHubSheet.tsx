@@ -16,14 +16,14 @@ type SnapState = 'peek' | 'full';
 
 interface Profile {
   id: string;
-  type: 'personal' | 'business';
+  type: 'personal' | 'creator' | 'business';
   name: string;
   avatarUrl?: string;
   subtitle?: string;
 }
 
 interface CurrentActor {
-  type: 'personal' | 'business';
+  type: 'personal' | 'creator' | 'business';
   id: string;
   name: string;
   avatarUrl?: string;

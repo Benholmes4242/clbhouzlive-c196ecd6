@@ -2500,7 +2500,8 @@ export type Database = {
           content_id: string | null
           created_at: string
           creator_page_id: string
-          event_type: string
+          event_hour: string | null
+          event_type: Database["public"]["Enums"]["creator_event_type"]
           id: string
           metadata: Json | null
           source: string | null
@@ -2511,7 +2512,8 @@ export type Database = {
           content_id?: string | null
           created_at?: string
           creator_page_id: string
-          event_type: string
+          event_hour?: string | null
+          event_type: Database["public"]["Enums"]["creator_event_type"]
           id?: string
           metadata?: Json | null
           source?: string | null
@@ -2522,7 +2524,8 @@ export type Database = {
           content_id?: string | null
           created_at?: string
           creator_page_id?: string
-          event_type?: string
+          event_hour?: string | null
+          event_type?: Database["public"]["Enums"]["creator_event_type"]
           id?: string
           metadata?: Json | null
           source?: string | null
@@ -2703,6 +2706,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_public: boolean
           is_verified: boolean
           location_city: string | null
           location_country: string | null
@@ -2721,6 +2725,7 @@ export type Database = {
           created_at?: string
           display_name: string
           id?: string
+          is_public?: boolean
           is_verified?: boolean
           location_city?: string | null
           location_country?: string | null
@@ -2739,6 +2744,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          is_public?: boolean
           is_verified?: boolean
           location_city?: string | null
           location_country?: string | null
@@ -11847,6 +11853,24 @@ export type Database = {
         Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
         Returns: undefined
       }
+      track_creator_event: {
+        Args: {
+          p_content_id?: string
+          p_creator_page_id: string
+          p_event_type: Database["public"]["Enums"]["creator_event_type"]
+          p_metadata?: Json
+          p_source?: string
+        }
+        Returns: string
+      }
+      track_creator_profile_visit: {
+        Args: {
+          p_creator_page_id: string
+          p_event_type?: string
+          p_path?: string
+        }
+        Returns: string
+      }
       unlockrows: { Args: { "": string }; Returns: number }
       update_business_member_role: {
         Args: {
@@ -11937,6 +11961,20 @@ export type Database = {
         | "Asia"
         | "Africa"
         | "Oceania"
+      creator_event_type:
+        | "impression"
+        | "profile_visit"
+        | "follow"
+        | "unfollow"
+        | "post_view"
+        | "post_like"
+        | "post_unlike"
+        | "post_comment"
+        | "post_save"
+        | "post_unsave"
+        | "post_share"
+        | "cta_click"
+        | "external_link_click"
       creator_team_role: "owner" | "admin" | "editor" | "analyst"
       leaderboard_scope:
         | "global"
@@ -12121,6 +12159,21 @@ export const Constants = {
         "Asia",
         "Africa",
         "Oceania",
+      ],
+      creator_event_type: [
+        "impression",
+        "profile_visit",
+        "follow",
+        "unfollow",
+        "post_view",
+        "post_like",
+        "post_unlike",
+        "post_comment",
+        "post_save",
+        "post_unsave",
+        "post_share",
+        "cta_click",
+        "external_link_click",
       ],
       creator_team_role: ["owner", "admin", "editor", "analyst"],
       leaderboard_scope: [

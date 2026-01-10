@@ -41,7 +41,7 @@ export function useDraftPersistence() {
   // Save draft to localStorage
   const saveDraft = useCallback((data: {
     caption: string;
-    actorType: 'personal' | 'business';
+    actorType: 'personal' | 'creator' | 'business';
     actorId?: string;
     course?: GolfCourse | null;
     visibility: 'public' | 'private';
