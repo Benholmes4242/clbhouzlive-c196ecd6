@@ -7,19 +7,41 @@ export function useUserGamesRealtime() {
   const qc = useQueryClient();
 
   useEffect(() => {
-    // Supabase Realtime: DB → UI
-    const channel = supabase
-      .channel('games-and-participants')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'games' }, () => {
-        qc.invalidateQueries({ queryKey: ['userGames:v2'] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_participants' }, () => {
-        qc.invalidateQueries({ queryKey: ['userGames:v2'] });
-      })
-      .subscribe();
+    // Supabase Realtime: DB → UI, filtered by user_id to avoid noisy updates
+    const setupRealtimeListener = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const channel = supabase
+        .channel('games-and-participants')
+        // Games where user is host
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'games',
+          filter: `host_user_id=eq.${user.id}`,
+        }, () => {
+          qc.invalidateQueries({ queryKey: ['userGames:v2'] });
+        })
+        // Participants where user is involved
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'game_participants',
+          filter: `user_id=eq.${user.id}`,
+        }, () => {
+          qc.invalidateQueries({ queryKey: ['userGames:v2'] });
+        })
+        .subscribe();
+
+      return channel;
+    };
+
+    let channel: any;
+    setupRealtimeListener().then(ch => { channel = ch; });
 
     return () => { 
-      supabase.removeChannel(channel); 
+      if (channel) supabase.removeChannel(channel); 
     };
   }, [qc]);
 
