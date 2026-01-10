@@ -4,18 +4,8 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { decideRoute, modelDeclined, type Mode } from "./router.ts";
 
-// Read API keys lazily inside handlers to ensure secrets are loaded
-function getOpenAIKey() {
-  const key = Deno.env.get("OPENAI_API_KEY");
-  if (!key) console.error("❌ OPENAI_API_KEY is missing!");
-  return key || "";
-}
-
-function getPerplexityKey() {
-  const key = Deno.env.get("PERPLEXITY_API_KEY");
-  if (!key) console.error("❌ PERPLEXITY_API_KEY is missing!");
-  return key || "";
-}
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
 
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
@@ -92,7 +82,7 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, history: Ech
   const messages = [{ role: "system", content: systemPrompt }, ...(history ?? []), { role: "user", content: userPrompt }];
   const resp = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${getOpenAIKey()}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: OPENAI_MODEL, messages, temperature: 0.2 }),
   });
   if (!resp.ok) throw new Error(`OpenAI error: ${await resp.text()}`);
@@ -100,50 +90,26 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, history: Ech
   return data.choices?.[0]?.message?.content?.trim() || "Sorry, no response.";
 }
 
-function sanitizeHistoryForSearch(history: EchoRequestBody["conversation"] = []) {
-  const cleaned = (history ?? [])
-    .filter((m: any) => m && typeof m.content === "string")
-    // Perplexity follows OpenAI-like roles; drop any nested system prompts from clients
-    .filter((m: any) => m.role === "user" || m.role === "assistant");
-
-  // Perplexity rejects conversations that start with an assistant message.
-  // Echo often has an assistant "greeting" message at the top, so remove leading assistants.
-  while (cleaned.length > 0 && cleaned[0].role !== "user") cleaned.shift();
-
-  return cleaned;
-}
-
-async function callPerplexity(
-  query: string,
-  nowIso: string,
-  history: EchoRequestBody["conversation"] = []
-): Promise<{ text: string; citations: string[] | null }> {
-  const safeHistory = sanitizeHistoryForSearch(history);
-
+async function callPerplexity(query: string, nowIso: string, history: EchoRequestBody["conversation"] = []) {
   const messages = [
-    {
-      role: "system",
-      content: `You are a live-search golf/general assistant. Ensure facts are up to date as of ${nowIso}. For changing facts (captains/coaches/schedules/prices/weather/results), verify with fresh sources and include "As of ${nowIso.split("T")[0]}".`,
-    },
-    ...safeHistory,
+    { role: "system", content: `You are a live-search golf/general assistant. Ensure facts are up to date as of ${nowIso}. For changing facts (captains/coaches/schedules/prices/weather/results), verify with fresh sources and include "As of ${nowIso.split("T")[0]}".` },
+    ...(history ?? []),
     { role: "user", content: query },
   ];
-
   const resp = await fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${getPerplexityKey()}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
   });
-
   if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
-
   const data = await resp.json();
-  const citations = Array.isArray(data?.citations) ? (data.citations as string[]) : null;
-
   let content = data.choices?.[0]?.message?.content?.trim() || "";
+  
+  // Clean up citation numbers for better readability
+  content = content.replace(/\[\d+\]/g, '');
+  
   if (content && !/as of/i.test(content)) content += `\n\n_As of ${nowIso.split("T")[0]}._`;
-
-  return { text: content || "Sorry, no live result.", citations };
+  return content || "Sorry, no live result.";
 }
 
 async function withTimeout<T>(p: Promise<T>, ms = 15000): Promise<T> {
@@ -286,7 +252,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${getOpenAIKey()}`,
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
           signal: controller.signal,
@@ -406,8 +372,10 @@ Based on the submitted frames, I can see:
     }
 
     async function callPerplexityEnhanced(messages: any[]) {
-      const result = await callPerplexity(message, now, messages);
-      return { text: result.text, usage: {}, sources: result.citations };
+      const response = await callPerplexity(message, now, messages);
+      // Perplexity often includes citations in response - preserve them
+      const sources = response.match(/\[(\d+)\]/g) ? 'Available' : null;
+      return { text: response, usage: {}, sources };
     }
 
     try {
