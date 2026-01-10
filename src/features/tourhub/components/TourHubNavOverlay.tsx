@@ -1,6 +1,6 @@
 /**
  * TourHubNavOverlay - Full-screen light mode overlay menu for Tour Hub navigation
- * Solid light background with Clbhouz logo mark watermark
+ * Solid light background with Clbhouz logo mark watermark and World Rankings carousel
  */
 
 import React, { useEffect, useCallback } from 'react';
@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
+import { WorldRankingsCarousel } from './WorldRankingsCarousel';
 import type { TourHubTab } from './TourHubTabs';
 
 interface NavItem {
@@ -76,6 +77,13 @@ export function TourHubNavOverlay({
     // Scroll to top on section change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [onNavigate, onClose]);
+
+  const handleViewAllRankings = useCallback(() => {
+    haptic('light');
+    onNavigate('leaderboards');
+    onClose();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [onNavigate, onClose]);
   
   if (typeof document === 'undefined') return null;
   
@@ -107,7 +115,7 @@ export function TourHubNavOverlay({
               duration: 0.28, 
               ease: [0.2, 0.8, 0.2, 1],
             }}
-            className="fixed inset-0 z-[10000] flex flex-col"
+            className="fixed inset-0 z-[10000] flex flex-col overflow-hidden"
             style={{
               background: '#F8FAFC',
             }}
@@ -115,64 +123,62 @@ export function TourHubNavOverlay({
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            {/* Clbhouz Logo Mark Watermark - centered behind content */}
+            {/* Clbhouz Logo Mark Watermark - large, off-screen right, orange */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.05, scale: 1 }}
+              animate={{ opacity: 0.2, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="absolute inset-0 pointer-events-none flex items-center justify-center"
+              className="absolute pointer-events-none"
+              style={{
+                right: '-25%',
+                top: '18%',
+                width: '500px',
+                height: '500px',
+              }}
             >
               <img 
                 src="/assets/logomark-orange.png"
                 alt=""
-                className="w-64 h-64 object-contain"
+                className="w-full h-full object-contain"
                 style={{ 
                   opacity: 1,
-                  filter: 'brightness(0) saturate(100%)',
-                  // Apply orange color via filter
                 }}
               />
             </motion.div>
             
-            {/* Header with divider */}
-            <div>
-              <div className="flex items-center justify-between px-5 pt-safe-top py-4">
-                <button
-                  onClick={() => {
-                    haptic('light');
-                    onClose();
-                  }}
-                  className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95"
-                  style={{ 
-                    background: 'rgba(0, 0, 0, 0.05)',
-                  }}
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" style={{ color: '#64748B' }} />
-                </button>
-                
-                <span 
-                  className="text-lg font-semibold tracking-tight"
-                  style={{ color: '#1e293b' }}
-                >
-                  Navigate
-                </span>
-                
-                {/* Placeholder for balance */}
-                <div className="w-10" />
-              </div>
+            {/* Close button header */}
+            <div className="flex items-center justify-between px-5 pt-safe-top py-4">
+              <button
+                onClick={() => {
+                  haptic('light');
+                  onClose();
+                }}
+                className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95"
+                style={{ 
+                  background: 'rgba(0, 0, 0, 0.05)',
+                }}
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" style={{ color: '#64748B' }} />
+              </button>
               
-              {/* Subtle divider */}
-              <div 
-                className="h-px mx-5"
-                style={{ background: 'rgba(0, 0, 0, 0.06)' }}
-              />
+              {/* Placeholder for balance */}
+              <div className="w-10" />
             </div>
+            
+            {/* World Rankings Carousel Header */}
+            <WorldRankingsCarousel onViewAll={handleViewAllRankings} />
+            
+            {/* Subtle divider */}
+            <div 
+              className="h-px mx-5"
+              style={{ background: 'rgba(0, 0, 0, 0.06)' }}
+            />
             
             {/* Menu Items */}
             <div 
-              className="flex-1 overflow-y-auto px-5 py-6"
+              className="flex-1 overflow-y-auto px-5 py-5"
               style={{ overscrollBehavior: 'contain' }}
             >
               <div className="space-y-2">
@@ -185,7 +191,7 @@ export function TourHubNavOverlay({
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ 
-                        delay: 0.05 + index * 0.03,
+                        delay: 0.15 + index * 0.03,
                         duration: 0.25,
                         ease: [0.2, 0.8, 0.2, 1],
                       }}
@@ -245,8 +251,6 @@ export function TourHubNavOverlay({
                 })}
               </div>
             </div>
-            
-            {/* No footer text - removed per spec */}
           </motion.div>
         </>
       )}
