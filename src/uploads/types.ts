@@ -36,7 +36,7 @@ export type UploadJobStatus =
   | 'complete'
   | 'failed';
 
-export type ActorType = 'personal' | 'business';
+export type ActorType = 'personal' | 'creator' | 'business';
 
 export interface UploadJobProgress {
   totalFiles: number;
