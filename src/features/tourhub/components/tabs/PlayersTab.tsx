@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings } from '../../hooks/useWorldRankings';
+import { useCollegeLookup } from '../../hooks/useCollegeMedia';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import {
   FeaturedPlayersCarousel,
@@ -60,8 +61,9 @@ export function PlayersTab() {
   const { data: players, isLoading: playersLoading } = useTourPlayers();
   const { data: playerStats, isLoading: statsLoading } = useTourPlayerStatistics(season?.id);
   const { rankedOnly: worldRankedPlayers, isLoading: worldRankLoading } = useWorldRankings();
+  const { getCollege, isLoading: collegeLoading } = useCollegeLookup();
 
-  const isLoading = playersLoading || statsLoading || worldRankLoading;
+  const isLoading = playersLoading || statsLoading || worldRankLoading || collegeLoading;
 
   // Create stats lookup map with world rank data
   const statsMap = useMemo(() => {
@@ -333,6 +335,7 @@ export function PlayersTab() {
               key={player.id}
               player={player}
               stats={statsMap.get(player.id)}
+              college={getCollege(player.college)}
               statDisplay={statDisplay}
             />
           ))}
