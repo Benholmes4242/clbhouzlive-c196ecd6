@@ -1,5 +1,6 @@
 /**
  * EchoEmptyState - Hero panel with prompt chips for first-use
+ * Uses design tokens for theming
  */
 
 import React from 'react';
@@ -37,13 +38,9 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
     >
       {/* Hero glass card */}
       <div 
-        className="w-full max-w-[340px] rounded-3xl p-6 text-center"
+        className="w-full max-w-[340px] rounded-3xl p-6 text-center bg-card/75 backdrop-blur-xl border border-border/30"
         style={{
-          background: 'rgba(255, 255, 255, 0.75)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(0, 0, 0, 0.04)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03)',
+          boxShadow: '0 8px 32px hsl(var(--foreground) / 0.06), 0 2px 8px hsl(var(--foreground) / 0.03)',
         }}
       >
         {/* Icon badge */}
@@ -51,28 +48,22 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
           <div 
             className="w-14 h-14 rounded-full flex items-center justify-center"
             style={{ 
-              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%)',
-              border: '1px solid rgba(168, 85, 247, 0.15)',
-              boxShadow: '0 4px 16px rgba(168, 85, 247, 0.1)',
+              background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%) / 0.12) 0%, hsl(var(--echo-accent-dark, 262 83% 58%) / 0.08) 100%)',
+              border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.15)',
+              boxShadow: '0 4px 16px hsl(var(--echo-accent, 270 60% 60%) / 0.1)',
             }}
           >
-            <Sparkles className="w-7 h-7" style={{ color: '#a855f7' }} />
+            <Sparkles className="w-7 h-7 text-[hsl(var(--echo-accent,270_60%_60%))]" />
           </div>
         </div>
 
         {/* Title */}
-        <h3 
-          className="text-[20px] font-semibold mb-2"
-          style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
-        >
+        <h3 className="text-[20px] font-semibold mb-2 text-foreground" style={{ letterSpacing: '-0.02em' }}>
           Ask Echo
         </h3>
 
         {/* Subcopy */}
-        <p 
-          className="text-[14px] leading-relaxed mb-6"
-          style={{ color: '#64748b' }}
-        >
+        <p className="text-[14px] leading-relaxed mb-6 text-muted-foreground">
           Instant golf answers — distances, rules, course intel, gear, and trip planning.
         </p>
 
@@ -84,12 +75,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
               <button
                 key={chip.text}
                 onClick={() => handleChipClick(chip.text)}
-                className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95"
-                style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
-                  color: '#64748b',
-                }}
+                className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 border border-border text-muted-foreground hover:bg-muted"
               >
                 {chip.text}
               </button>
@@ -102,12 +88,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
               <button
                 key={chip.text}
                 onClick={() => handleChipClick(chip.text)}
-                className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95"
-                style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
-                  color: '#64748b',
-                }}
+                className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 border border-border text-muted-foreground hover:bg-muted"
               >
                 {chip.text}
               </button>
@@ -118,11 +99,10 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
         {/* Primary CTA */}
         <button
           onClick={handleCTAClick}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-full text-[14px] font-semibold transition-all active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-full text-[14px] font-semibold transition-all active:scale-[0.98] text-white"
           style={{
-            background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
-            color: 'white',
-            boxShadow: '0 4px 16px rgba(168, 85, 247, 0.3)',
+            background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%)) 0%, hsl(var(--echo-accent-dark, 262 83% 58%)) 100%)',
+            boxShadow: '0 4px 16px hsl(var(--echo-accent, 270 60% 60%) / 0.3)',
           }}
         >
           Start a conversation

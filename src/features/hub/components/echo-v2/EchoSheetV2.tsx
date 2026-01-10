@@ -1,7 +1,7 @@
 /**
  * EchoSheetV2 - Premium AI assistant sheet
  * 
- * Matches Hub design language:
+ * Matches Hub design language with design tokens:
  * - Frosted glass aesthetics
  * - Clean typography
  * - Premium animations
@@ -13,11 +13,11 @@ import { createPortal } from 'react-dom';
 import { X, Sparkles, MoreVertical, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
+import { toast } from 'sonner';
 import { useEchoConversation } from '@/features/echo/hooks/useEchoConversation';
 import { EchoMessageList } from './EchoMessageList';
 import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
-import '../../home/hubThemeLight.css';
 
 interface EchoSheetV2Props {
   isOpen: boolean;
@@ -43,6 +43,7 @@ export function EchoSheetV2({
     isStreaming,
     streamingContent,
     abortStream,
+    resetConversation,
   } = useEchoConversation({ resetOnMount: true });
 
   // Scroll-lock
@@ -96,6 +97,15 @@ export function EchoSheetV2({
     }
   }, [isOpen]);
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!showMenu) return;
+    
+    const handleClickOutside = () => setShowMenu(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showMenu]);
+
   const handleClose = useCallback(() => {
     haptic('light');
     onClose();
@@ -109,38 +119,41 @@ export function EchoSheetV2({
     setInput('');
   }, [input, isStreaming, sendMessage]);
 
+  // Safe chip/follow-up handler that respects streaming state
+  const sendPrompt = useCallback((prompt: string) => {
+    if (isStreaming) {
+      toast.info('Echo is still responding...');
+      return;
+    }
+    sendMessage(prompt);
+    setInput('');
+  }, [isStreaming, sendMessage]);
+
   const handleChipClick = useCallback((prompt: string) => {
-    setInput(prompt);
-    // Auto-send after a brief delay
-    setTimeout(() => {
-      sendMessage(prompt);
-      setInput('');
-    }, 100);
-  }, [sendMessage]);
+    haptic('light');
+    sendPrompt(prompt);
+  }, [sendPrompt]);
 
   const handleFollowUp = useCallback((text: string) => {
-    setInput(text);
-    setTimeout(() => {
-      sendMessage(text);
-      setInput('');
-    }, 100);
-  }, [sendMessage]);
+    haptic('light');
+    sendPrompt(text);
+  }, [sendPrompt]);
 
   const handleFocusInput = useCallback(() => {
     composerInputRef.current?.focus({ preventScroll: true });
   }, []);
 
-  const handleClearChat = useCallback(() => {
+  const handleClearChat = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
     haptic('medium');
     setShowMenu(false);
-    // The conversation resets on mount, so we close and reopen
-    // For now, just close the menu - full clear requires page reload
-    try {
-      localStorage.removeItem('echo-current-conversation');
-      window.location.reload();
-    } catch (e) {
-      console.warn('Could not clear chat:', e);
-    }
+    resetConversation();
+    toast.success('Chat cleared');
+  }, [resetConversation]);
+
+  const handleMenuClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(prev => !prev);
   }, []);
 
   const hasMessages = messages.length > 0 || isStreaming;
@@ -159,12 +172,7 @@ export function EchoSheetV2({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[10001]"
-            style={{
-              background: 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}
+            className="fixed inset-0 z-[10001] bg-black/35 backdrop-blur-sm"
             onClick={handleClose}
           />
 
@@ -174,43 +182,28 @@ export function EchoSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden"
-            style={{
-              height: '92svh',
-              maxHeight: '92svh',
-              background: '#F8FAFC',
-            }}
+            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden bg-background"
+            style={{ height: '92svh', maxHeight: '92svh' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Grabber */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div 
-                className="w-9 h-[3px] rounded-full"
-                style={{ background: 'rgba(0, 0, 0, 0.1)' }}
-              />
+              <div className="w-9 h-[3px] rounded-full bg-border" />
             </div>
 
             {/* Header */}
-            <div 
-              className="flex items-center justify-between px-5 pb-3 flex-shrink-0"
-              style={{ 
-                borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
-              }}
-            >
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0 border-b border-border/30">
               <div className="flex items-center gap-2">
                 <div 
                   className="w-7 h-7 rounded-full flex items-center justify-center"
                   style={{ 
-                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%)',
-                    border: '1px solid rgba(168, 85, 247, 0.15)',
+                    background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%) / 0.12) 0%, hsl(var(--echo-accent-dark, 262 83% 58%) / 0.08) 100%)',
+                    border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.15)',
                   }}
                 >
-                  <Sparkles className="w-3.5 h-3.5" style={{ color: '#a855f7' }} />
+                  <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--echo-accent,270_60%_60%))]" />
                 </div>
-                <h2 
-                  className="text-[17px] font-semibold"
-                  style={{ color: '#1e293b', letterSpacing: '-0.01em' }}
-                >
+                <h2 className="text-[17px] font-semibold text-foreground" style={{ letterSpacing: '-0.01em' }}>
                   Echo
                 </h2>
               </div>
@@ -220,34 +213,24 @@ export function EchoSheetV2({
                 {hasMessages && (
                   <div className="relative">
                     <button
-                      onClick={() => setShowMenu(!showMenu)}
-                      className="p-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                      onClick={handleMenuClick}
+                      className="p-2 rounded-full transition-all duration-150 hover:bg-muted active:scale-95"
                     >
-                      <MoreVertical 
-                        className="w-5 h-5"
-                        style={{ color: 'rgba(100, 116, 139, 0.6)' }}
-                      />
+                      <MoreVertical className="w-5 h-5 text-muted-foreground" />
                     </button>
                     
-                    {/* Dropdown */}
+                    {/* Dropdown - portal to ensure proper layering */}
                     <AnimatePresence>
                       {showMenu && (
                         <motion.div
                           initial={{ opacity: 0, y: -8, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                          className="absolute right-0 top-full mt-1 w-40 rounded-xl overflow-hidden"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.95)',
-                            backdropFilter: 'blur(12px)',
-                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                            border: '1px solid rgba(0, 0, 0, 0.06)',
-                          }}
+                          className="absolute right-0 top-full mt-1 w-40 rounded-xl overflow-hidden bg-popover border border-border shadow-lg z-[10003]"
                         >
                           <button
                             onClick={handleClearChat}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50"
-                            style={{ color: '#ef4444' }}
+                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-destructive/10 text-destructive"
                           >
                             <Trash2 className="w-4 h-4" />
                             Clear chat
@@ -261,12 +244,9 @@ export function EchoSheetV2({
                 {/* Close button */}
                 <button
                   onClick={handleClose}
-                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-muted active:scale-95"
                 >
-                  <X 
-                    className="w-5 h-5"
-                    style={{ color: 'rgba(100, 116, 139, 0.6)' }}
-                  />
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
             </div>
@@ -288,6 +268,7 @@ export function EchoSheetV2({
 
             {/* Composer - Always visible */}
             <EchoComposer
+              ref={composerInputRef}
               value={input}
               onChange={setInput}
               onSend={handleSend}

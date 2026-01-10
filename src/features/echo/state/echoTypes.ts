@@ -14,6 +14,7 @@ export interface EchoMessage {
     tokens?: number;
     error?: string;
     latency?: number;
+    aborted?: boolean;
   };
 }
 

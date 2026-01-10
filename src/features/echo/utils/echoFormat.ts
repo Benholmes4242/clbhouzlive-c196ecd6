@@ -4,7 +4,10 @@
  */
 
 /**
- * Remove "As of YYYY-MM-DD" lines and other noise from Echo responses
+ * Sanitize Echo text for markdown rendering
+ * - Remove "As of YYYY-MM-DD" lines
+ * - Clean up awkward bold/italic patterns
+ * - Normalize whitespace
  */
 export function sanitizeEchoText(text: string): string {
   if (!text) return '';
@@ -19,6 +22,17 @@ export function sanitizeEchoText(text: string): string {
   
   // Remove "Current as of" patterns  
   cleaned = cleaned.replace(/Current as of[:\s]*\d{4}-\d{2}-\d{2}/gi, '');
+  
+  // Fix awkward single-word bold (e.g., **word** at start of sentence that looks weird)
+  // Only fix cases where it's just one word wrapped weirdly
+  cleaned = cleaned.replace(/\*\*([A-Za-z]{1,12})\*\*(?=\s*[—–-])/g, '$1');
+  
+  // Fix underline patterns that shouldn't be there (e.g., ___text___)
+  cleaned = cleaned.replace(/_{3,}([^_]+)_{3,}/g, '$1');
+  
+  // Fix double-emphasis combos (e.g., **_text_** or _**text**_)
+  cleaned = cleaned.replace(/\*\*_([^_*]+)_\*\*/g, '**$1**');
+  cleaned = cleaned.replace(/_\*\*([^_*]+)\*\*_/g, '**$1**');
   
   // Clean up excessive whitespace/newlines left behind
   cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
@@ -65,10 +79,12 @@ export function generateFollowUps(lastResponse: string): string[] {
 }
 
 /**
- * Simple markdown-safe rendering config
- * Only allows: paragraphs, bullets, bold, italics
+ * Markdown allowlist for react-markdown
  */
-export const ECHO_MARKDOWN_CONFIG = {
-  allowedElements: ['p', 'ul', 'ol', 'li', 'strong', 'em', 'br'],
-  disallowedElements: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'u', 'code', 'pre', 'blockquote'],
-};
+export const ECHO_ALLOWED_ELEMENTS = [
+  'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'span'
+];
+
+export const ECHO_DISALLOWED_ELEMENTS = [
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'u', 'pre', 'blockquote', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'
+];

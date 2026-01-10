@@ -3,7 +3,7 @@
  * Manages a single conversation with messages and AI streaming
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { nanoid } from 'nanoid';
 import type { EchoMessage } from '../state/echoTypes';
 import { useAIStream } from './useAIStream';
@@ -14,6 +14,7 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
   const [messages, setMessages] = useState<EchoMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
+  const [wasAborted, setWasAborted] = useState(false);
   const { sendMessage: sendToAI, abort } = useAIStream();
 
   // Load messages from localStorage on mount (or reset if resetOnMount is true)
@@ -52,6 +53,9 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
   }, [messages, resetOnMount]);
 
   const sendMessage = useCallback(async (content: string) => {
+    // Prevent double-sends while streaming
+    if (isStreaming) return;
+
     const userMessage: EchoMessage = {
       id: nanoid(),
       role: 'user',
@@ -62,6 +66,7 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
     setMessages(prev => [...prev, userMessage]);
     setIsStreaming(true);
     setStreamingContent('');
+    setWasAborted(false);
 
     const assistantMessageId = nanoid();
     let accumulatedContent = '';
@@ -82,22 +87,7 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
               content: accumulatedContent,
               createdAt: new Date().toISOString(),
             };
-            setMessages(prev => {
-              const next = [...prev, assistantMessage];
-              
-              // Smooth scroll to bottom after message is added
-              requestAnimationFrame(() => {
-                const container = document.querySelector('[data-echo-scroll-container]');
-                if (container) {
-                  container.scrollTo({
-                    top: (container as HTMLElement).scrollHeight,
-                    behavior: 'smooth',
-                  });
-                }
-              });
-              
-              return next;
-            });
+            setMessages(prev => [...prev, assistantMessage]);
             setIsStreaming(false);
             setStreamingContent('');
           },
@@ -120,13 +110,40 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [messages, sendToAI]);
+  }, [messages, sendToAI, isStreaming]);
 
   const abortStream = useCallback(() => {
     abort();
+    setWasAborted(true);
+    
+    // Keep partial content as a message marked as stopped
+    if (streamingContent.trim()) {
+      const partialMessage: EchoMessage = {
+        id: nanoid(),
+        role: 'assistant',
+        content: streamingContent,
+        createdAt: new Date().toISOString(),
+        meta: { aborted: true },
+      };
+      setMessages(prev => [...prev, partialMessage]);
+    }
+    
     setIsStreaming(false);
     setStreamingContent('');
-  }, [abort]);
+  }, [abort, streamingContent]);
+
+  // Reset conversation without page reload
+  const resetConversation = useCallback(() => {
+    setMessages([]);
+    setStreamingContent('');
+    setIsStreaming(false);
+    setWasAborted(false);
+    try {
+      localStorage.removeItem('echo-current-conversation');
+    } catch (e) {
+      console.warn('[Echo] Failed to clear stored conversation', e);
+    }
+  }, []);
 
   return {
     messages,
@@ -134,5 +151,7 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
     isStreaming,
     streamingContent,
     abortStream,
+    resetConversation,
+    wasAborted,
   };
 }
