@@ -2,12 +2,13 @@
  * useDiscoverTrips - Uses trip_participants.rsvp_status as single source of truth
  * 
  * Key features:
+ * - Uses discover_trips_anon view for server-side search (name + description + host home_club)
  * - Excludes trips where user has rsvp_status='rejected'
  * - Returns anonymous host blurb (no identity)
  * - Tracks user's request status from trip_participants only
  */
 
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export type DiscoverVisibility = 'all' | 'public' | 'friends' | 'club';
@@ -77,6 +78,15 @@ function buildFiltersKey(filters: DiscoverTripsFilters): string {
   });
 }
 
+/**
+ * Invalidate all discover-trips queries regardless of filter combination
+ */
+export function invalidateDiscoverTrips(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({
+    predicate: (query) => query.queryKey[0] === 'discover-trips',
+  });
+}
+
 export function useDiscoverTrips(filters: DiscoverTripsFilters) {
   const filtersKey = buildFiltersKey(filters);
 
@@ -93,22 +103,12 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
       const rangeStart = filters.customStartAt || startOfTodayISO();
       const rangeEnd = filters.customEndAt || endOfRangeISO(when);
 
-      // Base query - select trip fields
+      // Use discover_trips_anon view for server-side search
+      const search = (filters.search ?? '').trim();
+
       let q = supabase
-        .from('trips')
-        .select(`
-          id,
-          name,
-          description,
-          start_date,
-          end_date,
-          visibility,
-          cover_image_url,
-          created_by,
-          capacity,
-          status
-        `)
-        .eq('status', 'active')
+        .from('discover_trips_anon')
+        .select('*')
         .gte('start_date', rangeStart)
         .lte('start_date', rangeEnd)
         .order('start_date', { ascending: true })
@@ -125,18 +125,19 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
         q = q.eq('visibility', vis);
       }
 
-      // Search: name ILIKE
-      const search = (filters.search ?? '').trim();
+      // Server-side search using the combined search_text field
       if (search.length >= 2) {
-        q = q.ilike('name', `%${search}%`);
+        q = q.ilike('search_text', `%${search}%`);
       }
 
-      const { data, error } = await q;
-      if (error) throw error;
+      const { data: trips, error } = await q;
+      if (error) {
+        console.error('[useDiscoverTrips] Query error:', error);
+        throw error;
+      }
 
-      const trips = (data ?? []) as any[];
-      const tripIds = trips.map(t => t.id);
-      const hostIds = trips.map(t => t.created_by).filter(Boolean);
+      const tripsList = trips ?? [];
+      const tripIds = tripsList.map(t => t.id);
 
       // Get all participant data for these trips (for counting)
       let allParticipantData: any[] = [];
@@ -161,18 +162,8 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
           .map(r => r.trip_id)
       );
 
-      // Get host blurbs (anonymous - no names)
-      let hostBlurbs: any[] = [];
-      if (hostIds.length > 0) {
-        const { data: blurbs } = await supabase
-          .from('public_golfer_blurbs')
-          .select('user_id, handicap, home_club')
-          .in('user_id', hostIds);
-        hostBlurbs = blurbs ?? [];
-      }
-
       // Filter out trips where user was rejected
-      const filteredTrips = trips.filter(t => !rejectedTripIds.has(t.id));
+      const filteredTrips = tripsList.filter(t => !rejectedTripIds.has(t.id));
 
       // Map to DiscoverTrip shape
       const mapped: DiscoverTrip[] = filteredTrips.map((t) => {
@@ -182,12 +173,13 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
         const goingParticipants = tripParticipants.filter(p => p.rsvp_status === 'going').length;
         const goingCount = goingParticipants + 1; // +1 for creator (consistent rule)
         
-        // Calculate slots open: capacity - goingCount
-        const slotsOpen = Math.max(0, (t.capacity ?? 20) - goingCount);
+        // Calculate slots open: capacity - goingCount (trips don't have capacity in this view)
+        const slotsTotal = 20; // Default for trips
+        const slotsOpen = Math.max(0, slotsTotal - goingCount);
 
         // Get user's request status from trip_participants (single source of truth)
         let userRequestStatus: 'none' | 'requested' | 'going' | 'invited' | 'rejected' = 'none';
-        if (userId === t.created_by) {
+        if (userId === t.organizer_id) {
           userRequestStatus = 'going';
         } else {
           const userRow = userParticipantRows.find(r => r.trip_id === t.id);
@@ -196,22 +188,20 @@ export function useDiscoverTrips(filters: DiscoverTripsFilters) {
           }
         }
 
-        const hostBlurb = hostBlurbs.find(b => b.user_id === t.created_by);
-
         return {
           id: t.id,
-          name: t.name ?? 'Untitled Trip',
+          name: t.title ?? 'Untitled Trip',
           destination: t.description,
           startDate: t.start_date,
           endDate: t.end_date,
           visibility: t.visibility ?? 'public',
-          coverImageUrl: t.cover_image_url,
-          slotsTotal: t.capacity ?? 20,
+          coverImageUrl: undefined, // Not in view
+          slotsTotal,
           slotsOpen,
           participantCount: goingCount,
           hostBlurb: {
-            handicap: hostBlurb?.handicap ?? null,
-            homeClub: hostBlurb?.home_club ?? null,
+            handicap: t.organizer_handicap ?? null,
+            homeClub: t.organizer_home_club ?? null,
           },
           userRequestStatus,
         };

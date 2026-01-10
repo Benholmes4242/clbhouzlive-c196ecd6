@@ -1,3 +1,8 @@
+/**
+ * useTotalPendingHostRequests - Get total pending requests across all games a user hosts
+ * 
+ * Uses game_participants.rsvp_status='requested' as single source of truth
+ */
 import { useQueries } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -17,10 +22,10 @@ export function useTotalPendingHostRequests(
       queryKey: ['pendingRequestCount', game.id],
       queryFn: async () => {
         const { count, error } = await supabase
-          .from('game_join_requests')
+          .from('game_participants')
           .select('id', { count: 'exact', head: true })
           .eq('game_id', game.id)
-          .eq('status', 'pending');
+          .eq('rsvp_status', 'requested');
 
         if (error) {
           console.error('[useTotalPendingHostRequests] Error:', error);

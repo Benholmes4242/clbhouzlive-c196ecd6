@@ -3152,6 +3152,13 @@ export type Database = {
             foreignKeyName: "game_join_requests_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
+            referencedRelation: "discover_games_anon"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
@@ -3210,6 +3217,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "game_participants_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "discover_games_anon"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "game_participants_game_id_fkey"
             columns: ["game_id"]
@@ -3275,6 +3289,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "game_reminders_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "discover_games_anon"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "game_reminders_game_id_fkey"
             columns: ["game_id"]
@@ -3387,6 +3408,13 @@ export type Database = {
             foreignKeyName: "game_threads_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: true
+            referencedRelation: "discover_games_anon"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_threads_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
@@ -3462,6 +3490,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "discover_trips_anon"
             referencedColumns: ["id"]
           },
           {
@@ -4001,6 +4036,13 @@ export type Database = {
           state?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "discover_games_anon"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "join_requests_game_id_fkey"
             columns: ["game_id"]
@@ -7288,6 +7330,13 @@ export type Database = {
             foreignKeyName: "trip_participants_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
+            referencedRelation: "discover_trips_anon"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_participants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
             referencedRelation: "trips"
             referencedColumns: ["id"]
           },
@@ -7322,6 +7371,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "trip_timeline_notes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "discover_trips_anon"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trip_timeline_notes_trip_id_fkey"
             columns: ["trip_id"]
@@ -8914,6 +8970,49 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      discover_games_anon: {
+        Row: {
+          course_id: string | null
+          course_name: string | null
+          ends_at: string | null
+          expires_at: string | null
+          host_handicap: number | null
+          host_home_club: string | null
+          host_user_id: string | null
+          id: string | null
+          search_text: string | null
+          slots_open: number | null
+          slots_total: number | null
+          start_time: string | null
+          status: string | null
+          visibility: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_beacons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discover_trips_anon: {
+        Row: {
+          description: string | null
+          end_date: string | null
+          id: string | null
+          organizer_handicap: number | null
+          organizer_home_club: string | null
+          organizer_id: string | null
+          search_text: string | null
+          start_date: string | null
+          status: string | null
+          title: string | null
+          visibility: string | null
+        }
+        Relationships: []
       }
       echo_first_msgs: {
         Row: {
