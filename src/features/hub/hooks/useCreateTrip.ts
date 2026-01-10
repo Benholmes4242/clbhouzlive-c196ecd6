@@ -128,7 +128,7 @@ export function useCreateTrip() {
       if (gameErrors.length > 0) {
         // Cleanup: soft-cancel the orphaned trip (UPDATE works under RLS, DELETE often doesn't)
         console.error('[useCreateTrip] Game creation failed, soft-cancelling trip:', trip.id);
-        await supabase
+        const { error: cancelErr } = await supabase
           .from('trips')
           .update({ 
             status: 'cancelled', 
@@ -137,6 +137,16 @@ export function useCreateTrip() {
           })
           .eq('id', trip.id)
           .eq('created_by', user.id);
+        
+        if (cancelErr) {
+          console.error('[useCreateTrip] Soft-cancel cleanup failed', {
+            code: cancelErr.code,
+            message: cancelErr.message,
+            details: cancelErr.details,
+            hint: cancelErr.hint,
+            tripId: trip.id,
+          });
+        }
         
         throw new Error(`Failed to create ${gameErrors.length} round(s): ${gameErrors[0]?.error?.message || 'Unknown error'}`);
       }
