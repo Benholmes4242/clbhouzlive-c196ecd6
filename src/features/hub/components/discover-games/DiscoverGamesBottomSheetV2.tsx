@@ -6,6 +6,7 @@
  * - Anonymous host blurbs (no identity leaks)
  * - Request to join CTA with proper states
  * - Excludes games where user was declined
+ * - Custom date picker with preset/single/range modes
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -16,14 +17,15 @@ import { haptic } from '@/utils/haptics';
 
 import { useDiscoverGamesV2, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '../../hooks/useDiscoverGamesV2';
 import { useDiscoverTrips } from '../../hooks/useDiscoverTrips';
+import { useRequestJoinGame } from '../../hooks/useRequestJoinGame';
 import { GameDetailSheetV2 } from '../game-detail-v2';
 import { DiscoverSearchInput } from './DiscoverSearchInput';
-import { DiscoverFilterChips } from './DiscoverFilterChips';
+import { DiscoverDatePicker, type DateFilterValue, dateFilterToQueryParams } from './DiscoverDatePicker';
+import { DiscoverVisibilityChip } from './DiscoverVisibilityChip';
 import { DiscoverTabPills, type DiscoverTab } from './DiscoverTabPills';
 import { DiscoverEmptyState } from './DiscoverEmptyState';
 import { GameDiscoverCard } from './GameDiscoverCard';
 import { TripDiscoverCard } from './TripDiscoverCard';
-import { useJoinGame } from '@/features/nearby/hooks/useJoinGame';
 
 interface DiscoverGamesBottomSheetV2Props {
   isOpen: boolean;
@@ -36,7 +38,7 @@ export function DiscoverGamesBottomSheetV2({
 }: DiscoverGamesBottomSheetV2Props) {
   // Filter state
   const [search, setSearch] = useState('');
-  const [when, setWhen] = useState<DiscoverWhen>('any');
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ mode: 'preset', preset: 'any' });
   const [visibility, setVisibility] = useState<DiscoverVisibility>('all');
   const [activeTab, setActiveTab] = useState<DiscoverTab>('games');
 
@@ -52,11 +54,14 @@ export function DiscoverGamesBottomSheetV2({
   const wasOpenRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Build filters
+  // Build filters with custom date support
+  const dateParams = dateFilterToQueryParams(dateFilter);
   const filters: DiscoverGamesFilters = {
     search,
-    when,
+    when: dateFilter.mode === 'preset' ? dateFilter.preset : 'any',
     visibility,
+    customStartAt: dateParams.startAt,
+    customEndAt: dateParams.endAt,
   };
 
   // Query games
@@ -70,26 +75,17 @@ export function DiscoverGamesBottomSheetV2({
   const isLoading = activeTab === 'games' ? gamesQuery.isLoading : tripsQuery.isLoading;
   const isError = activeTab === 'games' ? gamesQuery.isError : tripsQuery.isError;
 
-  // Join game hook
-  const joinGame = useJoinGame(requestingGameId || '');
+  // Join game mutation (refactored)
+  const joinGameMutation = useRequestJoinGame();
 
   const handleRequestJoin = useCallback((gameId: string) => {
     setRequestingGameId(gameId);
-  }, []);
-
-  // Trigger join when requestingGameId changes
-  useEffect(() => {
-    if (requestingGameId) {
-      joinGame.requestJoin();
-    }
-  }, [requestingGameId]);
-
-  // Reset requesting state when join completes
-  useEffect(() => {
-    if (joinGame.state === 'requested' || joinGame.state === 'error') {
-      setTimeout(() => setRequestingGameId(null), 300);
-    }
-  }, [joinGame.state]);
+    joinGameMutation.mutate({ gameId }, {
+      onSettled: () => {
+        setTimeout(() => setRequestingGameId(null), 300);
+      },
+    });
+  }, [joinGameMutation]);
 
   // Lock body scroll
   useEffect(() => {
@@ -129,7 +125,7 @@ export function DiscoverGamesBottomSheetV2({
     if (!isOpen) {
       const timer = setTimeout(() => {
         setSearch('');
-        setWhen('any');
+        setDateFilter({ mode: 'preset', preset: 'any' });
         setVisibility('all');
         setActiveTab('games');
         setSelectedGameId(null);
@@ -291,12 +287,14 @@ export function DiscoverGamesBottomSheetV2({
             </div>
 
             {/* Filter chips */}
-            <div className="px-5 pb-3 flex-shrink-0">
-              <DiscoverFilterChips
-                when={when}
-                visibility={visibility}
-                onWhenChange={setWhen}
-                onVisibilityChange={setVisibility}
+            <div className="px-5 pb-3 flex-shrink-0 flex items-center gap-2">
+              <DiscoverDatePicker
+                value={dateFilter}
+                onChange={setDateFilter}
+              />
+              <DiscoverVisibilityChip
+                value={visibility}
+                onChange={setVisibility}
               />
             </div>
 
@@ -327,7 +325,7 @@ export function DiscoverGamesBottomSheetV2({
                         game={game}
                         onTap={() => handleOpenGameDetail(game.id)}
                         onRequestJoin={() => handleRequestJoin(game.id)}
-                        isRequesting={requestingGameId === game.id && joinGame.isPending}
+                        isRequesting={requestingGameId === game.id && joinGameMutation.isPending}
                       />
                     ))}
 
