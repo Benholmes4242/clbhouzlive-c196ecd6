@@ -1,8 +1,10 @@
 /**
- * create-join-request - Creates a join request using game_participants.rsvp_status
+ * create-trip-join-request - Creates a join request for a trip
  * 
- * Single source of truth: game_participants table with rsvp_status = 'requested'
- * Blocks re-requests after rejection (rsvp_status = 'rejected')
+ * Mirrors create-join-request for games:
+ * - Uses trip_participants table with rsvp_status = 'requested'
+ * - Blocks re-requests after rejection
+ * - Supports optional message field
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1';
@@ -34,18 +36,18 @@ Deno.serve(async (req) => {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error('[create-join-request] Auth error:', authError);
+      console.error('[create-trip-join-request] Auth error:', authError);
       return new Response(
         JSON.stringify({ error: 'UNAUTHORIZED', message: 'Not authenticated' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { game_id, message } = await req.json();
+    const { trip_id, message } = await req.json();
 
-    if (!game_id) {
+    if (!trip_id) {
       return new Response(
-        JSON.stringify({ error: 'INVALID_REQUEST', message: 'game_id is required' }),
+        JSON.stringify({ error: 'INVALID_REQUEST', message: 'trip_id is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -59,50 +61,50 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`[create-join-request] User ${user.id} requesting to join game ${game_id}`);
+    console.log(`[create-trip-join-request] User ${user.id} requesting to join trip ${trip_id}`);
 
-    // Fetch game details
-    const { data: game, error: gameError } = await supabase
-      .from('games')
-      .select('id, host_user_id, status, start_time, slots_total, slots_open')
-      .eq('id', game_id)
+    // Fetch trip details
+    const { data: trip, error: tripError } = await supabase
+      .from('trips')
+      .select('id, created_by, status, start_date, max_participants')
+      .eq('id', trip_id)
       .single();
 
-    if (gameError || !game) {
-      console.error('[create-join-request] Game not found:', gameError);
+    if (tripError || !trip) {
+      console.error('[create-trip-join-request] Trip not found:', tripError);
       return new Response(
-        JSON.stringify({ error: 'GAME_NOT_FOUND', message: 'Game not found' }),
+        JSON.stringify({ error: 'TRIP_NOT_FOUND', message: 'Trip not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Validation checks
-    if (game.host_user_id === user.id) {
+    if (trip.created_by === user.id) {
       return new Response(
-        JSON.stringify({ error: 'IS_HOST', message: 'Cannot request to join your own game' }),
+        JSON.stringify({ error: 'IS_ORGANIZER', message: 'Cannot request to join your own trip' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (!['active', 'scheduled'].includes(game.status)) {
+    if (trip.status !== 'active') {
       return new Response(
-        JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is not available' }),
+        JSON.stringify({ error: 'TRIP_NOT_AVAILABLE', message: 'Trip is not available' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (new Date(game.start_time) < new Date()) {
+    if (new Date(trip.start_date) < new Date()) {
       return new Response(
-        JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game has already started' }),
+        JSON.stringify({ error: 'TRIP_NOT_AVAILABLE', message: 'Trip has already started' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Check existing participant row (single source of truth)
+    // Check existing participant row
     const { data: existingParticipant } = await supabase
-      .from('game_participants')
+      .from('trip_participants')
       .select('id, rsvp_status')
-      .eq('game_id', game_id)
+      .eq('trip_id', trip_id)
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -123,30 +125,38 @@ Deno.serve(async (req) => {
         );
       }
       
-      // Block re-requests after rejection - game disappears from discover
+      // Block re-requests after rejection
       if (status === 'rejected') {
         return new Response(
-          JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is no longer available' }),
+          JSON.stringify({ error: 'TRIP_NOT_AVAILABLE', message: 'Trip is no longer available' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
     }
 
-    // Check slots
-    if (game.slots_open !== null && game.slots_open <= 0) {
-      return new Response(
-        JSON.stringify({ error: 'GAME_NOT_AVAILABLE', message: 'Game is full' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Check capacity
+    if (trip.max_participants !== null) {
+      const { count } = await supabase
+        .from('trip_participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('trip_id', trip_id)
+        .in('rsvp_status', ['going', 'invited']);
+
+      if (count !== null && count >= trip.max_participants) {
+        return new Response(
+          JSON.stringify({ error: 'TRIP_NOT_AVAILABLE', message: 'Trip is full' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Create participant row with rsvp_status = 'requested'
     const { data: participant, error: insertError } = await supabase
-      .from('game_participants')
+      .from('trip_participants')
       .insert({
-        game_id,
+        trip_id,
         user_id: user.id,
-        role: 'player',
+        role: 'participant',
         rsvp_status: 'requested',
         rsvp_updated_at: new Date().toISOString(),
         request_message: sanitizedMessage,
@@ -156,16 +166,16 @@ Deno.serve(async (req) => {
       .single();
 
     if (insertError) {
-      console.error('[create-join-request] Insert error:', insertError);
+      console.error('[create-trip-join-request] Insert error:', insertError);
       return new Response(
         JSON.stringify({ error: 'INSERT_FAILED', message: 'Failed to create request' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`[create-join-request] Request created successfully:`, participant.id);
+    console.log(`[create-trip-join-request] Request created successfully:`, participant.id);
 
-    // Notify host
+    // Notify trip organizer
     const { data: requesterProfile } = await supabase
       .from('user_profiles')
       .select('display_name')
@@ -175,19 +185,19 @@ Deno.serve(async (req) => {
     const requesterName = requesterProfile?.display_name || 'Someone';
     
     // Build notification message with optional message preview
-    let notificationMessage = `${requesterName} wants to join your game.`;
+    let notificationMessage = `${requesterName} wants to join your trip.`;
     if (sanitizedMessage) {
       const preview = sanitizedMessage.slice(0, 80);
       notificationMessage = `${requesterName} wants to join: "${preview}${sanitizedMessage.length > 80 ? '…' : ''}"`;
     }
 
     await supabase.from('notifications').insert({
-      user_id: game.host_user_id,
-      type: 'game_join_requested',
+      user_id: trip.created_by,
+      type: 'trip_join_requested',
       title: 'New join request',
       message: notificationMessage,
       data: {
-        game_id,
+        trip_id,
         requester_id: user.id,
         participant_id: participant.id,
         has_message: !!sanitizedMessage,
@@ -199,7 +209,7 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('[create-join-request] Unexpected error:', error);
+    console.error('[create-trip-join-request] Unexpected error:', error);
     return new Response(
       JSON.stringify({ error: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

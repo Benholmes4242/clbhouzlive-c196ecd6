@@ -2,9 +2,10 @@
  * useRequestJoinGame - Refactored join mutation with proper mutation pattern
  * 
  * Uses predicate-based invalidation for all discover-games query variants
+ * Now supports optional message field for Phase 2
  * 
  * Usage: const { mutate } = useRequestJoinGame();
- *        mutate({ gameId: 'xxx' });
+ *        mutate({ gameId: 'xxx', message: 'optional note' });
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -14,6 +15,7 @@ import { haptic } from '@/utils/haptics';
 
 interface RequestJoinParams {
   gameId: string;
+  message?: string | null;
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -28,11 +30,11 @@ export function useRequestJoinGame() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ gameId }: RequestJoinParams) => {
-      console.log('[useRequestJoinGame] Creating join request for game:', gameId);
+    mutationFn: async ({ gameId, message }: RequestJoinParams) => {
+      console.log('[useRequestJoinGame] Creating join request for game:', gameId, message ? '(with message)' : '');
       
       const { data, error } = await supabase.functions.invoke('create-join-request', {
-        body: { game_id: gameId },
+        body: { game_id: gameId, message: message || null },
       });
 
       if (error) {
@@ -64,7 +66,7 @@ export function useRequestJoinGame() {
       
       // Also invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['game-detail', gameId] });
-      queryClient.invalidateQueries({ queryKey: ['host-pending-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['hostPendingRequests'] });
       queryClient.invalidateQueries({ queryKey: ['user-games'] });
       queryClient.invalidateQueries({ queryKey: ['your-games-trips'] });
     },
