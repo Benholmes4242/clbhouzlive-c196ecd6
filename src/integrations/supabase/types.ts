@@ -2574,7 +2574,7 @@ export type Database = {
           is_playoff: boolean | null
           margin: number | null
           narrative: string | null
-          player_id: string
+          player_id: string | null
           score_to_par: number | null
           tournament_id: string
           updated_at: string
@@ -2588,7 +2588,7 @@ export type Database = {
           is_playoff?: boolean | null
           margin?: number | null
           narrative?: string | null
-          player_id: string
+          player_id?: string | null
           score_to_par?: number | null
           tournament_id: string
           updated_at?: string
@@ -2602,7 +2602,7 @@ export type Database = {
           is_playoff?: boolean | null
           margin?: number | null
           narrative?: string | null
-          player_id?: string
+          player_id?: string | null
           score_to_par?: number | null
           tournament_id?: string
           updated_at?: string
