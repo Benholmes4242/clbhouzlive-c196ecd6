@@ -9,7 +9,7 @@ import { Sparkles, Copy, Check, ChevronRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
 import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
 import { cn } from '@/lib/utils';
-import { HUB_CARD } from './echoStyles';
+import { HUB_CARD, ECHO_ORANGE } from './echoStyles';
 
 interface EchoResponseCardProps {
   content: string;
@@ -55,11 +55,11 @@ export function EchoResponseCard({
       <div 
         className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
         style={{ 
-          background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%) / 0.12) 0%, hsl(var(--echo-accent-dark, 262 83% 58%) / 0.08) 100%)',
-          border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.15)',
+          background: `linear-gradient(135deg, ${ECHO_ORANGE}1F 0%, ${ECHO_ORANGE}14 100%)`,
+          border: `1px solid ${ECHO_ORANGE}26`,
         }}
       >
-        <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--echo-accent,270_60%_60%))]" />
+        <Sparkles className="w-3.5 h-3.5" style={{ color: ECHO_ORANGE }} />
       </div>
 
       {/* Response card */}
@@ -74,11 +74,11 @@ export function EchoResponseCard({
           <div 
             className="flex items-center gap-2 px-3.5 pt-2.5 pb-1 border-b border-black/[0.05]"
           >
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-[hsl(var(--echo-accent,270_60%_60%))]">
+            <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ECHO_ORANGE }}>
               Echo
             </span>
             {isStreaming && (
-              <span className="inline-block w-1.5 h-3 bg-[hsl(var(--echo-accent,270_60%_60%))] opacity-70 animate-pulse rounded-sm" />
+              <span className="inline-block w-1.5 h-3 opacity-70 animate-pulse rounded-sm" style={{ background: ECHO_ORANGE }} />
             )}
             {wasAborted && (
               <span className="text-[10px] text-slate-500">(stopped)</span>
@@ -135,9 +135,9 @@ export function EchoResponseCard({
                 onClick={() => handleFollowUp(chip)}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium transition-all active:scale-95"
                 style={{
-                  background: 'hsl(var(--echo-accent, 270 60% 60%) / 0.06)',
-                  border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.12)',
-                  color: 'hsl(var(--echo-accent-dark, 262 83% 58%))',
+                  background: `${ECHO_ORANGE}0F`,
+                  border: `1px solid ${ECHO_ORANGE}1F`,
+                  color: '#D97706',
                 }}
               >
                 {chip}

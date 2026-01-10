@@ -22,7 +22,7 @@ import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
 import { EchoHistoryTab } from './EchoHistoryTab';
 import { EchoTabPills, type EchoTab } from './EchoTabPills';
-import { HUB_SHEET } from './echoStyles';
+import { HUB_SHEET, ECHO_ORANGE } from './echoStyles';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -265,11 +265,11 @@ export function EchoSheetV2({
                 <div 
                   className="w-7 h-7 rounded-full flex items-center justify-center"
                   style={{ 
-                    background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%) / 0.12) 0%, hsl(var(--echo-accent-dark, 262 83% 58%) / 0.08) 100%)',
-                    border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.15)',
+                    background: `linear-gradient(135deg, ${ECHO_ORANGE}1F 0%, ${ECHO_ORANGE}14 100%)`,
+                    border: `1px solid ${ECHO_ORANGE}26`,
                   }}
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--echo-accent,270_60%_60%))]" />
+                  <Sparkles className="w-3.5 h-3.5" style={{ color: ECHO_ORANGE }} />
                 </div>
                 <h2 className="text-[17px] font-semibold text-slate-900" style={{ letterSpacing: '-0.01em' }}>
                   Echo

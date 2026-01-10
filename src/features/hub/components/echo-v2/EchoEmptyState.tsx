@@ -6,7 +6,7 @@
 import React from 'react';
 import { Sparkles, ChevronRight } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { HUB_CARD, HUB_CHIP } from './echoStyles';
+import { HUB_CARD, HUB_CHIP, ECHO_ORANGE } from './echoStyles';
 import { cn } from '@/lib/utils';
 
 interface EchoEmptyStateProps {
@@ -50,12 +50,12 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
           <div 
             className="w-14 h-14 rounded-full flex items-center justify-center"
             style={{ 
-              background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%) / 0.12) 0%, hsl(var(--echo-accent-dark, 262 83% 58%) / 0.08) 100%)',
-              border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.15)',
-              boxShadow: '0 4px 16px hsl(var(--echo-accent, 270 60% 60%) / 0.1)',
+              background: `linear-gradient(135deg, ${ECHO_ORANGE}1F 0%, ${ECHO_ORANGE}14 100%)`,
+              border: `1px solid ${ECHO_ORANGE}26`,
+              boxShadow: `0 4px 16px ${ECHO_ORANGE}1A`,
             }}
           >
-            <Sparkles className="w-7 h-7 text-[hsl(var(--echo-accent,270_60%_60%))]" />
+            <Sparkles className="w-7 h-7" style={{ color: ECHO_ORANGE }} />
           </div>
         </div>
 
@@ -103,8 +103,8 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
           onClick={handleCTAClick}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-full text-[14px] font-semibold transition-all active:scale-[0.98] text-white"
           style={{
-            background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%)) 0%, hsl(var(--echo-accent-dark, 262 83% 58%)) 100%)',
-            boxShadow: '0 4px 16px hsl(var(--echo-accent, 270 60% 60%) / 0.3)',
+            background: `linear-gradient(135deg, ${ECHO_ORANGE} 0%, #D97706 100%)`,
+            boxShadow: `0 4px 16px ${ECHO_ORANGE}4D`,
           }}
         >
           Start a conversation

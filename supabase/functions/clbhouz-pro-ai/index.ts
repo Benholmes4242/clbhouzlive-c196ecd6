@@ -346,7 +346,7 @@ Based on the submitted frames, I can see:
     const CHAT_EDGE_TIMEOUT_MS = 30000; // align with client 32s
 
     const { route, reason } = decideRoute(message, mode);
-    const routeReason = reason;
+    let routeReason = reason;
     console.log('🤖 Route decision', { route, reason });
 
     const staticSystem = [
