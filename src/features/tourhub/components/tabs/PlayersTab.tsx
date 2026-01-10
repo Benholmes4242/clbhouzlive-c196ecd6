@@ -4,8 +4,8 @@
  * Features:
  * - Featured players carousel at top
  * - Search + filter chips with context descriptions
+ * - Region chips for geographic filtering
  * - Flat editorial rows with labelled metadata
- * - Regional grouping for All Players
  * - Sort control
  * - Human pagination messaging
  */
@@ -23,6 +23,10 @@ import {
   PlayerSortControl,
   type PlayerSortType,
   PlayerRow,
+  RegionChips,
+  type RegionType,
+  getPlayerRegion,
+  getRegionLabel,
 } from '../players';
 
 // Tab context descriptions
@@ -45,29 +49,11 @@ const TAB_CONTEXT: Record<PlayerFilterType, { description: string; tooltip: stri
   },
 };
 
-// Region grouping for better browsing
-const REGIONS: Record<string, string[]> = {
-  'United States': ['United States', 'USA', 'U.S.A.', 'US'],
-  'Europe': ['England', 'Scotland', 'Ireland', 'Northern Ireland', 'Wales', 'Spain', 'France', 'Germany', 'Italy', 'Sweden', 'Norway', 'Denmark', 'Netherlands', 'Belgium', 'Austria', 'Switzerland', 'Portugal', 'Finland', 'Poland', 'Czech Republic'],
-  'Asia-Pacific': ['Australia', 'Japan', 'South Korea', 'Korea', 'China', 'Taiwan', 'Thailand', 'Philippines', 'India', 'New Zealand', 'Singapore', 'Malaysia', 'Indonesia', 'Vietnam'],
-};
-
-function getRegion(country: string | null): string {
-  if (!country) return 'International';
-  const upperCountry = country.toUpperCase();
-  
-  for (const [region, countries] of Object.entries(REGIONS)) {
-    if (countries.some(c => c.toUpperCase() === upperCountry)) {
-      return region;
-    }
-  }
-  return 'International';
-}
-
 export function PlayersTab() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<PlayerFilterType>('all');
   const [sort, setSort] = useState<PlayerSortType>('alphabetical');
+  const [region, setRegion] = useState<RegionType>('all');
   
   const { data: season } = useTourSeason();
   const { data: players, isLoading: playersLoading } = useTourPlayers();
@@ -97,24 +83,26 @@ export function PlayersTab() {
       );
     }
 
-    // Apply filter
+    // Apply region filter
+    if (region !== 'all') {
+      filtered = filtered.filter(p => getPlayerRegion(p.country) === region);
+    }
+
+    // Apply category filter
     switch (filter) {
       case 'top-ranked':
-        // Only players with fedex_rank
         filtered = filtered.filter(p => {
           const stats = statsMap.get(p.id);
           return stats?.fedex_rank && stats.fedex_rank <= 50;
         });
         break;
       case 'most-active':
-        // Players with most events
         filtered = filtered.filter(p => {
           const stats = statsMap.get(p.id);
           return stats?.events_played && stats.events_played >= 10;
         });
         break;
       case 'rookies':
-        // Turned pro in last 3 years
         const currentYear = new Date().getFullYear();
         filtered = filtered.filter(p =>
           p.turned_pro && p.turned_pro >= currentYear - 3
@@ -147,29 +135,7 @@ export function PlayersTab() {
     }
 
     return filtered;
-  }, [players, search, filter, sort, statsMap]);
-
-  // Group players by region (only for 'all' filter without search)
-  const groupedPlayers = useMemo(() => {
-    if (filter !== 'all' || search.length >= 2) {
-      return null; // Don't group when filtered or searching
-    }
-
-    const groups: Record<string, TourPlayer[]> = {
-      'United States': [],
-      'Europe': [],
-      'Asia-Pacific': [],
-      'International': [],
-    };
-
-    processedPlayers.forEach(player => {
-      const region = getRegion(player.country);
-      groups[region].push(player);
-    });
-
-    // Remove empty groups
-    return Object.entries(groups).filter(([_, players]) => players.length > 0);
-  }, [processedPlayers, filter, search]);
+  }, [players, search, filter, sort, region, statsMap]);
 
   // Determine stat display based on filter/sort
   const statDisplay = useMemo(() => {
@@ -216,13 +182,14 @@ export function PlayersTab() {
     return <TourHubEmptyState variant="players" />;
   }
 
-  // Check for empty filtered results (e.g., no ranking data)
-  const hasNoRankingData = filter === 'top-ranked' && processedPlayers.length === 0;
+  // Check for empty filtered results
+  const hasNoRankingData = filter === 'top-ranked' && processedPlayers.length === 0 && region === 'all';
+  const hasNoRegionResults = processedPlayers.length === 0 && region !== 'all';
 
   return (
     <div className="space-y-5">
       {/* Featured Players Carousel */}
-      {playerStats && playerStats.length > 0 && !search && filter === 'all' && (
+      {playerStats && playerStats.length > 0 && !search && filter === 'all' && region === 'all' && (
         <div className="mb-6">
           <FeaturedPlayersCarousel players={players} stats={playerStats} />
         </div>
@@ -274,6 +241,19 @@ export function PlayersTab() {
         <PlayerSortControl value={sort} onChange={setSort} />
       </div>
 
+      {/* Region Chips */}
+      <RegionChips
+        activeRegion={region}
+        onRegionChange={setRegion}
+      />
+
+      {/* Region active helper text */}
+      {region !== 'all' && processedPlayers.length > 0 && (
+        <p className="text-xs text-muted-foreground/70">
+          Showing players from {getRegionLabel(region)}
+        </p>
+      )}
+
       {/* Player List */}
       {hasNoRankingData ? (
         <div className="text-center py-12 space-y-2">
@@ -284,55 +264,27 @@ export function PlayersTab() {
             Check back later for updated rankings.
           </p>
         </div>
+      ) : hasNoRegionResults ? (
+        <div className="text-center py-12 space-y-2">
+          <p className="text-sm text-muted-foreground">
+            No players found for this region and category.
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            Try selecting a different region or category.
+          </p>
+        </div>
       ) : processedPlayers.length > 0 ? (
-        groupedPlayers ? (
-          // Grouped by region (All Players without search)
-          <div className="space-y-6">
-            {groupedPlayers.map(([region, regionPlayers]) => (
-              <div key={region}>
-                {/* Region Header */}
-                <div className="flex items-baseline gap-2 mb-3 pb-2 border-b border-border/30">
-                  <h3 className="text-sm font-medium text-foreground">
-                    {region}
-                  </h3>
-                  <span className="text-xs text-muted-foreground/60">
-                    {regionPlayers.length} player{regionPlayers.length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-                
-                {/* Region Players */}
-                <div className="divide-y divide-border/20">
-                  {regionPlayers.slice(0, 25).map((player) => (
-                    <PlayerRow
-                      key={player.id}
-                      player={player}
-                      stats={statsMap.get(player.id)}
-                      statDisplay={statDisplay}
-                    />
-                  ))}
-                </div>
-                
-                {regionPlayers.length > 25 && (
-                  <p className="text-xs text-muted-foreground/50 text-center py-2">
-                    +{regionPlayers.length - 25} more players
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          // Flat list (filtered or searching)
-          <div className="divide-y divide-border/30">
-            {processedPlayers.slice(0, 50).map((player) => (
-              <PlayerRow
-                key={player.id}
-                player={player}
-                stats={statsMap.get(player.id)}
-                statDisplay={statDisplay}
-              />
-            ))}
-          </div>
-        )
+        // Flat list (always, no more region grouping)
+        <div className="divide-y divide-border/30">
+          {processedPlayers.slice(0, 50).map((player) => (
+            <PlayerRow
+              key={player.id}
+              player={player}
+              stats={statsMap.get(player.id)}
+              statDisplay={statDisplay}
+            />
+          ))}
+        </div>
       ) : (
         <div className="text-center py-12 space-y-2">
           <p className="text-sm text-muted-foreground">
@@ -345,7 +297,7 @@ export function PlayersTab() {
       )}
 
       {/* Human pagination message */}
-      {processedPlayers.length > 50 && !groupedPlayers && (
+      {processedPlayers.length > 50 && (
         <p className="text-center text-sm text-muted-foreground/70 py-4">
           Scroll to explore the field, or search to find a specific player.
         </p>
