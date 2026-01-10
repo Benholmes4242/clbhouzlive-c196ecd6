@@ -46,10 +46,41 @@ export interface TourPlayer {
   photo_url: string | null;
 }
 
+// Raw data structure from SportsRadar
+interface RawStatistics {
+  world_rank?: number;
+  points?: number;
+  points_rank?: number;
+  earnings?: number;
+  earnings_rank?: number;
+  scoring_avg?: number;
+  drive_avg?: number;
+  drive_acc?: number;
+  gir_pct?: number;
+  putt_avg?: number;
+  sand_saves_pct?: number;
+  scrambling_pct?: number;
+  birdies_per_round?: number;
+  holes_per_eagle?: number;
+  strokes_gained?: number;
+  strokes_gained_tee_green?: number;
+  strokes_gained_total?: number;
+  first_place?: number;
+  second_place?: number;
+  third_place?: number;
+  top_10?: number;
+  top_25?: number;
+  cuts?: number;
+  cuts_made?: number;
+  events_played?: number;
+  withdrawals?: number;
+}
+
 export interface TourPlayerStatistics {
   id: string;
   player_id: string;
   season_id: string;
+  // Core stats from columns
   fedex_points: number | null;
   fedex_rank: number | null;
   events_played: number | null;
@@ -63,6 +94,13 @@ export interface TourPlayerStatistics {
   greens_in_reg: number | null;
   putting_average: number | null;
   sand_saves: number | null;
+  // Extracted from raw_data
+  world_rank: number | null;
+  earnings: number | null;
+  earnings_rank: number | null;
+  scrambling: number | null;
+  birdies_per_round: number | null;
+  strokes_gained_total: number | null;
   // Joined player data
   player?: TourPlayer;
 }
@@ -186,6 +224,33 @@ export function useTourPlayer(playerId: string) {
   });
 }
 
+// Helper: Extract and transform raw_data statistics
+function extractRawStats(rawData: { statistics?: RawStatistics } | null): Partial<TourPlayerStatistics> {
+  if (!rawData?.statistics) return {};
+  
+  const stats = rawData.statistics;
+  return {
+    world_rank: stats.world_rank && stats.world_rank > 0 ? stats.world_rank : null,
+    earnings: stats.earnings ?? null,
+    earnings_rank: stats.earnings_rank ?? null,
+    scrambling: stats.scrambling_pct ?? null,
+    birdies_per_round: stats.birdies_per_round ?? null,
+    strokes_gained_total: stats.strokes_gained_total ?? null,
+    // Fill in missing column data from raw
+    scoring_average: stats.scoring_avg ?? null,
+    driving_distance: stats.drive_avg ?? null,
+    driving_accuracy: stats.drive_acc ?? null,
+    greens_in_reg: stats.gir_pct ?? null,
+    putting_average: stats.putt_avg ?? null,
+    sand_saves: stats.sand_saves_pct ?? null,
+    top_10s: stats.top_10 ?? null,
+    top_25s: stats.top_25 ?? null,
+    wins: stats.first_place ?? null,
+    fedex_points: stats.points ?? null,
+    fedex_rank: stats.points_rank ?? null,
+  };
+}
+
 // Hook: Get player statistics with player info joined
 export function useTourPlayerStatistics(seasonId?: string) {
   return useQuery({
@@ -220,21 +285,48 @@ export function useTourPlayerStatistics(seasonId?: string) {
       
       if (playersError) {
         console.error('Error fetching players for stats:', playersError);
-        return stats as TourPlayerStatistics[];
       }
       
-      // Join player data
+      // Join player data and extract raw stats
       const playerMap = new Map(players?.map(p => [p.id, p]) || []);
-      const enrichedStats = stats.map(stat => ({
-        ...stat,
-        player: playerMap.get(stat.player_id),
-      })) as TourPlayerStatistics[];
+      const enrichedStats = stats.map(stat => {
+        const rawExtracted = extractRawStats(stat.raw_data as { statistics?: RawStatistics } | null);
+        
+        return {
+          ...stat,
+          // Use column data first, fall back to raw_data
+          fedex_points: stat.fedex_points ?? rawExtracted.fedex_points ?? null,
+          fedex_rank: stat.fedex_rank ?? rawExtracted.fedex_rank ?? null,
+          wins: stat.wins ?? rawExtracted.wins ?? null,
+          top_10s: stat.top_10s ?? rawExtracted.top_10s ?? null,
+          top_25s: stat.top_25s ?? rawExtracted.top_25s ?? null,
+          scoring_average: stat.scoring_average ?? rawExtracted.scoring_average ?? null,
+          driving_distance: stat.driving_distance ?? rawExtracted.driving_distance ?? null,
+          driving_accuracy: stat.driving_accuracy ?? rawExtracted.driving_accuracy ?? null,
+          greens_in_reg: stat.greens_in_reg ?? rawExtracted.greens_in_reg ?? null,
+          putting_average: stat.putting_average ?? rawExtracted.putting_average ?? null,
+          sand_saves: stat.sand_saves ?? rawExtracted.sand_saves ?? null,
+          // Always from raw
+          world_rank: rawExtracted.world_rank ?? null,
+          earnings: rawExtracted.earnings ?? null,
+          earnings_rank: rawExtracted.earnings_rank ?? null,
+          scrambling: rawExtracted.scrambling ?? null,
+          birdies_per_round: rawExtracted.birdies_per_round ?? null,
+          strokes_gained_total: rawExtracted.strokes_gained_total ?? null,
+          player: playerMap.get(stat.player_id),
+        } as TourPlayerStatistics;
+      });
       
-      // Sort by fedex_rank if available, otherwise by events_played
+      // Sort by world_rank (properly handling 0/null as unranked)
       return enrichedStats.sort((a, b) => {
-        if (a.fedex_rank && b.fedex_rank) return a.fedex_rank - b.fedex_rank;
-        if (a.fedex_rank) return -1;
-        if (b.fedex_rank) return 1;
+        const aRank = a.world_rank && a.world_rank > 0 ? a.world_rank : Infinity;
+        const bRank = b.world_rank && b.world_rank > 0 ? b.world_rank : Infinity;
+        if (aRank !== bRank) return aRank - bRank;
+        // Secondary sort by fedex_rank
+        const aFedex = a.fedex_rank && a.fedex_rank > 0 ? a.fedex_rank : Infinity;
+        const bFedex = b.fedex_rank && b.fedex_rank > 0 ? b.fedex_rank : Infinity;
+        if (aFedex !== bFedex) return aFedex - bFedex;
+        // Tertiary sort by events played
         return (b.events_played || 0) - (a.events_played || 0);
       });
     },
