@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, GraduationCap, Search, Trophy, TrendingUp } from 'lucide-react';
-import { TourHubShell, PremiumEmptyState } from '../components';
+import { ArrowLeft, GraduationCap, TrendingUp } from 'lucide-react';
+import { TourHubShell } from '../components';
+import { CollegeSearch, CollegeLeaderboard } from '../components/college';
 
 /**
  * College Golf Hub - Main landing page for college golf content.
- * Sprint 1: Placeholder structure, to be expanded with leaderboards in Sprint 2/3.
+ * Features search, leaderboards by various metrics.
  */
 export function CollegeGolfHubPage() {
   return (
@@ -37,38 +38,21 @@ export function CollegeGolfHubPage() {
         </div>
       </header>
       
-      {/* Search Section - Coming Soon */}
-      <section className="mb-6">
-        <div className="bg-surface-card border border-border-subtle rounded-sq-lg p-4">
-          <div className="flex items-center gap-3 text-text-tertiary">
-            <Search className="w-5 h-5" />
-            <span className="text-body-sm">Search colleges coming soon...</span>
-          </div>
-        </div>
+      {/* Search Section */}
+      <section className="mb-8">
+        <CollegeSearch />
       </section>
       
-      {/* Featured Colleges Placeholder */}
-      <section className="mb-6">
-        <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <Trophy className="w-5 h-5 text-text-tertiary" />
-          Featured Colleges
-        </h2>
-        <PremiumEmptyState
-          title="Coming soon"
-          description="Top performing college programs ranked by PGA Tour wins, earnings, and active alumni."
-        />
-      </section>
-      
-      {/* Leaderboards Preview Placeholder */}
+      {/* Leaderboards */}
       <section className="mb-6">
         <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-text-tertiary" />
           College Leaderboards
         </h2>
-        <PremiumEmptyState
-          title="Leaderboards coming soon"
-          description="Compare colleges by total earnings, wins, cuts made, and average world ranking."
-        />
+        <p className="text-body-sm text-text-secondary mb-4">
+          2025 Season rankings by total alumni performance
+        </p>
+        <CollegeLeaderboard limit={25} />
       </section>
     </TourHubShell>
   );

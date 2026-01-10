@@ -1677,6 +1677,59 @@ export type Database = {
         }
         Relationships: []
       }
+      college_season_stats: {
+        Row: {
+          created_at: string
+          cuts_total: number
+          earnings_total: number
+          events_total: number
+          id: string
+          normalized_name: string
+          player_count: number
+          season_id: string | null
+          top10_total: number
+          top25_total: number
+          updated_at: string
+          wins_total: number
+        }
+        Insert: {
+          created_at?: string
+          cuts_total?: number
+          earnings_total?: number
+          events_total?: number
+          id?: string
+          normalized_name: string
+          player_count?: number
+          season_id?: string | null
+          top10_total?: number
+          top25_total?: number
+          updated_at?: string
+          wins_total?: number
+        }
+        Update: {
+          created_at?: string
+          cuts_total?: number
+          earnings_total?: number
+          events_total?: number
+          id?: string
+          normalized_name?: string
+          player_count?: number
+          season_id?: string | null
+          top10_total?: number
+          top25_total?: number
+          updated_at?: string
+          wins_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "college_season_stats_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "sr_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_likes: {
         Row: {
           comment_id: string
@@ -10099,6 +10152,10 @@ export type Database = {
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
         Returns: undefined
+      }
+      refresh_college_season_stats: {
+        Args: { target_season_id: string }
+        Returns: number
       }
       reinvite_golfer_verification_request:
         | {
