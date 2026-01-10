@@ -1641,6 +1641,42 @@ export type Database = {
         }
         Relationships: []
       }
+      college_media: {
+        Row: {
+          college_name: string
+          country: string | null
+          created_at: string | null
+          id: string
+          logo_url: string | null
+          normalized_name: string
+          short_name: string | null
+          source: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          college_name: string
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          normalized_name: string
+          short_name?: string | null
+          source?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          college_name?: string
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          normalized_name?: string
+          short_name?: string | null
+          source?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       comment_likes: {
         Row: {
           comment_id: string
