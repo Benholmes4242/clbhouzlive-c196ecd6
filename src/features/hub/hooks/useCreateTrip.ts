@@ -86,6 +86,7 @@ export function useCreateTrip() {
       // Create games for each itinerary stop (trips contain games)
       // CRITICAL: If any game fails, we throw to avoid trips with empty timelines
       const gameErrors: { courseId: string; error: any }[] = [];
+      const createdGameIds: string[] = [];
       
       for (const stop of draft.itinerary) {
         const stopDate = new Date(draft.startDate);
@@ -108,9 +109,11 @@ export function useCreateTrip() {
 
         console.log('[useCreateTrip] Creating game for stop:', stop.courseName, gamePayload);
 
-        const { error: gameError } = await supabase
+        const { data: game, error: gameError } = await supabase
           .from('games')
-          .insert(gamePayload);
+          .insert(gamePayload)
+          .select('id')
+          .single();
 
         if (gameError) {
           console.error('[useCreateTrip] Failed to create trip game:', {
@@ -121,6 +124,9 @@ export function useCreateTrip() {
             payload: gamePayload,
           });
           gameErrors.push({ courseId: stop.courseId, error: gameError });
+        } else if (game) {
+          createdGameIds.push(game.id);
+          console.log('[useCreateTrip] Game created:', game.id);
         }
       }
 
