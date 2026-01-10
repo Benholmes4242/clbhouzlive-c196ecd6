@@ -11,7 +11,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, MoreVertical, ExternalLink, LogOut, Trash2, Share2, Loader2 } from 'lucide-react';
+import { ChevronLeft, MoreVertical, ExternalLink, LogOut, Trash2, Share2, Loader2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
@@ -128,6 +128,16 @@ export function TripDetailSheetV2({
     setGameSheetOpen(false);
     setTimeout(() => setSelectedGameId(null), 300);
   }, []);
+
+  // Handler for adding a round (opens create game flow with trip context)
+  const handleAddRound = useCallback(() => {
+    haptic('light');
+    // Navigate to create game with trip context
+    onClose();
+    setTimeout(() => {
+      navigate(`/create-game?tripId=${tripId}`);
+    }, 150);
+  }, [onClose, navigate, tripId]);
 
   if (!isOpen) return null;
 
@@ -246,6 +256,12 @@ export function TripDetailSheetV2({
                     <ExternalLink className="w-4 h-4" />
                     Open full page
                   </DropdownMenuItem>
+                  {isHost && (
+                    <DropdownMenuItem className="gap-2">
+                      <Pencil className="w-4 h-4" />
+                      Edit trip
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem className="gap-2">
                     <Share2 className="w-4 h-4" />
                     Share trip
@@ -259,7 +275,7 @@ export function TripDetailSheetV2({
                   {isHost && (
                     <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600">
                       <Trash2 className="w-4 h-4" />
-                      Delete trip
+                      Remove trip
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -315,6 +331,7 @@ export function TripDetailSheetV2({
                       items={timeline} 
                       isLoading={false}
                       onGameTap={handleGameTap}
+                      onAddRound={isHost ? handleAddRound : undefined}
                       todayDayNumber={todayDayNumber}
                       hasMultipleDays={hasMultipleDays}
                       hasTodayInTrip={hasTodayInTrip}
