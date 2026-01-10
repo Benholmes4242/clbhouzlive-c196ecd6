@@ -4,8 +4,18 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { decideRoute, modelDeclined, type Mode } from "./router.ts";
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
-const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
+// Read API keys lazily inside handlers to ensure secrets are loaded
+function getOpenAIKey() {
+  const key = Deno.env.get("OPENAI_API_KEY");
+  if (!key) console.error("❌ OPENAI_API_KEY is missing!");
+  return key || "";
+}
+
+function getPerplexityKey() {
+  const key = Deno.env.get("PERPLEXITY_API_KEY");
+  if (!key) console.error("❌ PERPLEXITY_API_KEY is missing!");
+  return key || "";
+}
 
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
@@ -82,7 +92,7 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, history: Ech
   const messages = [{ role: "system", content: systemPrompt }, ...(history ?? []), { role: "user", content: userPrompt }];
   const resp = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${getOpenAIKey()}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: OPENAI_MODEL, messages, temperature: 0.2 }),
   });
   if (!resp.ok) throw new Error(`OpenAI error: ${await resp.text()}`);
@@ -98,7 +108,7 @@ async function callPerplexity(query: string, nowIso: string, history: EchoReques
   ];
   const resp = await fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${getPerplexityKey()}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
   });
   if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
@@ -252,7 +262,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Authorization': `Bearer ${getOpenAIKey()}`,
             'Content-Type': 'application/json',
           },
           signal: controller.signal,
