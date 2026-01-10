@@ -3242,6 +3242,8 @@ export type Database = {
           id: string
           invited_by: string | null
           joined_at: string | null
+          request_message: string | null
+          request_message_updated_at: string | null
           reserves_slot: boolean
           role: string
           rsvp_status: string | null
@@ -3259,6 +3261,8 @@ export type Database = {
           id?: string
           invited_by?: string | null
           joined_at?: string | null
+          request_message?: string | null
+          request_message_updated_at?: string | null
           reserves_slot?: boolean
           role?: string
           rsvp_status?: string | null
@@ -3276,6 +3280,8 @@ export type Database = {
           id?: string
           invited_by?: string | null
           joined_at?: string | null
+          request_message?: string | null
+          request_message_updated_at?: string | null
           reserves_slot?: boolean
           role?: string
           rsvp_status?: string | null
@@ -7367,6 +7373,8 @@ export type Database = {
           created_at: string
           id: string
           invited_by: string | null
+          request_message: string | null
+          request_message_updated_at: string | null
           role: string
           rsvp_status: string
           rsvp_updated_at: string | null
@@ -7377,6 +7385,8 @@ export type Database = {
           created_at?: string
           id?: string
           invited_by?: string | null
+          request_message?: string | null
+          request_message_updated_at?: string | null
           role?: string
           rsvp_status?: string
           rsvp_updated_at?: string | null
@@ -7387,6 +7397,8 @@ export type Database = {
           created_at?: string
           id?: string
           invited_by?: string | null
+          request_message?: string | null
+          request_message_updated_at?: string | null
           role?: string
           rsvp_status?: string
           rsvp_updated_at?: string | null

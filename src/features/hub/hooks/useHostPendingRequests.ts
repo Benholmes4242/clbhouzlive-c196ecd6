@@ -15,6 +15,7 @@ export interface PendingGameRequest {
   user_id: string;
   rsvp_status: string;
   created_at: string;
+  request_message: string | null;
   type: 'game';
   game: {
     id: string;
@@ -36,6 +37,7 @@ export interface PendingTripRequest {
   user_id: string;
   rsvp_status: string;
   created_at: string;
+  request_message: string | null;
   type: 'trip';
   trip: {
     id: string;
@@ -92,7 +94,7 @@ export function useHostPendingRequests() {
       if (gameIds.length > 0) {
         const { data: participants, error: partError } = await supabase
           .from('game_participants')
-          .select('id, game_id, user_id, rsvp_status, created_at')
+          .select('id, game_id, user_id, rsvp_status, created_at, request_message')
           .in('game_id', gameIds)
           .eq('rsvp_status', 'requested')
           .order('created_at', { ascending: false });
@@ -118,6 +120,7 @@ export function useHostPendingRequests() {
             user_id: p.user_id,
             rsvp_status: p.rsvp_status,
             created_at: p.created_at,
+            request_message: p.request_message || null,
             type: 'game' as const,
             game: gamesMap.get(p.game_id) || { id: p.game_id, course_name: 'Unknown', start_time: null },
             requester: profilesMap.get(p.user_id) || {
@@ -136,7 +139,7 @@ export function useHostPendingRequests() {
       if (tripIds.length > 0) {
         const { data: tripParticipants, error: tripPartError } = await supabase
           .from('trip_participants')
-          .select('id, trip_id, user_id, rsvp_status, created_at')
+          .select('id, trip_id, user_id, rsvp_status, created_at, request_message')
           .in('trip_id', tripIds)
           .eq('rsvp_status', 'requested')
           .order('created_at', { ascending: false });
@@ -162,6 +165,7 @@ export function useHostPendingRequests() {
             user_id: p.user_id,
             rsvp_status: p.rsvp_status,
             created_at: p.created_at,
+            request_message: p.request_message || null,
             type: 'trip' as const,
             trip: tripsMap.get(p.trip_id) || { id: p.trip_id, name: 'Unknown', start_date: null },
             requester: profilesMap.get(p.user_id) || {
