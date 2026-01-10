@@ -10053,6 +10053,7 @@ export type Database = {
         }[]
       }
       normalize_club_key: { Args: { p_name: string }; Returns: string }
+      normalize_college_name: { Args: { name: string }; Returns: string }
       normalize_key: { Args: { p_text: string }; Returns: string }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
