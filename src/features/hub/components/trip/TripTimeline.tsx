@@ -14,6 +14,7 @@ interface TripTimelineProps {
   items: TripTimelineItem[];
   isLoading?: boolean;
   onGameTap?: (gameId: string) => void;
+  onAddRound?: () => void;
   todayDayNumber?: number;
   hasMultipleDays?: boolean;
   hasTodayInTrip?: boolean;
@@ -23,6 +24,7 @@ export function TripTimeline({
   items, 
   isLoading, 
   onGameTap,
+  onAddRound,
   todayDayNumber,
   hasMultipleDays,
   hasTodayInTrip,
@@ -91,13 +93,37 @@ export function TripTimeline({
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-          <Flag className="w-5 h-5 text-muted-foreground" />
+        <div 
+          className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+          style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+        >
+          <Flag className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.6)' }} />
         </div>
-        <h3 className="font-medium text-foreground mb-1">No rounds scheduled yet</h3>
-        <p className="text-sm text-muted-foreground">
-          Add games to build your tour itinerary
+        <h3 
+          className="text-[15px] font-semibold mb-1"
+          style={{ color: '#1e293b' }}
+        >
+          No rounds scheduled yet
+        </h3>
+        <p 
+          className="text-[13px] mb-5"
+          style={{ color: 'rgba(100, 116, 139, 0.7)' }}
+        >
+          Add rounds to build your tour itinerary
         </p>
+        {onAddRound && (
+          <button
+            onClick={onAddRound}
+            className="px-4 py-2 text-[13px] font-semibold rounded-full transition-all active:scale-[0.97]"
+            style={{
+              background: '#1e293b',
+              color: '#ffffff',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+            }}
+          >
+            Add a round
+          </button>
+        )}
       </div>
     );
   }
