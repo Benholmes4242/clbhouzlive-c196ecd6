@@ -8,7 +8,7 @@
  * - V2 pill tabs with subtle elevation
  * - No bounce animation, no background jump
  * 
- * Opens GameDetailSheetV2 on game tap (no route change)
+ * Opens GameDetailSheetV2 / TripDetailSheetV2 on tap (no route change)
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -23,6 +23,7 @@ import { UpcomingTab } from './UpcomingTab';
 import { PastTab } from './PastTab';
 import { TripsTab } from './TripsTab';
 import { GameDetailSheetV2 } from '../game-detail-v2';
+import { TripDetailSheetV2 } from '../trip/TripDetailSheetV2';
 import type { SheetTab } from './types';
 
 interface YourGamesTripsSheetV2Props {
@@ -46,6 +47,10 @@ export function YourGamesTripsSheetV2({
   // Game detail sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [gameSheetOpen, setGameSheetOpen] = useState(false);
+  
+  // Trip detail sheet state
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [tripSheetOpen, setTripSheetOpen] = useState(false);
   
   // Scroll lock refs
   const scrollYRef = useRef(0);
@@ -100,6 +105,8 @@ export function YourGamesTripsSheetV2({
         setSearchQuery('');
         setSelectedGameId(null);
         setGameSheetOpen(false);
+        setSelectedTripId(null);
+        setTripSheetOpen(false);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -116,6 +123,18 @@ export function YourGamesTripsSheetV2({
     setGameSheetOpen(false);
     // Keep selectedGameId for animation, clear after close
     setTimeout(() => setSelectedGameId(null), 300);
+  }, []);
+
+  // Handler for opening trip detail sheet (no navigation)
+  const handleOpenTripDetail = useCallback((tripId: string) => {
+    haptic('light');
+    setSelectedTripId(tripId);
+    setTripSheetOpen(true);
+  }, []);
+
+  const handleCloseTripDetail = useCallback(() => {
+    setTripSheetOpen(false);
+    setTimeout(() => setSelectedTripId(null), 300);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -142,6 +161,9 @@ export function YourGamesTripsSheetV2({
   if (!isOpen) return null;
 
   const portalRoot = document.getElementById('portal-root') || document.body;
+  
+  // Determine if any nested sheet is open for stacking effect
+  const hasStackedSheet = gameSheetOpen || tripSheetOpen;
 
   return createPortal(
     <AnimatePresence>
@@ -168,7 +190,7 @@ export function YourGamesTripsSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${gameSheetOpen ? 'stacked-behind' : ''}`}
+            className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${hasStackedSheet ? 'stacked-behind trip-stacked-behind' : ''}`}
             style={{
               height: '85svh',
               maxHeight: '85svh',
@@ -199,7 +221,7 @@ export function YourGamesTripsSheetV2({
                   className="text-[12px] mt-0.5"
                   style={{ color: 'rgba(100, 116, 139, 0.8)' }}
                 >
-                  All your rounds and tours — in one place.
+                  Everything you've planned — games, trips and who's joined.
                 </p>
               </div>
               
@@ -260,7 +282,7 @@ export function YourGamesTripsSheetV2({
                 <TripsTab
                   searchQuery={searchQuery}
                   onCreateTrip={handleCreateTrip}
-                  onClose={onClose}
+                  onTripTap={handleOpenTripDetail}
                 />
               )}
             </div>
@@ -272,6 +294,15 @@ export function YourGamesTripsSheetV2({
               isOpen={gameSheetOpen}
               onClose={handleCloseGameDetail}
               gameId={selectedGameId}
+            />
+          )}
+
+          {/* Trip Detail Sheet (stacked) */}
+          {selectedTripId && (
+            <TripDetailSheetV2
+              isOpen={tripSheetOpen}
+              onClose={handleCloseTripDetail}
+              tripId={selectedTripId}
             />
           )}
         </>

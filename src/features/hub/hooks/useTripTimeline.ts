@@ -109,38 +109,57 @@ export function useTripTimeline(tripId: string | undefined) {
     enabled: !!tripId,
   });
 
-  // Fetch trip participants
+  // Fetch trip participants using 2-step pattern (no FK join)
   const participantsQuery = useQuery({
     queryKey: ['trip-participants', tripId],
     queryFn: async (): Promise<TripParticipant[]> => {
       if (!tripId) return [];
       
-      const { data, error } = await supabase
+      // Step 1: Get participant rows
+      const { data: tp, error: tpErr } = await supabase
         .from('trip_participants')
-        .select(`
-          id,
-          user_id,
-          role,
-          rsvp_status,
-          user_profiles:user_id (
-            display_name,
-            profile_photo_url
-          )
-        `)
-        .eq('trip_id', tripId);
+        .select('id, user_id, role, rsvp_status')
+        .eq('trip_id', tripId)
+        .limit(50);
       
-      if (error) throw error;
+      if (tpErr) {
+        console.error('[useTripTimeline] Error fetching trip_participants:', tpErr);
+        throw tpErr;
+      }
       
-      return (data || []).map(p => ({
-        id: p.id,
-        userId: p.user_id,
-        role: p.role,
-        rsvpStatus: p.rsvp_status,
-        profile: p.user_profiles ? {
-          displayName: (p.user_profiles as any).display_name,
-          profilePhotoUrl: (p.user_profiles as any).profile_photo_url,
-        } : undefined,
-      }));
+      const userIds = (tp ?? []).map(x => x.user_id).filter(Boolean);
+      
+      // Step 2: Get profiles separately
+      let profilesById = new Map<string, any>();
+      
+      if (userIds.length > 0) {
+        const { data: profiles, error: pErr } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, profile_photo_url')
+          .in('id', userIds);
+        
+        if (pErr) {
+          console.error('[useTripTimeline] Error fetching profiles:', pErr);
+          // Non-fatal, continue without profiles
+        } else {
+          profilesById = new Map((profiles ?? []).map(p => [p.id, p]));
+        }
+      }
+      
+      // Map to final shape
+      return (tp ?? []).map(row => {
+        const profile = profilesById.get(row.user_id);
+        return {
+          id: row.id,
+          userId: row.user_id,
+          role: row.role,
+          rsvpStatus: row.rsvp_status,
+          profile: profile ? {
+            displayName: profile.display_name,
+            profilePhotoUrl: profile.profile_photo_url,
+          } : undefined,
+        };
+      });
     },
     enabled: !!tripId,
   });
@@ -160,24 +179,49 @@ export function useTripTimeline(tripId: string | undefined) {
       
       const tripStartDate = tripData?.start_date ? new Date(tripData.start_date) : null;
       
-      // Fetch games for this trip
-      const { data: games, error: gamesError } = await supabase
+      // Step 1: Fetch games for this trip (NO FK join)
+      const { data: gamesData, error: gamesError } = await supabase
         .from('games')
-        .select(`
-          id,
-          start_time,
-          status,
-          course_id,
-          golf_courses:course_id (
-            name,
-            country,
-            hero_image_url
-          )
-        `)
+        .select('id, start_time, status, course_id')
         .eq('trip_id', tripId)
-        .order('start_time', { ascending: true });
+        .order('start_time', { ascending: true })
+        .limit(200);
       
-      if (gamesError) throw gamesError;
+      if (gamesError) {
+        console.error('[useTripTimeline] Error fetching games:', gamesError);
+        throw gamesError;
+      }
+      
+      // Step 2: Fetch courses separately
+      const courseIds = (gamesData ?? []).map(g => g.course_id).filter(Boolean) as string[];
+      let coursesById = new Map<string, { name: string; country: string | null; thumbnail_image: string | null }>();
+      
+      if (courseIds.length > 0) {
+        const { data: coursesData, error: coursesError } = await supabase
+          .from('golf_courses')
+          .select('id, name, country, thumbnail_image')
+          .in('id', courseIds);
+        
+        if (coursesError) {
+          console.error('[useTripTimeline] Error fetching courses:', coursesError);
+          // Non-fatal, continue without course data
+        } else {
+          coursesById = new Map((coursesData ?? []).map(c => [c.id, c]));
+        }
+      }
+      
+      // Map games with courses
+      const games = (gamesData ?? []).map(g => {
+        const course = g.course_id ? coursesById.get(g.course_id) : null;
+        return {
+          ...g,
+          golf_courses: course ? {
+            name: course.name,
+            country: course.country,
+            hero_image_url: course.thumbnail_image, // Map to expected field name
+          } : null,
+        };
+      });
       
       // Fetch notes for this trip
       const { data: notes, error: notesError } = await supabase

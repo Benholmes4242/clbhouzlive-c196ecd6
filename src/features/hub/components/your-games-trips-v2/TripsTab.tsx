@@ -1,10 +1,10 @@
 /**
  * TripsTab - Shows user's trips
  * V2: Matches Games tab layout with NEXT UP hero + UPCOMING sections
+ * V3: Opens TripDetailSheetV2 instead of navigating
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { TripCard } from './TripCard';
 import { EmptyState } from './EmptyState';
@@ -14,11 +14,10 @@ import { useUserTripsByStatus, type UserTrip } from '../../hooks/useUserGamesTri
 interface TripsTabProps {
   searchQuery: string;
   onCreateTrip: () => void;
-  onClose: () => void;
+  onTripTap: (tripId: string) => void; // Changed from onClose
 }
 
-export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) {
-  const navigate = useNavigate();
+export function TripsTab({ searchQuery, onCreateTrip, onTripTap }: TripsTabProps) {
   const { upcomingTrips, pastTrips, isLoading } = useUserTripsByStatus();
 
   // Filter by search
@@ -35,8 +34,7 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
   }, [pastTrips, searchQuery]);
 
   const handleTripTap = (trip: UserTrip) => {
-    onClose();
-    navigate(`/hub/trip/${trip.id}?tab=timeline`);
+    onTripTap(trip.id);
   };
 
   if (isLoading) {
@@ -46,7 +44,12 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
   const hasAnyTrips = filteredUpcoming.length > 0 || filteredPast.length > 0;
 
   if (!hasAnyTrips) {
-    return <EmptyState tab="trips" onCreateTrip={onCreateTrip} />;
+    return (
+      <EmptyState 
+        tab="trips" 
+        onCreateTrip={onCreateTrip}
+      />
+    );
   }
 
   const nextUp = filteredUpcoming[0];
@@ -58,7 +61,7 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
       {nextUp && (
         <div>
           <h4 
-            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3 px-0.5"
             style={{ color: 'rgba(100, 116, 139, 0.5)' }}
           >
             Next Up
@@ -75,7 +78,7 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
       {upcomingList.length > 0 && (
         <div>
           <h4 
-            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3 px-0.5"
             style={{ color: 'rgba(100, 116, 139, 0.5)' }}
           >
             Upcoming
@@ -105,7 +108,7 @@ export function TripsTab({ searchQuery, onCreateTrip, onClose }: TripsTabProps) 
       {filteredPast.length > 0 && (
         <div>
           <h4 
-            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
+            className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3 px-0.5"
             style={{ color: 'rgba(100, 116, 139, 0.5)' }}
           >
             Past
