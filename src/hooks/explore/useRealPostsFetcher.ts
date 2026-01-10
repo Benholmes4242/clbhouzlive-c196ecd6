@@ -428,7 +428,15 @@ export const useRealPostsFetcher = () => {
         return formattedPost;
       }).filter(Boolean) as ExploreContentItem[];
 
-      return formattedPosts;
+      // Deduplicate posts by id (can occur when user follows both a creator and the underlying user)
+      const seenIds = new Set<string>();
+      const deduplicatedPosts = formattedPosts.filter(post => {
+        if (seenIds.has(post.id)) return false;
+        seenIds.add(post.id);
+        return true;
+      });
+
+      return deduplicatedPosts;
     } catch (error) {
       console.error('Error fetching friends posts:', error);
       return [];

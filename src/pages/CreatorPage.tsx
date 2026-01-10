@@ -5,7 +5,8 @@ import { UserPlus, UserCheck, MoreHorizontal, Loader2, Settings, MapPin, Check, 
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useFollow } from '@/hooks/useFollow';
+import { useCreatorFollow } from '@/hooks/useCreatorFollow';
+import { useCreatorPageBySlug } from '@/hooks/useCreatorPageBySlug';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useInfiniteShortsVideos } from '@/hooks/useInfiniteShortsVideos';
 import { useCreatorStats } from '@/hooks/useCreatorStats';
@@ -51,7 +52,8 @@ const CREATOR_TABS = [
 type CreatorTab = typeof CREATOR_TABS[number]['id'];
 
 export const CreatorPage: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+  // Route param is now slug (or userId for legacy compatibility)
+  const { userId: slugOrUserId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSupabaseSession();
@@ -83,24 +85,27 @@ export const CreatorPage: React.FC = () => {
     mode: 'grid',
   });
 
-  // Fetch creator profile data
-  const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
+  // Fetch creator page by slug (entity-based)
+  const { data: creatorPage, isLoading: creatorPageLoading } = useCreatorPageBySlug(slugOrUserId);
+  
+  // Fallback: Fetch user profile for backward compatibility
+  const { data: profile, isLoading: profileLoading } = useUserProfile(creatorPage?.owner_user_id || slugOrUserId);
 
-  // Fetch creator stats
-  const { data: stats, isLoading: statsLoading } = useCreatorStats(userId);
+  // Fetch creator stats - use owner_user_id if we have a creator page
+  const { data: stats, isLoading: statsLoading } = useCreatorStats(creatorPage?.owner_user_id || slugOrUserId);
 
   // Check if viewing own page
-  const isOwnPage = user?.id === userId;
+  const isOwnPage = user?.id === (creatorPage?.owner_user_id || slugOrUserId);
 
-  // Follow state
-  const { isFollowing, toggle: toggleFollow, busy: followLoading, ensureInitial } = useFollow(userId);
+  // Follow state - use creator page ID for entity-based following
+  const { isFollowing, toggle: toggleFollow, busy: followLoading, ensureInitial } = useCreatorFollow(creatorPage?.id);
 
   // Initialize follow state
   useEffect(() => {
-    if (userId) {
+    if (creatorPage?.id) {
       ensureInitial();
     }
-  }, [userId, ensureInitial]);
+  }, [creatorPage?.id, ensureInitial]);
 
   // Fetch long-form videos (≥4 min) with infinite scroll
   const {
@@ -111,7 +116,7 @@ export const CreatorPage: React.FC = () => {
     isFetchingNextPage: isFetchingMoreVideos,
   } = useInfiniteLongFormVideos({
     section: 'recommended',
-    creatorUserId: userId,
+    creatorUserId: creatorPage?.owner_user_id || slugOrUserId,
     minDuration: 240,
   });
 
@@ -123,7 +128,7 @@ export const CreatorPage: React.FC = () => {
     fetchNextPage: fetchMoreShorts,
     isFetchingNextPage: isFetchingMoreShorts,
   } = useInfiniteShortsVideos({
-    creatorUserId: userId,
+    creatorUserId: creatorPage?.owner_user_id || slugOrUserId,
     maxDuration: 240,
   });
 
@@ -473,7 +478,7 @@ export const CreatorPage: React.FC = () => {
                 <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
                   Edit Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate(`/profile/${profile.username || userId}`)}>
+                <DropdownMenuItem onClick={() => navigate(`/profile/${profile?.username || creatorPage?.owner_user_id || slugOrUserId}`)}>
                   View personal profile
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -510,7 +515,7 @@ export const CreatorPage: React.FC = () => {
                 background: '#f1f5f9',
                 border: '1px solid #E0E0E0'
               }}
-              onClick={() => navigate(`/profile/${profile.username || userId}`)}
+              onClick={() => navigate(`/profile/${profile?.username || creatorPage?.owner_user_id || slugOrUserId}`)}
             >
               View profile
             </button>
