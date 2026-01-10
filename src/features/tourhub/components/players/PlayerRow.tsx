@@ -8,6 +8,7 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
+import { PlayerAvatar } from '../PlayerAvatar';
 
 interface PlayerRowProps {
   player: TourPlayer;
@@ -28,13 +29,6 @@ function toTitleCase(str: string): string {
 }
 
 export function PlayerRow({ player, stats, statDisplay = 'rank', className }: PlayerRowProps) {
-  const initials = player.full_name
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-
   // Format country in Title Case
   const formattedCountry = player.country ? toTitleCase(player.country) : null;
 
@@ -79,18 +73,13 @@ export function PlayerRow({ player, stats, statDisplay = 'rank', className }: Pl
         className
       )}
     >
-      {/* Avatar */}
-      <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-        {player.photo_url ? (
-          <img 
-            src={player.photo_url} 
-            alt={player.full_name}
-            className="w-11 h-11 object-cover"
-          />
-        ) : (
-          <span className="text-sm font-medium text-muted-foreground">{initials}</span>
-        )}
-      </div>
+      {/* Avatar - now uses PlayerAvatar with headshot lookup */}
+      <PlayerAvatar
+        playerId={player.id}
+        playerName={player.full_name}
+        fallbackPhotoUrl={player.photo_url}
+        size="md"
+      />
 
       {/* Name + Country (line 2) + Context (line 3) */}
       <div className="flex-1 min-w-0 space-y-0.5">
