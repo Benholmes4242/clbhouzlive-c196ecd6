@@ -86,10 +86,6 @@ export function UpcomingTab({ searchQuery, onCreateGame, onGameTap }: UpcomingTa
                     game={game}
                     variant="row"
                     onTap={() => handleGameTap(game)}
-                    onKebabTap={() => {
-                      // TODO: Open action menu
-                      console.log('Kebab tapped for game:', game.id);
-                    }}
                   />
                 </motion.div>
               ))}

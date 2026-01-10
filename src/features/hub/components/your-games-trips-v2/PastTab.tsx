@@ -1,14 +1,26 @@
 /**
  * PastTab - Shows past/completed games
- * V2: Consistent spacing with UpcomingTab
+ * V2: Consistent spacing with UpcomingTab, with trash icon to archive
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Trash2 } from 'lucide-react';
 import { GameCard } from './GameCard';
 import { EmptyState } from './EmptyState';
 import { SkeletonList } from './SkeletonLoader';
 import { useUserPastGames, type UserGame } from '../../hooks/useUserGamesTrips';
+import { useArchivePastGame } from '../../hooks/useArchivePastGame';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface PastTabProps {
   searchQuery: string;
@@ -17,6 +29,8 @@ interface PastTabProps {
 
 export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
   const { data: games, isLoading } = useUserPastGames();
+  const { archiveGame, isPending } = useArchivePastGame();
+  const [gameToRemove, setGameToRemove] = useState<UserGame | null>(null);
 
   // Filter by search
   const filtered = React.useMemo(() => {
@@ -33,6 +47,13 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
     onGameTap(game.id);
   };
 
+  const handleRemoveConfirm = () => {
+    if (gameToRemove) {
+      archiveGame(gameToRemove.id);
+      setGameToRemove(null);
+    }
+  };
+
   if (isLoading) {
     return <SkeletonList />;
   }
@@ -42,27 +63,64 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
   }
 
   return (
-    <div className="space-y-2">
-      <AnimatePresence>
-        {filtered.map((game, index) => (
-          <motion.div
-            key={game.id}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.03 }}
-          >
-            <GameCard
-              game={game}
-              variant="row"
-              onTap={() => handleGameTap(game)}
-              onKebabTap={() => {
-                // TODO: Open action menu with "Post recap" option
-                console.log('Kebab tapped for past game:', game.id);
-              }}
-            />
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
+    <>
+      <div className="space-y-2">
+        <AnimatePresence>
+          {filtered.map((game, index) => (
+            <motion.div
+              key={game.id}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ delay: index * 0.03 }}
+              className="relative"
+            >
+              <GameCard
+                game={game}
+                variant="row"
+                onTap={() => handleGameTap(game)}
+              />
+              {/* Trash icon overlay */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setGameToRemove(game);
+                }}
+                disabled={isPending}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-red-50 transition-colors"
+                aria-label="Remove from past games"
+              >
+                <Trash2 
+                  className="w-4 h-4"
+                  style={{ color: 'rgba(220, 38, 38, 0.7)' }}
+                />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!gameToRemove} onOpenChange={() => setGameToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove from your list?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove "{gameToRemove?.courseName}" from your past games. 
+              You can still find it if you search for it later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleRemoveConfirm}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
