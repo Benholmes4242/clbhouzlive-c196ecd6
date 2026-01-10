@@ -1677,6 +1677,30 @@ export type Database = {
         }
         Relationships: []
       }
+      college_rivalries: {
+        Row: {
+          college_a: string
+          college_b: string
+          created_at: string
+          id: string
+          weight: number
+        }
+        Insert: {
+          college_a: string
+          college_b: string
+          created_at?: string
+          id?: string
+          weight?: number
+        }
+        Update: {
+          college_a?: string
+          college_b?: string
+          created_at?: string
+          id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       college_season_stats: {
         Row: {
           created_at: string
@@ -1723,6 +1747,115 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "college_season_stats_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "sr_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      college_stats_snapshots: {
+        Row: {
+          created_at: string
+          cuts_total: number
+          earnings_total: number
+          events_total: number
+          id: string
+          normalized_name: string
+          player_count: number
+          season_id: string
+          top10_total: number
+          top25_total: number
+          week_end: string
+          week_start: string
+          wins_total: number
+        }
+        Insert: {
+          created_at?: string
+          cuts_total?: number
+          earnings_total?: number
+          events_total?: number
+          id?: string
+          normalized_name: string
+          player_count?: number
+          season_id: string
+          top10_total?: number
+          top25_total?: number
+          week_end: string
+          week_start: string
+          wins_total?: number
+        }
+        Update: {
+          created_at?: string
+          cuts_total?: number
+          earnings_total?: number
+          events_total?: number
+          id?: string
+          normalized_name?: string
+          player_count?: number
+          season_id?: string
+          top10_total?: number
+          top25_total?: number
+          week_end?: string
+          week_start?: string
+          wins_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "college_stats_snapshots_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "sr_seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      college_weekly_movers: {
+        Row: {
+          created_at: string
+          cuts_delta: number
+          earnings_delta: number
+          earnings_rank_change: number | null
+          earnings_rank_last_week: number | null
+          earnings_rank_this_week: number | null
+          id: string
+          normalized_name: string
+          season_id: string
+          top10_delta: number
+          week_start: string
+          wins_delta: number
+        }
+        Insert: {
+          created_at?: string
+          cuts_delta?: number
+          earnings_delta?: number
+          earnings_rank_change?: number | null
+          earnings_rank_last_week?: number | null
+          earnings_rank_this_week?: number | null
+          id?: string
+          normalized_name: string
+          season_id: string
+          top10_delta?: number
+          week_start: string
+          wins_delta?: number
+        }
+        Update: {
+          created_at?: string
+          cuts_delta?: number
+          earnings_delta?: number
+          earnings_rank_change?: number | null
+          earnings_rank_last_week?: number | null
+          earnings_rank_this_week?: number | null
+          id?: string
+          normalized_name?: string
+          season_id?: string
+          top10_delta?: number
+          week_start?: string
+          wins_delta?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "college_weekly_movers_season_id_fkey"
             columns: ["season_id"]
             isOneToOne: false
             referencedRelation: "sr_seasons"
@@ -7491,6 +7624,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_followed_colleges: {
+        Row: {
+          created_at: string
+          id: string
+          normalized_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          normalized_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          normalized_name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_follows: {
         Row: {

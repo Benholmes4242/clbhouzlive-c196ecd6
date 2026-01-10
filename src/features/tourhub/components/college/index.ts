@@ -3,3 +3,7 @@ export { CollegeSearch } from './CollegeSearch';
 export { CollegeLeaderboard } from './CollegeLeaderboard';
 export { CollegeAlumniList } from './CollegeAlumniList';
 export { CollegeHero } from './CollegeHero';
+export { CollegeWeeklyMovers } from './CollegeWeeklyMovers';
+export { CollegeRivalsCarousel } from './CollegeRivalsCarousel';
+export { FollowCollegeButton } from './FollowCollegeButton';
+export { CollegeCompareHero } from './CollegeCompareHero';

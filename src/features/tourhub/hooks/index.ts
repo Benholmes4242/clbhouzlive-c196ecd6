@@ -5,4 +5,6 @@ export * from './useTourHubData';
 export * from './useCollegeMedia';
 export * from './useCollegeStats';
 export * from './useCollegeAlumni';
+export * from './useCollegeMovers';
+export * from './useCollegeCompare';
 export { useUpcomingEvents, useLiveEvents } from './useTourEvents';
