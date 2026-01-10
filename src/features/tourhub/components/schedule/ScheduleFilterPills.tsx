@@ -1,16 +1,16 @@
 /**
- * ScheduleFilterPills - Premium segmented pill controls
- * Matches Overview styling with subtle elevation on active state
+ * ScheduleFilterPills - Tab-style filters matching Discover page
+ * Uses underline active state like Explore, Top 100, Friends tabs
  */
 
 import { cn } from '@/lib/utils';
+import '@/styles/discover-tabs.css';
 
 export type ScheduleFilterType = 'all' | 'upcoming' | 'live' | 'completed';
 
 interface FilterOption {
   value: ScheduleFilterType;
   label: string;
-  count?: number;
   hasLiveIndicator?: boolean;
 }
 
@@ -31,57 +31,51 @@ export function ScheduleFilterPills({
   counts 
 }: ScheduleFilterPillsProps) {
   const options: FilterOption[] = [
-    { value: 'all', label: 'All', count: counts.all },
-    { value: 'upcoming', label: 'Upcoming', count: counts.upcoming },
-    { value: 'live', label: 'Live', count: counts.live, hasLiveIndicator: true },
-    { value: 'completed', label: 'Completed', count: counts.completed },
+    { value: 'all', label: 'All' },
+    { value: 'upcoming', label: 'Upcoming' },
+    { value: 'live', label: 'Live', hasLiveIndicator: true },
+    { value: 'completed', label: 'Completed' },
   ];
+
+  const showLiveDot = counts.live > 0;
 
   return (
     <div 
-      className="flex gap-1.5 p-1.5 rounded-xl bg-muted/50 backdrop-blur-sm"
+      className="discover-header relative w-full"
       role="tablist"
       aria-label="Filter tournaments"
     >
-      {options.map((option) => {
-        const isActive = activeFilter === option.value;
-        const showCount = option.value !== 'all' && option.count !== undefined && option.count > 0;
-        const showLiveDot = option.hasLiveIndicator && counts.live > 0;
+      <div className="discover-tabs flex w-full items-center">
+        <div className="flex flex-1">
+          {options.map((option) => {
+            const isActive = activeFilter === option.value;
 
-        return (
-          <button
-            key={option.value}
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => onFilterChange(option.value)}
-            className={cn(
-              "relative flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-              isActive 
-                ? "bg-card text-foreground shadow-sm" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <span>{option.label}</span>
-            
-            {showCount && (
-              <span 
+            return (
+              <button
+                key={option.value}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onFilterChange(option.value)}
                 className={cn(
-                  "text-xs px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center",
+                  "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-heading-md font-medium leading-tight",
+                  "transition-all duration-motion-fast ease-standard",
+                  "active:scale-[0.97] motion-reduce:active:scale-100",
+                  "flex items-center justify-center gap-1.5",
                   isActive 
-                    ? "bg-primary/10 text-primary" 
-                    : "bg-background/60"
+                    ? "active text-primary" 
+                    : "text-secondary hover:text-primary/80 motion-reduce:transition-none"
                 )}
               >
-                {option.count}
-              </span>
-            )}
-            
-            {showLiveDot && (
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            )}
-          </button>
-        );
-      })}
+                <span>{option.label}</span>
+                
+                {option.hasLiveIndicator && showLiveDot && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
