@@ -131,3 +131,12 @@ verify_jwt = false
 
 [functions.delete-review-video]
 verify_jwt = true
+
+[functions.echo-purge]
+verify_jwt = false
+
+[functions.create-join-request]
+verify_jwt = true
+
+[functions.game-request-decide]
+verify_jwt = true

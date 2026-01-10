@@ -1,23 +1,26 @@
 /**
  * EchoSheetV2 - Premium AI assistant sheet
  * 
- * Matches Hub design language with design tokens:
- * - Frosted glass aesthetics
- * - Clean typography
- * - Premium animations
- * - Same scroll-lock pattern as other sheets
+ * Features:
+ * - Chat | History tabs
+ * - Conversation persistence to Supabase
+ * - Pin/Delete from history
+ * - 30-day auto-purge (server-side)
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, MoreVertical, Trash2 } from 'lucide-react';
+import { X, Sparkles, MoreVertical, Trash2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEchoConversation } from '@/features/echo/hooks/useEchoConversation';
 import { EchoMessageList } from './EchoMessageList';
 import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
+import { EchoHistoryTab } from './EchoHistoryTab';
+import { EchoTabPills, type EchoTab } from './EchoTabPills';
 
 interface EchoSheetV2Props {
   isOpen: boolean;
@@ -33,17 +36,21 @@ export function EchoSheetV2({
   const scrollYRef = useRef(0);
   const wasOpenRef = useRef(false);
   const composerInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
   
   const [input, setInput] = useState('');
   const [showMenu, setShowMenu] = useState(false);
+  const [activeTab, setActiveTab] = useState<EchoTab>('chat');
   
   const {
+    conversationId,
     messages,
     sendMessage,
     isStreaming,
     streamingContent,
     abortStream,
     resetConversation,
+    loadConversation,
   } = useEchoConversation({ resetOnMount: true });
 
   // Scroll-lock
@@ -92,6 +99,7 @@ export function EchoSheetV2({
       const timer = setTimeout(() => {
         setInput('');
         setShowMenu(false);
+        setActiveTab('chat');
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -151,10 +159,31 @@ export function EchoSheetV2({
     toast.success('Chat cleared');
   }, [resetConversation]);
 
+  const handleNewChat = useCallback(() => {
+    haptic('light');
+    resetConversation();
+    setActiveTab('chat');
+    // Invalidate history to show any pending changes
+    queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
+  }, [resetConversation, queryClient]);
+
   const handleMenuClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(prev => !prev);
   }, []);
+
+  const handleSelectConversation = useCallback((convId: string) => {
+    loadConversation(convId);
+    setActiveTab('chat');
+  }, [loadConversation]);
+
+  const handleTabChange = useCallback((tab: EchoTab) => {
+    setActiveTab(tab);
+    if (tab === 'history') {
+      // Refresh history when switching to it
+      queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
+    }
+  }, [queryClient]);
 
   const hasMessages = messages.length > 0 || isStreaming;
 
@@ -192,7 +221,7 @@ export function EchoSheetV2({
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0 border-b border-border/30">
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <div 
                   className="w-7 h-7 rounded-full flex items-center justify-center"
@@ -209,8 +238,19 @@ export function EchoSheetV2({
               </div>
               
               <div className="flex items-center gap-1">
-                {/* Menu button */}
-                {hasMessages && (
+                {/* New chat button */}
+                {(hasMessages || activeTab === 'history') && (
+                  <button
+                    onClick={handleNewChat}
+                    className="p-2 rounded-full transition-all duration-150 hover:bg-muted active:scale-95"
+                    title="New chat"
+                  >
+                    <Plus className="w-5 h-5 text-muted-foreground" />
+                  </button>
+                )}
+
+                {/* Menu button - only in chat tab with messages */}
+                {activeTab === 'chat' && hasMessages && (
                   <div className="relative">
                     <button
                       onClick={handleMenuClick}
@@ -219,7 +259,7 @@ export function EchoSheetV2({
                       <MoreVertical className="w-5 h-5 text-muted-foreground" />
                     </button>
                     
-                    {/* Dropdown - portal to ensure proper layering */}
+                    {/* Dropdown */}
                     <AnimatePresence>
                       {showMenu && (
                         <motion.div
@@ -251,31 +291,48 @@ export function EchoSheetV2({
               </div>
             </div>
 
-            {/* Body - Empty state or messages */}
-            {!hasMessages ? (
-              <EchoEmptyState
-                onChipClick={handleChipClick}
-                onFocusInput={handleFocusInput}
-              />
+            {/* Tabs */}
+            <div className="px-5 pb-3 flex-shrink-0">
+              <EchoTabPills activeTab={activeTab} onTabChange={handleTabChange} />
+            </div>
+
+            {/* Divider */}
+            <div className="h-px mx-5 flex-shrink-0 bg-border/30" />
+
+            {/* Body - Tab content */}
+            {activeTab === 'chat' ? (
+              <>
+                {!hasMessages ? (
+                  <EchoEmptyState
+                    onChipClick={handleChipClick}
+                    onFocusInput={handleFocusInput}
+                  />
+                ) : (
+                  <EchoMessageList
+                    messages={messages}
+                    isStreaming={isStreaming}
+                    streamingContent={streamingContent}
+                    onFollowUp={handleFollowUp}
+                  />
+                )}
+
+                {/* Composer - Always visible in chat tab */}
+                <EchoComposer
+                  ref={composerInputRef}
+                  value={input}
+                  onChange={setInput}
+                  onSend={handleSend}
+                  onAbort={abortStream}
+                  isStreaming={isStreaming}
+                  autoFocus={hasMessages}
+                />
+              </>
             ) : (
-              <EchoMessageList
-                messages={messages}
-                isStreaming={isStreaming}
-                streamingContent={streamingContent}
-                onFollowUp={handleFollowUp}
+              <EchoHistoryTab
+                onSelectConversation={handleSelectConversation}
+                currentConversationId={conversationId}
               />
             )}
-
-            {/* Composer - Always visible */}
-            <EchoComposer
-              ref={composerInputRef}
-              value={input}
-              onChange={setInput}
-              onSend={handleSend}
-              onAbort={abortStream}
-              isStreaming={isStreaming}
-              autoFocus={hasMessages}
-            />
           </motion.div>
         </>
       )}
