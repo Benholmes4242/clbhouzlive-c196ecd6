@@ -2494,6 +2494,298 @@ export type Database = {
           },
         ]
       }
+      creator_analytics_events: {
+        Row: {
+          action_type: string | null
+          content_id: string | null
+          created_at: string
+          creator_page_id: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type?: string | null
+          content_id?: string | null
+          created_at?: string
+          creator_page_id: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string | null
+          content_id?: string | null
+          created_at?: string
+          creator_page_id?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_analytics_events_creator_page_id_fkey"
+            columns: ["creator_page_id"]
+            isOneToOne: false
+            referencedRelation: "creator_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_daily_metrics: {
+        Row: {
+          creator_page_id: string
+          engagements: number
+          impressions: number
+          metric_date: string
+          new_followers: number
+          post_comments: number
+          post_likes: number
+          post_saves: number
+          post_views: number
+          profile_visits: number
+          unique_viewers: number
+        }
+        Insert: {
+          creator_page_id: string
+          engagements?: number
+          impressions?: number
+          metric_date: string
+          new_followers?: number
+          post_comments?: number
+          post_likes?: number
+          post_saves?: number
+          post_views?: number
+          profile_visits?: number
+          unique_viewers?: number
+        }
+        Update: {
+          creator_page_id?: string
+          engagements?: number
+          impressions?: number
+          metric_date?: string
+          new_followers?: number
+          post_comments?: number
+          post_likes?: number
+          post_saves?: number
+          post_views?: number
+          profile_visits?: number
+          unique_viewers?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_daily_metrics_creator_page_id_fkey"
+            columns: ["creator_page_id"]
+            isOneToOne: false
+            referencedRelation: "creator_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_follows: {
+        Row: {
+          created_at: string
+          creator_page_id: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_page_id: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          creator_page_id?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_follows_creator_page_id_fkey"
+            columns: ["creator_page_id"]
+            isOneToOne: false
+            referencedRelation: "creator_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "creator_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_members: {
+        Row: {
+          created_at: string
+          created_by: string
+          creator_page_id: string
+          id: string
+          role: Database["public"]["Enums"]["creator_team_role"]
+          user_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          creator_page_id: string
+          id?: string
+          role?: Database["public"]["Enums"]["creator_team_role"]
+          user_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          creator_page_id?: string
+          id?: string
+          role?: Database["public"]["Enums"]["creator_team_role"]
+          user_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_members_creator_page_id_fkey"
+            columns: ["creator_page_id"]
+            isOneToOne: false
+            referencedRelation: "creator_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "creator_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_pages: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          categories: string[] | null
+          cover_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          is_verified: boolean
+          location_city: string | null
+          location_country: string | null
+          owner_user_id: string
+          slug: string
+          social_links: Json | null
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          categories?: string[] | null
+          cover_url?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          is_verified?: boolean
+          location_city?: string | null
+          location_country?: string | null
+          owner_user_id: string
+          slug: string
+          social_links?: Json | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          categories?: string[] | null
+          cover_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_verified?: boolean
+          location_city?: string | null
+          location_country?: string | null
+          owner_user_id?: string
+          slug?: string
+          social_links?: Json | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
+      creator_profile_events: {
+        Row: {
+          created_at: string
+          creator_page_id: string
+          event_type: string
+          id: string
+          path: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_page_id: string
+          event_type?: string
+          id?: string
+          path?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_page_id?: string
+          event_type?: string
+          id?: string
+          path?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_profile_events_creator_page_id_fkey"
+            columns: ["creator_page_id"]
+            isOneToOne: false
+            referencedRelation: "creator_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       echo_admin_dashboard_views: {
         Row: {
           created_at: string
@@ -9749,6 +10041,10 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
+      aggregate_creator_daily_metrics: {
+        Args: { target_date?: string }
+        Returns: undefined
+      }
       approve_business_verification: {
         Args: { _request_id: string }
         Returns: undefined
@@ -9813,6 +10109,15 @@ export type Database = {
           p_club_name?: string
           p_description?: string
           p_name: string
+        }
+        Returns: string
+      }
+      create_creator_page: {
+        Args: {
+          p_avatar_url?: string
+          p_bio?: string
+          p_display_name: string
+          p_slug?: string
         }
         Returns: string
       }
@@ -10222,6 +10527,10 @@ export type Database = {
         Args: { p_game_id: string; p_text: string }
         Returns: string
       }
+      generate_creator_slug: {
+        Args: { p_display_name: string }
+        Returns: string
+      }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -10362,6 +10671,7 @@ export type Database = {
         Returns: Json
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_default_creator_page: { Args: { p_user_id: string }; Returns: string }
       get_friends_first_post_ids: {
         Args: {
           p_current_user_id: string
@@ -11627,6 +11937,7 @@ export type Database = {
         | "Asia"
         | "Africa"
         | "Oceania"
+      creator_team_role: "owner" | "admin" | "editor" | "analyst"
       leaderboard_scope:
         | "global"
         | "gbi"
@@ -11811,6 +12122,7 @@ export const Constants = {
         "Africa",
         "Oceania",
       ],
+      creator_team_role: ["owner", "admin", "editor", "analyst"],
       leaderboard_scope: [
         "global",
         "gbi",
