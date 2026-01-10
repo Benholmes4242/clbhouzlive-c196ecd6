@@ -126,9 +126,17 @@ export function useCreateTrip() {
 
       // CRITICAL: Fail if ANY game fails (not just all) to prevent partial trips
       if (gameErrors.length > 0) {
-        // Cleanup: delete the orphaned trip to avoid partial trips
-        console.error('[useCreateTrip] Game creation failed, cleaning up trip:', trip.id);
-        await supabase.from('trips').delete().eq('id', trip.id);
+        // Cleanup: soft-cancel the orphaned trip (UPDATE works under RLS, DELETE often doesn't)
+        console.error('[useCreateTrip] Game creation failed, soft-cancelling trip:', trip.id);
+        await supabase
+          .from('trips')
+          .update({ 
+            status: 'cancelled', 
+            cancelled_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', trip.id)
+          .eq('created_by', user.id);
         
         throw new Error(`Failed to create ${gameErrors.length} round(s): ${gameErrors[0]?.error?.message || 'Unknown error'}`);
       }
