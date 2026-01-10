@@ -1,6 +1,6 @@
 /**
- * TourHubNavOverlay - Full-screen frosted overlay menu for Tour Hub navigation
- * LIV-style 9-dot portal with Clbhouz watermark
+ * TourHubNavOverlay - Full-screen light mode overlay menu for Tour Hub navigation
+ * Solid light background with Clbhouz logo mark watermark
  */
 
 import React, { useEffect, useCallback } from 'react';
@@ -26,6 +26,9 @@ const NAV_ITEMS: NavItem[] = [
   { value: 'tee-times', label: 'Tee Times', subtitle: 'Starting times' },
   { value: 'hole-stats', label: 'Holes', subtitle: 'Course analytics' },
 ];
+
+// Clbhouz brand orange
+const CLBHOUZ_ORANGE = '#F97316';
 
 interface TourHubNavOverlayProps {
   isOpen: boolean;
@@ -82,7 +85,7 @@ export function TourHubNavOverlay({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with frosted glass */}
+          {/* Backdrop - tap to close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -90,33 +93,12 @@ export function TourHubNavOverlay({
             transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
             className="fixed inset-0 z-[9998]"
             style={{
-              background: 'rgba(10, 20, 25, 0.72)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
+              background: 'rgba(0, 0, 0, 0.15)',
             }}
             onClick={onClose}
           />
           
-          {/* Clbhouz Watermark */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.04 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center"
-          >
-            <span 
-              className="text-[120px] font-bold tracking-tighter select-none"
-              style={{ 
-                color: 'white',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-              }}
-            >
-              Clbhouz
-            </span>
-          </motion.div>
-          
-          {/* Menu Panel - slide from right */}
+          {/* Menu Panel - slide from right with solid light background */}
           <motion.div
             initial={{ x: '100%', opacity: 0.5 }}
             animate={{ x: 0, opacity: 1 }}
@@ -126,30 +108,66 @@ export function TourHubNavOverlay({
               ease: [0.2, 0.8, 0.2, 1],
             }}
             className="fixed inset-0 z-[10000] flex flex-col"
+            style={{
+              background: '#F8FAFC',
+            }}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-safe-top py-4">
-              <button
-                onClick={() => {
-                  haptic('light');
-                  onClose();
+            {/* Clbhouz Logo Mark Watermark - centered behind content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 0.05, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="absolute inset-0 pointer-events-none flex items-center justify-center"
+            >
+              <img 
+                src="/assets/logomark-orange.png"
+                alt=""
+                className="w-64 h-64 object-contain"
+                style={{ 
+                  opacity: 1,
+                  filter: 'brightness(0) saturate(100%)',
+                  // Apply orange color via filter
                 }}
-                className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95"
-                style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-                aria-label="Close menu"
-              >
-                <X className="w-5 h-5 text-white" />
-              </button>
+              />
+            </motion.div>
+            
+            {/* Header with divider */}
+            <div>
+              <div className="flex items-center justify-between px-5 pt-safe-top py-4">
+                <button
+                  onClick={() => {
+                    haptic('light');
+                    onClose();
+                  }}
+                  className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95"
+                  style={{ 
+                    background: 'rgba(0, 0, 0, 0.05)',
+                  }}
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" style={{ color: '#64748B' }} />
+                </button>
+                
+                <span 
+                  className="text-lg font-semibold tracking-tight"
+                  style={{ color: '#1e293b' }}
+                >
+                  Navigate
+                </span>
+                
+                {/* Placeholder for balance */}
+                <div className="w-10" />
+              </div>
               
-              <span className="text-white/90 text-lg font-semibold tracking-tight">
-                Navigate
-              </span>
-              
-              {/* Placeholder for balance */}
-              <div className="w-10" />
+              {/* Subtle divider */}
+              <div 
+                className="h-px mx-5"
+                style={{ background: 'rgba(0, 0, 0, 0.06)' }}
+              />
             </div>
             
             {/* Menu Items */}
@@ -157,7 +175,7 @@ export function TourHubNavOverlay({
               className="flex-1 overflow-y-auto px-5 py-6"
               style={{ overscrollBehavior: 'contain' }}
             >
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
                   
@@ -175,11 +193,12 @@ export function TourHubNavOverlay({
                       className="w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
                       style={{
                         background: isActive 
-                          ? 'rgba(255, 255, 255, 0.12)' 
-                          : 'rgba(255, 255, 255, 0.04)',
-                        border: isActive 
-                          ? '1px solid rgba(255, 255, 255, 0.15)'
-                          : '1px solid transparent',
+                          ? 'rgba(255, 255, 255, 0.9)' 
+                          : 'rgba(255, 255, 255, 0.6)',
+                        border: '1px solid rgba(0, 0, 0, 0.04)',
+                        boxShadow: isActive
+                          ? '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                          : '0 1px 3px rgba(0, 0, 0, 0.03)',
                       }}
                     >
                       {/* Active indicator dot */}
@@ -187,10 +206,10 @@ export function TourHubNavOverlay({
                         className="w-2 h-2 rounded-full flex-shrink-0 transition-all"
                         style={{
                           background: isActive 
-                            ? 'hsl(var(--hub-accent, 28 85% 65%))' 
-                            : 'rgba(255, 255, 255, 0.2)',
+                            ? CLBHOUZ_ORANGE
+                            : 'rgba(100, 116, 139, 0.25)',
                           boxShadow: isActive 
-                            ? '0 0 8px hsl(var(--hub-accent, 28 85% 65%) / 0.5)'
+                            ? `0 0 8px ${CLBHOUZ_ORANGE}60`
                             : 'none',
                         }}
                       />
@@ -198,16 +217,16 @@ export function TourHubNavOverlay({
                       {/* Text content */}
                       <div className="flex-1 min-w-0">
                         <div 
-                          className="text-[17px] font-semibold"
+                          className="text-[16px] font-semibold"
                           style={{ 
-                            color: isActive ? 'white' : 'rgba(255, 255, 255, 0.85)',
+                            color: isActive ? '#1e293b' : '#475569',
                           }}
                         >
                           {item.label}
                         </div>
                         <div 
                           className="text-[13px] mt-0.5"
-                          style={{ color: 'rgba(255, 255, 255, 0.5)' }}
+                          style={{ color: '#94a3b8' }}
                         >
                           {item.subtitle}
                         </div>
@@ -217,7 +236,7 @@ export function TourHubNavOverlay({
                       <ChevronRight 
                         className="w-5 h-5 flex-shrink-0 transition-transform"
                         style={{ 
-                          color: isActive ? 'white' : 'rgba(255, 255, 255, 0.3)',
+                          color: isActive ? '#64748B' : '#CBD5E1',
                           transform: isActive ? 'translateX(2px)' : 'none',
                         }}
                       />
@@ -227,15 +246,7 @@ export function TourHubNavOverlay({
               </div>
             </div>
             
-            {/* Footer hint */}
-            <div className="px-5 py-4 pb-safe-bottom text-center">
-              <span 
-                className="text-[12px]"
-                style={{ color: 'rgba(255, 255, 255, 0.3)' }}
-              >
-                Swipe right or tap outside to close
-              </span>
-            </div>
+            {/* No footer text - removed per spec */}
           </motion.div>
         </>
       )}
