@@ -177,6 +177,10 @@ export function EchoSheetV2({
     setActiveTab('chat');
   }, [loadConversation]);
 
+  const handleDeleteCurrentConversation = useCallback(() => {
+    resetConversation();
+  }, [resetConversation]);
+
   const handleTabChange = useCallback((tab: EchoTab) => {
     setActiveTab(tab);
     if (tab === 'history') {
@@ -331,6 +335,7 @@ export function EchoSheetV2({
               <EchoHistoryTab
                 onSelectConversation={handleSelectConversation}
                 currentConversationId={conversationId}
+                onDeleteCurrentConversation={handleDeleteCurrentConversation}
               />
             )}
           </motion.div>

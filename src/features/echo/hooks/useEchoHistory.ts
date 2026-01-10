@@ -55,19 +55,17 @@ export function useEchoConversations(search?: string) {
         throw error;
       }
 
-      // Get message counts for each conversation
+      // Get message counts using server-side RPC aggregate
       const conversationIds = (data ?? []).map(c => c.id);
       let messageCounts: Record<string, number> = {};
       
       if (conversationIds.length > 0) {
-        const { data: counts } = await supabase
-          .from('echo_conversation_messages')
-          .select('conversation_id')
-          .in('conversation_id', conversationIds);
+        const { data: counts, error: countError } = await supabase
+          .rpc('echo_message_counts', { conversation_ids: conversationIds });
         
-        if (counts) {
+        if (!countError && counts) {
           for (const row of counts) {
-            messageCounts[row.conversation_id] = (messageCounts[row.conversation_id] || 0) + 1;
+            messageCounts[row.conversation_id] = Number(row.message_count) || 0;
           }
         }
       }

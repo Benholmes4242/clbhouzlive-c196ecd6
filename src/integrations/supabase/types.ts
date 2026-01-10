@@ -9972,6 +9972,13 @@ export type Database = {
           thread_id: string
         }[]
       }
+      echo_message_counts: {
+        Args: { conversation_ids: string[] }
+        Returns: {
+          conversation_id: string
+          message_count: number
+        }[]
+      }
       echo_purge_old_data: { Args: never; Returns: undefined }
       echo_share_create:
         | { Args: { p_thread: string }; Returns: string }

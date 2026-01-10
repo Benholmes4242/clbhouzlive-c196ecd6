@@ -3,6 +3,7 @@
  * 
  * Should be called daily via scheduled job or external scheduler.
  * Uses service role to delete data across all users.
+ * Relies on FK CASCADE to delete messages when conversations are deleted.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1';
@@ -30,37 +31,33 @@ Deno.serve(async (req) => {
 
     console.log(`[echo-purge] Purging data older than ${cutoffDate}`);
 
-    // Delete old messages first (respects FK cascade anyway, but explicit is clearer)
-    const { count: messagesDeleted, error: msgError } = await supabase
-      .from('echo_conversation_messages')
-      .delete()
-      .lt('created_at', cutoffDate)
-      .select('id', { count: 'exact', head: true });
-
-    if (msgError) {
-      console.error('[echo-purge] Error deleting messages:', msgError);
-    }
-
-    // Delete old conversations
-    const { count: conversationsDeleted, error: convError } = await supabase
+    // Delete conversations older than 30 days (FK CASCADE will remove messages)
+    const { error: convError } = await supabase
       .from('echo_conversations')
       .delete()
-      .lt('last_message_at', cutoffDate)
-      .select('id', { count: 'exact', head: true });
+      .lt('last_message_at', cutoffDate);
 
     if (convError) {
       console.error('[echo-purge] Error deleting conversations:', convError);
+      throw convError;
     }
 
-    console.log(`[echo-purge] Complete. Messages: ${messagesDeleted ?? 0}, Conversations: ${conversationsDeleted ?? 0}`);
+    // Belt-and-braces: delete orphan messages older than cutoff (if any exist without conversation)
+    const { error: msgError } = await supabase
+      .from('echo_conversation_messages')
+      .delete()
+      .lt('created_at', cutoffDate);
+
+    if (msgError) {
+      console.error('[echo-purge] Error deleting orphan messages:', msgError);
+      // Non-fatal, continue
+    }
+
+    console.log(`[echo-purge] Complete. Cutoff: ${cutoffDate}`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        purged: {
-          messages: messagesDeleted ?? 0,
-          conversations: conversationsDeleted ?? 0,
-        },
         cutoffDate,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
