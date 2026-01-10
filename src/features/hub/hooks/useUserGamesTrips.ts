@@ -292,7 +292,7 @@ export function useUserTrips() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      // Get trips created by user
+      // Get trips created by user (exclude cancelled)
       const { data: createdTrips, error: createdError } = await supabase
         .from('trips')
         .select(`
@@ -303,9 +303,11 @@ export function useUserTrips() {
           end_date,
           visibility,
           cover_image_url,
-          created_by
+          created_by,
+          status
         `)
         .eq('created_by', user.id)
+        .neq('status', 'cancelled')
         .order('start_date', { ascending: false })
         .limit(30);
 
@@ -341,9 +343,11 @@ export function useUserTrips() {
             end_date,
             visibility,
             cover_image_url,
-            created_by
+            created_by,
+            status
           `)
-          .in('id', participantTripIds);
+          .in('id', participantTripIds)
+          .neq('status', 'cancelled');
 
         if (tripError) {
           console.error('[useUserTrips] Error fetching participant trip details:', tripError);
