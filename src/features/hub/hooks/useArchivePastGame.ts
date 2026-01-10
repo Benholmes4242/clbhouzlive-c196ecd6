@@ -25,15 +25,17 @@ export function useArchivePastGame() {
 
       if (participant) {
         // Update existing participant row with archived_at
+        // Using type assertion since archived_at was just added via migration
         const { error } = await supabase
           .from('game_participants')
-          .update({ archived_at: new Date().toISOString() })
+          .update({ archived_at: new Date().toISOString() } as any)
           .eq('game_id', gameId)
           .eq('user_id', user.id);
 
         if (error) throw error;
       } else {
         // User is host but not in participants - insert with archived_at
+        // Using type assertion since archived_at was just added via migration
         const { error } = await supabase
           .from('game_participants')
           .insert({
@@ -41,7 +43,7 @@ export function useArchivePastGame() {
             user_id: user.id,
             rsvp_status: 'going',
             archived_at: new Date().toISOString(),
-          });
+          } as any);
 
         if (error) throw error;
       }

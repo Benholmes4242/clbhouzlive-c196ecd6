@@ -19,7 +19,6 @@ interface GameCardProps {
   game: UserGame;
   variant: 'hero' | 'row';
   onTap: () => void;
-  onKebabTap?: (e: React.MouseEvent) => void;
 }
 
 function formatGameDate(dateStr: string): string {
@@ -42,7 +41,7 @@ function getStatusChip(status: string): { label: string; bg: string; color: stri
   }
 }
 
-export function GameCard({ game, variant, onTap, onKebabTap }: GameCardProps) {
+export function GameCard({ game, variant, onTap }: GameCardProps) {
   const statusChip = getStatusChip(game.status);
 
   if (variant === 'hero') {
