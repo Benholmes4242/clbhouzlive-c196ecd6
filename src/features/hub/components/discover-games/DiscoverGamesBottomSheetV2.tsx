@@ -1,12 +1,10 @@
 /**
  * DiscoverGamesBottomSheetV2 - Bottom sheet for discovering games & trips
  * 
- * Updated V2 design:
- * - Games | Trips tabs (removed Recommended/Upcoming)
- * - Anonymous host blurbs (no identity leaks)
- * - Request to join CTA with proper states
- * - Excludes games where user was declined
- * - Custom date picker with preset/single/range modes
+ * Phase 2B Updates:
+ * - RequestNoteModal wired for games & trips
+ * - TripDetailSheetV2 for trip details
+ * - Time-of-day filter chips
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -18,7 +16,9 @@ import { haptic } from '@/utils/haptics';
 import { useDiscoverGamesV2, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '../../hooks/useDiscoverGamesV2';
 import { useDiscoverTrips } from '../../hooks/useDiscoverTrips';
 import { useRequestJoinGame } from '../../hooks/useRequestJoinGame';
+import { useRequestJoinTrip } from '../../hooks/useRequestJoinTrip';
 import { GameDetailSheetV2 } from '../game-detail-v2';
+import { TripDetailSheetV2 } from '../trip-detail-v2';
 import { DiscoverSearchInput } from './DiscoverSearchInput';
 import { DiscoverDatePicker, type DateFilterValue, dateFilterToQueryParams } from './DiscoverDatePicker';
 import { DiscoverVisibilityChip } from './DiscoverVisibilityChip';
@@ -26,6 +26,9 @@ import { DiscoverTabPills, type DiscoverTab } from './DiscoverTabPills';
 import { DiscoverEmptyState } from './DiscoverEmptyState';
 import { GameDiscoverCard } from './GameDiscoverCard';
 import { TripDiscoverCard } from './TripDiscoverCard';
+import { RequestNoteModal } from './RequestNoteModal';
+import { TimeOfDayChips, type TimeOfDay, getTimeOfDayRange } from './TimeOfDayChips';
+import { setHours, setMinutes, startOfDay, endOfDay } from 'date-fns';
 
 interface DiscoverGamesBottomSheetV2Props {
   isOpen: boolean;
@@ -41,27 +44,48 @@ export function DiscoverGamesBottomSheetV2({
   const [dateFilter, setDateFilter] = useState<DateFilterValue>({ mode: 'preset', preset: 'any' });
   const [visibility, setVisibility] = useState<DiscoverVisibility>('all');
   const [activeTab, setActiveTab] = useState<DiscoverTab>('games');
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('any');
 
   // Game detail sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [gameSheetOpen, setGameSheetOpen] = useState(false);
   
-  // Join request state
-  const [requestingGameId, setRequestingGameId] = useState<string | null>(null);
+  // Trip detail sheet state
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [tripSheetOpen, setTripSheetOpen] = useState(false);
+  
+  // Request note modal state
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [requestModalType, setRequestModalType] = useState<'game' | 'trip'>('game');
+  const [pendingRequestId, setPendingRequestId] = useState<string | null>(null);
 
   // Scroll lock refs
   const scrollYRef = useRef(0);
   const wasOpenRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Build filters with custom date support
+  // Build filters with custom date + time-of-day support
   const dateParams = dateFilterToQueryParams(dateFilter);
+  
+  // Apply time-of-day filter on top of date filter
+  let finalStartAt = dateParams.startAt;
+  let finalEndAt = dateParams.endAt;
+  
+  if (timeOfDay !== 'any' && dateFilter.mode === 'single' && dateFilter.singleDate && !dateFilter.singleTime) {
+    const todRange = getTimeOfDayRange(timeOfDay);
+    if (todRange) {
+      const baseDate = dateFilter.singleDate;
+      finalStartAt = setMinutes(setHours(baseDate, todRange.startHour), 0).toISOString();
+      finalEndAt = setMinutes(setHours(baseDate, todRange.endHour), 59).toISOString();
+    }
+  }
+  
   const filters: DiscoverGamesFilters = {
     search,
     when: dateFilter.mode === 'preset' ? dateFilter.preset : 'any',
     visibility,
-    customStartAt: dateParams.startAt,
-    customEndAt: dateParams.endAt,
+    customStartAt: finalStartAt,
+    customEndAt: finalEndAt,
   };
 
   // Query games
@@ -75,17 +99,47 @@ export function DiscoverGamesBottomSheetV2({
   const isLoading = activeTab === 'games' ? gamesQuery.isLoading : tripsQuery.isLoading;
   const isError = activeTab === 'games' ? gamesQuery.isError : tripsQuery.isError;
 
-  // Join game mutation (refactored)
+  // Join mutations
   const joinGameMutation = useRequestJoinGame();
+  const joinTripMutation = useRequestJoinTrip();
 
-  const handleRequestJoin = useCallback((gameId: string) => {
-    setRequestingGameId(gameId);
-    joinGameMutation.mutate({ gameId }, {
-      onSettled: () => {
-        setTimeout(() => setRequestingGameId(null), 300);
-      },
-    });
-  }, [joinGameMutation]);
+  // Open request modal for games
+  const handleOpenGameRequestModal = useCallback((gameId: string) => {
+    haptic('light');
+    setPendingRequestId(gameId);
+    setRequestModalType('game');
+    setRequestModalOpen(true);
+  }, []);
+
+  // Open request modal for trips
+  const handleOpenTripRequestModal = useCallback((tripId: string) => {
+    haptic('light');
+    setPendingRequestId(tripId);
+    setRequestModalType('trip');
+    setRequestModalOpen(true);
+  }, []);
+
+  // Submit request with optional message
+  const handleSubmitRequest = useCallback((message: string | null) => {
+    if (!pendingRequestId) return;
+    
+    if (requestModalType === 'game') {
+      joinGameMutation.mutate({ gameId: pendingRequestId, message }, {
+        onSettled: () => {
+          setRequestModalOpen(false);
+          setPendingRequestId(null);
+        },
+      });
+    } else {
+      joinTripMutation.mutate({ tripId: pendingRequestId, message }, {
+        onSettled: () => {
+          setRequestModalOpen(false);
+          setPendingRequestId(null);
+          setTripSheetOpen(false);
+        },
+      });
+    }
+  }, [pendingRequestId, requestModalType, joinGameMutation, joinTripMutation]);
 
   // Lock body scroll
   useEffect(() => {
