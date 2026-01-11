@@ -178,7 +178,12 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled' | '
   });
 
   if (queryError) throw queryError;
-  if (!data || data.length === 0) return [];
+  
+  // If no real videos found, inject mock data for demo purposes
+  if (!data || data.length === 0) {
+    console.log(`[useLongFormVideosQuery] No videos found for ${section}, injecting mock data`);
+    return getMockVideosForSection(section as any, limit);
+  }
 
   // Fetch profiles
   const userIds = [...new Set(data.map((post: any) => post.user_id))];
@@ -223,12 +228,6 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled' | '
       const scoreB = (b.likes || 0) * 3 + (b.views || 0) / 10;
       return scoreB - scoreA;
     });
-  }
-
-  // If no real videos found, inject mock data for demo purposes
-  if (videos.length === 0) {
-    console.log(`[useLongFormVideosQuery] No videos found for ${section}, injecting mock data`);
-    return getMockVideosForSection(section as any, limit);
   }
 
   return videos;
