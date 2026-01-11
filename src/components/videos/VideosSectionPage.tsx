@@ -42,6 +42,16 @@ const SECTION_DESCRIPTIONS: Record<SectionType, string> = {
 // Local storage key for sort preference
 const VIDEOS_SECTION_SORT_KEY = 'videos-section-sort-option';
 
+// Map SortOption to query sort
+type QuerySort = 'newest' | 'most-liked' | 'most-discussed';
+const sortOptionToQuerySort = (sortOption: SortOption): QuerySort => {
+  switch (sortOption) {
+    case 'most-liked': return 'most-liked';
+    case 'most-discussed': return 'most-discussed';
+    default: return 'newest';
+  }
+};
+
 /**
  * VideosSectionPage - Full section page with infinite scroll
  * 
@@ -83,6 +93,7 @@ export const VideosSectionPage: React.FC = () => {
     section,
     followedCreatorIds: followedIds,
     category,
+    sort: sortOptionToQuerySort(sortOption),
   });
 
   // Client-side search filter
