@@ -355,6 +355,7 @@ export function createHeroItem(
   }
 
   // Determine context label based on engagement and age
+  // REMOVED "FEATURED COURSE" label - Watch page should focus on video content, not courses
   let contextLabel = "RECOMMENDED FOR YOU";
   
   if (engagementScore !== undefined && ageHours !== undefined) {
@@ -362,15 +363,15 @@ export function createHeroItem(
     const HIGH_ENGAGEMENT_THRESHOLD = 200;
     
     if (ageHours < 6 && engagementScore > VIRAL_THRESHOLD) {
-      contextLabel = "GOING VIRAL";
+      contextLabel = "GOING VIRAL 🔥";
     } else if (ageHours < 24 && engagementScore > HIGH_ENGAGEMENT_THRESHOLD) {
-      contextLabel = "TRENDING NOW";
+      contextLabel = "TRENDING NOW 🔥";
     } else if (engagementScore > HIGH_ENGAGEMENT_THRESHOLD) {
       contextLabel = "POPULAR THIS WEEK";
-    } else if (post.golfCourse?.id) {
-      contextLabel = "FEATURED COURSE";
     } else if (post.user?.is_verified) {
       contextLabel = "FROM TOP CREATOR";
+    } else {
+      contextLabel = "WATCH NOW";
     }
   } else {
     // Fallback for older code paths without scoring
