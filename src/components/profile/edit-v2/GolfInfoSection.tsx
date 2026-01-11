@@ -608,15 +608,17 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
               <div className="flex items-center gap-4 p-4 border border-primary/20 bg-card rounded-xl shadow-sm">
                 {/* Large circular logo */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-background shadow-lg border-2 border-primary/20 flex items-center justify-center overflow-hidden">
+                  <div className="w-16 h-16 rounded-full shadow-lg border-2 border-primary/20 overflow-hidden">
                     {currentCollege.logo_url ? (
                       <img
                         src={currentCollege.logo_url}
                         alt={currentCollege.short_name || currentCollege.college_name}
-                        className="w-14 h-14 object-contain"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <GraduationCap className="w-8 h-8 text-primary" />
+                      <div className="w-full h-full bg-background flex items-center justify-center">
+                        <GraduationCap className="w-8 h-8 text-primary" />
+                      </div>
                     )}
                   </div>
                   {/* Subtle animated ring */}

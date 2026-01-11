@@ -137,72 +137,45 @@ const EditProfilePage: React.FC = () => {
 
   const isUsernameSet = profile?.username && profile.username.trim() !== '';
 
-  // Section order for sequential movement
-  const sectionOrder = ['photos', 'basic', 'info', 'bio', 'links'];
+  // Section order for scroll-spy
+  const sectionOrder = ['photos', 'basic', 'golf', 'bio', 'privacy'];
   
   // Track if we're programmatically scrolling (from click)
   const isScrollingFromClick = useRef(false);
 
-  // Intersection observer for active section (scrollspy)
+  // Scroll-spy: update active tab based on scroll position
   useEffect(() => {
-    // Wait for profile to load so sections are rendered
     if (isLoading) return;
 
-    // Small delay to ensure refs are populated after render
-    const timeoutId = setTimeout(() => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          // Skip if we're scrolling from a click (let handleSectionClick control state)
-          if (isScrollingFromClick.current) return;
-          
-          // Find the entry with highest intersection ratio that's visible
-          const visible = entries
-            .filter((e) => e.isIntersecting)
-            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    const handleScroll = () => {
+      // Skip if we're scrolling from a tab click
+      if (isScrollingFromClick.current) return;
 
-          if (visible) {
-            const newSectionId = visible.target.id;
-            if (newSectionId) {
-              setActiveSection(prev => {
-                const currentIndex = sectionOrder.indexOf(prev);
-                const newIndex = sectionOrder.indexOf(newSectionId);
-                
-                // Only move to adjacent section (sequential movement)
-                if (Math.abs(newIndex - currentIndex) <= 1 || currentIndex === -1) {
-                  return newSectionId;
-                }
-                // If not adjacent, move one step toward the new section
-                if (newIndex > currentIndex) {
-                  return sectionOrder[currentIndex + 1];
-                } else {
-                  return sectionOrder[currentIndex - 1];
-                }
-              });
-            }
+      const scrollPosition = window.scrollY + 200; // Offset for sticky header
+
+      // Find which section is currently in view
+      for (const sectionId of sectionOrder) {
+        const section = sectionRefs.current[sectionId];
+        if (section) {
+          const { offsetTop, offsetHeight } = section;
+
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(sectionId);
+            break;
           }
-        },
-        {
-          root: null,
-          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
-          rootMargin: '-120px 0px -40% 0px', // Account for sticky header
         }
-      );
-
-      Object.values(sectionRefs.current).forEach((ref) => {
-        if (ref) observer.observe(ref);
-      });
-
-      // Store observer for cleanup
-      (window as any).__editProfileObserver = observer;
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if ((window as any).__editProfileObserver) {
-        (window as any).__editProfileObserver.disconnect();
       }
     };
-  }, [isLoading]); // Re-run when loading state changes
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isLoading]);
 
   // Scroll to section
   const handleSectionClick = useCallback((sectionId: string) => {
@@ -590,8 +563,8 @@ const EditProfilePage: React.FC = () => {
             disabled={saving || saveSuccess}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-8 h-12 text-sm font-semibold transition-all",
-              "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground",
-              "hover:shadow-lg hover:scale-[1.02]",
+              "bg-gradient-to-r from-blue-600 to-blue-700 text-white",
+              "hover:from-blue-700 hover:to-blue-800 hover:shadow-lg hover:scale-[1.02]",
               "disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100",
               saveSuccess && "from-emerald-500 to-emerald-600"
             )}
