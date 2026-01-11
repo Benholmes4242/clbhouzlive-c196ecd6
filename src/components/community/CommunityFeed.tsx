@@ -414,10 +414,20 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
       {/* Infinite scroll sentinel - no spinner, seamless loading like Watch tab */}
       <div ref={sentinelRef} className="h-20 w-full" />
 
-      {/* End of feed */}
+      {/* End of feed - polished "All caught up" state */}
       {!hasMore && items.length > 0 && (
-        <div className="py-8 text-center">
-          <p className="text-sm text-muted-foreground">You're all caught up</p>
+        <div className="flex flex-col items-center justify-center py-12 px-6">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+            <svg className="w-6 h-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-foreground mb-1">
+            You're all caught up
+          </p>
+          <p className="text-xs text-muted-foreground text-center">
+            Check back later for new posts from your community
+          </p>
         </div>
       )}
     </div>

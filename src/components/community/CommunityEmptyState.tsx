@@ -31,38 +31,36 @@ export const CommunityEmptyState: React.FC<CommunityEmptyStateProps> = ({
 
   if (variant === 'no-community') {
     return (
-      <div className={cn("px-5 py-16 text-center", className)}>
-        <div className="max-w-sm mx-auto">
-          {/* Icon */}
-          <div className="w-16 h-16 mx-auto rounded-full bg-surface-alt/60 flex items-center justify-center mb-6">
-            <Users className="w-8 h-8 text-muted-foreground" />
-          </div>
-          
-          {/* Message */}
-          <h3 className="text-lg font-serif text-foreground">
-            Your Community is empty
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-            Follow golfers or connect with friends to see posts here.
-          </p>
-          
-          {/* CTAs */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Button
-              variant="default"
-              onClick={() => navigate('/friends')}
-              className="px-5"
-            >
-              Find friends
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/discover?main=shorts')}
-              className="px-5"
-            >
-              Discover golfers
-            </Button>
-          </div>
+      <div className={cn("flex flex-col items-center justify-center py-16 px-6", className)}>
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+          <Users className="w-8 h-8 text-muted-foreground" />
+        </div>
+        
+        {/* Message */}
+        <h3 className="text-lg font-semibold text-foreground mb-1">
+          Your Community is empty
+        </h3>
+        <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+          Follow golfers or connect with friends to see their posts here
+        </p>
+        
+        {/* CTAs - stacked for mobile consistency */}
+        <div className="flex flex-col gap-3 w-full max-w-[240px]">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/friends')}
+            className="w-full"
+          >
+            Find friends
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/discover?main=shorts')}
+            className="w-full"
+          >
+            Discover golfers
+          </Button>
         </div>
       </div>
     );
