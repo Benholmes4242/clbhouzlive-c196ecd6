@@ -5,16 +5,16 @@
  * Initial render: 20 items, then infinite scroll in batches of 20
  * Order: latest first (created_at desc)
  * 
- * Polish: skeleton tiles, video poster fallback, no duplicates
+ * Polish: skeleton tiles, video autoplay with HLSPlayer, no duplicates
  */
 
 import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
-import { Play } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
+import HLSPlayer from '@/media/HLSPlayer';
 
 interface DiscoverMomentsGridProps {
   regionKey?: RegionKey;
@@ -37,12 +37,13 @@ const MomentTileSkeleton: React.FC = () => (
   </div>
 );
 
-// Individual moment tile with image error handling
+// Individual moment tile with video autoplay support
 const MomentTile: React.FC<{
   moment: ExploreMoment;
   index: number;
   onClick: () => void;
-}> = ({ moment, index, onClick }) => {
+  isInViewport?: boolean;
+}> = ({ moment, index, onClick, isInViewport = false }) => {
   const [imageError, setImageError] = useState(false);
   const isVideo = moment.media_type === 'video';
   const gradientIndex = index % GRADIENTS.length;
@@ -50,15 +51,30 @@ const MomentTile: React.FC<{
   // Use thumbnail_url, falling back to media_url for images, then gradient
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
+  
+  // Video source - use media_url for video playback
+  const videoSrc = moment.media_url;
 
   return (
     <button
       onClick={onClick}
       className="group text-left"
     >
-      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm">
-        {/* Background image or gradient */}
-        {!showGradient ? (
+      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
+        {/* Video with HLSPlayer autoplay */}
+        {isVideo && videoSrc ? (
+          <HLSPlayer
+            src={videoSrc}
+            poster={moment.thumbnail_url || undefined}
+            mediaId={moment.moment_id}
+            autoplay={isInViewport}
+            muted
+            loop
+            className="absolute inset-0 w-full h-full object-cover"
+            aspectRatio="auto"
+            objectFit="cover"
+          />
+        ) : !showGradient ? (
           <img 
             src={imageUrl!} 
             alt="Moment"
@@ -78,22 +94,6 @@ const MomentTile: React.FC<{
         
         {/* Bottom gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        
-        {/* Video indicator */}
-        {isVideo && (
-          <div className="absolute top-3 right-3">
-            <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-sm">
-              <Play className="w-4 h-4 text-white fill-white" />
-            </div>
-          </div>
-        )}
-        
-        {/* Source type badge */}
-        <div className="absolute top-3 left-3">
-          <div className="px-2 py-0.5 bg-black/50 backdrop-blur-sm rounded-full text-xs text-white/90 shadow-sm">
-            {moment.source_type === 'post' ? 'Post' : 'Review'}
-          </div>
-        </div>
       </div>
     </button>
   );
@@ -106,6 +106,9 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
 }) => {
   const navigate = useNavigate();
   const loadMoreRef = useRef(false);
+  
+  // Track which items are in viewport for autoplay
+  const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   
   const {
     data,
@@ -206,7 +209,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       {/* Grid */}
       <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
         {moments.map((moment, index) => (
-          <MomentTile
+          <MomentTileWithVisibility
             key={moment.moment_id}
             moment={moment}
             index={index}
@@ -228,6 +231,29 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
           <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
         )}
       </div>
+    </div>
+  );
+};
+
+// Wrapper component that tracks visibility for autoplay
+const MomentTileWithVisibility: React.FC<{
+  moment: ExploreMoment;
+  index: number;
+  onClick: () => void;
+}> = ({ moment, index, onClick }) => {
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+    triggerOnce: false,
+  });
+
+  return (
+    <div ref={ref}>
+      <MomentTile
+        moment={moment}
+        index={index}
+        onClick={onClick}
+        isInViewport={inView}
+      />
     </div>
   );
 };

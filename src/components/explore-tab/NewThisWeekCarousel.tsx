@@ -3,14 +3,18 @@
  * 
  * Shows top 10 moments from last 7 days (trending sort)
  * Hides if fewer than 3 items
+ * 
+ * Video autoplay with HLSPlayer for inline playback
  */
 
 import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Play, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNewThisWeekByRegion, RegionKey, TrendingMoment } from '@/hooks/useExploreMoments';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useInView } from 'react-intersection-observer';
+import HLSPlayer from '@/media/HLSPlayer';
 
 interface NewThisWeekCarouselProps {
   regionKey: RegionKey;
@@ -35,27 +39,43 @@ const GRADIENTS = [
   "from-teal-700 via-slate-600 to-slate-900",
 ];
 
-// Single tile component
+// Single tile component with video autoplay
 const MomentTile: React.FC<{
   moment: TrendingMoment;
   index: number;
   onClick: () => void;
-}> = ({ moment, index, onClick }) => {
+  isInViewport?: boolean;
+}> = ({ moment, index, onClick, isInViewport = false }) => {
   const [imageError, setImageError] = useState(false);
   const isVideo = moment.media_type === 'video';
   const gradientIndex = index % GRADIENTS.length;
   
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
+  
+  // Video source - use media_url for video playback
+  const videoSrc = moment.media_url;
 
   return (
     <button
       onClick={onClick}
       className="flex-shrink-0 group"
     >
-      <div className="relative w-28 md:w-32 aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm">
-        {/* Background */}
-        {!showGradient ? (
+      <div className="relative w-28 md:w-32 aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
+        {/* Video with HLSPlayer autoplay */}
+        {isVideo && videoSrc ? (
+          <HLSPlayer
+            src={videoSrc}
+            poster={moment.thumbnail_url || undefined}
+            mediaId={moment.moment_id}
+            autoplay={isInViewport}
+            muted
+            loop
+            className="absolute inset-0 w-full h-full object-cover"
+            aspectRatio="auto"
+            objectFit="cover"
+          />
+        ) : !showGradient ? (
           <img 
             src={imageUrl!} 
             alt="Moment"
@@ -72,17 +92,31 @@ const MomentTile: React.FC<{
         
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-        
-        {/* Video indicator */}
-        {isVideo && (
-          <div className="absolute top-2 right-2">
-            <div className="w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-              <Play className="w-3 h-3 text-white fill-white" />
-            </div>
-          </div>
-        )}
       </div>
     </button>
+  );
+};
+
+// Wrapper for visibility tracking
+const MomentTileWithVisibility: React.FC<{
+  moment: TrendingMoment;
+  index: number;
+  onClick: () => void;
+}> = ({ moment, index, onClick }) => {
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+    triggerOnce: false,
+  });
+
+  return (
+    <div ref={ref}>
+      <MomentTile
+        moment={moment}
+        index={index}
+        onClick={onClick}
+        isInViewport={inView}
+      />
+    </div>
   );
 };
 
@@ -159,7 +193,7 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
       {/* Carousel */}
       <div className="flex gap-2 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
         {moments.slice(0, 10).map((moment, index) => (
-          <MomentTile
+          <MomentTileWithVisibility
             key={moment.moment_id}
             moment={moment}
             index={index}

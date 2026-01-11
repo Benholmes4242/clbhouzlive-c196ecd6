@@ -40,6 +40,7 @@ interface DiscoverCommandCenterProps {
   pills: Pill[];
   onPillSelect: (key: string) => void;
   showPills?: boolean;
+  showSort?: boolean; // Whether to show sort button (default: true)
   className?: string;
 }
 
@@ -69,6 +70,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   pills,
   onPillSelect,
   showPills = true,
+  showSort = true,
   className,
 }) => {
   const isNonDefaultSort = sortValue !== defaultSortValue;
@@ -328,11 +330,11 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                 WebkitOverflowScrolling: 'touch',
               }}
             >
-              {/* Sort Pill */}
-              {sortPillElement}
+              {/* Sort Pill - conditionally rendered */}
+              {showSort && sortPillElement}
 
-              {/* Divider */}
-              <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />
+              {/* Divider - only show if sort is visible */}
+              {showSort && <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />}
 
               {/* Filter Pills - Enhanced styling */}
               {pills.map((pill) => (

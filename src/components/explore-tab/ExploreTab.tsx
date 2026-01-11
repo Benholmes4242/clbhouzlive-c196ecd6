@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
 import ExploreHero from './ExploreHero';
 import Top100JourneySummary from './Top100JourneySummary';
 import ExploreRegionCards from './ExploreRegionCards';
@@ -18,14 +18,14 @@ interface ExploreTabProps {
   className?: string;
 }
 
-// Local storage key
+// Local storage key - kept for future use but sort is hidden
 const EXPLORE_SORT_KEY = 'explore-sort-option';
 
+// Only show filters that work - removed bucket-list until implemented
 const EXPLORE_PILLS: { id: string; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'courses', label: 'Courses' },
   { id: 'regions', label: 'Regions' },
-  { id: 'bucket-list', label: 'Bucket List' },
 ];
 
 // Region metadata for carousels
@@ -199,20 +199,21 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
           </div>
         );
 
+      // Bucket list removed from pills - this case kept for safety
       case 'bucket-list':
         return (
           <div className="px-5 py-16 text-center">
             <div className="max-w-sm mx-auto">
-              <div className="w-16 h-16 mx-auto rounded-full bg-surface-alt/60 flex items-center justify-center mb-6">
-                <Heart className="w-8 h-8 text-muted-foreground" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center mb-6">
+                <Bookmark className="w-8 h-8 text-orange-500" />
               </div>
-              <h3 className="text-lg font-serif text-foreground">No bucket list courses yet</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Save courses from Explore to build your list.
+              <h3 className="text-lg font-semibold text-foreground">Bucket List Coming Soon</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
+                Soon you'll be able to save courses to your bucket list and track your golf journey.
               </p>
               <button
                 onClick={() => setActiveFilter('courses')}
-                className="mt-6 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+                className="mt-6 px-6 py-2.5 bg-foreground text-background rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
               >
                 Browse courses
               </button>
@@ -253,7 +254,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
   return (
     <div className={cn("min-h-screen bg-background", className)}>
-      {/* Sticky Command Center: Search + Sort + Pills */}
+      {/* Sticky Command Center: Search + Pills (Sort hidden for Explore) */}
       <div ref={searchContainerRef} className="sticky top-0 z-30 bg-background">
         <DiscoverCommandCenter
           searchPlaceholder="Search courses, regions..."
@@ -263,6 +264,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
           onSortChange={handleSortChange}
           pills={pills}
           onPillSelect={handleFilterChange}
+          showSort={false}
         />
         
         {/* Search Results Overlay */}
