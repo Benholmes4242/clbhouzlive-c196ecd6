@@ -613,7 +613,7 @@ export const VideoPlayerModal: React.FC = () => {
             {/* Video area - centered 16:9 */}
             <div ref={videoAreaRef} className="flex-1 flex items-center justify-center px-4 py-4">
               {isLoading ? (
-                <div className="w-full max-w-4xl aspect-video bg-muted/20 rounded-xl overflow-hidden animate-pulse relative">
+                <div className="w-full max-w-4xl aspect-video bg-muted/20 overflow-hidden animate-pulse relative">
                   {/* Video skeleton with gradient shimmer */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_2s_infinite] -translate-x-full" style={{ animationName: 'shimmer' }} />
                   {/* Center play icon */}
@@ -635,7 +635,7 @@ export const VideoPlayerModal: React.FC = () => {
                   </div>
                 </div>
               ) : videoData ? (
-                <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
+                <div className="relative w-full max-w-4xl aspect-video overflow-hidden bg-black">
                   {/* Filtered pixel layer with crop/rotate */}
                   {(() => {
                     const cropClass = getCropWrapperClass(videoData.studioEdits?.crop);
