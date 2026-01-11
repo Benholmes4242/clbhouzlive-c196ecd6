@@ -23,8 +23,15 @@ export const ProfileSnapshotPreview: React.FC<ProfileSnapshotPreviewProps> = ({
   
   return (
     <div className="rounded-2xl bg-white/80 border border-slate-100 p-4 flex items-center gap-3">
-      {/* Avatar */}
-      <div className="h-14 w-14 rounded-2xl overflow-hidden bg-muted/60 border border-border/50 flex-shrink-0">
+      {/* Avatar - squircle spec: 1/1.05 aspect, 34% radius */}
+      <div 
+        className="overflow-hidden bg-[#F8FAFC] border border-border/50 flex-shrink-0 flex items-center justify-center"
+        style={{
+          width: '56px',
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
+        }}
+      >
         {photoUrl ? (
           <img 
             src={photoUrl} 

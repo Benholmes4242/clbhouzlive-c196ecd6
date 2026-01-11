@@ -590,7 +590,7 @@ const EditProfilePage: React.FC = () => {
             disabled={saving || saveSuccess}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all",
-              "bg-slate-900 text-white hover:bg-slate-800",
+              "bg-[#6e7071] text-white hover:bg-[#5a5b5c]",
               "disabled:opacity-60 disabled:cursor-not-allowed",
               saveSuccess && "bg-emerald-500"
             )}

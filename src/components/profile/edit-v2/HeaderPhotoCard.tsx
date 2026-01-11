@@ -52,8 +52,8 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         onClick={handleClick}
         className={cn(
           "relative w-full overflow-hidden rounded-xl border border-dashed border-border/70",
-          "bg-muted/40 h-[200px] flex items-center justify-center",
-          "hover:bg-muted/60 transition-colors group"
+          "bg-[#F8FAFC] h-[200px] flex items-center justify-center",
+          "hover:bg-slate-100 transition-colors group"
         )}
       >
         {displayUrl ? (

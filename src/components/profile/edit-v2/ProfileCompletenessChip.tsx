@@ -34,7 +34,7 @@ export const ProfileCompletenessChip: React.FC<ProfileCompletenessChipProps> = (
   return (
     <div className={cn(
       "inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-sq-pill",
-      "bg-muted/50 text-muted-foreground"
+      "bg-white text-muted-foreground border border-border/40"
     )}>
       <span className="font-medium">Profile completeness</span>
       <span className="text-muted-foreground/70">·</span>
