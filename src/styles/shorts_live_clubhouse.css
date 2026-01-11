@@ -1,7 +1,7 @@
 /* Live Clubhouse Strip Styles - Suggested Golfers */
 
 /* ============================= */
-/* NEW: Suggested Golfers Carousel (Gamified) */
+/* Suggested Golfers Carousel (Polished) */
 /* ============================= */
 
 .suggested-golfers-row {
@@ -17,7 +17,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  width: 32px;
+  width: 40px;
   background: linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%);
   pointer-events: none;
   z-index: 10;
@@ -28,50 +28,51 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 16px; /* Match content gutter */
+  padding-left: 16px;
   padding-right: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-/* Section title */
+/* Section title - slightly larger and bolder */
 .suggested-golfers-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: hsl(var(--muted-foreground));
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
 }
 
-/* See all button */
+/* See all button - orange accent with chevron */
 .suggested-golfers-see-all {
   display: flex;
   align-items: center;
   gap: 2px;
   font-size: 13px;
   font-weight: 500;
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--primary));
   background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .suggested-golfers-see-all:hover {
-  color: hsl(var(--foreground));
+  color: hsl(var(--primary) / 0.8);
+  gap: 4px;
 }
 
-/* Horizontal scroll track - LEFT GUTTER MATCHES HEADER */
+/* Horizontal scroll track */
 .suggested-golfers-scroll {
   display: flex;
-  gap: 10px; /* Tighter gap for wider cards */
+  gap: 12px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding-left: 12px; /* Slightly reduced padding */
-  padding-right: 12px;
+  padding-left: 16px;
+  padding-right: 48px; /* Extra space for fade */
   padding-bottom: 8px;
   scrollbar-width: none;
-  align-items: stretch; /* All cards same height */
+  align-items: stretch;
 }
 
 .suggested-golfers-scroll::-webkit-scrollbar {
@@ -82,7 +83,7 @@
 /* LEGACY: Old styles (kept for backwards compat) */
 /* ============================= */
 
-/* Row container - transparent background, no extra spacing (handled by parent) */
+/* Row container */
 .live-row {
   position: relative;
   padding-left: 4px;
@@ -90,7 +91,7 @@
   background: transparent;
 }
 
-/* Right edge scroll fade affordance - signals horizontal scroll */
+/* Right edge scroll fade affordance */
 .live-row::after {
   content: '';
   position: absolute;
@@ -103,7 +104,7 @@
   z-index: 10;
 }
 
-/* Section header - flex row with title and "See all" */
+/* Section header */
 .live-row-header {
   display: flex;
   align-items: center;
@@ -113,14 +114,14 @@
   margin-bottom: 12px;
 }
 
-/* Section title - subtle, slate text */
+/* Section title */
 .live-row-title {
   font-size: 13px;
   font-weight: 500;
   color: hsl(var(--muted-foreground));
 }
 
-/* See all button - chevron action */
+/* See all button */
 .live-row-see-all {
   display: flex;
   align-items: center;
@@ -142,7 +143,7 @@
 /* Horizontal scroll track */
 .live-scroll {
   display: flex;
-  gap: 10px; /* Slightly increased spacing between squircles */
+  gap: 10px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
@@ -156,7 +157,7 @@
   display: none;
 }
 
-/* Tiles - keep tap target same size for all */
+/* Tiles */
 .lc-tile {
   width: 96px;
   position: relative;
@@ -170,8 +171,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 72px;  /* Reduced from 84px - lighter feel */
-  height: 82px; /* Proportionally adjusted */
+  width: 72px;
+  height: 82px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -179,13 +180,11 @@
   position: relative;
 }
 
-/* Nearby golfers button is larger */
 .lc-nearby .lc-avatar-btn {
   width: 96px;
   height: 96px;
 }
 
-/* Creator avatars (regular size) - clipped by Squircle component */
 .lc-avatar {
   width: 100%;
   height: 100%;
@@ -195,7 +194,7 @@
   border-radius: 0 !important;
 }
 
-/* Online dot - high contrast for visibility */
+/* Online dot */
 .lc-dot {
   position: absolute;
   right: -2px;
@@ -210,7 +209,7 @@
   z-index: 2;
 }
 
-/* Labels - using semantic tokens, NO white text */
+/* Labels */
 .lc-name {
   margin-top: 6px;
   font-size: 13px;
@@ -236,12 +235,10 @@
   overflow: hidden;
 }
 
-/* Nearby label spacing aligned with creator names */
 .lc-nearby .lc-label {
   margin-top: 6px;
 }
 
-/* Nearby bubble styling */
 .lc-nearby {
   cursor: pointer;
   border: none;
@@ -261,16 +258,14 @@
 /* Nearby pin — Frosted white glass */
 /* ============================= */
 
-/* Sizing tokens */
 :root {
-  --lc-avatar-size: 72px; /* Reduced from 84px */
+  --lc-avatar-size: 72px;
   --lc-nearby-scale: 1.0;
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
   --lc-nearby-border: 2px;
   --lc-nearby-inset: 3px;
 }
 
-/* Avatar container styling for nearby - frosted white glass */
 .lc-nearby-avatar {
   position: relative;
   width: 100%;
@@ -284,20 +279,17 @@
   isolation: isolate;
 }
 
-/* Center all inner elements with uniform inset */
 .lc-nearby-avatar > svg {
   position: absolute;
   inset: var(--lc-nearby-inset);
 }
 
-/* subtle checker sits under the pin */
 .lc-nearby-avatar .lc-checker {
   opacity: 0.8;
   width: 100%;
   height: 100%;
 }
 
-/* Leaf pin icon - centered with improved contrast */
 .lc-nearby-avatar .lc-leaf-pin {
   position: absolute;
   top: 50%;
@@ -310,13 +302,12 @@
   pointer-events: none;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  /* All animations removed - static design only */
+  /* Static design only */
 }
 
 /* ============================= */
-/* Suggested Profile Cards - No scale on touch */
+/* Suggested Profile Cards */
 /* ============================= */
 
 .suggested-profile-card {

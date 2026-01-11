@@ -136,30 +136,33 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     <div
       className={cn(
         "suggested-profile-card",
-        "relative flex-shrink-0 w-[185px] h-[220px] rounded-2xl overflow-hidden cursor-pointer",
-        "bg-card/80 backdrop-blur-sm border border-border/40",
-        "shadow-sm select-none touch-manipulation"
+        "relative flex-shrink-0 w-[180px] rounded-2xl overflow-hidden cursor-pointer",
+        "bg-card border border-border/50",
+        "shadow-sm hover:shadow-md transition-shadow duration-200",
+        "select-none touch-manipulation"
       )}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
     >
-      {/* Card content - flex column */}
-      <div className="flex flex-col h-full pt-3 pb-3 px-3">
-        {/* Avatar - large, centered (~20% bigger: 56 → 68) */}
-        <div className="relative flex justify-center mb-2">
-          <SquircleAvatar
-            size={68}
-            src={avatarUrl}
-            alt={displayName}
-          />
+      {/* Card content - flex column with auto height */}
+      <div className="flex flex-col pt-4 pb-3 px-3">
+        {/* Avatar - centered with subtle ring */}
+        <div className="relative flex justify-center mb-3">
+          <div className="ring-2 ring-border/30 rounded-full">
+            <SquircleAvatar
+              size={64}
+              src={avatarUrl}
+              alt={displayName}
+            />
+          </div>
         </div>
 
-        {/* Text stack - tight gap, no reserved empty heights */}
-        <div className="flex flex-col gap-0.5 items-center min-w-0">
-          {/* Name + Verified badge inline - golfers: 1 line truncated, businesses: 2 lines */}
+        {/* Text stack - tighter spacing */}
+        <div className="flex flex-col gap-0.5 items-center min-w-0 mb-3">
+          {/* Name + Verified badge inline */}
           <p className={cn(
-            "text-sm font-semibold text-foreground text-center leading-snug w-full",
+            "text-sm font-semibold text-foreground text-center leading-tight w-full",
             isGolfer ? "truncate" : "line-clamp-2"
           )}>
             {businessVerifiedNameParts ? (
@@ -221,16 +224,15 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           )}
         </div>
 
-        {/* Spacer pushes button to bottom */}
-        <div className="flex-1" />
-
-        {/* Follow CTA - pinned to bottom, SDS squircle style */}
+        {/* Follow CTA - clean styling */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full h-7 text-xs font-medium rounded-sq-sm",
-            isFollowing && "bg-muted text-muted-foreground"
+            "w-full h-9 text-sm font-semibold rounded-xl",
+            isFollowing 
+              ? "bg-muted text-muted-foreground" 
+              : "bg-foreground text-background hover:bg-foreground/90"
           )}
           onClick={handleFollow}
           disabled={isLoading || isFollowing}
@@ -239,7 +241,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
             <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
           ) : isFollowing ? (
             <>
-              <Check className="w-3.5 h-3.5 mr-1" />
+              <Check className="w-4 h-4 mr-1.5" />
               Following
             </>
           ) : (

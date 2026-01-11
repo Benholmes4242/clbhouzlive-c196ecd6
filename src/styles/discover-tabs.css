@@ -1,64 +1,80 @@
-/* Discover Tabs - Light/Clean Design with Orange Underline */
+/* Discover Tabs - Polished Design with Pill Container */
 
-/* Tokens - using primary (orange) for active underline */
+/* Tokens - using primary (orange) for active states */
 :root {
   --tab-active-color: hsl(var(--foreground));
   --tab-inactive-color: hsl(var(--muted-foreground));
   --tab-hover-color: hsl(var(--foreground) / 0.8);
   --tab-underline-color: hsl(var(--primary));
+  --tab-active-bg: hsl(var(--background));
+  --tab-container-bg: hsl(var(--muted) / 0.5);
 }
 
-/* Tab container - sits directly on page canvas, fully transparent */
+/* Header wrapper - sits directly on page canvas */
+.discover-header {
+  background: transparent;
+  border: none;
+  padding: 0 12px;
+  padding-top: 0;
+  padding-bottom: 12px;
+}
+
+/* Tab container - rounded pill background */
 .discover-tabs {
   display: flex;
   gap: 0;
   position: relative;
   align-items: center;
+  background: var(--tab-container-bg);
+  border-radius: 12px;
+  padding: 4px;
 }
 
-/* Base tab - tight vertical padding, underline sits close to text */
+/* Base tab - balanced padding for pill effect */
 .discover-tab {
   position: relative;
-  padding: 10px 0 8px 0; /* Less bottom padding so underline is close */
+  padding: 8px 16px;
   color: var(--tab-inactive-color);
   font-weight: 500;
   font-size: 14px;
-  transition: color 120ms ease;
+  border-radius: 8px;
+  transition: all 150ms ease;
+  z-index: 1;
 }
 
-.discover-tab:hover {
+.discover-tab:hover:not(.active) {
   color: var(--tab-hover-color);
+  background: hsl(var(--background) / 0.5);
 }
 
-/* Active state with underline */
+/* Active state - white pill with subtle shadow */
 .discover-tab.active {
   color: var(--tab-active-color);
   font-weight: 600;
+  background: var(--tab-active-bg);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.08), 0 1px 2px hsl(var(--foreground) / 0.04);
 }
 
-/* Underline: text-width only, 2px height, orange color, no glow */
+/* Active indicator dot - orange accent below text */
 .discover-tab.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 40px; /* Roughly text width */
-  height: 2px;
+  width: 4px;
+  height: 4px;
   background: var(--tab-underline-color);
-  border-radius: 1px;
-  /* No shadow or glow */
-  box-shadow: none;
+  border-radius: 50%;
 }
 
-/* Header - fully transparent, tucked tight under header chrome */
-.discover-header {
-  background: transparent;
-  border: none;
-  padding: 0 4px;
-  /* NO top padding - tabs anchor directly to header */
-  padding-top: 0;
-  /* Space below tabs to hero: 12-14px */
-  padding-bottom: 12px;
+/* Touch feedback */
+.discover-tab:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discover-tab:active {
+    transform: none;
+  }
 }
