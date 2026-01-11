@@ -386,7 +386,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Capsule Container */}
+      {/* Capsule Container - Enhanced glass effect */}
       <motion.div
         ref={capsuleRef}
         initial={{ opacity: 0, y: 20 }}
@@ -414,17 +414,20 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           transition={{ layout: { duration: 0.22, ease: [0.19, 1, 0.22, 1] } }}
           className={cn(
             'overflow-hidden',
-            'backdrop-blur-xl',
-            'border',
-            'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]',
+            'rounded-2xl',
             // Review mode: rounded card, Regular mode: squircle pill
-            isReview ? 'rounded-xl' : 'rounded-sq-lg',
-            // Background tint based on mode
-            isReview && isOutstanding 
-              ? 'bg-[rgba(210,180,97,0.08)]' 
-              : 'bg-black/50'
+            isReview ? 'rounded-xl' : 'rounded-sq-lg'
           )}
-          style={{ borderColor }}
+          style={{ 
+            borderColor,
+            background: isReview && isOutstanding 
+              ? 'rgba(210, 180, 97, 0.08)' 
+              : 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid ${borderColor}`,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+          }}
         >
           {/* Collapsed State - mode-dependent */}
           {isReview ? reviewContent : regularCollapsedContent}

@@ -95,20 +95,25 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
       className="flex flex-col items-center"
       style={{ height: SLOT_HEIGHT }}
     >
-      {/* Icon button - fixed size */}
+      {/* Icon button - fixed size with enhanced glass effect */}
       <motion.button
         whileTap={pressFeedback}
         onClick={handlePress}
         aria-label={ariaLabel}
         className={cn(
           'relative rounded-full',
-          'bg-black/25 backdrop-blur-xl',
-          'border border-white/10',
           'flex items-center justify-center',
-          'shadow-[0_4px_12px_rgba(0,0,0,0.25)]',
-          'hover:bg-black/35'
+          'transition-all duration-150'
         )}
-        style={{ width: ICON_SIZE, height: ICON_SIZE }}
+        style={{ 
+          width: ICON_SIZE, 
+          height: ICON_SIZE,
+          background: 'rgba(0, 0, 0, 0.35)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+        }}
       >
         {/* Ripple effect */}
         <AnimatePresence>
