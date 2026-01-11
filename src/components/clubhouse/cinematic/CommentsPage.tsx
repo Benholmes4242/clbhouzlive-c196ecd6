@@ -768,6 +768,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [revealedCommentIds, setRevealedCommentIds] = useState<Set<string>>(new Set());
   const [headerCompressed, setHeaderCompressed] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const commentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -849,6 +850,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   // Page entrance animation - fade in list after mount
   useEffect(() => {
     if (isOpen) {
+      setThumbnailError(false); // Reset thumbnail error state when opening
       const timer = setTimeout(() => setListVisible(true), 100);
       return () => clearTimeout(timer);
     } else {
@@ -1153,9 +1155,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 >
                   <div className="flex gap-3">
                     {/* Left column: Media thumbnail with smart aspect-ratio handling */}
-                    {videoThumbnail && (
+                    {(videoThumbnail && !thumbnailError) ? (
                       <motion.div 
-                        className="relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity"
+                        className="relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity bg-black"
                         animate={{
                           width: headerCompressed ? 80 : 110,
                           height: headerCompressed ? 100 : 140,
@@ -1170,9 +1172,10 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           <>
                             <img
                               src={videoThumbnail}
-                              alt="Post thumbnail"
+                              alt=""
                               className="absolute inset-0 w-full h-full object-cover"
                               style={{ objectPosition: 'center center' }}
+                              onError={() => setThumbnailError(true)}
                             />
                             {/* Review badge overlay for portrait */}
                             {isReview && reviewRating && (
@@ -1211,8 +1214,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                             <div className="absolute inset-0 flex items-center justify-center">
                               <img
                                 src={videoThumbnail}
-                                alt="Post thumbnail"
+                                alt=""
                                 className="w-full h-auto max-h-[60%] object-contain"
+                                onError={() => setThumbnailError(true)}
                               />
                             </div>
                             {/* Review badge overlay for landscape */}
@@ -1227,7 +1231,26 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                           </>
                         )}
                       </motion.div>
-                    )}
+                    ) : videoThumbnail ? (
+                      // Fallback when thumbnail fails to load
+                      <motion.div 
+                        className={cn(
+                          "relative flex-shrink-0 rounded-[14px] overflow-hidden cursor-pointer active:opacity-90 transition-opacity flex items-center justify-center",
+                          isDark ? "bg-white/10" : "bg-muted/60"
+                        )}
+                        animate={{
+                          width: headerCompressed ? 80 : 110,
+                          height: headerCompressed ? 100 : 140,
+                        }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        onClick={onClose}
+                      >
+                        <MessageCircle className={cn(
+                          "w-8 h-8",
+                          isDark ? "text-white/30" : "text-muted-foreground/40"
+                        )} />
+                      </motion.div>
+                    ) : null}
                     
                     {/* Right column: Creator stack + caption */}
                     <div className="flex-1 min-w-0 flex flex-col">

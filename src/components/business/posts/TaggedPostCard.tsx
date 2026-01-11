@@ -317,6 +317,13 @@ export default function TaggedPostCard({
         onClose={() => setCommentsOpen(false)}
         postId={post.id}
         videoThumbnail={thumbnailUrl || undefined}
+        aspectRatio={(() => {
+          const media = primaryMedia as any;
+          if (media?.aspect_ratio) return media.aspect_ratio;
+          if (media?.width && media?.height) return media.width / media.height;
+          return undefined;
+        })()}
+        isReview={(post as any).categories?.includes('review')}
         creatorName={authorName}
         creatorAvatar={authorAvatar || undefined}
         theme="grey"
