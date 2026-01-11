@@ -5,7 +5,10 @@
  * Initial render: 20 items, then infinite scroll in batches of 20
  * Order: latest first (created_at desc)
  * 
- * Polish: skeleton tiles, video autoplay with HLSPlayer, no duplicates
+ * Autoplay pattern: Diagonal alternating
+ * - Row 1: Left plays, Right static
+ * - Row 2: Left static, Right plays
+ * (repeats)
  */
 
 import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
@@ -14,7 +17,9 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import HLSPlayer from '@/media/HLSPlayer';
+import { Play } from 'lucide-react';
+import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
+import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 
 interface DiscoverMomentsGridProps {
   regionKey?: RegionKey;
@@ -30,6 +35,17 @@ const GRADIENTS = [
   "from-teal-700 via-slate-600 to-slate-900",
 ];
 
+/**
+ * Diagonal alternating autoplay pattern:
+ * Row 1: Left plays (0), Right static (1)
+ * Row 2: Left static (2), Right plays (3)
+ * Pattern repeats every 4 items
+ */
+const isAutoplayCandidate = (index: number): boolean => {
+  const positionInPattern = index % 4;
+  return positionInPattern === 0 || positionInPattern === 3;
+};
+
 // Skeleton tile component
 const MomentTileSkeleton: React.FC = () => (
   <div className="aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt">
@@ -42,38 +58,80 @@ const MomentTile: React.FC<{
   moment: ExploreMoment;
   index: number;
   onClick: () => void;
-  isInViewport?: boolean;
-}> = ({ moment, index, onClick, isInViewport = false }) => {
+  isPlaying: boolean;
+  canAutoplay: boolean;
+  registerRef: (el: HTMLVideoElement | null) => void;
+}> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef }) => {
   const [imageError, setImageError] = useState(false);
   const isVideo = moment.media_type === 'video';
   const gradientIndex = index % GRADIENTS.length;
+  const playerRef = useRef<HLSPlayerRef>(null);
   
   // Use thumbnail_url, falling back to media_url for images, then gradient
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
   
-  // Video source - use media_url for video playback
+  // Video source
   const videoSrc = moment.media_url;
+
+  // Register video element with MediaRuntime
+  useEffect(() => {
+    if (canAutoplay && playerRef.current) {
+      const videoEl = playerRef.current.getElement();
+      registerRef(videoEl);
+    }
+    return () => {
+      if (canAutoplay) {
+        registerRef(null);
+      }
+    };
+  }, [canAutoplay, registerRef]);
 
   return (
     <button
       onClick={onClick}
-      className="group text-left"
+      className="group text-left w-full"
     >
       <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
-        {/* Video with HLSPlayer autoplay */}
-        {isVideo && videoSrc ? (
+        {/* Video with autoplay capability */}
+        {isVideo && videoSrc && canAutoplay ? (
           <HLSPlayer
+            ref={playerRef}
             src={videoSrc}
             poster={moment.thumbnail_url || undefined}
             mediaId={moment.moment_id}
-            autoplay={isInViewport}
+            autoplay={isPlaying}
             muted
             loop
             className="absolute inset-0 w-full h-full object-cover"
             aspectRatio="auto"
             objectFit="cover"
+            managedByMediaRuntime
           />
+        ) : isVideo && videoSrc ? (
+          // Static video thumbnail (not an autoplay candidate)
+          <div className="relative">
+            {!showGradient ? (
+              <img 
+                src={moment.thumbnail_url || imageUrl!} 
+                alt="Moment"
+                loading="lazy"
+                onError={() => setImageError(true)}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className={cn(
+                "absolute inset-0 bg-gradient-to-br",
+                GRADIENTS[gradientIndex]
+              )} />
+            )}
+            {/* Play icon overlay for static videos */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+              </div>
+            </div>
+          </div>
         ) : !showGradient ? (
           <img 
             src={imageUrl!} 
@@ -93,7 +151,7 @@ const MomentTile: React.FC<{
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         
         {/* Bottom gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
       </div>
     </button>
   );
@@ -107,8 +165,13 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   const navigate = useNavigate();
   const loadMoreRef = useRef(false);
   
-  // Track which items are in viewport for autoplay
-  const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
+  // Set up autoplay with MediaRuntime
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'grid',
+    startThreshold: 0.5,  // Play when 50% visible
+    stopThreshold: 0.2,   // Pause when below 20% visible
+  });
   
   const {
     data,
@@ -160,6 +223,18 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     }
   }, [navigate, onMomentClick]);
 
+  // Create registration callback for each moment
+  const createRegisterRef = useCallback((momentId: string, index: number) => {
+    return (el: HTMLVideoElement | null) => {
+      registerMedia({
+        id: momentId,
+        element: el,
+        isCandidate: true,
+        sortIndex: index,
+      });
+    };
+  }, [registerMedia]);
+
   // Initial loading state with skeleton
   if (isLoading && moments.length === 0) {
     return (
@@ -208,14 +283,22 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
       
       {/* Grid */}
       <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-        {moments.map((moment, index) => (
-          <MomentTileWithVisibility
-            key={moment.moment_id}
-            moment={moment}
-            index={index}
-            onClick={() => handleMomentClick(moment)}
-          />
-        ))}
+        {moments.map((moment, index) => {
+          const canAutoplay = isAutoplayCandidate(index) && moment.media_type === 'video';
+          const isPlaying = canAutoplay && playingIds.has(moment.moment_id);
+          
+          return (
+            <MomentTile
+              key={moment.moment_id}
+              moment={moment}
+              index={index}
+              onClick={() => handleMomentClick(moment)}
+              isPlaying={isPlaying}
+              canAutoplay={canAutoplay}
+              registerRef={createRegisterRef(moment.moment_id, index)}
+            />
+          );
+        })}
         
         {/* Pagination skeleton tiles */}
         {isFetchingNextPage && (
@@ -231,29 +314,6 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
           <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
         )}
       </div>
-    </div>
-  );
-};
-
-// Wrapper component that tracks visibility for autoplay
-const MomentTileWithVisibility: React.FC<{
-  moment: ExploreMoment;
-  index: number;
-  onClick: () => void;
-}> = ({ moment, index, onClick }) => {
-  const { ref, inView } = useInView({
-    threshold: 0.5,
-    triggerOnce: false,
-  });
-
-  return (
-    <div ref={ref}>
-      <MomentTile
-        moment={moment}
-        index={index}
-        onClick={onClick}
-        isInViewport={inView}
-      />
     </div>
   );
 };
