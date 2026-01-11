@@ -304,10 +304,16 @@ const ActivityGridV2: React.FC<ActivityGridV2Props> = ({
         </div>
       </div>
 
-      {/* Loading indicator for infinite scroll */}
+      {/* Loading indicator for infinite scroll - skeleton tiles matching grid pattern */}
       {(isLoading || isFetchingNextPage) && items.length > 0 && (
-        <div className="flex justify-center py-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+        <div className="animate-pulse" style={{ marginTop: `${config.gapPx}px` }}>
+          <div className="grid grid-cols-2" style={{ gap: `${config.gapPx}px` }}>
+            {/* First row: 2 portrait skeletons */}
+            <div className="aspect-[3/4] bg-gradient-to-br from-muted/40 to-muted/20 rounded-md" />
+            <div className="aspect-[3/4] bg-gradient-to-br from-muted/40 to-muted/20 rounded-md" />
+            {/* Second row: 1 landscape skeleton spanning both columns */}
+            <div className="col-span-2 aspect-[16/9] bg-gradient-to-br from-muted/40 to-muted/20 rounded-md" />
+          </div>
         </div>
       )}
     </>

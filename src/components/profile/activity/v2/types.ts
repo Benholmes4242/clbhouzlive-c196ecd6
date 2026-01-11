@@ -60,7 +60,7 @@ export interface ActivityGridV2Config {
 export const DEFAULT_ACTIVITY_GRID_CONFIG: ActivityGridV2Config = {
   landscapeLookahead: 5,
   pageSize: 24, // 8 blocks × 3 items
-  gapPx: 2,
+  gapPx: 4,     // Increased from 2px for better visual breathing room
   autoplayEnabled: true,
   maxAutoplay: 2,
   playThreshold: 0.6,    // Start playing at 60% visible
