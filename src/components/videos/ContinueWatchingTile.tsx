@@ -55,7 +55,7 @@ export const ContinueWatchingTile: React.FC<ContinueWatchingTileProps> = ({
 
   return (
     <div 
-      className={cn("group cursor-pointer bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300", className)}
+      className={cn("group cursor-pointer bg-card overflow-hidden", className)}
       onClick={handleVideoClick}
     >
       {/* Thumbnail container */}
