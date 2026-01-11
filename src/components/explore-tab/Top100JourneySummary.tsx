@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin, ArrowRight } from 'lucide-react';
 import { useUserTop100Intent } from '@/hooks/useUserTop100Intent';
 import { motion } from 'framer-motion';
 
@@ -11,13 +11,13 @@ interface Top100JourneySummaryProps {
 }
 
 /**
- * Top100JourneySummary - Anchors Explore to a long-term goal
+ * Top100JourneySummary - Polished journey card with progress visualization
  * 
- * Cinematic copy spec:
- * - Title: "Your Top 100 Journey"
- * - Progress: "12 of 100 played"
- * - Micro-copy: "Every round is a step forward."
- * - CTA: "Continue your journey →"
+ * Features:
+ * - Gradient icon with shadow
+ * - Progress bar (when user has progress)
+ * - Decorative background pattern
+ * - Engaging copy
  */
 export const Top100JourneySummary: React.FC<Top100JourneySummaryProps> = ({
   className,
@@ -30,9 +30,9 @@ export const Top100JourneySummary: React.FC<Top100JourneySummaryProps> = ({
   
   const totalPlayed = intent?.total_top100_played ?? 0;
   const hasProgress = totalPlayed > 0;
-  const progressPercent = (totalPlayed / 100) * 100;
+  const progressPercent = Math.min((totalPlayed / 100) * 100, 100);
 
-  // Animate progress ring only once on first load
+  // Animate progress only once on first load
   useEffect(() => {
     if (!isLoading && !hasAnimated) {
       const timer = setTimeout(() => setHasAnimated(true), 100);
@@ -42,21 +42,11 @@ export const Top100JourneySummary: React.FC<Top100JourneySummaryProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("px-5 py-6", className)}>
-        <div className="bg-surface-alt/50 rounded-xl p-5 animate-pulse">
-          <div className="h-5 w-32 bg-muted rounded" />
-          <div className="h-4 w-48 bg-muted rounded mt-2" />
-        </div>
+      <div className={cn("mx-4 mt-6", className)}>
+        <div className="h-[180px] rounded-2xl bg-muted animate-pulse" />
       </div>
     );
   }
-
-  // SVG circumference for progress ring
-  const circumference = 2 * Math.PI * 16; // r=16
-  const strokeDasharray = circumference;
-  const strokeDashoffset = hasAnimated 
-    ? circumference - (progressPercent / 100) * circumference 
-    : circumference;
 
   return (
     <motion.div
@@ -64,91 +54,62 @@ export const Top100JourneySummary: React.FC<Top100JourneySummaryProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
-      className={cn("px-5 py-6", className)}
+      className={cn("mx-4 mt-6", className)}
     >
-      <div className="bg-surface-alt/40 border border-border/40 rounded-xl p-5 hover:bg-surface-alt/60 transition-colors">
-        {hasProgress ? (
-          // User has progress
-          <div className="space-y-3">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2 text-primary">
-                  <MapPin className="w-4 h-4" />
-                  <span className="text-sm font-medium">Your Top 100 Journey</span>
-                </div>
-                <p className="mt-2 text-2xl font-serif text-foreground">
-                  {totalPlayed} <span className="text-lg text-muted-foreground">of 100 played</span>
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground font-light">
-                  Every round is a step forward.
-                </p>
-              </div>
-              
-              {/* Progress ring with one-time animation */}
-              <div className="relative w-14 h-14 flex-shrink-0">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="text-border"
-                  />
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeDasharray={strokeDasharray}
-                    strokeDashoffset={strokeDashoffset}
-                    className="text-primary transition-all duration-1000 ease-out"
-                  />
-                </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-foreground">
-                  {totalPlayed}%
-                </span>
-              </div>
+      <div className="relative p-5 bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+        {/* Decorative background pattern */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-50 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 dark:from-orange-950/30" />
+        
+        {/* Content */}
+        <div className="relative">
+          {/* Header row with icon */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/25">
+              <MapPin className="w-5 h-5 text-white" />
             </div>
-            
-            <button
-              onClick={onContinueJourney}
-              className="w-full flex items-center justify-between py-2.5 px-3 bg-background/60 rounded-lg text-sm text-foreground hover:bg-background transition-colors group"
-            >
-              <span>Continue your journey</span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform duration-200" />
-            </button>
-          </div>
-        ) : (
-          // No progress yet
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-4 h-4" />
-              <span className="text-sm font-medium">Your Top 100 Journey</span>
-            </div>
-            
             <div>
-              <h3 className="text-lg font-serif text-foreground">
-                Begin your journey
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground leading-relaxed font-light">
-                Every round is a step forward. Track the courses you have played and discover ones waiting for you.
+              <p className="text-xs font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wider">
+                Your Top 100 Journey
               </p>
+              <h3 className="text-lg font-bold text-foreground">
+                {hasProgress ? `${totalPlayed} of 100 played` : 'Begin your journey'}
+              </h3>
             </div>
-            
-            <button
-              onClick={onStartJourney}
-              className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors group"
-            >
-              <span>Start your journey</span>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
-            </button>
           </div>
-        )}
+          
+          {/* Description */}
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+            {hasProgress 
+              ? 'Every round is a step forward. Keep tracking your journey.'
+              : 'Every round is a step forward. Track the courses you have played and discover ones waiting for you.'
+            }
+          </p>
+          
+          {/* Progress bar (if user has progress) */}
+          {hasProgress && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                <span>Progress</span>
+                <span className="font-semibold text-foreground">{totalPlayed}/100</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: hasAnimated ? `${progressPercent}%` : '0%' }}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* CTA */}
+          <button
+            onClick={hasProgress ? onContinueJourney : onStartJourney}
+            className="flex items-center gap-2 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-semibold text-sm transition-colors group"
+          >
+            <span>{hasProgress ? 'Continue your journey' : 'Start your journey'}</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+          </button>
+        </div>
       </div>
     </motion.div>
   );

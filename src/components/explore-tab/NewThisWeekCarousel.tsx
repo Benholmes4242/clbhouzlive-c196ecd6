@@ -1,11 +1,13 @@
 /**
- * NewThisWeekCarousel - Horizontal carousel showing trending moments for a region
+ * NewThisWeekCarousel - Enhanced horizontal carousel showing trending moments
  * 
  * Shows top 10 moments from last 7 days (trending sort)
  * Hides if fewer than 3 items
  * 
  * Autoplay pattern: Every third item (conservative for bandwidth)
  * Items at index 0, 3, 6, 9 autoplay when visible
+ * 
+ * Polish: Better cards, gradient overlays, hover effects
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
@@ -48,7 +50,7 @@ const isAutoplayCandidate = (index: number): boolean => {
   return index % 3 === 0;
 };
 
-// Single tile component with video autoplay
+// Enhanced tile component with hover effects
 const MomentTile: React.FC<{
   moment: TrendingMoment;
   index: number;
@@ -64,8 +66,6 @@ const MomentTile: React.FC<{
   
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
-  
-  // Video source
   const videoSrc = moment.media_url;
 
   // Register video element with MediaRuntime
@@ -86,7 +86,7 @@ const MomentTile: React.FC<{
       onClick={onClick}
       className="flex-shrink-0 group"
     >
-      <div className="relative w-28 md:w-32 aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
+      <div className="relative w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
         {/* Video with autoplay capability */}
         {isVideo && videoSrc && canAutoplay ? (
           <HLSPlayer
@@ -111,7 +111,7 @@ const MomentTile: React.FC<{
                 alt="Moment"
                 loading="lazy"
                 onError={() => setImageError(true)}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
               <div className={cn(
@@ -119,10 +119,10 @@ const MomentTile: React.FC<{
                 GRADIENTS[gradientIndex]
               )} />
             )}
-            {/* Play icon overlay for static videos */}
+            {/* Play icon overlay with hover effect */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+              <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:bg-black/60 transition-colors">
+                <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
               </div>
             </div>
           </div>
@@ -141,8 +141,8 @@ const MomentTile: React.FC<{
           )} />
         )}
         
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+        {/* Bottom gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
       </div>
     </button>
   );
@@ -150,7 +150,7 @@ const MomentTile: React.FC<{
 
 // Skeleton tile
 const TileSkeleton: React.FC = () => (
-  <div className="flex-shrink-0 w-28 md:w-32 aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt">
+  <div className="flex-shrink-0 w-[120px] aspect-[3/4] rounded-xl overflow-hidden bg-muted">
     <Skeleton className="w-full h-full" />
   </div>
 );
@@ -168,8 +168,8 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'grid',
-    startThreshold: 0.5,  // Play when 50% visible
-    stopThreshold: 0.2,   // Pause when below 20% visible
+    startThreshold: 0.5,
+    stopThreshold: 0.2,
   });
 
   const handleMomentClick = useCallback((moment: TrendingMoment) => {
@@ -204,12 +204,12 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
   if (isLoading) {
     return (
       <div className={cn("py-4", className)}>
-        <div className="px-4 mb-3 flex items-center justify-between">
+        <div className="flex items-center justify-between px-4 mb-3">
           <Skeleton className="h-5 w-48" />
-          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-8 w-20 rounded-full" />
         </div>
-        <div className="flex gap-2 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
+          {Array.from({ length: 5 }).map((_, i) => (
             <TileSkeleton key={i} />
           ))}
         </div>
@@ -224,22 +224,22 @@ export const NewThisWeekCarousel: React.FC<NewThisWeekCarouselProps> = ({
 
   return (
     <div className={cn("py-4", className)}>
-      {/* Header */}
-      <div className="px-4 mb-3 flex items-center justify-between">
-        <h4 className="text-sm font-medium text-foreground">
+      {/* Enhanced Header */}
+      <div className="flex items-center justify-between px-4 mb-3">
+        <h3 className="text-base font-bold text-foreground">
           New this week in {regionTitle}
-        </h4>
+        </h3>
         <button
           onClick={handleSeeAll}
-          className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
         >
-          See all
-          <ChevronRight className="w-3.5 h-3.5" />
+          <span className="text-sm font-medium text-muted-foreground">See all</span>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
       </div>
       
-      {/* Carousel */}
-      <div className="flex gap-2 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
+      {/* Enhanced Carousel */}
+      <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
         {moments.slice(0, 10).map((moment, index) => {
           const canAutoplay = isAutoplayCandidate(index) && moment.media_type === 'video';
           const isPlaying = canAutoplay && playingIds.has(moment.moment_id);
