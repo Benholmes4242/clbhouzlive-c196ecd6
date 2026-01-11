@@ -5354,6 +5354,33 @@ export type Database = {
           },
         ]
       }
+      profile_creation_errors: {
+        Row: {
+          created_at: string | null
+          error_code: string | null
+          error_message: string
+          id: string
+          resolved_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message: string
+          id?: string
+          resolved_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string
+          id?: string
+          resolved_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profile_immersive_telemetry: {
         Row: {
           created_at: string | null
