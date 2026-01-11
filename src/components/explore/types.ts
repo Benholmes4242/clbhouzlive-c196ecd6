@@ -68,6 +68,12 @@ export interface ExploreContentItem {
     id: string;
     media_type: 'video' | 'image';
     media_url: string;
+    poster_url?: string | null;
+    stream_id?: string | null;
+    width?: number | null;
+    height?: number | null;
+    aspect_ratio?: number | null;
+    display_order?: number | null;
     filter_id?: string | null;
     studio_edits?: any | null;
   }[];
