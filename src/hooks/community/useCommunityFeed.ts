@@ -199,6 +199,14 @@ export function useCommunityFeed({
             commentCount,
             badges: post.badges || [],
             categories: post.categories || [], // Include categories for client-side filtering
+            // Include media array with dimensions for dynamic aspect ratio
+            media: [{
+              id: m.id,
+              media_type: kind as 'image' | 'video',
+              media_url: m.media_url,
+              width: m.width ?? undefined,
+              height: m.height ?? undefined,
+            }],
           };
         })
         .filter(Boolean) as CommunityContentItem[];
