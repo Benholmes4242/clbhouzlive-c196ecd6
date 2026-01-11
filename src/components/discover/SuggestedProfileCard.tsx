@@ -136,7 +136,7 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     <div
       className={cn(
         "suggested-profile-card",
-        "relative flex-shrink-0 w-[180px] rounded-2xl overflow-hidden cursor-pointer",
+        "relative flex-shrink-0 w-[180px] h-[240px] rounded-2xl overflow-hidden cursor-pointer",
         "bg-card border border-border/50",
         "shadow-sm hover:shadow-md transition-shadow duration-200",
         "select-none touch-manipulation"
@@ -145,9 +145,9 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
       role="button"
       tabIndex={0}
     >
-      {/* Card content - flex column with auto height */}
-      <div className="flex flex-col pt-4 pb-3 px-3">
-        {/* Avatar - centered */}
+      {/* Card content - flex column with fixed height */}
+      <div className="flex flex-col h-full pt-4 pb-3 px-3">
+        {/* Avatar - centered (fixed height section) */}
         <div className="relative flex justify-center mb-3">
           <SquircleAvatar
             size={64}
@@ -156,8 +156,8 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           />
         </div>
 
-        {/* Text stack - tighter spacing */}
-        <div className="flex flex-col gap-0.5 items-center min-w-0 mb-3">
+        {/* Text stack - flexible section that grows to fill space */}
+        <div className="flex flex-col flex-1 items-center min-w-0">
           {/* Name + Verified badge inline */}
           <p className={cn(
             "text-sm font-semibold text-foreground text-center leading-tight w-full",
@@ -187,12 +187,12 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
 
           {/* Golfer: Home club (1 line, truncate) OR Business: "Business Profile" */}
           {isGolfer && golferData?.home_club && (
-            <p className="text-[11px] text-muted-foreground text-center truncate w-full">
+            <p className="text-[11px] text-muted-foreground text-center truncate w-full mt-0.5">
               {golferData.home_club}
             </p>
           )}
           {isBusiness && (
-            <p className="text-[11px] text-muted-foreground text-center line-clamp-1 w-full">
+            <p className="text-[11px] text-muted-foreground text-center line-clamp-1 w-full mt-0.5">
               Business Profile
             </p>
           )}
@@ -209,9 +209,12 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
             </p>
           )}
 
-          {/* Golfer: Reason row with optional mutual friend avatars */}
+          {/* Spacer to push reason to bottom of info section */}
+          <div className="flex-1" />
+
+          {/* Golfer: Reason row with optional mutual friend avatars - anchored to bottom of info section */}
           {isGolfer && (
-            <div className="flex items-center justify-center gap-1.5 mt-0.5 w-full">
+            <div className="flex items-center justify-center gap-1.5 w-full">
               {golferData?.mutual_friends && golferData.mutual_friends.length > 0 && (
                 <MutualFriendsAvatars friends={golferData.mutual_friends} maxDisplay={3} />
               )}
@@ -222,12 +225,12 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
           )}
         </div>
 
-        {/* Follow CTA - clean styling */}
+        {/* Follow CTA - fixed at bottom */}
         <Button
           size="sm"
           variant={isFollowing ? "secondary" : "default"}
           className={cn(
-            "w-full h-9 text-sm font-semibold rounded-xl",
+            "w-full h-9 text-sm font-semibold rounded-xl mt-3",
             isFollowing 
               ? "bg-muted text-muted-foreground" 
               : "bg-foreground text-background hover:bg-foreground/90"
