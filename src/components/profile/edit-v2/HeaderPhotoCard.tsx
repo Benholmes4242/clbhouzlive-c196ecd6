@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { Camera, ImageIcon } from 'lucide-react';
+import { Camera, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SectionHeader } from './SectionHeader';
 
 interface HeaderPhotoCardProps {
   currentUrl?: string | null;
@@ -28,32 +29,34 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-medium">Header photo</h2>
+          <h3 className="text-sm font-semibold text-foreground">Header Photo</h3>
           <p className="text-xs text-muted-foreground">
-            This image appears at the top of your profile. Use a wide, landscape photo.
+            Appears at the top of your profile
           </p>
         </div>
-        {!!displayUrl && (
+        {displayUrl && (
           <button
             type="button"
             onClick={handleClick}
-            className="text-sm font-medium text-slate-600 hover:text-slate-500"
+            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
-            Change photo
+            Change
           </button>
         )}
       </div>
 
-      {/* Preview container matches ProfilePageV2 hero exactly: h-[250px], object-cover object-bottom */}
       <button
         type="button"
         onClick={handleClick}
         className={cn(
-          "relative w-full overflow-hidden rounded-xl border border-dashed border-border/70",
-          "bg-[#F8FAFC] h-[200px] flex items-center justify-center",
-          "hover:bg-slate-100 transition-colors group"
+          "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
+          "h-[180px] flex flex-col items-center justify-center",
+          "group",
+          displayUrl 
+            ? "border-transparent" 
+            : "border-border hover:border-primary/50 hover:bg-primary/5"
         )}
       >
         {displayUrl ? (
@@ -61,26 +64,28 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <img
               src={displayUrl}
               alt="Header preview"
-              className="h-full w-full object-cover object-bottom"
+              className="h-full w-full object-cover object-bottom rounded-xl"
             />
             {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <div className="flex items-center gap-2 text-white text-sm font-medium">
-                <Camera className="w-4 h-4" />
-                Change photo
-              </div>
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-xl">
+              <Camera className="w-8 h-8 text-white mb-2" />
+              <span className="text-white text-sm font-medium">Change photo</span>
             </div>
           </>
         ) : (
-          <span className="text-xs text-muted-foreground">
-            Tap to upload a header photo
-          </span>
+          <div className="text-center p-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+              <Camera className="w-8 h-8 text-primary" />
+            </div>
+            <p className="text-sm font-medium text-foreground mb-1">
+              Upload header photo
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Recommended: 1600×600px • JPG, PNG or WebP
+            </p>
+          </div>
         )}
       </button>
-
-      <p className="mt-2 text-[11px] text-muted-foreground">
-        Recommended: 1600×600px or larger. JPG, PNG, or WebP.
-      </p>
 
       <input
         ref={inputRef}

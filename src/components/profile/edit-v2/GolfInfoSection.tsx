@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
 import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
 import { useCollegeMediaSearch, useCollegeMediaByName, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
+import { SectionHeader } from './SectionHeader';
 
 interface GolfInfoSectionProps {
   homeClub: string;
@@ -273,10 +274,11 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-sm font-medium">Golf information</h2>
-        <p className="text-xs text-muted-foreground">We use this to show members, nearby golfers, and club activity.</p>
-      </div>
+      <SectionHeader
+        icon={<MapPin className="w-5 h-5 text-primary" />}
+        title="Golf Information"
+        subtitle="Connect with nearby golfers and show club activity"
+      />
 
       <div className="space-y-5">
         {/* Primary Home Club Card */}
@@ -583,47 +585,64 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
           </div>
         )}
 
-        {/* College Selection */}
+        {/* College Selection - Enhanced prominent display */}
         <div className={cn(
-          "rounded-sq-md border border-border p-4 space-y-3",
-          collegeNormalized ? "bg-white" : "bg-[#F8FAFC]"
+          "rounded-2xl border-2 p-5 space-y-3 transition-all",
+          collegeNormalized && currentCollege
+            ? "border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5" 
+            : "border-border bg-card"
         )}>
           <div className="flex items-center gap-2">
-            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <Label className="text-sm font-semibold text-foreground">
               College
             </Label>
-            {collegeNormalized && currentCollege && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                Badge active
-              </span>
-            )}
           </div>
           
-          <p className="text-xs text-muted-foreground -mt-1">
+          <p className="text-xs text-muted-foreground">
             Add your college to show a badge on your profile and connect with alumni.
           </p>
 
           <div ref={collegeSearchRef} className="relative">
             {collegeNormalized && currentCollege ? (
-              <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-sq-sm bg-[#F8FAFC]">
-                {currentCollege.logo_url ? (
-                  <img
-                    src={currentCollege.logo_url}
-                    alt={currentCollege.short_name || currentCollege.college_name}
-                    className="w-6 h-6 rounded-full object-contain bg-background flex-shrink-0"
-                  />
-                ) : (
-                  <GraduationCap className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                )}
-                <span className="flex-1 text-sm font-medium">
-                  {currentCollege.short_name || currentCollege.college_name}
-                </span>
+              /* Prominent College Card when selected */
+              <div className="flex items-center gap-4 p-4 border border-primary/20 bg-card rounded-xl shadow-sm">
+                {/* Large circular logo */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-background shadow-lg border-2 border-primary/20 flex items-center justify-center overflow-hidden">
+                    {currentCollege.logo_url ? (
+                      <img
+                        src={currentCollege.logo_url}
+                        alt={currentCollege.short_name || currentCollege.college_name}
+                        className="w-14 h-14 object-contain"
+                      />
+                    ) : (
+                      <GraduationCap className="w-8 h-8 text-primary" />
+                    )}
+                  </div>
+                  {/* Subtle animated ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse" />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-base text-foreground truncate">
+                      {currentCollege.short_name || currentCollege.college_name}
+                    </span>
+                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full flex-shrink-0">
+                      Badge active
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Showing on your profile
+                  </p>
+                </div>
+                
                 <button
                   type="button"
                   onClick={handleClearCollege}
-                  className="p-1.5 hover:bg-muted rounded-full transition-colors"
+                  className="p-2 hover:bg-destructive/10 rounded-full transition-colors flex-shrink-0"
                 >
-                  <X className="w-4 h-4 text-muted-foreground" />
+                  <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
                 </button>
               </div>
             ) : (
@@ -638,13 +657,13 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                     }}
                     onFocus={() => setIsCollegeSearchOpen(true)}
                     placeholder="Search for your college..."
-                    className="pl-10 h-11"
+                    className="pl-10 h-12 text-base border-border focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
                 {/* College Search Results Dropdown */}
                 {isCollegeSearchOpen && collegeSearchQuery.length >= 2 && (
-                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-sq-sm shadow-lg max-h-64 overflow-y-auto">
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-xl shadow-lg max-h-64 overflow-y-auto">
                     {collegeSearchLoading ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
                         Searching...
@@ -661,17 +680,17 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => handleCollegeSelect(college)}
-                            className="w-full px-3 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-muted transition-colors flex items-center gap-3"
+                            className="w-full px-4 py-3 text-left hover:bg-primary/5 transition-colors flex items-center gap-3"
                           >
                             {college.logo_url ? (
                               <img
                                 src={college.logo_url}
                                 alt={college.short_name || college.college_name}
-                                className="w-6 h-6 rounded-full object-contain bg-background flex-shrink-0"
+                                className="w-8 h-8 rounded-full object-contain bg-background flex-shrink-0"
                               />
                             ) : (
-                              <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
-                                <GraduationCap className="w-3.5 h-3.5 text-muted-foreground" />
+                              <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
+                                <GraduationCap className="w-4 h-4 text-muted-foreground" />
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
