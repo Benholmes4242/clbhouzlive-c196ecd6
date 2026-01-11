@@ -287,10 +287,10 @@ export const VideosSectionPage: React.FC = () => {
           </div>
         </div>
         
-        {/* Loading skeletons - enhanced */}
-        <div className="px-4 pt-4 space-y-4">
+        {/* Loading skeletons - full bleed */}
+        <div className="divide-y divide-border/30">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-card rounded-xl overflow-hidden shadow-sm animate-pulse">
+            <div key={i} className="bg-card overflow-hidden animate-pulse">
               <div className="aspect-video bg-muted" />
               <div className="px-4 py-3 flex gap-3">
                 <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0" />
@@ -354,8 +354,8 @@ export const VideosSectionPage: React.FC = () => {
         />
       </div>
 
-      {/* Video feed - enhanced layout */}
-      <div ref={containerRef} className="px-4 pt-4 space-y-4">
+      {/* Video feed - full bleed layout */}
+      <div ref={containerRef} className="divide-y divide-border/30">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-6">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -393,9 +393,9 @@ export const VideosSectionPage: React.FC = () => {
 
         {/* Loading indicator - skeleton tiles */}
         {isFetchingNextPage && (
-          <div className="space-y-4 animate-pulse">
+          <div className="divide-y divide-border/30 animate-pulse">
             {[1, 2].map((i) => (
-              <div key={i} className="bg-card rounded-xl overflow-hidden shadow-sm">
+              <div key={i} className="bg-card overflow-hidden">
                 <div className="aspect-video bg-muted" />
                 <div className="px-4 py-3 flex gap-3">
                   <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0" />

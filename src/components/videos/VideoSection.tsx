@@ -97,8 +97,8 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
         )}
       </div>
 
-      {/* Video cards with consistent spacing */}
-      <div className="px-4 space-y-4">
+      {/* Video cards - full bleed, no gaps */}
+      <div className="divide-y divide-border/30">
         {videos.map((video, index) => (
           <LongFormVideoTileAutoplay
             key={video.id}
