@@ -626,26 +626,26 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-base text-foreground truncate">
-                      {currentCollege.short_name || currentCollege.college_name}
-                    </span>
-                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full flex-shrink-0">
-                      Badge active
-                    </span>
-                  </div>
+                  <span className="font-semibold text-base text-foreground truncate block">
+                    {currentCollege.short_name || currentCollege.college_name}
+                  </span>
                   <p className="text-sm text-muted-foreground">
                     Showing on your profile
                   </p>
                 </div>
                 
-                <button
-                  type="button"
-                  onClick={handleClearCollege}
-                  className="p-2 hover:bg-destructive/10 rounded-full transition-colors flex-shrink-0"
-                >
-                  <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                </button>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full">
+                    Badge active
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleClearCollege}
+                    className="p-2 hover:bg-destructive/10 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                  </button>
+                </div>
               </div>
             ) : (
               <>
