@@ -216,8 +216,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
           <div className={cn(
             "relative flex items-center gap-3 h-12 px-4 rounded-xl border-2 transition-all",
             useLightTheme 
-              ? "bg-slate-50 border-slate-200 focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20" 
-              : "bg-white/8 border-white/10 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20"
+              ? "bg-slate-50 border-slate-200 focus-within:border-[#e2e8f0] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#e2e8f0]/50" 
+              : "bg-white/8 border-white/10 focus-within:border-[#e2e8f0]/50 focus-within:ring-2 focus-within:ring-[#e2e8f0]/30"
           )}>
             <Search className={cn(
               "h-5 w-5 flex-shrink-0",
