@@ -574,9 +574,14 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           item={heroItem}
           isLoading={loading && !content}
           onWatch={(item) => {
-            const originalItem = content?.find(c => c.id === item.id);
-            const index = content?.findIndex(c => c.id === item.id) ?? 0;
-            if (originalItem) onMediaClick(originalItem, index);
+            // Hero click: find the item in unfiltered content and open fullscreen
+            // Pass the full content array to maintain proper playlist order
+            if (content && content.length > 0) {
+              const index = content.findIndex(c => c.id === item.id);
+              if (index !== -1) {
+                onMediaClick(content[index], index);
+              }
+            }
           }}
         />
         
@@ -588,12 +593,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         <div className="h-4" /> {/* 16px gap: Suggested Golfers → Grid */}
         
         {/* Feed Grid - uses new WatchGridV2 with ActivityGrid layout */}
+        {/* CRITICAL FIX: WatchGridV2 now passes its own items array, 
+            so we use that directly instead of searching in 'content' */}
         <WatchGridV2 
-          onMediaClick={(item, index) => {
-            // Find original item and pass with index for unified fullscreen
-            const originalItem = content?.find(c => c.id === item.postId);
-            const originalIndex = content?.findIndex(c => c.id === item.postId) ?? index;
-            if (originalItem) onMediaClick(originalItem, originalIndex);
+          onMediaClick={(item, index, gridItems) => {
+            // Use the grid's own data array directly - this ensures we open 
+            // the correct video since gridItems IS the displayed playlist
+            onMediaClick(item as any, index);
           }}
         />
       </div>

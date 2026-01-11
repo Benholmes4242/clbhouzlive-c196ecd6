@@ -18,6 +18,9 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { FeedAdapter } from '@/types/feed-adapter';
 import { UnifiedFullscreenViewer } from '@/components/fullscreen/UnifiedFullscreenViewer';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 // ============ Types ============
 
@@ -75,6 +78,30 @@ export function FullscreenPlayerProvider({ children }: { children: React.ReactNo
     // Clear any pending close timeout
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
+    }
+    
+    // CRITICAL FIX: Preload HLS manifest for target video BEFORE opening
+    // This eliminates the delay between fullscreen open and video playback
+    const targetItem = newConfig.items[newConfig.initialIndex] as any;
+    if (targetItem) {
+      // Try to extract media URL from various item shapes
+      const mediaUrl = 
+        targetItem.media?.[0]?.media_url || 
+        targetItem.src || 
+        targetItem.mediaUrl || 
+        targetItem.url;
+      
+      const mediaType = 
+        targetItem.media?.[0]?.media_type || 
+        targetItem.type || 
+        targetItem.mediaType;
+      
+      if (mediaUrl && mediaType === 'video') {
+        const streamId = uidFromNode({ src: mediaUrl });
+        if (streamId) {
+          preloadHlsManifest(generateStreamHlsUrl(streamId));
+        }
+      }
     }
     
     setConfig(newConfig as FullscreenPlayerConfig<any>);

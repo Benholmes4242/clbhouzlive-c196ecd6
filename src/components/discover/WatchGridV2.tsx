@@ -5,7 +5,8 @@ import { useWatchPostsV2 } from './useWatchPostsV2';
 import { UnifiedMediaItem } from '@/components/shared/grid/types';
 
 interface WatchGridV2Props {
-  onMediaClick?: (item: UnifiedMediaItem, index: number) => void;
+  /** Click handler receives the clicked item, its index, AND the full items array */
+  onMediaClick?: (item: UnifiedMediaItem, index: number, items: UnifiedMediaItem[]) => void;
 }
 
 /**
@@ -15,6 +16,10 @@ interface WatchGridV2Props {
  * Layout: PP → L pattern (2 portraits, then 1 landscape)
  * Autoplay: 60% visible to start, 20% to pause
  * Infinite scroll: 24 items per page
+ * 
+ * CRITICAL: This component manages its own data via useWatchPostsV2.
+ * The onMediaClick callback receives the items array so the parent can
+ * pass it directly to fullscreen without using a different data source.
  */
 export function WatchGridV2({ onMediaClick }: WatchGridV2Props) {
   const navigate = useNavigate();
@@ -44,15 +49,16 @@ export function WatchGridV2({ onMediaClick }: WatchGridV2Props) {
     }
   }, [items]);
 
-  // Default click handler navigates to shorts player
+  // Click handler passes the grid's own items array for correct fullscreen playlist
   const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
     if (onMediaClick) {
-      onMediaClick(item, index);
+      // CRITICAL: Pass items array so parent uses the SAME data source
+      onMediaClick(item, index, items);
     } else {
       // Default: navigate to shorts player at this index
       navigate(`/shorts/${item.postId}`);
     }
-  }, [onMediaClick, navigate]);
+  }, [onMediaClick, navigate, items]);
 
   if (isError) {
     return (
