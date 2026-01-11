@@ -197,14 +197,37 @@ export function UnifiedFullscreenViewer<T>({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+
+  // Deduplicate items to prevent duplicate key warnings
+  const deduplicatedItems = useMemo(() => {
+    const seen = new Set<string>();
+    const result: T[] = [];
+    for (const item of items) {
+      const id = adapter.getId(item);
+      if (!seen.has(id)) {
+        seen.add(id);
+        result.push(item);
+      }
+    }
+    return result;
+  }, [items, adapter]);
+
+  // Recalculate initialIndex after deduplication
+  const adjustedInitialIndex = useMemo(() => {
+    if (initialIndex >= deduplicatedItems.length) {
+      return Math.max(0, deduplicatedItems.length - 1);
+    }
+    return initialIndex;
+  }, [initialIndex, deduplicatedItems.length]);
+
   const queryClient = useQueryClient();
   const { softResume } = useSoftResume();
 
-  // Use unified fullscreen logic hook
+  // Use unified fullscreen logic hook with deduplicated items
   const logic = useUnifiedFullscreenLogic({
-    items,
+    items: deduplicatedItems,
     adapter,
-    initialIndex,
+    initialIndex: adjustedInitialIndex,
     onIndexChange,
     onLoadMore,
     hasMore,
