@@ -95,6 +95,12 @@ html.lightbox-open {
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   /* ========================================
+     PAGE BACKGROUND VARIABLES
+     ======================================== */
+  --bg-page: #F8FAFC; /* slate-50 - primary page background for light theme */
+  --bg-page-dark: #0F0F0F; /* Clubhouse dark mode background */
+  
+  /* ========================================
      CLUBHOUSE DARK THEME VARIABLES
      ======================================== */
   
