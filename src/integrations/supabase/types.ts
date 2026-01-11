@@ -9515,8 +9515,10 @@ export type Database = {
         Row: {
           aspect_ratio: number | null
           course_id: string | null
+          course_name: string | null
           created_at: string | null
           display_order: number | null
+          likes_count: number | null
           media_type: string | null
           media_url: string | null
           moment_id: string | null

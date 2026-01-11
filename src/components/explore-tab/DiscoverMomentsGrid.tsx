@@ -16,9 +16,17 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment, ExploreFilters } from '@/hooks/useExploreMoments';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play } from 'lucide-react';
+import { Play, Heart } from 'lucide-react';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+
+// Helper to format like count
+const formatLikeCount = (count: number): string => {
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return count.toString();
+};
 
 interface DiscoverMomentsGridProps {
   regionKey?: RegionKey;
@@ -97,6 +105,10 @@ const MomentTile: React.FC<{
     };
   }, [canAutoplay, registerRef]);
 
+  // Get course name and like count from moment data
+  const courseName = moment.course_name;
+  const likeCount = moment.likes_count ?? 0;
+
   return (
     <button
       onClick={onClick}
@@ -155,8 +167,31 @@ const MomentTile: React.FC<{
           )} />
         )}
         
-        {/* Bottom gradient overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+        {/* Bottom gradient overlay for text readability */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/30 to-transparent pointer-events-none" />
+        
+        {/* Course name badge - top center */}
+        {courseName && (
+          <div className="absolute top-2 left-2 right-2 flex justify-center pointer-events-none">
+            <div className="px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full max-w-[90%]">
+              <span className="text-[11px] font-medium text-white truncate block text-center">
+                {courseName}
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {/* Like count badge - bottom left */}
+        {likeCount > 0 && (
+          <div className="absolute bottom-2 left-2 pointer-events-none">
+            <div className="flex items-center gap-1 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-full">
+              <Heart className="w-3 h-3 text-white fill-white" />
+              <span className="text-[11px] font-medium text-white">
+                {formatLikeCount(likeCount)}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </button>
   );
