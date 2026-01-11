@@ -147,6 +147,7 @@ const AdminAuditPage = lazy(() => import("./pages/admin/AdminAuditPage"));
 const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
 const GolfCourseEditorPage = lazy(() => import("./pages/admin/GolfCourseEditorPage"));
 const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
+const CollegeLogosPage = lazy(() => import("./pages/admin/CollegeLogosPage").then(m => ({ default: m.CollegeLogosPage })));
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.AdminAnalyticsPage })));
@@ -423,6 +424,7 @@ function AppRoutes() {
           {/* Legacy/management sections */}
           <Route path="golf-courses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCoursesPage /></Suspense>} />
           <Route path="logos" element={<Suspense fallback={<GenericPageSkeleton />}><LogosPage /></Suspense>} />
+          <Route path="college-logos" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeLogosPage /></Suspense>} />
           <Route path="country-flags" element={<Suspense fallback={<GenericPageSkeleton />}><CountryFlagsPage /></Suspense>} />
           <Route path="courses" element={<Suspense fallback={<GenericPageSkeleton />}><CourseImportPage /></Suspense>} />
           <Route path="analytics" element={
