@@ -31,7 +31,7 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
           id="public-profile"
           checked={isPublic}
           onCheckedChange={onChange}
-          className="data-[state=checked]:bg-[#6e7071]"
+          className="data-[state=checked]:bg-[#E2E8F0] data-[state=unchecked]:bg-[#E2E8F0] [&>span]:bg-white [&>span]:shadow-sm"
         />
       </div>
     </div>

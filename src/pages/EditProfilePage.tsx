@@ -590,9 +590,9 @@ const EditProfilePage: React.FC = () => {
             disabled={saving || saveSuccess}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all",
-              "bg-[#6e7071] text-white hover:bg-[#5a5b5c]",
+              "bg-[#E2E8F0] text-foreground hover:bg-slate-300",
               "disabled:opacity-60 disabled:cursor-not-allowed",
-              saveSuccess && "bg-emerald-500"
+              saveSuccess && "bg-emerald-500 text-white"
             )}
           >
             <AnimatePresence mode="wait">

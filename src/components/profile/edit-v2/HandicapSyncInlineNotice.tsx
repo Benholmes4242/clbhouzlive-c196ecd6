@@ -64,7 +64,7 @@ const HandicapSyncInlineNotice: React.FC<HandicapSyncInlineNoticeProps> = ({
           type="button"
           onClick={handleRegisterInterest}
           disabled={isLoading}
-          className="text-xs font-medium text-primary hover:underline whitespace-nowrap disabled:opacity-50"
+          className="text-xs font-medium px-3 py-1 rounded-full bg-[#E2E8F0] text-foreground hover:bg-slate-300 whitespace-nowrap disabled:opacity-50 transition-colors"
         >
           {isLoading ? 'Registering...' : 'Get early access'}
         </button>
