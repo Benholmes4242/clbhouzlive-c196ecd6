@@ -24,6 +24,7 @@ export interface ExploreMoment {
   source_type: 'post' | 'review';
   source_id: string;
   course_id: string;
+  course_name: string | null;
   user_id: string;
   created_at: string;
   media_type: string;
@@ -33,6 +34,7 @@ export interface ExploreMoment {
   aspect_ratio: number | null;
   display_order: number | null;
   region_key: RegionKey | null;
+  likes_count: number | null;
 }
 
 export interface TrendingMoment extends ExploreMoment {
