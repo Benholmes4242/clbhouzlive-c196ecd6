@@ -592,10 +592,15 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             ? "border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5" 
             : "border-border bg-card"
         )}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between">
             <Label className="text-sm font-semibold text-foreground">
               College
             </Label>
+            {collegeNormalized && currentCollege && (
+              <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full">
+                Badge active
+              </span>
+            )}
           </div>
           
           <p className="text-xs text-muted-foreground">
@@ -634,18 +639,13 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-full">
-                    Badge active
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleClearCollege}
-                    className="p-2 hover:bg-destructive/10 rounded-full transition-colors"
-                  >
-                    <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleClearCollege}
+                  className="p-2 hover:bg-destructive/10 rounded-full transition-colors flex-shrink-0"
+                >
+                  <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                </button>
               </div>
             ) : (
               <>
