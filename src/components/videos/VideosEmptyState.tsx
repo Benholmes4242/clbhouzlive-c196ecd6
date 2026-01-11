@@ -35,7 +35,7 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
           variant="default"
           size="sm"
           className="px-5 py-2.5 rounded-xl font-semibold shadow-sm"
-          onClick={() => navigate('/golfers')}
+          onClick={() => navigate('/golferstofollow')}
         >
           Discover creators
         </Button>
