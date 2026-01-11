@@ -77,6 +77,10 @@ const AuthCallback: React.FC = () => {
         
         setStatus("Checking profile...");
 
+        // FIX: Add small delay to give the database trigger time to create profile
+        // This reduces reliance on the client-side fallback for race conditions
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         // Check if user has a profile
         let { data: profile, error: profileError } = await supabase
           .from('user_profiles')
