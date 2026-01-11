@@ -190,10 +190,10 @@ const GolfersToFollowPage = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-slate-50">
+    <PageRoot className="min-h-screen bg-white">
       <div className="w-full">
-        {/* Header section - bg-slate-50 */}
-        <section className="bg-slate-50">
+        {/* Header section - white */}
+        <section className="bg-white">
           {/* Back CTA - 24px below header */}
           <div className="px-4 pt-6">
             <button
@@ -217,8 +217,8 @@ const GolfersToFollowPage = () => {
           </div>
         </section>
 
-        {/* Tabs & Search section - bg-slate-100 */}
-        <section className="bg-slate-100 pb-4">
+        {/* Tabs & Search section - #F8FAFC (slate-50) */}
+        <section className="bg-[#F8FAFC] pb-4">
           {/* Tabs - matching Courses page styling exactly */}
           <div className="px-6">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabKey)} className="w-full">
@@ -286,8 +286,8 @@ const GolfersToFollowPage = () => {
           </div>
         </section>
 
-        {/* Content section - bg-slate-50 */}
-        <section className="bg-slate-50 min-h-[50vh]">
+        {/* Content section - white */}
+        <section className="bg-white min-h-[50vh]">
           {/* Error state */}
           {error && !loading && (
             <div className="flex flex-col items-center justify-center py-16 px-6">
