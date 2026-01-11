@@ -5,7 +5,7 @@ import { VideoSection } from './VideoSection';
 import { VideosEmptyState } from './VideosEmptyState';
 import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
-import { ContinueWatchingSection } from './ContinueWatchingSection';
+import { ContinueWatchingCarousel } from './ContinueWatchingCarousel';
 import { VideoNudgeBanner } from './VideoNudgeBanner';
 import { FeaturedVideoHero } from './FeaturedVideoHero';
 import { TrendingNowSection } from './TrendingNowSection';
@@ -438,12 +438,13 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         onCreatorClick={handleCreatorClick}
       />
 
-      {/* Continue Watching (only shows if user has in-progress videos) */}
-      <ContinueWatchingSection
+      {/* Continue Watching - horizontal carousel */}
+      <ContinueWatchingCarousel
         onVideoClick={(id, resumeAt) => {
           console.log('Resume video:', id, 'at', resumeAt);
           handleVideoClick(id);
         }}
+        onCreatorClick={handleCreatorClick}
         className="mb-6"
       />
 
