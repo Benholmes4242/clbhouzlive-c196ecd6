@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  trackAuthMethodSelected,
+  trackAuthInitiated,
+  trackAuthFailed,
+  trackAuthException,
+  trackSignupInitiated,
+  trackSignupSuccess,
+  trackSignupFailed,
+  trackLoginSuccess,
+  trackLoginFailed,
+} from "@/lib/authAnalytics";
 
 // New UI components (presentational only)
 import AuthHeroScreen from "./components/AuthHeroScreen";
@@ -116,35 +127,87 @@ const AuthForm: React.FC<AuthFormProps> = ({
   // ===================
 
   const handleGoogleSignIn = async () => {
+    trackAuthMethodSelected('google');
     setSubmitting(true);
     setErrorMsg(null);
     
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      }
-    });
+    const startTime = Date.now();
     
-    if (error) {
-      setErrorMsg("Google sign-in failed. Please try again.");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        }
+      });
+      
+      if (error) {
+        // FIX 3: Enhanced error messaging
+        let errorMessage = 'Google sign-in failed.';
+        
+        if (error.message?.includes('popup_closed')) {
+          errorMessage = 'Sign-in was cancelled. Please try again.';
+        } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+          errorMessage = 'Connection issue. Please check your internet and try again.';
+        } else if (error.message?.includes('unauthorized') || error.message?.includes('invalid')) {
+          errorMessage = 'Unable to verify with Google. Please try again.';
+        } else {
+          errorMessage += ` ${error.message}`;
+        }
+        
+        trackAuthFailed('google', error.message, Date.now() - startTime);
+        setErrorMsg(errorMessage);
+        setSubmitting(false);
+      } else {
+        trackAuthInitiated('google', Date.now() - startTime);
+      }
+    } catch (error) {
+      const err = error as Error;
+      trackAuthException('google', err.message);
+      setErrorMsg('An unexpected error occurred. Please try again.');
       setSubmitting(false);
     }
   };
 
   const handleAppleSignIn = async () => {
+    trackAuthMethodSelected('apple');
     setSubmitting(true);
     setErrorMsg(null);
     
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      }
-    });
+    const startTime = Date.now();
     
-    if (error) {
-      setErrorMsg("Apple sign-in failed. Please try again.");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        }
+      });
+      
+      if (error) {
+        // FIX 3: Enhanced error messaging
+        let errorMessage = 'Apple sign-in failed.';
+        
+        if (error.message?.includes('popup_closed')) {
+          errorMessage = 'Sign-in was cancelled. Please try again.';
+        } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+          errorMessage = 'Connection issue. Please check your internet and try again.';
+        } else if (error.message?.includes('unauthorized') || error.message?.includes('invalid')) {
+          errorMessage = 'Unable to verify with Apple. Please try again.';
+        } else {
+          errorMessage += ` ${error.message}`;
+        }
+        
+        trackAuthFailed('apple', error.message, Date.now() - startTime);
+        setErrorMsg(errorMessage);
+        setSubmitting(false);
+      } else {
+        trackAuthInitiated('apple', Date.now() - startTime);
+      }
+    } catch (error) {
+      const err = error as Error;
+      trackAuthException('apple', err.message);
+      setErrorMsg('An unexpected error occurred. Please try again.');
       setSubmitting(false);
     }
   };
@@ -163,15 +226,20 @@ const AuthForm: React.FC<AuthFormProps> = ({
       return;
     }
 
+    trackAuthMethodSelected('email');
     setSubmitting(true);
     setPasswordError(null);
+    
+    const startTime = Date.now();
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
+      trackLoginFailed('email', error.message, Date.now() - startTime);
       setPasswordError("Email or password is incorrect");
       setSubmitting(false);
     } else if (data?.user) {
+      trackLoginSuccess('email', Date.now() - startTime);
       navigate('/auth/callback');
     }
   };
@@ -200,8 +268,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
       return;
     }
 
+    trackSignupInitiated('email');
     setSubmitting(true);
     console.log('[Auth] Starting signup for:', email);
+    
+    const startTime = Date.now();
 
     // Timeout protection - 30 seconds
     const timeoutId = setTimeout(() => {
