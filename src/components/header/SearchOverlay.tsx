@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, User, MapPin, Building, Clock, TrendingUp, ChevronRight } from 'lucide-react';
+import { Search, X, User, MapPin, Building, Clock, Sparkles, ChevronRight, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type BusinessResult } from '@/hooks/useGlobalEntitySearch';
@@ -535,23 +535,29 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                 </div>
               )}
 
-              {/* Trending - Enhanced */}
+              {/* Today's Picks - Daily rotating content */}
               {popularItems.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2.5 px-3 mb-3">
-                    <div className={cn(
-                      "w-6 h-6 rounded-md flex items-center justify-center",
-                      useLightTheme ? "bg-orange-100" : "bg-primary/20"
-                    )}>
-                      <TrendingUp className={cn(
-                        "h-3.5 w-3.5",
-                        useLightTheme ? "text-orange-600" : "text-primary"
-                      )} />
+                  <div className="flex items-center justify-between px-3 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br",
+                        useLightTheme ? "from-orange-500 to-amber-500" : "from-primary to-amber-500"
+                      )}>
+                        <Sparkles className="h-3.5 w-3.5 text-white" />
+                      </div>
+                      <span className={cn(
+                        "text-xs font-bold uppercase tracking-wide",
+                        useLightTheme ? "text-slate-700" : "text-white/70"
+                      )}>Today's Picks</span>
                     </div>
-                    <span className={cn(
-                      "text-xs font-bold uppercase tracking-wide",
-                      useLightTheme ? "text-slate-700" : "text-white/70"
-                    )}>Popular</span>
+                    <div className={cn(
+                      "flex items-center gap-1 text-[10px]",
+                      useLightTheme ? "text-slate-400" : "text-white/30"
+                    )}>
+                      <RefreshCw className="w-2.5 h-2.5" />
+                      <span>Updates daily</span>
+                    </div>
                   </div>
                   <div className="space-y-1">
                     {popularItems.slice(0, 5).map((item, index) => (

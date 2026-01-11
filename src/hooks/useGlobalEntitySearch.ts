@@ -1,5 +1,5 @@
 import { useQuery, useQueries } from '@tanstack/react-query';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { searchAnalytics } from '@/utils/searchAnalytics';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
@@ -276,25 +276,59 @@ const getRecentSearches = (): RecentSearch[] => {
   return [];
 };
 
-// Get trending items (popular courses) with images
+// Daily seed for consistent shuffling throughout the day
+const getDailySeed = (): number => {
+  const today = new Date();
+  return today.getFullYear() * 10000 + 
+         (today.getMonth() + 1) * 100 + 
+         today.getDate();
+};
+
+// Seeded random function for daily-consistent shuffling
+const seededRandom = (seed: number): (() => number) => {
+  let s = seed;
+  return function() {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+};
+
+// Shuffle array with daily seed for consistent daily picks
+const dailyShuffle = <T,>(array: T[]): T[] => {
+  const random = seededRandom(getDailySeed());
+  const shuffled = [...array];
+  
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// Get trending items (popular courses) with daily rotation
 const getTrendingItems = async (): Promise<TrendingItem[]> => {
   try {
+    // Fetch a larger pool of courses to enable meaningful daily rotation
     const { data, error } = await supabase
       .from('golf_courses')
       .select('id, name, global_rank, thumbnail_image, country, region')
       .not('global_rank', 'is', null)
+      .lte('global_rank', 200) // Top 200 courses for a good pool
       .order('global_rank', { ascending: true })
-      .limit(8);
+      .limit(50);
 
     if (error) throw error;
 
-    return (data || []).map(course => ({
+    const allCourses = (data || []).map(course => ({
       label: course.name,
       type: 'clubs' as const,
       id: course.id,
       image: course.thumbnail_image,
       subtitle: `${course.region ? `${course.region}, ` : ''}${course.country}${course.global_rank ? ` • #${course.global_rank}` : ''}`
     }));
+
+    // Apply daily shuffle and take top picks for the day
+    return dailyShuffle(allCourses).slice(0, 8);
   } catch (error) {
     console.error('Error loading trending items:', error);
     return [];
