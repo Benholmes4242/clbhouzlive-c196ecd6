@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { runtimeUserTap } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
 import { SHOW_MOCK_DATA, generateMockVideos } from '@/utils/mockVideoData';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
@@ -98,6 +99,14 @@ export const VideosSectionPage: React.FC = () => {
     sort: sortOptionToQuerySort(sortOption),
   });
 
+  // Unified fullscreen player for section videos
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+    onLoadMore: fetchNextPage,
+    hasMore,
+    isLoadingMore: isFetchingNextPage,
+  });
+
   // Client-side search filter + mock data injection
   const items = useMemo(() => {
     // Inject mock data when flag is enabled
@@ -117,6 +126,29 @@ export const VideosSectionPage: React.FC = () => {
       return titleMatch || creatorMatch || courseMatch;
     });
   }, [rawItems, searchQuery, section]);
+
+  // Convert LongFormVideo items to ExploreContentItem format for fullscreen
+  const videosAsExploreItems = useMemo(() => {
+    return items.map(video => ({
+      id: video.id,
+      type: 'video' as const,
+      src: video.mediaUrl || '',
+      thumbnailSrc: video.thumbnailUrl,
+      title: video.title,
+      durationSeconds: video.durationSeconds,
+      user: {
+        id: video.creatorUserId,
+        name: video.creatorName,
+        avatar: video.creatorAvatarUrl,
+      },
+      likes: video.likes || 0,
+      golfCourse: video.golfCourseId ? {
+        id: video.golfCourseId,
+        name: video.golfCourseName || 'Golf Course',
+      } : undefined,
+      createdAt: video.createdAt,
+    }));
+  }, [items]);
 
   // Handle category selection - update URL
   const handleCategorySelect = (categoryKey: string) => {
@@ -256,12 +288,15 @@ export const VideosSectionPage: React.FC = () => {
     };
   }, [hasMore, fetchNextPage, isLoading]);
 
-  const handleVideoClick = (id: string) => {
+  const handleVideoClick = useCallback((id: string) => {
     runtimeUserTap(id);
-    navigate(`/video/${id}`, {
-      state: { backgroundLocation: location, fromVideo: true }
-    });
-  };
+    
+    // Find the video in the playlist and open fullscreen
+    const index = videosAsExploreItems.findIndex(v => v.id === id);
+    if (index !== -1) {
+      openFullscreen(videosAsExploreItems, index);
+    }
+  }, [videosAsExploreItems, openFullscreen]);
 
   const handleCreatorClick = (creatorUserId: string) => {
     navigate(`/creator/${creatorUserId}`);
