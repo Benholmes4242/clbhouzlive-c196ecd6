@@ -244,16 +244,13 @@ const Discover = () => {
     }
   }, [allContent, openFullscreen]);
 
-  // Handle video click from VideosTab (receives just string id)
+  // Handle video click from VideosTab
+  // NOTE: VideosTab now handles fullscreen internally using its own data source.
+  // This callback is kept for any navigation or analytics, but doesn't open fullscreen.
   const handleVideoClick = useCallback((id: string) => {
-    const clickedIndex = allContent.findIndex(c => c.id === id);
-    if (clickedIndex !== -1) {
-      openFullscreen(allContent, clickedIndex);
-    } else {
-      // Fallback: navigate to video page if not found in current content
-      navigate(`/video/${id}`);
-    }
-  }, [allContent, openFullscreen, navigate]);
+    // VideosTab handles fullscreen internally - this is just for fallback/analytics
+    console.log('[Discover] Video click received:', id);
+  }, []);
 
   // Handle media click from CommunityFeed (receives any item shape)
   const handleCommunityMediaClick = useCallback((item: any) => {

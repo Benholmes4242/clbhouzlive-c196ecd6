@@ -556,7 +556,8 @@ export function UnifiedFullscreenViewer<T>({
                 onTouchStart={(e) => handleMediaTouchStart(e, item.id, hasMultipleMedia)}
                 onTouchEnd={(e) => handleMediaTouchEnd(e, item.id, hasMultipleMedia, currentMediaIndex, item.media.length)}
                 className="relative w-full h-full z-10"
-                style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px))' }}
+                // FIXED: Remove bottom padding that was causing black gap
+                // The safe area insets are handled by the overlay components instead
               >
                 {/* Double-tap heart burst */}
                 {showTapHeart[item.id] && (

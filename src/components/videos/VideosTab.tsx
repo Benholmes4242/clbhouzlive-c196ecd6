@@ -362,11 +362,14 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     // Find the video in the combined playlist
     const index = videosAsExploreItems.findIndex(v => v.id === id);
     if (index !== -1) {
+      // Open fullscreen with our own data - don't call parent's onVideoClick
+      // to avoid competing fullscreen calls
       openFullscreen(videosAsExploreItems, index);
     }
     
-    onVideoClick?.(id);
-  }, [videosAsExploreItems, openFullscreen, savePosition, onVideoClick]);
+    // NOTE: Removed onVideoClick?.(id) to prevent parent from also opening fullscreen
+    // Parent's handleVideoClick now just logs - we handle fullscreen here
+  }, [videosAsExploreItems, openFullscreen, savePosition]);
 
   const handleCreatorClick = (creatorUserId: string) => {
     savePosition();

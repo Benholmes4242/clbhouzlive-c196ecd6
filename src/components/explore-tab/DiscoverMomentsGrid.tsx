@@ -38,14 +38,12 @@ const GRADIENTS = [
 ];
 
 /**
- * Diagonal alternating autoplay pattern:
- * Row 1: Left plays (0), Right static (1)
- * Row 2: Left static (2), Right plays (3)
- * Pattern repeats every 4 items
+ * All videos are autoplay candidates - MediaRuntime handles concurrency.
+ * Previously used diagonal alternating pattern that was too restrictive.
  */
 const isAutoplayCandidate = (index: number): boolean => {
-  const positionInPattern = index % 4;
-  return positionInPattern === 0 || positionInPattern === 3;
+  // All tiles are candidates, MediaRuntime handles which ones actually play
+  return true;
 };
 
 // Skeleton tile component
@@ -232,13 +230,28 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   }, [navigate, onMomentClick, moments]);
 
   // Create registration callback for each moment
+  // Uses requestAnimationFrame to ensure element is fully mounted before registration
   const createRegisterRef = useCallback((momentId: string, index: number) => {
     return (el: HTMLVideoElement | null) => {
-      registerMedia({
-        id: momentId,
-        element: el,
-        isCandidate: true,
-        sortIndex: index,
+      if (!el) {
+        // Unregister when element is unmounted
+        registerMedia({
+          id: momentId,
+          element: null,
+          isCandidate: false,
+          sortIndex: index,
+        });
+        return;
+      }
+      
+      // Use requestAnimationFrame to ensure element is fully mounted
+      requestAnimationFrame(() => {
+        registerMedia({
+          id: momentId,
+          element: el,
+          isCandidate: true,
+          sortIndex: index,
+        });
       });
     };
   }, [registerMedia]);
