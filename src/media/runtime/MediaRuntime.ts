@@ -83,6 +83,12 @@ const MAX_RETRIES = 1;
 const PLAY_RETRY_MAX = 3; // Max retries for requestPlay with backoff
 const PLAY_RETRY_BASE_DELAY = 100; // Base delay for exponential backoff
 
+// Autoplay hysteresis thresholds
+// Incumbent video keeps playing until it drops below STOP_THRESHOLD
+// New video only starts when it crosses START_THRESHOLD AND incumbent is below STOP_THRESHOLD
+const AUTOPLAY_START_THRESHOLD = 0.4;  // 40% visible to start playing
+const AUTOPLAY_STOP_THRESHOLD = 0.25;  // 25% visible to stop playing (incumbent priority)
+
 // Memory management caps
 const MAX_REGISTERED_MEDIA = 10; // Max videos to keep registered
 const CLEANUP_THRESHOLD = 15; // Trigger cleanup when registry reaches this size
@@ -710,11 +716,11 @@ class MediaRuntimeCore {
     // Don't evaluate during user-initiated playback
     if (this.state.activeReason === 'user') return;
     
-    // Get all visible candidates
+    // Get all visible candidates (above start threshold)
     const candidates: MediaNode[] = [];
     
     this.registry.forEach((node) => {
-      if (node.isVisible && !node.errorState) {
+      if (node.isVisible && !node.errorState && node.visibilityRatio >= AUTOPLAY_START_THRESHOLD) {
         candidates.push(node);
       }
     });
@@ -722,107 +728,95 @@ class MediaRuntimeCore {
     // Get IDs of visible candidates
     const visibleIds = new Set(candidates.map(c => c.id));
     
+    // Process each surface type with incumbent priority
+    const surfaceTypes: MediaSurface[] = ['grid', 'videos', 'hero', 'fullscreen', 'clubhouse'];
     
-    // Grid video concurrency: allow up to MAX_CONCURRENT_GRID_VIDEOS (3)
-    const gridVideosPlaying = Array.from(this.state.activeMediaIds).filter(id => {
-      const media = this.registry.get(id);
-      return media?.surface === 'grid';
-    });
-    
-    // Separate candidates by surface
-    const gridCandidates = candidates.filter(c => c.surface === 'grid');
-    const otherCandidates = candidates.filter(c => c.surface !== 'grid');
-    
-    // Pause grid videos that are no longer visible
-    for (const playingId of gridVideosPlaying) {
-      const node = this.registry.get(playingId);
-      if (node && !node.isVisible) {
-        this.requestPause({ id: playingId, reason: 'scroll_away' });
-      }
-    }
-    
-    // Count currently playing visible grid videos
-    const visibleGridPlaying = gridVideosPlaying.filter(id => {
-      const node = this.registry.get(id);
-      return node?.isVisible;
-    });
-    
-    // For grid: allow up to MAX_CONCURRENT_GRID_VIDEOS to play
-    if (gridCandidates.length > 0) {
-      // Sort by visibility ratio (highest first) then sortIndex (lowest first)
-      const sortedGridCandidates = [...gridCandidates].sort((a, b) => {
-        // Primary: visibility ratio (higher is better)
-        if (b.visibilityRatio !== a.visibilityRatio) {
-          return b.visibilityRatio - a.visibilityRatio;
-        }
-        // Secondary: sortIndex (lower is higher priority)
-        return a.sortIndex - b.sortIndex;
+    for (const surface of surfaceTypes) {
+      const surfaceCandidates = candidates.filter(c => c.surface === surface);
+      const maxConcurrent = MAX_CONCURRENT_PER_SURFACE[surface];
+      
+      // Get currently playing videos on this surface
+      const playingOnSurface = Array.from(this.state.activeMediaIds).filter(id => {
+        const media = this.registry.get(id);
+        return media?.surface === surface;
       });
       
-      // Start playing visible candidates up to the limit
-      for (const candidate of sortedGridCandidates) {
-        const currentGridCount = Array.from(this.state.activeMediaIds).filter(id => {
-          const media = this.registry.get(id);
-          return media?.surface === 'grid';
-        }).length;
-        
-        if (currentGridCount >= MAX_CONCURRENT_PER_SURFACE['grid']) {
-          // At limit - need to pause lowest priority if new one is higher
-          const activeGridNodes = Array.from(this.state.activeMediaIds)
-            .map(id => this.registry.get(id))
-            .filter((n): n is MediaNode => n?.surface === 'grid')
-            .sort((a, b) => {
-              // Sort by visibility (lower is lower priority)
-              if (a.visibilityRatio !== b.visibilityRatio) {
-                return a.visibilityRatio - b.visibilityRatio;
-              }
-              // Then by sortIndex (higher is lower priority)
-              return b.sortIndex - a.sortIndex;
-            });
-          
-          const lowestPriority = activeGridNodes[0];
-          
-          // Only swap if candidate has higher visibility
-          if (lowestPriority && candidate.visibilityRatio > lowestPriority.visibilityRatio) {
-            this.requestPause({ id: lowestPriority.id, reason: 'priority_swap' });
-          } else {
-            // Can't add more, skip this candidate
-            continue;
-          }
+      // INCUMBENT PRIORITY: Check if incumbents are still above stop threshold
+      // If so, they retain priority and shouldn't be swapped out
+      const incumbentsToKeep: string[] = [];
+      const incumbentsToPause: string[] = [];
+      
+      for (const playingId of playingOnSurface) {
+        const node = this.registry.get(playingId);
+        if (!node) {
+          incumbentsToPause.push(playingId);
+          continue;
         }
         
-        // Start playing if not already
+        // Incumbent stays if still above STOP threshold
+        if (node.visibilityRatio >= AUTOPLAY_STOP_THRESHOLD) {
+          incumbentsToKeep.push(playingId);
+          if (DEBUG_MEDIA_RUNTIME) {
+            console.log('[MediaRuntime] Incumbent retained:', playingId.slice(0, 8), 
+              `ratio=${node.visibilityRatio.toFixed(2)} >= stop=${AUTOPLAY_STOP_THRESHOLD}`);
+          }
+        } else {
+          // Incumbent dropped below stop threshold - eligible to be replaced
+          incumbentsToPause.push(playingId);
+          if (DEBUG_MEDIA_RUNTIME) {
+            console.log('[MediaRuntime] Incumbent released:', playingId.slice(0, 8), 
+              `ratio=${node.visibilityRatio.toFixed(2)} < stop=${AUTOPLAY_STOP_THRESHOLD}`);
+          }
+        }
+      }
+      
+      // Pause incumbents that dropped below threshold
+      for (const id of incumbentsToPause) {
+        this.requestPause({ id, reason: 'below_stop_threshold' });
+      }
+      
+      // Calculate available slots after keeping incumbents
+      const availableSlots = maxConcurrent - incumbentsToKeep.length;
+      
+      if (availableSlots <= 0) {
+        // No slots available - incumbents are holding position
+        continue;
+      }
+      
+      // Sort candidates by visibility ratio (highest first) then sortIndex (lowest first)
+      // Exclude incumbents we're already keeping
+      const sortedCandidates = surfaceCandidates
+        .filter(c => !incumbentsToKeep.includes(c.id))
+        .sort((a, b) => {
+          if (b.visibilityRatio !== a.visibilityRatio) {
+            return b.visibilityRatio - a.visibilityRatio;
+          }
+          return a.sortIndex - b.sortIndex;
+        });
+      
+      // Start playing top candidates up to available slots
+      let slotsUsed = 0;
+      for (const candidate of sortedCandidates) {
+        if (slotsUsed >= availableSlots) break;
+        
         if (!this.state.activeMediaIds.has(candidate.id)) {
           this.requestPlay({
             id: candidate.id,
             surface: candidate.surface,
             reason: 'autoplay',
           });
+          slotsUsed++;
         }
       }
-      
     }
     
-    // For non-grid surfaces (clubhouse, fullscreen), allow concurrent play
-    for (const candidate of otherCandidates) {
-      if (!this.state.activeMediaIds.has(candidate.id)) {
-        this.requestPlay({
-          id: candidate.id,
-          surface: candidate.surface,
-          reason: 'autoplay',
-        });
-      }
-    }
-    
-    // Pause any active media that's no longer visible (for autoplay only)
+    // Pause any active media that's completely invisible (ratio = 0 or not in registry)
     const toStop: string[] = [];
     this.state.activeMediaIds.forEach((activeId) => {
-      if (!visibleIds.has(activeId)) {
-        const node = this.registry.get(activeId);
-        // Only auto-pause autoplay videos, not user-initiated
-        if (node && !node.isVisible) {
-          toStop.push(activeId);
-        }
+      const node = this.registry.get(activeId);
+      // Only auto-pause if truly invisible (below stop threshold handled above)
+      if (!node || node.visibilityRatio < AUTOPLAY_STOP_THRESHOLD) {
+        toStop.push(activeId);
       }
     });
     
@@ -830,6 +824,7 @@ class MediaRuntimeCore {
       this.requestPause({ id, reason: 'no_visible' });
     }
   }
+  
   
   // ============ Warm Pool Management ============
   
