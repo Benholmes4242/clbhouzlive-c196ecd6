@@ -6,10 +6,11 @@ import {
   MapPin, 
   Building, 
   Clock, 
-  TrendingUp, 
+  Sparkles, 
   ChevronRight,
   X,
-  Play
+  Play,
+  RefreshCw
 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -265,16 +266,30 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     </div>
   );
 
-  // Trending section
+  // Today's Picks section (daily rotating content)
   const TrendingSection = () => (
     <div className="p-4">
-      <h3 className={cn(
-        "text-xs font-medium flex items-center gap-2 mb-3",
-        isClubhousePage ? "text-white/60" : "text-black/60"
-      )}>
-        <TrendingUp className="h-3 w-3" />
-        Popular courses
-      </h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className={cn(
+          "text-xs font-medium flex items-center gap-2",
+          isClubhousePage ? "text-white/60" : "text-black/60"
+        )}>
+          <div className={cn(
+            "w-5 h-5 rounded flex items-center justify-center bg-gradient-to-br",
+            isClubhousePage ? "from-primary to-amber-500" : "from-orange-500 to-amber-500"
+          )}>
+            <Sparkles className="h-2.5 w-2.5 text-white" />
+          </div>
+          Today's Picks
+        </h3>
+        <div className={cn(
+          "flex items-center gap-1 text-[10px]",
+          isClubhousePage ? "text-white/30" : "text-black/30"
+        )}>
+          <RefreshCw className="w-2 h-2" />
+          <span>Daily</span>
+        </div>
+      </div>
       <div className="space-y-1">
         {popularItems.slice(0, 5).map((item, index) => (
           <button
