@@ -10757,6 +10757,10 @@ export type Database = {
         Returns: Json
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_creator_page_ids_for_user: {
+        Args: { p_user_id: string }
+        Returns: string[]
+      }
       get_default_creator_page: { Args: { p_user_id: string }; Returns: string }
       get_friends_first_post_ids: {
         Args: {
@@ -12003,6 +12007,10 @@ export type Database = {
           }
       user_can_see_game: {
         Args: { _game_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_is_creator_owner_or_admin: {
+        Args: { p_creator_page_id: string; p_user_id: string }
         Returns: boolean
       }
       user_is_friend_of_host: {
