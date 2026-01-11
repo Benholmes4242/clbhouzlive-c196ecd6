@@ -565,7 +565,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             maxHeight: 'calc(100vh - 24px)',
             borderRadius: '20px',
             overflow: 'hidden',
-            background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.96)',
+            background: useLightTheme ? '#F8FAFC' : 'rgba(16, 16, 16, 0.96)',
             backdropFilter: 'blur(40px) saturate(150%)',
             WebkitBackdropFilter: 'blur(40px) saturate(150%)',
             boxShadow: useLightTheme 
