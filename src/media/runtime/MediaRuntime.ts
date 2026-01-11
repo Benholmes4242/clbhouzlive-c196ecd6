@@ -82,6 +82,10 @@ const BUFFERING_SUPPRESS_DURATION = 500; // 500ms grace for buffering videos
 const MAX_RETRIES = 1;
 const PLAY_RETRY_MAX = 3; // Max retries for requestPlay with backoff
 const PLAY_RETRY_BASE_DELAY = 100; // Base delay for exponential backoff
+
+// Memory management caps
+const MAX_REGISTERED_MEDIA = 10; // Max videos to keep registered
+const CLEANUP_THRESHOLD = 15; // Trigger cleanup when registry reaches this size
 // Concurrent video limits by surface
 // Hero + Grid can play simultaneously (1 each), fullscreen/clubhouse is exclusive
 const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
@@ -178,6 +182,58 @@ class MediaRuntimeCore {
     if (DEBUG_MEDIA_RUNTIME) {
       console.log('[MediaRuntime] Registered:', id.slice(0, 8), surface);
     }
+    
+    // Memory management: cleanup distant videos when registry gets too large
+    if (this.registry.size >= CLEANUP_THRESHOLD) {
+      this.cleanupDistantMedia();
+    }
+  }
+  
+  /**
+   * Cleanup distant media to cap memory usage
+   * Removes videos furthest from current playback position
+   */
+  private cleanupDistantMedia(): void {
+    // Find the current sortIndex (from primary active or most visible)
+    let currentSortIndex = 0;
+    
+    if (this.state.primaryActiveId) {
+      const activeNode = this.registry.get(this.state.primaryActiveId);
+      if (activeNode) {
+        currentSortIndex = activeNode.sortIndex;
+      }
+    } else {
+      // Find the most visible node
+      let maxRatio = 0;
+      this.registry.forEach((node) => {
+        if (node.visibilityRatio > maxRatio) {
+          maxRatio = node.visibilityRatio;
+          currentSortIndex = node.sortIndex;
+        }
+      });
+    }
+    
+    // Sort entries by distance from current (furthest first)
+    const entries = Array.from(this.registry.entries());
+    entries.sort((a, b) => {
+      const distA = Math.abs(a[1].sortIndex - currentSortIndex);
+      const distB = Math.abs(b[1].sortIndex - currentSortIndex);
+      return distB - distA; // Furthest first
+    });
+    
+    // Unregister videos beyond MAX_REGISTERED_MEDIA
+    const toRemove = entries.slice(MAX_REGISTERED_MEDIA);
+    
+    if (toRemove.length > 0 && DEBUG_MEDIA_RUNTIME) {
+      console.log(`[MediaRuntime] Cleaning up ${toRemove.length} distant videos (registry size: ${this.registry.size})`);
+    }
+    
+    toRemove.forEach(([id]) => {
+      // Only cleanup if not currently active
+      if (!this.state.activeMediaIds.has(id)) {
+        this.unregisterMedia(id);
+      }
+    });
   }
   
   unregisterMedia(id: string): void {

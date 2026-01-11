@@ -159,13 +159,28 @@ export function useVerticalFeedLogic({
       return;
     }
     
+    // Helper: schedule attach with requestIdleCallback to prevent scroll jank
+    const scheduleAttach = (id: string, shouldAttach: boolean) => {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          setShouldAttachMap((m) => ({ ...m, [id]: shouldAttach }));
+        }, { timeout: 100 }); // 100ms deadline for responsiveness
+      } else {
+        // Fallback for Safari (no requestIdleCallback support)
+        setTimeout(() => {
+          setShouldAttachMap((m) => ({ ...m, [id]: shouldAttach }));
+        }, 0);
+      }
+    };
+
     // Prebuffer observer (wider margin)
     const nearObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
-          setShouldAttachMap((m) => ({ ...m, [id]: e.isIntersecting || e.intersectionRatio > 0 }));
+          // Use idle callback for attach operations to prevent scroll jank
+          scheduleAttach(id, e.isIntersecting || e.intersectionRatio > 0);
         });
       },
       { root: null, rootMargin: '500px 0px 500px 0px', threshold: 0 }

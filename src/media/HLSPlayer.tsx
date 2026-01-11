@@ -25,6 +25,7 @@ import {
   logFirstVideoLoadedData,
   logFirstMediaPosterLoaded 
 } from '@/utils/bootTimeline';
+import { getConnectionAwareQualityConfig } from '@/utils/connectionAwareQuality';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import {
   startVideoSession,
@@ -602,17 +603,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           return;
         }
         
+        // Get connection-aware quality settings
+        const qualityConfig = getConnectionAwareQualityConfig();
+        
         const hls = new Hls({
-          // Performance: Auto-select quality based on bandwidth for crisp initial quality
-          startLevel: -1, // Auto-select (not forced lowest)
+          // Connection-aware quality: adapts to network conditions
+          startLevel: qualityConfig.startLevel,
           
           // Buffer settings for fast startup
           maxBufferLength: 10, // Buffer 10 seconds ahead
           maxMaxBufferLength: 20,
           backBufferLength: 4,
           
-          // Better initial bandwidth estimate for HD quality
-          abrEwmaDefaultEstimate: 2000000, // Start with 2Mbps estimate for decent quality
+          // Connection-aware bandwidth estimate
+          abrEwmaDefaultEstimate: qualityConfig.abrEwmaDefaultEstimate,
           abrBandWidthFactor: 0.95, // More responsive quality switching
           abrBandWidthUpFactor: 0.7, // Faster ramp-up to HD
           
@@ -620,6 +624,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           fragLoadingTimeOut: 10000,
           manifestLoadingTimeOut: 10000,
         });
+        
+        // Apply quality cap after creation (autoLevelCapping is a property, not config)
+        if (qualityConfig.autoLevelCapping >= 0) {
+          hls.autoLevelCapping = qualityConfig.autoLevelCapping;
+        }
         
         hls.on(Hls.Events.ERROR, async (_, data) => {
           if (!data.fatal) return;
