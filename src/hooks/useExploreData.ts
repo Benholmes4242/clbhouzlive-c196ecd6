@@ -242,48 +242,8 @@ export function useExploreThemeDetail(slug: string) {
   });
 }
 
-/**
- * Search courses, regions, and themes
- */
-export function useExploreSearch(query: string) {
-  return useQuery({
-    queryKey: ['explore-search', query],
-    queryFn: async () => {
-      if (!query.trim()) return { courses: [], regions: [], themes: [] };
-
-      const searchTerm = `%${query.trim()}%`;
-
-      // Search courses
-      const { data: courses } = await supabase
-        .from('golf_courses')
-        .select('id, name, country, sub_country, thumbnail_image')
-        .ilike('name', searchTerm)
-        .limit(10);
-
-      // Search regions
-      const { data: regions } = await supabase
-        .from('explore_regions')
-        .select('id, slug, title, subtitle')
-        .ilike('title', searchTerm)
-        .limit(5);
-
-      // Search themes
-      const { data: themes } = await supabase
-        .from('explore_themes')
-        .select('id, slug, title, subtitle')
-        .ilike('title', searchTerm)
-        .limit(5);
-
-      return {
-        courses: courses || [],
-        regions: regions || [],
-        themes: themes || [],
-      };
-    },
-    enabled: query.length >= 2,
-    staleTime: 30 * 1000, // 30 seconds
-  });
-}
+// Note: useExploreSearch has been consolidated into src/hooks/useExploreSearch.ts
+// Import from there instead: import { useExploreSearch } from '@/hooks/useExploreSearch';
 
 /**
  * Fetch trending courses (based on recent activity)

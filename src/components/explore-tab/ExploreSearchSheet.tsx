@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 import { X, Search, MapPin, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useExploreSearch } from '@/hooks/useExploreData';
+import { useExploreSearch } from '@/hooks/useExploreSearch';
 import { RegionKey } from '@/hooks/useExploreMoments';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -37,7 +37,7 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
   const rootScrollTopRef = useRef(0);
   const [query, setQuery] = useState('');
   
-  const { data: searchResults, isLoading } = useExploreSearch(query);
+  const { courses: searchCourses, isLoading } = useExploreSearch(query);
 
   // Auto-focus input when sheet opens (without scrolling the page behind)
   useEffect(() => {
@@ -117,7 +117,7 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
       .map(([key, data]) => ({ key, ...data }));
   }, [query]);
 
-  const courses = searchResults?.courses || [];
+  const courses = searchCourses || [];
   const hasResults = courses.length > 0 || matchingRegions.length > 0;
 
   if (typeof document === 'undefined') return null;
@@ -252,18 +252,9 @@ export const ExploreSearchSheet: React.FC<ExploreSearchSheetProps> = ({
                             className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-surface-alt active:bg-surface-alt transition-colors"
                           >
                             <div className="w-10 h-10 rounded-lg bg-surface-alt overflow-hidden flex-shrink-0">
-                              {course.thumbnail_image ? (
-                                <img 
-                                  src={course.thumbnail_image} 
-                                  alt={course.name}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-emerald-800/50 to-slate-900/50" />
-                              )}
+                              <div className="w-full h-full bg-gradient-to-br from-emerald-800/50 to-slate-900/50 flex items-center justify-center">
+                                <MapPin className="w-4 h-4 text-white/70" />
+                              </div>
                             </div>
                             <div className="flex-1 text-left min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">{course.name}</p>
