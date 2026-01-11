@@ -1007,7 +1007,20 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
           })()}
           aspectRatio={(() => {
             const post = filteredPosts[currentIndex];
-            // Try to get aspect ratio - default to portrait
+            const currentMediaIdx = mediaIndices[post?.id] || 0;
+            const mediaItems = post?.media && post.media.length > 0 ? post.media : [];
+            const currentMedia = mediaItems[currentMediaIdx] || mediaItems[0];
+            const mediaAny = currentMedia as any;
+            
+            // First try media-level aspect ratio
+            if (mediaAny?.aspect_ratio) {
+              return mediaAny.aspect_ratio;
+            }
+            // Then try media dimensions
+            if (mediaAny?.width && mediaAny?.height) {
+              return mediaAny.width / mediaAny.height;
+            }
+            // Then try post-level dimensions
             if (post?.width && post?.height) {
               return post.width / post.height;
             }
