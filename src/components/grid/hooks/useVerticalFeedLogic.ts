@@ -327,14 +327,23 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // Preload next 5 videos for fast scrolling (increased from 3)
-  useEffect(() => {
-    if (!posts.length) return;
+  // Adaptive preload count based on network connection
+  const getAdaptivePreloadCount = useCallback(() => {
+    const connection = (navigator as any).connection;
+    if (!connection) return 5; // Default to 5 if Network Info API not available
     
-    const VIDEOS_TO_PRELOAD = 5; // Increased from 3 for smoother scrolling
-    
-    for (let i = 1; i <= VIDEOS_TO_PRELOAD; i++) {
-      const nextIndex = currentIndex + i;
+    switch (connection.effectiveType) {
+      case '4g': return 5;
+      case '3g': return 3;
+      case '2g': return 2;
+      default: return 4;
+    }
+  }, []);
+  
+  // Preload videos based on network conditions
+  const preloadVideos = useCallback((count: number, startFromIndex: number = currentIndex) => {
+    for (let i = 1; i <= count; i++) {
+      const nextIndex = startFromIndex + i;
       if (nextIndex >= posts.length) break;
       
       const nextPost = posts[nextIndex];
@@ -354,7 +363,46 @@ export function useVerticalFeedLogic({
         img.src = thumbnailUrl;
       }
     }
-  }, [currentIndex, posts]);
+  }, [posts, currentIndex]);
+  
+  // Preload videos on index change (adaptive count)
+  useEffect(() => {
+    if (!posts.length) return;
+    
+    const preloadCount = getAdaptivePreloadCount();
+    preloadVideos(preloadCount);
+  }, [currentIndex, posts, getAdaptivePreloadCount, preloadVideos]);
+  
+  // Aggressive preload when user pauses - they might be reading comments/caption
+  const isPausedRef = useRef(false);
+  
+  useEffect(() => {
+    // Listen for pause events on current video to trigger aggressive preload
+    const currentPost = posts[currentIndex];
+    if (!currentPost) return;
+    
+    const handleVideoPause = () => {
+      isPausedRef.current = true;
+      // User paused - good time to preload more aggressively
+      preloadVideos(3, currentIndex);
+    };
+    
+    const handleVideoPlay = () => {
+      isPausedRef.current = false;
+    };
+    
+    // Get the video element for current index
+    const videoEl = videoRefs.current[currentPost.id];
+    if (videoEl) {
+      videoEl.addEventListener('pause', handleVideoPause);
+      videoEl.addEventListener('play', handleVideoPlay);
+      
+      return () => {
+        videoEl.removeEventListener('pause', handleVideoPause);
+        videoEl.removeEventListener('play', handleVideoPlay);
+      };
+    }
+  }, [currentIndex, posts, preloadVideos]);
   
   // Signal first frame ready
   const handleFirstFrameReady = useCallback(() => {

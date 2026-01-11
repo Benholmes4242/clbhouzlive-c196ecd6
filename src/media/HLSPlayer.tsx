@@ -226,6 +226,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         firstFrameCleanupRef.current();
         firstFrameCleanupRef.current = null;
       }
+      // Cleanup HD badge timeout
+      if (hdBadgeTimeoutRef.current) {
+        clearTimeout(hdBadgeTimeoutRef.current);
+        hdBadgeTimeoutRef.current = null;
+      }
     };
   }, []);
   
@@ -241,6 +246,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [triedMp4Fallback, setTriedMp4Fallback] = useState(false); // Track if MP4 fallback was attempted
   const [showUnavailable, setShowUnavailable] = useState(false); // Show "Video unavailable" overlay
   const [lastError, setLastError] = useState<string | null>(null); // Last error message for debug
+  
+  // HD Badge: Show briefly when video upgrades to high quality
+  const [showHDBadge, setShowHDBadge] = useState(false);
+  const initialLevelRef = useRef<number>(-1);
+  const hdBadgeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Ref for first-frame timeout cleanup
   const firstFrameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -779,9 +789,24 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           }
         });
         
-        // Log quality level switches
+        // Log quality level switches and show HD badge on upgrade
         hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
           const level = hls.levels?.[data.level];
+          const levelHeight = level?.height ?? 0;
+          
+          // Track initial level (first switch after start)
+          if (initialLevelRef.current === -1) {
+            initialLevelRef.current = data.level;
+          } else if (data.level > initialLevelRef.current && levelHeight >= 720) {
+            // Upgraded to HD (720p+) - show badge briefly
+            setShowHDBadge(true);
+            if (hdBadgeTimeoutRef.current) {
+              clearTimeout(hdBadgeTimeoutRef.current);
+            }
+            hdBadgeTimeoutRef.current = setTimeout(() => {
+              setShowHDBadge(false);
+            }, 2000);
+          }
           
           // RUM: Record quality change
           if (mediaId && level?.bitrate) {
@@ -1537,6 +1562,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
               {lastError}
             </div>
           )}
+        </div>
+      )}
+      
+      {/* HD Badge - shows briefly when video upgrades to HD quality */}
+      {showHDBadge && (
+        <div
+          className="absolute top-4 right-4 px-2 py-1 rounded text-white text-xs font-semibold z-20 animate-fade-in"
+          style={{
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          HD
         </div>
       )}
       
