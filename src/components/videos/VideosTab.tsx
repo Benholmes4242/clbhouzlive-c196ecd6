@@ -12,7 +12,7 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
-import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
+
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMediaAutoplay } from '@/media';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
@@ -37,6 +37,17 @@ const VIDEO_PILLS = [
 
 // Local storage keys
 const VIDEOS_SORT_KEY = 'videos-sort-option';
+const VIDEOS_CATEGORY_KEY = 'videos-category';
+
+// Map SortOption to query sort
+type QuerySort = 'newest' | 'most-liked' | 'most-discussed';
+const sortOptionToQuerySort = (sortOption: SortOption): QuerySort => {
+  switch (sortOption) {
+    case 'most-liked': return 'most-liked';
+    case 'most-discussed': return 'most-discussed';
+    default: return 'newest';
+  }
+};
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -75,7 +86,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Nudges for growth hooks
   const { shouldShowNudge, markNudgeSeen, getNudgeMessage, shouldShowQueueReminder, markQueueReminderShown } = useVideoNudges();
   const { queue } = useVideoQueue();
-  const { getBoostScore } = useDiscoverySignals();
   const [showQueueNudge, setShowQueueNudge] = useState(false);
   const [showQueueReminder, setShowQueueReminder] = useState(false);
 
@@ -112,11 +122,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     if (coursesInView && !coursesTriggered) setCoursesTriggered(true);
   }, [coursesInView, coursesTriggered]);
 
-  // Memoize boost score to prevent unnecessary re-renders
-  const memoizedBoostScore = useCallback(
-    (creatorId: string, category?: string) => getBoostScore(creatorId, category),
-    [getBoostScore]
-  );
 
   // Show queue nudge after user has been on page (one-time)
   useEffect(() => {
@@ -173,17 +178,20 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   // Fetch videos using React Query with caching
   // Each section shows max 5 videos to keep the page compact
+  const querySort = sortOptionToQuerySort(sortOption);
+  
   const { videos: recommendedVideosRaw } = useLongFormVideosQuery({
     section: 'recommended',
     limit: 5,
     category: categoryFilter,
-    getBoostScore: memoizedBoostScore,
+    sort: querySort,
   });
 
   const { videos: trendingVideosRaw } = useLongFormVideosQuery({
     section: 'trending',
     limit: 5,
     category: categoryFilter,
+    // Trending always uses engagement sort, ignore user sort
   });
 
   const { videos: followedVideosRaw } = useLongFormVideosQuery({
@@ -191,6 +199,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     limit: 5,
     followedCreatorIds: followedIds,
     category: categoryFilter,
+    sort: querySort,
   });
 
   const { videos: coursesVideosRaw } = useLongFormVideosQuery({

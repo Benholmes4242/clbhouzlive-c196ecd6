@@ -1,9 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 // PRODUCTION: 4 minutes minimum for long-form videos
 const VIDEO_DURATION_THRESHOLD_SECONDS = 240;
+
+export type VideoSortOption = 'newest' | 'most-liked' | 'most-discussed';
 
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
@@ -11,9 +15,9 @@ interface UseLongFormVideosOptions {
   followedCreatorIds?: string[];
   creatorUserId?: string;
   searchQuery?: string;
-  category?: string; // Kept for compatibility, ignored
-  sort?: string; // Kept for compatibility, ignored
-  getBoostScore?: (creatorId: string, category?: string) => number; // Kept for compatibility, ignored
+  category?: string;
+  sort?: VideoSortOption;
+  getBoostScore?: (creatorId: string, category?: string) => number; // Kept for compatibility
   enabled?: boolean;
 }
 
@@ -28,13 +32,41 @@ const formatDuration = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): Promise<LongFormVideo[]> {
+/**
+ * Get a guaranteed thumbnail URL with fallbacks
+ */
+const getGuaranteedThumbnail = (media: any): string => {
+  // 1. Direct poster_url
+  if (media?.poster_url && media.poster_url.trim()) {
+    return media.poster_url;
+  }
+  
+  // 2. Generate from media_url (Cloudflare Stream)
+  if (media?.media_url) {
+    const uid = uidFromNode({ media_url: media.media_url });
+    if (uid) {
+      return generateStreamThumbnailUrl(uid);
+    }
+  }
+  
+  // 3. Generate from stream_id if available
+  if (media?.stream_id) {
+    return generateStreamThumbnailUrl(media.stream_id);
+  }
+  
+  // 4. Fallback - empty string (component will handle fallback UI)
+  return '';
+};
+
+async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled' | 'getBoostScore'>): Promise<LongFormVideo[]> {
   const { 
     section = 'all', 
     limit = 20, 
     followedCreatorIds = [], 
     creatorUserId, 
     searchQuery,
+    category,
+    sort = 'newest',
   } = options;
 
   // Production query with proper filters
@@ -46,12 +78,17 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
       created_at,
       user_id,
       badges,
+      course_id,
+      categories,
+      like_count,
+      comment_count,
       post_media!inner(
         media_url,
         duration_seconds,
         poster_url,
         width,
-        height
+        height,
+        stream_id
       ),
       post_tags(
         taggable_entities(
@@ -78,6 +115,11 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
     query = query.ilike('content', `%${searchQuery.trim()}%`);
   }
 
+  // Category filter - filter by categories array
+  if (category && category !== 'all') {
+    query = query.contains('categories', [category]);
+  }
+
   // Section-specific filters
   if (section === 'following' && !creatorUserId && !searchQuery) {
     if (followedCreatorIds.length > 0) {
@@ -94,11 +136,38 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
     query = query.gte('created_at', sevenDaysAgo.toISOString());
   }
 
+  // Courses: filter to videos with course association
+  if (section === 'courses') {
+    query = query.not('course_id', 'is', null);
+  }
+
+  // Apply sorting based on section and sort option
+  // Trending uses engagement sorting, others respect sort option
+  if (section === 'trending') {
+    // Trending always sorts by engagement (likes first, then date)
+    query = query
+      .order('like_count', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false });
+  } else {
+    // Apply user-selected sort
+    switch (sort) {
+      case 'most-liked':
+        query = query.order('like_count', { ascending: false, nullsFirst: false });
+        break;
+      case 'most-discussed':
+        query = query.order('comment_count', { ascending: false, nullsFirst: false });
+        break;
+      case 'newest':
+      default:
+        query = query.order('created_at', { ascending: false });
+    }
+  }
+
   // Reasonable overfetch (2x limit, max 50)
   const overfetch = Math.min(limit * 2, 50);
-  query = query.order('created_at', { ascending: false }).limit(overfetch);
+  query = query.limit(overfetch);
 
-  console.log(`[useLongFormVideosQuery] 🔍 Query for ${section} (threshold: ${VIDEO_DURATION_THRESHOLD_SECONDS}s)`);
+  console.log(`[useLongFormVideosQuery] 🔍 Query for ${section} (threshold: ${VIDEO_DURATION_THRESHOLD_SECONDS}s, sort: ${sort}, category: ${category || 'all'})`);
 
   const { data, error: queryError } = await query;
 
@@ -119,11 +188,12 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
 
   const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
-  const videos: LongFormVideo[] = data.slice(0, limit).map((post: any) => {
+  let videos: LongFormVideo[] = data.slice(0, limit).map((post: any) => {
     const media = post.post_media?.[0];
     const user = profileMap.get(post.user_id);
     const golfTag = post.post_tags?.find((tag: any) => tag.taggable_entities?.entity_type === 'golf_club');
     const views = post.post_views?.[0]?.count || 0;
+    const likes = post.like_count || post.post_likes?.[0]?.count || 0;
 
     return {
       id: post.id,
@@ -131,23 +201,35 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
       creatorUserId: post.user_id,
       creatorName: user?.display_name || user?.username || 'Unknown',
       creatorAvatarUrl: user?.profile_photo_url,
-      thumbnailUrl: media?.poster_url || '',
+      thumbnailUrl: getGuaranteedThumbnail(media),
       mediaUrl: media?.media_url || undefined,
       duration: formatDuration(media?.duration_seconds || 0),
       durationSeconds: media?.duration_seconds || 0,
       views,
+      likes,
       createdAt: post.created_at,
-      golfCourseId: golfTag?.taggable_entities?.entity_id,
+      golfCourseId: golfTag?.taggable_entities?.entity_id || post.course_id,
       golfCourseName: golfTag?.taggable_entities?.name,
       isTrending: section === 'trending',
     };
   });
+
+  // For trending section, apply engagement scoring (in case DB sort isn't perfect)
+  if (section === 'trending') {
+    videos = videos.sort((a, b) => {
+      // Score: likes * 3 + views / 10
+      const scoreA = (a.likes || 0) * 3 + (a.views || 0) / 10;
+      const scoreB = (b.likes || 0) * 3 + (b.views || 0) / 10;
+      return scoreB - scoreA;
+    });
+  }
 
   return videos;
 }
 
 /**
  * Production query hook for long-form videos (≥4 minutes, public visibility)
+ * Supports section filtering, sorting, and category filtering.
  */
 export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) => {
   const { 
@@ -156,16 +238,20 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
     followedCreatorIds = [], 
     creatorUserId, 
     searchQuery,
+    category,
+    sort = 'newest',
     enabled = true,
   } = options;
 
   const queryKey = [
-    'videos-longform-v3',
+    'videos-longform-v4',
     section,
     limit,
     followedCreatorIds.join(','),
     creatorUserId || '',
     searchQuery || '',
+    category || 'all',
+    sort,
   ];
 
   const query = useQuery({
@@ -177,6 +263,8 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
         followedCreatorIds,
         creatorUserId,
         searchQuery,
+        category,
+        sort,
       });
     },
     staleTime: 5 * 60 * 1000,

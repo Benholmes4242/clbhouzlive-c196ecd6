@@ -153,8 +153,15 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
             alt={video.title}
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
+            onError={(e) => {
+              // Hide broken image and show fallback
+              e.currentTarget.style.display = 'none';
+            }}
           />
-        ) : (
+        ) : null}
+        
+        {/* Fallback when no thumbnail - always rendered behind image */}
+        {!video.mediaUrl && (
           <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
             <Play className="h-12 w-12 text-muted-foreground/40" />
           </div>
