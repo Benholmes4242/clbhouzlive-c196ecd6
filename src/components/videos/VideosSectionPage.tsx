@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { LongFormVideoTileAutoplay } from './LongFormVideoTileAutoplay';
 import { useInfiniteLongFormVideos } from '@/hooks/useInfiniteLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
@@ -355,19 +356,25 @@ export const VideosSectionPage: React.FC = () => {
       {/* Video feed - enhanced layout */}
       <div ref={containerRef} className="px-4 pt-4 space-y-4">
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-6 bg-card rounded-2xl border border-border/50 shadow-sm">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
-              <ArrowLeft className="h-6 w-6 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-16 px-6">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Play className="w-8 h-8 text-muted-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground text-center mb-4">
-              No videos available in this section yet.
+            <h3 className="text-lg font-semibold text-foreground mb-1">
+              Nothing here yet
+            </h3>
+            <p className="text-sm text-muted-foreground text-center max-w-[240px] mb-6">
+              Videos in this category will appear here as creators share new content
             </p>
-            <button 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleBack}
-              className="text-sm text-primary font-medium hover:underline"
+              className="gap-2"
             >
+              <ArrowLeft className="w-4 h-4" />
               Back to Videos
-            </button>
+            </Button>
           </div>
         ) : (
           items.map((item, index) => (
