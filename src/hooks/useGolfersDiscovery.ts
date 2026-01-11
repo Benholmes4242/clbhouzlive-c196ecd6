@@ -119,7 +119,7 @@ export function useGolfersDiscovery() {
   const hasHomeClub = !!viewerPrimaryClubId;
 
   // Global search query (searches within active tab context)
-  const { data: searchResults, isLoading: searchLoading } = useQuery({
+  const { data: searchResults, isLoading: searchLoading, error: searchError, refetch: refetchSearch } = useQuery({
     queryKey: ['search-golfers', searchQuery, activeTab, viewerPrimaryClubId],
     // Home Club search only enabled if user has primary_club_id set
     enabled: searchQuery.trim().length > 0 && !!user && (activeTab !== 'home_club' || !!viewerPrimaryClubId),
@@ -177,7 +177,7 @@ export function useGolfersDiscovery() {
   });
 
   // Paginated filtered query by tab
-  const { data: filteredData, isLoading: filterLoading } = useQuery({
+  const { data: filteredData, isLoading: filterLoading, error: filterError, refetch: refetchFiltered } = useQuery({
     queryKey: ['golfers-filtered', activeTab, page, viewerPrimaryClubId, user?.id],
     // Home Club tab only enabled if user has primary_club_id set
     enabled: searchQuery.trim().length === 0 && !!user && (activeTab !== 'home_club' || !!viewerPrimaryClubId),
@@ -304,7 +304,17 @@ export function useGolfersDiscovery() {
   const isSearching = searchQuery.trim().length > 0;
   const totalCount = processedGolfers.length;
   const loading = isSearching ? searchLoading : filterLoading;
+  const error = isSearching ? searchError : filterError;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+  // Refetch function that refetches the appropriate query
+  const refetch = () => {
+    if (isSearching) {
+      refetchSearch();
+    } else {
+      refetchFiltered();
+    }
+  };
 
   // Check if user has no home club (for nudge display)
   const hasNoHomeClub = !hasHomeClub;
@@ -312,6 +322,8 @@ export function useGolfersDiscovery() {
   return {
     golfers: paginatedGolfers,
     loading,
+    error,
+    refetch,
     searchQuery,
     setSearchQuery,
     activeTab,
