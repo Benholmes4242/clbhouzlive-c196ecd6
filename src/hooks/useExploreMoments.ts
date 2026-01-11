@@ -35,6 +35,7 @@ export interface ExploreMoment {
   display_order: number | null;
   region_key: RegionKey | null;
   likes_count: number | null;
+  duration_seconds: number | null;
 }
 
 export interface TrendingMoment extends ExploreMoment {
