@@ -209,16 +209,23 @@ export function useUnifiedFullscreenLogic<T>({
   useLayoutEffect(() => {
     if (hasPreloadedFirst.current || !filteredItems.length) return;
     
-    const firstItem = filteredItems[0];
-    if (!firstItem) return;
+    // CRITICAL FIX: Use computedInitialIndex instead of always targeting index 0
+    // This ensures the correct video starts playing when opening fullscreen from any position
+    const targetIndex = computedInitialIndex;
+    const targetItem = filteredItems[targetIndex];
+    if (!targetItem) return;
     
-    const firstMedia = firstItem.media[0];
-    if (!firstMedia || firstMedia.media_type !== 'video') return;
+    const targetMedia = targetItem.media[0];
+    if (!targetMedia || targetMedia.media_type !== 'video') {
+      // Still mark as preloaded but skip video-specific setup
+      hasPreloadedFirst.current = true;
+      return;
+    }
     
     hasPreloadedFirst.current = true;
-    firstPostIdRef.current = firstItem.id;
+    firstPostIdRef.current = targetItem.id;
     
-    // Bootstrap: keep first card autoplay true on initial landing
+    // Bootstrap: keep initial card autoplay true on initial landing
     bootstrapFirstAutoplayRef.current = true;
     if (bootstrapFirstAutoplayTimeoutRef.current) {
       window.clearTimeout(bootstrapFirstAutoplayTimeoutRef.current);
@@ -231,27 +238,36 @@ export function useUnifiedFullscreenLogic<T>({
     // Protect against early observer false negatives
     firstVideoProtectedUntilRef.current = Date.now() + 2500;
     
-    // Set both maps synchronously
-    setShouldAttachMap({ [firstItem.id]: true });
-    setAutoplayMap({ [firstItem.id]: true });
+    // Set both maps synchronously for the TARGET item (not always index 0)
+    setShouldAttachMap({ [targetItem.id]: true });
+    setAutoplayMap({ [targetItem.id]: true });
     
-    // Preload HLS manifest
-    const mediaSrc = firstMedia.media_url;
+    // Preload HLS manifest for target video
+    const mediaSrc = targetMedia.media_url;
     if (mediaSrc) {
       const uid = uidFromNode({ src: mediaSrc });
       if (uid) {
         preloadHlsManifest(generateStreamHlsUrl(uid));
       }
     }
-  }, [filteredItems]);
+  }, [filteredItems, computedInitialIndex]);
 
   // ==================================================================================
   // STEP 6: Scroll to Initial Index (for deep linking)
   // ==================================================================================
   
+  // Scroll to initial index (for non-zero start positions)
+  // This runs AFTER the first video bootstrap, so maps are already set
   useEffect(() => {
-    if (hasScrolledToInitialRef.current || computedInitialIndex === 0 || !filteredItems.length) return;
+    // Skip if already scrolled or no items
+    if (hasScrolledToInitialRef.current || !filteredItems.length) return;
     if (!scrollViewRef.current) return;
+    
+    // CRITICAL FIX: Always mark as scrolled (even for index 0) to prevent re-runs
+    hasScrolledToInitialRef.current = true;
+    
+    // Only actually scroll if index is non-zero
+    if (computedInitialIndex === 0) return;
     
     requestAnimationFrame(() => {
       const itemHeight = window.innerHeight;
@@ -259,9 +275,8 @@ export function useUnifiedFullscreenLogic<T>({
       
       if (scrollViewRef.current) {
         scrollViewRef.current.scrollTo({ top: targetScrollTop, behavior: 'instant' });
-        hasScrolledToInitialRef.current = true;
         
-        // Update maps for the target post
+        // Maps already set in bootstrap effect, but ensure they're updated
         const targetItem = filteredItems[computedInitialIndex];
         if (targetItem) {
           setShouldAttachMap(m => ({ ...m, [targetItem.id]: true }));
