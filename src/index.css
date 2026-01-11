@@ -95,6 +95,36 @@ html.lightbox-open {
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   /* ========================================
+     CLUBHOUSE DARK THEME VARIABLES
+     ======================================== */
+  
+  /* Dark backgrounds */
+  --clubhouse-bg-page: 0 0% 6%;
+  --clubhouse-bg-header: 0 0% 4% / 0.95;
+  --clubhouse-bg-footer: 0 0% 5% / 0.95;
+  --clubhouse-bg-card: 0 0% 4% / 0.78;
+  --clubhouse-bg-action: 0 0% 0% / 0.25;
+  --clubhouse-bg-capsule: 0 0% 0% / 0.5;
+  
+  /* Dark text */
+  --clubhouse-text-primary: 0 0% 100%;
+  --clubhouse-text-secondary: 0 0% 100% / 0.90;
+  --clubhouse-text-muted: 0 0% 100% / 0.60;
+  --clubhouse-text-dimmed: 0 0% 100% / 0.55;
+  
+  /* Dark borders */
+  --clubhouse-border: 0 0% 100% / 0.06;
+  --clubhouse-border-light: 0 0% 100% / 0.10;
+  
+  /* Cinema dim mode overrides */
+  --clubhouse-dim-bg-header: 0 0% 6% / 0.02;
+  --clubhouse-dim-bg-footer: 0 0% 5% / 0.02;
+  
+  /* Active states for dark theme */
+  --clubhouse-active-bg: 0 0% 100% / 0.10;
+  --clubhouse-hover-bg: 0 0% 100% / 0.05;
+
+  /* ========================================
      SAFE AREA INSETS - iOS/Android notch & status bar
      ======================================== */
   /* TOP safe area disabled - content goes edge-to-edge */
