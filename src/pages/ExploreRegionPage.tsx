@@ -1,15 +1,13 @@
 /**
  * ExploreRegionPage - Shows moments grid filtered by region
  * 
- * Phase 1: Uses explore_moments view with region_key filter
- * 
- * Polish: improved header, back navigation, loading states
- * Uses static region banner images instead of latest moment thumbnail
+ * Polish pass: Region-specific visual identities with branded gradients,
+ * decorative flag/icon backgrounds, and evocative copy.
  */
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Film, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RegionKey, useExploreRegionStats } from '@/hooks/useExploreMoments';
 import { DiscoverMomentsGrid } from '@/components/explore-tab/DiscoverMomentsGrid';
@@ -27,41 +25,75 @@ const SLUG_TO_REGION: Record<string, RegionKey> = {
   'rest-of-world': 'ROW',
 };
 
-// Region metadata with banner images
-const REGION_CONFIG: Record<RegionKey, { 
-  title: string; 
+// Region configuration with branded visual identity
+interface RegionConfig {
+  title: string;
   subtitle: string;
+  emoji: string;
+  secondaryEmoji?: string;
   gradient: string;
-  bannerUrl: string;
-}> = {
+  decorativeType: 'dual-flags' | 'single-flag' | 'globe';
+}
+
+const REGION_CONFIG: Record<RegionKey, RegionConfig> = {
   GBI: { 
     title: 'Great Britain & Ireland', 
-    subtitle: 'From the rugged links of Scotland to the rolling parklands of Ireland',
-    gradient: 'from-slate-700 via-emerald-800 to-slate-900',
-    // UK/Ireland composite flag banner
-    bannerUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80',
+    subtitle: 'From the windswept links of Scotland to the emerald fairways of Ireland — where golf began.',
+    emoji: '🇬🇧',
+    secondaryEmoji: '🇮🇪',
+    gradient: 'from-[#1B4D3E] to-[#0D2818]',
+    decorativeType: 'dual-flags',
   },
   EU: { 
     title: 'Continental Europe', 
-    subtitle: 'Sun-drenched Spain, majestic France, and beyond',
-    gradient: 'from-amber-800 via-slate-700 to-slate-900',
-    // European golf landscape
-    bannerUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&q=80',
+    subtitle: 'Sun-drenched Spanish resorts, majestic French châteaux, and hidden Alpine gems.',
+    emoji: '🇪🇺',
+    gradient: 'from-[#1E3A5F] to-[#0F1F33]',
+    decorativeType: 'single-flag',
   },
   USA: { 
     title: 'United States', 
-    subtitle: 'From Pebble Beach to Pinehurst, coast to coast',
-    gradient: 'from-blue-800 via-slate-700 to-slate-900',
-    // American golf course
-    bannerUrl: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&q=80',
+    subtitle: "From Pebble Beach's ocean cliffs to Augusta's azaleas — America's golfing treasures.",
+    emoji: '🇺🇸',
+    gradient: 'from-[#1A237E] to-[#0D1442]',
+    decorativeType: 'single-flag',
   },
   ROW: { 
     title: 'Rest of World', 
-    subtitle: 'Hidden gems and bucket-list courses worldwide',
-    gradient: 'from-teal-800 via-slate-700 to-slate-900',
-    // World/global golf image
-    bannerUrl: 'https://images.unsplash.com/photo-1632845986643-f3d32ec8bd21?w=800&q=80',
+    subtitle: 'Hidden gems and bucket-list courses from every corner of the globe.',
+    emoji: '🌍',
+    gradient: 'from-[#5D4037] to-[#3E2723]',
+    decorativeType: 'globe',
   },
+};
+
+// Decorative background component for each region
+const RegionDecorativeBackground: React.FC<{ config: RegionConfig }> = ({ config }) => {
+  switch (config.decorativeType) {
+    case 'dual-flags':
+      return (
+        <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-[0.12]">
+          <span className="text-[100px] select-none">{config.emoji}</span>
+          {config.secondaryEmoji && (
+            <span className="text-[100px] select-none">{config.secondaryEmoji}</span>
+          )}
+        </div>
+      );
+    case 'single-flag':
+      return (
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.12]">
+          <span className="text-[120px] select-none">{config.emoji}</span>
+        </div>
+      );
+    case 'globe':
+      return (
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.12]">
+          <Globe className="w-40 h-40 text-white" strokeWidth={1} />
+        </div>
+      );
+    default:
+      return null;
+  }
 };
 
 const ExploreRegionPage: React.FC = () => {
@@ -77,7 +109,6 @@ const ExploreRegionPage: React.FC = () => {
 
   // Handle back navigation
   const handleBack = () => {
-    // Try to go back, but if there's no history, go to explore
     if (window.history.length > 1) {
       navigate(-1);
     } else {
@@ -112,50 +143,77 @@ const ExploreRegionPage: React.FC = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Sticky Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border/40">
-        <div className="px-5 py-4 flex items-center gap-3">
+        <div className="px-4 py-3 flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="p-1.5 -ml-1.5 rounded-full hover:bg-surface-alt transition-colors"
+            className="p-1 -ml-1 rounded-full hover:bg-muted transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-serif text-foreground truncate">{config.title}</h1>
-          </div>
+          <span className="font-medium text-foreground">{config.title}</span>
         </div>
       </div>
 
-      {/* Hero Section - Uses static region banner */}
-      <div className="relative h-48">
-        <img 
-          src={config.bannerUrl} 
-          alt={config.title}
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={(e) => {
-            // Fallback to gradient on error
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
-        <div className={cn("absolute inset-0 bg-gradient-to-br opacity-60", config.gradient)} />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h2 className="text-2xl font-serif text-foreground drop-shadow-sm">{config.title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground max-w-md">{config.subtitle}</p>
-          <div className="mt-2 text-xs text-muted-foreground">
+      {/* Hero Section - Branded gradient with decorative background */}
+      <div className={cn(
+        "relative overflow-hidden",
+        `bg-gradient-to-b ${config.gradient}`
+      )}>
+        {/* Decorative background pattern */}
+        <RegionDecorativeBackground config={config} />
+        
+        {/* Content */}
+        <div className="relative z-10 px-4 pt-6 pb-8">
+          {/* Region badge */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl">{config.emoji}</span>
+            <span className="text-xs font-medium text-white/60 uppercase tracking-wider">
+              Region
+            </span>
+          </div>
+          
+          {/* Title */}
+          <h1 className="text-2xl font-bold text-white mb-2">
+            {config.title}
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-sm text-white/75 leading-relaxed max-w-[300px]">
+            {config.subtitle}
+          </p>
+          
+          {/* Stats pill */}
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm">
+            <Film className="w-4 h-4 text-white/80" />
             {statsLoading ? (
-              <Skeleton className="h-3 w-28" />
-            ) : momentCount > 0 ? (
-              `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
+              <Skeleton className="h-4 w-24 bg-white/20" />
             ) : (
-              'Be the first to share a moment'
+              <span className="text-sm font-medium text-white">
+                {momentCount > 0 
+                  ? `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
+                  : 'Be the first to share'
+                }
+              </span>
             )}
           </div>
         </div>
       </div>
 
+      {/* Section header */}
+      <div className="px-4 pt-6 pb-3">
+        <h2 className="text-lg font-bold text-foreground">
+          Latest Moments
+        </h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Recent posts from {config.title}
+        </p>
+      </div>
+
       {/* Moments Grid */}
-      <DiscoverMomentsGrid regionKey={regionKey} />
+      <div className="px-2">
+        <DiscoverMomentsGrid regionKey={regionKey} />
+      </div>
     </div>
   );
 };
