@@ -64,8 +64,16 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
         <SelectContent align="end" className="min-w-[200px] bg-white border-slate-200 z-50 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
           {VISIBILITY_OPTIONS.map((option) => {
             const OptionIcon = option.icon;
+            const isSelected = option.value === value;
             return (
-              <SelectItem key={option.value} value={option.value} className="text-sm">
+              <SelectItem 
+                key={option.value} 
+                value={option.value} 
+                className={cn(
+                  "text-sm",
+                  isSelected && "bg-[#e2e8f0]"
+                )}
+              >
                 <div className="flex items-center gap-2">
                   <OptionIcon className="w-3.5 h-3.5 text-muted-foreground" />
                   <span>{option.label}</span>
