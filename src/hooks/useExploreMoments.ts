@@ -2,6 +2,7 @@
  * useExploreMoments - Hook for fetching explore moments from unified view
  * 
  * Phase 2: Adds trending support, caching, and prefetch
+ * Phase 3: Adds filtering by time frame, region, and sort order
  */
 
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -9,6 +10,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
 
 export type RegionKey = 'GBI' | 'EU' | 'USA' | 'ROW';
+export type TimeFilter = 'all' | 'year' | 'month' | 'week';
+export type SortFilter = 'recent' | 'liked';
+
+export interface ExploreFilters {
+  timeFrame: TimeFilter;
+  region: RegionKey | 'all';
+  sort: SortFilter;
+}
 
 export interface ExploreMoment {
   moment_id: string;
@@ -49,24 +58,66 @@ const CACHE_TTL = {
 
 const PAGE_SIZE = 20;
 
+// Helper to get date cutoff for time filter
+const getTimeFilterDate = (timeFrame?: TimeFilter): Date | null => {
+  if (!timeFrame || timeFrame === 'all') return null;
+  
+  const now = new Date();
+  switch (timeFrame) {
+    case 'week':
+      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    case 'month':
+      return new Date(now.getFullYear(), now.getMonth(), 1);
+    case 'year':
+      return new Date(now.getFullYear(), 0, 1);
+    default:
+      return null;
+  }
+};
+
 /**
  * Fetch paginated explore moments with cursor-based pagination
+ * Now supports filtering by time frame, region, and sort
  */
-export function useInfiniteExploreMoments(regionKey?: RegionKey) {
+export function useInfiniteExploreMoments(
+  regionKey?: RegionKey,
+  filters?: Partial<ExploreFilters>
+) {
+  // Merge regionKey prop with filters.region (prop takes precedence for region pages)
+  const effectiveRegion = regionKey || (filters?.region && filters.region !== 'all' ? filters.region : undefined);
+  const timeFrame = filters?.timeFrame || 'all';
+  const sortBy = filters?.sort || 'recent';
+
   return useInfiniteQuery({
-    queryKey: ['explore-moments', regionKey],
+    queryKey: ['explore-moments', effectiveRegion, timeFrame, sortBy],
     queryFn: async ({ pageParam }) => {
       let query = supabase
         .from('explore_moments')
         .select('*')
-        .order('created_at', { ascending: false })
-        .order('moment_id', { ascending: false })
         .limit(PAGE_SIZE);
 
       // Filter by region if provided
-      if (regionKey) {
-        query = query.eq('region_key', regionKey);
+      if (effectiveRegion) {
+        query = query.eq('region_key', effectiveRegion);
       }
+
+      // Filter by time frame
+      const timeDate = getTimeFilterDate(timeFrame);
+      if (timeDate) {
+        query = query.gte('created_at', timeDate.toISOString());
+      }
+
+      // Sort order
+      if (sortBy === 'liked') {
+        // For "most liked", we'd need engagement data - for now fallback to recent
+        // TODO: Add likes_count to explore_moments view or use RPC
+        query = query.order('created_at', { ascending: false });
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
+      
+      // Secondary sort for stable pagination
+      query = query.order('moment_id', { ascending: false });
 
       // Cursor pagination
       if (pageParam) {
