@@ -1165,25 +1165,12 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         transition={{ duration: 0.25, ease: 'easeOut' }}
                         onClick={onClose}
                       >
-                        {/* Always show full frame with blur letterboxing for all aspect ratios */}
+                        {/* Thumbnail fills container without zoom - uses object-cover */}
                         <>
-                          {/* Blurred background - fills any letterbox gaps */}
-                          <div 
-                            className="absolute inset-0"
-                            style={{
-                              backgroundImage: `url(${videoThumbnail})`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              filter: 'blur(20px) brightness(0.5)',
-                              transform: 'scale(1.3)',
-                            }}
-                            aria-hidden="true"
-                          />
-                          {/* Actual thumbnail - shows full frame with object-contain */}
                           <img
                             src={videoThumbnail}
                             alt=""
-                            className="absolute inset-0 w-full h-full object-contain"
+                            className="absolute inset-0 w-full h-full object-cover"
                             onError={() => setThumbnailError(true)}
                           />
                           {/* Review badge overlay */}
