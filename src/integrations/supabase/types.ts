@@ -1706,7 +1706,10 @@ export type Database = {
       }
       college_logo_sources: {
         Row: {
+          confidence: number | null
           created_at: string
+          found_image_url: string | null
+          found_page_url: string | null
           id: string
           last_error: string | null
           normalized_name: string
@@ -1717,7 +1720,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          confidence?: number | null
           created_at?: string
+          found_image_url?: string | null
+          found_page_url?: string | null
           id?: string
           last_error?: string | null
           normalized_name: string
@@ -1728,7 +1734,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          confidence?: number | null
           created_at?: string
+          found_image_url?: string | null
+          found_page_url?: string | null
           id?: string
           last_error?: string | null
           normalized_name?: string

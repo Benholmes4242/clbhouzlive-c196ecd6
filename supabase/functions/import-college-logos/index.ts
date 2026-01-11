@@ -10,6 +10,9 @@ import { corsHeaders } from '../_shared/cors.ts';
  * - POST { action: 'update-mapping' }: Update source URL for a college
  * - POST { action: 'import-single' }: Import a single college logo
  * - POST { action: 'import-batch' }: Import multiple college logos (rate-limited)
+ * - POST { action: 'auto-match-single' }: Use Perplexity to find logo URL for a single college
+ * - POST { action: 'auto-match-batch' }: Use Perplexity to find logo URLs for multiple colleges
+ * - POST { action: 'import-matched-batch' }: Import logos for colleges with matched URLs
  */
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -22,6 +25,9 @@ const r2AccessKeyId = Deno.env.get('R2_ACCESS_KEY_ID')!;
 const r2SecretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY')!;
 const r2Bucket = Deno.env.get('R2_BUCKET') || 'clbhouz-media';
 const r2PublicBaseUrl = Deno.env.get('R2_PUBLIC_BASE_URL') || 'https://media.clbhouz.co.uk';
+
+// Perplexity Configuration
+const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY')!;
 
 // Helper: Generate AWS Signature V4
 async function signR2Request(
@@ -75,12 +81,13 @@ async function signR2Request(
 }
 
 // Helper: Upload image to R2
-async function uploadToR2(imageData: ArrayBuffer, normalizedName: string): Promise<string> {
-  const path = `colleges/${normalizedName}.png`;
+async function uploadToR2(imageData: ArrayBuffer, normalizedName: string, extension: string = 'png'): Promise<string> {
+  const path = `colleges/${normalizedName}.${extension}`;
   const contentHash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', imageData)))
     .map(b => b.toString(16).padStart(2, '0')).join('');
 
-  const { url, headers } = await signR2Request('PUT', path, contentHash, 'image/png');
+  const contentType = extension === 'svg' ? 'image/svg+xml' : `image/${extension}`;
+  const { url, headers } = await signR2Request('PUT', path, contentHash, contentType);
 
   const response = await fetch(url, {
     method: 'PUT',
@@ -95,8 +102,8 @@ async function uploadToR2(imageData: ArrayBuffer, normalizedName: string): Promi
   return `${r2PublicBaseUrl}/${path}`;
 }
 
-// Helper: Download and convert image to PNG
-async function downloadImage(url: string): Promise<ArrayBuffer> {
+// Helper: Download image
+async function downloadImage(url: string): Promise<{ data: ArrayBuffer; extension: string }> {
   const response = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (compatible; ClbhouzBot/1.0)',
@@ -108,7 +115,20 @@ async function downloadImage(url: string): Promise<ArrayBuffer> {
     throw new Error(`Failed to download image: ${response.status}`);
   }
 
-  return await response.arrayBuffer();
+  const contentType = response.headers.get('content-type') || 'image/png';
+  let extension = 'png';
+  if (contentType.includes('svg')) extension = 'svg';
+  else if (contentType.includes('jpeg') || contentType.includes('jpg')) extension = 'jpg';
+  else if (contentType.includes('gif')) extension = 'gif';
+  else if (contentType.includes('webp')) extension = 'webp';
+
+  // Also check URL extension as fallback
+  const urlExt = url.split('.').pop()?.toLowerCase().split('?')[0];
+  if (urlExt && ['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'].includes(urlExt)) {
+    extension = urlExt === 'jpeg' ? 'jpg' : urlExt;
+  }
+
+  return { data: await response.arrayBuffer(), extension };
 }
 
 // Helper: Verify admin auth
@@ -128,6 +148,78 @@ async function verifyAdmin(authHeader: string | null): Promise<boolean> {
     .single();
 
   return !!membership;
+}
+
+// Helper: Query Perplexity to find logo URL
+async function findLogoWithPerplexity(collegeName: string, shortName: string | null): Promise<{
+  found_page_url: string | null;
+  found_image_url: string | null;
+  confidence: number;
+}> {
+  const prompt = `You are helping populate a database of US college athletics logos.
+
+Find the official SportsLogos.net page for the college:
+"${collegeName}"${shortName ? ` (also known as "${shortName}")` : ''}
+
+Return the result as STRICT JSON in this exact format (no markdown, no extra text):
+
+{
+  "sportslogos_page_url": string | null,
+  "logo_image_url": string | null,
+  "confidence": number
+}
+
+Rules:
+- Search sportslogos.net for NCAA athletics team logos
+- The sportslogos_page_url should be the team's page on sportslogos.net
+- The logo_image_url must be a direct image URL (png, svg, jpg, gif) - look for the primary athletics logo
+- If you can't find a confident match, return nulls with confidence < 0.5
+- Confidence should be between 0 and 1`;
+
+  const response = await fetch('https://api.perplexity.ai/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${perplexityApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'sonar-pro',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  
+  // Parse the JSON response
+  try {
+    // Try to extract JSON from the response (handle markdown code blocks)
+    let jsonStr = content;
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1];
+    }
+    
+    const parsed = JSON.parse(jsonStr.trim());
+    return {
+      found_page_url: parsed.sportslogos_page_url || null,
+      found_image_url: parsed.logo_image_url || null,
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
+    };
+  } catch (parseError) {
+    console.error('Failed to parse Perplexity response:', content);
+    return {
+      found_page_url: null,
+      found_image_url: null,
+      confidence: 0,
+    };
+  }
 }
 
 serve(async (req) => {
@@ -232,6 +324,249 @@ serve(async (req) => {
           });
         }
 
+        case 'auto-match-single': {
+          const { normalized_name } = body;
+
+          if (!normalized_name) {
+            throw new Error('normalized_name is required');
+          }
+
+          console.log(`Auto-matching logo for ${normalized_name} using Perplexity`);
+
+          // Get college info
+          const { data: collegeData, error: collegeError } = await supabase
+            .from('college_media')
+            .select('college_name, short_name')
+            .eq('normalized_name', normalized_name)
+            .single();
+
+          if (collegeError || !collegeData) {
+            throw new Error(`College not found: ${normalized_name}`);
+          }
+
+          // Query Perplexity
+          const result = await findLogoWithPerplexity(
+            collegeData.college_name,
+            collegeData.short_name
+          );
+
+          console.log(`Perplexity result for ${normalized_name}:`, result);
+
+          // Update college_logo_sources
+          const newStatus = result.found_image_url && result.confidence >= 0.5 ? 'matched' : 'failed';
+          const { error: updateError } = await supabase
+            .from('college_logo_sources')
+            .update({
+              found_page_url: result.found_page_url,
+              found_image_url: result.found_image_url,
+              confidence: result.confidence,
+              status: newStatus,
+              last_error: newStatus === 'failed' ? 'No confident match found' : null,
+              source: 'perplexity',
+              updated_at: new Date().toISOString()
+            })
+            .eq('normalized_name', normalized_name);
+
+          if (updateError) throw updateError;
+
+          return new Response(JSON.stringify({
+            success: true,
+            normalized_name,
+            ...result,
+            status: newStatus
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        case 'auto-match-batch': {
+          const { limit: batchLimit = 10 } = body;
+
+          console.log(`Auto-matching batch of ${batchLimit} pending colleges`);
+
+          // Get pending colleges
+          const { data: pendingColleges, error: fetchError } = await supabase
+            .from('college_logo_sources')
+            .select('normalized_name, college_media!inner(college_name, short_name)')
+            .eq('status', 'pending')
+            .limit(batchLimit);
+
+          if (fetchError) throw fetchError;
+
+          if (!pendingColleges || pendingColleges.length === 0) {
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'No pending colleges to process',
+              processed: 0,
+              matched: 0,
+              failed: 0
+            }), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+          }
+
+          const results: Array<{
+            normalized_name: string;
+            success: boolean;
+            found_image_url?: string | null;
+            confidence?: number;
+            error?: string;
+          }> = [];
+
+          // Process sequentially to avoid rate limits
+          for (const college of pendingColleges) {
+            try {
+              // Rate limiting: wait between requests
+              await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+
+              const collegeMedia = college.college_media as { college_name: string; short_name: string | null };
+              const result = await findLogoWithPerplexity(
+                collegeMedia.college_name,
+                collegeMedia.short_name
+              );
+
+              const newStatus = result.found_image_url && result.confidence >= 0.5 ? 'matched' : 'failed';
+              
+              await supabase
+                .from('college_logo_sources')
+                .update({
+                  found_page_url: result.found_page_url,
+                  found_image_url: result.found_image_url,
+                  confidence: result.confidence,
+                  status: newStatus,
+                  last_error: newStatus === 'failed' ? 'No confident match found' : null,
+                  source: 'perplexity',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('normalized_name', college.normalized_name);
+
+              results.push({
+                normalized_name: college.normalized_name,
+                success: newStatus === 'matched',
+                found_image_url: result.found_image_url,
+                confidence: result.confidence
+              });
+            } catch (err) {
+              const errorMsg = (err as Error).message;
+              
+              await supabase
+                .from('college_logo_sources')
+                .update({
+                  status: 'failed',
+                  last_error: errorMsg,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('normalized_name', college.normalized_name);
+
+              results.push({
+                normalized_name: college.normalized_name,
+                success: false,
+                error: errorMsg
+              });
+            }
+          }
+
+          const matchedCount = results.filter(r => r.success).length;
+          const failedCount = results.filter(r => !r.success).length;
+
+          return new Response(JSON.stringify({
+            success: true,
+            processed: results.length,
+            matched: matchedCount,
+            failed: failedCount,
+            results
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        case 'import-matched-batch': {
+          const { limit: batchLimit = 10 } = body;
+
+          console.log(`Importing batch of ${batchLimit} matched colleges`);
+
+          // Get matched colleges with found_image_url
+          const { data: matchedColleges, error: fetchError } = await supabase
+            .from('college_logo_sources')
+            .select('normalized_name, found_image_url')
+            .eq('status', 'matched')
+            .not('found_image_url', 'is', null)
+            .limit(batchLimit);
+
+          if (fetchError) throw fetchError;
+
+          if (!matchedColleges || matchedColleges.length === 0) {
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'No matched colleges to import',
+              imported: 0,
+              failed: 0
+            }), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+          }
+
+          const results: Array<{
+            normalized_name: string;
+            success: boolean;
+            logo_url?: string;
+            error?: string;
+          }> = [];
+
+          for (const college of matchedColleges) {
+            try {
+              // Rate limiting
+              await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
+
+              const { data: imageData, extension } = await downloadImage(college.found_image_url!);
+              const r2Url = await uploadToR2(imageData, college.normalized_name, extension);
+
+              // Update college_media
+              await supabase
+                .from('college_media')
+                .update({ logo_url: r2Url, updated_at: new Date().toISOString() })
+                .eq('normalized_name', college.normalized_name);
+
+              // Update college_logo_sources
+              await supabase
+                .from('college_logo_sources')
+                .update({
+                  status: 'uploaded',
+                  last_error: null,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('normalized_name', college.normalized_name);
+
+              results.push({ normalized_name: college.normalized_name, success: true, logo_url: r2Url });
+            } catch (err) {
+              const errorMsg = (err as Error).message;
+              
+              await supabase
+                .from('college_logo_sources')
+                .update({
+                  status: 'failed',
+                  last_error: errorMsg,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('normalized_name', college.normalized_name);
+
+              results.push({ normalized_name: college.normalized_name, success: false, error: errorMsg });
+            }
+          }
+
+          const importedCount = results.filter(r => r.success).length;
+          const failedCount = results.filter(r => !r.success).length;
+
+          return new Response(JSON.stringify({
+            success: true,
+            imported: importedCount,
+            failed: failedCount,
+            results
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
         case 'import-single': {
           const { normalized_name, image_url } = body;
 
@@ -242,11 +577,11 @@ serve(async (req) => {
           console.log(`Importing logo for ${normalized_name} from ${image_url}`);
 
           // Download image
-          const imageData = await downloadImage(image_url);
+          const { data: imageData, extension } = await downloadImage(image_url);
           console.log(`Downloaded ${imageData.byteLength} bytes`);
 
           // Upload to R2
-          const r2Url = await uploadToR2(imageData, normalized_name);
+          const r2Url = await uploadToR2(imageData, normalized_name, extension);
           console.log(`Uploaded to R2: ${r2Url}`);
 
           // Update college_media
@@ -292,8 +627,8 @@ serve(async (req) => {
               // Rate limiting: wait between requests
               await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
 
-              const imageData = await downloadImage(item.image_url);
-              const r2Url = await uploadToR2(imageData, item.normalized_name);
+              const { data: imageData, extension } = await downloadImage(item.image_url);
+              const r2Url = await uploadToR2(imageData, item.normalized_name, extension);
 
               await supabase
                 .from('college_media')

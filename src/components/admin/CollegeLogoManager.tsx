@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Search, Upload, Check, X, ExternalLink, AlertCircle, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { Search, Upload, ExternalLink, AlertCircle, RefreshCw, Image as ImageIcon, Wand2, Download, Sparkles } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
@@ -22,6 +22,9 @@ interface CollegeLogoSource {
   source: string;
   source_page_url: string | null;
   suggested_url: string | null;
+  found_page_url: string | null;
+  found_image_url: string | null;
+  confidence: number | null;
   status: string;
   last_error: string | null;
   college_media: {
@@ -55,6 +58,7 @@ export default function CollegeLogoManager() {
   const [editingCollege, setEditingCollege] = useState<CollegeLogoSource | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [importingColleges, setImportingColleges] = useState<Set<string>>(new Set());
+  const [matchingColleges, setMatchingColleges] = useState<Set<string>>(new Set());
 
   // Fetch colleges with mapping status
   const { data, isLoading, refetch } = useQuery({
@@ -79,30 +83,85 @@ export default function CollegeLogoManager() {
     },
   });
 
-  // Update mapping mutation
-  const updateMappingMutation = useMutation({
-    mutationFn: async ({ normalized_name, source_page_url }: { normalized_name: string; source_page_url: string }) => {
-      const { data: session } = await supabase.auth.getSession();
+  // Auto-match single mutation
+  const autoMatchSingleMutation = useMutation({
+    mutationFn: async (normalized_name: string) => {
+      setMatchingColleges(prev => new Set(prev).add(normalized_name));
       
       const response = await supabase.functions.invoke('import-college-logos', {
         method: 'POST',
         body: {
-          action: 'update-mapping',
+          action: 'auto-match-single',
           normalized_name,
-          source_page_url,
         },
       });
 
       if (response.error) throw response.error;
       return response.data;
     },
-    onSuccess: () => {
-      toast.success('Mapping updated');
+    onSuccess: (data) => {
+      if (data.status === 'matched') {
+        toast.success(`Found logo for ${data.normalized_name} (${Math.round(data.confidence * 100)}% confidence)`);
+      } else {
+        toast.warning(`No confident match found for ${data.normalized_name}`);
+      }
       queryClient.invalidateQueries({ queryKey: ['college-logos'] });
-      setEditingCollege(null);
     },
     onError: (error) => {
-      toast.error(`Failed to update: ${error.message}`);
+      toast.error(`Auto-match failed: ${error.message}`);
+    },
+    onSettled: (_, __, normalized_name) => {
+      setMatchingColleges(prev => {
+        const next = new Set(prev);
+        next.delete(normalized_name);
+        return next;
+      });
+    },
+  });
+
+  // Auto-match batch mutation
+  const autoMatchBatchMutation = useMutation({
+    mutationFn: async (limit: number) => {
+      const response = await supabase.functions.invoke('import-college-logos', {
+        method: 'POST',
+        body: {
+          action: 'auto-match-batch',
+          limit,
+        },
+      });
+
+      if (response.error) throw response.error;
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(`Auto-matched ${data.matched} of ${data.processed} colleges`);
+      queryClient.invalidateQueries({ queryKey: ['college-logos'] });
+    },
+    onError: (error) => {
+      toast.error(`Batch auto-match failed: ${error.message}`);
+    },
+  });
+
+  // Import matched batch mutation
+  const importMatchedBatchMutation = useMutation({
+    mutationFn: async (limit: number) => {
+      const response = await supabase.functions.invoke('import-college-logos', {
+        method: 'POST',
+        body: {
+          action: 'import-matched-batch',
+          limit,
+        },
+      });
+
+      if (response.error) throw response.error;
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(`Imported ${data.imported} logos to R2`);
+      queryClient.invalidateQueries({ queryKey: ['college-logos'] });
+    },
+    onError: (error) => {
+      toast.error(`Batch import failed: ${error.message}`);
     },
   });
 
@@ -152,8 +211,21 @@ export default function CollegeLogoManager() {
     });
   };
 
+  const handleImportMatched = (college: CollegeLogoSource) => {
+    if (!college.found_image_url) {
+      toast.error('No matched image URL');
+      return;
+    }
+    importLogoMutation.mutate({
+      normalized_name: college.normalized_name,
+      image_url: college.found_image_url,
+    });
+  };
+
   const stats = data?.stats;
   const colleges = data?.colleges || [];
+
+  const isBatchProcessing = autoMatchBatchMutation.isPending || importMatchedBatchMutation.isPending;
 
   return (
     <Card>
@@ -163,10 +235,51 @@ export default function CollegeLogoManager() {
           College Logo Manager
         </CardTitle>
         <CardDescription>
-          Map colleges to logo sources and import logos to R2
+          Auto-match logos with Perplexity AI and import to R2
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Batch Action Buttons */}
+        <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => autoMatchBatchMutation.mutate(10)}
+            disabled={isBatchProcessing || (stats?.pending ?? 0) === 0}
+          >
+            {autoMatchBatchMutation.isPending ? (
+              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Wand2 className="h-4 w-4 mr-2" />
+            )}
+            Auto-match Pending (10)
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => importMatchedBatchMutation.mutate(10)}
+            disabled={isBatchProcessing || (stats?.matched ?? 0) === 0}
+          >
+            {importMatchedBatchMutation.isPending ? (
+              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            Import Matched (10)
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              autoMatchBatchMutation.mutate(50);
+            }}
+            disabled={isBatchProcessing || (stats?.pending ?? 0) === 0}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Auto-match (50)
+          </Button>
+        </div>
+
         {/* Stats */}
         {stats && (
           <div className="flex flex-wrap gap-2">
@@ -178,6 +291,12 @@ export default function CollegeLogoManager() {
               onClick={() => setStatusFilter(statusFilter === 'pending' ? null : 'pending')}
             >
               Pending: {stats.pending}
+            </Badge>
+            <Badge 
+              className={`cursor-pointer ${statusFilter === 'matched' ? 'ring-2 ring-primary' : ''} ${statusColors.matched}`}
+              onClick={() => setStatusFilter(statusFilter === 'matched' ? null : 'matched')}
+            >
+              Matched: {stats.matched}
             </Badge>
             <Badge 
               className={`cursor-pointer ${statusFilter === 'uploaded' ? 'ring-2 ring-primary' : ''} ${statusColors.uploaded}`}
@@ -245,6 +364,11 @@ export default function CollegeLogoManager() {
                       {college.normalized_name}
                       {college.college_media?.short_name && ` • ${college.college_media.short_name}`}
                     </div>
+                    {college.confidence !== null && college.confidence > 0 && (
+                      <div className="text-xs text-blue-600 dark:text-blue-400">
+                        {Math.round(college.confidence * 100)}% confidence
+                      </div>
+                    )}
                     {college.last_error && (
                       <div className="text-xs text-destructive flex items-center gap-1 mt-1">
                         <AlertCircle className="h-3 w-3" />
@@ -260,32 +384,67 @@ export default function CollegeLogoManager() {
 
                   {/* Actions */}
                   <div className="flex gap-1">
-                    {college.source_page_url && (
+                    {college.found_page_url && (
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => window.open(college.source_page_url!, '_blank')}
+                        title="Open SportsLogos page"
+                        onClick={() => window.open(college.found_page_url!, '_blank')}
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
                     )}
+                    
+                    {/* Auto-match button for pending/failed */}
+                    {(college.status === 'pending' || college.status === 'failed') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => autoMatchSingleMutation.mutate(college.normalized_name)}
+                        disabled={matchingColleges.has(college.normalized_name)}
+                      >
+                        {matchingColleges.has(college.normalized_name) ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Wand2 className="h-4 w-4 mr-1" />
+                            Match
+                          </>
+                        )}
+                      </Button>
+                    )}
+
+                    {/* Import button for matched */}
+                    {college.status === 'matched' && college.found_image_url && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleImportMatched(college)}
+                        disabled={importingColleges.has(college.normalized_name)}
+                      >
+                        {importingColleges.has(college.normalized_name) ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Download className="h-4 w-4 mr-1" />
+                            Import
+                          </>
+                        )}
+                      </Button>
+                    )}
+
+                    {/* Manual add/replace button */}
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => {
                         setEditingCollege(college);
-                        setImageUrl('');
+                        setImageUrl(college.found_image_url || '');
                       }}
                       disabled={importingColleges.has(college.normalized_name)}
                     >
-                      {importingColleges.has(college.normalized_name) ? (
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                      ) : college.college_media?.logo_url ? (
-                        'Replace'
-                      ) : (
-                        'Add Logo'
-                      )}
+                      {college.college_media?.logo_url ? 'Replace' : 'Manual'}
                     </Button>
                   </div>
                 </div>
@@ -316,6 +475,29 @@ export default function CollegeLogoManager() {
                 </div>
               )}
 
+              {/* Found URL info */}
+              {editingCollege?.found_image_url && (
+                <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <div className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
+                    AI-Discovered URL ({Math.round((editingCollege.confidence || 0) * 100)}% confidence)
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {editingCollege.found_image_url}
+                  </div>
+                  {editingCollege.found_page_url && (
+                    <a
+                      href={editingCollege.found_page_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      View source page
+                    </a>
+                  )}
+                </div>
+              )}
+
               {/* Image URL input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Logo Image URL</label>
@@ -325,7 +507,7 @@ export default function CollegeLogoManager() {
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Paste a direct link to a PNG/JPG logo image. The image will be downloaded and uploaded to R2.
+                  Paste a direct link to a PNG/JPG/SVG logo image. The image will be downloaded and uploaded to R2.
                 </p>
               </div>
 
