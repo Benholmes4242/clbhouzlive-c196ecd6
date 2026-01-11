@@ -38,6 +38,7 @@ interface FormData {
   username: string;
   homeClub: string;
   homeClubId: string | null;  // Links to golf_clubs.id (primary_club_id)
+  collegeNormalized: string | null;  // Links to college_media.normalized_name
   handicap: string;
   bio: string;
   websites: string[];
@@ -95,6 +96,7 @@ const EditProfilePage: React.FC = () => {
     username: '',
     homeClub: '',
     homeClubId: null,
+    collegeNormalized: null,
     handicap: '',
     bio: '',
     websites: [],
@@ -118,6 +120,7 @@ const EditProfilePage: React.FC = () => {
         username: profile.username || '',
         homeClub: profile.home_club || '',
         homeClubId: profile.primary_club_id || null,  // Load from primary_club_id
+        collegeNormalized: (profile as any).college_normalized || null,  // Load college
         handicap: profile.eg_handicap_index?.toString() || '',
         bio: profile.bio || '',
         websites: profile.websites || [],
@@ -290,6 +293,7 @@ const EditProfilePage: React.FC = () => {
         display_name: formData.displayName || null,
         home_club: formData.homeClub || null,
         primary_club_id: formData.homeClubId || null,  // Store club ID from golf_clubs
+        college_normalized: formData.collegeNormalized || null,  // Store college
         eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
         bio: formData.bio || null,
         websites: normalizeWebsites(formData.websites),
@@ -473,7 +477,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-muted/30"
+            className="px-4 py-6 bg-slate-50 dark:bg-muted/30"
           >
             <div className="space-y-6">
               <HeaderPhotoCard
@@ -515,11 +519,12 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-muted/30"
+            className="px-4 py-6 bg-slate-50 dark:bg-muted/30"
           >
             <GolfInfoSection
               homeClub={formData.homeClub}
               homeClubId={formData.homeClubId}
+              collegeNormalized={formData.collegeNormalized}
               handicap={formData.handicap}
               userId={user?.id}
               homeClubVisibility={formData.homeClubVisibility}
@@ -557,7 +562,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-muted/30"
+            className="px-4 py-6 bg-slate-50 dark:bg-muted/30"
           >
             <PrivacySection
               isPublic={formData.isPublic}
