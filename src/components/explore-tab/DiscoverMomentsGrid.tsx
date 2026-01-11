@@ -3,30 +3,31 @@
  * 
  * Data source: unified explore_moments view
  * Initial render: 20 items, then infinite scroll in batches of 20
- * Order: latest first (created_at desc)
+ * Order: latest first (created_at desc) - ALL TIME by default
  * 
- * Autoplay pattern: Diagonal alternating
- * - Row 1: Left plays, Right static
- * - Row 2: Left static, Right plays
- * (repeats)
+ * Autoplay pattern: All videos are candidates, MediaRuntime handles concurrency
  * 
- * Polish: Course name overlay, better gradients, hover effects
+ * Phase 3: Supports filtering by time frame, region, and sort
  */
 
 import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useInfiniteExploreMoments, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
+import { useInfiniteExploreMoments, RegionKey, ExploreMoment, ExploreFilters } from '@/hooks/useExploreMoments';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play, MapPin } from 'lucide-react';
+import { Play } from 'lucide-react';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 
 interface DiscoverMomentsGridProps {
   regionKey?: RegionKey;
+  filters?: ExploreFilters;
   className?: string;
   onMomentClick?: (moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => void;
+  showHeader?: boolean;
+  headerTitle?: string;
+  headerSubtitle?: string;
 }
 
 // Gradient fallbacks for items without thumbnails
@@ -39,10 +40,8 @@ const GRADIENTS = [
 
 /**
  * All videos are autoplay candidates - MediaRuntime handles concurrency.
- * Previously used diagonal alternating pattern that was too restrictive.
  */
 const isAutoplayCandidate = (index: number): boolean => {
-  // All tiles are candidates, MediaRuntime handles which ones actually play
   return true;
 };
 
@@ -85,7 +84,6 @@ const MomentTile: React.FC<{
       if (videoEl) {
         registerRef(videoEl);
       } else if (retryCount < maxRetries) {
-        // Video element not ready yet, retry after short delay
         retryCount++;
         setTimeout(checkAndRegister, 50);
       }
@@ -121,7 +119,6 @@ const MomentTile: React.FC<{
             managedByMediaRuntime
           />
         ) : isVideo && videoSrc ? (
-          // Static video thumbnail (not an autoplay candidate)
           <div className="relative w-full h-full">
             {!showGradient ? (
               <img 
@@ -137,7 +134,6 @@ const MomentTile: React.FC<{
                 GRADIENTS[gradientIndex]
               )} />
             )}
-            {/* Play icon overlay with hover effect */}
             <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
               <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:bg-black/60 transition-colors">
                 <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
@@ -168,8 +164,12 @@ const MomentTile: React.FC<{
 
 export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   regionKey,
+  filters,
   className,
   onMomentClick,
+  showHeader = true,
+  headerTitle = "Discover Courses",
+  headerSubtitle = "Moments from the world's great courses",
 }) => {
   const navigate = useNavigate();
   const loadMoreRef = useRef(false);
@@ -188,7 +188,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteExploreMoments(regionKey);
+  } = useInfiniteExploreMoments(regionKey, filters);
 
   // Infinite scroll trigger
   const { ref: sentinelRef, inView } = useInView({
@@ -237,11 +237,9 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   const registeredIdsRef = useRef<Set<string>>(new Set());
   
   // Create registration callback for each moment
-  // Uses stable ref pattern to prevent infinite re-registration loops
   const createRegisterRef = useCallback((momentId: string, index: number) => {
     return (el: HTMLVideoElement | null) => {
       if (!el) {
-        // Unregister when element is unmounted
         if (registeredIdsRef.current.has(momentId)) {
           registeredIdsRef.current.delete(momentId);
           registerMediaRef.current({
@@ -254,12 +252,10 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
         return;
       }
       
-      // Skip if already registered with same element
       if (registeredIdsRef.current.has(momentId)) {
         return;
       }
       
-      // Use requestAnimationFrame to ensure element is fully mounted
       requestAnimationFrame(() => {
         registeredIdsRef.current.add(momentId);
         registerMediaRef.current({
@@ -270,16 +266,18 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
         });
       });
     };
-  }, []); // Empty deps - uses refs for stability
+  }, []);
 
   // Initial loading state with skeleton
   if (isLoading && moments.length === 0) {
     return (
       <div className={cn("py-6", className)}>
-        <div className="px-4 mb-4">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-56 mt-2" />
-        </div>
+        {showHeader && (
+          <div className="px-4 mb-4">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-4 w-56 mt-2" />
+          </div>
+        )}
         <div className="px-1 grid grid-cols-2 gap-1">
           {Array.from({ length: 8 }).map((_, i) => (
             <MomentTileSkeleton key={i} />
@@ -293,15 +291,15 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   if (moments.length === 0) {
     return (
       <div className={cn("py-6", className)}>
-        <div className="px-4 mb-4">
-          <h2 className="text-lg font-bold text-foreground">Discover Courses</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Moments from the world's great courses
-          </p>
-        </div>
+        {showHeader && (
+          <div className="px-4 mb-4">
+            <h2 className="text-lg font-bold text-foreground">{headerTitle}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{headerSubtitle}</p>
+          </div>
+        )}
         <div className="px-4 py-12 text-center">
           <p className="text-sm text-muted-foreground">
-            No moments found yet. Be the first to share!
+            No moments found. Try adjusting your filters or be the first to share!
           </p>
         </div>
       </div>
@@ -311,14 +309,12 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   return (
     <div className={cn("py-6", className)}>
       {/* Enhanced Section Header */}
-      <div className="px-4 mb-4">
-        <h2 className="text-lg font-bold text-foreground">
-          Discover Courses
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Moments from the world's great courses
-        </p>
-      </div>
+      {showHeader && (
+        <div className="px-4 mb-4">
+          <h2 className="text-lg font-bold text-foreground">{headerTitle}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{headerSubtitle}</p>
+        </div>
+      )}
       
       {/* Grid with tighter gaps */}
       <div className="px-1 grid grid-cols-2 gap-1">

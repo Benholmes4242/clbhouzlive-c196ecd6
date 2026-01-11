@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, Flag, Globe } from 'lucide-react';
+import { Bookmark, Flag, Globe, SlidersHorizontal } from 'lucide-react';
 import ExploreHero from './ExploreHero';
 import Top100JourneySummary from './Top100JourneySummary';
 import ExploreRegionCards from './ExploreRegionCards';
@@ -10,8 +10,11 @@ import ExploreSearchSheet from './ExploreSearchSheet';
 import NewThisWeekCarousel from './NewThisWeekCarousel';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import ExploreSearchResults from './ExploreSearchResults';
+import ExploreFiltersSheet, { 
+  countActiveFilters 
+} from './ExploreFiltersSheet';
 import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
-import { useExplorePrefetch, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
+import { useExplorePrefetch, RegionKey, ExploreMoment, ExploreFilters, TimeFilter, SortFilter } from '@/hooks/useExploreMoments';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import { exploreMomentAdapter } from '@/adapters/exploreMomentAdapter';
 
@@ -20,8 +23,8 @@ interface ExploreTabProps {
   className?: string;
 }
 
-// Local storage key - kept for future use but sort is hidden
-const EXPLORE_SORT_KEY = 'explore-sort-option';
+// Local storage key for filters
+const EXPLORE_FILTERS_KEY = 'explore-filters';
 
 // Enhanced filter options with icons
 const EXPLORE_PILLS: { id: string; label: string; icon?: React.ElementType }[] = [
@@ -38,13 +41,17 @@ const REGION_CONFIG: { key: RegionKey; title: string }[] = [
   { key: 'ROW', title: 'Rest of World' },
 ];
 
+// Default filters
+const DEFAULT_FILTERS: ExploreFilters = {
+  timeFrame: 'all',
+  region: 'all',
+  sort: 'recent',
+};
+
 /**
  * ExploreTab - The aspirational discovery surface for golf places, courses, and journeys
  * 
- * Phase 2:
- * - Trending support (7 days weighted by engagement)
- * - "New this week in [Region]" micro-carousels
- * - Caching + prefetch for instant tab switching
+ * Phase 3: Adds filter bottom sheet for time frame, region, and sort
  */
 export const ExploreTab: React.FC<ExploreTabProps> = ({
   onMediaClick,
@@ -56,7 +63,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   // Prefetch explore data on mount
   useExplorePrefetch();
   
-  // Fullscreen player hook - uses explore-moments adapter for ExploreMoment type
+  // Fullscreen player hook
   const { openFullscreen } = useUnifiedFullscreen('explore-moments', {
     allowLandscape: true,
   });
@@ -65,10 +72,18 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [sortOption, setSortOption] = useState<SortOption>(() => {
-    const saved = localStorage.getItem(EXPLORE_SORT_KEY);
-    return (saved as SortOption) || 'newest';
+  const [sortOption, setSortOption] = useState<SortOption>('newest');
+  
+  // Filter state
+  const [filters, setFilters] = useState<ExploreFilters>(() => {
+    try {
+      const saved = localStorage.getItem(EXPLORE_FILTERS_KEY);
+      return saved ? { ...DEFAULT_FILTERS, ...JSON.parse(saved) } : DEFAULT_FILTERS;
+    } catch {
+      return DEFAULT_FILTERS;
+    }
   });
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   
   // Search sheet state
   const [isSearchSheetOpen, setIsSearchSheetOpen] = useState(false);
@@ -76,6 +91,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   // Data hooks
   const { data: trendingCourses } = useTrendingCourses(20);
   const { data: regions } = useExploreRegions();
+
+  // Active filter count
+  const activeFilterCount = countActiveFilters(filters);
 
   // Handle click outside to close search
   useEffect(() => {
@@ -100,19 +118,27 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
   const handleSortChange = useCallback((sort: SortOption) => {
     setSortOption(sort);
-    localStorage.setItem(EXPLORE_SORT_KEY, sort);
   }, []);
 
   const handleFilterChange = useCallback((key: string) => {
     setActiveFilter(key);
   }, []);
 
-  // Build pills for command center
-  const pills: Pill[] = EXPLORE_PILLS.map(p => ({
-    key: p.id,
-    label: p.label,
-    selected: activeFilter === p.id,
-  }));
+  const handleApplyFilters = useCallback((newFilters: ExploreFilters) => {
+    setFilters(newFilters);
+    try {
+      localStorage.setItem(EXPLORE_FILTERS_KEY, JSON.stringify(newFilters));
+    } catch {}
+  }, []);
+
+  // Build pills for command center - add filter button
+  const pills: Pill[] = [
+    ...EXPLORE_PILLS.map(p => ({
+      key: p.id,
+      label: p.label,
+      selected: activeFilter === p.id,
+    })),
+  ];
 
   const handleSearchClick = useCallback(() => {
     setIsSearchSheetOpen(true);
@@ -128,8 +154,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
   // Handle moment click - opens fullscreen player with all moments
   const handleMomentClick = useCallback((moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => {
-    // Convert ExploreMoments to format expected by fullscreen viewer
-    // The adapter will handle the normalization
     openFullscreen(allMoments, index);
   }, [openFullscreen]);
 
@@ -137,6 +161,27 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   const handleItemClick = (item: any) => {
     onMediaClick?.(item);
   };
+
+  // Filter button for command center
+  const FilterButton = () => (
+    <button
+      onClick={() => setIsFilterSheetOpen(true)}
+      className={cn(
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+        activeFilterCount > 0
+          ? "bg-foreground text-background"
+          : "bg-muted text-muted-foreground hover:bg-muted/80"
+      )}
+    >
+      <SlidersHorizontal className="w-4 h-4" />
+      <span>Filters</span>
+      {activeFilterCount > 0 && (
+        <span className="ml-0.5 w-5 h-5 rounded-full bg-background text-foreground text-xs flex items-center justify-center font-semibold">
+          {activeFilterCount}
+        </span>
+      )}
+    </button>
+  );
 
   // Render content based on active filter
   const renderContent = () => {
@@ -217,22 +262,16 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
           </div>
         );
 
-      // Bucket list removed from pills - this case kept for safety
       case 'bucket-list':
         return (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center mx-4">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-950/50 dark:to-orange-900/30 flex items-center justify-center mb-4">
               <Bookmark className="w-10 h-10 text-orange-500" />
             </div>
-            
-            <h3 className="text-lg font-bold text-foreground mb-2">
-              Your Bucket List
-            </h3>
-            
+            <h3 className="text-lg font-bold text-foreground mb-2">Your Bucket List</h3>
             <p className="text-sm text-muted-foreground max-w-xs mb-6">
               Save courses you dream of playing. We'll help you track your journey.
             </p>
-            
             <button
               onClick={() => setActiveFilter('courses')}
               className="px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
@@ -267,7 +306,18 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
             </div>
             
             <div className="h-px bg-border/40 mx-4" />
-            <DiscoverMomentsGrid onMomentClick={handleMomentClick} />
+            
+            {/* Filter button row */}
+            <div className="px-4 pt-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground">Discover Courses</h2>
+              <FilterButton />
+            </div>
+            
+            <DiscoverMomentsGrid 
+              onMomentClick={handleMomentClick}
+              filters={filters}
+              showHeader={false}
+            />
           </>
         );
     }
@@ -275,7 +325,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
   return (
     <div className={cn("min-h-screen bg-background", className)}>
-      {/* Sticky Command Center: Search + Pills (Sort hidden for Explore) */}
+      {/* Sticky Command Center: Search + Pills */}
       <div ref={searchContainerRef} className="sticky top-0 z-30 bg-background">
         <DiscoverCommandCenter
           searchPlaceholder="Search courses, regions..."
@@ -308,6 +358,15 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       <ExploreSearchSheet 
         isOpen={isSearchSheetOpen} 
         onClose={() => setIsSearchSheetOpen(false)} 
+      />
+      
+      {/* Filters Sheet */}
+      <ExploreFiltersSheet
+        isOpen={isFilterSheetOpen}
+        onClose={() => setIsFilterSheetOpen(false)}
+        filters={filters}
+        onApply={handleApplyFilters}
+        showRegionFilter={true}
       />
     </div>
   );
