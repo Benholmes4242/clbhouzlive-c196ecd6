@@ -114,12 +114,11 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Sort options content (inline to avoid hook issues with inner components)
+  // Sort options content - polished bottom sheet styling
   const sortOptionsContent = (
     <div 
-      className="px-4 pb-6 overflow-y-auto"
+      className="px-4 pb-8 overflow-y-auto"
       style={{
-        paddingBottom: '24px',
         maxHeight: 'calc(75vh - 140px)',
       }}
     >
@@ -132,33 +131,32 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               key={option.id}
               type="button"
               onClick={() => handleSortSelect(option.id)}
-              className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
+              className={cn(
+                "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all active:scale-[0.98]",
+                isActive 
+                  ? "bg-foreground text-background shadow-lg" 
+                  : "bg-muted/50 hover:bg-muted text-foreground"
+              )}
               style={{
-                background: isActive ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
-                boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+                boxShadow: isActive ? '0 4px 20px hsl(var(--foreground) / 0.25)' : 'none',
               }}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                  style={{
-                    background: isActive ? 'rgba(255,255,255,0.15)' : 'var(--cm-surface-card)',
-                    border: isActive ? 'none' : '1px solid var(--cm-border-subtle)',
-                  }}
-                >
-                  <Icon
-                    className="w-5 h-5"
-                    style={{ color: isActive ? 'white' : 'var(--cm-icon-primary)' }}
-                  />
-                </div>
-                <span
-                  className="font-medium text-sm"
-                  style={{ color: isActive ? 'white' : 'var(--cm-text-primary)' }}
-                >
-                  {option.label}
-                </span>
+              <div 
+                className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                  isActive ? "bg-background/20" : "bg-background"
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "w-5 h-5",
+                    isActive ? "text-background" : "text-muted-foreground"
+                  )}
+                />
               </div>
+              <span className="flex-1 text-left font-medium">
+                {option.label}
+              </span>
               {isActive && <AnimatedCheck />}
             </button>
           );
@@ -168,12 +166,12 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   );
 
   const pillClasses = cn(
-    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-    "transition-colors active:scale-[0.98]",
+    "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap shrink-0",
+    "transition-all active:scale-[0.98] shadow-sm",
     "focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0",
     isNonDefaultSort
-      ? "bg-foreground/15 text-foreground border border-foreground/30"
-      : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted"
+      ? "bg-primary/10 text-primary border border-primary/30 hover:bg-primary/15"
+      : "bg-background text-foreground border border-border/60 hover:border-border hover:shadow"
   );
 
   // Sort pill - renders as Drawer on mobile, DropdownMenu on desktop
@@ -266,22 +264,29 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
       {/* Top spacing gap */}
       <div className="h-4" />
 
-      {/* Search bar */}
-      <div ref={containerRef} className="px-5 relative">
-        <div className="relative h-10">
-          {/* Background layer with blur */}
+      {/* Enhanced Search bar */}
+      <div ref={containerRef} className="px-4 relative">
+        <div className="relative h-12">
+          {/* Background layer with enhanced styling */}
           <div 
             className={cn(
-              "absolute inset-0 rounded-full border transition-all duration-200",
-              "bg-background/60 border-border/60",
-              isFocused && "bg-background/80 border-border"
+              "absolute inset-0 rounded-xl border-2 transition-all duration-200",
+              "bg-muted/50",
+              isFocused 
+                ? "bg-background border-primary/40 ring-4 ring-primary/10" 
+                : "border-transparent"
             )}
-            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
           />
           {/* Content layer */}
           <div className="relative h-full flex items-center">
-            <div className="absolute left-3 inset-y-0 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
+            <div className="absolute left-4 inset-y-0 flex items-center pointer-events-none">
+              <Search 
+                className={cn(
+                  "h-5 w-5 transition-colors duration-200",
+                  isFocused ? "text-primary" : "text-muted-foreground"
+                )} 
+                strokeWidth={2} 
+              />
             </div>
             <input
               ref={inputRef}
@@ -290,7 +295,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => setIsFocused(true)}
               placeholder={searchPlaceholder}
-              className="w-full h-full pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground rounded-full bg-transparent"
+              className="w-full h-full pl-12 pr-12 text-base text-foreground placeholder:text-muted-foreground rounded-xl bg-transparent font-medium"
               style={{
                 outline: 'none',
                 WebkitTapHighlightColor: 'transparent',
@@ -300,7 +305,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               <button
                 type="button"
                 onClick={handleClear}
-                className="absolute right-3 inset-y-0 flex items-center p-1 hover:opacity-70 transition-opacity"
+                className="absolute right-3 inset-y-0 flex items-center p-1.5 hover:bg-muted rounded-full transition-colors"
               >
                 <X className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
               </button>
@@ -329,7 +334,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               {/* Divider */}
               <div className="w-px h-5 bg-border/50 mx-1 shrink-0" />
 
-              {/* Filter Pills */}
+              {/* Filter Pills - Enhanced styling */}
               {pills.map((pill) => (
                 <motion.button
                   key={pill.key}
@@ -337,15 +342,21 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
                   whileTap={{ scale: 0.96 }}
                   transition={{ duration: 0.1 }}
                   className={cn(
-                    "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shrink-0",
-                    "flex items-center gap-1.5",
+                    "px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border-2",
+                    "flex items-center gap-2",
                     pill.selected
-                      ? "bg-foreground text-background"
-                      : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/40"
+                      ? "bg-foreground text-background border-foreground shadow-lg"
+                      : "bg-background text-muted-foreground hover:text-foreground border-border/60 hover:border-border"
                   )}
+                  style={{
+                    boxShadow: pill.selected ? '0 4px 12px hsl(var(--foreground) / 0.2)' : 'none',
+                  }}
                 >
                   {pill.icon && (
-                    <span className="flex items-center justify-center w-4 h-4 leading-none">
+                    <span className={cn(
+                      "flex items-center justify-center w-4 h-4 leading-none",
+                      pill.selected ? "text-background" : "text-muted-foreground"
+                    )}>
                       {pill.icon}
                     </span>
                   )}

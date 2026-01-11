@@ -211,13 +211,11 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border/60 overflow-hidden">
-        <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
-          <Skeleton className="absolute inset-0" />
-        </div>
-        <div className="px-4 py-3 space-y-2">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-3 w-1/3" />
+      <div className="rounded-2xl overflow-hidden shadow-xl">
+        <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]" />
+        <div className="bg-card px-4 py-3 space-y-2">
+          <div className="h-4 w-3/4 rounded-md bg-muted animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]" />
+          <div className="h-3 w-1/3 rounded-md bg-muted animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]" />
         </div>
       </div>
     );
@@ -243,10 +241,10 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   return (
     <div 
       ref={containerRef}
-      className="bg-card border border-border/30 overflow-hidden cursor-pointer group"
+      className="rounded-2xl overflow-hidden cursor-pointer group shadow-xl bg-card"
       onClick={handleClick}
     >
-      {/* Media Section - 16:9 */}
+      {/* Media Section - 16:9 with cinematic gradient */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {/* Media - Image or Video */}
         {item.mediaType === 'video' && item.mediaUrl ? (
@@ -278,24 +276,27 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
           />
         )}
 
+        {/* Cinematic gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+
         {/* Unified overlay system - no club tag on hero */}
         <OverlayCorners
           surface="hero"
           club={null}
           showDuration={false}
-          trendingLabel="Trending Today"
+          trendingLabel={item.contextLabel || "Trending Today"}
           showCreator={false}
           showLikes={true}
           likes={item.likes}
           showAvatar={false}
         />
 
-        {/* Subtle hover effect */}
-        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+        {/* Subtle hover effect - lifted feel */}
+        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       </div>
 
-      {/* Meta Area - White card section */}
-      <div className="px-4 py-3 flex items-end justify-between gap-3">
+      {/* Meta Area - Clean card section with enhanced styling */}
+      <div className="px-4 py-4 flex items-end justify-between gap-3 bg-card">
         {/* Text content - constrained to ~75% to leave room for avatar */}
         <div className="flex-1 min-w-0 max-w-[80%]">
           {/* Caption + Course using PostMeta */}
@@ -307,17 +308,17 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
             maxLines={2}
             showMore={false}
           />
-          {/* Creator name */}
-          <p className="text-xs text-muted-foreground mt-1 truncate">
+          {/* Creator name with improved styling */}
+          <p className="text-sm text-muted-foreground mt-1.5 truncate font-medium">
             {creatorName}
           </p>
         </div>
 
-        {/* Avatar - global squircle shape, no border */}
+        {/* Avatar - enhanced squircle shape with border */}
         <div 
-          className="shrink-0 overflow-hidden shadow-sm"
+          className="shrink-0 overflow-hidden shadow-md ring-2 ring-border/30"
           style={{
-            width: '40px',
+            width: '44px',
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
           }}
