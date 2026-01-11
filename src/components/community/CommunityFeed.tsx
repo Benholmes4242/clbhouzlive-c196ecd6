@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption, CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import CommunityFeedCard from './CommunityFeedCard';
 import CommunityEmptyState from './CommunityEmptyState';
@@ -12,9 +12,10 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 interface CommunityFeedProps {
-  onMediaClick: (item: any) => void;
+  onMediaClick?: (item: any) => void; // Optional now - we handle fullscreen internally
 }
 
 // Local storage keys
@@ -35,7 +36,6 @@ const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
  */
 export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const navigate = useNavigate();
-  const location = useLocation();
   
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
@@ -204,6 +204,14 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     stopThreshold: 0.25,   // Pause at 25% visible - consistent with Videos tab
   });
 
+  // Unified fullscreen player for Community content
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+    onLoadMore: loadMore,
+    hasMore,
+    isLoadingMore: loading,
+  });
+
   // Calculate date separators
   const dateSeparators = React.useMemo(() => {
     return calculateDateSeparators(items);
@@ -232,18 +240,11 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return () => observer.disconnect();
   }, [loadMore]);
 
-  const handleVideoClick = useCallback((id: string) => {
-    const item = items.find(i => i.id === id);
-    if (item) {
-      if (item.type === 'video') {
-        navigate(`/video/${id}`, {
-          state: { backgroundLocation: location, fromVideo: true }
-        });
-      } else {
-        onMediaClick(item);
-      }
-    }
-  }, [items, navigate, location, onMediaClick]);
+  // Unified fullscreen click handler - works for both videos AND photos
+  const handleCardClick = useCallback((id: string, index: number) => {
+    // Open the unified fullscreen player with Community items as playlist
+    openFullscreen(items, index);
+  }, [items, openFullscreen]);
 
   const handleCreatorClick = useCallback((creatorUserId: string) => {
     navigate(`/golfer/${creatorUserId}`);
@@ -375,7 +376,7 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
             
             <CommunityFeedCard
               item={item}
-              onVideoClick={handleVideoClick}
+              onCardClick={handleCardClick}
               onCreatorClick={handleCreatorClick}
               registerVideo={registerMedia}
               isPlaying={playingIds.has(item.id)}

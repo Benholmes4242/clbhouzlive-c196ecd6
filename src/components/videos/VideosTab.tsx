@@ -12,6 +12,7 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMediaAutoplay } from '@/media';
@@ -102,6 +103,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     scrollSettleDelay: 200,
     startThreshold: 0.4,   // Play at 40% visible
     stopThreshold: 0.25,   // Pause at 25% visible (aligned with Watch/Profile)
+  });
+
+  // Unified fullscreen player for Videos content
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
   });
 
   // Track if first video has been preloaded
@@ -303,16 +309,64 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     }
   }, [recommendedVideos, followedVideos, continueWatchingVideos]);
 
-  const handleVideoClick = (id: string) => {
+  // Build combined playlist from all video sections (for fullscreen navigation)
+  const allVideos = useMemo(() => {
+    // Combine all videos in display order (dedupe)
+    const seen = new Set<string>();
+    const combined: typeof recommendedVideos = [];
+    
+    const addUnique = (videos: typeof recommendedVideos) => {
+      videos.forEach(v => {
+        if (!seen.has(v.id)) {
+          seen.add(v.id);
+          combined.push(v);
+        }
+      });
+    };
+    
+    addUnique(recommendedVideos.slice(0, 10));
+    addUnique(trendingVideos.slice(0, 10));
+    addUnique(followedVideos.slice(0, 10));
+    addUnique(coursesVideos.slice(0, 10));
+    
+    return combined;
+  }, [recommendedVideos, trendingVideos, followedVideos, coursesVideos]);
+
+  // Convert LongFormVideo to ExploreContentItem format for fullscreen
+  const videosAsExploreItems = useMemo(() => {
+    return allVideos.map(video => ({
+      id: video.id,
+      type: 'video' as const,
+      src: video.mediaUrl || '',
+      thumbnailSrc: video.thumbnailUrl,
+      title: video.title,
+      durationSeconds: video.durationSeconds,
+      user: {
+        id: video.creatorUserId,
+        name: video.creatorName,
+        avatar: video.creatorAvatarUrl,
+      },
+      likes: video.likes || 0,
+      golfCourse: video.golfCourseId ? {
+        id: video.golfCourseId,
+        name: video.golfCourseName || 'Golf Course',
+      } : undefined,
+      createdAt: video.createdAt,
+    }));
+  }, [allVideos]);
+
+  const handleVideoClick = useCallback((id: string) => {
     savePosition();
     console.log('Video clicked:', id);
     
-    navigate(`/video/${id}`, {
-      state: { backgroundLocation: location, fromVideo: true }
-    });
+    // Find the video in the combined playlist
+    const index = videosAsExploreItems.findIndex(v => v.id === id);
+    if (index !== -1) {
+      openFullscreen(videosAsExploreItems, index);
+    }
     
     onVideoClick?.(id);
-  };
+  }, [videosAsExploreItems, openFullscreen, savePosition, onVideoClick]);
 
   const handleCreatorClick = (creatorUserId: string) => {
     savePosition();

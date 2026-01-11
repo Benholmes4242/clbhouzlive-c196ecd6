@@ -44,7 +44,7 @@ const formatDuration = (duration?: string | number): string | null => {
 
 interface CommunityFeedCardProps {
   item: CommunityContentItem;
-  onVideoClick?: (id: string) => void;
+  onCardClick?: (id: string, index: number) => void;
   onCreatorClick?: (creatorUserId: string) => void;
   className?: string;
   registerVideo?: RegisterMediaFn;
@@ -58,7 +58,7 @@ interface CommunityFeedCardProps {
  */
 export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   item,
-  onVideoClick,
+  onCardClick,
   onCreatorClick,
   className,
   registerVideo,
@@ -127,11 +127,11 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     }
   };
 
-  const handleCardClick = () => {
+  const handleClick = () => {
     if (isVideo) {
       runtimeUserTap(item.id);
     }
-    onVideoClick?.(item.id);
+    onCardClick?.(item.id, videoIndex);
   };
 
   const likesDisplay = formatLikes(item.likeCount);
@@ -143,7 +143,7 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
         "group cursor-pointer bg-card overflow-hidden",
         className
       )}
-      onClick={handleCardClick}
+      onClick={handleClick}
     >
       {/* Media Section - dynamic aspect ratio */}
       <div 
