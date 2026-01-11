@@ -159,19 +159,8 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
     }
   };
 
-  // When username becomes valid, focus password field
-  useEffect(() => {
-    if (isUsernameValid && !password) {
-      setTimeout(() => passwordRef.current?.focus(), 100);
-    }
-  }, [isUsernameValid]);
-
-  // When password becomes valid and confirm is empty, focus confirm field
-  useEffect(() => {
-    if (isPasswordValid && !confirmPassword) {
-      setTimeout(() => confirmPasswordRef.current?.focus(), 100);
-    }
-  }, [isPasswordValid]);
+  // REMOVED: Auto-focus effects that were causing focus to jump while typing
+  // Users should manually tab between fields to prevent UX issues
 
   const getInputBackground = (focused: boolean, disabled: boolean = false) => {
     if (disabled) return 'rgba(255, 255, 255, 0.02)';
@@ -232,6 +221,12 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
                 ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
                 : 'none',
             }}
+            tabIndex={1}
+            aria-label="Username"
+            autoComplete="username"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="off"
           />
           <style>{`
             input::placeholder {
@@ -308,6 +303,14 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
               cursor: isPasswordDisabled ? 'not-allowed' : 'text',
             }}
             autoComplete="new-password"
+            data-lpignore="true"
+            data-form-type="other"
+            data-1p-ignore="true"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="off"
+            tabIndex={2}
+            aria-label="Create password"
           />
           {!isPasswordDisabled && (
             <button
@@ -375,6 +378,14 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
               cursor: isConfirmPasswordDisabled ? 'not-allowed' : 'text',
             }}
             autoComplete="new-password"
+            data-lpignore="true"
+            data-form-type="other"
+            data-1p-ignore="true"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="off"
+            tabIndex={3}
+            aria-label="Confirm password"
           />
           {!isConfirmPasswordDisabled && (
             <button

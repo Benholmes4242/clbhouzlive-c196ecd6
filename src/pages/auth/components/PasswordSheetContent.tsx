@@ -89,6 +89,13 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
               : 'none',
           }}
           autoComplete="current-password"
+          aria-label="Password"
+          aria-invalid={!!passwordError}
+          aria-describedby={passwordError ? "password-error" : undefined}
+          data-lpignore="true"
+          data-form-type="other"
+          data-1p-ignore="true"
+          spellCheck={false}
         />
         <style>{`
           input::placeholder {
@@ -97,7 +104,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           }
         `}</style>
         {passwordError && (
-          <p className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
+          <p id="password-error" role="alert" className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
         )}
       </div>
       

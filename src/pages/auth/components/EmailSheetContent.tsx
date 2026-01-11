@@ -130,6 +130,10 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
               : 'none',
           }}
           autoComplete="email"
+          aria-label="Email address"
+          aria-invalid={!!(emailError || showEmailExistsError)}
+          aria-describedby={emailError ? "email-error" : undefined}
+          spellCheck={false}
         />
         <style>{`
           input::placeholder {
@@ -140,7 +144,7 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
         
         {/* Standard email error */}
         {emailError && !showEmailExistsError && (
-          <p className="text-[#E03131] text-[13px] mt-2">{emailError}</p>
+          <p id="email-error" role="alert" className="text-[#E03131] text-[13px] mt-2">{emailError}</p>
         )}
 
         {/* Email exists error with action buttons */}
