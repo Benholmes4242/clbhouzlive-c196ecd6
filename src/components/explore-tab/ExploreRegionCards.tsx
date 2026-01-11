@@ -1,15 +1,15 @@
 /**
- * ExploreRegionCards - Region cards for Explore page
+ * ExploreRegionCards - Enhanced region cards for Explore page
  * 
  * Shows 4 regions: GBI, EU, USA, ROW
  * Each card shows: background image, title, moment count
  * 
- * Polish: skeleton shimmer, graceful image fallbacks, consistent sizing
+ * Polish: hover effects, arrow indicator, better gradients
  */
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useExploreRegionStats, RegionKey } from '@/hooks/useExploreMoments';
@@ -47,14 +47,14 @@ const REGION_CONFIG: Record<RegionKey, {
   },
 };
 
-// Skeleton card component with shimmer effect
+// Skeleton card component
 const RegionCardSkeleton: React.FC = () => (
-  <div className="flex-shrink-0 w-44 md:w-56 aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt">
+  <div className="flex-shrink-0 w-[200px] h-[140px] rounded-2xl overflow-hidden bg-muted">
     <Skeleton className="w-full h-full" />
   </div>
 );
 
-// Region card with image fallback handling
+// Region card with enhanced hover effects
 const RegionCard: React.FC<{
   regionKey: RegionKey;
   thumbnailUrl: string | null;
@@ -68,47 +68,45 @@ const RegionCard: React.FC<{
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 group"
+      className="relative w-[200px] h-[140px] flex-shrink-0 rounded-2xl overflow-hidden group"
     >
-      <div className="relative w-44 md:w-56 aspect-[4/3] rounded-xl overflow-hidden shadow-md">
-        {/* Background - thumbnail or gradient fallback */}
-        {!showGradient ? (
-          <img 
-            src={thumbnailUrl!} 
-            alt={config.title}
-            onError={() => setImageError(true)}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className={cn(
-            "absolute inset-0 bg-gradient-to-br",
-            config.gradient
-          )} />
-        )}
-        
-        {/* Overlay for text legibility */}
-        <div className="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors duration-200" />
-        
-        {/* Bottom gradient for text */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        
-        {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-end p-4">
-          <h4 className="text-base font-medium text-white drop-shadow-sm">{config.title}</h4>
-          
-          {/* Moment count */}
-          <p className="mt-1 text-xs text-white/80 drop-shadow-sm">
-            {momentCount > 0 
-              ? `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
-              : 'Explore courses'
-            }
-          </p>
-        </div>
-        
-        {/* Hover arrow indicator */}
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <ChevronRight className="w-5 h-5 text-white/90 drop-shadow-sm" />
-        </div>
+      {/* Background - thumbnail or gradient fallback */}
+      {!showGradient ? (
+        <img 
+          src={thumbnailUrl!} 
+          alt={config.title}
+          onError={() => setImageError(true)}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <div className={cn(
+          "absolute inset-0 bg-gradient-to-br",
+          config.gradient
+        )} />
+      )}
+      
+      {/* Gradient overlay for text */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      
+      {/* Hover overlay */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+      
+      {/* Content */}
+      <div className="absolute inset-0 p-4 flex flex-col justify-end">
+        <h3 className="text-white font-bold text-base mb-1">
+          {config.title}
+        </h3>
+        <p className="text-white/70 text-xs">
+          {momentCount > 0 
+            ? `${momentCount} moment${momentCount === 1 ? '' : 's'} this month`
+            : 'Explore courses'
+          }
+        </p>
+      </div>
+      
+      {/* Arrow indicator on hover */}
+      <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <ArrowRight className="w-4 h-4 text-white" />
       </div>
     </button>
   );
@@ -142,8 +140,10 @@ export const ExploreRegionCards: React.FC<ExploreRegionCardsProps> = ({
           </>
         ) : (
           <>
-            <h3 className="text-lg font-serif text-foreground">Explore by Region</h3>
-            <p className="mt-1.5 text-sm text-muted-foreground font-light leading-relaxed max-w-md">
+            <h2 className="text-lg font-bold text-foreground">
+              Explore by Region
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1 max-w-md">
               From rugged coastlines to rolling parkland, discover the world's greatest courses.
             </p>
           </>
@@ -152,7 +152,7 @@ export const ExploreRegionCards: React.FC<ExploreRegionCardsProps> = ({
       
       {/* Horizontal scroll rail */}
       <div className="relative">
-        <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-2 scrollbar-hide scroll-smooth">
+        <div className="flex gap-3 overflow-x-auto pl-4 pr-4 pb-4 scrollbar-hide scroll-smooth">
           {isLoading ? (
             // Skeleton cards during loading
             Array.from({ length: 4 }).map((_, i) => (

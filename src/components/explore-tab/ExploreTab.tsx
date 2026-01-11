@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, Flag, Globe } from 'lucide-react';
 import ExploreHero from './ExploreHero';
 import Top100JourneySummary from './Top100JourneySummary';
 import ExploreRegionCards from './ExploreRegionCards';
@@ -21,11 +21,11 @@ interface ExploreTabProps {
 // Local storage key - kept for future use but sort is hidden
 const EXPLORE_SORT_KEY = 'explore-sort-option';
 
-// Only show filters that work - removed bucket-list until implemented
-const EXPLORE_PILLS: { id: string; label: string }[] = [
+// Enhanced filter options with icons
+const EXPLORE_PILLS: { id: string; label: string; icon?: React.ElementType }[] = [
   { id: 'all', label: 'All' },
-  { id: 'courses', label: 'Courses' },
-  { id: 'regions', label: 'Regions' },
+  { id: 'courses', label: 'Courses', icon: Flag },
+  { id: 'regions', label: 'Regions', icon: Globe },
 ];
 
 // Region metadata for carousels
@@ -129,13 +129,13 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       case 'courses':
         return (
           <div className="py-6">
-            <div className="px-5 mb-4">
-              <h3 className="text-lg font-serif text-foreground">All Courses</h3>
+            <div className="px-4 mb-4">
+              <h2 className="text-lg font-bold text-foreground">All Courses</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Discover courses from around the world
               </p>
             </div>
-            <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="px-4 grid grid-cols-2 gap-3">
               {(trendingCourses || []).map(course => (
                 <button
                   key={course.id}
@@ -154,7 +154,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                     {course.global_rank && (
-                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 rounded-full text-xs text-white font-medium">
+                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 backdrop-blur-sm rounded-full text-xs text-white font-medium">
                         #{course.global_rank}
                       </div>
                     )}
@@ -174,10 +174,13 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       case 'regions':
         return (
           <div className="py-6">
-            <div className="px-5 mb-4">
-              <h3 className="text-lg font-serif text-foreground">All Regions</h3>
+            <div className="px-4 mb-4">
+              <h2 className="text-lg font-bold text-foreground">All Regions</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Explore golf destinations around the world
+              </p>
             </div>
-            <div className="px-5 grid grid-cols-2 gap-3">
+            <div className="px-4 grid grid-cols-2 gap-3">
               {(regions || []).map(region => (
                 <button
                   key={region.id}
@@ -187,7 +190,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-emerald-800 via-slate-700 to-slate-900">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h4 className="text-base font-medium text-white">{region.title}</h4>
+                      <h4 className="text-base font-bold text-white">{region.title}</h4>
                       {region.subtitle && (
                         <p className="mt-1 text-xs text-white/70">{region.subtitle}</p>
                       )}
@@ -202,22 +205,25 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       // Bucket list removed from pills - this case kept for safety
       case 'bucket-list':
         return (
-          <div className="px-5 py-16 text-center">
-            <div className="max-w-sm mx-auto">
-              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center mb-6">
-                <Bookmark className="w-8 h-8 text-orange-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Bucket List Coming Soon</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
-                Soon you'll be able to save courses to your bucket list and track your golf journey.
-              </p>
-              <button
-                onClick={() => setActiveFilter('courses')}
-                className="mt-6 px-6 py-2.5 bg-foreground text-background rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                Browse courses
-              </button>
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center mx-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-950/50 dark:to-orange-900/30 flex items-center justify-center mb-4">
+              <Bookmark className="w-10 h-10 text-orange-500" />
             </div>
+            
+            <h3 className="text-lg font-bold text-foreground mb-2">
+              Your Bucket List
+            </h3>
+            
+            <p className="text-sm text-muted-foreground max-w-xs mb-6">
+              Save courses you dream of playing. We'll help you track your journey.
+            </p>
+            
+            <button
+              onClick={() => setActiveFilter('courses')}
+              className="px-5 py-2.5 bg-foreground text-background text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+            >
+              Explore Courses
+            </button>
           </div>
         );
 
@@ -229,11 +235,11 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
               onStartJourney={handleStartJourney}
               onContinueJourney={handleContinueJourney}
             />
-            <div className="h-px bg-border/40 mx-5" />
+            <div className="h-px bg-border/40 mx-4" />
             <ExploreRegionCards />
             
             {/* New this week micro-carousels */}
-            <div className="h-px bg-border/40 mx-5" />
+            <div className="h-px bg-border/40 mx-4" />
             <div className="py-2">
               {REGION_CONFIG.map(region => (
                 <NewThisWeekCarousel
@@ -245,7 +251,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
               ))}
             </div>
             
-            <div className="h-px bg-border/40 mx-5" />
+            <div className="h-px bg-border/40 mx-4" />
             <DiscoverMomentsGrid onMomentClick={handleItemClick} />
           </>
         );
@@ -269,7 +275,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
         
         {/* Search Results Overlay */}
         {showSearchResults && (
-          <div className="px-5 relative">
+          <div className="px-4 relative">
             <ExploreSearchResults
               query={searchQuery}
               onSelect={handleSearchResultSelect}

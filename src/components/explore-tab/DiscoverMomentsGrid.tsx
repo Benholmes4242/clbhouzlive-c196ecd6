@@ -1,5 +1,5 @@
 /**
- * DiscoverMomentsGrid - Grid displaying explore_moments
+ * DiscoverMomentsGrid - Enhanced grid displaying explore_moments
  * 
  * Data source: unified explore_moments view
  * Initial render: 20 items, then infinite scroll in batches of 20
@@ -9,6 +9,8 @@
  * - Row 1: Left plays, Right static
  * - Row 2: Left static, Right plays
  * (repeats)
+ * 
+ * Polish: Course name overlay, better gradients, hover effects
  */
 
 import React, { useCallback, useMemo, useEffect, useRef, useState } from 'react';
@@ -17,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteExploreMoments, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play } from 'lucide-react';
+import { Play, MapPin } from 'lucide-react';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 
@@ -48,12 +50,12 @@ const isAutoplayCandidate = (index: number): boolean => {
 
 // Skeleton tile component
 const MomentTileSkeleton: React.FC = () => (
-  <div className="aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt">
+  <div className="aspect-[3/4] rounded-lg overflow-hidden bg-muted">
     <Skeleton className="w-full h-full" />
   </div>
 );
 
-// Individual moment tile with video autoplay support
+// Enhanced moment tile with course name overlay
 const MomentTile: React.FC<{
   moment: ExploreMoment;
   index: number;
@@ -67,11 +69,8 @@ const MomentTile: React.FC<{
   const gradientIndex = index % GRADIENTS.length;
   const playerRef = useRef<HLSPlayerRef>(null);
   
-  // Use thumbnail_url, falling back to media_url for images, then gradient
   const imageUrl = moment.thumbnail_url || (moment.media_type === 'image' ? moment.media_url : null);
   const showGradient = !imageUrl || imageError;
-  
-  // Video source
   const videoSrc = moment.media_url;
 
   // Register video element with MediaRuntime
@@ -92,7 +91,7 @@ const MomentTile: React.FC<{
       onClick={onClick}
       className="group text-left w-full"
     >
-      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
+      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-surface-alt shadow-sm hover:shadow-md transition-shadow">
         {/* Video with autoplay capability */}
         {isVideo && videoSrc && canAutoplay ? (
           <HLSPlayer
@@ -110,14 +109,14 @@ const MomentTile: React.FC<{
           />
         ) : isVideo && videoSrc ? (
           // Static video thumbnail (not an autoplay candidate)
-          <div className="relative">
+          <div className="relative w-full h-full">
             {!showGradient ? (
               <img 
                 src={moment.thumbnail_url || imageUrl!} 
                 alt="Moment"
                 loading="lazy"
                 onError={() => setImageError(true)}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
               <div className={cn(
@@ -125,10 +124,10 @@ const MomentTile: React.FC<{
                 GRADIENTS[gradientIndex]
               )} />
             )}
-            {/* Play icon overlay for static videos */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+            {/* Play icon overlay with hover effect */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:bg-black/60 transition-colors">
+                <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
               </div>
             </div>
           </div>
@@ -147,11 +146,8 @@ const MomentTile: React.FC<{
           )} />
         )}
         
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-        
-        {/* Bottom gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+        {/* Bottom gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
       </div>
     </button>
   );
@@ -169,8 +165,8 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'grid',
-    startThreshold: 0.5,  // Play when 50% visible
-    stopThreshold: 0.2,   // Pause when below 20% visible
+    startThreshold: 0.5,
+    stopThreshold: 0.2,
   });
   
   const {
@@ -200,7 +196,6 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   // Flatten all pages into single array, deduplicate by moment_id
   const moments = useMemo(() => {
     const allMoments = data?.pages.flatMap(page => page.moments) || [];
-    // Deduplicate to prevent any edge-case repeats
     const seen = new Set<string>();
     return allMoments.filter(m => {
       if (seen.has(m.moment_id)) return false;
@@ -213,11 +208,9 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     if (onMomentClick) {
       onMomentClick(moment);
     } else {
-      // Navigate based on source type
       if (moment.source_type === 'post') {
         navigate(`/post/${moment.source_id}`);
       } else {
-        // For reviews, navigate to course
         navigate(`/courses/${moment.course_id}`);
       }
     }
@@ -239,11 +232,11 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   if (isLoading && moments.length === 0) {
     return (
       <div className={cn("py-6", className)}>
-        <div className="px-5 mb-4">
+        <div className="px-4 mb-4">
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-4 w-56 mt-2" />
         </div>
-        <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        <div className="px-1 grid grid-cols-2 gap-1">
           {Array.from({ length: 8 }).map((_, i) => (
             <MomentTileSkeleton key={i} />
           ))}
@@ -256,13 +249,13 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
   if (moments.length === 0) {
     return (
       <div className={cn("py-6", className)}>
-        <div className="px-5 mb-4">
-          <h3 className="text-lg font-serif text-foreground">Discover Courses</h3>
+        <div className="px-4 mb-4">
+          <h2 className="text-lg font-bold text-foreground">Discover Courses</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Moments from the world's great courses
           </p>
         </div>
-        <div className="px-5 py-12 text-center">
+        <div className="px-4 py-12 text-center">
           <p className="text-sm text-muted-foreground">
             No moments found yet. Be the first to share!
           </p>
@@ -273,16 +266,18 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
 
   return (
     <div className={cn("py-6", className)}>
-      {/* Section Header */}
-      <div className="px-5 mb-4">
-        <h3 className="text-lg font-serif text-foreground">Discover Courses</h3>
+      {/* Enhanced Section Header */}
+      <div className="px-4 mb-4">
+        <h2 className="text-lg font-bold text-foreground">
+          Discover Courses
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Moments from the world's great courses
         </p>
       </div>
       
-      {/* Grid */}
-      <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+      {/* Grid with tighter gaps */}
+      <div className="px-1 grid grid-cols-2 gap-1">
         {moments.map((moment, index) => {
           const canAutoplay = isAutoplayCandidate(index) && moment.media_type === 'video';
           const isPlaying = canAutoplay && playingIds.has(moment.moment_id);
@@ -300,7 +295,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
           );
         })}
         
-        {/* Pagination skeleton tiles */}
+        {/* Skeleton tiles for infinite scroll loading */}
         {isFetchingNextPage && (
           Array.from({ length: 4 }).map((_, i) => (
             <MomentTileSkeleton key={`loading-${i}`} />
@@ -314,6 +309,14 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
           <div className="w-5 h-5 border-2 border-muted border-t-primary rounded-full animate-spin" />
         )}
       </div>
+      
+      {/* End of list indicator */}
+      {!hasNextPage && moments.length > 0 && (
+        <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+          <div className="w-12 h-0.5 bg-border rounded-full mb-3" />
+          <p className="text-xs font-medium">You've explored it all</p>
+        </div>
+      )}
     </div>
   );
 };
