@@ -4,6 +4,7 @@
  */
 
 import { ExploreContentItem, CreatorInfo } from '@/components/explore/types';
+import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
 // Sample video sources (Cloudflare Stream test videos)
 const SAMPLE_VIDEO_URLS = [
@@ -22,14 +23,14 @@ const SAMPLE_THUMBNAILS = [
 ];
 
 const MOCK_CREATORS: CreatorInfo[] = [
-  { type: 'personal', id: 'mock-1', name: 'Tiger Woods', username: 'tigerwoods', verified: true, subtitle: 'Augusta National', handicap: '+6' },
-  { type: 'personal', id: 'mock-2', name: 'Rory McIlroy', username: 'rorymcilroy', verified: true, subtitle: 'Royal Portrush', handicap: '+5' },
-  { type: 'personal', id: 'mock-3', name: 'Jordan Spieth', username: 'jordanspieth', verified: true, subtitle: 'Dallas Country Club', handicap: '+4' },
-  { type: 'creator', id: 'mock-4', name: 'Golf Sidekick', username: 'golfsidekick', verified: true, subtitle: 'Golf Content Creator' },
-  { type: 'creator', id: 'mock-5', name: 'Rick Shiels', username: 'rickshiels', verified: true, subtitle: 'Golf Coach & YouTuber' },
-  { type: 'business', id: 'mock-6', name: 'TaylorMade Golf', verified: true, subtitle: 'Equipment Manufacturer' },
-  { type: 'personal', id: 'mock-7', name: 'Scottie Scheffler', username: 'scottiescheffler', verified: true, subtitle: 'Royal Oaks CC', handicap: '+7' },
-  { type: 'personal', id: 'mock-8', name: 'Dustin Johnson', username: 'djohnsonpga', verified: true, subtitle: 'The Bear\'s Club', handicap: '+5' },
+  { type: 'personal', id: 'mock-1', name: 'Tiger Woods', username: 'tigerwoods', avatarUrl: 'https://i.pravatar.cc/150?u=tiger', verified: true, subtitle: 'Augusta National', handicap: '+6' },
+  { type: 'personal', id: 'mock-2', name: 'Rory McIlroy', username: 'rorymcilroy', avatarUrl: 'https://i.pravatar.cc/150?u=rory', verified: true, subtitle: 'Royal Portrush', handicap: '+5' },
+  { type: 'personal', id: 'mock-3', name: 'Jordan Spieth', username: 'jordanspieth', avatarUrl: 'https://i.pravatar.cc/150?u=jordan', verified: true, subtitle: 'Dallas Country Club', handicap: '+4' },
+  { type: 'creator', id: 'mock-4', name: 'Golf Sidekick', username: 'golfsidekick', avatarUrl: 'https://i.pravatar.cc/150?u=sidekick', verified: true, subtitle: 'Golf Content Creator' },
+  { type: 'creator', id: 'mock-5', name: 'Rick Shiels', username: 'rickshiels', avatarUrl: 'https://i.pravatar.cc/150?u=rick', verified: true, subtitle: 'Golf Coach & YouTuber' },
+  { type: 'business', id: 'mock-6', name: 'TaylorMade Golf', avatarUrl: 'https://i.pravatar.cc/150?u=taylormade', verified: true, subtitle: 'Equipment Manufacturer' },
+  { type: 'personal', id: 'mock-7', name: 'Scottie Scheffler', username: 'scottiescheffler', avatarUrl: 'https://i.pravatar.cc/150?u=scottie', verified: true, subtitle: 'Royal Oaks CC', handicap: '+7' },
+  { type: 'personal', id: 'mock-8', name: 'Dustin Johnson', username: 'djohnsonpga', avatarUrl: 'https://i.pravatar.cc/150?u=dustin', verified: true, subtitle: 'The Bear\'s Club', handicap: '+5' },
 ];
 
 const VIDEO_TITLES = [
@@ -61,8 +62,8 @@ const GOLF_COURSES = [
 const DURATION_RANGES = {
   short: { min: 15, max: 60 },      // Under 1 min
   medium: { min: 61, max: 240 },    // 1-4 min
-  long: { min: 241, max: 600 },     // 4-10 min
-  extended: { min: 601, max: 1800 }, // 10-30 min
+  long: { min: 241, max: 600 },     // 4-10 min (long-form)
+  extended: { min: 601, max: 1800 }, // 10-30 min (long-form)
 };
 
 function formatDuration(seconds: number): string {
@@ -80,7 +81,7 @@ function randomElement<T>(arr: T[]): T {
 }
 
 /**
- * Generate a single mock video item
+ * Generate a single mock video item (ExploreContentItem format)
  */
 function generateMockVideo(index: number, durationRange?: keyof typeof DURATION_RANGES): ExploreContentItem {
   const range = durationRange ? DURATION_RANGES[durationRange] : randomElement(Object.values(DURATION_RANGES));
@@ -127,7 +128,45 @@ function generateMockVideo(index: number, durationRange?: keyof typeof DURATION_
 }
 
 /**
- * Generate mock videos for Videos tab
+ * Generate a single mock LongFormVideo (for VideosTab sections)
+ */
+function generateMockLongFormVideo(index: number, section: string): LongFormVideo {
+  // Long-form videos are 4+ minutes (240+ seconds)
+  const durationSeconds = randomInt(240, 1800);
+  const creator = randomElement(MOCK_CREATORS);
+  const course = randomElement(GOLF_COURSES);
+  const thumbnail = randomElement(SAMPLE_THUMBNAILS);
+  
+  return {
+    id: `mock-longform-${section}-${index}-${Date.now()}`,
+    title: randomElement(VIDEO_TITLES),
+    creatorUserId: creator.id,
+    creatorName: creator.name,
+    creatorAvatarUrl: creator.avatarUrl,
+    thumbnailUrl: thumbnail,
+    mediaUrl: randomElement(SAMPLE_VIDEO_URLS),
+    duration: formatDuration(durationSeconds),
+    durationSeconds,
+    views: randomInt(100, 50000),
+    createdAt: new Date(Date.now() - randomInt(0, 14 * 24 * 60 * 60 * 1000)).toISOString(),
+    golfCourseId: course.id,
+    golfCourseName: course.name,
+    isTrending: section === 'trending',
+  };
+}
+
+/**
+ * Generate mock long-form videos for a specific section
+ */
+export function generateMockLongFormVideos(
+  section: 'recommended' | 'trending' | 'following' | 'courses' | 'all' = 'all',
+  count: number = 10
+): LongFormVideo[] {
+  return Array.from({ length: count }, (_, i) => generateMockLongFormVideo(i, section));
+}
+
+/**
+ * Generate mock videos for Videos tab (ExploreContentItem format)
  * @param count Number of videos to generate (default 30)
  * @param durationRange Optional filter by duration range
  */
@@ -163,6 +202,7 @@ export function getMockVideosByDuration(
  * Cached mock videos to prevent regeneration on each render
  */
 let cachedMockVideos: ExploreContentItem[] | null = null;
+let cachedLongFormVideos: Record<string, LongFormVideo[]> = {};
 
 export function getCachedMockVideos(count: number = 30): ExploreContentItem[] {
   if (!cachedMockVideos || cachedMockVideos.length < count) {
@@ -171,9 +211,21 @@ export function getCachedMockVideos(count: number = 30): ExploreContentItem[] {
   return cachedMockVideos.slice(0, count);
 }
 
+export function getCachedMockLongFormVideos(
+  section: 'recommended' | 'trending' | 'following' | 'courses' | 'all',
+  count: number = 10
+): LongFormVideo[] {
+  const key = `${section}-${count}`;
+  if (!cachedLongFormVideos[key]) {
+    cachedLongFormVideos[key] = generateMockLongFormVideos(section, count);
+  }
+  return cachedLongFormVideos[key];
+}
+
 /**
  * Clear mock cache (useful for testing)
  */
 export function clearMockVideoCache(): void {
   cachedMockVideos = null;
+  cachedLongFormVideos = {};
 }
