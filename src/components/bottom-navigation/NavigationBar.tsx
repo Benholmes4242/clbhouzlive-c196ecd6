@@ -38,36 +38,24 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             )}
             aria-label={tab.label}
           >
-            {/* Icon with active indicator dot */}
-            <div className="relative">
-              <Icon 
-                className={cn(
-                  "h-[24px] w-[24px] transition-all duration-300",
-                  "[stroke-width:1.5]",
-                  // Scale up slightly when active
-                  isActive && "scale-110",
-                  isLightTheme
-                    ? isActive 
-                      ? "text-slate-800 opacity-100" 
-                      : "text-slate-500 opacity-90"
-                    : isActive 
-                      ? "text-primary" 
-                      : isDimmed 
-                        ? "text-[rgba(255,255,255,0.55)]" 
-                        : "text-white/70"
-                )}
-              />
-              
-              {/* Active indicator dot above icon */}
-              {isActive && (
-                <span 
-                  className={cn(
-                    "absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
-                    isLightTheme ? "bg-slate-700" : "bg-primary"
-                  )} 
-                />
+            {/* Icon */}
+            <Icon 
+              className={cn(
+                "h-[24px] w-[24px] transition-all duration-300",
+                "[stroke-width:1.5]",
+                // Scale up slightly when active
+                isActive && "scale-110",
+                isLightTheme
+                  ? isActive 
+                    ? "text-slate-800 opacity-100" 
+                    : "text-slate-500 opacity-90"
+                  : isActive 
+                    ? "text-primary" 
+                    : isDimmed 
+                      ? "text-[rgba(255,255,255,0.55)]" 
+                      : "text-white/70"
               )}
-            </div>
+            />
             
             {/* Label */}
             <span 
