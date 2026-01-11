@@ -2,12 +2,11 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Bookmark, Flag, Globe, SlidersHorizontal } from 'lucide-react';
-import ExploreHero from './ExploreHero';
+import FeaturedCourseHero from './FeaturedCourseHero';
 import Top100JourneySummary from './Top100JourneySummary';
-import ExploreRegionCards from './ExploreRegionCards';
-import DiscoverMomentsGrid from './DiscoverMomentsGrid';
+import ExpandedRegionsSection from './ExpandedRegionsSection';
+import DiscoverGridPPL from './DiscoverGridPPL';
 import ExploreSearchSheet from './ExploreSearchSheet';
-import NewThisWeekCarousel from './NewThisWeekCarousel';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import ExploreSearchResults from './ExploreSearchResults';
 import ExploreFiltersSheet, { 
@@ -284,36 +283,23 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
       default: // 'all'
         return (
           <>
-            <ExploreHero onSearchClick={handleSearchClick} />
+            <FeaturedCourseHero onSearchClick={handleSearchClick} />
             <Top100JourneySummary
               onStartJourney={handleStartJourney}
               onContinueJourney={handleContinueJourney}
             />
             <div className="h-px bg-border/40 mx-4" />
-            <ExploreRegionCards />
-            
-            {/* New this week micro-carousels */}
-            <div className="h-px bg-border/40 mx-4" />
-            <div className="py-2">
-              {REGION_CONFIG.map(region => (
-                <NewThisWeekCarousel
-                  key={region.key}
-                  regionKey={region.key}
-                  regionTitle={region.title}
-                  onMomentClick={handleItemClick}
-                />
-              ))}
-            </div>
+            <ExpandedRegionsSection />
             
             <div className="h-px bg-border/40 mx-4" />
             
             {/* Filter button row */}
             <div className="px-4 pt-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Discover Courses</h2>
+              <h2 className="text-lg font-bold text-foreground">Discover</h2>
               <FilterButton />
             </div>
             
-            <DiscoverMomentsGrid 
+            <DiscoverGridPPL 
               onMomentClick={handleMomentClick}
               filters={filters}
               showHeader={false}
