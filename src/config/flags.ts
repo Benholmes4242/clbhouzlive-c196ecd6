@@ -8,7 +8,6 @@ export const FLAGS = {
   TOP100_MOCK_FRIENDS_ENABLED: false, // inject 10 mock Top 100 friends for testing
   MOCK_FULL_GAME_PLAYERS: true, // TEST: inject mock players into Benjamin's Ardglass game (set false for prod)
   LEADERBOARD_V2_MOCK_100: true, // TEST: inject 100 mock players into V2 leaderboard for busy-state testing
-  VIDEOS_TAB_MOCK_ENABLED: true, // TEST: inject 30 mock videos for Videos tab testing
 } as const;
 
 export type FeatureFlags = typeof FLAGS;
