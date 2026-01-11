@@ -7,7 +7,7 @@ import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useInfiniteClubhouseShorts, useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
+import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -24,7 +24,6 @@ import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkelet
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
-import { FeedToggle, type FeedTab } from '@/components/clubhouse/FeedToggle';
 
 const Clubhouse = () => {
   // ============================================================================
@@ -68,16 +67,14 @@ const Clubhouse = () => {
     return params.get('focusPostId');
   }, [location.search]);
   
-  // Feed toggle state: For You vs Following
-  const [activeTab, setActiveTab] = useState<FeedTab>('for_you');
-  
   // Clubhouse: explore feed with short videos only (<120s)
-  const forYouFeed = useInfiniteClubhouseShorts();
-  const followingFeed = useInfiniteFollowedPosts();
-  
-  // Select active feed based on tab
-  const activeFeed = activeTab === 'for_you' ? forYouFeed : followingFeed;
-  const { posts, isLoading, hasMore, loadMore, isLoadingMore } = activeFeed;
+  const {
+    posts,
+    isLoading,
+    hasMore,
+    loadMore,
+    isLoadingMore
+  } = useInfiniteClubhouseShorts();
   
   // Note: focusPostId is passed directly to ClubhouseVerticalGrid which calculates
   // the correct index from filteredPosts (fixes race condition and index mismatch)
@@ -275,13 +272,8 @@ const Clubhouse = () => {
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
       <CompactHeader />
-      
-      {/* Feed Toggle: For You / Following */}
-      <FeedToggle 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        isVisible={!cinemaDim}
-      />
+
+      {/* Skeleton Shimmer - Overlays content until first frame is ready */}
       <ClubhouseSkeletonShimmer 
         isVisible={skeletonVisible} 
         isStatic={skeletonMode === 'static'} 

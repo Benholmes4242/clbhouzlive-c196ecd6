@@ -5,11 +5,8 @@ import { VideoSection } from './VideoSection';
 import { VideosEmptyState } from './VideosEmptyState';
 import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
-import { ContinueWatchingCarousel } from './ContinueWatchingCarousel';
+import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { VideoNudgeBanner } from './VideoNudgeBanner';
-import { FeaturedVideoHero } from './FeaturedVideoHero';
-import { TrendingNowSection } from './TrendingNowSection';
-import { CompactCreatorsSection } from './CompactCreatorsSection';
 import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
@@ -432,33 +429,13 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         />
       </div>
 
-      {/* Featured Video Hero - replaces "Featured Course" */}
-      <FeaturedVideoHero
-        onVideoClick={handleVideoClick}
-        onCreatorClick={handleCreatorClick}
-      />
-
-      {/* Continue Watching - horizontal carousel */}
-      <ContinueWatchingCarousel
+      {/* Continue Watching (only shows if user has in-progress videos) */}
+      <ContinueWatchingSection
         onVideoClick={(id, resumeAt) => {
           console.log('Resume video:', id, 'at', resumeAt);
-          handleVideoClick(id);
+          onVideoClick?.(id);
         }}
-        onCreatorClick={handleCreatorClick}
-        className="mb-6"
-      />
-
-      {/* Trending Now - horizontal carousel */}
-      <TrendingNowSection
-        onVideoClick={handleVideoClick}
-        onViewAll={() => handleViewAll('trending')}
-        className="mb-6"
-      />
-
-      {/* Compact Creators Section */}
-      <CompactCreatorsSection
-        onCreatorClick={handleCreatorClick}
-        className="mb-6"
+        className="mb-8"
       />
 
       {/* Module 1: Recommended for you (loads immediately) */}

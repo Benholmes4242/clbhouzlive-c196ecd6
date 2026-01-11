@@ -79,21 +79,15 @@ function useExpandedRegions() {
 
             courseCount = cCount || 0;
 
-            // Get top100 count - courses that are in ANY Top 100 list
-            const { data: coursesInRegion } = await supabase
+            // Get top100 count
+            const { count: t100Count } = await supabase
               .from('golf_courses')
-              .select('id')
-              .in('country', countries);
+              .select('*', { count: 'exact', head: true })
+              .in('country', countries)
+              .not('global_rank', 'is', null)
+              .lte('global_rank', 100);
 
-            if (coursesInRegion && coursesInRegion.length > 0) {
-              const courseIds = coursesInRegion.map(c => c.id);
-              const { count: t100Count } = await supabase
-                .from('course_top100_memberships')
-                .select('course_id', { count: 'exact', head: true })
-                .in('course_id', courseIds);
-
-              top100Count = t100Count || 0;
-            }
+            top100Count = t100Count || 0;
           }
 
           return {

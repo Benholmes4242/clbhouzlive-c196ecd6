@@ -4,7 +4,7 @@ import { useSuggestedBusinesses } from '@/hooks/useSuggestedBusinesses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { CompactSuggestedCard } from '@/components/discover/CompactSuggestedCard';
+import SuggestedProfileCard from '@/components/discover/SuggestedProfileCard';
 import { SuggestedItem, SuggestedGolfer, SuggestedBusiness, buildBusinessLocationLabel } from '@/types/suggestedItem';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery } from '@tanstack/react-query';
@@ -245,20 +245,16 @@ export function LiveClubhouseStrip() {
     }
   }
 
-  // Show compact skeleton while loading
+  // Show skeleton while loading
   if (isLoading || isLoadingBusinesses) {
     return (
       <div className="suggested-golfers-row">
         <div className="suggested-golfers-header">
-          <span className="suggested-golfers-title">Creators for you</span>
+          <span className="suggested-golfers-title">Suggested for you</span>
         </div>
-        <div className="flex gap-4 overflow-x-auto px-4 no-scrollbar pb-2" role="listbox" aria-label="Loading suggested profiles">
-          {[...Array(5)].map((_, idx) => (
-            <div key={idx} className="flex-shrink-0 flex flex-col items-center gap-2 w-20">
-              <div className="w-16 h-16 rounded-full bg-muted animate-pulse" />
-              <div className="h-3 w-14 bg-muted rounded animate-pulse" />
-              <div className="h-7 w-16 bg-muted rounded-full animate-pulse" />
-            </div>
+        <div className="suggested-golfers-scroll" role="listbox" aria-label="Loading suggested profiles">
+          {[...Array(4)].map((_, idx) => (
+            <div key={idx} className="w-[185px] h-[220px] rounded-2xl bg-muted animate-pulse flex-shrink-0" />
           ))}
         </div>
       </div>
@@ -269,9 +265,9 @@ export function LiveClubhouseStrip() {
 
   return (
     <div className="suggested-golfers-row">
-      {/* Section header with "See all" link */}
+      {/* Section header with "See all" link - matching left gutter */}
       <div className="suggested-golfers-header">
-        <span className="suggested-golfers-title">Creators for you</span>
+        <span className="suggested-golfers-title">Suggested for you</span>
         <button 
           className="suggested-golfers-see-all"
           onClick={() => navigate('/golferstofollow')}
@@ -281,15 +277,15 @@ export function LiveClubhouseStrip() {
         </button>
       </div>
       
-      {/* Compact carousel */}
+      {/* Carousel with proper left gutter matching title */}
       <div
-        className="flex gap-4 overflow-x-auto px-4 no-scrollbar pb-2" 
+        className="suggested-golfers-scroll" 
         ref={rowRef} 
         role="listbox" 
         aria-label="Suggested profiles"
       >
         {mixedItems.map((item) => (
-          <CompactSuggestedCard
+          <SuggestedProfileCard
             key={item.id}
             item={item}
             onFollow={handleFollow}

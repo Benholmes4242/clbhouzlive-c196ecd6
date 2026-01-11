@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
@@ -15,14 +15,12 @@ interface CinematicActionRailProps {
   likesCount: number;
   commentsCount: number;
   hasLiked: boolean;
-  hasSaved?: boolean;
   isMuted: boolean;
   isVisible: boolean;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
   onSave?: () => void;
-  onMore?: () => void;
   onMuteToggle: () => void;
   isReviewPost?: boolean;
   onNextMedia?: () => void;
@@ -169,14 +167,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   likesCount,
   commentsCount,
   hasLiked,
-  hasSaved = false,
   isMuted,
   isVisible,
   onLike,
   onComment,
   onShare,
   onSave,
-  onMore,
   onMuteToggle,
   isReviewPost = false,
   onNextMedia,
@@ -186,8 +182,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 }) => {
   // Calculate slot count dynamically based on what's actually rendered
   const GAP = 12;
-  let slotCount = 5; // base: mute, like, comment, share, more
-  if (onSave) slotCount++; // add save slot
+  let slotCount = onSave ? 5 : 4; // base: mute, like, comment, share (+ optional save)
   const hasNextMediaSlot = isReviewPost && onNextMedia && hasNextMedia;
   if (hasNextMediaSlot) slotCount++; // add next media button slot
   
@@ -255,32 +250,20 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         ariaLabel="Comments"
       />
 
-      {/* Slot 5: Save/Bookmark */}
-      {onSave && (
-        <ActionSlot
-          icon={Bookmark}
-          isActive={hasSaved}
-          onClick={onSave}
-          ariaLabel={hasSaved ? 'Unsave' : 'Save'}
-          activeColor="text-yellow-400"
-          showCount={false}
-        />
-      )}
-
-      {/* Slot 6: Share */}
+      {/* Slot 5: Reshare */}
       <ActionSlot
         icon={Send}
         onClick={onShare}
-        ariaLabel="Share"
+        ariaLabel="Reshare"
         showCount={false}
       />
 
-      {/* Slot 7: More Options */}
-      {onMore && (
+      {/* Slot 6: Save/Bookmark (optional) */}
+      {onSave && (
         <ActionSlot
-          icon={MoreHorizontal}
-          onClick={onMore}
-          ariaLabel="More options"
+          icon={Bookmark}
+          onClick={onSave}
+          ariaLabel="Save"
           showCount={false}
         />
       )}
