@@ -22,7 +22,7 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 // ============ Constants ============
 
 const PORTRAIT_MIN_AR = 1.2; // Height/Width ratio threshold for portrait
-const VIDEOS_TO_PRELOAD = 3;
+const VIDEOS_TO_PRELOAD = 5; // Increased from 3 for smoother scrolling
 const MIN_INDEX_CHANGE_INTERVAL = 80;
 const SCROLL_SETTLE_DELAY = 150;
 

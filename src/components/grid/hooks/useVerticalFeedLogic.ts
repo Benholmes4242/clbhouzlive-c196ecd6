@@ -13,7 +13,7 @@ import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 const VIDEO_WINDOW_RADIUS = 2;
 
@@ -327,11 +327,11 @@ export function useVerticalFeedLogic({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onCurrentIndexChange]);
   
-  // Preload next 3 videos for fast scrolling
+  // Preload next 5 videos for fast scrolling (increased from 3)
   useEffect(() => {
     if (!posts.length) return;
     
-    const VIDEOS_TO_PRELOAD = 3;
+    const VIDEOS_TO_PRELOAD = 5; // Increased from 3 for smoother scrolling
     
     for (let i = 1; i <= VIDEOS_TO_PRELOAD; i++) {
       const nextIndex = currentIndex + i;
@@ -345,7 +345,13 @@ export function useVerticalFeedLogic({
       
       const uid = uidFromNode({ src });
       if (uid) {
+        // Preload HLS manifest and first segments
         preloadHlsManifest(generateStreamHlsUrl(uid));
+        
+        // Also preload thumbnail for instant poster display
+        const thumbnailUrl = generateStreamThumbnailUrl(uid, { height: 600 });
+        const img = new Image();
+        img.src = thumbnailUrl;
       }
     }
   }, [currentIndex, posts]);
