@@ -31,7 +31,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         <div>
           <h2 className="text-sm font-medium">Profile photo</h2>
           <p className="text-xs text-muted-foreground">
-            Your photo appears as a rounded square across Clbhouz.
+            Your photo appears as a squircle across clbhouz.
           </p>
         </div>
         {displayUrl && (
@@ -50,7 +50,15 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         onClick={handleClick}
         className="inline-flex items-center gap-3 group"
       >
-        <div className="h-20 w-20 rounded-[28%] overflow-hidden border border-border bg-muted/60 relative">
+        {/* Squircle spec: 1/1.05 aspect ratio, 34% border radius - matches ProfileAvatarRing */}
+        <div 
+          className="overflow-hidden border border-border bg-muted/60 relative"
+          style={{
+            width: '80px',
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
+          }}
+        >
           {displayUrl ? (
             <>
               <img 
@@ -59,7 +67,10 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
                 className="h-full w-full object-cover" 
               />
               {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-[28%]">
+              <div 
+                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                style={{ borderRadius: '34%' }}
+              >
                 <Camera className="w-6 h-6 text-white" />
               </div>
             </>
