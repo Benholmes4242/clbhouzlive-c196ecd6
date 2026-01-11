@@ -195,13 +195,13 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     }
   }, [items]);
 
-  // Unified media autoplay with consistent thresholds
+  // Unified media autoplay with consistent thresholds (matches Videos tab)
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     preloadMargin: 300,
     scrollSettleDelay: 200,
     startThreshold: 0.4,   // Play at 40% visible
-    stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
+    stopThreshold: 0.25,   // Pause at 25% visible - consistent with Videos tab
   });
 
   // Calculate date separators
@@ -385,31 +385,33 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         ))}
       </div>
 
-      {/* Loading state */}
+      {/* Loading state - full bleed, dynamic heights, square corners */}
       {loading && items.length === 0 && (
-        <div className="py-12 px-5">
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse bg-card border border-border/30 overflow-hidden">
-                <div className="aspect-[16/9] bg-muted" />
-                <div className="px-4 py-3">
-                  <div className="h-4 w-3/4 bg-muted rounded" />
-                  <div className="h-3 w-1/3 bg-muted rounded mt-2" />
+        <div className="w-full">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-full mb-4 animate-pulse">
+              {/* Media skeleton - vary heights for visual interest */}
+              <div 
+                className="w-full bg-muted"
+                style={{ aspectRatio: i % 2 === 0 ? 16/9 : 4/5 }}
+              />
+              {/* Meta area skeleton */}
+              <div className="px-4 py-3 flex items-start gap-3">
+                {/* Avatar squircle */}
+                <div className="w-10 h-10 rounded-xl bg-muted flex-shrink-0" />
+                {/* Text lines */}
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted/60 rounded w-1/2" />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="h-20 w-full">
-        {loading && hasMore && items.length > 0 && (
-          <div className="flex justify-center py-6">
-            <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-          </div>
-        )}
-      </div>
+      {/* Infinite scroll sentinel - no spinner, seamless loading like Watch tab */}
+      <div ref={sentinelRef} className="h-20 w-full" />
 
       {/* End of feed */}
       {!hasMore && items.length > 0 && (

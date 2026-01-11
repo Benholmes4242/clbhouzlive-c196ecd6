@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Heart, Play } from 'lucide-react';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
@@ -8,6 +8,39 @@ import PostMeta from '@/components/posts/PostMeta';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 import { getFilterClass } from '@/utils/studioFilters';
+
+// Helper to calculate aspect ratio from media dimensions
+const getAspectRatio = (item: CommunityContentItem): number => {
+  const media = (item as any).media?.[0];
+  if (media?.width && media?.height) {
+    const rawRatio = media.width / media.height;
+    // Clamp to reasonable bounds
+    const minRatio = 0.5;  // Portrait limit (1:2)
+    const maxRatio = 2.0;  // Landscape limit (2:1)
+    return Math.max(minRatio, Math.min(maxRatio, rawRatio));
+  }
+  // Fallback to 16:9 if no dimensions
+  return 16 / 9;
+};
+
+// Format duration for display
+const formatDuration = (duration?: string | number): string | null => {
+  if (!duration) return null;
+  
+  let seconds: number;
+  if (typeof duration === 'string') {
+    // Handle "XXs" format
+    seconds = parseInt(duration.replace('s', ''), 10);
+  } else {
+    seconds = Math.floor(duration);
+  }
+  
+  if (isNaN(seconds) || seconds <= 0) return null;
+  
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
 
 interface CommunityFeedCardProps {
   item: CommunityContentItem;
@@ -37,6 +70,10 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   const isVideo = item.type === 'video';
   const hasMedia = !!item.src;
   const filterClass = getFilterClass((item as any).filterId);
+  
+  // Calculate dynamic aspect ratio from media dimensions
+  const aspectRatio = useMemo(() => getAspectRatio(item), [item]);
+  const durationDisplay = useMemo(() => formatDuration(item.duration || item.durationSeconds), [item.duration, item.durationSeconds]);
 
   const videoIndexRef = useRef(videoIndex);
   videoIndexRef.current = videoIndex;
@@ -103,13 +140,16 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     <div
       ref={tileRef}
       className={cn(
-        "group cursor-pointer bg-card border border-border/30 overflow-hidden mb-3",
+        "group cursor-pointer bg-card overflow-hidden",
         className
       )}
       onClick={handleCardClick}
     >
-      {/* Media Section - 16:9 aspect ratio */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+      {/* Media Section - dynamic aspect ratio */}
+      <div 
+        className="relative w-full overflow-hidden bg-muted"
+        style={{ aspectRatio }}
+      >
         {isVideo && hasMedia ? (
           <>
             {/* Filtered pixel layer */}
@@ -152,23 +192,23 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
 
         {/* Subtle hover effect - OUTSIDE filtered layer */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
-        {/* Likes - bottom left (hidden when 0) */}
+        {/* Like counter - bottom left, glass style (hidden when 0) */}
         {likesDisplay && (
-          <div 
-            className="absolute bottom-3 left-3 flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
-            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
-          >
-            <Heart className="w-3 h-3" />
-            <span>{likesDisplay}</span>
+          <div className="absolute bottom-2 left-2 z-10">
+            <div className="flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
+              <Heart className="w-3 h-3 text-white fill-white" />
+              <span className="text-xs text-white font-medium">{likesDisplay}</span>
+            </div>
           </div>
         )}
 
-        {/* Duration badge for videos - bottom right */}
-        {isVideo && item.duration && (
-          <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
-            {item.duration}
+        {/* Duration badge for videos - bottom right, glass style */}
+        {isVideo && durationDisplay && (
+          <div className="absolute bottom-2 right-2 z-10">
+            <div className="px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
+              <span className="text-xs text-white font-medium">{durationDisplay}</span>
+            </div>
           </div>
         )}
       </div>

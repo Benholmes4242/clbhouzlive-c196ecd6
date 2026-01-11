@@ -176,14 +176,11 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
           className={cn(OVERLAY_BOTTOM_LEFT, 'z-10 flex flex-col gap-1 pointer-events-none')}
           style={{ maxWidth: textMaxWidth }}
         >
-          {/* Likes - shown above trending label for hero */}
+          {/* Likes - glass style badge */}
           {showLikes && (
-            <div 
-              className="flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
-              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
-            >
-              <Heart className="w-3 h-3" />
-              <span>{formatLikeCount(likes ?? 0)}</span>
+            <div className="flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-full">
+              <Heart className="w-3 h-3 text-white fill-white" />
+              <span className="text-xs text-white font-medium">{formatLikeCount(likes ?? 0)}</span>
             </div>
           )}
           
