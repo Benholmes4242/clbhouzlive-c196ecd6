@@ -211,7 +211,7 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
 
   if (isLoading) {
     return (
-      <div className="overflow-hidden shadow-xl">
+      <div className="rounded-2xl overflow-hidden shadow-xl">
         <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]" />
         <div className="bg-card px-4 py-3 space-y-2">
           <div className="h-4 w-3/4 rounded-md bg-muted animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted bg-[length:200%_100%]" />
@@ -241,7 +241,7 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   return (
     <div 
       ref={containerRef}
-      className="overflow-hidden cursor-pointer group shadow-xl bg-card"
+      className="rounded-2xl overflow-hidden cursor-pointer group shadow-xl bg-card"
       onClick={handleClick}
     >
       {/* Media Section - 16:9 with cinematic gradient */}

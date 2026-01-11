@@ -8,7 +8,7 @@
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
 // Feature flag - set to false to disable mock data
-export const SHOW_MOCK_DATA = false;
+export const SHOW_MOCK_DATA = true;
 
 // Golf courses for realistic tagging
 const GOLF_COURSES = [
