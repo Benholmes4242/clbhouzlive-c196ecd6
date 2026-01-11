@@ -322,7 +322,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
           <div className="relative">
             <div
               ref={scrollContainerRef}
-              className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1"
+              className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide py-1"
               onScroll={checkScrollPosition}
               style={{
                 scrollbarWidth: 'none',
