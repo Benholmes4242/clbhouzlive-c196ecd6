@@ -1,4 +1,5 @@
 import React from 'react';
+import { Camera, User, MapPin, FileText, Shield, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import '@/styles/discover-tabs.css';
 
@@ -11,16 +12,26 @@ interface SectionJumpStripProps {
   sections: Section[];
   activeSection: string;
   onSectionClick: (sectionId: string) => void;
+  completedSections?: string[];
 }
 
+const sectionIcons: Record<string, React.ElementType> = {
+  photos: Camera,
+  basic: User,
+  golf: MapPin,
+  bio: FileText,
+  privacy: Shield,
+};
+
 /**
- * SectionJumpStrip - Tab-style navigation matching Discover page
- * Uses underline active state with orange accent like Explore, Top 100, Friends tabs
+ * SectionJumpStrip - Tab-style navigation with icons
+ * Uses underline active state with orange accent
  */
 export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
   sections,
   activeSection,
   onSectionClick,
+  completedSections = [],
 }) => {
   return (
     <div 
@@ -29,9 +40,11 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
       aria-label="Profile sections"
     >
       <div className="discover-tabs flex w-full items-center justify-center">
-        <div className="flex">
+        <div className="flex gap-1">
           {sections.map((section) => {
             const isActive = activeSection === section.id;
+            const isComplete = completedSections.includes(section.id);
+            const Icon = sectionIcons[section.id];
 
             return (
               <button
@@ -40,7 +53,7 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
                 aria-selected={isActive}
                 onClick={() => onSectionClick(section.id)}
                 className={cn(
-                  "discover-tab px-4 py-[10px] text-center relative z-10 text-[14px] font-medium leading-tight",
+                  "discover-tab flex items-center gap-1.5 px-3 py-[10px] text-center relative z-10 text-[13px] font-medium leading-tight",
                   "transition-all duration-[120ms] ease-out",
                   "active:scale-[0.97] motion-reduce:active:scale-100",
                   isActive 
@@ -48,7 +61,11 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
                     : "text-muted-foreground hover:text-foreground/80 motion-reduce:transition-none"
                 )}
               >
-                {section.label}
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">{section.label}</span>
+                {isComplete && !isActive && (
+                  <Check className="w-3 h-3 text-emerald-500" />
+                )}
               </button>
             );
           })}

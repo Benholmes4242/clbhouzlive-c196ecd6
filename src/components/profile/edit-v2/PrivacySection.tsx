@@ -1,6 +1,9 @@
 import React from 'react';
+import { Shield, Globe, Lock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { SectionHeader } from './SectionHeader';
+import { cn } from '@/lib/utils';
 
 interface PrivacySectionProps {
   isPublic: boolean;
@@ -12,26 +15,42 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
   onChange,
 }) => {
   return (
-    <div className="space-y-3">
-      <div>
-        <h2 className="text-sm font-medium">Privacy</h2>
-        <p className="text-xs text-muted-foreground">Control who can see your profile.</p>
-      </div>
+    <div className="space-y-4">
+      <SectionHeader
+        icon={<Shield className="w-5 h-5 text-primary" />}
+        title="Privacy"
+        subtitle="Control who can see your profile"
+      />
 
-      <div className="flex items-center justify-between py-1">
-        <div className="space-y-0.5">
-          <Label htmlFor="public-profile" className="text-sm font-normal">
-            Public Profile
-          </Label>
-          <p className="text-[11px] text-muted-foreground max-w-xs">
-            When your profile is public, anyone on Clbhouz can view your posts and golf journey.
-          </p>
+      <div className={cn(
+        "flex items-center justify-between p-4 rounded-xl border transition-all",
+        isPublic 
+          ? "bg-primary/5 border-primary/20" 
+          : "bg-muted/30 border-border"
+      )}>
+        <div className="flex items-center gap-3">
+          {isPublic ? (
+            <Globe className="w-5 h-5 text-primary" />
+          ) : (
+            <Lock className="w-5 h-5 text-muted-foreground" />
+          )}
+          <div className="space-y-0.5">
+            <Label htmlFor="public-profile" className="text-sm font-semibold text-foreground cursor-pointer">
+              {isPublic ? 'Public Profile' : 'Private Profile'}
+            </Label>
+            <p className="text-xs text-muted-foreground max-w-xs">
+              {isPublic 
+                ? 'Anyone on Clbhouz can view your posts and golf journey.'
+                : 'Only approved followers can see your profile.'
+              }
+            </p>
+          </div>
         </div>
         <Switch
           id="public-profile"
           checked={isPublic}
           onCheckedChange={onChange}
-          className="data-[state=checked]:bg-[#E2E8F0] data-[state=unchecked]:bg-[#E2E8F0] [&>span]:bg-white [&>span]:shadow-sm"
+          className="data-[state=checked]:bg-primary"
         />
       </div>
     </div>

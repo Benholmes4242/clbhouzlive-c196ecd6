@@ -572,14 +572,14 @@ const EditProfilePage: React.FC = () => {
         </div>
       </main>
 
-      {/* Sticky Footer */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-end gap-3 px-4 py-3">
+      {/* Sticky Footer - Enhanced */}
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur shadow-lg">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-4">
           <button
             type="button"
             onClick={handleBack}
             disabled={saving}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
           >
             Cancel
           </button>
@@ -589,10 +589,11 @@ const EditProfilePage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || saveSuccess}
             className={cn(
-              "inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all",
-              "bg-[#E2E8F0] text-foreground hover:bg-slate-300",
-              "disabled:opacity-60 disabled:cursor-not-allowed",
-              saveSuccess && "bg-emerald-500 text-white"
+              "inline-flex items-center justify-center rounded-full px-8 h-12 text-sm font-semibold transition-all",
+              "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground",
+              "hover:shadow-lg hover:scale-[1.02]",
+              "disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100",
+              saveSuccess && "from-emerald-500 to-emerald-600"
             )}
           >
             <AnimatePresence mode="wait">
@@ -630,7 +631,7 @@ const EditProfilePage: React.FC = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  Save
+                  Save Changes
                 </motion.span>
               )}
             </AnimatePresence>
