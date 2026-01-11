@@ -44,7 +44,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             }}
             aria-label={tab.label}
           >
-            {/* Icon with indicator */}
+            {/* Icon */}
             <div className="relative">
               <Icon 
                 className={cn(
@@ -64,16 +64,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   transition: 'all var(--motion-fast) var(--ease-pop)'
                 }}
               />
-              
-              {/* Active indicator dot - Clubhouse only */}
-              {isClubhouseTheme && isActive && (
-                <span 
-                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"
-                  style={{
-                    animation: 'scale-in 150ms var(--ease-pop)'
-                  }}
-                />
-              )}
             </div>
             
             {/* Label */}
