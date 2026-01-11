@@ -4313,6 +4313,35 @@ html[data-immersive="true"] .app-shell--topSpacer {
   transform: translateY(-50%);
 }
 
+/* =========================================
+   EMOJI PICKER (emoji-mart) CUSTOMIZATION
+   Brand color: #F79E1B (Orange)
+   ========================================= */
+em-emoji-picker {
+  /* Override accent color to brand orange */
+  --rgb-accent: 247, 158, 27 !important;
+  --color-border-over: rgba(247, 158, 27, 0.5) !important;
+}
+
+/* Active category indicator - the icon highlight at top */
+.emoji-picker-container [data-skin] button[aria-selected="true"],
+.emoji-picker-container button[aria-selected="true"] {
+  color: #F79E1B !important;
+}
+
+/* Category nav active indicator line/border */
+em-emoji-picker .flex button[aria-selected="true"]::after,
+em-emoji-picker nav button[aria-selected="true"] {
+  border-color: #F79E1B !important;
+  color: #F79E1B !important;
+}
+
+/* Search input focus state */
+em-emoji-picker input:focus {
+  border-color: #F79E1B !important;
+  box-shadow: 0 0 0 2px rgba(247, 158, 27, 0.2) !important;
+}
+
 /* Respect prefers-reduced-motion globally */
 @media (prefers-reduced-motion: reduce) {
   *,
