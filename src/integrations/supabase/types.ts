@@ -1747,7 +1747,15 @@ export type Database = {
           suggested_url?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "college_logo_sources_normalized_name_fkey"
+            columns: ["normalized_name"]
+            isOneToOne: true
+            referencedRelation: "college_media"
+            referencedColumns: ["normalized_name"]
+          },
+        ]
       }
       college_media: {
         Row: {
