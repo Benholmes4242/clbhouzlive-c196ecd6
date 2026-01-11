@@ -1097,7 +1097,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               />
             )}
             
-            {/* Header */}
+            {/* Header - Enhanced with glass blur effect */}
             <motion.div 
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1106,22 +1106,44 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 "relative z-10 flex-shrink-0 pt-[max(env(safe-area-inset-top,0px),12px)]",
                 isDark ? "border-white/10" : "border-border/50"
               )}
+              style={isDark ? {
+                background: 'rgba(13, 13, 13, 0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+              } : undefined}
             >
-              {/* Back CTA - text style matching notifications page */}
-              <div className="px-4 py-3">
+              {/* Back CTA with improved styling */}
+              <div className="px-4 py-3 flex items-center gap-3">
                 <button
                   type="button"
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-0.5 transition-colors active:opacity-70",
+                    "p-2 -ml-2 rounded-full transition-colors",
                     isDark 
-                      ? "text-white/80 hover:text-white" 
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "hover:bg-white/10 text-white" 
+                      : "hover:bg-muted text-foreground"
                   )}
                 >
-                  <ChevronLeft className="h-5 w-5" />
-                  <span className="text-sm">Back</span>
+                  <ChevronLeft className="h-6 w-6" />
                 </button>
+                
+                <h1 className={cn(
+                  "text-lg font-semibold",
+                  isDark ? "text-white" : "text-foreground"
+                )}>
+                  Comments
+                </h1>
+                
+                {/* Comment count badge */}
+                {comments.length > 0 && (
+                  <span className={cn(
+                    "px-2 py-0.5 rounded-full text-sm",
+                    isDark ? "bg-white/10 text-white/60" : "bg-muted text-muted-foreground"
+                  )}>
+                    {comments.length}
+                  </span>
+                )}
               </div>
 
               {/* Post preview card - smart media scaling with scroll compression */}
@@ -1304,38 +1326,84 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 </div>
               ) : comments.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 -mt-4 text-center">
-                  {/* Soft icon with slow pulse animation */}
+                  {/* Enhanced empty state with glow effect */}
                   <motion.div
-                    animate={{ 
-                      scale: [1, 1.05, 1],
-                      opacity: [0.4, 0.55, 0.4],
-                    }}
-                    transition={{ 
-                      duration: 6, 
-                      repeat: Infinity, 
-                      ease: 'easeInOut' 
-                    }}
-                    className={cn(
-                      "w-16 h-16 rounded-full flex items-center justify-center mb-4",
-                      isDark ? "bg-white/5" : "bg-muted/40"
-                    )}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="relative mb-6"
                   >
-                    <MessageCircle className={cn(
-                      "w-8 h-8",
-                      isDark ? "text-white/25" : "text-muted-foreground/35"
-                    )} />
+                    {/* Subtle glow behind icon */}
+                    <div 
+                      className={cn(
+                        "absolute inset-0 rounded-full blur-2xl",
+                        isDark ? "bg-orange-500/20" : "bg-primary/15"
+                      )} 
+                    />
+                    
+                    {/* Icon container with gradient background */}
+                    <motion.div
+                      animate={{ 
+                        scale: [1, 1.03, 1],
+                        opacity: [0.8, 1, 0.8],
+                      }}
+                      transition={{ 
+                        duration: 4, 
+                        repeat: Infinity, 
+                        ease: 'easeInOut' 
+                      }}
+                      className={cn(
+                        "relative w-20 h-20 rounded-full flex items-center justify-center",
+                        isDark 
+                          ? "bg-gradient-to-br from-white/10 to-white/5 border border-white/10" 
+                          : "bg-gradient-to-br from-muted to-muted/50 border border-border/50"
+                      )}
+                    >
+                      <MessageCircle className={cn(
+                        "w-10 h-10",
+                        isDark ? "text-white/40" : "text-muted-foreground/50"
+                      )} />
+                    </motion.div>
                   </motion.div>
-                  <div className={cn(
-                    "text-[15px] font-medium mb-1",
-                    isDark ? "text-white/60" : "text-foreground/70"
+                  
+                  <h3 className={cn(
+                    "text-[17px] font-semibold mb-2",
+                    isDark ? "text-white" : "text-foreground"
                   )}>
                     Start the conversation
-                  </div>
-                  <div className={cn(
-                    "text-[13px]",
-                    isDark ? "text-white/40" : "text-muted-foreground/60"
+                  </h3>
+                  
+                  <p className={cn(
+                    "text-[14px] max-w-[240px] mb-6",
+                    isDark ? "text-white/50" : "text-muted-foreground"
                   )}>
-                    What did you think of this moment?
+                    What did you think of this moment? Be the first to share your thoughts.
+                  </p>
+                  
+                  {/* Quick reaction buttons */}
+                  <div className="flex items-center gap-2">
+                    {['🔥', '⛳', '👏', '😂', '❤️'].map(emoji => (
+                      <motion.button
+                        key={emoji}
+                        whileTap={{ scale: 0.85 }}
+                        onClick={async () => {
+                          triggerHaptic('success');
+                          try {
+                            await addComment(emoji);
+                          } catch (error) {
+                            console.error('Failed to add quick reaction:', error);
+                          }
+                        }}
+                        className={cn(
+                          "w-12 h-12 rounded-full flex items-center justify-center text-xl transition-colors",
+                          isDark 
+                            ? "bg-white/5 hover:bg-white/10 border border-white/10" 
+                            : "bg-muted hover:bg-muted/80 border border-border/50"
+                        )}
+                      >
+                        {emoji}
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
               ) : (
@@ -1449,18 +1517,19 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               )}
             </motion.div>
 
-            {/* Comment Input - Fixed Bottom with keyboard-aware transform */}
+            {/* Comment Input - Fixed Bottom with enhanced glass effect */}
             <motion.div 
-              className={cn(
-                "flex-shrink-0 border-t backdrop-blur-xl px-4 py-3",
-                isDark 
-                  ? "border-white/10 bg-black/80" 
-                  : isGrey 
-                    ? "border-border/50 bg-muted/80"
-                    : "border-border/50 bg-white/80"
-              )}
+              className="flex-shrink-0 px-4 py-3"
               style={{ 
                 paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+                background: isDark 
+                  ? 'rgba(13, 13, 13, 0.98)' 
+                  : isGrey 
+                    ? 'rgba(248, 250, 252, 0.95)'
+                    : 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)',
               }}
               animate={{ 
                 y: -keyboardOffset 
