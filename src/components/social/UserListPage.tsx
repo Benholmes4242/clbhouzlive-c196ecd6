@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Search, Check, Loader2 } from 'lucide-react';
+import { ChevronLeft, Search, Check, Users, UserPlus, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -27,10 +27,13 @@ interface UserListPageProps {
   users: SocialUser[];
   totalCount?: number;
   isLoading: boolean;
+  error?: Error | null;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
+  onRefetch?: () => void;
   backPath?: string;
+  isOwnProfile?: boolean;
 }
 
 export const UserListPage: React.FC<UserListPageProps> = ({
@@ -42,10 +45,13 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   users,
   totalCount,
   isLoading,
+  error,
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
+  onRefetch,
   backPath,
+  isOwnProfile = true,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -79,91 +85,221 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
   const showingCount = filteredUsers.length;
   const displayTotal = totalCount ?? users.length;
+  const isSearching = debouncedSearch.trim().length > 0;
+
+  // Get mode display name for messages
+  const modeDisplayName = mode === 'followers' ? 'followers' : mode === 'following' ? 'following' : 'friends';
 
   return (
-    <PageRoot className="bg-muted/40">
+    <PageRoot className="min-h-screen bg-white">
       <div className="w-full">
-        {/* Back CTA */}
-        <div className="px-4 pt-6">
+        {/* Scrollable header - scrolls away */}
+        <div className="px-4 pt-6 pb-4 bg-white">
+          {/* Back button */}
           <button
             type="button"
             onClick={handleBack}
-            className="flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
           >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="text-sm">Back</span>
+            <ChevronLeft className="h-4 w-4" />
+            Back
           </button>
-        </div>
 
-        {/* Title block */}
-        <div className="text-center px-4 pt-4 pb-3">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            {title}
-            {displayTotal > 0 && (
-              <span className="text-[10px] text-muted-foreground/50 ml-1 align-middle">
-                {displayTotal}
-              </span>
-            )}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
-        </div>
-
-        {/* Search bar */}
-        <div className="px-6 mt-4 mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={searchPlaceholder}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-9 h-11 rounded-xl border-border/40 bg-white/35"
-            />
+          {/* Title block */}
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-foreground mb-1">
+              {title}
+              {displayTotal > 0 && (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ({displayTotal})
+                </span>
+              )}
+            </h1>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           </div>
+        </div>
+
+        {/* Sticky search bar */}
+        <div className="sticky top-0 z-40 bg-[#F8FAFC]">
+          <div className="px-4 py-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={searchPlaceholder}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="pl-10 h-11 rounded-xl border-border/40 bg-white"
+                aria-label={searchPlaceholder}
+              />
+            </div>
+          </div>
+          {/* Bottom border for visual separation when sticky */}
+          <div className="border-b border-border/50" />
         </div>
 
         {/* Content */}
-        {isLoading ? (
-          <div className="divide-y divide-border/25">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="px-6 py-4 flex items-center gap-3">
-                <div className="h-12 w-12 rounded-sq-md bg-muted animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 w-1/2 rounded-full bg-muted animate-pulse" />
-                  <div className="h-3 w-1/3 rounded-full bg-muted/60 animate-pulse" />
-                </div>
-                <div className="h-7 w-20 rounded-sq-xs bg-muted animate-pulse" />
+        <div className="bg-white min-h-[50vh]">
+          {/* Error state */}
+          {error && !isLoading && (
+            <div className="flex flex-col items-center justify-center py-16 px-6">
+              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                <AlertCircle className="w-8 h-8 text-destructive" />
               </div>
-            ))}
-          </div>
-        ) : filteredUsers.length === 0 ? (
-          <div className="flex flex-col items-center text-center gap-4 py-16 px-6">
-            {searchInput ? (
-              <>
-                <p className="text-sm font-medium text-foreground">No results found</p>
-                <p className="text-sm text-muted-foreground max-w-[280px]">
-                  Try a different name or club.
-                </p>
-                <Button variant="secondary" size="sm" onClick={handleClearSearch}>
-                  Clear search
+              <h3 className="text-lg font-semibold text-foreground mb-1">
+                Something went wrong
+              </h3>
+              <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+                We couldn't load {modeDisplayName}. Please try again.
+              </p>
+              {onRefetch && (
+                <Button variant="outline" size="sm" onClick={onRefetch}>
+                  Try again
                 </Button>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground max-w-[280px]">{emptyText}</p>
-            )}
-          </div>
-        ) : (
-          <InfiniteUserList
-            users={filteredUsers}
-            currentUserId={user?.id}
-            mode={mode}
-            hasNextPage={hasNextPage && !searchInput}
-            isFetchingNextPage={isFetchingNextPage}
-            onLoadMore={onLoadMore}
-            displayTotal={displayTotal}
-            showStatus={!searchInput}
-          />
-        )}
+              )}
+            </div>
+          )}
+
+          {/* Loading skeletons */}
+          {isLoading && !error && (
+            <div>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-start gap-3 px-4 py-4 border-b border-border/30">
+                  {/* Avatar skeleton */}
+                  <div className="w-14 h-14 rounded-sq-md bg-muted animate-pulse flex-shrink-0" />
+                  
+                  {/* Content skeleton */}
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-muted animate-pulse rounded w-32" />
+                    <div className="h-3 bg-muted animate-pulse rounded w-24" />
+                    <div className="h-3 bg-muted animate-pulse rounded w-40" />
+                    
+                    {/* Button skeletons */}
+                    <div className="flex gap-2 pt-1">
+                      <div className="h-9 bg-muted animate-pulse rounded-md flex-1" />
+                      <div className="h-9 bg-muted animate-pulse rounded-md flex-1" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty states */}
+          {!isLoading && !error && filteredUsers.length === 0 && (
+            <>
+              {isSearching ? (
+                /* Search empty state */
+                <div className="flex flex-col items-center justify-center py-16 px-6">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Search className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                    No results found
+                  </h3>
+                  <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+                    No {modeDisplayName} match "{searchInput}". Try a different search.
+                  </p>
+                  <Button variant="outline" size="sm" onClick={handleClearSearch}>
+                    Clear search
+                  </Button>
+                </div>
+              ) : mode === 'followers' ? (
+                /* Followers empty state */
+                <div className="flex flex-col items-center justify-center py-16 px-6">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Users className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                    No followers yet
+                  </h3>
+                  <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-6">
+                    {isOwnProfile 
+                      ? "When people follow you, they'll appear here."
+                      : "When people follow this golfer, they'll appear here."
+                    }
+                  </p>
+                  {isOwnProfile && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => navigate('/golferstofollow')}
+                      className="w-full max-w-[280px]"
+                    >
+                      Find golfers to follow
+                    </Button>
+                  )}
+                </div>
+              ) : mode === 'friends' ? (
+                /* Friends empty state */
+                <div className="flex flex-col items-center justify-center py-16 px-6">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <UserPlus className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                    No friends yet
+                  </h3>
+                  <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-6">
+                    {isOwnProfile 
+                      ? "You haven't added any friends yet. Connect with golfers you play with!"
+                      : "This golfer hasn't added any friends yet."
+                    }
+                  </p>
+                  {isOwnProfile && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => navigate('/golferstofollow')}
+                      className="w-full max-w-[280px]"
+                    >
+                      Find golfers
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                /* Following empty state */
+                <div className="flex flex-col items-center justify-center py-16 px-6">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Users className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                    Not following anyone yet
+                  </h3>
+                  <p className="text-sm text-muted-foreground text-center max-w-[280px] mb-6">
+                    {isOwnProfile 
+                      ? "Find golfers to follow and see their activity in your feed."
+                      : "This golfer isn't following anyone yet."
+                    }
+                  </p>
+                  {isOwnProfile && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => navigate('/golferstofollow')}
+                      className="w-full max-w-[280px]"
+                    >
+                      Find golfers to follow
+                    </Button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* User list */}
+          {!isLoading && !error && filteredUsers.length > 0 && (
+            <InfiniteUserList
+              users={filteredUsers}
+              currentUserId={user?.id}
+              mode={mode}
+              hasNextPage={hasNextPage && !isSearching}
+              isFetchingNextPage={isFetchingNextPage}
+              onLoadMore={onLoadMore}
+              displayTotal={displayTotal}
+              showStatus={!isSearching}
+            />
+          )}
+        </div>
       </div>
     </PageRoot>
   );
@@ -223,10 +359,12 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
+  const modeDisplayName = mode === 'followers' ? 'followers' : mode === 'following' ? 'following' : 'friends';
+
   return (
     <>
       {/* User list rows */}
-      <div className="divide-y divide-border/25">
+      <div>
         {users.map((socialUser) => (
           <UserRowFlat
             key={socialUser.id}
@@ -237,27 +375,23 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
         ))}
       </div>
 
-      {/* Infinite scroll sentinel */}
-      {hasNextPage && (
-        <div ref={sentinelRef} className="flex justify-center py-6">
-          {isFetchingNextPage && (
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          )}
-        </div>
-      )}
+      {/* Sentinel for infinite scroll - no visible spinner */}
+      {hasNextPage && <div ref={sentinelRef} className="h-1" />}
 
-      {/* Status text */}
+      {/* Footer count */}
       {showStatus && displayTotal > 0 && (
-        <p className="mt-2 pb-6 text-center text-xs text-muted-foreground">
-          Showing {users.length} of {displayTotal} {mode}
-        </p>
+        <div className="py-8 text-center">
+          <p className="text-xs text-muted-foreground">
+            Showing {users.length} of {displayTotal} {modeDisplayName}
+          </p>
+        </div>
       )}
     </>
   );
 };
 
 // ============================================================================
-// Inline UserRowFlat component (matches GolfersToFollowPage row styling)
+// UserRowFlat component - matches GolfersToFollowPage row styling
 // ============================================================================
 
 interface UserRowFlatProps {
@@ -289,7 +423,6 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
   );
 
   const handleRowClick = () => {
-    // Use proper profile path based on user type (creator_only goes to /creator/:id)
     const profilePath = getProfilePathById(user.id, user.creatorOnly, user.username);
     navigate(profilePath);
   };
@@ -338,89 +471,112 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode }) 
   return (
     <button
       onClick={handleRowClick}
-      className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
+      className="w-full flex items-start gap-3 px-4 py-4 hover:bg-muted/50 transition-colors text-left border-b border-border/30 last:border-0"
     >
-      <div className="flex items-start gap-3">
-        {/* Avatar */}
-        <div className="relative shrink-0">
-          <SquircleAvatar
-            src={user.avatarUrl || undefined}
-            alt={user.displayName}
-            size={56}
-            fallback={user.displayName?.charAt(0) || '?'}
-            ringColor={getRingColorForTotalPlayed(0)}
-          />
-        </div>
+      {/* Avatar */}
+      <SquircleAvatar
+        src={user.avatarUrl || undefined}
+        alt={user.displayName}
+        size={56}
+        fallback={user.displayName?.charAt(0) || '?'}
+        ringColor={getRingColorForTotalPlayed(0)}
+        className="flex-shrink-0"
+      />
 
-        {/* Content area */}
-        <div className="flex-1 min-w-0">
-          {/* Row 1: Name */}
-          <p className="text-sm font-semibold text-foreground truncate">
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {/* Name row */}
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span className="text-sm font-semibold text-foreground truncate">
             {user.displayName}
-          </p>
-
-          {/* Row 2: Username */}
-          <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
-
-          {/* Row 3: Home club */}
-          <p className="text-xs text-muted-foreground truncate">{clubLine}</p>
-          {!isSelf && currentUserId && !relationshipLoading && (
-            <div
-              className="grid grid-cols-2 gap-2 pt-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Follow/Following button */}
-              {isFollowing ? (
-                <button
-                  onClick={handleFollowToggle}
-                  disabled={followLoading}
-                  className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted text-foreground/80 gap-1"
-                >
-                  <Check className="h-3 w-3" />
-                  Following
-                </button>
-              ) : (
-                <button
-                  onClick={handleFollowToggle}
-                  disabled={followLoading}
-                  className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[hsl(var(--tab-orange))] bg-[hsl(var(--tab-orange))]/10 text-[hsl(var(--tab-orange))] hover:bg-[hsl(var(--tab-orange))]/20"
-                >
-                  Follow
-                </button>
-              )}
-
-              {/* Friend button */}
-              {friendStatus === 'friends' ? (
-                mode === 'friends' ? (
-                  <button
-                    onClick={handleFriendAction}
-                    disabled={friendLoading}
-                    className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-destructive/50 bg-transparent text-destructive hover:bg-destructive/10"
-                  >
-                    Unfriend
-                  </button>
-                ) : (
-                  <span className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-500/10 text-emerald-600 gap-1 cursor-default">
-                    <Check className="h-2.5 w-2.5" />
-                    Friends
-                  </span>
-                )
-              ) : friendStatus === 'pending' ? (
-                <span className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted/50 text-muted-foreground cursor-default">
-                  Request sent
-                </span>
-              ) : (
-                <button
-                  onClick={handleFriendAction}
-                  disabled={friendLoading}
-                  className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50"
-                >
-                  Add friend
-                </button>
-              )}
-            </div>
-          )}
+          </span>
         </div>
+
+        {/* Username */}
+        <p className="text-xs text-muted-foreground mb-0.5 truncate">
+          @{user.username}
+        </p>
+
+        {/* Home club */}
+        <p className="text-xs text-muted-foreground mb-3 truncate">
+          {clubLine}
+        </p>
+
+        {/* Action buttons */}
+        {!isSelf && currentUserId && !relationshipLoading && (
+          <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* Follow/Following button */}
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "h-9 flex-1 font-medium",
+                isFollowing
+                  ? "border-border bg-muted text-muted-foreground hover:bg-muted/80"
+                  : "border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
+              )}
+              disabled={followLoading}
+              onClick={handleFollowToggle}
+              aria-label={isFollowing ? `Unfollow ${user.displayName}` : `Follow ${user.displayName}`}
+            >
+              {isFollowing ? (
+                <>
+                  <Check className="w-3.5 h-3.5 mr-1.5" />
+                  Following
+                </>
+              ) : (
+                'Follow'
+              )}
+            </Button>
+
+            {/* Friend button - varies by mode and status */}
+            {mode === 'friends' && friendStatus === 'friends' ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 flex-1 font-medium border-destructive/50 bg-transparent text-destructive hover:bg-destructive/10"
+                disabled={friendLoading}
+                onClick={handleFriendAction}
+                aria-label={`Unfriend ${user.displayName}`}
+              >
+                Unfriend
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 flex-1 font-medium",
+                  friendStatus === 'friends'
+                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                    : friendStatus === 'pending'
+                    ? "border-border bg-muted/50 text-muted-foreground"
+                    : "border-emerald-500/60 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                )}
+                disabled={friendLoading || friendStatus === 'friends' || friendStatus === 'pending'}
+                onClick={handleFriendAction}
+                aria-label={
+                  friendStatus === 'friends'
+                    ? `Already friends with ${user.displayName}`
+                    : friendStatus === 'pending'
+                    ? `Friend request pending for ${user.displayName}`
+                    : `Send friend request to ${user.displayName}`
+                }
+              >
+                {friendStatus === 'friends' ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 mr-1.5" />
+                    Friends
+                  </>
+                ) : friendStatus === 'pending' ? (
+                  'Request sent'
+                ) : (
+                  'Add friend'
+                )}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </button>
   );

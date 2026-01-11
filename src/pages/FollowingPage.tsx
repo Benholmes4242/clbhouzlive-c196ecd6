@@ -16,6 +16,8 @@ const FollowingPage = () => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
+    error,
+    refetch,
   } = usePaginatedFollowing(user?.id);
 
   const following = data?.pages.flatMap((page) => page.users) ?? [];
@@ -47,9 +49,12 @@ const FollowingPage = () => {
       users={following}
       totalCount={totalCount}
       isLoading={followingLoading}
+      error={error as Error | null}
       hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={() => fetchNextPage()}
+      onRefetch={() => refetch()}
+      isOwnProfile={true}
     />
   );
 };
