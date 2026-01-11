@@ -1704,6 +1704,42 @@ export type Database = {
         }
         Relationships: []
       }
+      college_logo_sources: {
+        Row: {
+          created_at: string
+          id: string
+          last_error: string | null
+          normalized_name: string
+          source: string
+          source_page_url: string | null
+          status: string
+          suggested_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          normalized_name: string
+          source?: string
+          source_page_url?: string | null
+          status?: string
+          suggested_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          normalized_name?: string
+          source?: string
+          source_page_url?: string | null
+          status?: string
+          suggested_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       college_media: {
         Row: {
           college_name: string

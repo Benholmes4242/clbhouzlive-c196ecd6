@@ -10,6 +10,7 @@ import { DatabaseUrlUpdater } from './DatabaseUrlUpdater';
 import { StreamAccountIdFixer } from './StreamAccountIdFixer';
 import { VideoUrlAnalyzer } from './VideoUrlAnalyzer';
 import Top100DebugPanel from './Top100DebugPanel';
+import CollegeLogoManager from './CollegeLogoManager';
 
 const AdminSettings = () => {
   return (
@@ -31,6 +32,12 @@ const AdminSettings = () => {
       <div>
         <h3 className="text-lg font-semibold mb-2">Top 100 Debug (Local Override)</h3>
         <Top100DebugPanel />
+      </div>
+
+      {/* College Logo Manager */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2">College Logos</h3>
+        <CollegeLogoManager />
       </div>
 
       {/* Migration Tools Section */}
