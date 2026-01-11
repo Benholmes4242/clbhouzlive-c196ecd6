@@ -42,8 +42,29 @@ import { DEBUG_HLS_PLAYER, FORCE_HLS_JS } from '@/media/debug';
 import { VideoLoadingSpinner } from '@/media/components/VideoLoadingSpinner';
 import { VideoErrorState } from '@/media/components/VideoErrorState';
 
-// First frame timeout in ms (prevents infinite spinner)
-const FIRST_FRAME_TIMEOUT_MS = 8000;
+// Adaptive first frame timeout based on connection quality
+const getAdaptiveTimeout = (): number => {
+  if (typeof navigator === 'undefined') return 15000;
+  const connection = (navigator as any).connection;
+  
+  if (!connection) {
+    return 15000; // Default 15s if no connection API
+  }
+  
+  switch (connection.effectiveType) {
+    case 'slow-2g':
+      return 30000; // 30 seconds for very slow
+    case '2g':
+      return 25000; // 25 seconds
+    case '3g':
+      return 20000; // 20 seconds
+    case '4g':
+    default:
+      return 12000; // 12 seconds for fast connections
+  }
+};
+
+const FIRST_FRAME_TIMEOUT_MS = getAdaptiveTimeout();
 
 const getTimestamp = () => performance.now().toFixed(2);
 const logDebug = (event: string, data?: any) => {
@@ -186,6 +207,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ==================================================================================
   const pendingAutoplayRetryRef = useRef(false);
   
+  // Auto-retry ref for first-frame timeout (try once before showing error)
+  const autoRetryAttemptedRef = useRef(false);
+  
   // RUM: Rebuffer tracking ref
   const rebufferStartRef = useRef<number>(0);
   
@@ -257,20 +281,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const firstFrameCleanupRef = useRef<(() => void) | null>(null);
   
   // ============ Derived State for Poster vs Paused Video Mode ============
-  // NEW: In "instant playback" mode, we always show a poster/thumbnail until video is ready
-  // This replaces the spinner with a seamless crossfade
+  // INSTANT PLAYBACK: Always show poster/placeholder until video is ready
+  // This completely eliminates the spinner - the poster IS the loading state
   const shouldShowPoster = useMemo(() => {
-    // Always show poster until first frame is ready (no more spinner)
-    return !!poster && !hasFirstFrame;
-  }, [poster, hasFirstFrame]);
+    // Show poster layer until first frame is ready (even if no poster image - shows black bg)
+    return !hasFirstFrame;
+  }, [hasFirstFrame]);
   
-  // REMOVED: shouldShowLoadingSpinner - replaced by poster crossfade
-  // Spinner is now only shown as absolute last resort (no poster AND no first frame)
-  const shouldShowLoadingSpinner = useMemo(() => {
-    // Only show spinner if there's NO poster and we're still waiting for first frame
-    // This should rarely happen since we always generate thumbnails
-    return !poster && !hasFirstFrame && !firstFrameError && !hasError;
-  }, [poster, hasFirstFrame, firstFrameError, hasError]);
+  // COMPLETELY DISABLED: Never show spinner
+  // The poster layer (with fallback to black bg) acts as the loading state
+  // This achieves Instagram/TikTok-like perceived instant playback
+  const shouldShowLoadingSpinner = false;
 
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);
@@ -1018,6 +1039,42 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const markError = () => {
       if (!mountedRef.current) return;
+      
+      // AUTO-RETRY: Try once before showing error
+      // This helps with slow connections or temporary network issues
+      if (!autoRetryAttemptedRef.current) {
+        autoRetryAttemptedRef.current = true;
+        
+        logDebug('FIRST_FRAME_AUTO_RETRY', {
+          mediaId: mediaId?.slice(0, 8),
+          timeoutMs: FIRST_FRAME_TIMEOUT_MS,
+        });
+        
+        // Try to restart HLS loading
+        if (hlsRef.current) {
+          try {
+            hlsRef.current.stopLoad();
+            hlsRef.current.startLoad();
+          } catch {}
+        }
+        
+        // Set new timeout for retry attempt
+        firstFrameTimeoutRef.current = setTimeout(() => {
+          // If still no first frame after retry, show error
+          if (!hasFirstFrame && mountedRef.current) {
+            cleanup();
+            logDebug('FIRST_FRAME_TIMEOUT_AFTER_RETRY', {
+              mediaId: mediaId?.slice(0, 8),
+            });
+            setFirstFrameError(true);
+            if (mediaId) {
+              recordFailure(mediaId, 'first_frame_timeout_after_retry', false);
+            }
+          }
+        }, FIRST_FRAME_TIMEOUT_MS);
+        
+        return; // Don't show error yet, wait for retry
+      }
       
       cleanup();
       
