@@ -71,6 +71,7 @@ const MomentTile: React.FC<{
   registerRef: (el: HTMLVideoElement | null) => void;
 }> = ({ moment, index, onClick, isPlaying, canAutoplay, registerRef }) => {
   const [imageError, setImageError] = useState(false);
+  const [clientDuration, setClientDuration] = useState<number | null>(null);
   const isVideo = moment.media_type === 'video';
   const gradientIndex = index % GRADIENTS.length;
   const playerRef = useRef<HLSPlayerRef>(null);
@@ -92,6 +93,20 @@ const MomentTile: React.FC<{
       const videoEl = playerRef.current?.getElement();
       if (videoEl) {
         registerRef(videoEl);
+        
+        // Listen for loadedmetadata to get client-side duration fallback
+        if (!moment.duration_seconds) {
+          const handleMetadata = () => {
+            if (videoEl.duration && isFinite(videoEl.duration)) {
+              setClientDuration(Math.round(videoEl.duration));
+            }
+          };
+          if (videoEl.duration && isFinite(videoEl.duration)) {
+            setClientDuration(Math.round(videoEl.duration));
+          } else {
+            videoEl.addEventListener('loadedmetadata', handleMetadata, { once: true });
+          }
+        }
       } else if (retryCount < maxRetries) {
         retryCount++;
         setTimeout(checkAndRegister, 50);
@@ -104,12 +119,12 @@ const MomentTile: React.FC<{
       cancelled = true;
       registerRef(null);
     };
-  }, [canAutoplay, registerRef]);
+  }, [canAutoplay, registerRef, moment.duration_seconds]);
 
-  // Get course name, like count, and duration from moment data
+  // Get course name, like count, and duration from moment data (with client fallback)
   const courseName = moment.course_name;
   const likeCount = moment.likes_count ?? 0;
-  const durationSeconds = moment.duration_seconds;
+  const durationSeconds = moment.duration_seconds ?? clientDuration;
 
   return (
     <button
