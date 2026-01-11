@@ -21,6 +21,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
+import { SHOW_MOCK_DATA, withMockVideos } from '@/utils/mockVideoData';
 
 // Dynamic category type from definitions
 export type VideoCategory = string;
@@ -209,6 +210,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   });
 
   // Avoid re-showing Continue Watching videos in the sections below.
+  // Also inject mock data when SHOW_MOCK_DATA is enabled
   const { recommendedVideos, followedVideos, trendingVideos, coursesVideos } = useMemo(() => {
     const continueWatchingIds = new Set<string>();
 
@@ -270,11 +272,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     const trending = searchFilter(excludeContinueWatching(trendingVideosRaw));
     const courses = searchFilter(excludeContinueWatching(coursesVideosRaw));
 
+    // Inject mock data for visual testing when flag is enabled
     return {
-      followedVideos: followed,
-      recommendedVideos: recommended,
-      trendingVideos: trending,
-      coursesVideos: courses,
+      followedVideos: withMockVideos(followed, 8, 'following'),
+      recommendedVideos: withMockVideos(recommended, 15, 'recommended'),
+      trendingVideos: withMockVideos(trending, 10, 'trending'),
+      coursesVideos: withMockVideos(courses, 10, 'courses'),
     };
   }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw, searchQuery]);
 
