@@ -9,6 +9,7 @@ import { useMediaAutoplay } from '@/media';
 import { runtimeUserTap } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
+import { SHOW_MOCK_DATA, generateMockVideos } from '@/utils/mockVideoData';
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
@@ -96,18 +97,25 @@ export const VideosSectionPage: React.FC = () => {
     sort: sortOptionToQuerySort(sortOption),
   });
 
-  // Client-side search filter
+  // Client-side search filter + mock data injection
   const items = useMemo(() => {
-    if (!searchQuery.trim()) return rawItems;
+    // Inject mock data when flag is enabled
+    let videosToFilter = rawItems;
+    if (SHOW_MOCK_DATA) {
+      const mockVideos = generateMockVideos(20, `section-${section}`);
+      videosToFilter = [...rawItems, ...mockVideos];
+    }
+    
+    if (!searchQuery.trim()) return videosToFilter;
     
     const query = searchQuery.toLowerCase();
-    return rawItems.filter(v => {
+    return videosToFilter.filter(v => {
       const titleMatch = (v.title || '').toLowerCase().includes(query);
       const creatorMatch = (v.creatorName || '').toLowerCase().includes(query);
       const courseMatch = (v.golfCourseName || '').toLowerCase().includes(query);
       return titleMatch || creatorMatch || courseMatch;
     });
-  }, [rawItems, searchQuery]);
+  }, [rawItems, searchQuery, section]);
 
   // Handle category selection - update URL
   const handleCategorySelect = (categoryKey: string) => {
