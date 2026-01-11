@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2, ArrowLeft, Check, X, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
 
 interface SignupSheetContentProps {
   email: string;
@@ -329,20 +330,14 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           )}
         </div>
         
-        {/* Password hint - show when password field is enabled but empty/short */}
-        {isUsernameValid && !passwordError && (
-          <p className="text-white/40 text-[12px] mt-2">
-            Minimum 8 characters
-          </p>
-        )}
+        {/* Password strength indicator */}
+        <PasswordStrengthIndicator 
+          password={password}
+          show={!isPasswordDisabled && (passwordFocused || password.length > 0)}
+        />
         
         {passwordError && (
           <p className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
-        )}
-        {password.length > 0 && password.length < MIN_PASSWORD_LENGTH && !passwordError && (
-          <p className="text-[#E03131] text-[13px] mt-2">
-            Password must be at least {MIN_PASSWORD_LENGTH} characters
-          </p>
         )}
       </div>
       

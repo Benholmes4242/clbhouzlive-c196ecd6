@@ -151,6 +151,7 @@ const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").the
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.AdminAnalyticsPage })));
 const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEchoAnalyticsPage").then(m => ({ default: m.AdminEchoAnalyticsPage })));
+const AuthMonitoringPage = lazy(() => import("./pages/admin/AuthMonitoringPage"));
 const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
 const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
@@ -432,6 +433,11 @@ function AppRoutes() {
           <Route path="analytics/echo" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminEchoAnalyticsPage /></Suspense>
+            </PanelGuard>
+          } />
+          <Route path="auth-monitoring" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><AuthMonitoringPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="team" element={<Suspense fallback={<GenericPageSkeleton />}><TeamPage /></Suspense>} />

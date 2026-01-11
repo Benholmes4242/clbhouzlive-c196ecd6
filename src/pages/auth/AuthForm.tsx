@@ -20,6 +20,7 @@ import EmailSheetContent from "./components/EmailSheetContent";
 import PasswordSheetContent from "./components/PasswordSheetContent";
 import SignupSheetContent from "./components/SignupSheetContent";
 import ForgotPasswordSheetContent from "./components/ForgotPasswordSheetContent";
+import { AuthSuccessAnimation } from "@/components/auth/AuthSuccessAnimation";
 
 type AuthNotice = {
   type: 'success' | 'error';
@@ -80,6 +81,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState<string | null>(null);
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+  
+  // Success animation state
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Handle email prefill from query params (after email verification)
   useEffect(() => {
@@ -240,7 +245,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
       setSubmitting(false);
     } else if (data?.user) {
       trackLoginSuccess('email', Date.now() - startTime);
-      navigate('/auth/callback');
+      // Show success animation before redirect
+      setSuccessMessage('Welcome back!');
+      setShowSuccessAnimation(true);
     }
   };
 
@@ -500,8 +507,23 @@ const AuthForm: React.FC<AuthFormProps> = ({
   
   const { title: sheetTitle, subtitle: sheetSubtitle } = getSheetContent();
 
+  // Handle success animation completion
+  const handleSuccessAnimationComplete = () => {
+    setShowSuccessAnimation(false);
+    navigate('/auth/callback');
+  };
+
   return (
     <>
+      {/* Success animation overlay */}
+      {showSuccessAnimation && (
+        <AuthSuccessAnimation 
+          message={successMessage}
+          onComplete={handleSuccessAnimationComplete}
+          duration={800}
+        />
+      )}
+
       {/* Hero entry screen */}
       <AuthHeroScreen
         onAppleSignIn={handleAppleSignIn}
