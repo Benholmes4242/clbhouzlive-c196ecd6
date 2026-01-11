@@ -411,7 +411,7 @@ const EditProfilePage: React.FC = () => {
     <PageRoot className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-2">
+        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-0">
           {/* Back link */}
           <button
             type="button"
@@ -438,8 +438,8 @@ const EditProfilePage: React.FC = () => {
             />
           </div>
           
-          {/* Section jump strip */}
-          <div className="mt-3 flex justify-center">
+          {/* Section tabs - orange underline style */}
+          <div className="mt-3">
             <SectionJumpStrip
               sections={SECTIONS}
               activeSection={activeSection}
@@ -457,7 +457,7 @@ const EditProfilePage: React.FC = () => {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="px-4 py-4 bg-muted/20"
+            className="px-4 py-4 bg-[#F8FAFC] dark:bg-muted/30"
           >
             <ProfileSnapshotPreview
               displayName={formData.displayName}
@@ -469,7 +469,7 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.div>
 
-          {/* Band A: Photos */}
+          {/* Band A: Photos - Light blue background */}
           <motion.section
             id="photos"
             ref={(el) => { sectionRefs.current.photos = el; }}
@@ -477,7 +477,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-slate-50 dark:bg-muted/30"
+            className="px-4 py-6 bg-white dark:bg-background"
           >
             <div className="space-y-6">
               <HeaderPhotoCard
@@ -493,7 +493,7 @@ const EditProfilePage: React.FC = () => {
             </div>
           </motion.section>
 
-          {/* Band B: Basic Info */}
+          {/* Band B: Basic Info - White background */}
           <motion.section
             id="basic"
             ref={(el) => { sectionRefs.current.basic = el; }}
@@ -501,7 +501,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6"
+            className="px-4 py-6 bg-[#F8FAFC] dark:bg-muted/30"
           >
             <IdentitySection
               displayName={formData.displayName}
@@ -511,7 +511,7 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Band A: Golf Info */}
+          {/* Band A: Golf Info - Light blue background */}
           <motion.section
             id="golf"
             ref={(el) => { sectionRefs.current.golf = el; }}
@@ -519,7 +519,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-slate-50 dark:bg-muted/30"
+            className="px-4 py-6 bg-white dark:bg-background"
           >
             <GolfInfoSection
               homeClub={formData.homeClub}
@@ -535,7 +535,7 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Band B: Bio & Websites */}
+          {/* Band B: Bio & Websites - White background */}
           <motion.section
             id="bio"
             ref={(el) => { sectionRefs.current.bio = el; }}
@@ -543,7 +543,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6"
+            className="px-4 py-6 bg-[#F8FAFC] dark:bg-muted/30"
           >
             <BioWebsitesSection
               bio={formData.bio}
@@ -554,7 +554,7 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Band A: Privacy */}
+          {/* Band A: Privacy - Light blue background */}
           <motion.section
             id="privacy"
             ref={(el) => { sectionRefs.current.privacy = el; }}
@@ -562,7 +562,7 @@ const EditProfilePage: React.FC = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-slate-50 dark:bg-muted/30"
+            className="px-4 py-6 bg-white dark:bg-background"
           >
             <PrivacySection
               isPublic={formData.isPublic}
