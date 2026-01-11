@@ -17,6 +17,7 @@ import { useInfiniteExploreMoments, RegionKey, ExploreMoment, ExploreFilters } f
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Play, Heart } from 'lucide-react';
+import { formatDuration } from '@/utils/formatDuration';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 
@@ -105,9 +106,10 @@ const MomentTile: React.FC<{
     };
   }, [canAutoplay, registerRef]);
 
-  // Get course name and like count from moment data
+  // Get course name, like count, and duration from moment data
   const courseName = moment.course_name;
   const likeCount = moment.likes_count ?? 0;
+  const durationSeconds = moment.duration_seconds;
 
   return (
     <button
@@ -190,6 +192,13 @@ const MomentTile: React.FC<{
                 {formatLikeCount(likeCount)}
               </span>
             </div>
+          </div>
+        )}
+        
+        {/* Duration badge - bottom right (videos only) */}
+        {isVideo && durationSeconds && durationSeconds > 0 && (
+          <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 rounded text-xs text-white font-medium pointer-events-none">
+            {formatDuration(durationSeconds)}
           </div>
         )}
       </div>

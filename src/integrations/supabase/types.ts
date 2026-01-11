@@ -9518,6 +9518,7 @@ export type Database = {
           course_name: string | null
           created_at: string | null
           display_order: number | null
+          duration_seconds: number | null
           likes_count: number | null
           media_type: string | null
           media_url: string | null
