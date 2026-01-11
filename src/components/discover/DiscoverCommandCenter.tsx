@@ -318,11 +318,17 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
 
       {/* Pills row */}
       {showPills && (
-        <div className="mt-3 px-3 md:container md:mx-auto md:px-0">
+        <div className={cn(
+          "mt-3 md:container md:mx-auto md:px-0",
+          showSort ? "px-4" : "px-3"
+        )}>
           <div className="relative">
             <div
               ref={scrollContainerRef}
-              className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide py-1"
+              className={cn(
+                "flex items-center gap-2 overflow-x-auto scrollbar-hide py-1",
+                !showSort && "justify-center"
+              )}
               onScroll={checkScrollPosition}
               style={{
                 scrollbarWidth: 'none',
@@ -367,11 +373,11 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               ))}
             </div>
 
-            {/* Gradient overlays */}
-            {!isAtStart && (
+            {/* Gradient overlays - only show when sort is visible (scrollable) */}
+            {showSort && !isAtStart && (
               <div className="absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-[var(--bg-page)] to-transparent pointer-events-none z-10" />
             )}
-            {!isAtEnd && (
+            {showSort && !isAtEnd && (
               <div className="absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-[var(--bg-page)] to-transparent pointer-events-none z-10" />
             )}
           </div>
