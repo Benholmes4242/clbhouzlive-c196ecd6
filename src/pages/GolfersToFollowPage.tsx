@@ -192,37 +192,31 @@ const GolfersToFollowPage = () => {
   return (
     <PageRoot className="min-h-screen bg-white">
       <div className="w-full">
-        {/* Header section - white */}
-        <section className="bg-white">
-          {/* Back CTA - 24px below header */}
-          <div className="px-4 pt-6">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ChevronLeft className="h-5 w-5" />
-              <span className="text-sm">Back</span>
-            </button>
+        {/* Scrollable header - scrolls away */}
+        <div className="bg-white px-4 pt-6 pb-4">
+          {/* Back button */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </button>
+          
+          {/* Title block */}
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-foreground mb-1">Golfers to follow</h1>
+            <p className="text-sm text-muted-foreground">Discover new golfers and build your community.</p>
           </div>
-
-          {/* Title block - centered beneath back button */}
-          <div className="text-center px-4 pt-4 pb-3">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              Golfers to follow
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Discover new golfers and build your community.
-            </p>
-          </div>
-        </section>
-
-        {/* Tabs & Search section - #F8FAFC (slate-50) */}
-        <section className="bg-[#F8FAFC] pb-4">
-          {/* Tabs - matching Courses page styling exactly */}
-          <div className="px-6">
+        </div>
+        
+        {/* Sticky section - tabs + search */}
+        <div className="sticky top-0 z-40 bg-[#F8FAFC]">
+          {/* Tabs */}
+          <div className="px-4 pb-3">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabKey)} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
+              <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 h-auto gap-0">
                 <TabsTrigger value="suggested" className={tabTriggerClass}>
                   Suggested
                 </TabsTrigger>
@@ -235,38 +229,11 @@ const GolfersToFollowPage = () => {
               </TabsList>
             </Tabs>
           </div>
-
-          {/* Home club nudge card when on home_club tab with no club set */}
-          {activeTab === 'home_club' && hasNoHomeClub && (
-            <div className="mx-6 mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
-                  <Info className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                    Set your home club
-                  </h4>
-                  <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">
-                    Add your home club to find and connect with golfers from your club.
-                  </p>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                    onClick={() => navigate('/edit-profile?section=golf')}
-                  >
-                    Set Home Club
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Search bar - disabled on home_club tab when no club set */}
-          <div className="px-6 mt-4">
+          
+          {/* Search bar */}
+          <div className="px-4 pb-3">
             {activeTab === 'home_club' && hasNoHomeClub ? (
-              <div className="h-11 px-4 flex items-center rounded-xl border border-slate-200 bg-white/50">
+              <div className="h-11 px-4 flex items-center rounded-xl border border-border/40 bg-white/50">
                 <Search className="h-4 w-4 text-muted-foreground/50 mr-2" />
                 <span className="text-sm text-muted-foreground/60">Set your home club to search</span>
               </div>
@@ -279,15 +246,45 @@ const GolfersToFollowPage = () => {
                   aria-label="Search golfers by name or club"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-9 h-11 rounded-xl border-slate-200 bg-white"
+                  className="pl-9 h-11 rounded-xl border-border/40 bg-white"
                 />
               </div>
             )}
           </div>
-        </section>
+          
+          {/* Bottom border for visual separation when sticky */}
+          <div className="border-b border-border/30" />
+        </div>
 
-        {/* Content section - white */}
-        <section className="bg-white min-h-[50vh]">
+        {/* Content area */}
+        <div className="bg-white min-h-[50vh]">
+          {/* Home club nudge card - orange style */}
+          {activeTab === 'home_club' && hasNoHomeClub && (
+            <div className="mx-4 my-4 p-4 bg-[#F79E1B]/10 border border-[#F79E1B]/30 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#F79E1B]/20 flex items-center justify-center flex-shrink-0">
+                  <Info className="w-5 h-5 text-[#F79E1B]" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-[#F79E1B] mb-1">
+                    Set your home club
+                  </h4>
+                  <p className="text-xs text-[#F79E1B]/80 mb-3">
+                    Add your home club to find and connect with golfers from your club.
+                  </p>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="border-[#F79E1B]/50 text-[#F79E1B] hover:bg-[#F79E1B]/10 font-medium"
+                    onClick={() => navigate('/edit-profile?section=golf')}
+                  >
+                    Set Home Club
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Error state */}
           {error && !loading && (
             <div className="flex flex-col items-center justify-center py-16 px-6">
@@ -506,7 +503,7 @@ const GolfersToFollowPage = () => {
             )}
           </>
         )}
-        </section>
+        </div>
       </div>
     </PageRoot>
   );
