@@ -80,45 +80,24 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
             </span>
           </div>
           
-          {!bio ? (
-            <button
-              type="button"
-              onClick={() => {
-                // Focus the textarea by setting a space then clearing
-                const textarea = document.getElementById('bio') as HTMLTextAreaElement;
-                textarea?.focus();
-              }}
-              className="w-full border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all group"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
-                <FileText className="w-6 h-6 text-primary" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">
-                Tell your golf story
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Share your favourite club, dream course, or biggest flex
-              </p>
-            </button>
-          ) : null}
-          
           <Textarea
             id="bio"
             value={bio}
             onChange={handleBioChange}
-            placeholder="Share how you play – e.g. favourite club, dream course or biggest golf flex..."
+            placeholder="Share your favourite club, dream course, or biggest flex..."
             className={cn(
-              "min-h-[100px] resize-none text-base border-border focus:border-primary focus:ring-2 focus:ring-primary/20",
-              !bio && "hidden"
+              "min-h-[120px] resize-none text-base transition-all",
+              "border-2",
+              bio 
+                ? "border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                : "border-dashed border-primary/30 bg-primary/5 focus:border-primary focus:bg-background"
             )}
             maxLength={maxBioLength}
           />
           
-          {bio && (
-            <p className="text-xs text-muted-foreground">
-              Share how you play – your favourite club, dream course or biggest golf flex.
-            </p>
-          )}
+          <p className="text-xs text-muted-foreground">
+            {bio ? 'Share your golf story' : 'Tell your golf story'}
+          </p>
         </div>
 
         {/* Websites */}
