@@ -190,184 +190,191 @@ const GolfersToFollowPage = () => {
   };
 
   return (
-    <PageRoot className="bg-muted/40">
+    <PageRoot className="min-h-screen bg-slate-50">
       <div className="w-full">
-        {/* Back CTA - 24px below header */}
-        <div className="px-4 pt-6">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="text-sm">Back</span>
-          </button>
-        </div>
-
-        {/* Title block - centered beneath back button */}
-        <div className="text-center px-4 pt-4 pb-3">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Golfers to follow
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Discover new golfers and build your community.
-          </p>
-        </div>
-
-        {/* Tabs - matching Courses page styling exactly */}
-        <div className="px-6">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabKey)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
-              <TabsTrigger value="suggested" className={tabTriggerClass}>
-                Suggested
-              </TabsTrigger>
-              <TabsTrigger value="home_club" className={tabTriggerClass}>
-                Home Club
-              </TabsTrigger>
-              <TabsTrigger value="verified" className={tabTriggerClass}>
-                Verified
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Home club nudge card when on home_club tab with no club set */}
-        {activeTab === 'home_club' && hasNoHomeClub && (
-          <div className="mx-6 mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
-                <Info className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                  Set your home club
-                </h4>
-                <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">
-                  Add your home club to find and connect with golfers from your club.
-                </p>
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                  onClick={() => navigate('/edit-profile?section=golf')}
-                >
-                  Set Home Club
-                </Button>
-              </div>
-            </div>
+        {/* Header section - bg-slate-50 */}
+        <section className="bg-slate-50">
+          {/* Back CTA - 24px below header */}
+          <div className="px-4 pt-6">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              <span className="text-sm">Back</span>
+            </button>
           </div>
-        )}
 
-        {/* Search bar - disabled on home_club tab when no club set */}
-        <div className="px-6 mt-4 mb-4">
-          {activeTab === 'home_club' && hasNoHomeClub ? (
-            <div className="h-11 px-4 flex items-center rounded-xl border border-border/40 bg-muted/30">
-              <Search className="h-4 w-4 text-muted-foreground/50 mr-2" />
-              <span className="text-sm text-muted-foreground/60">Set your home club to search</span>
-            </div>
-          ) : (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search golfers by name or club"
-                aria-label="Search golfers by name or club"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-9 h-11 rounded-xl border-border/40 bg-white/35"
-              />
+          {/* Title block - centered beneath back button */}
+          <div className="text-center px-4 pt-4 pb-3">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Golfers to follow
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Discover new golfers and build your community.
+            </p>
+          </div>
+        </section>
+
+        {/* Tabs & Search section - bg-slate-100 */}
+        <section className="bg-slate-100 pb-4">
+          {/* Tabs - matching Courses page styling exactly */}
+          <div className="px-6">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabKey)} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-transparent border-0 px-0 py-0 mb-block gap-0">
+                <TabsTrigger value="suggested" className={tabTriggerClass}>
+                  Suggested
+                </TabsTrigger>
+                <TabsTrigger value="home_club" className={tabTriggerClass}>
+                  Home Club
+                </TabsTrigger>
+                <TabsTrigger value="verified" className={tabTriggerClass}>
+                  Verified
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Home club nudge card when on home_club tab with no club set */}
+          {activeTab === 'home_club' && hasNoHomeClub && (
+            <div className="mx-6 mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+                  <Info className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                    Set your home club
+                  </h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">
+                    Add your home club to find and connect with golfers from your club.
+                  </p>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                    onClick={() => navigate('/edit-profile?section=golf')}
+                  >
+                    Set Home Club
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Content */}
-        {/* Error state */}
-        {error && !loading && (
-          <div className="flex flex-col items-center justify-center py-16 px-6">
-            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-              <AlertCircle className="w-8 h-8 text-destructive" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-1">
-              Something went wrong
-            </h3>
-            <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
-              We couldn't load golfers. Please try again.
-            </p>
-            <Button variant="outline" onClick={() => refetch()}>
-              Try again
-            </Button>
-          </div>
-        )}
-
-        {/* Loading skeletons */}
-        {loading && !error ? (
-          <div className="px-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-start gap-3 py-4 border-b border-border/50 last:border-0">
-                {/* Avatar skeleton */}
-                <div className="w-14 h-14 rounded-sq-md bg-muted animate-pulse flex-shrink-0" />
-                
-                {/* Content skeleton */}
-                <div className="flex-1 space-y-3">
-                  {/* Name + username */}
-                  <div className="space-y-1.5">
-                    <div className="h-4 bg-muted animate-pulse rounded w-32" />
-                    <div className="h-3 bg-muted animate-pulse rounded w-24" />
-                    <div className="h-3 bg-muted animate-pulse rounded w-40" />
-                  </div>
-                  
-                  {/* Buttons */}
-                  <div className="flex gap-2">
-                    <div className="h-8 bg-muted animate-pulse rounded-sq-sm w-24" />
-                    <div className="h-8 bg-muted animate-pulse rounded-sq-sm w-28" />
-                  </div>
-                </div>
+          {/* Search bar - disabled on home_club tab when no club set */}
+          <div className="px-6 mt-4">
+            {activeTab === 'home_club' && hasNoHomeClub ? (
+              <div className="h-11 px-4 flex items-center rounded-xl border border-slate-200 bg-white/50">
+                <Search className="h-4 w-4 text-muted-foreground/50 mr-2" />
+                <span className="text-sm text-muted-foreground/60">Set your home club to search</span>
               </div>
-            ))}
-          </div>
-        ) : !error && golfers.length === 0 ? (
-          // Empty states
-          <div className="flex flex-col items-center justify-center py-16 px-6">
-            {isSearching || searchInput ? (
-              // Search = no results
-              <>
-                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                  <Search className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">
-                  No golfers found
-                </h3>
-                <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
-                  No results for "{searchInput}". Try a different name or club.
-                </p>
-                <Button variant="outline" size="sm" onClick={handleClearSearch}>
-                  Clear search
-                </Button>
-              </>
             ) : (
-              // Tab-specific empty state with icon
-              <>
-                {(() => {
-                  const EmptyIcon = EMPTY_STATES[activeTab].icon;
-                  return (
-                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                      <EmptyIcon className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  );
-                })()}
-                <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
-                  {EMPTY_STATES[activeTab].title}
-                </h3>
-                <p className="text-sm text-muted-foreground text-center max-w-[280px]">
-                  {EMPTY_STATES[activeTab].description}
-                </p>
-              </>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search golfers by name or club"
+                  aria-label="Search golfers by name or club"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-9 h-11 rounded-xl border-slate-200 bg-white"
+                />
+              </div>
             )}
           </div>
-        ) : (
-          <>
-            {/* Golfer list rows */}
-            <div className="divide-y divide-border/25">
+        </section>
+
+        {/* Content section - bg-slate-50 */}
+        <section className="bg-slate-50 min-h-[50vh]">
+          {/* Error state */}
+          {error && !loading && (
+            <div className="flex flex-col items-center justify-center py-16 px-6">
+              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                <AlertCircle className="w-8 h-8 text-destructive" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-1">
+                Something went wrong
+              </h3>
+              <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+                We couldn't load golfers. Please try again.
+              </p>
+              <Button variant="outline" onClick={() => refetch()}>
+                Try again
+              </Button>
+            </div>
+          )}
+
+          {/* Loading skeletons */}
+          {loading && !error ? (
+            <div className="px-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-start gap-3 py-4 border-b border-slate-200 last:border-0">
+                  {/* Avatar skeleton */}
+                  <div className="w-14 h-14 rounded-sq-md bg-slate-200 animate-pulse flex-shrink-0" />
+                  
+                  {/* Content skeleton */}
+                  <div className="flex-1 space-y-3">
+                    {/* Name + username */}
+                    <div className="space-y-1.5">
+                      <div className="h-4 bg-slate-200 animate-pulse rounded w-32" />
+                      <div className="h-3 bg-slate-200 animate-pulse rounded w-24" />
+                      <div className="h-3 bg-slate-200 animate-pulse rounded w-40" />
+                    </div>
+                    
+                    {/* Buttons */}
+                    <div className="flex gap-2">
+                      <div className="h-8 bg-slate-200 animate-pulse rounded-sq-sm w-24" />
+                      <div className="h-8 bg-slate-200 animate-pulse rounded-sq-sm w-28" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : !error && golfers.length === 0 ? (
+            // Empty states
+            <div className="flex flex-col items-center justify-center py-16 px-6">
+              {isSearching || searchInput ? (
+                // Search = no results
+                <>
+                  <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                    <Search className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
+                    No golfers found
+                  </h3>
+                  <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+                    No results for "{searchInput}". Try a different name or club.
+                  </p>
+                  <Button variant="outline" size="sm" onClick={handleClearSearch}>
+                    Clear search
+                  </Button>
+                </>
+              ) : (
+                // Tab-specific empty state with icon
+                <>
+                  {(() => {
+                    const EmptyIcon = EMPTY_STATES[activeTab].icon;
+                    return (
+                      <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                        <EmptyIcon className="w-8 h-8 text-slate-400" />
+                      </div>
+                    );
+                  })()}
+                  <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
+                    {EMPTY_STATES[activeTab].title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground text-center max-w-[280px]">
+                    {EMPTY_STATES[activeTab].description}
+                  </p>
+                </>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Golfer list rows */}
+              <div className="divide-y divide-slate-200">
               {golfers.map((golfer) => {
                 const isFollowing = followingIds.has(golfer.id);
                 const isActioning = actioningUserId === golfer.id;
@@ -378,7 +385,7 @@ const GolfersToFollowPage = () => {
                   <button
                     key={golfer.id}
                     onClick={() => navigate(getProfilePathById(golfer.id, golfer.creatorOnly, golfer.username))}
-                    className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
+                    className="w-full text-left px-6 py-4 hover:bg-slate-100 transition-colors"
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar - no overlay */}
@@ -499,6 +506,7 @@ const GolfersToFollowPage = () => {
             )}
           </>
         )}
+        </section>
       </div>
     </PageRoot>
   );
