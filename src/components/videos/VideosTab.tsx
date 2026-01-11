@@ -12,6 +12,7 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
+import { getMockVideosForSection } from '@/components/videos/mockVideoData';
 
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMediaAutoplay } from '@/media';
@@ -208,6 +209,22 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     category: categoryFilter,
   });
 
+  // Fallback to mock content when long-form catalog is empty (demo/dev)
+  const recommendedVideosInput = useMemo(
+    () => (recommendedVideosRaw.length > 0 ? recommendedVideosRaw : getMockVideosForSection('recommended', 10)),
+    [recommendedVideosRaw]
+  );
+
+  const trendingVideosInput = useMemo(
+    () => (trendingVideosRaw.length > 0 ? trendingVideosRaw : getMockVideosForSection('trending', 10)),
+    [trendingVideosRaw]
+  );
+
+  const coursesVideosInput = useMemo(
+    () => (coursesVideosRaw.length > 0 ? coursesVideosRaw : getMockVideosForSection('courses', 10)),
+    [coursesVideosRaw]
+  );
+
   // Avoid re-showing Continue Watching videos in the sections below.
   const { recommendedVideos, followedVideos, trendingVideos, coursesVideos } = useMemo(() => {
     const continueWatchingIds = new Set<string>();
@@ -266,9 +283,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     };
 
     const followed = searchFilter(excludeContinueWatching(followedVideosRaw));
-    const recommended = searchFilter(excludeContinueWatching(recommendedVideosRaw));
-    const trending = searchFilter(excludeContinueWatching(trendingVideosRaw));
-    const courses = searchFilter(excludeContinueWatching(coursesVideosRaw));
+    const recommended = searchFilter(excludeContinueWatching(recommendedVideosInput));
+    const trending = searchFilter(excludeContinueWatching(trendingVideosInput));
+    const courses = searchFilter(excludeContinueWatching(coursesVideosInput));
 
     return {
       followedVideos: followed,
@@ -276,7 +293,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       trendingVideos: trending,
       coursesVideos: courses,
     };
-  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw, searchQuery]);
+  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosInput, trendingVideosInput, coursesVideosInput, searchQuery]);
 
   // CRITICAL: Preload first video immediately in layout phase (before paint)
   useLayoutEffect(() => {

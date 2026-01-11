@@ -250,7 +250,7 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
   } = options;
 
   const queryKey = [
-    'videos-longform-v4',
+    'videos-longform-v5',
     section,
     limit,
     followedCreatorIds.join(','),
