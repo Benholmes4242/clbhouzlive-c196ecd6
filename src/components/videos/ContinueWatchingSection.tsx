@@ -56,22 +56,25 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
 
   return (
     <div className={cn("", className)}>
-      {/* Section header */}
-      <div className="flex items-center justify-between px-5 mb-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          Continue watching
-        </h2>
+      {/* Section header - enhanced */}
+      <div className="flex items-center justify-between px-4 mb-4">
+        <div>
+          <h2 className="text-lg font-bold text-foreground">
+            Continue watching
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">Pick up where you left off</p>
+        </div>
         {videos.length > 3 && (
-          <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            View all
-            <ChevronRight className="h-4 w-4" />
+          <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted/80 hover:bg-muted transition-colors">
+            <span className="text-sm font-medium text-foreground">View all</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
         )}
       </div>
 
-      {/* Videos grid */}
-      <div className="px-5">
-        <div className="grid grid-cols-1 gap-5">
+      {/* Videos grid - enhanced spacing */}
+      <div className="px-4">
+        <div className="grid grid-cols-1 gap-4">
           {videos.slice(0, 3).map((video) => (
             <ContinueWatchingTile
               key={video.id}
@@ -82,6 +85,9 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
           ))}
         </div>
       </div>
+
+      {/* Section divider */}
+      <div className="mt-6 h-2 bg-muted/40" />
     </div>
   );
 };

@@ -264,25 +264,31 @@ export const VideosSectionPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-[var(--bg-page)] pb-20">
         {/* Header skeleton */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="sticky top-0 z-30 bg-[var(--bg-page)]/95 backdrop-blur-md border-b border-border/50">
           <div className="flex items-center gap-3 px-4 py-3">
             <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <div className="h-6 bg-muted rounded w-48 animate-pulse" />
+            <div className="flex-1">
+              <div className="h-5 bg-muted rounded w-48 animate-pulse" />
+              <div className="h-3 bg-muted/60 rounded w-32 mt-1.5 animate-pulse" />
+            </div>
           </div>
         </div>
         
-        {/* Loading skeletons */}
-        <div className="space-y-4 pt-4">
+        {/* Loading skeletons - enhanced */}
+        <div className="px-4 pt-4 space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse">
+            <div key={i} className="bg-card rounded-xl overflow-hidden shadow-sm animate-pulse">
               <div className="aspect-video bg-muted" />
-              <div className="px-4 py-3">
-                <div className="h-4 bg-muted rounded w-3/4 mb-2" />
-                <div className="h-3 bg-muted rounded w-1/2" />
+              <div className="px-4 py-3 flex gap-3">
+                <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted/60 rounded w-1/2" />
+                </div>
               </div>
             </div>
           ))}
@@ -293,13 +299,13 @@ export const VideosSectionPage: React.FC = () => {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
         <div className="text-center px-4">
           <p className="text-lg font-medium text-foreground mb-2">Failed to load videos</p>
           <p className="text-sm text-muted-foreground">{error?.message}</p>
           <button 
             onClick={handleBack}
-            className="mt-4 text-sm text-primary hover:underline"
+            className="mt-4 text-sm text-primary font-medium hover:underline"
           >
             Back to Videos
           </button>
@@ -310,19 +316,19 @@ export const VideosSectionPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] pb-20">
-      {/* Sticky Header with back button and section title */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+      {/* Sticky Header with back button and section title - enhanced */}
+      <div className="sticky top-0 z-30 bg-[var(--bg-page)]/95 backdrop-blur-md">
         {/* Back button row */}
-        <div className="flex items-center gap-3 px-4 py-2 border-b border-border">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border/50">
           <button
             onClick={handleBack}
             className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
-          <div>
-            <h1 className="text-lg font-semibold">{SECTION_TITLES[section]}</h1>
-            <p className="text-xs text-muted-foreground">{SECTION_DESCRIPTIONS[section]}</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold text-foreground truncate">{SECTION_TITLES[section]}</h1>
+            <p className="text-xs text-muted-foreground truncate">{SECTION_DESCRIPTIONS[section]}</p>
           </div>
         </div>
         
@@ -338,16 +344,19 @@ export const VideosSectionPage: React.FC = () => {
         />
       </div>
 
-      {/* Video feed */}
-      <div ref={containerRef} className="space-y-0">
+      {/* Video feed - enhanced layout */}
+      <div ref={containerRef} className="px-4 pt-4 space-y-4">
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
-            <p className="text-sm text-muted-foreground text-center">
+          <div className="flex flex-col items-center justify-center py-12 px-6 bg-card rounded-2xl border border-border/50 shadow-sm">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
+              <ArrowLeft className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground text-center mb-4">
               No videos available in this section yet.
             </p>
             <button 
               onClick={handleBack}
-              className="mt-4 text-sm text-primary hover:underline"
+              className="text-sm text-primary font-medium hover:underline"
             >
               Back to Videos
             </button>
@@ -366,17 +375,29 @@ export const VideosSectionPage: React.FC = () => {
           ))
         )}
 
-        {/* Loading indicator */}
+        {/* Loading indicator - skeleton tiles */}
         {isFetchingNextPage && (
-          <div className="flex justify-center py-6">
-            <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="space-y-4 animate-pulse">
+            {[1, 2].map((i) => (
+              <div key={i} className="bg-card rounded-xl overflow-hidden shadow-sm">
+                <div className="aspect-video bg-muted" />
+                <div className="px-4 py-3 flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-3 bg-muted/60 rounded w-1/2" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* End of content */}
+        {/* End of content - enhanced */}
         {!hasMore && items.length > 0 && (
-          <div className="text-center py-8 text-sm text-muted-foreground">
-            You've reached the end
+          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+            <div className="w-12 h-0.5 bg-muted rounded-full mb-3" />
+            <p className="text-xs font-medium">You've seen it all</p>
           </div>
         )}
       </div>

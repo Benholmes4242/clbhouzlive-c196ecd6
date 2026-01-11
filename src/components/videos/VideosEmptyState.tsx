@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users } from 'lucide-react';
+import { Users, Film, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VideosEmptyStateProps {
@@ -9,7 +9,7 @@ interface VideosEmptyStateProps {
 }
 
 /**
- * VideosEmptyState - Empty states for different Videos tab scenarios
+ * VideosEmptyState - Enhanced empty states for different Videos tab scenarios
  */
 export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
   type,
@@ -19,16 +19,22 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
 
   if (type === 'creators-you-follow') {
     return (
-      <div className="flex flex-col items-center justify-center py-8 px-4 bg-muted/30 rounded-xl">
-        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-          <Users className="h-6 w-6 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center py-10 px-6 bg-card rounded-2xl border border-border/50 shadow-sm">
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
+          <Users className="h-8 w-8 text-muted-foreground" />
         </div>
-        <p className="text-sm text-muted-foreground text-center mb-4">
+        
+        {/* Message */}
+        <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-xs mb-6">
           Connect with creators to see their videos here
         </p>
+        
+        {/* CTA Button */}
         <Button
-          variant="outline"
+          variant="default"
           size="sm"
+          className="px-5 py-2.5 rounded-xl font-semibold shadow-sm"
           onClick={() => navigate('/golfers')}
         >
           Discover creators
@@ -39,16 +45,25 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
 
   if (type === 'global-explore') {
     return (
-      <div className="flex flex-col items-center justify-center py-6 px-4 bg-muted/20 rounded-lg border border-border/40">
-        <p className="text-sm text-muted-foreground text-center">
+      <div className="flex flex-col items-center justify-center py-10 px-6 bg-card rounded-2xl border border-border/50 shadow-sm">
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
+          <Film className="h-8 w-8 text-muted-foreground" />
+        </div>
+        
+        {/* Message */}
+        <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-xs mb-6">
           We're new around here — and waiting for the community to upload more long-form videos (4+ minutes). Check back soon.
         </p>
+        
+        {/* CTA Button */}
         <Button
           variant="secondary"
           size="sm"
-          className="mt-3 bg-muted hover:bg-muted/80 text-foreground"
+          className="px-5 py-2.5 rounded-xl font-semibold shadow-sm"
           onClick={() => navigate('/discover?main=shorts')}
         >
+          <Play className="h-4 w-4 mr-1.5" />
           Watch Shorts
         </Button>
       </div>
@@ -57,7 +72,10 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
 
   if (type === 'search') {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-4">
+      <div className="flex flex-col items-center justify-center py-12 px-6 bg-card rounded-2xl border border-border/50 shadow-sm">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
+          <Film className="h-7 w-7 text-muted-foreground" />
+        </div>
         <p className="text-sm text-muted-foreground text-center">
           No videos found. Try a different search.
         </p>
@@ -66,7 +84,10 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4">
+    <div className="flex flex-col items-center justify-center py-12 px-6 bg-card rounded-2xl border border-border/50 shadow-sm">
+      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
+        <Film className="h-7 w-7 text-muted-foreground" />
+      </div>
       <p className="text-sm text-muted-foreground text-center">
         No videos available at the moment.
       </p>
