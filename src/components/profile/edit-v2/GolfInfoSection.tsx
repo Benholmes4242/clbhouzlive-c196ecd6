@@ -315,7 +315,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
           
           <div ref={searchRef} className="relative">
             {homeClub ? (
-              <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/30">
+              <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-sq-sm bg-[#F8FAFC]">
                 <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <span className="flex-1 text-sm font-medium">{homeClub}</span>
                 <button
@@ -479,7 +479,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                 {additionalClubs.map((club) => (
                   <div
                     key={club.id}
-                    className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 bg-muted/50 border border-border rounded-full text-sm"
+                    className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 bg-[#F8FAFC] border border-border rounded-full text-sm"
                   >
                     <span className="truncate max-w-[180px]">{club.name}</span>
                     <button
@@ -603,7 +603,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
 
           <div ref={collegeSearchRef} className="relative">
             {collegeNormalized && currentCollege ? (
-              <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/30">
+              <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-sq-sm bg-[#F8FAFC]">
                 {currentCollege.logo_url ? (
                   <img
                     src={currentCollege.logo_url}

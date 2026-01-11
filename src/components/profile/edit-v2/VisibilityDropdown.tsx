@@ -51,7 +51,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger 
           className={cn(
-            "gap-1.5 border-none bg-muted/50 hover:bg-muted transition-colors rounded-full",
+            "gap-1.5 border-none bg-[#F8FAFC] hover:bg-slate-100 transition-colors rounded-full",
             size === 'sm' ? "h-7 px-2.5 text-[11px]" : "h-9 px-4 text-sm"
           )}
         >
