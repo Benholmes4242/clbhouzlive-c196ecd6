@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { getMockVideosForSection } from '@/components/videos/mockVideoData';
 
 // PRODUCTION: 4 minutes minimum for long-form videos
 const VIDEO_DURATION_THRESHOLD_SECONDS = 240;
@@ -222,6 +223,12 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled' | '
       const scoreB = (b.likes || 0) * 3 + (b.views || 0) / 10;
       return scoreB - scoreA;
     });
+  }
+
+  // If no real videos found, inject mock data for demo purposes
+  if (videos.length === 0) {
+    console.log(`[useLongFormVideosQuery] No videos found for ${section}, injecting mock data`);
+    return getMockVideosForSection(section as any, limit);
   }
 
   return videos;
