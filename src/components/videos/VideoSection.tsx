@@ -60,12 +60,12 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   }, [videos]);
   if (videos.length === 0 && emptyState) {
     return (
-      <section className={cn("px-5", className)}>
-        <div className="flex items-center justify-between mb-3">
+      <section className={cn("px-4", className)}>
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-semibold text-foreground">{title}</h2>
+            <h2 className="text-lg font-bold text-foreground">{title}</h2>
             {subtitle && (
-              <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
             )}
           </div>
         </div>
@@ -79,26 +79,26 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   return (
     <section className={cn("", className)}>
       {/* Header with View All */}
-      <div className="flex items-start justify-between px-5 mb-3">
+      <div className="flex items-center justify-between px-4 mb-4">
         <div>
-          <h2 className="text-base font-semibold text-foreground">{title}</h2>
+          <h2 className="text-lg font-bold text-foreground">{title}</h2>
           {subtitle && (
-            <p className="text-xs text-muted-foreground/70 mt-0.5">{subtitle}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
           )}
         </div>
         {showViewAll && onViewAll && (
           <button
             onClick={onViewAll}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted/80 hover:bg-muted transition-colors"
           >
-            <span>View all</span>
-            <ChevronRight className="h-4 w-4" />
+            <span className="text-sm font-medium text-foreground">View all</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
         )}
       </div>
 
-      {/* Video cards - full width with divider background visible between */}
-      <div className="space-y-3">
+      {/* Video cards with consistent spacing */}
+      <div className="px-4 space-y-4">
         {videos.map((video, index) => (
           <LongFormVideoTileAutoplay
             key={video.id}
@@ -111,6 +111,9 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
           />
         ))}
       </div>
+
+      {/* Section divider */}
+      <div className="mt-6 h-2 bg-muted/40" />
     </section>
   );
 };

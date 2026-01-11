@@ -117,7 +117,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     <div
       ref={tileRef}
       className={cn(
-        "group cursor-pointer bg-white border border-border/30 overflow-hidden",
+        "group cursor-pointer bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300",
         className
       )}
       onClick={() => {
@@ -144,14 +144,14 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
               objectFit="cover"
               externallyManaged
               mediaId={video.id}
-              className="absolute inset-0 w-full h-full"
+              className="absolute inset-0 w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
             />
           </>
         ) : video.thumbnailUrl ? (
           <img
             src={video.thumbnailUrl}
             alt={video.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
             loading="lazy"
             onError={(e) => {
               // Hide broken image and show fallback
@@ -167,23 +167,22 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           </div>
         )}
 
-
-        {/* Subtle hover effect */}
-        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+        {/* Bottom gradient overlay for better badge contrast */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
 
         {/* Play overlay on hover (only when not playing) */}
         {!isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/10 transition-colors">
-            <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
               <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
             </div>
           </div>
         )}
 
-        {/* Trending label - top left */}
+        {/* Trending label - top left with gradient */}
         {video.isTrending && (
-          <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-orange-500/90 text-white text-xs font-medium rounded-md">
-            <Flame className="h-3 w-3" />
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-semibold rounded-full shadow-lg shadow-orange-500/30">
+            <Flame className="h-3.5 w-3.5" />
             <span>Trending</span>
           </div>
         )}
@@ -202,50 +201,28 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           />
         )}
 
-        {/* Likes - bottom left */}
-        <div 
-          className="absolute bottom-3 left-3 flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
-          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
-        >
-          <Heart className="w-3 h-3" />
-          <span>{formatLikes(video.likes || video.views)}</span>
-        </div>
+        {/* Likes - bottom left with better contrast */}
+        {(video.likes || video.views) && (video.likes || 0) > 0 && (
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-full">
+            <Heart className="w-3.5 h-3.5 text-white" fill="white" />
+            <span className="text-white text-xs font-medium">
+              {formatLikes(video.likes || video.views)}
+            </span>
+          </div>
+        )}
 
-        {/* Duration badge - bottom right */}
-        <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
+        {/* Duration badge - bottom right with better styling */}
+        <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold tabular-nums rounded-md">
           {video.duration}
         </div>
       </div>
 
       {/* Meta Area - matches CommunityFeedCard layout */}
-      <div className="px-4 py-3 flex items-end justify-between gap-3">
-        <div className="flex-1 min-w-0 max-w-[80%]">
-          {/* Title */}
-          <p className="text-sm text-foreground line-clamp-2 leading-snug">
-            {video.title}
-          </p>
-          {/* Creator name · date · likes (smaller meta row) */}
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground/80 mt-1.5">
-            <button
-              onClick={handleCreatorClick}
-              className="hover:text-foreground transition-colors truncate"
-            >
-              {video.creatorName}
-            </button>
-            <span>·</span>
-            <span>{video.createdAt ? formatDistanceToNow(new Date(video.createdAt), { addSuffix: true }) : 'Recently'}</span>
-            {(video.likes || video.views) ? (
-              <>
-                <span>·</span>
-                <span>{formatLikes(video.likes || video.views)} likes</span>
-              </>
-            ) : null}
-          </div>
-        </div>
-
+      <div className="px-4 py-3 flex items-start gap-3">
+        {/* Creator avatar - left side */}
         <button
           onClick={handleCreatorClick}
-          className="shrink-0 overflow-hidden shadow-sm transition-all"
+          className="shrink-0 mt-0.5 overflow-hidden shadow-sm transition-all hover:ring-2 hover:ring-primary/20"
           style={{
             width: '40px',
             aspectRatio: '1 / 1.05',
@@ -258,6 +235,31 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
             size={40}
           />
         </button>
+
+        {/* Text content */}
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          <p className="text-sm font-medium text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+            {video.title}
+          </p>
+          {/* Creator name · date · likes (smaller meta row) */}
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+            <button
+              onClick={handleCreatorClick}
+              className="font-medium hover:text-foreground transition-colors truncate"
+            >
+              {video.creatorName}
+            </button>
+            <span className="text-muted-foreground/50">·</span>
+            <span>{video.createdAt ? formatDistanceToNow(new Date(video.createdAt), { addSuffix: true }) : 'Recently'}</span>
+            {(video.likes || video.views) ? (
+              <>
+                <span className="text-muted-foreground/50">·</span>
+                <span>{formatLikes(video.likes || video.views)} likes</span>
+              </>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   );
