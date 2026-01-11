@@ -91,6 +91,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
     { to: "/admin/tour",          label: "Tour Data" },
     { to: "/admin/golf-courses",  label: "Golf Courses" },
     { to: "/admin/logos",         label: "Logos" },
+    { to: "/admin/college-logos", label: "College Logos" },
     { to: "/admin/country-flags", label: "Country Flags" },
     { to: "/admin/courses",       label: "Course Import" },
     { to: "/admin/analytics",     label: "Analytics" },
