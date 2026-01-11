@@ -88,10 +88,11 @@ export function WatchGridV2({ onMediaClick }: WatchGridV2Props) {
         }}
       />
       
-      {/* All caught up message */}
+      {/* All caught up message - polished end-of-list indicator */}
       {!hasMore && items.length > 0 && !isLoading && !isFetchingNextPage && (
-        <div className="py-8 text-center">
-          <p className="text-sm text-muted-foreground">You're all caught up</p>
+        <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+          <div className="w-12 h-0.5 bg-muted/40 rounded-full mb-3" />
+          <p className="text-xs font-medium">You're all caught up</p>
         </div>
       )}
     </>

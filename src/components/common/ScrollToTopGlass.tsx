@@ -61,7 +61,7 @@ const ScrollToTopGlass = () => {
     <div 
       className={`
         fixed
-        top-[120px]
+        top-[200px]
         left-1/2
         -translate-x-1/2
         z-[39]
@@ -80,17 +80,19 @@ const ScrollToTopGlass = () => {
         aria-label="Back to top"
         className="
           pointer-events-auto
-          h-8
-          w-8
+          h-9
+          w-9
           rounded-full
           flex
           items-center
           justify-center
-          bg-slate-800/70
-          backdrop-blur-sm
+          bg-slate-900/80
+          backdrop-blur-md
           border
-          border-white/10
-          opacity-60
+          border-white/15
+          shadow-lg
+          shadow-black/20
+          opacity-80
           hover:opacity-100
           hover:scale-105
           active:scale-95
