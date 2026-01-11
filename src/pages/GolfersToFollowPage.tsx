@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, ChevronLeft, Check, UserPlus, Info, Loader2 } from 'lucide-react';
+import { Search, ChevronLeft, Check, UserPlus, Info, Users, Building2, BadgeCheck, AlertCircle, LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGolfersDiscovery, TabKey } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
@@ -20,10 +20,22 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 // Tab trigger class matching Courses page exactly
 const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]";
 
-const EMPTY_STATES: Record<TabKey, { title: string; description: string }> = {
-  suggested: { title: 'No suggestions yet.', description: 'Try searching by name or club.' },
-  home_club: { title: "Your club's still warming up.", description: "No golfers from your home club yet. Invite a few friends and you'll have a proper feed in no time." },
-  verified: { title: "We're new around here.", description: "Our verified golfers are currently going through verification. Check back soon to see who's been approved." },
+const EMPTY_STATES: Record<TabKey, { title: string; description: string; icon: LucideIcon }> = {
+  suggested: { 
+    title: 'No suggestions yet', 
+    description: 'Try searching by name or club to find golfers to follow.',
+    icon: Users
+  },
+  home_club: { 
+    title: "Your club's still warming up", 
+    description: "No golfers from your home club yet. Invite a few friends and you'll have a proper feed in no time.",
+    icon: Building2
+  },
+  verified: { 
+    title: "We're new around here", 
+    description: "Our verified golfers are currently going through verification. Check back soon to see who's been approved.",
+    icon: BadgeCheck
+  },
 };
 
 
@@ -38,6 +50,8 @@ const GolfersToFollowPage = () => {
   const {
     golfers,
     loading,
+    error,
+    refetch,
     setSearchQuery,
     activeTab,
     setActiveTab,
@@ -219,18 +233,22 @@ const GolfersToFollowPage = () => {
 
         {/* Home club nudge card when on home_club tab with no club set */}
         {activeTab === 'home_club' && hasNoHomeClub && (
-          <div className="mx-6 mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <div className="mx-6 mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
             <div className="flex items-start gap-3">
-              <Info className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+                <Info className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-amber-800">Set your home club</p>
-                <p className="text-xs text-amber-700 mt-0.5 mb-3">
-                  Add your home club to find golfers from your club.
+                <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                  Set your home club
+                </h4>
+                <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">
+                  Add your home club to find and connect with golfers from your club.
                 </p>
-                <Button
-                  size="sm"
+                <Button 
+                  size="sm" 
                   variant="outline"
-                  className="h-8 text-xs border-amber-300 bg-white hover:bg-amber-100 text-amber-800"
+                  className="border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
                   onClick={() => navigate('/edit-profile?section=golf')}
                 >
                   Set Home Club
@@ -253,6 +271,7 @@ const GolfersToFollowPage = () => {
               <Input
                 type="search"
                 placeholder="Search golfers by name or club"
+                aria-label="Search golfers by name or club"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-9 h-11 rounded-xl border-border/40 bg-white/35"
@@ -262,40 +281,84 @@ const GolfersToFollowPage = () => {
         </div>
 
         {/* Content */}
-        {loading ? (
-          <div className="divide-y divide-border/25">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="px-6 py-4 flex items-center gap-3">
-                <div className="h-12 w-12 rounded-sq-md bg-muted animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 w-1/2 rounded-full bg-muted animate-pulse" />
-                  <div className="h-3 w-1/3 rounded-full bg-muted/60 animate-pulse" />
+        {/* Error state */}
+        {error && !loading && (
+          <div className="flex flex-col items-center justify-center py-16 px-6">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertCircle className="w-8 h-8 text-destructive" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-1">
+              Something went wrong
+            </h3>
+            <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+              We couldn't load golfers. Please try again.
+            </p>
+            <Button variant="outline" onClick={() => refetch()}>
+              Try again
+            </Button>
+          </div>
+        )}
+
+        {/* Loading skeletons */}
+        {loading && !error ? (
+          <div className="px-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-start gap-3 py-4 border-b border-border/50 last:border-0">
+                {/* Avatar skeleton */}
+                <div className="w-14 h-14 rounded-sq-md bg-muted animate-pulse flex-shrink-0" />
+                
+                {/* Content skeleton */}
+                <div className="flex-1 space-y-3">
+                  {/* Name + username */}
+                  <div className="space-y-1.5">
+                    <div className="h-4 bg-muted animate-pulse rounded w-32" />
+                    <div className="h-3 bg-muted animate-pulse rounded w-24" />
+                    <div className="h-3 bg-muted animate-pulse rounded w-40" />
+                  </div>
+                  
+                  {/* Buttons */}
+                  <div className="flex gap-2">
+                    <div className="h-8 bg-muted animate-pulse rounded-sq-sm w-24" />
+                    <div className="h-8 bg-muted animate-pulse rounded-sq-sm w-28" />
+                  </div>
                 </div>
-                <div className="h-7 w-20 rounded-sq-xs bg-muted animate-pulse" />
               </div>
             ))}
           </div>
-        ) : golfers.length === 0 ? (
+        ) : !error && golfers.length === 0 ? (
           // Empty states
-          <div className="flex flex-col items-center text-center gap-4 py-16 px-6">
+          <div className="flex flex-col items-center justify-center py-16 px-6">
             {isSearching || searchInput ? (
               // Search = no results
               <>
-                <p className="text-sm font-medium text-foreground">No golfers found</p>
-                <p className="text-sm text-muted-foreground max-w-[280px]">
-                  Try a different name or club.
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <Search className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-1">
+                  No golfers found
+                </h3>
+                <p className="text-sm text-muted-foreground text-center max-w-[260px] mb-6">
+                  No results for "{searchInput}". Try a different name or club.
                 </p>
-                <Button variant="secondary" size="sm" onClick={handleClearSearch}>
+                <Button variant="outline" size="sm" onClick={handleClearSearch}>
                   Clear search
                 </Button>
               </>
             ) : (
-              // Tab-specific empty state
+              // Tab-specific empty state with icon
               <>
-                <p className="text-sm font-medium text-foreground">
+                {(() => {
+                  const EmptyIcon = EMPTY_STATES[activeTab].icon;
+                  return (
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <EmptyIcon className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  );
+                })()}
+                <h3 className="text-lg font-semibold text-foreground mb-1 text-center">
                   {EMPTY_STATES[activeTab].title}
-                </p>
-                <p className="text-sm text-muted-foreground max-w-[280px]">
+                </h3>
+                <p className="text-sm text-muted-foreground text-center max-w-[280px]">
                   {EMPTY_STATES[activeTab].description}
                 </p>
               </>
@@ -364,9 +427,10 @@ const GolfersToFollowPage = () => {
                                 handleFollowToggle(golfer.id, golfer.displayName, true);
                               }}
                               disabled={isActioning}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted text-foreground/80 gap-1"
+                              aria-label={`Unfollow ${golfer.displayName}`}
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted text-muted-foreground hover:bg-muted/80 gap-1.5"
                             >
-                              <Check className="h-3 w-3" />
+                              <Check className="h-3.5 w-3.5" />
                               Following
                             </button>
                           ) : (
@@ -376,6 +440,7 @@ const GolfersToFollowPage = () => {
                                 handleFollowToggle(golfer.id, golfer.displayName, false);
                               }}
                               disabled={isActioning}
+                              aria-label={`Follow ${golfer.displayName}`}
                               className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-[#F79E1B] bg-[#F79E1B]/10 text-[#F79E1B] hover:bg-[#F79E1B]/20"
                             >
                               Follow
@@ -385,13 +450,15 @@ const GolfersToFollowPage = () => {
                           {/* Add friend button - SECONDARY */}
                           {friendStatus === 'friends' ? (
                             <span
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-500/10 text-emerald-600 gap-1 cursor-default"
+                              aria-label={`Already friends with ${golfer.displayName}`}
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/50 bg-emerald-500/10 text-emerald-600 gap-1.5 cursor-default"
                             >
-                              <Check className="h-2.5 w-2.5" />
+                              <Check className="h-3.5 w-3.5" />
                               Friends
                             </span>
                           ) : friendStatus === 'pending' ? (
                             <span
+                              aria-label={`Friend request pending for ${golfer.displayName}`}
                               className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-border bg-muted/50 text-muted-foreground cursor-default"
                             >
                               Request sent
@@ -403,7 +470,8 @@ const GolfersToFollowPage = () => {
                                 handleFriendRequest(golfer.id, golfer.displayName, friendStatus);
                               }}
                               disabled={isActioning}
-                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50"
+                              aria-label={`Send friend request to ${golfer.displayName}`}
+                              className="h-8 px-3 text-xs font-medium rounded-sq-sm border transition-colors flex items-center justify-center whitespace-nowrap border-emerald-500/60 bg-transparent text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                             >
                               Add friend
                             </button>
@@ -416,20 +484,18 @@ const GolfersToFollowPage = () => {
               })}
             </div>
 
-            {/* Infinite scroll sentinel */}
+            {/* Infinite scroll sentinel - no spinner */}
             {!isSearching && hasMore && (
-              <div ref={sentinelRef} className="flex justify-center py-6">
-                {isLoadingMore && (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                )}
-              </div>
+              <div ref={sentinelRef} className="h-1" />
             )}
 
-            {/* Status text */}
+            {/* Footer count */}
             {!isSearching && totalCount > 0 && (
-              <p className="mt-sub pb-6 text-center text-xs text-muted-foreground">
-                Showing {showingCount} of {totalCount} golfers
-              </p>
+              <div className="py-6 text-center">
+                <p className="text-xs text-muted-foreground">
+                  Showing {showingCount} of {totalCount} golfers
+                </p>
+              </div>
             )}
           </>
         )}
