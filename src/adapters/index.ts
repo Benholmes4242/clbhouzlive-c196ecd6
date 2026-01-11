@@ -5,6 +5,7 @@
  */
 
 export { exploreFeedAdapter } from './exploreFeedAdapter';
+export { exploreMomentAdapter } from './exploreMomentAdapter';
 export { profileFeedAdapter } from './profileFeedAdapter';
 export { courseFeedAdapter, type CourseReviewMediaItem } from './courseFeedAdapter';
 export { unifiedMediaItemAdapter } from './unifiedMediaItemAdapter';

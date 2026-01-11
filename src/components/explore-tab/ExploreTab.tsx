@@ -11,7 +11,9 @@ import NewThisWeekCarousel from './NewThisWeekCarousel';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import ExploreSearchResults from './ExploreSearchResults';
 import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
-import { useExplorePrefetch, RegionKey } from '@/hooks/useExploreMoments';
+import { useExplorePrefetch, RegionKey, ExploreMoment } from '@/hooks/useExploreMoments';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import { exploreMomentAdapter } from '@/adapters/exploreMomentAdapter';
 
 interface ExploreTabProps {
   onMediaClick?: (item: any) => void;
@@ -53,6 +55,11 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   
   // Prefetch explore data on mount
   useExplorePrefetch();
+  
+  // Fullscreen player hook - uses explore-moments adapter for ExploreMoment type
+  const { openFullscreen } = useUnifiedFullscreen('explore-moments', {
+    allowLandscape: true,
+  });
   
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
@@ -119,6 +126,14 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     navigate('/top100');
   };
 
+  // Handle moment click - opens fullscreen player with all moments
+  const handleMomentClick = useCallback((moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => {
+    // Convert ExploreMoments to format expected by fullscreen viewer
+    // The adapter will handle the normalization
+    openFullscreen(allMoments, index);
+  }, [openFullscreen]);
+
+  // Legacy handler for parent callback
   const handleItemClick = (item: any) => {
     onMediaClick?.(item);
   };
@@ -252,7 +267,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
             </div>
             
             <div className="h-px bg-border/40 mx-4" />
-            <DiscoverMomentsGrid onMomentClick={handleItemClick} />
+            <DiscoverMomentsGrid onMomentClick={handleMomentClick} />
           </>
         );
     }

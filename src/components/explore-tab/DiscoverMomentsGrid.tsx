@@ -26,7 +26,7 @@ import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 interface DiscoverMomentsGridProps {
   regionKey?: RegionKey;
   className?: string;
-  onMomentClick?: (moment: ExploreMoment) => void;
+  onMomentClick?: (moment: ExploreMoment, index: number, allMoments: ExploreMoment[]) => void;
 }
 
 // Gradient fallbacks for items without thumbnails
@@ -73,16 +73,31 @@ const MomentTile: React.FC<{
   const showGradient = !imageUrl || imageError;
   const videoSrc = moment.media_url;
 
-  // Register video element with MediaRuntime
+  // Register video element with MediaRuntime - with retry for async mount
   useEffect(() => {
-    if (canAutoplay && playerRef.current) {
-      const videoEl = playerRef.current.getElement();
-      registerRef(videoEl);
-    }
-    return () => {
-      if (canAutoplay) {
-        registerRef(null);
+    if (!canAutoplay) return;
+    
+    let cancelled = false;
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    const checkAndRegister = () => {
+      if (cancelled) return;
+      const videoEl = playerRef.current?.getElement();
+      if (videoEl) {
+        registerRef(videoEl);
+      } else if (retryCount < maxRetries) {
+        // Video element not ready yet, retry after short delay
+        retryCount++;
+        setTimeout(checkAndRegister, 50);
       }
+    };
+    
+    checkAndRegister();
+    
+    return () => {
+      cancelled = true;
+      registerRef(null);
     };
   }, [canAutoplay, registerRef]);
 
@@ -204,9 +219,9 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     });
   }, [data]);
 
-  const handleMomentClick = useCallback((moment: ExploreMoment) => {
+  const handleMomentClick = useCallback((moment: ExploreMoment, index: number) => {
     if (onMomentClick) {
-      onMomentClick(moment);
+      onMomentClick(moment, index, moments);
     } else {
       if (moment.source_type === 'post') {
         navigate(`/post/${moment.source_id}`);
@@ -214,7 +229,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
         navigate(`/courses/${moment.course_id}`);
       }
     }
-  }, [navigate, onMomentClick]);
+  }, [navigate, onMomentClick, moments]);
 
   // Create registration callback for each moment
   const createRegisterRef = useCallback((momentId: string, index: number) => {
@@ -287,7 +302,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
               key={moment.moment_id}
               moment={moment}
               index={index}
-              onClick={() => handleMomentClick(moment)}
+              onClick={() => handleMomentClick(moment, index)}
               isPlaying={isPlaying}
               canAutoplay={canAutoplay}
               registerRef={createRegisterRef(moment.moment_id, index)}

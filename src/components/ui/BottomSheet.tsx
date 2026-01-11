@@ -1,5 +1,6 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { cn } from '@/lib/utils';
 
 interface BottomSheetProps {
   open: boolean;
@@ -21,6 +22,19 @@ export function BottomSheet({
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentTranslateY = useRef(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Animate in when opened
+  useEffect(() => {
+    if (open) {
+      // Trigger animation on next frame for CSS transition
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsAnimating(true));
+      });
+    } else {
+      setIsAnimating(false);
+    }
+  }, [open]);
 
   // Scroll lock
   useEffect(() => {
@@ -81,15 +95,24 @@ export function BottomSheet({
 
   return createPortal(
     <>
+      {/* Backdrop with fade animation */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-md"
+        className={cn(
+          "fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300",
+          isAnimating ? "opacity-100" : "opacity-0"
+        )}
         style={{ zIndex: zIndexBase }}
         onClick={onClose}
         aria-hidden="true"
       />
+      {/* Sheet with slide-up animation */}
       <div
         ref={sheetRef}
-        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-sq-lg shadow-[0_-4px_24px_rgba(0,0,0,0.12)] transform transition-transform duration-300 ${className}`}
+        className={cn(
+          "fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out",
+          isAnimating ? "translate-y-0" : "translate-y-full",
+          className
+        )}
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
@@ -98,14 +121,14 @@ export function BottomSheet({
         aria-modal="true"
         aria-labelledby={ariaLabelledBy}
       >
-        {/* Draggable grabber area */}
+        {/* Draggable grabber area - larger and more visible */}
         <div 
-          className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
+          className="w-full pt-4 pb-3 cursor-grab active:cursor-grabbing touch-none"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-10 h-1 mx-auto rounded-full bg-muted-foreground/30" />
+          <div className="w-12 h-1.5 mx-auto rounded-full bg-muted-foreground/40" />
         </div>
         {children}
       </div>

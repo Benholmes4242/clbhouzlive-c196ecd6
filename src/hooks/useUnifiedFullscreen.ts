@@ -25,6 +25,7 @@ import { useCallback } from 'react';
 import { useFullscreenPlayer } from '@/contexts/FullscreenPlayerContext';
 import { 
   exploreFeedAdapter, 
+  exploreMomentAdapter,
   profileFeedAdapter, 
   courseFeedAdapter,
   unifiedMediaItemAdapter,
@@ -32,7 +33,7 @@ import {
   type NormalizedItem
 } from '@/adapters';
 
-export type FullscreenSourceType = 'explore' | 'profile' | 'course' | 'unified';
+export type FullscreenSourceType = 'explore' | 'explore-moments' | 'profile' | 'course' | 'unified';
 
 interface UseUnifiedFullscreenOptions {
   /** Callback when like action is triggered */
@@ -81,6 +82,8 @@ function getAdapter(sourceType: FullscreenSourceType): FeedAdapter<any> {
   switch (sourceType) {
     case 'explore':
       return exploreFeedAdapter;
+    case 'explore-moments':
+      return exploreMomentAdapter;
     case 'profile':
       return profileFeedAdapter;
     case 'course':
