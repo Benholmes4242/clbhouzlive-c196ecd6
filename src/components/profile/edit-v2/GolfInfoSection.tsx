@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapPin, Search, X, Plus, Check, ExternalLink, Mail, Lock } from 'lucide-react';
+import { MapPin, Search, X, Plus, Check, ExternalLink, Mail, Lock, GraduationCap } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -12,10 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
 import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
+import { useCollegeMediaSearch, useCollegeMediaByName, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 
 interface GolfInfoSectionProps {
   homeClub: string;
   homeClubId: string | null;
+  collegeNormalized: string | null;
   handicap: string;
   userId?: string;
   homeClubVisibility: VisibilityValue;
@@ -40,6 +42,7 @@ interface ClubBusinessStatus {
 export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   homeClub,
   homeClubId,
+  collegeNormalized,
   handicap,
   userId,
   homeClubVisibility,
@@ -66,6 +69,11 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   // Invite modal
   const [showInviteModal, setShowInviteModal] = useState(false);
   
+  // College search state
+  const [collegeSearchQuery, setCollegeSearchQuery] = useState('');
+  const [isCollegeSearchOpen, setIsCollegeSearchOpen] = useState(false);
+  const collegeSearchRef = useRef<HTMLDivElement>(null);
+  
   // Search hooks
   const { data: searchResults, loading } = useClubSearch(searchQuery, {
     debounceMs: 250,
@@ -76,6 +84,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
     debounceMs: 250,
     limit: 10,
   });
+  
+  // College search hooks
+  const { data: collegeSearchResults, isLoading: collegeSearchLoading } = useCollegeMediaSearch(collegeSearchQuery);
+  const { data: currentCollege } = useCollegeMediaByName(collegeNormalized);
 
   // Check if primary club has a business profile
   useEffect(() => {
@@ -152,10 +164,25 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
         setShowAddClub(false);
         setAddClubQuery('');
       }
+      if (collegeSearchRef.current && !collegeSearchRef.current.contains(e.target as Node)) {
+        setIsCollegeSearchOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // College selection handlers
+  const handleCollegeSelect = (college: CollegeMediaResult) => {
+    onChange('collegeNormalized', college.normalized_name);
+    setCollegeSearchQuery('');
+    setIsCollegeSearchOpen(false);
+  };
+
+  const handleClearCollege = () => {
+    onChange('collegeNormalized', null);
+    setCollegeSearchQuery('');
+  };
 
   const handleClubSelect = (club: GolfClub) => {
     onChange('homeClub', club.name);
@@ -550,6 +577,115 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             )}
           </div>
         )}
+
+        {/* College Selection */}
+        <div className="rounded-sq-md border border-border bg-card p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              College
+            </Label>
+            {collegeNormalized && currentCollege && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                Badge active
+              </span>
+            )}
+          </div>
+          
+          <p className="text-xs text-muted-foreground -mt-1">
+            Add your college to show a badge on your profile and connect with alumni.
+          </p>
+
+          <div ref={collegeSearchRef} className="relative">
+            {collegeNormalized && currentCollege ? (
+              <div className="flex items-center gap-3 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/30">
+                {currentCollege.logo_url ? (
+                  <img
+                    src={currentCollege.logo_url}
+                    alt={currentCollege.short_name || currentCollege.college_name}
+                    className="w-6 h-6 rounded-full object-contain bg-background flex-shrink-0"
+                  />
+                ) : (
+                  <GraduationCap className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                )}
+                <span className="flex-1 text-sm font-medium">
+                  {currentCollege.short_name || currentCollege.college_name}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearCollege}
+                  className="p-1.5 hover:bg-muted rounded-full transition-colors"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="relative">
+                  <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    value={collegeSearchQuery}
+                    onChange={(e) => {
+                      setCollegeSearchQuery(e.target.value);
+                      setIsCollegeSearchOpen(true);
+                    }}
+                    onFocus={() => setIsCollegeSearchOpen(true)}
+                    placeholder="Search for your college..."
+                    className="pl-10 h-11"
+                  />
+                </div>
+
+                {/* College Search Results Dropdown */}
+                {isCollegeSearchOpen && collegeSearchQuery.length >= 2 && (
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-sq-sm shadow-lg max-h-64 overflow-y-auto">
+                    {collegeSearchLoading ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Searching...
+                      </div>
+                    ) : !collegeSearchResults?.length ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        No colleges found. Try the full name (e.g., "University of Texas").
+                      </div>
+                    ) : (
+                      <div className="py-1">
+                        {collegeSearchResults.map((college) => (
+                          <button
+                            key={college.normalized_name}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => handleCollegeSelect(college)}
+                            className="w-full px-3 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-muted transition-colors flex items-center gap-3"
+                          >
+                            {college.logo_url ? (
+                              <img
+                                src={college.logo_url}
+                                alt={college.short_name || college.college_name}
+                                className="w-6 h-6 rounded-full object-contain bg-background flex-shrink-0"
+                              />
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
+                                <GraduationCap className="w-3.5 h-3.5 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium truncate">
+                                {college.short_name || college.college_name}
+                              </div>
+                              {college.short_name && college.short_name !== college.college_name && (
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {college.college_name}
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Handicap Index */}
         <div className="space-y-1.5">
