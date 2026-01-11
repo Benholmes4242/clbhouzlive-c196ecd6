@@ -1,5 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
+import '@/styles/discover-tabs.css';
 
 interface Section {
   id: string;
@@ -12,59 +13,47 @@ interface SectionJumpStripProps {
   onSectionClick: (sectionId: string) => void;
 }
 
+/**
+ * SectionJumpStrip - Tab-style navigation matching Discover page
+ * Uses underline active state with orange accent like Explore, Top 100, Friends tabs
+ */
 export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
   sections,
   activeSection,
   onSectionClick,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
-  // Update indicator position when active section changes
-  useEffect(() => {
-    const activeButton = buttonRefs.current[activeSection];
-    if (activeButton && containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const buttonRect = activeButton.getBoundingClientRect();
-      setIndicatorStyle({
-        left: buttonRect.left - containerRect.left + containerRef.current.scrollLeft,
-        width: buttonRect.width,
-      });
-    }
-  }, [activeSection]);
-
   return (
-    <div ref={containerRef} className="relative flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
-      {/* Sliding indicator */}
-      <div
-        className="absolute top-1 h-[calc(100%-8px)] bg-slate-900 rounded-full transition-all duration-300 ease-out"
-        style={{
-          left: indicatorStyle.left,
-          width: indicatorStyle.width,
-        }}
-      />
-      
-      {sections.map((section, index) => (
-        <React.Fragment key={section.id}>
-          <button
-            ref={(el) => { buttonRefs.current[section.id] = el; }}
-            type="button"
-            onClick={() => onSectionClick(section.id)}
-            className={cn(
-              "relative z-10 text-xs whitespace-nowrap px-3 py-1.5 rounded-full transition-colors duration-300",
-              activeSection === section.id
-                ? "text-white font-medium"
-                : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            {section.label}
-          </button>
-          {index < sections.length - 1 && (
-            <span className="relative z-10 text-slate-300 text-xs">·</span>
-          )}
-        </React.Fragment>
-      ))}
+    <div 
+      className="discover-header relative w-full"
+      role="tablist"
+      aria-label="Profile sections"
+    >
+      <div className="discover-tabs flex w-full items-center justify-center">
+        <div className="flex">
+          {sections.map((section) => {
+            const isActive = activeSection === section.id;
+
+            return (
+              <button
+                key={section.id}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onSectionClick(section.id)}
+                className={cn(
+                  "discover-tab px-4 py-[10px] text-center relative z-10 text-[14px] font-medium leading-tight",
+                  "transition-all duration-[120ms] ease-out",
+                  "active:scale-[0.97] motion-reduce:active:scale-100",
+                  isActive 
+                    ? "active text-foreground" 
+                    : "text-muted-foreground hover:text-foreground/80 motion-reduce:transition-none"
+                )}
+              >
+                {section.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
