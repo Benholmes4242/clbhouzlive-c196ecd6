@@ -16,6 +16,8 @@ const FriendsPage = () => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
+    error,
+    refetch,
   } = usePaginatedFriends(user?.id);
 
   const friends = data?.pages.flatMap((page) => page.users) ?? [];
@@ -47,9 +49,12 @@ const FriendsPage = () => {
       users={friends}
       totalCount={totalCount}
       isLoading={friendsLoading}
+      error={error as Error | null}
       hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={() => fetchNextPage()}
+      onRefetch={() => refetch()}
+      isOwnProfile={true}
     />
   );
 };
