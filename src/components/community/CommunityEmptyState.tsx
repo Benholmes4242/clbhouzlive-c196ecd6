@@ -45,23 +45,13 @@ export const CommunityEmptyState: React.FC<CommunityEmptyStateProps> = ({
           Follow golfers or connect with friends to see their posts here
         </p>
         
-        {/* CTAs - stacked for mobile consistency */}
-        <div className="flex flex-col gap-3 w-full max-w-[240px]">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/friends')}
-            className="w-full"
-          >
-            Find friends
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/discover?main=shorts')}
-            className="w-full"
-          >
-            Discover golfers
-          </Button>
-        </div>
+        {/* CTA */}
+        <Button
+          variant="outline"
+          onClick={() => navigate('/golferstofollow')}
+        >
+          Discover golfers
+        </Button>
       </div>
     );
   }
