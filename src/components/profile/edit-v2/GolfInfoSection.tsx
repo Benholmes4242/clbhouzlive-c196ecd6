@@ -280,7 +280,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
 
       <div className="space-y-5">
         {/* Primary Home Club Card */}
-        <div className="rounded-sq-md border border-border bg-[#F8FAFC] p-4 space-y-3">
+        <div className={cn(
+          "rounded-sq-md border border-border p-4 space-y-3",
+          homeClub ? "bg-white" : "bg-[#F8FAFC]"
+        )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -414,7 +417,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between gap-2 py-2 px-3 bg-muted/50 border border-border rounded-sq-sm">
+                <div className="flex items-center justify-between gap-2 py-2 px-3 bg-white border border-border rounded-sq-sm">
                   <span className="text-xs text-muted-foreground">
                     No business profile yet.
                   </span>
@@ -436,7 +439,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
 
         {/* Additional Clubs Card */}
         {homeClub && (
-          <div className="rounded-sq-md border border-border bg-[#F8FAFC] p-4 space-y-3">
+          <div className="rounded-sq-md border border-border bg-white p-4 space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Additional Clubs
@@ -579,7 +582,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
         )}
 
         {/* College Selection */}
-        <div className="rounded-sq-md border border-border bg-[#F8FAFC] p-4 space-y-3">
+        <div className={cn(
+          "rounded-sq-md border border-border p-4 space-y-3",
+          collegeNormalized ? "bg-white" : "bg-[#F8FAFC]"
+        )}>
           <div className="flex items-center gap-2">
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               College
