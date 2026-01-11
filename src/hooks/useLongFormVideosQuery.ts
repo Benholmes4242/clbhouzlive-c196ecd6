@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
+import { FLAGS } from '@/config/flags';
+import { getCachedMockLongFormVideos } from '@/mocks/videosTabMock';
 
 // PRODUCTION: 4 minutes minimum for long-form videos
 const VIDEO_DURATION_THRESHOLD_SECONDS = 240;
@@ -148,6 +150,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled'>): 
 
 /**
  * Production query hook for long-form videos (≥4 minutes, public visibility)
+ * When VIDEOS_TAB_MOCK_ENABLED flag is true, returns mock data for testing
  */
 export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) => {
   const { 
@@ -166,17 +169,27 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
     followedCreatorIds.join(','),
     creatorUserId || '',
     searchQuery || '',
+    FLAGS.VIDEOS_TAB_MOCK_ENABLED ? 'mock' : 'real', // Include mock flag in cache key
   ];
 
   const query = useQuery({
     queryKey,
-    queryFn: () => fetchVideos({
-      section,
-      limit,
-      followedCreatorIds,
-      creatorUserId,
-      searchQuery,
-    }),
+    queryFn: async () => {
+      // Return mock data if flag is enabled
+      if (FLAGS.VIDEOS_TAB_MOCK_ENABLED) {
+        console.log(`[useLongFormVideosQuery] 🎭 Using MOCK data for ${section} (${limit} items)`);
+        return getCachedMockLongFormVideos(section, limit);
+      }
+      
+      // Otherwise fetch real data
+      return fetchVideos({
+        section,
+        limit,
+        followedCreatorIds,
+        creatorUserId,
+        searchQuery,
+      });
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     enabled,
