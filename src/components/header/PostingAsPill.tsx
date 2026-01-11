@@ -24,19 +24,19 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         <div className={cn(
           "flex items-center gap-2 px-2 py-1.5 rounded-sq-pill border",
           useLightTheme 
-            ? "bg-slate-100 border-slate-200" 
+            ? "bg-white border-slate-200" 
             : "bg-white/5 border-white/10"
         )}>
           <div 
             className={cn(
               "h-7 w-7 animate-pulse",
-              useLightTheme ? "bg-slate-200" : "bg-white/10"
+              useLightTheme ? "bg-slate-100" : "bg-white/10"
             )} 
             style={{ borderRadius: '34%' }} 
           />
           <div className={cn(
             "h-3 w-16 rounded animate-pulse",
-            useLightTheme ? "bg-slate-200" : "bg-white/10"
+            useLightTheme ? "bg-slate-100" : "bg-white/10"
           )} />
         </div>
       );
@@ -53,7 +53,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           "rounded-sq-pill border transition-colors",
           "max-w-[180px]",
           useLightTheme 
-            ? "bg-slate-100 border-slate-200/80 hover:bg-slate-200/80 active:bg-slate-200" 
+            ? "bg-white border-slate-200/80 hover:bg-slate-50 active:bg-slate-100" 
             : "bg-white/5 border-white/10 hover:bg-white/10 active:bg-white/15"
         )}
       >

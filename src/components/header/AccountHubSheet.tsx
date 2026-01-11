@@ -225,7 +225,7 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   // Theme colors
   const colors = {
     bg: useLightTheme 
-      ? 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)'
+      ? 'linear-gradient(180deg, #F8FAFC 0%, #F8FAFC 100%)'
       : 'linear-gradient(180deg, rgba(28,28,30,0.96) 0%, rgba(18,18,20,0.98) 100%)',
     shadow: useLightTheme
       ? '0 -8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)'
@@ -234,10 +234,10 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
     text: useLightTheme ? '#1a1a1a' : '#ffffff',
     textMuted: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
     sectionLabel: useLightTheme ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)',
-    cardBg: useLightTheme ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+    cardBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.05)',
     cardBorder: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
     grabHandle: useLightTheme ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.25)',
-    closeBg: useLightTheme ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)',
+    closeBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.08)',
     closeHover: useLightTheme ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)',
     closeIcon: useLightTheme ? '#666' : '#999',
   };
@@ -324,8 +324,9 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
             <div 
               className="w-10 h-10 overflow-hidden flex items-center justify-center flex-shrink-0"
               style={{ 
-                background: colors.cardBg,
+                background: useLightTheme ? '#ffffff' : colors.cardBg,
                 borderRadius: 12, // SDS squircle
+                border: useLightTheme ? '1px solid rgba(0,0,0,0.06)' : 'none',
               }}
             >
               {activeProfile.avatarUrl ? (
@@ -559,9 +560,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const colors = {
     text: useLightTheme ? '#1a1a1a' : '#ffffff',
     textMuted: useLightTheme ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.70)',
-    cardBg: useLightTheme ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
+    cardBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.06)',
     cardBorder: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
-    avatarBg: useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)',
+    avatarBg: useLightTheme ? '#ffffff' : 'rgba(255,255,255,0.1)',
   };
 
   // Frosted white active state (no blue glow)
@@ -689,7 +690,7 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     className="flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-[14px] transition-all active:scale-[0.98]"
     style={{
       background: useLightTheme 
-        ? 'linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.02) 100%)'
+        ? '#ffffff'
         : 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
       border: `1px solid ${useLightTheme ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'}`,
       color: useLightTheme ? '#1a1a1a' : '#ffffff',
