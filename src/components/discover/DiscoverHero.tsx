@@ -255,6 +255,7 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
             <HLSPlayer
               ref={playerRef}
               src={item.mediaUrl}
+              poster={item.posterUrl}
               autoplay={false}
               muted
               loop
