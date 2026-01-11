@@ -14,11 +14,24 @@ export const useProfileData = () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error) {
-          console.error('Error getting user:', error);
+          // Suppress expected auth errors on auth pages (no session is normal there)
+          const isAuthPage = window.location.pathname === '/auth' || 
+                            window.location.pathname.startsWith('/auth/');
+          const isExpectedError = error.name === 'AuthSessionMissingError' || 
+                                  error.message?.includes('Auth session missing');
+          
+          if (!isAuthPage || !isExpectedError) {
+            console.error('Error getting user:', error);
+          }
         }
         setUser(user);
       } catch (error) {
-        console.error('Error in getUser:', error);
+        // Suppress expected auth errors on auth pages
+        const isAuthPage = window.location.pathname === '/auth' || 
+                          window.location.pathname.startsWith('/auth/');
+        if (!isAuthPage) {
+          console.error('Error in getUser:', error);
+        }
       } finally {
         setLoading(false);
       }
