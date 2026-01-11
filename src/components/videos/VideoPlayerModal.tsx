@@ -613,8 +613,26 @@ export const VideoPlayerModal: React.FC = () => {
             {/* Video area - centered 16:9 */}
             <div ref={videoAreaRef} className="flex-1 flex items-center justify-center px-4 py-4">
               {isLoading ? (
-                <div className="w-full max-w-4xl aspect-video bg-muted/20 rounded-xl animate-pulse flex items-center justify-center">
-                  <Play className="h-12 w-12 text-white/30" />
+                <div className="w-full max-w-4xl aspect-video bg-muted/20 rounded-xl overflow-hidden animate-pulse relative">
+                  {/* Video skeleton with gradient shimmer */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_2s_infinite] -translate-x-full" style={{ animationName: 'shimmer' }} />
+                  {/* Center play icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
+                      <Play className="h-8 w-8 text-white/30 ml-1" />
+                    </div>
+                  </div>
+                  {/* Bottom gradient with skeleton controls */}
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent">
+                    <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                      {/* Progress bar skeleton */}
+                      <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                        <div className="w-1/3 h-full bg-white/30 rounded-full" />
+                      </div>
+                      {/* Time skeleton */}
+                      <div className="w-16 h-3 bg-white/20 rounded" />
+                    </div>
+                  </div>
                 </div>
               ) : videoData ? (
                 <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
