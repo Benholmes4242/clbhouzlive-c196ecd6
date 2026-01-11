@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { getMockVideosPage } from '@/components/videos/mockVideoData';
 
 const PAGE_SIZE = 10;
 
@@ -73,7 +72,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v5', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
+    queryKey: ['videos-infinite-longform-v4', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
@@ -238,17 +237,6 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
           const scoreB = (b.likes || 0) * 3 + (b.views || 0) / 10;
           return scoreB - scoreA;
         });
-      }
-
-      // If no real videos found, inject mock data for demo purposes
-      if (items.length === 0 && startRange === 0) {
-        console.log(`[useInfiniteLongFormVideos] No videos found for ${section}, injecting mock data`);
-        const mockPage = getMockVideosPage(section, 0, PAGE_SIZE);
-        return { 
-          items: mockPage.items, 
-          nextCursor: mockPage.hasMore ? PAGE_SIZE : 0, 
-          hasMore: mockPage.hasMore 
-        };
       }
 
       // hasMore based on PAGE_SIZE

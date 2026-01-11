@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { getMockVideosForSection } from '@/components/videos/mockVideoData';
 
 // PRODUCTION: 4 minutes minimum for long-form videos
 const VIDEO_DURATION_THRESHOLD_SECONDS = 240;
@@ -178,12 +177,7 @@ async function fetchVideos(options: Omit<UseLongFormVideosOptions, 'enabled' | '
   });
 
   if (queryError) throw queryError;
-  
-  // If no real videos found, inject mock data for demo purposes
-  if (!data || data.length === 0) {
-    console.log(`[useLongFormVideosQuery] No videos found for ${section}, injecting mock data`);
-    return getMockVideosForSection(section as any, limit);
-  }
+  if (!data || data.length === 0) return [];
 
   // Fetch profiles
   const userIds = [...new Set(data.map((post: any) => post.user_id))];
@@ -250,7 +244,7 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
   } = options;
 
   const queryKey = [
-    'videos-longform-v5',
+    'videos-longform-v4',
     section,
     limit,
     followedCreatorIds.join(','),

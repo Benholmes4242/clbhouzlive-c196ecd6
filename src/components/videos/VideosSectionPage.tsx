@@ -9,7 +9,6 @@ import { useMediaAutoplay } from '@/media';
 import { runtimeUserTap } from '@/media';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { getDiscoverCategories } from '@/components/post/create-moment/categoryDefinitions';
-import { getMockVideosForSection } from '@/components/videos/mockVideoData';
 
 type SectionType = 'recommended' | 'trending' | 'following' | 'courses';
 
@@ -97,23 +96,18 @@ export const VideosSectionPage: React.FC = () => {
     sort: sortOptionToQuerySort(sortOption),
   });
 
-  // Client-side search filter (+ mock fallback for empty long-form catalog)
+  // Client-side search filter
   const items = useMemo(() => {
-    const baseItems =
-      !isLoading && !isError && rawItems.length === 0 && section !== 'following'
-        ? getMockVideosForSection(section, 30)
-        : rawItems;
-
-    if (!searchQuery.trim()) return baseItems;
-
+    if (!searchQuery.trim()) return rawItems;
+    
     const query = searchQuery.toLowerCase();
-    return baseItems.filter(v => {
+    return rawItems.filter(v => {
       const titleMatch = (v.title || '').toLowerCase().includes(query);
       const creatorMatch = (v.creatorName || '').toLowerCase().includes(query);
       const courseMatch = (v.golfCourseName || '').toLowerCase().includes(query);
       return titleMatch || creatorMatch || courseMatch;
     });
-  }, [rawItems, searchQuery, isLoading, isError, section]);
+  }, [rawItems, searchQuery]);
 
   // Handle category selection - update URL
   const handleCategorySelect = (categoryKey: string) => {

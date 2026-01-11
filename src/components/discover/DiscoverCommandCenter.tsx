@@ -316,13 +316,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
         </div>
       </div>
 
-      {/* Pills row - px-4 matches search bar alignment */}
+      {/* Pills row */}
       {showPills && (
-        <div className="mt-3 px-4 md:container md:mx-auto md:px-0">
+        <div className="mt-3 px-3 md:container md:mx-auto md:px-0">
           <div className="relative">
             <div
               ref={scrollContainerRef}
-              className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1"
+              className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide py-1"
               onScroll={checkScrollPosition}
               style={{
                 scrollbarWidth: 'none',
