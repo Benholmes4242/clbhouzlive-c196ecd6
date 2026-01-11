@@ -27,33 +27,52 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               onTabClick(tab);
             }}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 flex-1 py-1",
-              "transition-transform duration-[120ms] ease-out",
+              "flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
+              "transition-all duration-[120ms] ease-out",
               "active:scale-95",
-              "focus:outline-none"
+              "focus:outline-none",
+              // Active background for light theme
+              isLightTheme && isActive && "bg-slate-100/80",
+              // Active background for dark theme  
+              !isLightTheme && isActive && "bg-white/8"
             )}
             aria-label={tab.label}
           >
-            <Icon 
-              className={cn(
-                "h-[26px] w-[26px] transition-colors duration-300",
-                "[stroke-width:1.5]", /* Consistent stroke weight across all icons */
-                isLightTheme
-                  ? isActive 
-                    ? "text-slate-800 opacity-100" 
-                    : "text-slate-500 opacity-90"
-                  : isActive 
-                    ? "text-primary" 
-                    : isDimmed 
-                      ? "text-[rgba(255,255,255,0.55)]" 
-                      : "text-white/70"
+            {/* Icon with active indicator dot */}
+            <div className="relative">
+              <Icon 
+                className={cn(
+                  "h-[24px] w-[24px] transition-all duration-300",
+                  "[stroke-width:1.5]",
+                  // Scale up slightly when active
+                  isActive && "scale-110",
+                  isLightTheme
+                    ? isActive 
+                      ? "text-slate-800 opacity-100" 
+                      : "text-slate-500 opacity-90"
+                    : isActive 
+                      ? "text-primary" 
+                      : isDimmed 
+                        ? "text-[rgba(255,255,255,0.55)]" 
+                        : "text-white/70"
+                )}
+              />
+              
+              {/* Active indicator dot above icon */}
+              {isActive && (
+                <span 
+                  className={cn(
+                    "absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
+                    isLightTheme ? "bg-slate-700" : "bg-primary"
+                  )} 
+                />
               )}
-            />
+            </div>
             
             {/* Label */}
             <span 
               className={cn(
-                "text-[10px] leading-none transition-colors duration-300",
+                "text-[10px] leading-none transition-colors duration-300 font-medium",
                 isLightTheme
                   ? isActive 
                     ? "text-slate-800" 

@@ -740,16 +740,20 @@ interface MenuSectionProps {
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({ title, children, useLightTheme }) => (
-  <div className="px-4 py-1">
+  <div className="px-4 py-1.5">
     {title && (
-      <div 
-        className="text-[12px] font-medium uppercase tracking-[0.06em] mb-1 px-3"
-        style={{ color: useLightTheme ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)' }}
-      >
-        {title}
+      <div className="flex items-center gap-2 mb-2 px-3">
+        <div 
+          className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+          style={{ color: useLightTheme ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.45)' }}
+        >
+          {title}
+        </div>
       </div>
     )}
-    {children}
+    <div className="space-y-0.5">
+      {children}
+    </div>
   </div>
 );
 
@@ -775,7 +779,13 @@ const MenuItem: React.FC<MenuItemProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-4 px-3 py-3 rounded-[12px] transition-colors active:bg-black/5 dark:active:bg-white/5"
+    className={cn(
+      "w-full flex items-center gap-3 px-3 py-3 rounded-[12px] transition-all",
+      "active:scale-[0.98]",
+      useLightTheme 
+        ? "hover:bg-slate-100/80" 
+        : "hover:bg-white/5"
+    )}
     style={{
       height: 52,
       color: danger 
@@ -783,12 +793,22 @@ const MenuItem: React.FC<MenuItemProps> = ({
         : (useLightTheme ? '#1a1a1a' : '#ffffff'),
     }}
   >
-    <span style={{ opacity: danger ? 1 : 0.6 }}>{icon}</span>
+    {/* Icon container with background */}
+    <div 
+      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+      style={{
+        background: danger 
+          ? 'rgba(239, 68, 68, 0.1)'
+          : (useLightTheme ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
+      }}
+    >
+      <span style={{ opacity: danger ? 1 : 0.7 }}>{icon}</span>
+    </div>
     <span className="flex-1 text-left text-[15px] font-medium">{label}</span>
     {!danger && (
       <ChevronRight 
         className="w-5 h-5" 
-        style={{ opacity: 0.3 }} 
+        style={{ opacity: 0.4 }} 
       />
     )}
   </button>
@@ -814,27 +834,39 @@ const AdminMenuItem: React.FC<AdminMenuItemProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-4 px-3 py-3 rounded-[12px] transition-colors"
+    className="w-full flex items-center gap-3 px-3 py-3 rounded-[14px] transition-all active:scale-[0.98] hover:shadow-md"
     style={{
-      height: 52,
-      background: 'rgba(245, 185, 66, 0.06)',
-      // Symmetric left + right borders
-      borderLeft: '2px solid rgba(245, 185, 66, 0.55)',
-      borderRight: '2px solid rgba(245, 185, 66, 0.55)',
+      height: 56,
+      background: useLightTheme 
+        ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)'
+        : 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.06) 100%)',
+      border: '1px solid rgba(251, 191, 36, 0.25)',
       color: useLightTheme ? '#1a1a1a' : '#ffffff',
     }}
   >
-    <span style={{ opacity: 0.8, color: 'rgba(245, 185, 66, 0.9)' }}>{icon}</span>
-    <span className="flex-1 text-left text-[15px] font-medium">{label}</span>
-    <span 
-      className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+    {/* Icon container with gold gradient */}
+    <div 
+      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
       style={{
-        background: 'rgba(245, 185, 66, 0.15)',
-        color: 'rgba(245, 185, 66, 0.9)',
+        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+        boxShadow: '0 2px 8px rgba(251, 191, 36, 0.3)',
       }}
     >
-      Admin
-    </span>
+      <span style={{ color: 'white' }}>{icon}</span>
+    </div>
+    <div className="flex-1 text-left">
+      <span className="text-[15px] font-semibold block">{label}</span>
+      <span 
+        className="text-[11px]"
+        style={{ color: useLightTheme ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)' }}
+      >
+        Manage site settings
+      </span>
+    </div>
+    <ChevronRight 
+      className="w-5 h-5 flex-shrink-0" 
+      style={{ color: 'rgba(251, 191, 36, 0.8)' }} 
+    />
   </button>
 );
 
