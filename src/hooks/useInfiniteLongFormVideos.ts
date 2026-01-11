@@ -1,6 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
+import { FLAGS } from '@/config/flags';
+import { generateMockLongFormVideos } from '@/mocks/videosTabMock';
 
 const PAGE_SIZE = 10;
 
@@ -46,12 +48,28 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v3', section, followedCreatorIds.join(','), creatorUserId || '', minDuration],
+    queryKey: ['videos-infinite-longform-v3', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, FLAGS.VIDEOS_TAB_MOCK_ENABLED ? 'mock' : 'real'],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
       const startRange = pageParam as number;
       const endRange = startRange + PAGE_SIZE - 1;
+
+      // Return mock data if flag is enabled
+      if (FLAGS.VIDEOS_TAB_MOCK_ENABLED) {
+        console.log(`[useInfiniteLongFormVideos] 🎭 Using MOCK data for ${section} (page ${pageParam})`);
+        
+        // Generate 30 mock items total, paginate through them
+        const allMocks = generateMockLongFormVideos(section, 30);
+        const pageItems = allMocks.slice(startRange, endRange + 1);
+        const hasMore = endRange + 1 < allMocks.length;
+        
+        return {
+          items: pageItems,
+          nextCursor: hasMore ? endRange + 1 : startRange,
+          hasMore,
+        };
+      }
 
       console.log('[useInfiniteLongFormVideos] 🔍 FETCHING PAGE:', {
         section,
