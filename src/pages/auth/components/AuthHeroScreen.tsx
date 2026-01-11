@@ -48,25 +48,36 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   return (
     <div className="fixed inset-0 flex flex-col">
-      {/* Background - solid dark color */}
+      {/* Background - solid dark with subtle gradient */}
       <div 
         className="absolute inset-0"
         style={{
-          background: '#0d0d0d',
+          background: 'linear-gradient(180deg, #0d0d0d 0%, #111111 100%)',
         }}
       />
       
-      {/* Subtle vignette overlay - darkens edges by ~4-5% */}
+      {/* Radial glow behind logo area */}
+      <div 
+        className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{
+          width: '100%',
+          height: '60%',
+          background: 'radial-gradient(circle at center 30%, rgba(247, 147, 30, 0.08) 0%, transparent 50%)',
+          opacity: 0.6,
+        }}
+      />
+      
+      {/* Subtle vignette overlay - darkens edges */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.35) 100%)',
+          background: 'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.4) 100%)',
         }}
       />
       
       {/* Ultra-fine grain texture overlay */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        className="absolute inset-0 pointer-events-none opacity-[0.02]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
@@ -74,33 +85,36 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       
       {/* Content container */}
       <div className="relative flex-1 flex flex-col px-6 pt-safe">
-        {/* Logo section - positioned at ~20% from top */}
+        {/* Logo section - enhanced with larger size and glow */}
         <div 
-          className="flex justify-center items-center gap-2.5 animate-auth-logo-in"
+          className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
           style={{ 
-            paddingTop: '18vh',
-            paddingBottom: '2rem',
+            paddingTop: '16vh',
+            paddingBottom: '2.5rem',
           }}
         >
-          {/* Subtle radial glow behind logo */}
+          {/* Enhanced radial glow behind logo */}
           <div 
-            className="absolute pointer-events-none"
+            className="absolute pointer-events-none animate-pulse"
             style={{
-              width: '180px',
-              height: '180px',
-              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.05) 0%, transparent 70%)',
-              filter: 'blur(30px)',
-              top: 'calc(18vh - 40px)',
+              width: '220px',
+              height: '220px',
+              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.12) 0%, transparent 65%)',
+              filter: 'blur(40px)',
+              top: 'calc(16vh - 50px)',
             }}
           />
+          
+          {/* Logo - larger for more presence */}
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-[77px] w-auto relative z-10"
+            className="h-[90px] md:h-[100px] w-auto relative z-10"
           />
+          
           {SHOW_WORDMARK && (
             <span 
-              className="text-white/90 text-[22px] font-medium tracking-tight"
+              className="text-white/90 text-[24px] font-medium tracking-tight"
               style={{ fontFamily: 'SF Pro Display, system-ui, sans-serif' }}
             >
               clbhouz
@@ -108,39 +122,41 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           )}
         </div>
         
-        {/* Hero text - increased spacing, refined typography */}
-        <div className="flex-1 flex flex-col justify-center items-center text-center -mt-8">
+        {/* Hero text - larger, more impactful */}
+        <div className="flex-1 flex flex-col justify-center items-center text-center -mt-4">
           <h1 
-            className="text-[32px] font-semibold text-white leading-tight"
+            className="text-[38px] md:text-[44px] font-semibold text-white leading-tight auth-tagline-animate"
             style={{ 
               fontFamily: 'SF Pro Display, system-ui, sans-serif',
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.02em',
             }}
           >
             stay in play.
           </h1>
         </div>
         
-        {/* Action buttons - glass container */}
+        {/* Action buttons - enhanced glass container */}
         <div 
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
-            background: 'rgba(13, 13, 13, 0.95)',
-            backdropFilter: 'blur(22px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-            boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.55)',
+            background: 'rgba(13, 13, 13, 0.92)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.6)',
           }}
         >
           <div className="space-y-3">
-            {/* Apple button - primary hero, white with subtle inner highlight */}
+            {/* Apple button - primary hero with enhanced shadow */}
             <button
               onClick={() => handleOAuthClick('apple', onAppleSignIn)}
               disabled={submitting}
               aria-label="Sign in with Apple"
               aria-busy={submitting}
-              className="w-full h-[54px] flex items-center justify-center gap-2.5 rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all duration-150 active:scale-[0.98] active:brightness-95 disabled:opacity-50 mb-1"
+              className="auth-button-1 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all duration-150 active:scale-[0.98] active:brightness-95 disabled:opacity-50 hover:bg-gray-50"
               style={{
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 8px rgba(0, 0, 0, 0.15)',
+                fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)',
               }}
             >
               {submitting ? (
@@ -155,17 +171,18 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               )}
             </button>
             
-            {/* Google button - secondary, darker with hairline border */}
+            {/* Google button - enhanced with better contrast */}
             <button
               onClick={() => handleOAuthClick('google', onGoogleSignIn)}
               disabled={submitting}
               aria-label="Sign in with Google"
               aria-busy={submitting}
-              className="w-full h-[54px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
+              className="auth-button-2 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.08]"
               style={{
-                background: 'rgba(26, 28, 32, 0.95)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                color: 'rgba(255, 255, 255, 0.9)',
+                fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: 'rgba(255, 255, 255, 0.92)',
               }}
             >
               {submitting ? (
@@ -183,32 +200,33 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               )}
             </button>
             
-            {/* Email button - secondary, darker with hairline border */}
+            {/* Email button - subtle hierarchy difference */}
             <button
               onClick={onEmailSignUp}
               disabled={submitting}
               aria-label="Continue with email"
-              className="w-full h-[54px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
+              className="auth-button-3 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
               style={{
-                background: 'rgba(26, 28, 32, 0.95)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                color: 'rgba(255, 255, 255, 0.9)',
+                fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                color: 'rgba(255, 255, 255, 0.88)',
               }}
             >
               Continue with Email
             </button>
             
-            
-            {/* Login link - polished with increased tap target */}
-            <div className="text-center pt-1">
+            {/* Login link - enhanced styling */}
+            <div className="text-center pt-2 auth-button-4">
               <button
                 onClick={onLoginClick}
                 disabled={submitting}
-                className="text-[14px] text-white/55 hover:text-white/75 transition-colors py-2 px-4 -mx-4"
+                className="text-[15px] text-white/50 hover:text-white/70 transition-colors py-2 px-4 -mx-4"
+                style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
               >
                 Already a member?{' '}
                 <span 
-                  className="font-medium hover:underline underline-offset-2"
+                  className="font-medium hover:underline underline-offset-2 transition-colors"
                   style={{ color: '#F7931E' }}
                 >
                   Log in
@@ -219,21 +237,53 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         </div>
       </div>
       
-      {/* Logo entrance animation styles */}
+      {/* Enhanced animation styles */}
       <style>{`
         @keyframes auth-logo-in {
-          from {
+          0% {
             opacity: 0;
-            transform: scale(0.98);
+            transform: scale(0.85) translateY(20px);
           }
-          to {
+          100% {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateY(0);
           }
         }
-        .animate-auth-logo-in {
-          animation: auth-logo-in 700ms ease-out forwards;
+        
+        @keyframes auth-tagline-in {
+          0% {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
+        
+        @keyframes auth-button-in {
+          0% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .auth-logo-animate {
+          animation: auth-logo-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+        }
+        
+        .auth-tagline-animate {
+          animation: auth-tagline-in 0.5s ease-out 0.25s both;
+        }
+        
+        .auth-button-1 { animation: auth-button-in 0.4s ease-out 0.35s both; }
+        .auth-button-2 { animation: auth-button-in 0.4s ease-out 0.45s both; }
+        .auth-button-3 { animation: auth-button-in 0.4s ease-out 0.55s both; }
+        .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
       `}</style>
     </div>
   );
