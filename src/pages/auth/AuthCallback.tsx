@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { 
+  trackAuthCallbackStarted, 
+  trackAuthRedirect, 
+  trackAuthComplete,
+  trackProfileFallbackCreated 
+} from "@/lib/authAnalytics";
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -9,6 +15,8 @@ const AuthCallback: React.FC = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
+      trackAuthCallbackStarted();
+      
       try {
         // Check URL hash for Supabase auth tokens (email verification comes with tokens in hash)
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -29,7 +37,7 @@ const AuthCallback: React.FC = () => {
             await supabase.auth.signOut();
           }
           
-          // Redirect immediately to verified page
+          trackAuthRedirect('verified');
           navigate('/auth/verified', { replace: true });
           return;
         }
@@ -40,6 +48,7 @@ const AuthCallback: React.FC = () => {
           // This is email verification in same browser - go to verified page
           localStorage.removeItem('pending_signup_email');
           await supabase.auth.signOut();
+          trackAuthRedirect('verified');
           navigate('/auth/verified', { replace: true });
           return;
         }
@@ -51,11 +60,13 @@ const AuthCallback: React.FC = () => {
           // No user found after callback - something went wrong or verification link
           if (pendingEmail) {
             localStorage.removeItem('pending_signup_email');
+            trackAuthRedirect('verified');
             navigate('/auth/verified', { replace: true });
             return;
           }
           
           setStatus("No authenticated user found. Redirecting to login...");
+          trackAuthRedirect('auth');
           setTimeout(() => navigate('/auth', { replace: true }), 1000);
           return;
         }
@@ -67,7 +78,7 @@ const AuthCallback: React.FC = () => {
         setStatus("Checking profile...");
 
         // Check if user has a profile
-        const { data: profile, error: profileError } = await supabase
+        let { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('id, has_completed_onboarding')
           .eq('id', user.id)
@@ -77,19 +88,71 @@ const AuthCallback: React.FC = () => {
           console.error('Error checking profile:', profileError);
         }
 
+        // FIX 2e: Client-side fallback for missing profiles
+        if (!profile) {
+          console.warn('[Auth] No profile found for user, attempting client-side creation');
+          
+          const fallbackUsername = user.email?.split('@')[0]?.toLowerCase() || `user_${user.id.slice(0, 8)}`;
+          const fallbackDisplayName = user.user_metadata?.name || 
+                                       user.user_metadata?.full_name || 
+                                       fallbackUsername;
+          
+          const { error: createError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: user.id,
+              username: fallbackUsername,
+              display_name: fallbackDisplayName,
+              user_type: 'individual',
+              is_public: true,
+              has_completed_onboarding: false
+            });
+          
+          if (createError) {
+            console.error('[Auth] Failed to create fallback profile:', createError);
+            trackProfileFallbackCreated(false, createError.message);
+            
+            // Log error to console - profile_creation_errors table may not exist yet
+            console.warn('[Auth] Profile creation error details:', {
+              user_id: user.id,
+              error_message: `Client-side fallback failed: ${createError.message}`,
+              error_code: createError.code
+            });
+          } else {
+            trackProfileFallbackCreated(true);
+            
+            // Retry the profile fetch
+            const { data: retryProfile } = await supabase
+              .from('user_profiles')
+              .select('id, has_completed_onboarding')
+              .eq('id', user.id)
+              .maybeSingle();
+            
+            if (retryProfile) {
+              console.log('[Auth] Fallback profile created successfully');
+              profile = retryProfile;
+            }
+          }
+        }
+
         if (!profile) {
           setStatus("Setting up your profile...");
+          trackAuthRedirect('onboarding');
           navigate('/edit-profile', { replace: true });
         } else if (!profile.has_completed_onboarding) {
           setStatus("Completing onboarding...");
+          trackAuthRedirect('onboarding');
           navigate('/edit-profile', { replace: true });
         } else {
           setStatus("Welcome back!");
+          trackAuthComplete(isOAuthUser ? (user.app_metadata.provider as 'google' | 'apple') : 'email');
+          trackAuthRedirect('home');
           navigate('/', { replace: true });
         }
       } catch (error) {
         console.error('Auth callback error:', error);
         setStatus("Something went wrong. Redirecting to login...");
+        trackAuthRedirect('auth');
         setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
     };
@@ -119,8 +182,8 @@ const AuthCallback: React.FC = () => {
           alt="clbhouz"
           className="h-10 w-auto opacity-80"
         />
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" />
-        <p className="text-white/50 text-sm">{status}</p>
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" aria-label="Loading" />
+        <p className="text-white/50 text-sm" aria-live="polite">{status}</p>
       </div>
     </div>
   );

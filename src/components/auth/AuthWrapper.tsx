@@ -3,7 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocation, Navigate } from 'react-router-dom';
 import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
 import { EmailVerificationGate } from './EmailVerificationGate';
-
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 interface AuthWrapperProps {
   children: React.ReactNode;
 }
@@ -23,6 +23,9 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
   const wasLoadingRef = useRef(false);
+
+  // FIX 6: Enforce 30-day session timeout
+  useSessionTimeout();
 
   // Track orange loader show/hide for boot timeline (audit only, no UI shown)
   useEffect(() => {
