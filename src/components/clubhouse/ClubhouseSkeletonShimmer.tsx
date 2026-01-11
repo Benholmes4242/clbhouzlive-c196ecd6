@@ -107,7 +107,7 @@ const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => {
  */
 const CreatorCapsuleSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
   <div 
-    className="flex flex-col gap-2.5 p-3 rounded-sq-lg bg-black/50 backdrop-blur-2xl border border-white/10"
+    className="flex flex-col gap-2.5 p-3 rounded-sq-lg bg-[var(--clubhouse-bg-capsule)] backdrop-blur-2xl border border-[var(--clubhouse-border-light)]"
     style={{ maxWidth: '75vw', minWidth: 200 }}
   >
     {/* Top row: avatar + username (matches collapsed state) */}
@@ -163,7 +163,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
         <motion.div
           className={cn(
             "absolute inset-0 z-50 pointer-events-none",
-            "bg-[#0F0F0F]",
+            "bg-[var(--clubhouse-bg-page)]",
             className
           )}
           initial={{ opacity: 1 }}

@@ -28,50 +28,67 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             }}
             className={cn(
               "flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
-              "transition-all duration-[120ms] ease-out",
+              "transition-all duration-[var(--motion-fast)] ease-out",
               "active:scale-95",
               "focus:outline-none",
               // Active background for light theme
-              isLightTheme && isActive && "bg-slate-100/80",
+              isLightTheme && isActive && "bg-orange-50/80",
               // Active background for dark theme  
-              !isLightTheme && isActive && "bg-white/8"
+              !isLightTheme && isActive && "bg-[var(--clubhouse-bg-active)]",
+              // Hover states
+              isLightTheme && !isActive && "hover:bg-slate-50",
+              !isLightTheme && !isActive && "hover:bg-[var(--clubhouse-bg-hover)]"
             )}
             aria-label={tab.label}
           >
-            {/* Icon */}
-            <Icon 
-              className={cn(
-                "h-[24px] w-[24px] transition-all duration-300",
-                "[stroke-width:1.5]",
-                // Scale up slightly when active
-                isActive && "scale-110",
-                isLightTheme
-                  ? isActive 
-                    ? "text-slate-800 opacity-100" 
-                    : "text-slate-500 opacity-90"
-                  : isActive 
-                    ? "text-primary" 
-                    : isDimmed 
-                      ? "text-[rgba(255,255,255,0.55)]" 
-                      : "text-white/70"
+            {/* Icon with active indicator */}
+            <div className={cn(
+              "relative transition-transform duration-[var(--motion-fast)]",
+              isActive && "scale-110"
+            )}>
+              <Icon 
+                className={cn(
+                  "h-[24px] w-[24px] transition-all duration-[var(--motion-medium)]",
+                  "[stroke-width:1.5]",
+                  isLightTheme
+                    ? isActive 
+                      ? "text-orange-600" 
+                      : "text-slate-500"
+                    : isActive 
+                      ? "text-orange-500" 
+                      : isDimmed 
+                        ? "text-[var(--clubhouse-text-dimmed)]" 
+                        : "text-[var(--clubhouse-text-muted)]"
+                )}
+              />
+              
+              {/* Active indicator dot */}
+              {isActive && (
+                <span 
+                  className={cn(
+                    "absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
+                    "transition-all duration-[var(--motion-fast)]",
+                    isLightTheme ? "bg-orange-600" : "bg-orange-500"
+                  )}
+                />
               )}
-            />
+            </div>
             
             {/* Label */}
             <span 
               className={cn(
-                "text-[10px] leading-none transition-colors duration-300 font-medium",
+                "text-[10px] leading-none transition-colors duration-[var(--motion-medium)] font-medium",
                 isLightTheme
                   ? isActive 
-                    ? "text-slate-800" 
+                    ? "text-orange-600" 
                     : "text-slate-500"
                   : isActive 
                     ? isDimmed 
-                      ? "text-[rgba(255,255,255,0.78)]" 
-                      : "text-white"
+                      ? "text-orange-500/90" 
+                      : "text-orange-500"
                     : isDimmed 
-                      ? "text-[rgba(255,255,255,0.42)]" 
-                      : "text-white/60"
+                      ? "text-[var(--clubhouse-text-dimmed)]" 
+                      : "text-[var(--clubhouse-text-muted)]"
               )}
             >
               {tab.label}

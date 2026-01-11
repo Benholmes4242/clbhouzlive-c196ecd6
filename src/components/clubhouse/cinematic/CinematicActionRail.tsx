@@ -102,11 +102,11 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
         aria-label={ariaLabel}
         className={cn(
           'relative rounded-full',
-          'bg-black/25 backdrop-blur-xl',
-          'border border-white/10',
+          'bg-[var(--clubhouse-bg-action)] backdrop-blur-xl',
+          'border border-[var(--clubhouse-border-light)]',
           'flex items-center justify-center',
           'shadow-[0_4px_12px_rgba(0,0,0,0.25)]',
-          'hover:bg-black/35'
+          'hover:bg-[var(--clubhouse-bg-capsule)] transition-colors duration-[var(--motion-fast)]'
         )}
         style={{ width: ICON_SIZE, height: ICON_SIZE }}
       >
