@@ -422,12 +422,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             // Background tint based on mode
             isReview && isOutstanding 
               ? 'bg-[rgba(210,180,97,0.08)]' 
-              : 'bg-[var(--clubhouse-bg-capsule)]'
+              : 'bg-black/50'
           )}
-          style={{ 
-            borderColor,
-            transition: 'background-color var(--motion-medium) var(--ease-standard)'
-          }}
+          style={{ borderColor }}
         >
           {/* Collapsed State - mode-dependent */}
           {isReview ? reviewContent : regularCollapsedContent}

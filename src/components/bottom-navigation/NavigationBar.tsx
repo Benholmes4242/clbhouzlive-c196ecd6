@@ -27,54 +27,51 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               onTabClick(tab);
             }}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 flex-1 py-1.5",
-              "transition-all ease-out",
+              "flex flex-col items-center justify-center gap-1 flex-1 py-1.5 mx-0.5 rounded-xl",
+              "transition-all duration-[120ms] ease-out",
               "active:scale-95",
               "focus:outline-none",
-              // Only clubhouse gets special active/hover backgrounds
-              !isLightTheme && isActive && "bg-[var(--clubhouse-bg-active)] mx-0.5 rounded-xl",
-              !isLightTheme && !isActive && "hover:bg-[var(--clubhouse-bg-hover)] mx-0.5 rounded-xl"
+              // Active background for light theme
+              isLightTheme && isActive && "bg-slate-100/80",
+              // Active background for dark theme  
+              !isLightTheme && isActive && "bg-white/8"
             )}
             aria-label={tab.label}
           >
             {/* Icon */}
-            <div className={cn(
-              "relative",
-              // Only clubhouse gets scale on active
-              !isLightTheme && isActive && "scale-110"
-            )}>
-              <Icon 
-                className={cn(
-                  "h-[24px] w-[24px] transition-all",
-                  "[stroke-width:1.5]",
-                  isLightTheme
-                    ? isActive 
-                      ? "text-slate-800 opacity-100" 
-                      : "text-slate-600 opacity-70"
-                    : isActive 
-                      ? "text-orange-500" 
-                      : isDimmed 
-                        ? "text-[var(--clubhouse-text-dimmed)]" 
-                        : "text-[var(--clubhouse-text-muted)]"
-                )}
-              />
-            </div>
+            <Icon 
+              className={cn(
+                "h-[24px] w-[24px] transition-all duration-300",
+                "[stroke-width:1.5]",
+                // Scale up slightly when active
+                isActive && "scale-110",
+                isLightTheme
+                  ? isActive 
+                    ? "text-slate-800 opacity-100" 
+                    : "text-slate-500 opacity-90"
+                  : isActive 
+                    ? "text-primary" 
+                    : isDimmed 
+                      ? "text-[rgba(255,255,255,0.55)]" 
+                      : "text-white/70"
+              )}
+            />
             
             {/* Label */}
             <span 
               className={cn(
-                "text-[10px] leading-none transition-colors font-medium",
+                "text-[10px] leading-none transition-colors duration-300 font-medium",
                 isLightTheme
                   ? isActive 
-                    ? "text-slate-800 opacity-100" 
-                    : "text-slate-600 opacity-70"
+                    ? "text-slate-800" 
+                    : "text-slate-500"
                   : isActive 
                     ? isDimmed 
-                      ? "text-orange-500/90" 
-                      : "text-orange-500"
+                      ? "text-[rgba(255,255,255,0.78)]" 
+                      : "text-white"
                     : isDimmed 
-                      ? "text-[var(--clubhouse-text-dimmed)]" 
-                      : "text-[var(--clubhouse-text-muted)]"
+                      ? "text-[rgba(255,255,255,0.42)]" 
+                      : "text-white/60"
               )}
             >
               {tab.label}

@@ -262,7 +262,7 @@ const Clubhouse = () => {
       ref={clubhouseRootRef} 
       className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
       style={{ 
-        "--bg-page": "var(--clubhouse-bg-page)", 
+        "--bg-page": "#0F0F0F", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
