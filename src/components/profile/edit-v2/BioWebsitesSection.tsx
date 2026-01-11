@@ -99,7 +99,7 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleAddWebsite}
-              className="h-7 gap-1.5 text-xs text-primary hover:text-primary"
+              className="h-7 gap-1.5 text-xs bg-[#E2E8F0] text-foreground hover:bg-slate-300 rounded-full px-3"
             >
               <Plus className="w-3.5 h-3.5" />
               Add link
