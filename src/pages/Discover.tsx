@@ -221,21 +221,18 @@ const Discover = () => {
     hasMore,
   });
 
-  // Show skeleton during rehydration (MUST be after all hooks)
-  if (isRehydrating) {
-    return <DiscoverSkeleton />;
-  }
+  // ============================================
+  // ALL CALLBACKS MUST USE useCallback HOOKS
+  // Defined BEFORE any early returns
+  // ============================================
 
-  // No loading state needed - Suspense at route level handles it with GenericPageSkeleton
-  // if (loading && allContent.length === 0) return null;
-
-  const handleLike = (contentId: string) => {
+  const handleLike = useCallback((contentId: string) => {
     // Update likes optimistically via engagement hook
-  };
+  }, []);
 
-  const handleFollow = (contentId: string) => {
+  const handleFollow = useCallback((contentId: string) => {
     // Update follow status optimistically - could be enhanced with actual API call
-  };
+  }, []);
 
   // Handle media click from DiscoverContent - opens unified fullscreen player
   const handleMediaClick = useCallback((item: ExploreContentItem, index?: number) => {
@@ -266,10 +263,23 @@ const Discover = () => {
     }
   }, [allContent, openFullscreen]);
 
-  const handleUserFollow = (userId: string) => {
+  const handleUserFollow = useCallback((userId: string) => {
     console.log('User followed:', userId);
     // In real app: API call to follow user
-  };
+  }, []);
+
+  // ============================================
+  // EARLY RETURNS ARE SAFE AFTER ALL HOOKS
+  // ============================================
+
+  // Show skeleton during rehydration
+  if (isRehydrating) {
+    return <DiscoverSkeleton />;
+  }
+
+  // ============================================
+  // MAIN RENDER
+  // ============================================
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)]">
