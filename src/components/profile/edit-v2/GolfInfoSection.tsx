@@ -444,21 +444,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
               <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Additional Clubs
               </Label>
-              <div className="flex items-center gap-2">
-                <VisibilityDropdown
-                  value={additionalClubsVisibility}
-                  onChange={(val) => onVisibilityChange('additionalClubsVisibility', val)}
-                />
-                {!showAddClub && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddClub(true)}
-                    className="h-7 px-3 text-xs rounded-full border border-border hover:bg-muted/40 transition"
-                  >
-                    + Add club
-                  </button>
-                )}
-              </div>
+              <VisibilityDropdown
+                value={additionalClubsVisibility}
+                onChange={(val) => onVisibilityChange('additionalClubsVisibility', val)}
+              />
             </div>
             
             <p className="text-xs text-muted-foreground -mt-1">
@@ -577,6 +566,19 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
               <p className="text-xs text-muted-foreground py-2">
                 Add clubs you also play at regularly.
               </p>
+            )}
+            
+            {/* Add club button - bottom right */}
+            {!showAddClub && (
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowAddClub(true)}
+                  className="h-7 px-3 text-xs rounded-full border border-border bg-[#F8FAFC] hover:bg-slate-100 transition"
+                >
+                  + Add club
+                </button>
+              </div>
             )}
           </div>
         )}

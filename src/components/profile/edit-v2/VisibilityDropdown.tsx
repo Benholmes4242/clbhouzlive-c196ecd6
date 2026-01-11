@@ -61,7 +61,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
             <span className="ml-1 font-medium">{selectedOption.label}</span>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent align="end" className="min-w-[200px]">
+        <SelectContent align="end" className="min-w-[200px] bg-white border-slate-200 z-50 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
           {VISIBILITY_OPTIONS.map((option) => {
             const OptionIcon = option.icon;
             return (
