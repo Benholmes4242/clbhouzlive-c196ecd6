@@ -413,11 +413,11 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                   )}>
                     <div className={cn(
                       "w-6 h-6 rounded-md flex items-center justify-center",
-                      useLightTheme ? "bg-green-100" : "bg-green-500/20"
+                      useLightTheme ? "bg-orange-100" : "bg-primary/20"
                     )}>
                       <MapPin className={cn(
                         "h-3.5 w-3.5",
-                        useLightTheme ? "text-green-600" : "text-green-400"
+                        useLightTheme ? "text-orange-600" : "text-primary"
                       )} />
                     </div>
                     <span className={cn(
