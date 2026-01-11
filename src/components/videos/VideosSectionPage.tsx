@@ -325,10 +325,9 @@ export const VideosSectionPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] pb-20">
-      {/* Sticky Header with back button and section title - enhanced */}
-      <div className="sticky top-0 z-30 bg-[var(--bg-page)]/95 backdrop-blur-md">
-        {/* Back button row */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-border/50">
+      {/* Section title - scrolls away (NOT sticky) */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex items-center gap-3 mb-1">
           <button
             onClick={handleBack}
             className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
@@ -340,8 +339,10 @@ export const VideosSectionPage: React.FC = () => {
             <p className="text-xs text-muted-foreground truncate">{SECTION_DESCRIPTIONS[section]}</p>
           </div>
         </div>
-        
-        {/* Command Center: Search + Sort + Pills */}
+      </div>
+
+      {/* Sticky header - Search + Sort + Pills anchored to top */}
+      <div className="sticky top-0 z-40 bg-[var(--bg-page)]">
         <DiscoverCommandCenter
           searchPlaceholder="Search videos, creators, courses..."
           searchValue={searchQuery}
