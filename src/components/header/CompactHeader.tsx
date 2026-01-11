@@ -70,35 +70,35 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Theme-specific styling
+  // Theme-specific styling - using CSS variables for consistency
   const LIGHT_BG = 'rgba(248, 250, 252, 0.95)';
   const LIGHT_BORDER = 'rgba(0, 0, 0, 0.06)';
-  const DIM_BG = 'rgba(15, 15, 15, 0.02)';
-  const DIM_BORDER = 'rgba(255, 255, 255, 0.06)';
-  const STANDARD_BG = 'rgba(10, 10, 10, 0.95)';
-  const STANDARD_BORDER = 'rgba(255, 255, 255, 0.06)';
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
   // Get background based on theme
   const getBackground = () => {
     if (useLightTheme) return LIGHT_BG;
-    if (isDimmed) return DIM_BG;
-    return STANDARD_BG;
+    if (isDimmed) return 'var(--clubhouse-dim-bg-header)';
+    return 'var(--clubhouse-bg-header)';
   };
 
   // Get border based on theme
   const getBorder = () => {
     if (useLightTheme) return LIGHT_BORDER;
     if (isDimmed && isClubhouseRoute) return "transparent";
-    if (isDimmed) return DIM_BORDER;
-    return STANDARD_BORDER;
+    if (isDimmed) return 'var(--clubhouse-border)';
+    return 'var(--clubhouse-border)';
   };
   
   // Hide brand (logo + wordmark) when dimmed on Clubhouse
   const hideBrand = isDimmed && isClubhouseRoute;
 
-  // Clubhouse uses 55px header, other pages use 40px
-  const headerHeight = isClubhouseRoute ? 55 : 40;
+  // Standardized header height - 55px for all routes
+  const headerHeight = 55;
+  
+  // Standardized element sizes
+  const logoSize = 'h-9 w-9';
+  const searchButtonSize = 'h-9 w-9';
   
   return (
     <>
@@ -138,19 +138,27 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="clbhouz"
               className={cn(
-                "object-contain transition-opacity duration-300",
-                isClubhouseRoute ? "h-10 w-10" : "h-8 w-8",
+                "object-contain transition-opacity duration-[var(--motion-fast)]",
+                logoSize,
                 hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />
             {/* Wordmark - desktop only */}
             <span 
               className={cn(
-                "hidden md:inline font-semibold tracking-tight transition-colors duration-300",
-                isClubhouseRoute ? "text-xl" : "text-lg",
+                "hidden md:inline font-semibold tracking-tight transition-colors duration-[var(--motion-medium)]",
+                "text-lg",
                 useLightTheme ? "text-slate-800" : ""
               )}
-              style={{ color: useLightTheme ? '#3A3F46' : hideBrand ? 'rgba(255, 255, 255, 0)' : isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
+              style={{ 
+                color: useLightTheme 
+                  ? '#3A3F46' 
+                  : hideBrand 
+                    ? 'rgba(255, 255, 255, 0)' 
+                    : isDimmed 
+                      ? 'var(--clubhouse-text-dimmed)' 
+                      : 'var(--clubhouse-text-primary)' 
+              }}
             >
               clbhouz
             </span>
@@ -174,22 +182,22 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     navigate(item.path);
                   }}
                   className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
+                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-[var(--motion-medium)]",
                     useLightTheme 
                       ? isActive 
                         ? "text-slate-800 bg-slate-900/8" 
                         : "text-slate-600 hover:text-slate-800 hover:bg-slate-900/5"
                       : isActive 
                         ? isDimmed 
-                          ? "bg-white/5" 
-                          : "text-white bg-white/10"
+                          ? "bg-[var(--clubhouse-bg-hover)]" 
+                          : "text-white bg-[var(--clubhouse-bg-active)]"
                         : isDimmed
-                          ? "hover:bg-white/5"
-                          : "text-white/60 hover:text-white hover:bg-white/5"
+                          ? "hover:bg-[var(--clubhouse-bg-hover)]"
+                          : "text-[var(--clubhouse-text-muted)] hover:text-white hover:bg-[var(--clubhouse-bg-hover)]"
                   )}
                   style={!useLightTheme ? {
                     color: isDimmed 
-                      ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
+                      ? (isActive ? 'var(--clubhouse-text-secondary)' : 'var(--clubhouse-text-dimmed)')
                       : undefined
                   } : undefined}
                 >
@@ -206,19 +214,19 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               variant="ghost"
               size="icon"
               className={cn(
-                "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
-                isClubhouseRoute ? "h-10 w-10" : "h-8 w-8",
+                "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-[var(--motion-fast)]",
+                searchButtonSize,
                 useLightTheme
                   ? "text-slate-600 hover:text-slate-800 hover:bg-slate-900/5"
                   : isDimmed 
-                    ? "hover:bg-white/5" 
-                    : "text-white/70 hover:text-white hover:bg-white/10"
+                    ? "hover:bg-[var(--clubhouse-bg-hover)]" 
+                    : "text-white/70 hover:text-white hover:bg-[var(--clubhouse-bg-active)]"
               )}
-              style={!useLightTheme ? { color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : undefined } : undefined}
+              style={!useLightTheme ? { color: isDimmed ? 'var(--clubhouse-text-dimmed)' : undefined } : undefined}
               onClick={handleSearchClick}
               aria-label="Search"
             >
-              <Search className={isClubhouseRoute ? "h-6 w-6" : "h-5 w-5"} />
+              <Search className="h-5 w-5" />
             </Button>
             
             {/* Identity pill (mobile only, logged in users) */}

@@ -213,15 +213,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               isClubhouseRoute
                 ? isDimmed
                   ? "border-transparent backdrop-blur-0"
-                  : "border border-[rgba(255,255,255,0.06)] border-b-0 backdrop-blur-xl"
+                  : "border border-[var(--clubhouse-border)] border-b-0 backdrop-blur-xl"
                 : "border border-slate-200/60 border-b-0 backdrop-blur-xl"
             )}
               data-chrome="bottom-nav"
               style={{
                 background: isDimmed 
-                  ? 'rgba(13, 13, 13, 0.02)'
+                  ? 'var(--clubhouse-dim-bg-footer)'
                   : isClubhouseRoute 
-                    ? 'rgba(13, 13, 13, 0.95)'
+                    ? 'var(--clubhouse-bg-footer)'
                     : 'rgba(248, 250, 252, 0.95)',
                 backdropFilter: isDimmed ? 'none' : undefined,
                 WebkitBackdropFilter: isDimmed ? 'none' : undefined,

@@ -109,6 +109,34 @@ html.lightbox-open {
 
   --radius-tile: 18px;
   
+  /* ========================================
+     CLUBHOUSE DARK THEME TOKENS
+     ======================================== */
+  /* Dark backgrounds */
+  --clubhouse-bg-page: #0F0F0F;
+  --clubhouse-bg-header: rgba(10, 10, 10, 0.95);
+  --clubhouse-bg-footer: rgba(13, 13, 13, 0.95);
+  --clubhouse-bg-card: rgba(10, 10, 10, 0.78);
+  --clubhouse-bg-action: rgba(0, 0, 0, 0.25);
+  --clubhouse-bg-capsule: rgba(0, 0, 0, 0.5);
+  --clubhouse-bg-hover: rgba(255, 255, 255, 0.05);
+  --clubhouse-bg-active: rgba(255, 255, 255, 0.10);
+  
+  /* Dark text */
+  --clubhouse-text-primary: #FFFFFF;
+  --clubhouse-text-secondary: rgba(255, 255, 255, 0.90);
+  --clubhouse-text-muted: rgba(255, 255, 255, 0.60);
+  --clubhouse-text-dimmed: rgba(255, 255, 255, 0.55);
+  
+  /* Dark borders */
+  --clubhouse-border: rgba(255, 255, 255, 0.06);
+  --clubhouse-border-light: rgba(255, 255, 255, 0.10);
+  --clubhouse-border-hover: rgba(255, 255, 255, 0.16);
+  
+  /* Cinema dim mode overrides */
+  --clubhouse-dim-bg-header: rgba(15, 15, 15, 0.02);
+  --clubhouse-dim-bg-footer: rgba(13, 13, 13, 0.02);
+  
   /* Echo brand orange - for accents */
   --echo-orange: 35 92% 57%;  /* #f89c2a in HSL */
   
@@ -197,6 +225,11 @@ html.lightbox-open {
   --squircle-unlocked-bg: rgba(252, 252, 254, 0.97);
   --squircle-locked-bg: rgba(248, 248, 250, 0.95);
   --journey-rail-base: rgba(31, 36, 40, 0.08);
+}
+
+/* Apply clubhouse dark theme when on clubhouse route */
+.route-clubhouse {
+  --bg-page: var(--clubhouse-bg-page);
 }
 
 /* Dark mode achievement card tokens */
