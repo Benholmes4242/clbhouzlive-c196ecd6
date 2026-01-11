@@ -1,9 +1,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { ExploreContentItem } from '@/components/explore/types';
+import { ExploreContentItem, FILTER_TYPES } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
 import { logDataFetch, logLoadMore } from '@/utils/debugWatchPage';
+import { FLAGS } from '@/config/flags';
+import { getMockVideosByDuration } from '@/mocks/videosTabMock';
 
 const POSTS_PER_PAGE = 20; // Increased for better performance
 const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
@@ -186,10 +188,22 @@ export const useInfiniteExploreContent = (
     try {
       // Get fresh offset value from state to avoid stale closure
       const freshOffset = offsetStates[currentFilter] || 0;
-      let posts = [];
+      let posts: ExploreContentItem[] = [];
       
-      // Use specific fetcher for Friends filter
-      if (activeFilter === 'Friends') {
+      // Check if we should use mock data for Videos tab
+      const isVideosFilter = activeFilter === FILTER_TYPES.VIDEOS || activeFilter === 'Videos';
+      const useMockVideos = FLAGS.VIDEOS_TAB_MOCK_ENABLED && isVideosFilter;
+      
+      if (useMockVideos) {
+        // Use mock videos for testing
+        const mockPosts = getMockVideosByDuration(durationFilter, 30);
+        // Simulate pagination with offset
+        const startIndex = freshOffset;
+        const endIndex = startIndex + POSTS_PER_PAGE;
+        posts = mockPosts.slice(startIndex, endIndex);
+        console.log('[useInfiniteExploreContent] Using mock videos:', posts.length, 'items');
+      } else if (activeFilter === 'Friends') {
+        // Use specific fetcher for Friends filter
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
         // Try to fetch real posts with filter and subfilter
@@ -240,8 +254,10 @@ export const useInfiniteExploreContent = (
           return pruneFilterMap(updated, currentFilter);
         });
         
-        // Start preloading next batch
-        setTimeout(() => preloadMore(abortSignal), 100);
+        // Start preloading next batch (skip for mock data)
+        if (!useMockVideos) {
+          setTimeout(() => preloadMore(abortSignal), 100);
+        }
         
         // If we got fewer posts than requested, we might be at the end
         if (posts.length < POSTS_PER_PAGE) {
