@@ -47,7 +47,7 @@ const HandicapSyncInlineNotice: React.FC<HandicapSyncInlineNoticeProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-3 py-2 px-3 bg-muted/50 border border-border rounded-sq-sm mt-2">
+    <div className="flex items-center gap-3 py-2 px-3 bg-[#F8FAFC] border border-border rounded-sq-sm mt-2">
       <Zap className="h-4 w-4 text-primary-accent flex-shrink-0" />
       <div className="flex-1 min-w-0">
         <span className="text-xs text-muted-foreground">

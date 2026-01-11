@@ -50,9 +50,9 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         onClick={handleClick}
         className="inline-flex items-center gap-3 group"
       >
-        {/* Squircle spec: 1/1.05 aspect ratio, 34% border radius - matches ProfileAvatarRing */}
+        {/* Squircle spec: 1/1.05 aspect ratio, 34% border radius - matches Creator capsule SquircleAvatar */}
         <div 
-          className="overflow-hidden border border-border bg-muted/60 relative"
+          className="overflow-hidden border border-border bg-[#F8FAFC] relative"
           style={{
             width: '80px',
             aspectRatio: '1 / 1.05',
