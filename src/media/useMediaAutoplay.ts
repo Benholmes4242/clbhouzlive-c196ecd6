@@ -170,6 +170,13 @@ const syncPlayingFromRuntime = useCallback(() => {
       return;
     }
 
+    // Guard: Skip if already registered with same element
+    const existing = registry.current.get(id);
+    if (existing && existing.element === element) {
+      // Already registered with same element, skip duplicate registration
+      return;
+    }
+
     // Register with media system
     mediaSystem.register({
       id,
@@ -187,7 +194,6 @@ const syncPlayingFromRuntime = useCallback(() => {
     });
 
     // Create/update registration
-    const existing = registry.current.get(id);
     const registration: MediaAutoplayRegistration = {
       id,
       element,

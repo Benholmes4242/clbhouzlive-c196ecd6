@@ -229,24 +229,40 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
     }
   }, [navigate, onMomentClick, moments]);
 
+  // Use ref to hold registerMedia to avoid dependency issues causing infinite loops
+  const registerMediaRef = useRef(registerMedia);
+  registerMediaRef.current = registerMedia;
+  
+  // Track registered IDs to prevent duplicate registrations
+  const registeredIdsRef = useRef<Set<string>>(new Set());
+  
   // Create registration callback for each moment
-  // Uses requestAnimationFrame to ensure element is fully mounted before registration
+  // Uses stable ref pattern to prevent infinite re-registration loops
   const createRegisterRef = useCallback((momentId: string, index: number) => {
     return (el: HTMLVideoElement | null) => {
       if (!el) {
         // Unregister when element is unmounted
-        registerMedia({
-          id: momentId,
-          element: null,
-          isCandidate: false,
-          sortIndex: index,
-        });
+        if (registeredIdsRef.current.has(momentId)) {
+          registeredIdsRef.current.delete(momentId);
+          registerMediaRef.current({
+            id: momentId,
+            element: null,
+            isCandidate: false,
+            sortIndex: index,
+          });
+        }
+        return;
+      }
+      
+      // Skip if already registered with same element
+      if (registeredIdsRef.current.has(momentId)) {
         return;
       }
       
       // Use requestAnimationFrame to ensure element is fully mounted
       requestAnimationFrame(() => {
-        registerMedia({
+        registeredIdsRef.current.add(momentId);
+        registerMediaRef.current({
           id: momentId,
           element: el,
           isCandidate: true,
@@ -254,7 +270,7 @@ export const DiscoverMomentsGrid: React.FC<DiscoverMomentsGridProps> = ({
         });
       });
     };
-  }, [registerMedia]);
+  }, []); // Empty deps - uses refs for stability
 
   // Initial loading state with skeleton
   if (isLoading && moments.length === 0) {
