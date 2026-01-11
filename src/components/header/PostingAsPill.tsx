@@ -21,12 +21,20 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
 
     if (isLoading || !activeActor) {
       return (
-        <div className={cn(
-          "flex items-center gap-2 px-2 py-1.5 rounded-sq-pill border",
-          useLightTheme 
-            ? "bg-white border-slate-200" 
-            : "bg-white/5 border-white/10"
-        )}>
+        <div 
+          className={cn(
+            "flex items-center gap-2 px-2 py-1.5 rounded-sq-pill border",
+            useLightTheme 
+              ? "border-white/40" 
+              : "bg-white/5 border-white/10"
+          )}
+          style={useLightTheme ? {
+            background: 'rgba(255, 255, 255, 0.6)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+          } : undefined}
+        >
           <div 
             className={cn(
               "h-7 w-7 animate-pulse",
@@ -50,12 +58,18 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         onClick={onClick}
         className={cn(
           "flex items-center gap-1.5 pl-1 pr-2 h-8",
-          "rounded-sq-pill border transition-colors",
+          "rounded-sq-pill border transition-all",
           "max-w-[180px]",
           useLightTheme 
-            ? "bg-white border-slate-200/80 hover:bg-slate-50 active:bg-slate-100" 
+            ? "border-white/40 hover:border-white/60" 
             : "bg-white/5 border-white/10 hover:bg-white/10 active:bg-white/15"
         )}
+        style={useLightTheme ? {
+          background: 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+        } : undefined}
       >
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">
