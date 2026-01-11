@@ -6,11 +6,8 @@
 import { ExploreContentItem, CreatorInfo } from '@/components/explore/types';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
-// Sample video sources (Cloudflare Stream test videos)
-const SAMPLE_VIDEO_URLS = [
-  'https://customer-0yn8l30qcd4ov2nn.cloudflarestream.com/ea95132c15732412d22c1476fa83f27a/manifest/video.m3u8',
-  'https://customer-0yn8l30qcd4ov2nn.cloudflarestream.com/3c1f0e0c8c1f4c1e8c1f0e0c8c1f4c1e/manifest/video.m3u8',
-];
+// No actual video URLs - we just show posters for mock data
+// This prevents "video unavailable" errors
 
 const SAMPLE_THUMBNAILS = [
   'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=600&fit=crop',
@@ -96,7 +93,7 @@ function generateMockVideo(index: number, durationRange?: keyof typeof DURATION_
   return {
     id: `mock-video-${index}-${Date.now()}`,
     type: 'video',
-    src: randomElement(SAMPLE_VIDEO_URLS),
+    src: '', // No video URL - just show poster
     thumbnailSrc: SAMPLE_THUMBNAILS[thumbnailIndex],
     title: randomElement(VIDEO_TITLES),
     likes: randomInt(50, 15000),
@@ -118,7 +115,7 @@ function generateMockVideo(index: number, durationRange?: keyof typeof DURATION_
     media: [{
       id: `media-${index}`,
       media_type: 'video',
-      media_url: randomElement(SAMPLE_VIDEO_URLS),
+      media_url: '', // No video URL - just show poster
       poster_url: SAMPLE_THUMBNAILS[thumbnailIndex],
       width: isLandscape ? 1920 : 1080,
       height: isLandscape ? 1080 : 1920,
@@ -144,7 +141,7 @@ function generateMockLongFormVideo(index: number, section: string): LongFormVide
     creatorName: creator.name,
     creatorAvatarUrl: creator.avatarUrl,
     thumbnailUrl: thumbnail,
-    mediaUrl: randomElement(SAMPLE_VIDEO_URLS),
+    mediaUrl: undefined, // No video URL - just show poster/thumbnail
     duration: formatDuration(durationSeconds),
     durationSeconds,
     views: randomInt(100, 50000),
