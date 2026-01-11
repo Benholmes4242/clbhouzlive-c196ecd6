@@ -1001,9 +1001,27 @@ const ClubhouseVerticalGrid: React.FC<ClubhouseVerticalGridProps> = ({
               media_url: post?.src
             }];
             const currentMedia = mediaItems[currentMediaIdx] || mediaItems[0];
-            return currentMedia?.media_url
-              ? generateStreamThumbnailUrl(uidFromNode({ src: currentMedia.media_url || '' }) || '', { height: 400 })
-              : undefined;
+            const mediaAny = currentMedia as any;
+            
+            // 1. Use poster_url directly if available
+            if (mediaAny?.poster_url) {
+              return mediaAny.poster_url;
+            }
+            
+            // 2. For images, use media_url directly
+            if (mediaAny?.media_type === 'image' && mediaAny?.media_url) {
+              return mediaAny.media_url;
+            }
+            
+            // 3. Generate from Cloudflare Stream URL
+            if (mediaAny?.media_url) {
+              const uid = uidFromNode({ src: mediaAny.media_url });
+              if (uid) {
+                return generateStreamThumbnailUrl(uid, { height: 400 });
+              }
+            }
+            
+            return undefined;
           })()}
           aspectRatio={(() => {
             const post = filteredPosts[currentIndex];
