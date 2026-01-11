@@ -169,6 +169,13 @@ class MediaRuntimeCore {
   }): void {
     const { id, element, surface, sortIndex, observeTarget } = args;
     
+    // Guard: Skip if already registered with same element
+    const existing = this.registry.get(id);
+    if (existing && existing.videoElement === element) {
+      // Already registered with same element, skip
+      return;
+    }
+    
     this.registry.set(id, {
       id,
       videoElement: element,
@@ -185,7 +192,8 @@ class MediaRuntimeCore {
     // Tag element for callbacks
     element.dataset.runtimeMediaId = id;
     
-    if (DEBUG_MEDIA_RUNTIME) {
+    // Only log on first registration (for debugging)
+    if (DEBUG_MEDIA_RUNTIME && !existing) {
       console.log('[MediaRuntime] Registered:', id.slice(0, 8), surface);
     }
     
