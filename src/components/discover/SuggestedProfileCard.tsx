@@ -147,15 +147,13 @@ export const SuggestedProfileCard: React.FC<SuggestedProfileCardProps> = ({
     >
       {/* Card content - flex column with auto height */}
       <div className="flex flex-col pt-4 pb-3 px-3">
-        {/* Avatar - centered with subtle ring */}
+        {/* Avatar - centered */}
         <div className="relative flex justify-center mb-3">
-          <div className="ring-2 ring-border/30 rounded-full">
-            <SquircleAvatar
-              size={64}
-              src={avatarUrl}
-              alt={displayName}
-            />
-          </div>
+          <SquircleAvatar
+            size={64}
+            src={avatarUrl}
+            alt={displayName}
+          />
         </div>
 
         {/* Text stack - tighter spacing */}
