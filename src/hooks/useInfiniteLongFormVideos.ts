@@ -73,7 +73,7 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
   } = options;
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-infinite-longform-v4', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
+    queryKey: ['videos-infinite-longform-v5', section, followedCreatorIds.join(','), creatorUserId || '', minDuration, category || 'all', sort],
     initialPageParam: 0,
     
     queryFn: async ({ pageParam = 0 }): Promise<LongFormVideosPage> => {
