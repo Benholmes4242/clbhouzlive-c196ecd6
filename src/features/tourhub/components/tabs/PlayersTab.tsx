@@ -204,6 +204,34 @@ export function PlayersTab() {
   }, [filter, worldRankedPlayers, statsMap, processedPlayers]);
   const currentContext = TAB_CONTEXT[filter];
 
+  // Calculate filter counts - MUST be before any early returns
+  const filterCounts = useMemo(() => {
+    if (!players) return { all: 0, topRanked: 0, mostActive: 0, rookies: 0 };
+    
+    const currentYear = new Date().getFullYear();
+    
+    // Top ranked: players with valid world rank
+    const topRankedCount = Math.min(50, worldRankedPlayers.length);
+    
+    // Most active: events_played >= 10
+    const mostActiveCount = players.filter(p => {
+      const stats = statsMap.get(p.id);
+      return stats?.events_played && stats.events_played >= 10;
+    }).length;
+    
+    // Rookies: turned pro in last 3 years
+    const rookiesCount = players.filter(p => 
+      p.turned_pro && p.turned_pro >= currentYear - 3
+    ).length;
+    
+    return {
+      all: players.length,
+      topRanked: topRankedCount,
+      mostActive: mostActiveCount,
+      rookies: rookiesCount,
+    };
+  }, [players, worldRankedPlayers, statsMap]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -239,34 +267,6 @@ export function PlayersTab() {
   // Check for empty filtered results
   const hasNoRankingData = filter === 'top-ranked' && processedPlayers.length === 0 && region === 'all';
   const hasNoRegionResults = processedPlayers.length === 0 && region !== 'all';
-
-  // Calculate filter counts
-  const filterCounts = useMemo(() => {
-    if (!players) return { all: 0, topRanked: 0, mostActive: 0, rookies: 0 };
-    
-    const currentYear = new Date().getFullYear();
-    
-    // Top ranked: players with valid world rank
-    const topRankedCount = Math.min(50, worldRankedPlayers.length);
-    
-    // Most active: events_played >= 10
-    const mostActiveCount = players.filter(p => {
-      const stats = statsMap.get(p.id);
-      return stats?.events_played && stats.events_played >= 10;
-    }).length;
-    
-    // Rookies: turned pro in last 3 years
-    const rookiesCount = players.filter(p => 
-      p.turned_pro && p.turned_pro >= currentYear - 3
-    ).length;
-    
-    return {
-      all: players.length,
-      topRanked: topRankedCount,
-      mostActive: mostActiveCount,
-      rookies: rookiesCount,
-    };
-  }, [players, worldRankedPlayers, statsMap]);
 
   return (
     <div className="space-y-5 bg-[#F8FAFC] -mx-4 px-4 py-6 min-h-screen">
