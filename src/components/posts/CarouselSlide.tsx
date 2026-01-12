@@ -17,6 +17,7 @@ interface CarouselSlideProps {
     previewUrl?: string;
     url?: string;
     file?: File;
+    thumbnailUrl?: string;
     alt?: string;
   };
   index?: number;
@@ -48,6 +49,7 @@ export default function CarouselSlide({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const { toast } = useToast();
   
   const showSkeleton = useCappedLoading(loaded, 600);
@@ -61,24 +63,46 @@ export default function CarouselSlide({
     haptic('light');
   });
 
+  // Create a stable object URL only if needed (avoid recreating blob URLs on re-render)
+  useEffect(() => {
+    if (!item.file) return;
+    if (item.previewUrl || item.url) return;
+
+    const url = URL.createObjectURL(item.file);
+    objectUrlRef.current = url;
+
+    return () => {
+      URL.revokeObjectURL(url);
+      objectUrlRef.current = null;
+    };
+  }, [item.file, item.previewUrl, item.url]);
+
   // Generate base URL for media
-  const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
-  
+  // IMPORTANT: For videos, a poster image is required for a non-playing preview;
+  // the video element often renders "blank" when preload is metadata.
+  const baseUrl = item.previewUrl || item.url || objectUrlRef.current || '';
+
+  // Use thumbnail URLs for poster images
+  const posterUrl = item.type === 'video'
+    ? (
+        // Prefer generated thumbnail (from normalizeFilesToMediaItems / generateVideoPoster)
+        item.thumbnailUrl && item.thumbnailUrl !== baseUrl
+          ? item.thumbnailUrl
+          : (!baseUrl.startsWith('blob:') ? buildVideoPosterUrl(baseUrl, { width: 600, height: 600 }) : undefined)
+      )
+    : buildImageThumbnailUrl(baseUrl, { width: 600, height: 600 });
+
   // Debug logging for video rendering issues
   if (item.type === 'video') {
-    console.log('[CarouselSlide] Video item:', {
+    console.log('[CarouselSlide] Rendering item:', {
       type: item.type,
       hasFile: !!item.file,
-      hasPreviewUrl: !!item.previewUrl,
-      hasUrl: !!item.url,
-      baseUrl: baseUrl ? baseUrl.substring(0, 50) + '...' : 'EMPTY',
+      previewUrl: item.previewUrl,
+      baseUrl: baseUrl,
+      thumbnailUrl: item.thumbnailUrl,
+      usingThumbnailPoster: !!(item.thumbnailUrl && item.thumbnailUrl !== baseUrl),
     });
   }
-  
-  // Use thumbnail URLs for poster images
-  const posterUrl = item.type === 'video' 
-    ? buildVideoPosterUrl(baseUrl, { width: 600, height: 600 })
-    : buildImageThumbnailUrl(baseUrl, { width: 600, height: 600 });
 
   useEffect(() => {
     if (videoRef.current && onVideoRef) {
@@ -177,9 +201,10 @@ export default function CarouselSlide({
             display: 'block',
           }}
           onLoadedMetadata={() => {
-            console.log('[CarouselSlide] Video metadata loaded for:', item.id);
+            console.log('[CarouselSlide] Video metadata loaded successfully');
             handleLoadedMetadata();
           }}
+          onCanPlay={() => console.log('[CarouselSlide] Video can play')}
           onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
           onTimeUpdate={handleTimeUpdate}
           onPlay={() => setIsPlaying(true)}
@@ -229,7 +254,7 @@ export default function CarouselSlide({
       </div>
 
       <img
-        src={posterUrl}
+        src={posterUrl || '/placeholder.svg'}
         alt={item.alt || `Media item ${item.id}`}
         onLoad={() => setLoaded(true)}
         className={cn("w-full h-full object-cover transition-all duration-300",

@@ -154,19 +154,20 @@ export default function CreateMomentMediaStage({
       <div ref={stageContainerRef} className="flex-1 relative" data-ecm-no-dismiss="true">
         {/* Media container wrapper for drag calculations */}
         <div ref={mediaContainerRef} className="relative h-full w-full">
-          <MediaCarousel
-            ref={carouselRef}
-            items={media.map((item) => {
-              const edits = getEdits(item.id);
-              return {
-                id: item.id,
-                type: item.type,
-                previewUrl: item.previewUrl,
-                file: item.file,
-                alt: `Media item ${item.id}`,
-                studioEdits: edits
-              };
-            })}
+            <MediaCarousel
+              ref={carouselRef}
+              items={media.map((item) => {
+                const edits = getEdits(item.id);
+                return {
+                  id: item.id,
+                  type: item.type,
+                  previewUrl: item.previewUrl,
+                  thumbnailUrl: item.thumbnailUrl,
+                  file: item.file,
+                  alt: `Media item ${item.id}`,
+                  studioEdits: edits
+                };
+              })}
             initialIndex={activeIndex}
             onIndexChange={handleCarouselIndexChange}
             onSetCover={(index) => {
