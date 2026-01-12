@@ -356,12 +356,33 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
 
   // === HERO DATA - INDEPENDENT, ALGORITHM-BASED ===
   // The hero uses a SEPARATE query and is NEVER affected by search/sort/tags
-  const { data: trendingHeroData, isLoading: trendingHeroLoading } = useTrendingHero();
+  const { data: trendingHeroData, isLoading: trendingHeroLoading, error: trendingHeroError } = useTrendingHero();
+
+  // Debug: Log hero data state
+  useEffect(() => {
+    console.log('[DiscoverContent] Hero state:', {
+      hasData: !!trendingHeroData,
+      isLoading: trendingHeroLoading,
+      error: trendingHeroError?.message,
+      postId: trendingHeroData?.post?.id?.slice(0, 8),
+      period: trendingHeroData?.trendingPeriod,
+      mediaUrl: trendingHeroData?.post?.media?.[0]?.media_url?.slice(0, 50),
+    });
+  }, [trendingHeroData, trendingHeroLoading, trendingHeroError]);
 
   // Create hero item from trending data (independent of grid filters)
   const heroItem = useMemo(() => {
-    if (!trendingHeroData?.post) return null;
-    return createHeroItemFromTrending(trendingHeroData.post, trendingHeroData.trendingPeriod);
+    if (!trendingHeroData?.post) {
+      console.log('[DiscoverContent] No trending hero post available');
+      return null;
+    }
+    const item = createHeroItemFromTrending(trendingHeroData.post, trendingHeroData.trendingPeriod);
+    console.log('[DiscoverContent] Created heroItem:', { 
+      id: item?.id?.slice(0, 8), 
+      mediaUrl: item?.mediaUrl?.slice(0, 50),
+      contextLabel: item?.contextLabel 
+    });
+    return item;
   }, [trendingHeroData]);
 
   // Grid content: Start with unfiltered content, remove hero, THEN apply search/tag filters
@@ -506,6 +527,11 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
             // Hero click: open fullscreen with the hero video
             // CRITICAL: Pass the hero video directly as a single-item playlist
             // Do NOT use allContent[0] which is a DIFFERENT video!
+            console.log('[DiscoverContent] Hero clicked:', { 
+              itemId: item?.id?.slice(0, 8),
+              hasHeroData: !!trendingHeroData?.post 
+            });
+            
             if (trendingHeroData?.post) {
               const heroPost = trendingHeroData.post;
               // Create a compatible ExploreContentItem structure
@@ -533,6 +559,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
                 width: heroPost.media?.[0]?.width,
                 height: heroPost.media?.[0]?.height,
               };
+              
+              console.log('[DiscoverContent] Opening fullscreen with hero:', {
+                heroId: heroContent.id.slice(0, 8),
+                mediaUrl: heroContent.src?.slice(0, 50),
+                playlistLength: 1
+              });
+              
               // FIX: Pass hero as index 0 of its own array, NOT allContent
               onMediaClick(heroContent, 0, [heroContent]);
             }
@@ -553,7 +586,53 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           onMediaClick={(item, index, gridItems) => {
             // FIX: Pass gridItems to parent so fullscreen uses the CORRECT data source
             // The grid's data is from useWatchPostsV2, NOT allContent from useInfiniteExploreContent
-            onMediaClick(item as any, index, gridItems as any);
+            console.log('[DiscoverContent] Grid item clicked:', {
+              itemId: (item as any).id?.slice(0, 8) || (item as any).postId?.slice(0, 8),
+              index,
+              gridItemsCount: gridItems?.length,
+              firstFiveIds: gridItems?.slice(0, 5).map((i: any) => (i.id || i.postId)?.slice(0, 8))
+            });
+            
+            // Convert UnifiedMediaItem to ExploreContentItem-compatible format
+            // The fullscreen player uses exploreFeedAdapter which expects 'id' not 'postId'
+            const convertedItem = {
+              id: (item as any).postId || (item as any).id,
+              src: (item as any).url || (item as any).playbackUrl,
+              type: (item as any).type || 'video',
+              thumbnailSrc: (item as any).thumbnailUrl,
+              user: (item as any).creator ? {
+                id: (item as any).creator.id,
+                name: (item as any).creator.name,
+                username: (item as any).creator.username,
+                avatar: (item as any).creator.avatar,
+              } : undefined,
+              likes: (item as any).likes,
+              durationSeconds: (item as any).durationSeconds,
+              aspectRatio: (item as any).aspectRatio,
+              width: (item as any).mediaWidth,
+              height: (item as any).mediaHeight,
+            };
+            
+            // Convert all grid items to compatible format
+            const convertedItems = gridItems?.map((i: any) => ({
+              id: i.postId || i.id,
+              src: i.url || i.playbackUrl,
+              type: i.type || 'video',
+              thumbnailSrc: i.thumbnailUrl,
+              user: i.creator ? {
+                id: i.creator.id,
+                name: i.creator.name,
+                username: i.creator.username,
+                avatar: i.creator.avatar,
+              } : undefined,
+              likes: i.likes,
+              durationSeconds: i.durationSeconds,
+              aspectRatio: i.aspectRatio,
+              width: i.mediaWidth,
+              height: i.mediaHeight,
+            })) || [];
+            
+            onMediaClick(convertedItem as any, index, convertedItems as any);
           }}
         />
       </div>
