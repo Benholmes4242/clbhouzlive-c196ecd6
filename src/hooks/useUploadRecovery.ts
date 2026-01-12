@@ -34,8 +34,10 @@ export function useUploadRecovery(userId?: string) {
         const jobs = await getAllIncompleteJobs();
         
         // Filter to only jobs that can be resumed (have uploaded bytes or are failed)
+        // Exclude scheduled posts - they're not "unfinished" uploads
         const resumableJobs = jobs.filter(job => 
           job.overallStatus !== 'complete' &&
+          !job.postData.scheduledAt && // Don't count scheduled posts as unfinished
           (job.mediaItems.some(m => m.status === 'failed') || 
            job.mediaItems.some(m => m.status === 'pending') ||
            job.mediaItems.some(m => m.status === 'uploading'))
