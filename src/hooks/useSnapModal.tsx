@@ -24,10 +24,14 @@ export type ComposerMediaType = "image" | "video";
 export interface ComposerMediaItem {
   id: string;
   type: ComposerMediaType;
-  file?: File;  // Optional for compiled videos (server-generated)
-  previewUrl: string; // blob URL
+  file?: File;  // Optional for compiled videos (server-generated) or restored drafts
+  previewUrl: string; // blob URL or remote URL for restored drafts
   thumbnailUrl?: string; // for videos: a generated poster image blob URL
   duration?: number;  // optional for video
+  // Dimensions (optional, populated from file metadata or draft)
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
   // For server-compiled videos (Smart Compilation)
   compiledVideo?: {
     streamId: string;
@@ -35,6 +39,10 @@ export interface ComposerMediaItem {
     posterUrl: string;
     duration: number;
   };
+  // For restored drafts - indicates media was loaded from storage
+  isRestored?: boolean;
+  restoredMediaUrl?: string; // The permanent URL for restored media
+  restoredStreamId?: string; // For restored videos
 }
 
 type SnapState = {

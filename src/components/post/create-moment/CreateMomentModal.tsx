@@ -86,15 +86,22 @@ export default function CreateMomentModal({
   // Get user session
   const { user } = useSupabaseSession();
 
-  // Database-backed drafts
+  // Database-backed drafts with media persistence
   const { 
     drafts, 
     draftCount, 
-    createDraft, 
+    createDraft,
+    uploadMedia: uploadDraftMedia,
     deleteDraft, 
     canCreateDraft,
     isCreating: isSavingDraft,
+    isUploadingMedia,
+    draftMediaToComposerItem,
   } = useDrafts();
+  
+  // Auto-save timer ref
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastMediaCountRef = useRef(0);
 
   // Hooks
   const {
@@ -286,6 +293,61 @@ export default function CreateMomentModal({
 
     wasOpenRef.current = isOpen;
   }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility, mediaItems, hasEdits, clearEdits, draftCount]);
+  
+  // Auto-save timer: Start 30s countdown when media changes
+  // Saves draft with media when idle for 30 seconds
+  useEffect(() => {
+    // Only run when modal is open and we have new media (not restored)
+    const newMediaItems = media.filter(m => !m.isRestored && m.file);
+    const newMediaCount = newMediaItems.length;
+    
+    // Clear existing timer on any change
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    
+    // Start timer if we have new media and user is authenticated
+    if (newMediaCount > 0 && user && canCreateDraft) {
+      autoSaveTimerRef.current = setTimeout(async () => {
+        console.log('[CreateMomentModal] Auto-saving draft with media after 30s idle...');
+        try {
+          // Create draft
+          const draft = await createDraft({
+            actorType: activeActor?.type || 'personal',
+            actorId: activeActor?.id || user.id,
+            content: caption || null,
+            visibility,
+            categories: selectedCategories,
+            badges: selectedBadges,
+            courseId: course?.id || null,
+            courseName: course?.name || null,
+            courseCountry: course?.country || null,
+            studioMusic: null,
+            audioMode: null,
+          });
+          
+          if (draft?.id && newMediaItems.length > 0) {
+            // Upload media
+            const result = await uploadDraftMedia(draft.id, newMediaItems, getEdits);
+            console.log('[CreateMomentModal] Auto-save complete:', result.uploaded.length, 'media uploaded');
+            toast.success(`Draft auto-saved with ${result.uploaded.length} media`);
+          }
+        } catch (error) {
+          console.error('[CreateMomentModal] Auto-save failed:', error);
+          // Silent fail for auto-save
+        }
+      }, 30000); // 30 seconds
+    }
+    
+    lastMediaCountRef.current = newMediaCount;
+    
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [media, user, canCreateDraft, createDraft, uploadDraftMedia, activeActor, caption, visibility, selectedCategories, selectedBadges, course, getEdits]);
 
   // Slide-in animation
   useEffect(() => {
@@ -557,7 +619,7 @@ export default function CreateMomentModal({
     }
   };
 
-  // Save draft handler (new DB-backed approach)
+  // Save draft handler (new DB-backed approach with media upload)
   const handleSaveDraft = async () => {
     if (!user || !canCreateDraft) {
       if (!canCreateDraft) {
@@ -566,8 +628,18 @@ export default function CreateMomentModal({
       return;
     }
     
+    // Cancel any pending auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    
+    // Get new media items that need uploading (not restored from a previous draft)
+    const newMediaItems = media.filter(m => !m.isRestored && m.file);
+    
     try {
-      await createDraft({
+      // Create draft first
+      const draft = await createDraft({
         actorType: activeActor?.type || 'personal',
         actorId: activeActor?.id || user.id,
         content: caption || null,
@@ -580,9 +652,24 @@ export default function CreateMomentModal({
         studioMusic: null, // TODO: extract from studio edits
         audioMode: null,
       });
-      toast.success('Draft saved');
+      
+      // Upload media if we have any new files and draft was created
+      if (draft?.id && newMediaItems.length > 0) {
+        toast.loading('Uploading media...', { id: 'draft-media-upload' });
+        const result = await uploadDraftMedia(draft.id, newMediaItems, getEdits);
+        toast.dismiss('draft-media-upload');
+        
+        if (result.failed.length > 0) {
+          toast.warning(`Draft saved with ${result.uploaded.length}/${newMediaItems.length} media`);
+        } else {
+          toast.success(`Draft saved with ${result.uploaded.length} media`);
+        }
+      } else {
+        toast.success('Draft saved');
+      }
     } catch (error) {
       console.error('[CreateMomentModal] Failed to save draft:', error);
+      toast.dismiss('draft-media-upload');
       toast.error('Failed to save draft');
     }
   };
@@ -610,12 +697,27 @@ export default function CreateMomentModal({
       onCourseSelect?.(restoredCourse);
     }
     
-    // Note: Media restoration would require downloading from storage
-    // For now, drafts restore text content only
-    // Media can be added fresh after loading a draft
+    // Restore media from draft
+    if (draft.media && draft.media.length > 0 && onMediaChange) {
+      const restoredMedia = draft.media.map(draftMediaToComposerItem);
+      onMediaChange(restoredMedia);
+      
+      // Note: Studio edits are stored per-media but applying them requires
+      // matching filter IDs which may have typing issues. For now, skip
+      // automatic edit restoration - user can re-apply filters if needed.
+    }
     
+    // Close drafts sheet and prompt
+    setShowDraftsSheet(false);
     setShowDraftPrompt(false);
-    toast.success('Draft loaded');
+    
+    // Delete the loaded draft since it's now in the composer
+    // (User can save again if they want to keep it as a new draft)
+    deleteDraft(draft.id).catch(() => {
+      // Silent fail - draft deletion is not critical
+    });
+    
+    toast.success(`Draft loaded${draft.media?.length ? ` with ${draft.media.length} media` : ''}`);
   };
 
   // View drafts handler
