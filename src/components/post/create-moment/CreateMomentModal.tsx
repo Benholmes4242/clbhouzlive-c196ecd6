@@ -98,6 +98,9 @@ export default function CreateMomentModal({
   // Current draft ID for update vs create logic (prevents duplicate drafts)
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   
+  // Pending scheduled date (used when user needs to select category first)
+  const [pendingScheduledAt, setPendingScheduledAt] = useState<Date | null>(null);
+  
   // Get user session
   const { user } = useSupabaseSession();
 
@@ -642,22 +645,19 @@ export default function CreateMomentModal({
     }
   };
   
-  // Schedule post handler
-  const handleSchedulePost = async (scheduledAt: Date) => {
+  // Schedule post handler - actually processes the scheduled upload
+  const proceedWithScheduledPost = async (scheduledAt: Date) => {
     if (!hasMedia || !user) return;
-    
-    if (selectedCategories.length === 0) {
-      setShowScheduleSheet(false);
-      setShowCategorySheet(true);
-      return;
-    }
     
     const files = media.map(item => item.file).filter((f): f is File => f instanceof File);
     if (files.length === 0) return;
     
     setIsScheduling(true);
     
-    console.log('[CreateMomentModal] Scheduling post for:', scheduledAt.toISOString());
+    console.log('[CreateMomentModal] Scheduling post for:', scheduledAt.toISOString(), {
+      status: 'scheduled',
+      categories: selectedCategories,
+    });
     
     try {
       // Use resilient upload with IndexedDB persistence for scheduled posts
@@ -678,6 +678,7 @@ export default function CreateMomentModal({
       });
       
       setShowScheduleSheet(false);
+      setPendingScheduledAt(null);
       toast.success(`Post scheduled for ${scheduledAt.toLocaleDateString()} at ${scheduledAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
       
       // Refetch scheduled posts count
@@ -689,6 +690,33 @@ export default function CreateMomentModal({
       toast.error('Failed to schedule post');
     } finally {
       setIsScheduling(false);
+    }
+  };
+
+  // Schedule post handler - entry point from ScheduleSheet
+  const handleSchedulePost = async (scheduledAt: Date) => {
+    if (!hasMedia || !user) return;
+    
+    // If no category selected, remember the schedule and redirect to category selection
+    if (selectedCategories.length === 0) {
+      setPendingScheduledAt(scheduledAt);
+      setShowScheduleSheet(false);
+      setShowCategorySheet(true);
+      return;
+    }
+    
+    // Proceed with scheduling
+    await proceedWithScheduledPost(scheduledAt);
+  };
+  
+  // Handler when category is selected from MomentCategorySheet
+  const handleCategoryConfirm = (categories: string[]) => {
+    setSelectedCategories(categories);
+    setShowCategorySheet(false);
+    
+    // If we have a pending schedule, proceed with it now that we have categories
+    if (pendingScheduledAt) {
+      proceedWithScheduledPost(pendingScheduledAt);
     }
   };
 
@@ -1307,9 +1335,16 @@ export default function CreateMomentModal({
       {/* Bottom Sheets */}
       <MomentCategorySheet
         isOpen={showCategorySheet}
-        onClose={() => setShowCategorySheet(false)}
+        onClose={() => {
+          setShowCategorySheet(false);
+          // Clear pending schedule if user dismisses without selecting
+          if (pendingScheduledAt) {
+            setPendingScheduledAt(null);
+          }
+        }}
         selectedCategories={selectedCategories}
         onCategoriesChange={setSelectedCategories}
+        onConfirm={handleCategoryConfirm}
         caption={caption}
         hasCourse={!!course}
         mediaTypes={media.map(m => m.type === 'video' ? 'video' : 'photo')}

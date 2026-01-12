@@ -164,15 +164,19 @@ class UploadManager {
     this.clearProcessing(jobId);
     this.persistToStorage();
 
+    const isScheduled = !!job.scheduledAt;
+    
     uploadEventBus.emit('upload:complete', {
       type: 'upload:complete',
       jobId,
       postId,
       actorType: job.actorType,
       actorId: job.actorId,
+      isScheduled,
+      scheduledAt: job.scheduledAt?.toISOString(),
     });
 
-    console.log(`[UploadManager] Job ${jobId} complete`);
+    console.log(`[UploadManager] Job ${jobId} complete${isScheduled ? ' (scheduled)' : ''}`);
   }
 
   /**
