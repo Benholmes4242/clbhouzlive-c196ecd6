@@ -51,13 +51,13 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           <NineDotsIcon className="text-foreground/60" size={20} />
         </motion.button>
         
-        {/* Center/Left: Dynamic title based on active section */}
+        {/* Center: Dynamic title based on active section */}
         {isOverview ? (
           <motion.h1 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="flex-1 text-[1.5rem] md:text-[1.75rem] font-semibold tracking-tight text-foreground text-left ml-2"
+            className="flex-1 text-[1.35rem] md:text-[1.5rem] font-semibold tracking-tight text-foreground text-center"
           >
             {title}
           </motion.h1>
@@ -67,8 +67,8 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           </h1>
         )}
         
-        {/* Right spacer for balance (only for non-overview) */}
-        {!isOverview && <div className="w-11" />}
+        {/* Right spacer for balance */}
+        <div className="w-11" />
       </div>
       
       {/* Second row: Dynamic subtext */}
@@ -77,7 +77,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15, delay: 0.05, ease: 'easeOut' }}
-          className="mt-2 md:mt-3 text-sm md:text-base font-normal text-muted-foreground leading-relaxed max-w-[70%]"
+          className="mt-2 md:mt-3 text-sm md:text-base font-normal text-muted-foreground leading-relaxed text-center px-12"
         >
           {subtext}
         </motion.p>
