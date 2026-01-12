@@ -168,12 +168,8 @@ export function TourHubNavOverlay({
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            {/* Clbhouz Logo Mark Watermark - fixed to viewport center */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.03, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+            {/* Clbhouz Logo Mark Watermark - centered between top/bottom of viewport */}
+            <div
               className="fixed pointer-events-none"
               style={{
                 right: '-140px',
@@ -181,15 +177,19 @@ export function TourHubNavOverlay({
                 transform: 'translateY(-50%)',
                 width: '450px',
                 height: '450px',
-                zIndex: 10001,
+                zIndex: 0,
               }}
             >
-              <img 
+              <motion.img
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 0.03, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
                 src="/assets/logomark-orange.png"
                 alt=""
                 className="w-full h-full object-contain"
               />
-            </motion.div>
+            </div>
             
             {/* Header with close button */}
             <div className="flex items-center justify-between px-5 pt-safe-top py-4">
