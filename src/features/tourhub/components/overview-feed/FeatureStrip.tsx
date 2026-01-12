@@ -67,15 +67,15 @@ export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
   if (cards.length === 0) return null;
 
   return (
-    <div>
+    <div className="-mx-4 sm:-mx-6">
       {/* Header - standardized */}
-      <div className="pb-6">
+      <div className="px-4 sm:px-6 pb-6">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           Season Snapshot
         </h3>
       </div>
       
-      <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:-mx-6 sm:px-6">
+      <div className="flex gap-3 overflow-x-auto px-4 sm:px-6 pb-4 scrollbar-hide">
         {cards.map((card) => {
           const gradient = categoryGradients[card.category] || categoryGradients.events;
           

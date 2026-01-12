@@ -12,7 +12,7 @@ export function WorldRankingsSection() {
 
   if (isLoading) {
     return (
-      <section>
+      <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
         <div className="animate-pulse">
           <div className="h-4 w-40 bg-slate-200 rounded mb-6" />
           <div className="flex gap-3">
@@ -31,7 +31,7 @@ export function WorldRankingsSection() {
   const displayPlayers = topPlayers.slice(0, 5);
 
   return (
-    <section>
+    <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
       {/* Header - standardized */}
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
