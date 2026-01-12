@@ -1,14 +1,15 @@
 /**
- * LeadersTab - Premium Leaders Page
+ * LeadersTab - Premium Arena-Style Leaders Page
  * 
- * Editorial layout: premium podium with photos, polished category tabs, clean rows
+ * The season's best — feels like an arena, not a spreadsheet.
+ * Features: stadium glow, sticky tier navigation, spotlight podium, premium rows
  * Category selection synced to URL for shareability
- * Organized into Season Performance + Ball Striking sections
  */
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Trophy, Target, Gauge, Calendar, DollarSign, Globe, Info, Zap, Crosshair, Circle, Flag, Sun, RefreshCw, Scissors } from 'lucide-react';
+import { Trophy, Target, Gauge, Calendar, DollarSign, Globe, Info, Zap, Crosshair, Circle, Flag, Sun, RefreshCw, Scissors, Crown, Clock } from 'lucide-react';
+import { CollegeCrestTile } from '../college';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings, toTitleCase, getInitials } from '../../hooks/useWorldRankings';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
@@ -321,53 +322,74 @@ export function LeadersTab() {
   }
 
   return (
-    <div className="space-y-5">
-      {/* Category Tabs - Two-row layout with section labels */}
-      <div 
-        className="space-y-4"
-        role="tablist"
-        aria-label="Leaderboard categories"
-      >
-        {/* Row 1: Season Performance */}
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 px-1">
-            Season Performance
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50/50 dark:from-background dark:to-background -mx-4 px-4">
+      {/* Stadium light glow - subtle radial gradient behind header */}
+      <div className="absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.12),transparent_60%)] pointer-events-none" />
+
+      {/* Page Header - Arena style */}
+      <div className="relative pt-6 pb-4">
+        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
+          Season Leaders
+        </h1>
+        <div className="flex items-center justify-between mt-1">
+          <p className="text-sm text-slate-500 dark:text-muted-foreground">
+            The season's best — updated as the Tour unfolds.
           </p>
-          <div className="flex overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {seasonCategories.map((cat) => {
-              const isSelected = selectedCategory.key === cat.key;
-              return (
-                <button
-                  key={cat.key}
-                  role="tab"
-                  aria-selected={isSelected}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={cn(
-                    "relative text-sm px-3 py-2 font-medium whitespace-nowrap",
-                    "bg-transparent border-0 shadow-none rounded-none",
-                    "transition-colors duration-200 ease-out",
-                    "inline-flex items-center justify-center gap-1",
-                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                    "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                    "after:transition-all after:duration-200 after:ease-out",
-                    isSelected 
-                      ? "text-foreground after:w-full after:opacity-[0.85]" 
-                      : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
-                  )}
-                >
-                  {cat.shortLabel}
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Clock className="w-3 h-3" />
+            <span>Updated weekly</span>
           </div>
         </div>
+      </div>
 
-        {/* Row 2: Ball Striking & Short Game */}
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 px-1">
-            Ball Striking & Short Game
-          </p>
-          <div className="flex overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      {/* Tier 1: Season Performance - Sticky pill segmented control */}
+      <div 
+        className="sticky top-[var(--header-h-mobile,44px)] z-20 bg-white/75 dark:bg-background/75 backdrop-blur-md -mx-4 px-4 py-3"
+        role="tablist"
+        aria-label="Season performance categories"
+      >
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          {seasonCategories.map((cat) => {
+            const isSelected = selectedCategory.key === cat.key;
+            return (
+              <button
+                key={cat.key}
+                role="tab"
+                aria-selected={isSelected}
+                onClick={() => handleCategoryChange(cat)}
+                className={cn(
+                  "relative flex-shrink-0 rounded-sq-pill px-4 py-2 text-sm font-medium whitespace-nowrap",
+                  "transition-all duration-200 ease-out",
+                  isSelected 
+                    ? "bg-white dark:bg-white/10 shadow-sm ring-1 ring-slate-200 dark:ring-white/10 text-foreground" 
+                    : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-muted-foreground hover:bg-slate-150 dark:hover:bg-white/8"
+                )}
+              >
+                {cat.shortLabel}
+                {/* Orange underline inside active pill */}
+                {isSelected && (
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-brand-orange" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tier 2: Ball Striking & Short Game - Scroll rail with fade edges */}
+      <div className="relative mt-3">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2 px-0.5">
+          Ball Striking & Short Game
+        </p>
+        
+        {/* Scroll container with fade masks */}
+        <div className="relative">
+          {/* Left fade mask */}
+          <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white dark:from-background to-transparent z-10 pointer-events-none" />
+          {/* Right fade mask */}
+          <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white dark:from-background to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex gap-1 overflow-x-auto no-scrollbar py-1">
             {statsCategories.map((cat) => {
               const isSelected = selectedCategory.key === cat.key;
               return (
@@ -377,19 +399,20 @@ export function LeadersTab() {
                   aria-selected={isSelected}
                   onClick={() => handleCategoryChange(cat)}
                   className={cn(
-                    "relative text-sm px-3 py-2 font-medium whitespace-nowrap",
-                    "bg-transparent border-0 shadow-none rounded-none",
-                    "transition-colors duration-200 ease-out",
-                    "inline-flex items-center justify-center gap-1",
-                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                    "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                    "after:transition-all after:duration-200 after:ease-out",
+                    "relative flex-shrink-0 px-3 py-2 text-sm whitespace-nowrap",
+                    "transition-all duration-200 ease-out",
                     isSelected 
-                      ? "text-foreground after:w-full after:opacity-[0.85]" 
-                      : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                      ? "font-semibold text-slate-900 dark:text-foreground" 
+                      : "text-slate-500 dark:text-muted-foreground hover:text-slate-700 dark:hover:text-foreground/80"
                   )}
                 >
                   {cat.shortLabel}
+                  {/* Animated underline */}
+                  <div className={cn(
+                    "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full bg-brand-orange",
+                    "transition-all duration-200 ease-out",
+                    isSelected ? "w-5 opacity-100" : "w-0 opacity-0"
+                  )} />
                 </button>
               );
             })}
@@ -627,19 +650,42 @@ function PlayerRow({ player, rank, category }: PlayerRowProps) {
     : '—';
   
   const photoUrl = resolvePhotoUrl(player.player?.photo_url);
+  const isTop10 = rank <= 10;
+  const isTop3 = rank <= 3;
 
   return (
     <Link
       to={`/tourhub/player/${player.player_id}`}
-      className="flex items-center gap-3 py-3 transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg group"
+      className={cn(
+        "relative flex items-center gap-3 px-4 py-3 rounded-sq-md",
+        "bg-white/70 dark:bg-white/5",
+        "ring-1 ring-slate-200/60 dark:ring-white/8",
+        "hover:bg-white dark:hover:bg-white/8",
+        "active:scale-[0.995] active:bg-slate-50 dark:active:bg-white/10",
+        "transition-all duration-150 ease-out group"
+      )}
     >
+      {/* Top 10 accent bar */}
+      {isTop10 && (
+        <div className={cn(
+          "absolute left-1 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full",
+          isTop3 ? "bg-brand-orange" : "bg-brand-orange/60"
+        )} />
+      )}
+
       {/* Rank number */}
-      <span className="w-7 text-center text-[13px] font-medium text-muted-foreground shrink-0 tabular-nums">
+      <span className={cn(
+        "w-8 text-center font-semibold shrink-0 tabular-nums",
+        isTop3 ? "text-brand-orange text-base" : "text-muted-foreground text-[13px]"
+      )}>
         {rank}
       </span>
       
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-muted/50 overflow-hidden">
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-muted/50 overflow-hidden",
+        isTop3 && "ring-2 ring-brand-orange/30"
+      )}>
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -663,8 +709,11 @@ function PlayerRow({ player, rank, category }: PlayerRowProps) {
         </p>
       </div>
       
-      {/* Value - clean, no labels */}
-      <span className="text-[14px] font-semibold text-foreground shrink-0 tabular-nums">
+      {/* Value */}
+      <span className={cn(
+        "font-semibold shrink-0 tabular-nums",
+        isTop3 ? "text-base text-foreground" : "text-[14px] text-foreground"
+      )}>
         {displayValue}
       </span>
     </Link>
