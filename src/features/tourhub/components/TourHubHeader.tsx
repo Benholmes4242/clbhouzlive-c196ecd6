@@ -1,6 +1,5 @@
 /**
- * TourHubHeader - Clean header with 9-dot menu trigger on the left
- * Premium intro line instead of section label
+ * TourHubHeader - Dynamic header that reflects the active section
  */
 
 import React from 'react';
@@ -14,17 +13,30 @@ interface TourHubHeaderProps {
   onMenuOpen: () => void;
 }
 
+/** Header content for each section */
+const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
+  overview: { title: 'Overview', subtext: 'Season snapshot' },
+  schedule: { title: 'Schedule', subtext: 'All events' },
+  players: { title: 'Players', subtext: 'Tour roster' },
+  leaderboards: { title: 'Leaders', subtext: 'Season rankings' },
+  summary: { title: 'Summary', subtext: 'Tournament recap' },
+  'tee-times': { title: 'Tee Times', subtext: 'Starting times' },
+  'hole-stats': { title: 'Holes', subtext: 'Course analytics' },
+};
+
 export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHeaderProps) {
   const handleMenuClick = () => {
     haptic('light');
     onMenuOpen();
   };
+
+  const { title, subtext } = HEADER_CONTENT[activeTab] || HEADER_CONTENT.overview;
   
   return (
     <header className="pt-4 pb-3">
       {/* Top row: 9-dot icon (left) + Title (center) */}
       <div className="flex items-center justify-between">
-        {/* Left: 9-dot menu button - no visible container */}
+        {/* Left: 9-dot menu button */}
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={handleMenuClick}
@@ -35,18 +47,18 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           <NineDotsIcon className="text-foreground/60" size={20} />
         </motion.button>
         
-        {/* Center: Title - Premium rebrand */}
+        {/* Center: Dynamic title based on active section */}
         <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground">
-          The Tour
+          {title}
         </h1>
         
         {/* Right spacer for balance */}
         <div className="w-11" />
       </div>
       
-      {/* Second row: Clean value prop */}
+      {/* Second row: Dynamic subtext */}
       <p className="mt-2 text-center text-[13px] text-muted-foreground">
-        Professional Golf Rankings, Leaderboards & Live Coverage
+        {subtext}
       </p>
     </header>
   );
