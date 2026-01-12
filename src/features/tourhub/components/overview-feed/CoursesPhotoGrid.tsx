@@ -19,7 +19,7 @@ export function CoursesPhotoGrid({ courses, courseImages }: CoursesPhotoGridProp
     <div className="space-y-6">
       {/* Header - standardized */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
           Tour Venues
         </h3>
         <Link 

@@ -70,7 +70,7 @@ export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
     <div className="-mx-4 sm:-mx-6">
       {/* Header - standardized */}
       <div className="px-4 sm:px-6 pb-6">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
           Season Snapshot
         </h3>
       </div>
