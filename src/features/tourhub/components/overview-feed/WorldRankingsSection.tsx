@@ -47,10 +47,8 @@ export function WorldRankingsSection() {
       
       {/* Horizontal scroll of player cards - wider cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-      {displayPlayers.map((player, index) => {
+        {displayPlayers.map((player, index) => {
           const isFirst = index === 0;
-          // Use full player name
-          const displayName = player.playerName;
           
           return (
             <Link
@@ -79,8 +77,8 @@ export function WorldRankingsSection() {
                   {player.worldRank}
                 </span>
                 
-                {/* Player photo/initials circle - centered */}
-                <div className="flex-1 flex items-center justify-center my-2">
+                {/* Player info (avatar + full name + country) */}
+                <div className="flex-1 flex flex-col items-center justify-center">
                   <div 
                     className={`
                       w-14 h-14 rounded-full flex items-center justify-center overflow-hidden
@@ -102,17 +100,15 @@ export function WorldRankingsSection() {
                       </span>
                     )}
                   </div>
+
+                  <p className="mt-2 text-sm font-medium text-foreground text-center leading-tight">
+                    {player.playerName}
+                  </p>
+
+                  <p className="mt-0.5 text-[10px] text-muted-foreground text-center">
+                    {toTitleCase(player.country) || 'Unknown'}
+                  </p>
                 </div>
-                
-                {/* Player full name */}
-                <p className="font-semibold text-sm leading-tight text-center line-clamp-2" style={{ color: '#1e293b' }}>
-                  {displayName}
-                </p>
-                
-                {/* Country */}
-                <p className="text-[10px] text-center mt-0.5" style={{ color: '#64748B' }}>
-                  {toTitleCase(player.country) || 'Unknown'}
-                </p>
               </div>
             </Link>
           );
