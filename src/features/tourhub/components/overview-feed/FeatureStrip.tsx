@@ -85,14 +85,15 @@ export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
               to={card.href}
               className="flex-shrink-0 w-[160px] group"
             >
-              <div className="relative h-[100px] rounded-xl overflow-hidden">
+              {/* Taller cards to show more of player image */}
+              <div className="relative h-[120px] rounded-xl overflow-hidden shadow-sm">
                 {/* Background - player photo or gradient */}
                 {card.imageUrl ? (
                   <>
                     <img
                       src={card.imageUrl}
                       alt={card.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
                   </>

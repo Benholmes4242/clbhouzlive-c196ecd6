@@ -48,7 +48,7 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
             <Link
               key={leader.category}
               to={`/tourhub/player/${leader.player.id}`}
-              className="group relative overflow-hidden rounded-xl aspect-[4/3]"
+              className="group relative overflow-hidden rounded-xl aspect-[4/3] shadow-md hover:shadow-lg transition-shadow"
             >
               {/* Background - player photo or gradient fallback */}
               {playerPhotoUrl ? (
@@ -56,7 +56,7 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
                   <img
                     src={playerPhotoUrl}
                     alt={leader.player.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   />
                   {/* Dark overlay for text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
@@ -88,8 +88,8 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
                 
                 {/* Bottom content */}
                 <div>
-                  {/* Big stat number */}
-                  <p className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                  {/* Big stat number - more prominent */}
+                  <p className="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-lg">
                     {leader.formattedValue}
                   </p>
                   

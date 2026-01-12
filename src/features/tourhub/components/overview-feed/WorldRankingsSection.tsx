@@ -49,9 +49,8 @@ export function WorldRankingsSection() {
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {displayPlayers.map((player, index) => {
           const isFirst = index === 0;
-          // Get last name for display, but show full if short
+          // Get last name for display - allow up to 2 lines if needed
           const lastName = player.playerName.split(' ').slice(-1)[0];
-          const displayName = lastName.length > 10 ? lastName.substring(0, 9) + '…' : lastName;
           
           return (
             <Link
@@ -63,14 +62,17 @@ export function WorldRankingsSection() {
                 className={`
                   relative h-[150px] rounded-xl p-3.5 flex flex-col
                   bg-white shadow-sm border border-slate-100
-                  transition-all group-hover:shadow-md group-hover:border-slate-200
-                  ${isFirst ? 'ring-2 ring-amber-400/60' : ''}
+                  transition-all group-hover:shadow-lg group-hover:border-slate-200
+                  ${isFirst 
+                    ? 'border-2 border-amber-400 bg-gradient-to-b from-amber-50/50 to-white shadow-md' 
+                    : ''
+                  }
                 `}
               >
-                {/* Rank number - top left, large */}
+                {/* Rank number - top left, larger and bolder */}
                 <span 
                   className={`
-                    text-2xl font-bold leading-none
+                    text-3xl font-extrabold leading-none
                     ${isFirst ? 'text-amber-500' : 'text-slate-300'}
                   `}
                 >
@@ -83,7 +85,7 @@ export function WorldRankingsSection() {
                     className={`
                       w-14 h-14 rounded-full flex items-center justify-center overflow-hidden
                       ${isFirst 
-                        ? 'bg-gradient-to-br from-amber-100 to-amber-200 ring-2 ring-amber-400/50' 
+                        ? 'bg-gradient-to-br from-amber-100 to-amber-200 ring-2 ring-amber-400' 
                         : 'bg-slate-100'
                       }
                     `}
@@ -92,7 +94,7 @@ export function WorldRankingsSection() {
                       <img 
                         src={player.photoUrl}
                         alt={player.playerName}
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full rounded-full object-cover object-top"
                       />
                     ) : (
                       <span className={`text-base font-bold ${isFirst ? 'text-amber-600' : 'text-slate-500'}`}>
@@ -102,9 +104,9 @@ export function WorldRankingsSection() {
                   </div>
                 </div>
                 
-                {/* Player name - full last name */}
-                <p className="text-foreground font-semibold text-sm leading-tight text-center">
-                  {displayName}
+                {/* Player name - allow wrapping for long names */}
+                <p className="text-foreground font-semibold text-sm leading-tight text-center line-clamp-2">
+                  {lastName}
                 </p>
                 
                 {/* Country */}
