@@ -240,8 +240,36 @@ export function PlayersTab() {
   const hasNoRankingData = filter === 'top-ranked' && processedPlayers.length === 0 && region === 'all';
   const hasNoRegionResults = processedPlayers.length === 0 && region !== 'all';
 
+  // Calculate filter counts
+  const filterCounts = useMemo(() => {
+    if (!players) return { all: 0, topRanked: 0, mostActive: 0, rookies: 0 };
+    
+    const currentYear = new Date().getFullYear();
+    
+    // Top ranked: players with valid world rank
+    const topRankedCount = Math.min(50, worldRankedPlayers.length);
+    
+    // Most active: events_played >= 10
+    const mostActiveCount = players.filter(p => {
+      const stats = statsMap.get(p.id);
+      return stats?.events_played && stats.events_played >= 10;
+    }).length;
+    
+    // Rookies: turned pro in last 3 years
+    const rookiesCount = players.filter(p => 
+      p.turned_pro && p.turned_pro >= currentYear - 3
+    ).length;
+    
+    return {
+      all: players.length,
+      topRanked: topRankedCount,
+      mostActive: mostActiveCount,
+      rookies: rookiesCount,
+    };
+  }, [players, worldRankedPlayers, statsMap]);
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 bg-[#F8FAFC] -mx-4 px-4 py-6 min-h-screen">
       {/* Featured Players Carousel */}
       {playerStats && playerStats.length > 0 && !search && filter === 'all' && region === 'all' && (
         <div className="mb-6">
@@ -260,11 +288,12 @@ export function PlayersTab() {
         />
       </div>
 
-      {/* Filter Chips */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm -mx-1 px-1">
+      {/* Filter Chips with counts */}
+      <div className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur-sm -mx-1 px-1 py-2">
         <PlayerFilterChips
           activeFilter={filter}
           onFilterChange={setFilter}
+          counts={filterCounts}
         />
       </div>
 
@@ -328,8 +357,8 @@ export function PlayersTab() {
           </p>
         </div>
       ) : processedPlayers.length > 0 ? (
-        // Flat list (always, no more region grouping)
-        <div className="divide-y divide-border/30">
+        // Flat list with subtle dividers
+        <div className="space-y-0">
           {processedPlayers.slice(0, 200).map((player) => (
             <PlayerRow
               key={player.id}
