@@ -95,6 +95,9 @@ export default function CreateMomentModal({
   const [editingScheduledAt, setEditingScheduledAt] = useState<Date | null>(null);
   const [isLoadingEditPost, setIsLoadingEditPost] = useState(false);
   
+  // Current draft ID for update vs create logic (prevents duplicate drafts)
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
+  
   // Get user session
   const { user } = useSupabaseSession();
 
@@ -103,6 +106,7 @@ export default function CreateMomentModal({
     drafts, 
     draftCount, 
     createDraft,
+    updateDraft: updateExistingDraft,
     uploadMedia: uploadDraftMedia,
     deleteDraft, 
     canCreateDraft,
@@ -295,6 +299,7 @@ export default function CreateMomentModal({
       setSelectedCategories([]);
       setSelectedBadges([]);
       setVisibility('anyone');
+      setCurrentDraftId(null); // Reset draft tracking on new post
       
       // Check for drafts (DB-backed)
       if (draftCount > 0) {
@@ -652,6 +657,8 @@ export default function CreateMomentModal({
     
     setIsScheduling(true);
     
+    console.log('[CreateMomentModal] Scheduling post for:', scheduledAt.toISOString());
+    
     try {
       // Use resilient upload with IndexedDB persistence for scheduled posts
       await enqueuePostUploadWithResilience({
@@ -671,7 +678,11 @@ export default function CreateMomentModal({
       });
       
       setShowScheduleSheet(false);
-      toast.success(`Post scheduled for ${scheduledAt.toLocaleDateString()}`);
+      toast.success(`Post scheduled for ${scheduledAt.toLocaleDateString()} at ${scheduledAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+      
+      // Refetch scheduled posts count
+      refetchScheduledPosts();
+      
       onClose();
     } catch (error) {
       console.error('[CreateMomentModal] Failed to schedule post:', error);
@@ -682,11 +693,13 @@ export default function CreateMomentModal({
   };
 
   // Save draft handler (new DB-backed approach with media upload)
+  // Supports update if currentDraftId is set, otherwise creates new
   const handleSaveDraft = async () => {
-    if (!user || !canCreateDraft) {
-      if (!canCreateDraft) {
-        toast.error('Draft limit reached (10 max)');
-      }
+    if (!user) return;
+    
+    // If updating existing draft, skip canCreateDraft check
+    if (!currentDraftId && !canCreateDraft) {
+      toast.error('Draft limit reached (10 max)');
       return;
     }
     
@@ -699,35 +712,50 @@ export default function CreateMomentModal({
     // Get new media items that need uploading (not restored from a previous draft)
     const newMediaItems = media.filter(m => !m.isRestored && m.file);
     
+    const draftInput = {
+      actorType: activeActor?.type || 'personal',
+      actorId: activeActor?.id || user.id,
+      content: caption || null,
+      visibility,
+      categories: selectedCategories,
+      badges: selectedBadges,
+      courseId: course?.id || null,
+      courseName: course?.name || null,
+      courseCountry: course?.country || null,
+      studioMusic: null,
+      audioMode: null,
+    };
+    
     try {
-      // Create draft first
-      const draft = await createDraft({
-        actorType: activeActor?.type || 'personal',
-        actorId: activeActor?.id || user.id,
-        content: caption || null,
-        visibility,
-        categories: selectedCategories,
-        badges: selectedBadges,
-        courseId: course?.id || null,
-        courseName: course?.name || null,
-        courseCountry: course?.country || null,
-        studioMusic: null, // TODO: extract from studio edits
-        audioMode: null,
-      });
+      let draftId = currentDraftId;
       
-      // Upload media if we have any new files and draft was created
-      if (draft?.id && newMediaItems.length > 0) {
+      if (currentDraftId) {
+        // Update existing draft
+        await updateExistingDraft(currentDraftId, draftInput);
+        console.log('[CreateMomentModal] Updated existing draft:', currentDraftId);
+      } else {
+        // Create new draft
+        const draft = await createDraft(draftInput);
+        draftId = draft?.id || null;
+        if (draftId) {
+          setCurrentDraftId(draftId);
+          console.log('[CreateMomentModal] Created new draft:', draftId);
+        }
+      }
+      
+      // Upload media if we have any new files and draft exists
+      if (draftId && newMediaItems.length > 0) {
         toast.loading('Uploading media...', { id: 'draft-media-upload' });
-        const result = await uploadDraftMedia(draft.id, newMediaItems, getEdits);
+        const result = await uploadDraftMedia(draftId, newMediaItems, getEdits);
         toast.dismiss('draft-media-upload');
         
         if (result.failed.length > 0) {
           toast.warning(`Draft saved with ${result.uploaded.length}/${newMediaItems.length} media`);
         } else {
-          toast.success(`Draft saved with ${result.uploaded.length} media`);
+          toast.success(currentDraftId ? 'Draft updated' : `Draft saved with ${result.uploaded.length} media`);
         }
       } else {
-        toast.success('Draft saved');
+        toast.success(currentDraftId ? 'Draft updated' : 'Draft saved');
       }
     } catch (error) {
       console.error('[CreateMomentModal] Failed to save draft:', error);
@@ -738,6 +766,9 @@ export default function CreateMomentModal({
 
   // Load draft handler (from DraftsListSheet)
   const handleLoadDraft = (draft: DraftWithMedia) => {
+    // Track the loaded draft ID for updates
+    setCurrentDraftId(draft.id);
+    
     // Restore caption
     setCaption(draft.content || '');
     
@@ -763,21 +794,11 @@ export default function CreateMomentModal({
     if (draft.media && draft.media.length > 0 && onMediaChange) {
       const restoredMedia = draft.media.map(draftMediaToComposerItem);
       onMediaChange(restoredMedia);
-      
-      // Note: Studio edits are stored per-media but applying them requires
-      // matching filter IDs which may have typing issues. For now, skip
-      // automatic edit restoration - user can re-apply filters if needed.
     }
     
     // Close drafts sheet and prompt
     setShowDraftsSheet(false);
     setShowDraftPrompt(false);
-    
-    // Delete the loaded draft since it's now in the composer
-    // (User can save again if they want to keep it as a new draft)
-    deleteDraft(draft.id).catch(() => {
-      // Silent fail - draft deletion is not critical
-    });
     
     toast.success(`Draft loaded${draft.media?.length ? ` with ${draft.media.length} media` : ''}`);
   };

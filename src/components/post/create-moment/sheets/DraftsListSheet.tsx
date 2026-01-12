@@ -1,8 +1,8 @@
 // DraftsListSheet - Bottom sheet showing all saved drafts
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { formatDistanceToNow } from 'date-fns';
 import { Trash2, FileEdit, AlertCircle } from 'lucide-react';
@@ -19,6 +19,11 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
   const { drafts, isLoading, deleteDraft, deleteAllDrafts, isDeleting, maxDrafts } = useDrafts();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
+
+  // Debug: log when open state changes
+  useEffect(() => {
+    console.log('[DraftsListSheet] isOpen:', isOpen);
+  }, [isOpen]);
 
   const handleLoadDraft = (draft: DraftWithMedia) => {
     onLoadDraft(draft);
@@ -49,10 +54,11 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="max-h-[85vh] bg-background">
-        {/* Accessibility: Screen reader title */}
+      <DrawerContent className="max-h-[85vh] bg-background z-[10002]" style={{ zIndex: 10002 }}>
+        {/* Accessibility: Screen reader title and description */}
         <VisuallyHidden>
           <DrawerTitle>Your Drafts</DrawerTitle>
+          <DrawerDescription>Manage your saved drafts</DrawerDescription>
         </VisuallyHidden>
         
         <div className="flex flex-col h-full max-h-[85vh]">
