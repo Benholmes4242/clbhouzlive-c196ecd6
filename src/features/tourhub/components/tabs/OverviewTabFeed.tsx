@@ -15,6 +15,7 @@ import {
 import { useTourOverviewData } from '../../hooks/useTourOverviewData';
 import { useCourseImageResolver } from '../../hooks/useCourseImageResolver';
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 
 export function OverviewTabFeed() {
   const {
@@ -71,6 +72,26 @@ export function OverviewTabFeed() {
 
   return (
     <div className="pb-8">
+      {/* Page Title & Subtext - Editorial intro */}
+      <div className="mb-6 md:mb-8">
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
+          className="text-[1.75rem] md:text-[2rem] font-semibold tracking-tight text-foreground"
+        >
+          The Global Golf Season
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15, delay: 0.05, ease: 'easeOut' }}
+          className="mt-2 md:mt-3 text-base md:text-lg font-normal text-muted-foreground leading-relaxed max-w-[70%]"
+        >
+          Every tour. Every event. Every moment that defines professional golf.
+        </motion.p>
+      </div>
+
       {/* 1. Hero Feature - Full bleed, cinematic */}
       {featuredTournament && (
         <HeroFeature
