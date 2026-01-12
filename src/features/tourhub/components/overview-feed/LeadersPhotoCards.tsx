@@ -1,23 +1,51 @@
 /**
- * LeadersPhotoCards - Photo-backed leader cards (broadcast style)
- * Each card has player photo background with stats overlay
+ * LeadersPhotoCards - Season Leaders Highlight Gallery
+ * Taller cards, category icon in corner, gradient tint per category
+ * Text hierarchy: Big number → Category → Player name
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Trophy, Target, Scissors, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { toTitleCase } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 import type { SeasonLeader } from '../../hooks/useTourOverviewData';
 
 interface LeadersPhotoCardsProps {
   leaders: SeasonLeader[];
 }
 
-// Category-specific accent colors for overlay
-const categoryColors: Record<string, { gradient: string; accent: string }> = {
-  events: { gradient: 'from-emerald-900/90 via-emerald-800/60', accent: 'bg-emerald-500' },
-  cuts: { gradient: 'from-blue-900/90 via-blue-800/60', accent: 'bg-blue-500' },
-  scoring: { gradient: 'from-amber-900/90 via-orange-800/60', accent: 'bg-amber-500' },
-  world_rank: { gradient: 'from-purple-900/90 via-violet-800/60', accent: 'bg-purple-500' },
+// Category-specific styling with gradient tints and icons
+const categoryStyles: Record<string, { 
+  gradient: string; 
+  accent: string; 
+  icon: React.ReactNode;
+  tint: string;
+}> = {
+  events: { 
+    gradient: 'from-emerald-900/90 via-emerald-800/60', 
+    accent: 'bg-emerald-500',
+    icon: <Calendar className="w-3.5 h-3.5" />,
+    tint: 'bg-emerald-500/20',
+  },
+  cuts: { 
+    gradient: 'from-blue-900/90 via-blue-800/60', 
+    accent: 'bg-blue-500',
+    icon: <Scissors className="w-3.5 h-3.5" />,
+    tint: 'bg-blue-500/20',
+  },
+  scoring: { 
+    gradient: 'from-amber-900/90 via-orange-800/60', 
+    accent: 'bg-amber-500',
+    icon: <Target className="w-3.5 h-3.5" />,
+    tint: 'bg-amber-500/20',
+  },
+  world_rank: { 
+    gradient: 'from-purple-900/90 via-violet-800/60', 
+    accent: 'bg-purple-500',
+    icon: <Trophy className="w-3.5 h-3.5" />,
+    tint: 'bg-purple-500/20',
+  },
 };
 
 export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
@@ -25,9 +53,9 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header - standardized */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
+        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
           Season Leaders
         </h3>
         <Link 
@@ -38,75 +66,90 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
         </Link>
       </div>
 
-      {/* 2-column grid */}
+      {/* 2-column grid - taller cards */}
       <div className="grid grid-cols-2 gap-3">
-        {leaders.map((leader) => {
-          const colors = categoryColors[leader.category] || categoryColors.events;
+        {leaders.map((leader, index) => {
+          const style = categoryStyles[leader.category] || categoryStyles.events;
           const playerPhotoUrl = leader.player.photoUrl;
           
           return (
-            <Link
+            <motion.div
               key={leader.category}
-              to={`/tourhub/player/${leader.player.id}`}
-              className="group relative overflow-hidden rounded-xl aspect-[4/3] shadow-md hover:shadow-lg transition-shadow"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {/* Background - player photo or gradient fallback */}
-              {playerPhotoUrl ? (
-                <>
-                  <img
-                    src={playerPhotoUrl}
-                    alt={leader.player.name}
-                    className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {/* Dark overlay for text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-                </>
-              ) : (
-                <>
-                  {/* Gradient fallback with initials */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} to-slate-900`}>
-                    {/* Large initials as fallback */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-4xl font-bold text-white/20">
-                        {leader.player.name.split(' ').map(n => n[0]).join('')}
-                      </span>
+              <Link
+                to={`/tourhub/player/${leader.player.id}`}
+                className="group relative overflow-hidden rounded-xl aspect-[3/4] shadow-md hover:shadow-xl transition-shadow block"
+              >
+                {/* Background - player photo or gradient fallback */}
+                {playerPhotoUrl ? (
+                  <>
+                    <img
+                      src={playerPhotoUrl}
+                      alt={leader.player.name}
+                      className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {/* Category-tinted overlay */}
+                    <div className={cn("absolute inset-0", style.tint)} />
+                    {/* Dark overlay for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
+                  </>
+                ) : (
+                  <>
+                    {/* Gradient fallback with initials */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${style.gradient} to-slate-900`}>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-5xl font-bold text-white/15">
+                          {leader.player.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  </>
+                )}
+                
+                {/* Content overlay */}
+                <div className="absolute inset-0 p-3.5 flex flex-col justify-between">
+                  {/* Category icon in corner */}
+                  <div className="flex items-center justify-between">
+                    <div className={cn(
+                      "w-7 h-7 rounded-lg flex items-center justify-center",
+                      style.accent
+                    )}>
+                      <span className="text-white">{style.icon}</span>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                </>
-              )}
-              
-              {/* Content overlay */}
-              <div className="absolute inset-0 p-3 flex flex-col justify-between">
-                {/* Category label with accent color */}
-                <div className="flex items-center gap-1.5">
-                  <div className={`w-1.5 h-1.5 rounded-full ${colors.accent}`} />
-                  <span className="text-white/90 text-[10px] font-medium uppercase tracking-wide">
-                    {leader.label}
-                  </span>
-                </div>
-                
-                {/* Bottom content */}
-                <div>
-                  {/* Big stat number - more prominent */}
-                  <p className="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-lg">
-                    {leader.formattedValue}
-                  </p>
                   
-                  {/* Player name */}
-                  <p className="text-white font-semibold text-sm mt-1 truncate group-hover:text-white/90 transition-colors">
-                    {leader.player.name}
-                  </p>
-                  
-                  {/* Country */}
-                  {leader.player.country && (
-                    <p className="text-white/60 text-xs mt-0.5">
-                      {toTitleCase(leader.player.country)}
+                  {/* Bottom content - improved hierarchy */}
+                  <div>
+                    {/* Big stat number - most prominent */}
+                    <p className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg leading-none">
+                      {leader.formattedValue}
                     </p>
-                  )}
+                    
+                    {/* Category label */}
+                    <p className="text-white/70 text-xs font-medium uppercase tracking-wide mt-2">
+                      {leader.label}
+                    </p>
+                    
+                    {/* Player name */}
+                    <p className="text-white font-semibold text-sm mt-1 truncate group-hover:text-white/90 transition-colors">
+                      {leader.player.name}
+                    </p>
+                    
+                    {/* Country */}
+                    {leader.player.country && (
+                      <p className="text-white/50 text-xs mt-0.5">
+                        {toTitleCase(leader.player.country)}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           );
         })}
       </div>

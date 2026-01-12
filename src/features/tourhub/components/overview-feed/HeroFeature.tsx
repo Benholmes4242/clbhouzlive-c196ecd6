@@ -1,11 +1,12 @@
 /**
- * HeroFeature - Full-bleed cinematic hero with course image
- * Enhanced height and stronger gradient for text contrast
+ * HeroFeature - Cinematic full-bleed hero with course image
+ * Height ~58-62vh, subtle scale animation, staggered content reveal
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { MapPin, Zap, Trophy, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
@@ -20,12 +21,12 @@ export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeaturePro
     live: { 
       text: 'LIVE', 
       icon: <Zap className="w-3 h-3" />, 
-      className: 'bg-red-500 text-white animate-pulse' 
+      className: 'bg-red-500 text-white' 
     },
     recent: { 
-      text: 'Most Recent', 
+      text: 'MOST RECENT', 
       icon: <Trophy className="w-3 h-3" />, 
-      className: 'bg-black/50 backdrop-blur-md text-white/90 border border-white/15'
+      className: 'bg-black/40 backdrop-blur-md text-white/95 border border-white/20'
     },
     upcoming: { 
       text: 'UPCOMING', 
@@ -40,14 +41,17 @@ export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeaturePro
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className="group block relative overflow-hidden -mx-4 sm:-mx-6"
-      style={{ height: 'min(44vh, 360px)' }}
+      style={{ height: 'min(60vh, 480px)' }}
     >
-      {/* Background Image or Gradient Fallback */}
+      {/* Background Image with subtle scale animation */}
       {courseImageUrl ? (
-        <img
+        <motion.img
           src={courseImageUrl}
           alt={tournament.venue_name || tournament.name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover"
+          initial={{ scale: 1.03 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 3.5, ease: 'easeOut' }}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-slate-800 to-slate-900">
@@ -65,69 +69,111 @@ export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeaturePro
         </div>
       )}
 
-      {/* Stronger gradient overlays for text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+      {/* TOP gradient overlay - per spec */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{ 
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 40%)' 
+        }} 
+      />
+      
+      {/* BOTTOM gradient overlay - per spec */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{ 
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 45%)' 
+        }} 
+      />
 
-      {/* Content overlay - pinned bottom-left */}
+      {/* Content overlay - anchored bottom-left */}
       <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
-        {/* Status pill - cleaner, smaller */}
-        <div className={cn(
-          "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider mb-4",
-          label.className
-        )}>
+        {/* 1. Status pill - fades in first */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25, delay: 0 }}
+          className={cn(
+            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider mb-4",
+            label.className
+          )}
+        >
           {label.icon}
           {label.text}
-        </div>
+        </motion.div>
 
-        {/* Tournament name - broadcast style */}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight line-clamp-2 mb-2 drop-shadow-lg tracking-tight">
+        {/* 2. Tournament name - slides up + fades */}
+        <motion.h1
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-[1.1] line-clamp-2 mb-3 drop-shadow-lg tracking-tight"
+        >
           {tournament.name}
-        </h1>
+        </motion.h1>
 
-        {/* Venue - proper bullet separator */}
+        {/* 3. Location with pin icon */}
         {tournament.venue_name && (
-          <div className="flex items-center gap-1.5 text-white/80 text-sm mb-3">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="flex items-center gap-1.5 text-white/85 text-sm mb-2"
+          >
             <MapPin className="w-3.5 h-3.5" />
             <span>
               {tournament.venue_name}
               {tournament.venue_city && ` · ${tournament.venue_city}`}
             </span>
-          </div>
+          </motion.div>
         )}
 
-        {/* Date */}
-        <p className="text-white/70 text-sm mb-4">
+        {/* 4. Date */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+          className="text-white/70 text-sm mb-4"
+        >
           {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
-        </p>
+        </motion.p>
 
-        {/* Stats row - semi-transparent white/blur background */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* 5. Stat chips - frosted glass style, fades in last */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.35 }}
+          className="flex flex-wrap items-center gap-2"
+        >
           {tournament.purse && (
-            <span className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-medium border border-white/10">
+            <span className="px-3 py-1.5 rounded-[10px] bg-black/30 backdrop-blur-md text-white text-xs font-medium">
               ${(tournament.purse / 1_000_000).toFixed(1)}M
             </span>
           )}
           {tournament.venue_par && (
-            <span className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-medium border border-white/10">
+            <span className="px-3 py-1.5 rounded-[10px] bg-black/30 backdrop-blur-md text-white text-xs font-medium">
               Par {tournament.venue_par}
             </span>
           )}
           {tournament.venue_yardage && (
-            <span className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-medium border border-white/10">
+            <span className="px-3 py-1.5 rounded-[10px] bg-black/30 backdrop-blur-md text-white text-xs font-medium">
               {tournament.venue_yardage.toLocaleString()} yds
             </span>
           )}
-        </div>
+        </motion.div>
 
         {/* Defending champion */}
-        {tournament.defending_champion && (
-          <div className="mt-4 pt-3 border-t border-white/20 flex items-center gap-2">
+        {tournament.defending_champion && type === 'recent' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+            className="mt-4 pt-3 border-t border-white/20 flex items-center gap-2"
+          >
             <Trophy className="w-4 h-4 text-amber-400" />
             <span className="text-white/80 text-sm">
               Champion: <span className="font-semibold text-white">{tournament.defending_champion}</span>
             </span>
-          </div>
+          </motion.div>
         )}
       </div>
     </Link>
