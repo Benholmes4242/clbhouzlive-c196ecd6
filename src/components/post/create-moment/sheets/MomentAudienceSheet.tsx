@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Globe, Users, Lock } from 'lucide-react';
+import { X, Globe, Users, Lock, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { MomentVisibility } from '../types';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
 
 interface AudienceOption {
   value: MomentVisibility;
@@ -41,7 +41,7 @@ interface MomentAudienceSheetProps {
 }
 
 /**
- * MomentAudienceSheet - Bottom sheet for selecting post visibility
+ * MomentAudienceSheet - Premium glass bottom sheet for selecting post visibility
  * Options: Anyone (default), Followers, Private
  */
 export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
@@ -68,48 +68,53 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
         onClick={onClose}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
         
         {/* Sheet */}
         <motion.div
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-2xl"
+          transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+          className="absolute bottom-0 left-0 right-0 rounded-t-[28px]"
           style={{ 
             background: 'var(--cm-surface-card)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div 
-              className="w-10 h-1 rounded-full"
-              style={{ background: 'var(--cm-border)' }}
-            />
+            <div className="w-10 h-1 rounded-full bg-slate-300/60" />
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 pb-4">
-            <h3 
-              className="text-lg font-semibold"
-              style={{ color: 'var(--cm-text-primary)' }}
-            >
-              Who can see this?
-            </h3>
+          <div className="flex items-center justify-between px-5 pb-4">
+            <div>
+              <h3 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--cm-text-primary)' }}>
+                Who can see this?
+              </h3>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--cm-text-tertiary)' }}>
+                You can change this later from the post menu
+              </p>
+            </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--cm-surface-alt)' }}
+              className={cn(
+                "w-9 h-9 rounded-full flex items-center justify-center",
+                "bg-slate-100/80 dark:bg-slate-800/80",
+                "backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50",
+                "transition-all duration-200 active:scale-95"
+              )}
             >
               <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
             </button>
           </div>
 
-          {/* Options - Tighter spacing */}
-          <div className="px-4 pb-4 space-y-1.5">
+          {/* Options */}
+          <div className="px-5 pb-6 space-y-2">
             {AUDIENCE_OPTIONS.map(option => {
               const isSelected = visibility === option.value;
               
@@ -118,24 +123,26 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                   key={option.value}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(option.value)}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-xl transition-all"
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all"
                   style={{
                     background: isSelected 
-                      ? 'var(--cm-surface-slate)' 
+                      ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))'
                       : 'var(--cm-surface-alt)',
                     border: isSelected 
-                      ? 'none' 
+                      ? '1.5px solid rgba(245, 158, 11, 0.4)' 
                       : '1px solid var(--cm-border-subtle)',
                     boxShadow: isSelected 
-                      ? '0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.1)' 
+                      ? '0 0 16px rgba(245, 158, 11, 0.1)' 
                       : 'none',
                   }}
                 >
                   <div 
-                    className="w-9 h-9 rounded-full flex items-center justify-center"
+                    className="w-11 h-11 rounded-full flex items-center justify-center"
                     style={{ 
-                      background: isSelected ? 'rgba(255,255,255,0.18)' : 'var(--cm-surface-card)',
-                      color: isSelected ? 'white' : 'var(--cm-icon-primary)',
+                      background: isSelected 
+                        ? 'rgba(245, 158, 11, 0.15)' 
+                        : 'var(--cm-surface-card)',
+                      color: isSelected ? '#f59e0b' : 'var(--cm-icon-primary)',
                     }}
                   >
                     {option.icon}
@@ -143,22 +150,25 @@ export const MomentAudienceSheet: React.FC<MomentAudienceSheetProps> = ({
                   
                   <div className="flex-1 text-left">
                     <p 
-                      className="font-medium text-[13px]"
-                      style={{ color: isSelected ? 'white' : 'var(--cm-text-primary)' }}
+                      className="font-medium text-sm"
+                      style={{ color: isSelected ? '#f59e0b' : 'var(--cm-text-primary)' }}
                     >
                       {option.label}
                     </p>
                     <p 
-                      className="text-[11px] mt-0.5"
-                      style={{ color: isSelected ? 'rgba(255,255,255,0.75)' : 'var(--cm-text-tertiary)' }}
+                      className="text-xs mt-0.5"
+                      style={{ color: 'var(--cm-text-tertiary)' }}
                     >
                       {option.description}
                     </p>
                   </div>
                   
                   {isSelected && (
-                    <div className="opacity-100">
-                      <AnimatedCheck />
+                    <div 
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
+                    >
+                      <Check className="w-3.5 h-3.5 text-white" />
                     </div>
                   )}
                 </motion.button>

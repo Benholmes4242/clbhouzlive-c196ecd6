@@ -1,12 +1,11 @@
-// DraftsListSheet - Bottom sheet showing all saved drafts
-// Dark theme polished design
-
+// DraftsListSheet - Premium glass bottom sheet for saved drafts
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { formatDistanceToNow } from 'date-fns';
 import { Trash2, FileText, AlertCircle, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useDrafts } from '@/hooks/useDrafts';
 import type { DraftWithMedia } from '@/services/drafts';
 
@@ -21,7 +20,6 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
 
-  // Debug: log when open state changes
   useEffect(() => {
     console.log('[DraftsListSheet] isOpen:', isOpen);
   }, [isOpen]);
@@ -44,57 +42,98 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
 
   const getActorLabel = (actorType: string) => {
     switch (actorType) {
-      case 'business':
-        return 'Business';
-      case 'creator':
-        return 'Creator';
-      default:
-        return 'Personal';
+      case 'business': return 'Business';
+      case 'creator': return 'Creator';
+      default: return 'Personal';
     }
   };
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DrawerContent className="max-h-[85vh] bg-white border-t border-gray-200 z-[10002]" style={{ zIndex: 10002 }}>
-        {/* Accessibility: Screen reader title and description */}
+      <DrawerContent 
+        className="max-h-[85vh] border-0 z-[10002]" 
+        style={{ 
+          background: 'var(--cm-surface-card)',
+          borderTopLeftRadius: '28px',
+          borderTopRightRadius: '28px',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
+          zIndex: 10002,
+        }}
+      >
         <VisuallyHidden>
           <DrawerTitle>Your Drafts</DrawerTitle>
           <DrawerDescription>Manage your saved drafts</DrawerDescription>
         </VisuallyHidden>
         
         <div className="flex flex-col h-full max-h-[85vh]">
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 rounded-full bg-slate-300/60" />
+          </div>
+          
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-gray-900">Drafts</h2>
+          <div className="flex items-center justify-between px-5 pb-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--cm-text-primary)' }}>
+                Drafts
+              </h2>
               {drafts.length > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                <span 
+                  className="px-2.5 py-1 rounded-full text-xs font-medium"
+                  style={{ 
+                    background: 'var(--cm-surface-alt)',
+                    color: 'var(--cm-text-secondary)',
+                    border: '1px solid var(--cm-border-subtle)',
+                  }}
+                >
                   {drafts.length}/{maxDrafts}
                 </span>
               )}
             </div>
-            {drafts.length > 1 && (
+            <div className="flex items-center gap-2">
+              {drafts.length > 1 && (
+                <button
+                  onClick={() => setShowDeleteAllConfirm(true)}
+                  disabled={isDeleting}
+                  className="text-red-500 text-sm font-medium hover:text-red-600 transition-colors disabled:opacity-50"
+                >
+                  Delete All
+                </button>
+              )}
               <button
-                onClick={() => setShowDeleteAllConfirm(true)}
-                disabled={isDeleting}
-                className="text-red-500 text-sm font-medium hover:text-red-600 transition-colors disabled:opacity-50"
+                onClick={onClose}
+                className={cn(
+                  "w-9 h-9 rounded-full flex items-center justify-center",
+                  "bg-slate-100/80 dark:bg-slate-800/80",
+                  "backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50",
+                  "transition-all duration-200 active:scale-95"
+                )}
               >
-                Delete All
+                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
               </button>
-            )}
+            </div>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto px-5 pb-6">
             {isLoading ? (
               <div className="flex items-center justify-center h-40">
-                <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : drafts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileText className="w-12 h-12 text-gray-300 mb-3" />
-                <p className="text-gray-500">No saved drafts</p>
-                <p className="text-xs text-gray-400 mt-1">Drafts are saved automatically</p>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: 'var(--cm-surface-alt)' }}
+                >
+                  <FileText className="w-8 h-8" style={{ color: 'var(--cm-text-tertiary)' }} />
+                </div>
+                <p className="font-medium" style={{ color: 'var(--cm-text-secondary)' }}>
+                  No drafts yet
+                </p>
+                <p className="text-sm mt-1" style={{ color: 'var(--cm-text-tertiary)' }}>
+                  Your unfinished posts appear here
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -114,18 +153,20 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-white/95 backdrop-blur-sm rounded-xl"
+                          className="absolute inset-0 z-10 flex items-center justify-center gap-2 rounded-2xl backdrop-blur-md"
+                          style={{ background: 'rgba(255, 255, 255, 0.95)' }}
                         >
                           <button
                             onClick={() => handleDeleteDraft(draft.id)}
                             disabled={isDeleting}
-                            className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-400 disabled:opacity-50 transition-colors"
+                            className="px-4 py-2.5 text-sm font-medium text-white bg-red-500 rounded-xl hover:bg-red-400 disabled:opacity-50 transition-all active:scale-95"
                           >
                             Delete
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(null)}
-                            className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                            className="px-4 py-2.5 text-sm font-medium rounded-xl transition-all active:scale-95"
+                            style={{ background: 'var(--cm-surface-alt)', color: 'var(--cm-text-primary)' }}
                           >
                             Cancel
                           </button>
@@ -133,33 +174,40 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
                       )}
                     </AnimatePresence>
 
-                    <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    {/* Draft Card */}
+                    <div 
+                      className="flex items-start gap-3 p-4 rounded-2xl transition-all active:scale-[0.99]"
+                      style={{ 
+                        background: 'var(--cm-surface-alt)',
+                        border: '1px solid var(--cm-border-subtle)',
+                      }}
+                    >
                       {/* Thumbnail */}
-                      <div className="relative flex-shrink-0 w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
+                      <div 
+                        className="relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden"
+                        style={{ background: 'var(--cm-surface-card)' }}
+                      >
                         {draft.media && draft.media.length > 0 ? (
                           <>
-                            {draft.media[0].mediaType === 'video' ? (
-                              <img
-                                src={draft.media[0].posterUrl || draft.media[0].mediaUrl}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <img
-                                src={draft.media[0].mediaUrl}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            )}
+                            <img
+                              src={draft.media[0].mediaType === 'video' 
+                                ? (draft.media[0].posterUrl || draft.media[0].mediaUrl)
+                                : draft.media[0].mediaUrl}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
                             {draft.media.length > 1 && (
-                              <div className="absolute bottom-0.5 right-0.5 px-1 py-0.5 text-[9px] font-medium bg-black/70 text-white rounded">
+                              <div 
+                                className="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-semibold rounded-md"
+                                style={{ background: 'rgba(0, 0, 0, 0.7)', color: 'white' }}
+                              >
                                 +{draft.media.length - 1}
                               </div>
                             )}
                           </>
                         ) : (
                           <div className="flex items-center justify-center w-full h-full">
-                            <FileText size={16} className="text-gray-400" />
+                            <FileText className="w-5 h-5" style={{ color: 'var(--cm-text-tertiary)' }} />
                           </div>
                         )}
                       </div>
@@ -169,20 +217,24 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
                         onClick={() => handleLoadDraft(draft)}
                         className="flex-1 text-left min-w-0"
                       >
-                        <p className="text-sm text-gray-900 line-clamp-1">
+                        <p className="text-sm line-clamp-2" style={{ color: 'var(--cm-text-primary)' }}>
                           {draft.content || (
-                            <span className="text-gray-400 italic">No caption</span>
+                            <span style={{ color: 'var(--cm-text-tertiary)' }} className="italic">No caption</span>
                           )}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs mt-1" style={{ color: 'var(--cm-text-tertiary)' }}>
                           {getActorLabel(draft.actorType)} · {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true })}
                         </p>
                         {draft.categories && draft.categories.length > 0 && (
-                          <div className="flex gap-1 mt-1.5 flex-wrap">
+                          <div className="flex gap-1.5 mt-2 flex-wrap">
                             {draft.categories.slice(0, 2).map((cat) => (
                               <span
                                 key={cat}
-                                className="px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded"
+                                className="px-2 py-0.5 text-[10px] font-medium rounded-full"
+                                style={{ 
+                                  background: 'var(--cm-surface-card)',
+                                  color: 'var(--cm-text-secondary)',
+                                }}
                               >
                                 {cat}
                               </span>
@@ -194,10 +246,17 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
                       {/* Delete button */}
                       <button
                         onClick={() => setConfirmDeleteId(draft.id)}
-                        className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className={cn(
+                          "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
+                          "transition-all active:scale-95"
+                        )}
+                        style={{ 
+                          background: 'var(--cm-surface-card)',
+                          border: '1px solid var(--cm-border-subtle)',
+                        }}
                         aria-label="Delete draft"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 className="w-4 h-4" style={{ color: 'var(--cm-text-tertiary)' }} />
                       </button>
                     </div>
                   </motion.div>
@@ -213,25 +272,34 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm p-6 rounded-t-3xl"
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 rounded-t-[28px] backdrop-blur-md"
+                style={{ background: 'rgba(255, 255, 255, 0.95)' }}
               >
-                <AlertCircle size={40} className="text-red-500 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete all drafts?</h3>
-                <p className="text-sm text-gray-500 text-center mb-6">
+                <div 
+                  className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                  style={{ background: 'rgba(239, 68, 68, 0.1)' }}
+                >
+                  <AlertCircle className="w-8 h-8 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--cm-text-primary)' }}>
+                  Delete all drafts?
+                </h3>
+                <p className="text-sm text-center mb-6" style={{ color: 'var(--cm-text-secondary)' }}>
                   This will permanently delete {drafts.length} draft{drafts.length !== 1 ? 's' : ''}.
-                  This action cannot be undone.
+                  <br />This action cannot be undone.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={handleDeleteAll}
                     disabled={isDeleting}
-                    className="px-6 py-2.5 text-sm font-medium text-white bg-red-500 rounded-xl hover:bg-red-400 disabled:opacity-50 transition-colors"
+                    className="px-6 py-3 text-sm font-semibold text-white bg-red-500 rounded-xl hover:bg-red-400 disabled:opacity-50 transition-all active:scale-95"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete All'}
                   </button>
                   <button
                     onClick={() => setShowDeleteAllConfirm(false)}
-                    className="px-6 py-2.5 text-sm font-medium bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                    className="px-6 py-3 text-sm font-medium rounded-xl transition-all active:scale-95"
+                    style={{ background: 'var(--cm-surface-alt)', color: 'var(--cm-text-primary)' }}
                   >
                     Cancel
                   </button>
