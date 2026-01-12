@@ -42,7 +42,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
 
 export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
   // Build cards from season leaders (already ordered: World Rank, Scoring, Cuts, Events)
-  const cards: FeatureCard[] = topPlayers.slice(0, 4).map((leader) => {
+  // Use index to ensure unique keys since same player may appear in multiple categories
+  const cards: FeatureCard[] = topPlayers.slice(0, 4).map((leader, index) => {
     const labelMap: Record<string, string> = {
       world_rank: 'WORLD NO.1',
       scoring: 'LOWEST SCORING',
@@ -51,7 +52,7 @@ export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
     };
     
     return {
-      id: `player-${leader.player.id}-${leader.category}`,
+      id: `card-${index}-${leader.category}`,
       type: 'player',
       label: labelMap[leader.category] || leader.label.toUpperCase(),
       title: leader.player.name,

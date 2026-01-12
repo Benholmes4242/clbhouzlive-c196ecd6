@@ -5,6 +5,7 @@
 
 import {
   HeroFeature,
+  WorldRankingsSection,
   FeatureStrip,
   PlayersFeed,
   LeadersPhotoCards,
@@ -79,10 +80,12 @@ export function OverviewTabFeed() {
         />
       )}
 
-      {/* 2. Season Snapshot Strip */}
+      {/* 2. World Rankings - Dark charcoal section */}
+      <WorldRankingsSection />
+
+      {/* 3. Season Snapshot Strip */}
       <FeatureStrip
         topPlayers={seasonLeaders}
-        courseImages={courseImages}
       />
 
       {/* 3. Top Players - Photo-led feed */}
