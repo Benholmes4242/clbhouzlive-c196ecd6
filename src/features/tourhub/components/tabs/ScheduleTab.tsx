@@ -163,7 +163,7 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] -mx-4 px-4 py-6 min-h-screen">
       {/* Featured Hero - Full Width */}
       {featured && filter === 'all' && !search && (
         <ScheduleHeroCard 
