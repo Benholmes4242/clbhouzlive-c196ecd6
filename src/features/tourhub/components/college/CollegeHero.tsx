@@ -1,7 +1,8 @@
-import { GraduationCap, Users, DollarSign, Trophy, Target, TrendingUp } from 'lucide-react';
+import { GraduationCap, DollarSign, Trophy, Target, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
+import { useTourSeason } from '../../hooks/useTourHubData';
 
 interface CollegeHeroProps {
   stats: CollegeSeasonStats;
@@ -37,6 +38,8 @@ function StatBadge({ icon: Icon, label, value, iconColor }: StatBadgeProps) {
 }
 
 export function CollegeHero({ stats, college, className }: CollegeHeroProps) {
+  const { data: season } = useTourSeason();
+  const seasonYear = season?.year || 2025;
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   
   return (
@@ -62,7 +65,7 @@ export function CollegeHero({ stats, college, className }: CollegeHeroProps) {
             {displayName}
           </h1>
           <p className="text-body-md text-text-secondary mt-1">
-            {stats.player_count} PGA Tour {stats.player_count === 1 ? 'player' : 'players'} · 2025 Season
+            {stats.player_count} PGA Tour {stats.player_count === 1 ? 'player' : 'players'} · {seasonYear} Season
           </p>
         </div>
       </div>

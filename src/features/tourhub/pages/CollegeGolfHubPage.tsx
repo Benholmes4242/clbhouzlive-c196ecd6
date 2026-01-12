@@ -1,14 +1,17 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, GraduationCap, TrendingUp, Zap, GitCompare } from 'lucide-react';
+import { ArrowLeft, GraduationCap, TrendingUp, Zap } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeSearch, CollegeLeaderboard, CollegeWeeklyMovers } from '../components/college';
-import { Button } from '@/components/ui/button';
+import { useTourSeason } from '../hooks/useTourHubData';
 
 /**
  * College Golf Hub - Main landing page for college golf content.
- * Features search, weekly movers, leaderboards by various metrics.
+ * Features search, leaderboards by various metrics, and weekly movers.
  */
 export function CollegeGolfHubPage() {
+  const { data: season } = useTourSeason();
+  const seasonYear = season?.year || 2025;
+
   return (
     <TourHubShell>
       {/* Back Link */}
@@ -24,28 +27,18 @@ export function CollegeGolfHubPage() {
       
       {/* Header */}
       <header className="py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-heading-lg font-bold text-text-primary">
-                College Golf
-              </h1>
-              <p className="text-body-sm text-text-secondary">
-                Alumni performance on the PGA Tour
-              </p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+            <GraduationCap className="w-6 h-6 text-primary" />
           </div>
-          
-          {/* Compare CTA */}
-          <Link to="/tourhub/college-golf/compare">
-            <Button variant="outline" size="sm" className="gap-2">
-              <GitCompare className="w-4 h-4" />
-              Compare
-            </Button>
-          </Link>
+          <div>
+            <h1 className="text-heading-lg font-bold text-text-primary">
+              College Rankings
+            </h1>
+            <p className="text-body-sm text-text-secondary">
+              See how your college stacks up on the PGA Tour
+            </p>
+          </div>
         </div>
       </header>
       
@@ -54,28 +47,25 @@ export function CollegeGolfHubPage() {
         <CollegeSearch />
       </section>
       
-      {/* Weekly Movers */}
+      {/* Leaderboards - Primary content */}
       <section className="mb-8">
-        <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <Zap className="w-5 h-5 text-accent-warning" />
-          This Week's Movers
-        </h2>
-        <p className="text-body-sm text-text-secondary mb-4">
-          Colleges trending up or down this week
-        </p>
-        <CollegeWeeklyMovers limit={8} />
-      </section>
-      
-      {/* Leaderboards */}
-      <section className="mb-6">
         <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-text-tertiary" />
           College Leaderboards
         </h2>
         <p className="text-body-sm text-text-secondary mb-4">
-          2025 Season rankings by total alumni performance
+          {seasonYear} Season rankings by total alumni performance
         </p>
         <CollegeLeaderboard limit={25} />
+      </section>
+      
+      {/* Weekly Movers - Secondary content */}
+      <section className="mb-6">
+        <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
+          <Zap className="w-5 h-5 text-accent-warning" />
+          This Week's Movers
+        </h2>
+        <CollegeWeeklyMovers limit={8} />
       </section>
     </TourHubShell>
   );
