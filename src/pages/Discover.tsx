@@ -241,8 +241,19 @@ const Discover = () => {
     // Otherwise fall back to allContent (legacy behavior)
     const playlist = items && items.length > 0 ? items : allContent;
     
+    console.log('[Discover] handleMediaClick:', {
+      itemId: item.id?.slice(0, 8),
+      providedIndex: index,
+      usingProvidedItems: !!(items && items.length > 0),
+      playlistLength: playlist.length,
+      firstFiveIds: playlist.slice(0, 5).map((p: any) => (p.id || p.postId)?.slice(0, 8))
+    });
+    
     // Find the index if not provided
     const clickedIndex = index ?? playlist.findIndex(c => c.id === item.id);
+    
+    console.log('[Discover] Opening fullscreen at index:', clickedIndex, 'for item:', item.id?.slice(0, 8));
+    
     if (clickedIndex !== -1) {
       setCurrentFullscreenPostId(item.id); // Set initial post
       openFullscreen(playlist, clickedIndex);

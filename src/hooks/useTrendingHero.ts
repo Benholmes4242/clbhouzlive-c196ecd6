@@ -57,6 +57,8 @@ export function useTrendingHero() {
       // Try to get most viewed video from TODAY first
       // We need to fetch posts and then sort by views since Supabase doesn't support
       // ordering by aggregated count in the same query
+      // Query posts with video media from TODAY
++      console.log('[useTrendingHero] Fetching today videos since:', todayStart.toISOString());
       const { data: todayData, error: todayError } = await supabase
         .from('posts')
         .select(`
@@ -81,7 +83,6 @@ export function useTrendingHero() {
           post_media!inner (
             media_url,
             media_type,
-            thumbnail_url,
             poster_url,
             width,
             height,
@@ -94,9 +95,14 @@ export function useTrendingHero() {
         .gte('created_at', todayStart.toISOString())
         .eq('visibility', 'anyone')
         .eq('post_media.media_type', 'video')
-        .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
         .limit(20);
+      
+      console.log('[useTrendingHero] Today query result:', { 
+        count: todayData?.length, 
+        error: todayError?.message,
+        firstPostId: todayData?.[0]?.id?.slice(0, 8)
+      });
 
       if (!todayError && todayData && todayData.length > 0) {
         // Sort by views and pick the top one
@@ -116,6 +122,7 @@ export function useTrendingHero() {
       }
 
       // Fallback: Most viewed video THIS WEEK
+      console.log('[useTrendingHero] Fetching week videos since:', weekStart.toISOString());
       const { data: weekData, error: weekError } = await supabase
         .from('posts')
         .select(`
@@ -140,7 +147,6 @@ export function useTrendingHero() {
           post_media!inner (
             media_url,
             media_type,
-            thumbnail_url,
             poster_url,
             width,
             height,
@@ -153,9 +159,14 @@ export function useTrendingHero() {
         .gte('created_at', weekStart.toISOString())
         .eq('visibility', 'anyone')
         .eq('post_media.media_type', 'video')
-        .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
         .limit(50);
+        
+      console.log('[useTrendingHero] Week query result:', { 
+        count: weekData?.length, 
+        error: weekError?.message,
+        firstPostId: weekData?.[0]?.id?.slice(0, 8)
+      });
 
       if (!weekError && weekData && weekData.length > 0) {
         // Sort by views and pick the top one
@@ -175,7 +186,8 @@ export function useTrendingHero() {
       }
 
       // Final fallback: Most liked video (no time constraint)
-      const { data: fallbackData } = await supabase
+      console.log('[useTrendingHero] Fetching fallback (all time)');
+      const { data: fallbackData, error: fallbackError } = await supabase
         .from('posts')
         .select(`
           id,
@@ -199,7 +211,6 @@ export function useTrendingHero() {
           post_media!inner (
             media_url,
             media_type,
-            thumbnail_url,
             poster_url,
             width,
             height,
@@ -210,9 +221,14 @@ export function useTrendingHero() {
         `)
         .eq('visibility', 'anyone')
         .eq('post_media.media_type', 'video')
-        .lte('post_media.duration_seconds', 240)
         .order('created_at', { ascending: false })
         .limit(30);
+        
+      console.log('[useTrendingHero] Fallback query result:', { 
+        count: fallbackData?.length, 
+        error: fallbackError?.message,
+        firstPostId: fallbackData?.[0]?.id?.slice(0, 8)
+      });
 
       if (fallbackData && fallbackData.length > 0) {
         // Sort by likes
@@ -266,7 +282,7 @@ function transformPostData(data: any): TrendingHeroPost {
     media: media.map((m: any) => ({
       media_url: m.media_url,
       media_type: m.media_type,
-      thumbnail_url: m.thumbnail_url,
+      thumbnail_url: m.poster_url, // poster_url is the actual column name
       poster_url: m.poster_url,
       width: m.width,
       height: m.height,
