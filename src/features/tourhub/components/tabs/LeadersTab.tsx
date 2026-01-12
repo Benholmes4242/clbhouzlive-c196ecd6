@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { Trophy, Target, Gauge, Award, TrendingUp, DollarSign, Globe } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings, toTitleCase, getInitials } from '../../hooks/useWorldRankings';
+import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
 import { cn } from '@/lib/utils';
 
 interface LeaderCategory {
@@ -338,11 +339,11 @@ export function LeadersTab() {
                     border: '2px solid rgba(251, 191, 36, 0.3)',
                   }}
                 >
-                  {top3[0].player?.photo_url ? (
+                  {resolvePhotoUrl(top3[0].player?.photo_url) ? (
                     <img 
-                      src={top3[0].player.photo_url} 
-                      alt={top3[0].player.full_name}
-                      className="w-full h-full rounded-full object-cover"
+                      src={resolvePhotoUrl(top3[0].player?.photo_url)!} 
+                      alt={top3[0].player?.full_name || ''}
+                      className="w-full h-full rounded-full object-cover object-top"
                     />
                   ) : (
                     <span className="text-lg font-semibold text-muted-foreground">
@@ -518,11 +519,11 @@ function PlayerRow({ player, rank, category }: PlayerRowProps) {
         className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
         style={{ background: 'hsl(var(--muted) / 0.5)' }}
       >
-        {player.player?.photo_url ? (
+        {resolvePhotoUrl(player.player?.photo_url) ? (
           <img 
-            src={player.player.photo_url} 
-            alt={player.player.full_name}
-            className="w-full h-full rounded-full object-cover"
+            src={resolvePhotoUrl(player.player?.photo_url)!} 
+            alt={player.player?.full_name || ''}
+            className="w-full h-full rounded-full object-cover object-top"
           />
         ) : (
           <span className="text-[11px] font-semibold text-muted-foreground">
