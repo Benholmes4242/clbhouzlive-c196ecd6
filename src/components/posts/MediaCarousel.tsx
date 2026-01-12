@@ -11,6 +11,7 @@ interface MediaItem {
   previewUrl?: string;
   url?: string;
   file?: File;
+  thumbnailUrl?: string;
   alt?: string;
   studioEdits?: StudioEdits; // Full studio edits
 }
