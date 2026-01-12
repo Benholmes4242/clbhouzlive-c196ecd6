@@ -76,15 +76,33 @@ export function useCourseImageResolver(venues: VenueInput[]) {
     queryFn: async () => {
       if (!venues.length) return new Map<string, ResolvedCourse>();
       
+      console.log('[CourseResolver] ===== RESOLUTION START =====');
+      console.log('[CourseResolver] Input venues:', venues.map(v => ({
+        venueName: v.venueName,
+        venueCourseName: v.venueCourseName,
+        city: v.city,
+        country: v.country
+      })));
+      
       const results = new Map<string, ResolvedCourse>();
       const uncached: VenueInput[] = [];
       
       // Check cache first
+      console.log('[CourseResolver] Step 1: Checking sr_course_map cache...');
       try {
-        const { data: cached } = await supabase
+        const { data: cached, error: cacheError } = await supabase
           .from('sr_course_map')
           .select('sr_venue_name, golf_course_id, confidence, golf_courses:golf_course_id(id, name, thumbnail_image)')
           .in('sr_venue_name', venues.map(v => v.venueName));
+        
+        if (cacheError) {
+          console.error('[CourseResolver] Cache query error:', cacheError);
+        } else {
+          console.log('[CourseResolver] Cache results:', cached?.length || 0, 'hits');
+          cached?.forEach((row: any) => {
+            console.log('[CourseResolver] Cache hit:', row.sr_venue_name, '->', row.golf_courses?.name);
+          });
+        }
         
         cached?.forEach((row: any) => {
           if (row.golf_courses) {
@@ -97,8 +115,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
           }
         });
       } catch (e) {
-        // Cache check failed, proceed with resolution
-        console.log('Cache check failed, resolving fresh');
+        console.error('[CourseResolver] Cache check exception:', e);
       }
       
       // Find uncached venues
@@ -108,13 +125,22 @@ export function useCourseImageResolver(venues: VenueInput[]) {
         }
       });
       
+      console.log('[CourseResolver] Step 2: Uncached venues to resolve:', uncached.length);
+      
       // Resolve uncached venues
       if (uncached.length > 0) {
-        // Fetch ALL courses that could match (don't filter by country here - do it in matching)
-        const { data: courses } = await supabase
+        // Fetch courses - increase limit significantly
+        console.log('[CourseResolver] Step 3: Fetching golf_courses...');
+        const { data: courses, error: coursesError } = await supabase
           .from('golf_courses')
           .select('id, name, thumbnail_image, country, sub_country')
-          .limit(2000);
+          .limit(10000);
+        
+        console.log('[CourseResolver] Courses fetched:', courses?.length || 0, coursesError ? `ERROR: ${coursesError.message}` : '');
+        
+        // Debug: Check if Tiburon is in the fetched courses
+        const tiburonCourses = courses?.filter(c => c.name.toLowerCase().includes('tiburon'));
+        console.log('[CourseResolver] Tiburon courses in fetch:', tiburonCourses?.map(c => ({ name: c.name, hasImage: !!c.thumbnail_image })));
         
         if (courses) {
           for (const venue of uncached) {
@@ -125,15 +151,19 @@ export function useCourseImageResolver(venues: VenueInput[]) {
             const searchBase = courseBaseName(venue.venueName); // Always use venue base for matching
             const searchNorm = courseNormalize(searchBase);
             
-            // Debug logging for key venues
-            if (venue.venueName.toLowerCase().includes('tiburon') || venue.venueName.toLowerCase().includes('torrey')) {
-              console.log(`[CourseResolver] Resolving: "${searchName}" (venue: "${venue.venueName}", course: "${venue.venueCourseName}")`);
-              console.log(`  Base: "${searchBase}", Normalized: "${searchNorm}"`);
+            const isDebugVenue = venue.venueName.toLowerCase().includes('tiburon') || venue.venueName.toLowerCase().includes('torrey');
+            
+            if (isDebugVenue) {
+              console.log(`[CourseResolver] ===== MATCHING: "${venue.venueName}" =====`);
+              console.log(`[CourseResolver] Full search: "${searchName}"`);
+              console.log(`[CourseResolver] Base name: "${searchBase}"`);
+              console.log(`[CourseResolver] Normalized: "${searchNorm}"`);
+              console.log(`[CourseResolver] Venue course name: "${venue.venueCourseName}"`);
             }
             
             // Find best match
             let bestMatch: { course: typeof courses[0]; score: number; boost: number; exactMatch: boolean; countryMatch: boolean; variantMatch: boolean } | null = null;
-            const candidates: { name: string; score: number; boost: number }[] = [];
+            const candidates: { name: string; score: number; boost: number; similarity: number }[] = [];
             
             for (const course of courses) {
               // Prefer same country, but don't exclude entirely
@@ -151,7 +181,10 @@ export function useCourseImageResolver(venues: VenueInput[]) {
               const exactBaseMatch = courseNormalize(searchBase) === courseNormalize(courseBase);
               const exactBonus = exactBaseMatch ? 50 : 0;
               
-              candidates.push({ name: course.name, score: finalScore, boost });
+              // Only track candidates with some relevance
+              if (finalScore > 0 || exactBaseMatch) {
+                candidates.push({ name: course.name, score: finalScore, boost, similarity: finalScore * 100 + boost + exactBonus });
+              }
               
               // Boost for matching the specific course variant (Gold, Black, etc.)
               let variantMatchBonus = 0;
@@ -175,16 +208,25 @@ export function useCourseImageResolver(venues: VenueInput[]) {
               }
             }
             
-            // Debug logging
-            if (venue.venueName.toLowerCase().includes('tiburon') || venue.venueName.toLowerCase().includes('torrey')) {
+            if (isDebugVenue) {
+              // Sort and show top candidates
               const topCandidates = candidates
-                .sort((a, b) => (b.score * 100 + b.boost) - (a.score * 100 + a.boost))
-                .slice(0, 5);
-              console.log(`  Top 5 candidates:`, topCandidates);
+                .sort((a, b) => b.similarity - a.similarity)
+                .slice(0, 10);
+              console.log(`[CourseResolver] Total candidates with score > 0:`, candidates.length);
+              console.log(`[CourseResolver] Top 10 candidates:`, topCandidates);
+              
               if (bestMatch) {
-                console.log(`  ✓ Matched: "${bestMatch.course.name}" (score: ${bestMatch.score.toFixed(2)}, variant: ${bestMatch.variantMatch}, image: ${bestMatch.course.thumbnail_image ? 'YES' : 'NO'})`);
+                console.log(`[CourseResolver] ✓ BEST MATCH: "${bestMatch.course.name}"`);
+                console.log(`[CourseResolver]   Score: ${bestMatch.score.toFixed(3)}, Boost: ${bestMatch.boost}, Exact: ${bestMatch.exactMatch}, Variant: ${bestMatch.variantMatch}`);
+                console.log(`[CourseResolver]   Has image: ${!!bestMatch.course.thumbnail_image}`);
               } else {
-                console.log(`  ✗ No match found`);
+                console.log(`[CourseResolver] ✗ NO MATCH FOUND (threshold: 0.35)`);
+                // Show why no match - what was the best score?
+                if (candidates.length > 0) {
+                  const best = candidates[0];
+                  console.log(`[CourseResolver]   Closest was: "${best.name}" with score ${best.score.toFixed(3)}`);
+                }
               }
             }
             
@@ -196,20 +238,34 @@ export function useCourseImageResolver(venues: VenueInput[]) {
                 name: bestMatch.course.name,
               });
               
-              // Cache the result (fire-and-forget)
-              supabase.from('sr_course_map').upsert({
-                sr_venue_name: venue.venueName,
-                sr_venue_course_name: venue.venueCourseName,
-                sr_city: venue.city,
-                sr_country: venue.country,
-                golf_course_id: bestMatch.course.id,
-                confidence: bestMatch.score,
-                match_type: bestMatch.score > 0.8 ? 'normalized' : 'fuzzy',
-              }, { onConflict: 'sr_venue_name,sr_city,sr_country' }).then(() => {});
+              // Cache the result with explicit error handling
+              console.log(`[CourseResolver] Step 4: Caching match for "${venue.venueName}"...`);
+              try {
+                const { error: upsertError } = await supabase.from('sr_course_map').upsert({
+                  sr_venue_name: venue.venueName,
+                  sr_venue_course_name: venue.venueCourseName,
+                  sr_city: venue.city,
+                  sr_country: venue.country,
+                  golf_course_id: bestMatch.course.id,
+                  confidence: bestMatch.score,
+                  source: bestMatch.score > 0.8 ? 'normalized' : 'fuzzy',
+                }, { onConflict: 'sr_venue_name' });
+                
+                if (upsertError) {
+                  console.error(`[CourseResolver] Cache write FAILED:`, upsertError);
+                } else {
+                  console.log(`[CourseResolver] Cache write SUCCESS for "${venue.venueName}"`);
+                }
+              } catch (cacheErr) {
+                console.error(`[CourseResolver] Cache write exception:`, cacheErr);
+              }
             }
           }
         }
       }
+      
+      console.log('[CourseResolver] ===== RESOLUTION COMPLETE =====');
+      console.log('[CourseResolver] Final results:', Array.from(results.entries()).map(([k, v]) => ({ venue: k, course: v.name, hasImage: !!v.imageUrl })));
       
       return results;
     },
