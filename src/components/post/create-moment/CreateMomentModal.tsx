@@ -116,6 +116,7 @@ export default function CreateMomentModal({
     isCreating: isSavingDraft,
     isUploadingMedia,
     draftMediaToComposerItem,
+    refetch: refetchDrafts,
   } = useDrafts();
   
   // Scheduled posts
@@ -641,6 +642,19 @@ export default function CreateMomentModal({
         badges: selectedBadges,
       });
       
+      // If this was from a draft, delete it after successful post
+      if (currentDraftId) {
+        try {
+          await deleteDraft(currentDraftId);
+          console.log('[CreateMomentModal] Deleted draft after posting:', currentDraftId);
+          setCurrentDraftId(null);
+          refetchDrafts(); // Update the drafts list/count
+        } catch (err) {
+          console.error('[CreateMomentModal] Failed to delete draft:', err);
+          // Don't block - post was successful
+        }
+      }
+      
       onClose();
     } catch (error) {
       console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
@@ -686,6 +700,19 @@ export default function CreateMomentModal({
         badges: selectedBadges,
         scheduledAt,
       });
+      
+      // If this was from a draft, delete it after successful schedule
+      if (currentDraftId) {
+        try {
+          await deleteDraft(currentDraftId);
+          console.log('[CreateMomentModal] Deleted draft after scheduling:', currentDraftId);
+          setCurrentDraftId(null);
+          refetchDrafts(); // Update the drafts list/count
+        } catch (err) {
+          console.error('[CreateMomentModal] Failed to delete draft:', err);
+          // Don't block - schedule was successful
+        }
+      }
       
       setShowScheduleSheet(false);
       setPendingScheduledAt(null);
