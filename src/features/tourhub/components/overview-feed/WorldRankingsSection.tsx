@@ -104,13 +104,13 @@ export function WorldRankingsSection() {
                   </div>
                 </div>
                 
-                {/* Player name - allow wrapping for long names */}
-                <p className="text-foreground font-semibold text-sm leading-tight text-center line-clamp-2">
+                {/* Player last name */}
+                <p className="font-semibold text-sm leading-tight text-center line-clamp-2" style={{ color: '#1e293b' }}>
                   {lastName}
                 </p>
                 
                 {/* Country */}
-                <p className="text-muted-foreground text-[10px] text-center mt-0.5">
+                <p className="text-[10px] text-center mt-0.5" style={{ color: '#64748B' }}>
                   {toTitleCase(player.country) || 'Unknown'}
                 </p>
               </div>

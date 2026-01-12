@@ -1,9 +1,9 @@
 /**
  * TourHubNavOverlay - Premium full-screen overlay menu for Tour Hub navigation
- * Clean design with icons, improved active states, and simplified rankings preview
+ * Clean design with icons, improved active states, and mini World Rankings cards
  */
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,7 +20,7 @@ import {
   GraduationCap 
 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { useTopWorldRanked } from '../hooks/useWorldRankings';
+import { useTopWorldRanked, toTitleCase, getInitials } from '../hooks/useWorldRankings';
 import type { TourHubTab } from './TourHubTabs';
 
 interface NavItem {
@@ -77,7 +77,8 @@ export function TourHubNavOverlay({
   onNavigate 
 }: TourHubNavOverlayProps) {
   const navigate = useNavigate();
-  const { data: topPlayers } = useTopWorldRanked(3);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { data: topPlayers, isLoading: rankingsLoading } = useTopWorldRanked(5);
   
   // Lock body scroll when open
   useEffect(() => {
@@ -124,15 +125,20 @@ export function TourHubNavOverlay({
     onClose();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [onNavigate, onClose]);
+
+  const handlePlayerClick = useCallback((playerId: string) => {
+    haptic('light');
+    onClose();
+    navigate(`/tourhub/player/${playerId}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [onClose, navigate]);
   
   if (typeof document === 'undefined') return null;
   
   const portalRoot = document.getElementById('portal-root') || document.body;
 
-  // Build simplified rankings text
-  const rankingsText = topPlayers.length > 0
-    ? topPlayers.map((p, i) => `#${i + 1} ${p.playerName.split(' ').pop()}`).join(' • ')
-    : null;
+  // Take top 3 for mini cards
+  const displayPlayers = topPlayers.slice(0, 3);
   
   return createPortal(
     <AnimatePresence>
@@ -168,21 +174,20 @@ export function TourHubNavOverlay({
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            {/* Clbhouz Logo Mark Watermark - centered between top/bottom of viewport */}
+            {/* Clbhouz Logo Mark Watermark - bottom right corner */}
             <div
               className="fixed pointer-events-none"
               style={{
-                right: '-140px',
-                top: '50vh',
-                transform: 'translateY(-50%)',
-                width: '450px',
-                height: '450px',
+                right: '-100px',
+                bottom: '-80px',
+                width: '380px',
+                height: '380px',
                 zIndex: 0,
               }}
             >
               <motion.img
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 0.03, scale: 1 }}
+                animate={{ opacity: 0.04, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
                 src="/assets/logomark-orange.png"
@@ -210,38 +215,126 @@ export function TourHubNavOverlay({
               <div className="w-11" />
             </div>
             
-            {/* World Rankings - Simplified inline text */}
-            {rankingsText && (
+            {/* World Rankings - Mini Cards */}
+            {displayPlayers.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
                 className="px-5 pb-4"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 
-                      className="text-sm font-semibold mb-1"
-                      style={{ color: '#1e293b' }}
-                    >
-                      World Rankings
-                    </h3>
-                    <p 
-                      className="text-sm"
-                      style={{ color: '#64748B' }}
-                    >
-                      {rankingsText}
-                    </p>
-                  </div>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 
+                    className="text-sm font-semibold"
+                    style={{ color: '#1e293b' }}
+                  >
+                    World Rankings
+                  </h3>
                   
                   <button
                     onClick={handleViewAllRankings}
-                    className="flex items-center gap-0.5 text-sm font-medium transition-colors hover:opacity-70 active:scale-95"
+                    className="flex items-center gap-0.5 text-xs font-medium transition-colors hover:opacity-70 active:scale-95"
                     style={{ color: '#64748B' }}
                   >
                     View all
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
+                </div>
+                
+                {/* Mini Cards Row */}
+                <div
+                  ref={scrollRef}
+                  className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide"
+                  style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                  }}
+                >
+                  {displayPlayers.map((player, index) => {
+                    const isFirst = index === 0;
+                    const lastName = player.playerName.split(' ').slice(-1)[0];
+                    const country = toTitleCase(player.country);
+                    
+                    return (
+                      <motion.button
+                        key={player.playerId}
+                        initial={{ opacity: 0, x: 15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.12 + index * 0.04 }}
+                        onClick={() => handlePlayerClick(player.playerId)}
+                        className="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
+                        style={{
+                          background: isFirst 
+                            ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%)'
+                            : 'rgba(255, 255, 255, 0.9)',
+                          border: isFirst 
+                            ? '1.5px solid rgba(245, 158, 11, 0.35)'
+                            : '1px solid rgba(0, 0, 0, 0.06)',
+                          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+                          minWidth: '140px',
+                        }}
+                      >
+                        {/* Rank Badge */}
+                        <div
+                          className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                          style={{
+                            background: isFirst 
+                              ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'
+                              : index === 1
+                              ? 'linear-gradient(135deg, #94A3B8 0%, #64748B 100%)'
+                              : 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+                          }}
+                        >
+                          <span className="text-xs font-bold text-white">
+                            {player.worldRank}
+                          </span>
+                        </div>
+                        
+                        {/* Avatar */}
+                        <div 
+                          className="flex-shrink-0 w-9 h-9 rounded-full overflow-hidden flex items-center justify-center"
+                          style={{
+                            background: isFirst 
+                              ? 'linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%)'
+                              : 'rgba(100, 116, 139, 0.1)',
+                          }}
+                        >
+                          {player.photoUrl ? (
+                            <img 
+                              src={player.photoUrl}
+                              alt={player.playerName}
+                              className="w-full h-full rounded-full object-cover object-top"
+                            />
+                          ) : (
+                            <span 
+                              className="text-xs font-semibold"
+                              style={{ color: isFirst ? '#92400E' : '#64748B' }}
+                            >
+                              {getInitials(player.playerName)}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Name & Country */}
+                        <div className="flex-1 min-w-0 text-left">
+                          <p 
+                            className="text-sm font-semibold truncate"
+                            style={{ color: '#1e293b' }}
+                          >
+                            {lastName}
+                          </p>
+                          <p 
+                            className="text-[10px] truncate"
+                            style={{ color: '#94a3b8' }}
+                          >
+                            {country || 'Unknown'}
+                          </p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
