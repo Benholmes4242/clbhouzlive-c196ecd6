@@ -20,7 +20,7 @@ export function CoursesPhotoGrid({ courses, courseImages }: CoursesPhotoGridProp
       {/* Header - standardized */}
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
-          Tour Venues
+          The Tour Venues
         </h3>
         <Link 
           to="/tourhub?tab=schedule"
