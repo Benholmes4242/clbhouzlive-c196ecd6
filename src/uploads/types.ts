@@ -58,7 +58,20 @@ export interface UploadJob {
     country: string;
   } | null;
   selectedTags?: any[];
-  mediaItems?: Array<{ id: string; file?: File; compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number } }>;
+  mediaItems?: Array<{ 
+    id: string; 
+    file?: File; 
+    type?: 'image' | 'video';
+    compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number };
+    // For restored drafts - already uploaded media
+    isRestored?: boolean;
+    restoredMediaUrl?: string;
+    restoredStreamId?: string;
+    width?: number;
+    height?: number;
+    aspectRatio?: number;
+    duration?: number;
+  }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   
   // v2 fields
@@ -91,7 +104,20 @@ export interface UploadJobInput {
   } | null;
   selectedTags?: any[];
   files: File[];
-  mediaItems?: Array<{ id: string; file?: File; compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number } }>;
+  mediaItems?: Array<{ 
+    id: string; 
+    file?: File; 
+    type?: 'image' | 'video';
+    compiledVideo?: { streamId: string; playbackUrl: string; posterUrl: string; duration: number };
+    // For restored drafts - already uploaded media
+    isRestored?: boolean;
+    restoredMediaUrl?: string;
+    restoredStreamId?: string;
+    width?: number;
+    height?: number;
+    aspectRatio?: number;
+    duration?: number;
+  }>;
   studioEditsByMediaId?: Record<string, StudioEditsPayload>;
   // New v2 fields
   categories?: string[];

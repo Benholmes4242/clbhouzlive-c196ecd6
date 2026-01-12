@@ -37,13 +37,17 @@ interface UseResilienceParams {
 export async function persistUploadJobBeforeStart(params: UseResilienceParams): Promise<string> {
   const jobId = nanoid();
   
-  // Generate thumbnails for each file
-  const thumbnails = await Promise.all(
-    params.files.map(file => generateThumbnailDataUrl(file))
+  // Separate new files from restored media
+  const newFiles = params.files || [];
+  const restoredItems = params.mediaItems?.filter(m => m.isRestored && m.restoredMediaUrl) || [];
+  
+  // Generate thumbnails for new files
+  const fileThumbnails = await Promise.all(
+    newFiles.map(file => generateThumbnailDataUrl(file))
   );
 
-  // Create media items for persistence
-  const mediaItems: PersistedMediaItem[] = params.files.map((file, index) => ({
+  // Create media items for persistence - new files
+  const newMediaItems: PersistedMediaItem[] = newFiles.map((file, index) => ({
     id: params.mediaItems[index]?.id || nanoid(),
     fileName: file.name,
     fileSize: file.size,
@@ -51,18 +55,34 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
     bytesUploaded: 0,
     totalBytes: file.size,
     status: 'pending',
-    thumbnailDataUrl: thumbnails[index],
+    thumbnailDataUrl: fileThumbnails[index],
+    retryCount: 0
+  }));
+  
+  // Create media items for restored media (already uploaded)
+  const restoredMediaItems: PersistedMediaItem[] = restoredItems.map(item => ({
+    id: item.id || nanoid(),
+    fileName: 'restored',
+    fileSize: 0,
+    mediaType: item.type || (item.restoredStreamId ? 'video' : 'image'),
+    bytesUploaded: 0,
+    totalBytes: 0,
+    status: 'complete' as const, // Already uploaded
+    thumbnailDataUrl: item.restoredStreamId 
+      ? `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${item.restoredStreamId}/thumbnails/thumbnail.jpg?width=320&height=180&time=1s`
+      : item.restoredMediaUrl,
     retryCount: 0
   }));
 
-  const totalBytes = params.files.reduce((sum, f) => sum + f.size, 0);
+  const allMediaItems = [...newMediaItems, ...restoredMediaItems];
+  const totalBytes = newFiles.reduce((sum, f) => sum + f.size, 0);
 
   // Create the persisted job
   const job: PersistedUploadJob = {
     id: jobId,
     postId: '', // Will be set when post is created
     userId: params.userId,
-    mediaItems,
+    mediaItems: allMediaItems,
     postData: {
       content: params.caption,
       actorType: params.actorType,
@@ -85,7 +105,7 @@ export async function persistUploadJobBeforeStart(params: UseResilienceParams): 
   // Save to IndexedDB
   await saveUploadJob(job);
   
-  console.log(`[usePostUploadResilience] Persisted upload job ${jobId} to IndexedDB`);
+  console.log(`[usePostUploadResilience] Persisted upload job ${jobId} to IndexedDB (${newFiles.length} new files, ${restoredItems.length} restored)`);
   
   return jobId;
 }

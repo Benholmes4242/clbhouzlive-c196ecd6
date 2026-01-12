@@ -560,10 +560,13 @@ export default function CreateMomentModal({
     // Extract files from media items and filter out any undefined/null
     const files = media.map(item => item.file).filter((f): f is File => f instanceof File);
     
-    // CRITICAL: Validate we actually have files to upload
-    if (files.length === 0) {
-      console.error('[CreateMomentModal] No valid files found in media items');
-      // Don't close modal - show error instead
+    // Check for restored media (already uploaded from drafts)
+    const restoredMedia = media.filter(m => m.isRestored && m.restoredMediaUrl);
+    
+    // CRITICAL: Validate we have at least some media to post (files OR restored)
+    if (files.length === 0 && restoredMedia.length === 0) {
+      console.error('[CreateMomentModal] No valid files or restored media found');
+      toast.error('No media to upload');
       return;
     }
     
@@ -650,7 +653,14 @@ export default function CreateMomentModal({
     if (!hasMedia || !user) return;
     
     const files = media.map(item => item.file).filter((f): f is File => f instanceof File);
-    if (files.length === 0) return;
+    const restoredMedia = media.filter(m => m.isRestored && m.restoredMediaUrl);
+    
+    // Allow either new files OR restored media
+    if (files.length === 0 && restoredMedia.length === 0) {
+      console.error('[CreateMomentModal] No media to schedule');
+      toast.error('No media to schedule');
+      return;
+    }
     
     setIsScheduling(true);
     
