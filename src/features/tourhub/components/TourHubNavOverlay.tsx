@@ -177,7 +177,7 @@ export function TourHubNavOverlay({
               className="absolute pointer-events-none"
               style={{
                 right: '-35%',
-                top: '55%',
+                top: '50%',
                 transform: 'translateY(-50%)',
                 width: '450px',
                 height: '450px',
