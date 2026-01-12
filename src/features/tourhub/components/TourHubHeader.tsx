@@ -21,7 +21,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   };
   
   return (
-    <header className="pt-4 pb-4">
+    <header className="pt-4 pb-3">
       {/* Top row: 9-dot icon (left) + Title (center) */}
       <div className="flex items-center justify-between">
         {/* Left: 9-dot menu button - no visible container */}
@@ -35,24 +35,19 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           <NineDotsIcon className="text-foreground/60" size={20} />
         </motion.button>
         
-        {/* Center: Title */}
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Tour Hub
+        {/* Center: Title - Premium rebrand */}
+        <h1 className="text-lg font-bold uppercase tracking-[-0.02em] text-foreground">
+          The Tour
         </h1>
         
         {/* Right spacer for balance */}
         <div className="w-11" />
       </div>
       
-      {/* Second row: Premium intro line */}
-      <div className="mt-3 text-center px-4">
-        <p 
-          className="text-[13px] leading-relaxed max-w-[320px] mx-auto"
-          style={{ color: 'hsl(var(--muted-foreground))' }}
-        >
-          Your home for pro golf: leaderboards, stats, schedules, and the latest storylines.
-        </p>
-      </div>
+      {/* Second row: Clean value prop */}
+      <p className="mt-2 text-center text-[13px] text-muted-foreground">
+        Professional Golf Rankings, Leaderboards & Live Coverage
+      </p>
     </header>
   );
 }
