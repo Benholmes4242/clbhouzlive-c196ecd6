@@ -59,13 +59,13 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn(
-        "block relative rounded-xl overflow-hidden h-[150px]",
+        "block relative -mx-4 h-[150px]",
         "transition-all duration-300 ease-out",
-        "hover:scale-[1.01] hover:shadow-lg",
+        "hover:brightness-110",
         className
       )}
     >
-      {/* Background Image or Grey Fallback */}
+      {/* Background Image or Grey Fallback - edge to edge */}
       {hasImage ? (
         <img 
           src={courseImage.imageUrl!}
@@ -80,12 +80,12 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       
       {/* Status Badge - Top Right */}
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3 right-4 z-10">
         <StatusBadge status={tournament.status} />
       </div>
       
-      {/* Content - Bottom */}
-      <div className="absolute inset-0 p-4 flex flex-col justify-end">
+      {/* Content - Bottom with internal padding */}
+      <div className="absolute inset-0 px-4 py-4 flex flex-col justify-end">
         {/* Tournament Name */}
         <h3 className="text-lg font-semibold text-white leading-tight line-clamp-1 mb-1">
           {tournament.name}

@@ -215,8 +215,8 @@ export function ScheduleTab() {
                 eventCount={group.tournaments.length}
               />
 
-              {/* Tournaments - Cinematic Cards */}
-              <div className="pl-5 border-l border-border/40 ml-[5px] space-y-4">
+              {/* Tournaments - Full-bleed Cinematic Cards */}
+              <div className="space-y-4 mt-4">
                 {group.tournaments.map((tournament) => (
                   <ScheduleTournamentCard 
                     key={tournament.id}
