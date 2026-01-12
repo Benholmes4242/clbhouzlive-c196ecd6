@@ -168,20 +168,20 @@ export function TourHubNavOverlay({
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            {/* Clbhouz Logo Mark Watermark */}
+            {/* Clbhouz Logo Mark Watermark - fixed to viewport center */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 0.03, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="absolute pointer-events-none"
+              className="fixed pointer-events-none"
               style={{
-                right: '-35%',
-                top: '50%',
+                right: '-140px',
+                top: '50vh',
                 transform: 'translateY(-50%)',
                 width: '450px',
                 height: '450px',
-                zIndex: 0,
+                zIndex: 10001,
               }}
             >
               <img 
