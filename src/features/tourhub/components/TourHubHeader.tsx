@@ -15,7 +15,10 @@ interface TourHubHeaderProps {
 
 /** Header content for each section */
 const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
-  overview: { title: 'Overview', subtext: 'Season snapshot' },
+  overview: { 
+    title: 'The Global Golf Season', 
+    subtext: 'Every tour. Every event. Every moment that defines professional golf.' 
+  },
   schedule: { title: 'Schedule', subtext: 'All events' },
   players: { title: 'Players', subtext: 'Tour roster' },
   leaderboards: { title: 'Leaders', subtext: 'Season rankings' },
@@ -31,10 +34,11 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   };
 
   const { title, subtext } = HEADER_CONTENT[activeTab] || HEADER_CONTENT.overview;
+  const isOverview = activeTab === 'overview';
   
   return (
     <header className="pt-4 pb-3">
-      {/* Top row: 9-dot icon (left) + Title (center) */}
+      {/* Top row: 9-dot icon (left) + Title */}
       <div className="flex items-center justify-between">
         {/* Left: 9-dot menu button */}
         <motion.button
@@ -47,19 +51,41 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           <NineDotsIcon className="text-foreground/60" size={20} />
         </motion.button>
         
-        {/* Center: Dynamic title based on active section */}
-        <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground">
-          {title}
-        </h1>
+        {/* Center/Left: Dynamic title based on active section */}
+        {isOverview ? (
+          <motion.h1 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="flex-1 text-[1.5rem] md:text-[1.75rem] font-semibold tracking-tight text-foreground text-left ml-2"
+          >
+            {title}
+          </motion.h1>
+        ) : (
+          <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground">
+            {title}
+          </h1>
+        )}
         
-        {/* Right spacer for balance */}
-        <div className="w-11" />
+        {/* Right spacer for balance (only for non-overview) */}
+        {!isOverview && <div className="w-11" />}
       </div>
       
       {/* Second row: Dynamic subtext */}
-      <p className="mt-2 text-center text-[13px] text-muted-foreground">
-        {subtext}
-      </p>
+      {isOverview ? (
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15, delay: 0.05, ease: 'easeOut' }}
+          className="mt-2 md:mt-3 text-sm md:text-base font-normal text-muted-foreground leading-relaxed max-w-[70%]"
+        >
+          {subtext}
+        </motion.p>
+      ) : (
+        <p className="mt-2 text-center text-[13px] text-muted-foreground">
+          {subtext}
+        </p>
+      )}
     </header>
   );
 }
