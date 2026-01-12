@@ -65,7 +65,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className="group block relative overflow-hidden -mx-4 sm:-mx-6"
+      className="group block relative overflow-hidden"
     >
       {/* Full-width immersive image container */}
       <div className="relative h-[50vh] min-h-[300px] max-h-[400px] overflow-hidden">

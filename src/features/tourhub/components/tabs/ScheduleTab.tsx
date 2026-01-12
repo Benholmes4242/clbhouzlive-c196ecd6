@@ -2,7 +2,7 @@
  * ScheduleTab - Premium Editorial Schedule Experience (Card-Free)
  * 
  * Features:
- * - Full-width immersive hero
+ * - Full-width immersive hero (full bleed, no borders/padding)
  * - Clean filter pills on page background
  * - Editorial tournament list (no cards)
  * - Timeline layout grouped by month
@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format, isAfter } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 // Import new schedule components
 import {
@@ -129,8 +128,8 @@ export function ScheduleTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        {/* Hero skeleton */}
-        <div className="h-[300px] bg-muted rounded-2xl -mx-4 sm:-mx-6" />
+        {/* Hero skeleton - full bleed */}
+        <div className="h-[300px] bg-muted -mx-4 sm:-mx-6 lg:-mx-8" />
         
         {/* Filters skeleton */}
         <div className="h-12 bg-muted rounded-xl w-full max-w-md" />
@@ -163,80 +162,85 @@ export function ScheduleTab() {
   }
   
   return (
-    <div className="space-y-6 bg-[#F8FAFC] -mx-4 px-4 py-6 min-h-screen">
-      {/* Featured Hero - Full Width */}
+    <div className="min-h-screen">
+      {/* Featured Hero - Full Width Full Bleed (no borders, no padding) */}
       {featured && filter === 'all' && !search && (
-        <ScheduleHeroCard 
-          tournament={featured.tournament} 
-          type={featured.type}
-        />
-      )}
-
-      {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search tournaments, venues, or cities..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-background border-border focus:ring-2 focus:ring-primary/20"
-        />
-      </div>
-
-      {/* Filter Tabs */}
-      <ScheduleFilterPills
-        activeFilter={filter}
-        onFilterChange={setFilter}
-        counts={filterStats}
-      />
-
-      {/* No Live Message (if filtering by Live and none exist) */}
-      {filter === 'live' && filterStats.live === 0 && (
-        <ScheduleEmptyMessage 
-          variant="no-live" 
-          nextTournamentName={nextUpcomingName}
-        />
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6">
+          <ScheduleHeroCard 
+            tournament={featured.tournament} 
+            type={featured.type}
+          />
+        </div>
       )}
       
-      {/* Result Count - subtle */}
-      <p className="text-xs text-muted-foreground/60">
-        Showing {filteredResults.length} tournament{filteredResults.length !== 1 ? 's' : ''}
-        {search && tournaments && filteredResults.length !== tournaments.length && ' (filtered)'}
-      </p>
-      
-      {/* Timeline Layout - Grouped by Month */}
-      {monthGroups.length > 0 ? (
-        <div className="space-y-0">
-          {monthGroups.map((group) => (
-            <div key={group.monthKey}>
-              {/* Month Header */}
-              <ScheduleMonthHeader 
-                monthLabel={group.monthLabel}
-                eventCount={group.tournaments.length}
-              />
+      {/* Main content with spacing */}
+      <div className="space-y-6">
+        {/* Search Bar */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tournaments, venues, or cities..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 bg-background border-border focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
 
-              {/* Tournaments - Flowing feed with reduced gap */}
-              <div className="pl-5 border-l border-border/40 ml-[5px] space-y-2">
-                {group.tournaments.map((tournament) => (
-                  <ScheduleTournamentCard 
-                    key={tournament.id}
-                    tournament={tournament}
-                  />
-                ))}
+        {/* Filter Tabs */}
+        <ScheduleFilterPills
+          activeFilter={filter}
+          onFilterChange={setFilter}
+          counts={filterStats}
+        />
+
+        {/* No Live Message (if filtering by Live and none exist) */}
+        {filter === 'live' && filterStats.live === 0 && (
+          <ScheduleEmptyMessage 
+            variant="no-live" 
+            nextTournamentName={nextUpcomingName}
+          />
+        )}
+        
+        {/* Result Count - subtle */}
+        <p className="text-xs text-muted-foreground/60">
+          Showing {filteredResults.length} tournament{filteredResults.length !== 1 ? 's' : ''}
+          {search && tournaments && filteredResults.length !== tournaments.length && ' (filtered)'}
+        </p>
+        
+        {/* Timeline Layout - Grouped by Month */}
+        {monthGroups.length > 0 ? (
+          <div className="space-y-0">
+            {monthGroups.map((group) => (
+              <div key={group.monthKey}>
+                {/* Month Header */}
+                <ScheduleMonthHeader 
+                  monthLabel={group.monthLabel}
+                  eventCount={group.tournaments.length}
+                />
+
+                {/* Tournaments - Flowing feed with reduced gap */}
+                <div className="pl-5 border-l border-border/40 ml-[5px] space-y-2">
+                  {group.tournaments.map((tournament) => (
+                    <ScheduleTournamentCard 
+                      key={tournament.id}
+                      tournament={tournament}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <ScheduleEmptyMessage variant="no-results" />
-      )}
+            ))}
+          </div>
+        ) : (
+          <ScheduleEmptyMessage variant="no-results" />
+        )}
 
-      {/* Season Complete Message */}
-      {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
-        <div className="pt-8 border-t border-border">
-          <ScheduleEmptyMessage variant="season-complete" />
-        </div>
-      )}
+        {/* Season Complete Message */}
+        {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
+          <div className="pt-8 border-t border-border">
+            <ScheduleEmptyMessage variant="season-complete" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

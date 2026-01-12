@@ -1,10 +1,9 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, DollarSign, Trophy, Target } from 'lucide-react';
+import { DollarSign, Trophy, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 
 type Direction = 'up' | 'down';
@@ -53,19 +52,41 @@ export function CollegeWeeklyMovers({ limit = 8, className }: CollegeWeeklyMover
         </p>
       )}
       
-      {/* Direction Tabs */}
-      <Tabs value={direction} onValueChange={(v) => setDirection(v as Direction)}>
-        <TabsList className="w-full grid grid-cols-2 mb-4">
-          <TabsTrigger value="up" className="flex items-center gap-1.5">
-            <TrendingUp className="w-4 h-4 text-accent-success" />
-            Rising
-          </TabsTrigger>
-          <TabsTrigger value="down" className="flex items-center gap-1.5">
-            <TrendingDown className="w-4 h-4 text-accent-error" />
-            Falling
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Direction Tabs - Leaders page style with orange underline */}
+      <div 
+        className="flex justify-center mb-6"
+        role="tablist"
+        aria-label="Mover direction"
+      >
+        {[
+          { value: 'up' as Direction, label: 'Rising' },
+          { value: 'down' as Direction, label: 'Falling' },
+        ].map(({ value, label }) => {
+          const isSelected = direction === value;
+          return (
+            <button
+              key={value}
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => setDirection(value)}
+              className={cn(
+                "relative text-sm px-4 py-2 font-medium whitespace-nowrap",
+                "bg-transparent border-0 shadow-none rounded-none",
+                "transition-colors duration-200 ease-out",
+                "inline-flex items-center justify-center",
+                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                "after:transition-all after:duration-200 after:ease-out",
+                isSelected 
+                  ? "text-foreground after:w-full after:opacity-[0.85]" 
+                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
       
       {/* Movers List */}
       <div className="space-y-2">
