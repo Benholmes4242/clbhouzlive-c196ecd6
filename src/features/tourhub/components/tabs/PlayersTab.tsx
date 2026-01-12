@@ -330,7 +330,7 @@ export function PlayersTab() {
       ) : processedPlayers.length > 0 ? (
         // Flat list (always, no more region grouping)
         <div className="divide-y divide-border/30">
-          {processedPlayers.slice(0, 50).map((player) => (
+          {processedPlayers.slice(0, 200).map((player) => (
             <PlayerRow
               key={player.id}
               player={player}
@@ -352,9 +352,9 @@ export function PlayersTab() {
       )}
 
       {/* Human pagination message */}
-      {processedPlayers.length > 50 && (
+      {processedPlayers.length > 200 && (
         <p className="text-center text-sm text-muted-foreground/70 py-4">
-          Scroll to explore the field, or search to find a specific player.
+          Showing 200 of {processedPlayers.length} players. Use search to find specific players.
         </p>
       )}
     </div>
