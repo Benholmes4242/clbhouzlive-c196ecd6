@@ -91,23 +91,28 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
         </Link>
       </div>
 
-      {/* Sort Tabs */}
-      <div className="flex gap-1 mb-5 overflow-x-auto pb-1">
+      {/* Sort Tabs - matching courses page style */}
+      <div className="flex mb-5 overflow-x-auto">
         {sortOptions.map(opt => (
           <button
             key={opt.value}
             onClick={() => setSortBy(opt.value)}
             className={cn(
-              "relative px-3 py-2 text-xs font-medium whitespace-nowrap transition-all",
+              "flex flex-col items-center gap-1 py-3 px-4 relative",
+              "transition-all duration-200 ease-out",
+              "hover:bg-muted/50",
               sortBy === opt.value
                 ? 'text-foreground'
-                : 'text-muted-foreground hover:text-foreground/80'
+                : 'text-muted-foreground'
             )}
           >
-            {opt.label}
+            <span className="text-sm font-medium whitespace-nowrap">{opt.label}</span>
             {/* Orange dot indicator */}
             {sortBy === opt.value && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+              <div 
+                className="w-1.5 h-1.5 rounded-full bg-primary mt-1 animate-fade-in"
+                style={{ marginTop: '4px' }}
+              />
             )}
           </button>
         ))}
