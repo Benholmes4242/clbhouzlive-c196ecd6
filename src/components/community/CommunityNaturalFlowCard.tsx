@@ -12,7 +12,7 @@ import type { CardOrientation } from '@/hooks/community/useNaturalFlowLayout';
 
 // Fixed aspect ratios for natural flow layout
 const ASPECT_RATIOS: Record<CardOrientation, number> = {
-  portrait: 9 / 16,   // 0.5625 - tall (9:16)
+  portrait: 4 / 5,    // 0.8 - tall (4:5)
   landscape: 16 / 9,  // 1.777 - wide (16:9)
 };
 
@@ -47,7 +47,7 @@ interface CommunityNaturalFlowCardProps {
 
 /**
  * CommunityNaturalFlowCard - Card for natural flow layout with fixed portrait/landscape sizes
- * Uses 9:16 for portrait and 16:9 for landscape, full container width
+ * Uses 4:5 for portrait and 16:9 for landscape, full container width
  */
 export const CommunityNaturalFlowCard: React.FC<CommunityNaturalFlowCardProps> = ({
   item,
@@ -154,7 +154,7 @@ export const CommunityNaturalFlowCard: React.FC<CommunityNaturalFlowCardProps> =
                 autoplay={isPlaying}
                 muted
                 loop
-                aspectRatio={orientation === 'portrait' ? '9:16' : '16:9'}
+                aspectRatio={orientation === 'portrait' ? '3:4' : '16:9'}
                 objectFit="cover"
                 externallyManaged
                 mediaId={item.id}
