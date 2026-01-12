@@ -1,5 +1,5 @@
 /**
- * EventWinnerCard - Display tournament winner with narrative
+ * EventWinnerCard - Display tournament winner with premium styling
  */
 
 import { Trophy } from 'lucide-react';
@@ -16,9 +16,16 @@ interface EventWinnerCardProps {
 function formatScore(score: number | null, toPar: number | null): string {
   if (score === null) return '—';
   if (toPar === null) return String(score);
-  if (toPar === 0) return `${score} (E)`;
-  if (toPar < 0) return `${score} (${toPar})`;
-  return `${score} (+${toPar})`;
+  const parDisplay = toPar === 0 ? 'E' : toPar < 0 ? String(toPar) : `+${toPar}`;
+  return `${score} (${parDisplay})`;
+}
+
+function formatEarnings(money: number | null | undefined): string {
+  if (!money) return '';
+  if (money >= 1_000_000) {
+    return `$${(money / 1_000_000).toFixed(2)}M`;
+  }
+  return `$${money.toLocaleString()}`;
 }
 
 export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProps) {
@@ -27,11 +34,15 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   if (isLoading) {
     return (
       <div className={cn("animate-pulse", className)}>
-        <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-xl">
-          <div className="w-14 h-14 rounded-full bg-muted" />
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-4 h-4 bg-muted rounded" />
+          <div className="h-3 w-16 bg-muted rounded" />
+        </div>
+        <div className="flex items-center gap-4 p-5 bg-muted/30 rounded-xl">
+          <div className="w-20 h-20 rounded-full bg-muted" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-32 bg-muted rounded" />
-            <div className="h-3 w-24 bg-muted rounded" />
+            <div className="h-5 w-32 bg-muted rounded" />
+            <div className="h-4 w-24 bg-muted rounded" />
           </div>
         </div>
       </div>
@@ -51,8 +62,8 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
         
         <div className="p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/30 dark:from-slate-100/10 dark:to-slate-200/5 rounded-xl border border-slate-600/20 dark:border-slate-400/20">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-slate-700/30 dark:bg-slate-300/20 flex items-center justify-center">
-              <Trophy className="w-7 h-7 text-amber-500/60" />
+            <div className="w-16 h-16 rounded-full bg-slate-700/30 dark:bg-slate-300/20 flex items-center justify-center">
+              <Trophy className="w-8 h-8 text-amber-500/60" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground/80">Champion unlocking soon</h3>
@@ -77,10 +88,10 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
           </span>
         </div>
         
-        <div className="p-5 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/20">
+        <div className="p-5 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/30">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <Trophy className="w-6 h-6 text-amber-600" />
+            <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center">
+              <Trophy className="w-7 h-7 text-amber-600" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">{winner.headline || 'Champion crowned'}</h3>
@@ -94,6 +105,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
     );
   }
   
+  // Full winner display with player linked
   return (
     <div className={cn("", className)}>
       <div className="flex items-center gap-2 mb-3">
@@ -107,62 +119,66 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
         to={`/tourhub/player/${winner.player.id}`}
         className="group block"
       >
-        <div className="flex items-center gap-4 p-4 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/20 transition-all group-hover:border-amber-500/40 group-hover:shadow-lg">
-          {/* Avatar */}
-          <PlayerAvatar
-            playerId={winner.player.id}
-            playerName={winner.player.full_name}
-            fallbackPhotoUrl={winner.player.photo_url}
-            size="lg"
-            className="border-2 border-amber-500/30"
-          />
+        <div className="relative overflow-hidden p-5 bg-gradient-to-br from-amber-500/15 via-amber-500/10 to-amber-600/5 rounded-xl border-2 border-amber-500/30 transition-all group-hover:border-amber-500/50 group-hover:shadow-lg group-hover:shadow-amber-500/10">
+          {/* Subtle gold shimmer effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
           
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-lg text-foreground group-hover:text-amber-600 transition-colors truncate">
-              {winner.player.full_name}
-            </h3>
+          <div className="relative flex items-center gap-5">
+            {/* Large Avatar with gold ring */}
+            <div className="relative">
+              <PlayerAvatar
+                playerId={winner.player.id}
+                playerName={winner.player.full_name}
+                fallbackPhotoUrl={winner.player.photo_url}
+                size="xl"
+                className="ring-4 ring-amber-500/40 ring-offset-2 ring-offset-background"
+              />
+              {/* Trophy badge overlay */}
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-lg">
+                <Trophy className="w-4 h-4 text-white" />
+              </div>
+            </div>
             
-            {winner.player.country && (
-              <p className="text-sm text-muted-foreground truncate">
-                {winner.player.country.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
-              </p>
-            )}
-            
-            {/* Score line */}
-            <div className="flex items-center gap-3 mt-1.5 text-sm">
-              <span className="font-semibold text-foreground">
-                {formatScore(winner.winning_score, winner.score_to_par)}
-              </span>
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-xl text-foreground group-hover:text-amber-600 transition-colors truncate">
+                {winner.player.full_name}
+              </h3>
               
-              {winner.margin && winner.margin > 0 && (
-                <span className="text-muted-foreground">
-                  Won by {winner.margin} {winner.margin === 1 ? 'shot' : 'shots'}
-                </span>
+              {winner.player.country && (
+                <p className="text-sm text-muted-foreground truncate mt-0.5">
+                  {winner.player.country.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
+                </p>
               )}
               
-              {winner.is_playoff && (
-                <span className="px-2 py-0.5 bg-red-500/15 text-red-600 text-xs rounded-full font-medium">
-                  Playoff
+              {/* Score line */}
+              <div className="flex flex-wrap items-center gap-3 mt-2">
+                <span className="text-lg font-bold text-foreground">
+                  {formatScore(winner.winning_score, winner.score_to_par)}
                 </span>
-              )}
+                
+                {winner.margin && winner.margin > 0 && (
+                  <span className="text-sm text-muted-foreground">
+                    Won by {winner.margin} {winner.margin === 1 ? 'stroke' : 'strokes'}
+                  </span>
+                )}
+                
+                {winner.is_playoff && (
+                  <span className="px-2 py-0.5 bg-red-500/15 text-red-600 text-xs rounded-full font-semibold">
+                    Playoff
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           
-          {/* Trophy indicator */}
-          <div className="shrink-0">
-            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <Trophy className="w-5 h-5 text-amber-600" />
-            </div>
-          </div>
+          {/* Headline / Narrative */}
+          {winner.headline && !winner.headline.includes('Champion crowned') && (
+            <p className="mt-4 pt-4 border-t border-amber-500/20 text-sm text-muted-foreground italic">
+              "{winner.headline}"
+            </p>
+          )}
         </div>
-        
-        {/* Headline / Narrative */}
-        {winner.headline && (
-          <p className="mt-3 text-sm text-muted-foreground italic">
-            "{winner.headline}"
-          </p>
-        )}
       </Link>
     </div>
   );
