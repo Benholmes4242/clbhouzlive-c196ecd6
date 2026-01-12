@@ -20,6 +20,21 @@ export interface VenueInput {
   country?: string | null;
 }
 
+// Generic words that appear in many course names - deprioritize as keywords
+const GENERIC_WORDS = new Set([
+  'the', 'at', 'of', 'and', 'golf', 'club', 'course', 'courses', 'resort', 
+  'country', 'national', 'plantation', 'links', 'hills', 'valley', 'beach',
+  'ocean', 'bay', 'lake', 'lakes', 'park', 'springs', 'creek', 'ridge',
+  'north', 'south', 'east', 'west', 'royal', 'grand', 'blue', 'green',
+  'white', 'black', 'red', 'gold', 'silver', 'championship', 'stadium',
+  'players', 'international', 'municipal', 'public', 'private', 'inn', 'hotel'
+]);
+
+// Words that are likely proper nouns / distinctive names
+function isDistinctiveWord(word: string): boolean {
+  return word.length >= 4 && !GENERIC_WORDS.has(word);
+}
+
 // Extract base name: strip variant suffixes like "- South Course", "- Black Course"
 function courseBaseName(input: string): string {
   return input
@@ -30,12 +45,15 @@ function courseBaseName(input: string): string {
     .trim();
 }
 
-// Normalize for matching: remove common words and punctuation
+// Normalize for matching: remove common suffixes and punctuation
+// "Country Club", "Golf Club", "Golf Course" are treated as equivalent
 function courseNormalize(input: string): string {
   return input
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\b(the|at|golf|club|course|resort|country|cc|gc)\b/g, ' ')
+    // Strip common suffixes for comparison
+    .replace(/\b(country\s*club|golf\s*club|golf\s*course|golf\s*resort|cc|gc)\b/g, ' ')
+    .replace(/\b(the|at|of|and|golf|club|course|resort|country)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -70,67 +88,99 @@ function getVariantBoost(courseName: string): number {
   return 0;
 }
 
-// Extract search keywords from venue name for ILIKE query
-function getSearchKeywords(venueName: string): string[] {
+// Extract search keywords from venue name, prioritizing distinctive proper nouns
+function getSearchKeywords(venueName: string): { distinctive: string[]; generic: string[] } {
   const base = courseBaseName(venueName);
-  const normalized = courseNormalize(base);
-  const tokens = normalized.split(' ').filter(t => t.length >= 3);
+  const tokens = base
+    .replace(/[^a-z0-9\s]/gi, ' ')
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(t => t.length >= 3);
   
-  // Return unique meaningful tokens (skip very common words)
-  const skipWords = new Set(['the', 'and', 'golf', 'club', 'course', 'resort', 'country']);
-  return [...new Set(tokens.filter(t => !skipWords.has(t)))];
+  const distinctive: string[] = [];
+  const generic: string[] = [];
+  
+  for (const token of tokens) {
+    if (isDistinctiveWord(token)) {
+      distinctive.push(token);
+    } else if (!GENERIC_WORDS.has(token) || token.length >= 5) {
+      generic.push(token);
+    }
+  }
+  
+  // Dedupe while preserving order
+  return {
+    distinctive: [...new Set(distinctive)],
+    generic: [...new Set(generic)],
+  };
 }
 
-// Server-side search for courses matching a venue
+// Server-side search for courses matching a venue using multiple keywords
 async function searchCoursesForVenue(venue: VenueInput): Promise<{
   courses: Array<{ id: string; name: string; thumbnail_image: string | null; country: string | null }>;
   searchTerms: string[];
 }> {
-  const keywords = getSearchKeywords(venue.venueName);
+  const { distinctive, generic } = getSearchKeywords(venue.venueName);
   
-  if (keywords.length === 0) {
+  // Priority: distinctive words first, then fall back to generic
+  const allKeywords = [...distinctive, ...generic];
+  
+  if (allKeywords.length === 0) {
+    console.log(`[CourseResolver] ✗ No keywords for "${venue.venueName}"`);
     return { courses: [], searchTerms: [] };
   }
   
-  // Use the most distinctive keyword (usually the proper noun)
-  // For "Tiburon Golf Club" -> "tiburon"
-  // For "Torrey Pines" -> "torrey" or "pines"
-  const primaryKeyword = keywords[0];
+  console.log(`[CourseResolver] Keywords for "${venue.venueName}":`, 
+    { distinctive, generic, using: allKeywords.slice(0, 3) });
   
-  console.log(`[CourseResolver] Server search for "${venue.venueName}" using keyword: "${primaryKeyword}"`);
+  // Search with up to 3 keywords in parallel, combining results
+  const keywordsToSearch = allKeywords.slice(0, 3);
+  const allCourses = new Map<string, { id: string; name: string; thumbnail_image: string | null; country: string | null }>();
   
-  // Search using ILIKE for the primary keyword
-  const { data, error } = await supabase
-    .from('golf_courses')
-    .select('id, name, thumbnail_image, country')
-    .ilike('name', `%${primaryKeyword}%`)
-    .limit(50);
+  const searchPromises = keywordsToSearch.map(async (keyword) => {
+    const { data, error } = await supabase
+      .from('golf_courses')
+      .select('id, name, thumbnail_image, country')
+      .ilike('name', `%${keyword}%`)
+      .limit(30);
+    
+    if (error) {
+      console.error(`[CourseResolver] Search error for "${keyword}":`, error);
+      return [];
+    }
+    
+    return data || [];
+  });
   
-  if (error) {
-    console.error(`[CourseResolver] Search error:`, error);
-    return { courses: [], searchTerms: [primaryKeyword] };
+  const results = await Promise.all(searchPromises);
+  
+  // Combine results, deduping by id
+  for (const courseList of results) {
+    for (const course of courseList) {
+      allCourses.set(course.id, course);
+    }
   }
   
-  console.log(`[CourseResolver] Found ${data?.length || 0} courses matching "${primaryKeyword}"`);
+  const courses = Array.from(allCourses.values());
+  console.log(`[CourseResolver] Found ${courses.length} unique courses for "${venue.venueName}"`);
   
-  return { 
-    courses: data || [], 
-    searchTerms: [primaryKeyword] 
-  };
+  return { courses, searchTerms: keywordsToSearch };
 }
 
-// Find best match from search results
+// Find best match from search results - always return something if we have results
 function findBestMatch(
   venue: VenueInput,
   courses: Array<{ id: string; name: string; thumbnail_image: string | null; country: string | null }>
-): { course: typeof courses[0]; score: number } | null {
+): { course: typeof courses[0]; score: number; isLowConfidence: boolean } | null {
   if (courses.length === 0) return null;
   
   const isDebug = venue.venueName.toLowerCase().includes('tiburon') || 
-                  venue.venueName.toLowerCase().includes('torrey');
+                  venue.venueName.toLowerCase().includes('torrey') ||
+                  venue.venueName.toLowerCase().includes('kapalua') ||
+                  venue.venueName.toLowerCase().includes('waialae');
   
   let bestMatch: { course: typeof courses[0]; score: number; combined: number } | null = null;
-  const candidates: Array<{ name: string; score: number; boost: number; combined: number }> = [];
+  const candidates: Array<{ name: string; score: number; boost: number; combined: number; hasImage: boolean }> = [];
   
   for (const course of courses) {
     const score = calculateSimilarity(venue.venueName, course.name);
@@ -152,12 +202,18 @@ function findBestMatch(
       }
     }
     
-    // Country match bonus
-    const countryBonus = (!venue.country || course.country === venue.country) ? 10 : 0;
+    // Country match bonus - also penalize mismatches
+    let countryBonus = 0;
+    if (venue.country && course.country) {
+      countryBonus = venue.country === course.country ? 20 : -30;
+    }
     
-    const combined = score * 100 + boost + exactBonus + variantBonus + countryBonus;
+    // Prefer courses with images
+    const imageBonus = course.thumbnail_image ? 5 : 0;
     
-    candidates.push({ name: course.name, score, boost, combined });
+    const combined = score * 100 + boost + exactBonus + variantBonus + countryBonus + imageBonus;
+    
+    candidates.push({ name: course.name, score, boost, combined, hasImage: !!course.thumbnail_image });
     
     if (!bestMatch || combined > bestMatch.combined) {
       bestMatch = { course, score, combined };
@@ -166,24 +222,34 @@ function findBestMatch(
   
   if (isDebug) {
     candidates.sort((a, b) => b.combined - a.combined);
-    console.log(`[CourseResolver] Candidates for "${venue.venueName}":`, candidates.slice(0, 5));
+    console.log(`[CourseResolver] Top 5 candidates for "${venue.venueName}":`, candidates.slice(0, 5));
     if (bestMatch) {
       console.log(`[CourseResolver] ✓ Best: "${bestMatch.course.name}" (score: ${bestMatch.score.toFixed(2)}, combined: ${bestMatch.combined})`);
     }
   }
   
-  // Accept match if we have reasonable confidence
-  // With server-side search, we already know the name contains the keyword
+  // High confidence: good score or high combined
   if (bestMatch && (bestMatch.score >= 0.3 || bestMatch.combined >= 100)) {
-    return { course: bestMatch.course, score: bestMatch.score };
+    return { course: bestMatch.course, score: bestMatch.score, isLowConfidence: false };
+  }
+  
+  // Low confidence fallback: return best available if country matches (or no country check)
+  if (bestMatch) {
+    const countryMatches = !venue.country || bestMatch.course.country === venue.country;
+    if (countryMatches) {
+      console.log(`[CourseResolver] ⚠ LOW CONFIDENCE match for "${venue.venueName}" -> "${bestMatch.course.name}" (combined: ${bestMatch.combined})`);
+      return { course: bestMatch.course, score: bestMatch.score, isLowConfidence: true };
+    }
   }
   
   return null;
 }
 
 // Cache a successful match
-async function cacheMatch(venue: VenueInput, courseId: string, confidence: number): Promise<void> {
+async function cacheMatch(venue: VenueInput, courseId: string, confidence: number, isLowConfidence: boolean): Promise<void> {
   try {
+    const source = isLowConfidence ? 'low_confidence' : (confidence > 0.8 ? 'normalized' : 'fuzzy');
+    
     const { error } = await supabase.from('sr_course_map').upsert({
       sr_venue_name: venue.venueName,
       sr_venue_course_name: venue.venueCourseName || null,
@@ -191,13 +257,14 @@ async function cacheMatch(venue: VenueInput, courseId: string, confidence: numbe
       sr_country: venue.country || null,
       golf_course_id: courseId,
       confidence: confidence,
-      source: confidence > 0.8 ? 'normalized' : 'fuzzy',
+      source,
     }, { onConflict: 'sr_venue_name' });
     
     if (error) {
       console.warn(`[CourseResolver] Cache write failed:`, error.message);
     } else {
-      console.log(`[CourseResolver] Cached: "${venue.venueName}" -> course ${courseId}`);
+      const confidenceLabel = isLowConfidence ? '⚠ LOW CONF' : '✓';
+      console.log(`[CourseResolver] ${confidenceLabel} Cached: "${venue.venueName}" -> course ${courseId}`);
     }
   } catch (e) {
     console.warn(`[CourseResolver] Cache exception:`, e);
@@ -268,8 +335,8 @@ export function useCourseImageResolver(venues: VenueInput[]) {
               name: match.course.name,
             });
             
-            // Cache for future lookups
-            await cacheMatch(venue, match.course.id, match.score);
+            // Cache for future lookups (mark low confidence separately)
+            await cacheMatch(venue, match.course.id, match.score, match.isLowConfidence);
           } else {
             console.log(`[CourseResolver] ✗ No acceptable match for "${venue.venueName}"`);
           }
