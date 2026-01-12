@@ -168,7 +168,7 @@ export function TourHubNavOverlay({
             }}
             className="fixed inset-0 z-[10000] flex flex-col overflow-hidden"
             style={{
-              background: '#FAFBFC',
+              background: '#F8FAFC',
             }}
             role="dialog"
             aria-modal="true"
