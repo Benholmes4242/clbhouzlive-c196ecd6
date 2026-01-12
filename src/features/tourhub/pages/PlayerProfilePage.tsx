@@ -1,17 +1,19 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, GraduationCap, Building, Award, Trophy, Globe, TrendingUp, Zap, Target, Flag, Activity } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, GraduationCap, Building, Award, Trophy, Globe, TrendingUp, Zap, Target, Flag, Activity, Ruler, Scale } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { useTourPlayer, useTourPlayerStatistics, useTourSeason, useTourTournaments } from '../hooks/useTourHubData';
+import { useTourPlayer, useTourPlayerStatistics, useTourSeason } from '../hooks/useTourHubData';
 import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
-import { useMemo, useEffect } from 'react';
+import { usePlayerResults, formatPosition, formatScore, formatMoney } from '../hooks/usePlayerResults';
+import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
+import { useMemo, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 // Helper to format numbers consistently
-function formatStat(value: number | null | undefined, format?: 'decimal' | 'percent' | 'yards' | 'currency'): string {
+function formatStat(value: number | null | undefined, formatType?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed'): string {
   if (value === null || value === undefined) return '—';
-  switch (format) {
+  switch (formatType) {
     case 'decimal':
       return value.toFixed(2);
     case 'percent':
@@ -22,6 +24,9 @@ function formatStat(value: number | null | undefined, format?: 'decimal' | 'perc
       return value >= 1_000_000 
         ? `$${(value / 1_000_000).toFixed(2)}M`
         : `$${value.toLocaleString()}`;
+    case 'signed':
+      if (value === 0) return '0.00';
+      return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
     default:
       return String(value);
   }
@@ -68,28 +73,60 @@ function StatGridRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Recent tournament result item
-function TournamentResultItem({ name, result, date }: { name: string; result: string; date: string }) {
+// Recent tournament result item - now with links
+function TournamentResultItem({ 
+  tournamentId,
+  name, 
+  position, 
+  score, 
+  earnings,
+  date 
+}: { 
+  tournamentId: string;
+  name: string; 
+  position: string; 
+  score: string;
+  earnings: string;
+  date: string;
+}) {
+  // Determine position color
+  const positionColor = position === '1st' || position === 'T1st' 
+    ? 'text-amber-600 dark:text-amber-500' 
+    : position.startsWith('T') && parseInt(position.slice(1)) <= 10
+      ? 'text-emerald-600 dark:text-emerald-500'
+      : position === 'MC' || position === 'WD' || position === 'DQ'
+        ? 'text-muted-foreground'
+        : 'text-foreground';
+
   return (
-    <div className="flex items-center gap-4 py-3 border-l-2 border-border/50 pl-4 hover:border-primary/50 transition-colors">
+    <Link 
+      to={`/tourhub/tournament/${tournamentId}`}
+      className="flex items-center gap-4 py-3 border-l-2 border-border/50 pl-4 hover:border-primary/50 hover:bg-muted/30 transition-colors -mx-2 px-2 rounded-r-lg group"
+    >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">{name}</p>
+        <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">{name}</p>
         <p className="text-xs text-muted-foreground">{date}</p>
       </div>
-      <div className="text-right">
-        <span className="text-sm font-semibold text-foreground">{result}</span>
+      <div className="text-right flex items-center gap-4">
+        <span className={cn("text-sm font-semibold", positionColor)}>{position}</span>
+        <span className="text-sm text-muted-foreground w-12 text-right">{score}</span>
+        {earnings !== '—' && (
+          <span className="text-xs text-emerald-600 dark:text-emerald-500 w-20 text-right">{earnings}</span>
+        )}
       </div>
-    </div>
+    </Link>
   );
 }
 
 export function PlayerProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
+  const [imageError, setImageError] = useState(false);
+  
   const { data: player, isLoading: playerLoading } = useTourPlayer(playerId || '');
   const { data: headshot } = usePlayerHeadshot(playerId);
   const { data: season } = useTourSeason();
   const { data: allStats } = useTourPlayerStatistics(season?.id);
-  const { data: tournaments } = useTourTournaments(season?.id);
+  const { data: playerResults, isLoading: resultsLoading } = usePlayerResults(playerId, 10);
   
   // Find this player's stats
   const playerStats = useMemo(() => {
@@ -118,17 +155,19 @@ export function PlayerProfilePage() {
     }
   }, [playerId, player, playerStats, allStats]);
 
-  // Get recent completed tournaments (mock historical data since we don't have player-tournament junction yet)
-  const recentTournaments = useMemo(() => {
-    if (!tournaments) return [];
-    return tournaments
-      .filter(t => t.status === 'closed')
-      .slice(-5)
-      .reverse();
-  }, [tournaments]);
-  
-  // Use headshot from player_media if available, fallback to sr_players.photo_url
-  const photoUrl = headshot || player?.photo_url;
+  // FIX 1: Photo URL resolution with correct priority
+  // Priority: sr_players.photo_url (resolved) > player_media.headshot_url (resolved, no ui-avatars) > null
+  const photoUrl = useMemo(() => {
+    // First try sr_players.photo_url
+    const primaryUrl = resolvePhotoUrl(player?.photo_url);
+    if (primaryUrl) return primaryUrl;
+    
+    // Fall back to player_media headshot (resolvePhotoUrl already filters ui-avatars)
+    const secondaryUrl = resolvePhotoUrl(headshot);
+    if (secondaryUrl) return secondaryUrl;
+    
+    return null;
+  }, [player?.photo_url, headshot]);
   
   const isLoading = playerLoading;
   
@@ -189,14 +228,15 @@ export function PlayerProfilePage() {
             {/* Top row: Avatar + Name + World Rank */}
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8">
               <div className="flex items-center gap-5">
-                {/* Avatar with initials watermark */}
+                {/* Avatar with proper photo resolution */}
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-700 shadow-lg">
-                    {photoUrl ? (
+                    {photoUrl && !imageError ? (
                       <img 
                         src={photoUrl} 
                         alt={player.full_name}
-                        className="w-24 h-24 object-cover"
+                        className="w-24 h-24 object-cover object-top"
+                        onError={() => setImageError(true)}
                       />
                     ) : (
                       <span className="text-3xl font-bold text-slate-400">{initials}</span>
@@ -295,6 +335,22 @@ export function PlayerProfilePage() {
                     <StatGridRow label="Scrambling" value={formatStat(playerStats.scrambling, 'percent')} />
                   </div>
                 </div>
+                
+                {/* FIX 4: Advanced Stats Section */}
+                {(playerStats.strokes_gained_total !== null || playerStats.birdies_per_round !== null) && (
+                  <div className="mt-6 pt-4 border-t border-border/30">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Advanced Stats</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+                      <div>
+                        <StatGridRow label="Strokes Gained Total" value={formatStat(playerStats.strokes_gained_total, 'signed')} />
+                        <StatGridRow label="Birdies per Round" value={formatStat(playerStats.birdies_per_round, 'decimal')} />
+                      </div>
+                      <div>
+                        {/* Additional advanced stats can be added here */}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="py-12 text-center">
@@ -308,31 +364,43 @@ export function PlayerProfilePage() {
               </div>
             )}
             
-            {/* Recent Activity - Timeline Style */}
+            {/* FIX 2: Recent Tournaments - Player-Specific Results */}
             <div>
               <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Activity className="w-5 h-5 text-muted-foreground" />
                 Recent Tournaments
               </h2>
               
-              {recentTournaments.length > 0 ? (
+              {resultsLoading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="h-16 bg-muted/50 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : playerResults && playerResults.length > 0 ? (
                 <div className="space-y-0">
-                  {recentTournaments.map((tournament) => (
+                  {playerResults.map((result) => (
                     <TournamentResultItem
-                      key={tournament.id}
-                      name={tournament.name}
-                      result="—" // We don't have player-specific results yet
-                      date={format(new Date(tournament.end_date), 'MMM d, yyyy')}
+                      key={result.id}
+                      tournamentId={result.tournament_id}
+                      name={result.tournament_name}
+                      position={formatPosition(result.position, result.position_tied, result.status)}
+                      score={formatScore(result.score)}
+                      earnings={formatMoney(result.money)}
+                      date={result.tournament_end_date 
+                        ? format(new Date(result.tournament_end_date), 'MMM d, yyyy')
+                        : '—'
+                      }
                     />
                   ))}
-                  <p className="text-xs text-muted-foreground mt-4 italic">
-                    Player-specific results will be available when live scoring is enabled.
-                  </p>
                 </div>
               ) : (
                 <div className="py-8 text-center border border-dashed border-border/50 rounded-lg">
                   <Activity className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground text-sm">No recent tournament history available</p>
+                  <p className="text-muted-foreground text-sm">No tournament results available yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Results will appear as tournaments are completed
+                  </p>
                 </div>
               )}
             </div>
@@ -379,12 +447,18 @@ export function PlayerProfilePage() {
                   </div>
                 )}
                 
+                {/* FIX 3a: College with link */}
                 {player.college && (
                   <div className="flex items-start gap-3">
                     <GraduationCap className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div>
                       <p className="text-muted-foreground text-xs">College</p>
-                      <p className="text-foreground">{player.college}</p>
+                      <Link 
+                        to={`/tourhub?tab=college-golf`}
+                        className="text-primary hover:underline"
+                      >
+                        {player.college}
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -395,6 +469,27 @@ export function PlayerProfilePage() {
                     <div>
                       <p className="text-muted-foreground text-xs">Turned Pro</p>
                       <p className="text-foreground">{player.turned_pro}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* FIX 4: Height & Weight if available */}
+                {player.height && (
+                  <div className="flex items-start gap-3">
+                    <Ruler className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-muted-foreground text-xs">Height</p>
+                      <p className="text-foreground">{player.height}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {player.weight && (
+                  <div className="flex items-start gap-3">
+                    <Scale className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-muted-foreground text-xs">Weight</p>
+                      <p className="text-foreground">{player.weight}</p>
                     </div>
                   </div>
                 )}

@@ -40,10 +40,13 @@ export interface TourPlayer {
   birth_place: string | null;
   residence: string | null;
   college: string | null;
+  college_normalized: string | null;
   turned_pro: number | null;
   country: string | null;
   country_code: string | null;
   photo_url: string | null;
+  height: string | null;
+  weight: string | null;
 }
 
 // Raw data structure from SportsRadar
