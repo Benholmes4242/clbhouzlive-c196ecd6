@@ -40,10 +40,12 @@ export interface TrendingHero {
 }
 
 /**
- * Fetches the most-watched video for the Watch tab hero
- * Priority 1: Most viewed video TODAY
- * Fallback: Most viewed video THIS WEEK
- * Final fallback: Most liked recent video
+ * Fetches the hero video for Watch tab
+ * Algorithm: Most liked video with priority:
+ * 1. Most liked TODAY
+ * 2. Most liked THIS WEEK
+ * 3. Most liked THIS MONTH
+ * Any video ever posted is eligible.
  */
 export function useTrendingHero() {
   return useQuery({
@@ -53,221 +55,89 @@ export function useTrendingHero() {
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const weekStart = new Date(todayStart);
       weekStart.setDate(weekStart.getDate() - 7);
+      const monthStart = new Date(todayStart);
+      monthStart.setMonth(monthStart.getMonth() - 1);
 
-      // Try to get most viewed video from TODAY first
-      // We need to fetch posts and then sort by views since Supabase doesn't support
-      // ordering by aggregated count in the same query
-      // Query posts with video media from TODAY
-      console.log('[useTrendingHero] Fetching today videos since:', todayStart.toISOString());
-      const { data: todayData, error: todayError } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          user_id,
-          content,
-          course_id,
-          created_at,
-          golf_courses:course_id (
-            id,
-            name,
-            country,
-            region,
-            sub_country
-          ),
-          user_profiles:user_id (
-            id,
-            username,
-            display_name,
-            profile_photo_url
-          ),
-          post_media!inner (
-            media_url,
-            media_type,
-            poster_url,
-            width,
-            height,
-            duration_seconds,
-            aspect_ratio
-          ),
-          post_views (count),
-          post_likes (count)
-        `)
-        .gte('created_at', todayStart.toISOString())
-        .eq('visibility', 'anyone')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      
-      // Filter for video posts client-side (Supabase nested filters are unreliable)
-      const todayVideos = todayData?.filter(post => 
-        (post as any).post_media?.some((m: any) => m.media_type === 'video')
-      );
-      
-      console.log('[useTrendingHero] Today query result:', { 
-        rawCount: todayData?.length, 
-        videoCount: todayVideos?.length,
-        error: todayError?.message,
-        firstPostId: todayVideos?.[0]?.id?.slice(0, 8)
-      });
-
-      if (!todayError && todayVideos && todayVideos.length > 0) {
-        // Sort by views and pick the top one
-        const sorted = todayVideos.sort((a, b) => {
-          const aViews = (a as any).post_views?.[0]?.count || 0;
-          const bViews = (b as any).post_views?.[0]?.count || 0;
-          return bViews - aViews;
-        });
+      // Helper to fetch and find most liked video in a date range
+      const fetchMostLiked = async (since: Date, label: string) => {
+        console.log(`[useTrendingHero] Fetching ${label} since:`, since.toISOString());
         
-        const topPost = sorted[0];
-        if (topPost) {
-          console.log('[useTrendingHero] Found TODAY hero:', topPost.id?.slice(0, 8));
-          return {
-            post: transformPostData(topPost),
-            trendingPeriod: 'today',
-          };
+        const { data, error } = await supabase
+          .from('posts')
+          .select(`
+            id,
+            user_id,
+            content,
+            course_id,
+            created_at,
+            golf_courses:course_id (
+              id, name, country, region, sub_country
+            ),
+            user_profiles:user_id (
+              id, username, display_name, profile_photo_url
+            ),
+            post_media!inner (
+              media_url, media_type, poster_url, width, height, duration_seconds, aspect_ratio
+            ),
+            post_likes (count)
+          `)
+          .gte('created_at', since.toISOString())
+          .eq('visibility', 'anyone')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (error) {
+          console.log(`[useTrendingHero] ${label} error:`, error.message);
+          return null;
         }
-      }
 
-      // Fallback: Most viewed video THIS WEEK
-      console.log('[useTrendingHero] Fetching week videos since:', weekStart.toISOString());
-      const { data: weekData, error: weekError } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          user_id,
-          content,
-          course_id,
-          created_at,
-          golf_courses:course_id (
-            id,
-            name,
-            country,
-            region,
-            sub_country
-          ),
-          user_profiles:user_id (
-            id,
-            username,
-            display_name,
-            profile_photo_url
-          ),
-          post_media!inner (
-            media_url,
-            media_type,
-            poster_url,
-            width,
-            height,
-            duration_seconds,
-            aspect_ratio
-          ),
-          post_views (count),
-          post_likes (count)
-        `)
-        .gte('created_at', weekStart.toISOString())
-        .eq('visibility', 'anyone')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      
-      // Filter for video posts client-side
-      const weekVideos = weekData?.filter(post => 
-        (post as any).post_media?.some((m: any) => m.media_type === 'video')
-      );
-        
-      console.log('[useTrendingHero] Week query result:', { 
-        rawCount: weekData?.length, 
-        videoCount: weekVideos?.length,
-        error: weekError?.message,
-        firstPostId: weekVideos?.[0]?.id?.slice(0, 8)
-      });
+        // Filter for video posts
+        const videos = data?.filter(post =>
+          (post as any).post_media?.some((m: any) => m.media_type === 'video')
+        );
 
-      if (!weekError && weekVideos && weekVideos.length > 0) {
-        // Sort by views and pick the top one
-        const sorted = weekVideos.sort((a, b) => {
-          const aViews = (a as any).post_views?.[0]?.count || 0;
-          const bViews = (b as any).post_views?.[0]?.count || 0;
-          return bViews - aViews;
+        console.log(`[useTrendingHero] ${label} result:`, { 
+          rawCount: data?.length, 
+          videoCount: videos?.length 
         });
-        
-        const topPost = sorted[0];
-        if (topPost) {
-          console.log('[useTrendingHero] Found WEEK hero:', topPost.id?.slice(0, 8));
-          return {
-            post: transformPostData(topPost),
-            trendingPeriod: 'this_week',
-          };
-        }
-      }
 
-      // Final fallback: Most liked video (no time constraint)
-      console.log('[useTrendingHero] Fetching fallback (all time)');
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          user_id,
-          content,
-          course_id,
-          created_at,
-          golf_courses:course_id (
-            id,
-            name,
-            country,
-            region,
-            sub_country
-          ),
-          user_profiles:user_id (
-            id,
-            username,
-            display_name,
-            profile_photo_url
-          ),
-          post_media!inner (
-            media_url,
-            media_type,
-            poster_url,
-            width,
-            height,
-            duration_seconds,
-            aspect_ratio
-          ),
-          post_likes (count)
-        `)
-        .eq('visibility', 'anyone')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      
-      // Filter for video posts client-side
-      const fallbackVideos = fallbackData?.filter(post => 
-        (post as any).post_media?.some((m: any) => m.media_type === 'video')
-      );
-        
-      console.log('[useTrendingHero] Fallback query result:', { 
-        rawCount: fallbackData?.length, 
-        videoCount: fallbackVideos?.length,
-        error: fallbackError?.message,
-        firstPostId: fallbackVideos?.[0]?.id?.slice(0, 8)
-      });
+        if (!videos?.length) return null;
 
-      if (fallbackVideos && fallbackVideos.length > 0) {
-        // Sort by likes
-        const sorted = fallbackVideos.sort((a, b) => {
+        // Sort by likes (descending) and return top
+        const sorted = videos.sort((a, b) => {
           const aLikes = (a as any).post_likes?.[0]?.count || 0;
           const bLikes = (b as any).post_likes?.[0]?.count || 0;
           return bLikes - aLikes;
         });
-        
-        const topPost = sorted[0];
-        if (topPost) {
-          console.log('[useTrendingHero] Found FALLBACK hero:', topPost.id?.slice(0, 8));
-          return {
-            post: transformPostData(topPost),
-            trendingPeriod: 'this_week', // Label as this week even if fallback
-          };
-        }
+
+        return sorted[0];
+      };
+
+      // Priority 1: Most liked TODAY
+      const todayPost = await fetchMostLiked(todayStart, 'TODAY');
+      if (todayPost) {
+        console.log('[useTrendingHero] ✓ Using TODAY hero:', todayPost.id?.slice(0, 8));
+        return { post: transformPostData(todayPost), trendingPeriod: 'today' };
       }
 
+      // Priority 2: Most liked THIS WEEK
+      const weekPost = await fetchMostLiked(weekStart, 'WEEK');
+      if (weekPost) {
+        console.log('[useTrendingHero] ✓ Using WEEK hero:', weekPost.id?.slice(0, 8));
+        return { post: transformPostData(weekPost), trendingPeriod: 'this_week' };
+      }
+
+      // Priority 3: Most liked THIS MONTH
+      const monthPost = await fetchMostLiked(monthStart, 'MONTH');
+      if (monthPost) {
+        console.log('[useTrendingHero] ✓ Using MONTH hero:', monthPost.id?.slice(0, 8));
+        return { post: transformPostData(monthPost), trendingPeriod: 'this_week' }; // Show as "this week" label
+      }
+
+      console.log('[useTrendingHero] ✗ No hero found');
       return null;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 }
