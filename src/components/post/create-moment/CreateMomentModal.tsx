@@ -23,7 +23,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet } from "./sheets";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 import type { DraftWithMedia } from "@/services/drafts";
 
@@ -82,6 +82,8 @@ export default function CreateMomentModal({
   const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
   const [showSmartCompilationSheet, setShowSmartCompilationSheet] = useState(false);
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
+  const [showScheduleSheet, setShowScheduleSheet] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -615,7 +617,49 @@ export default function CreateMomentModal({
       onClose();
     } catch (error) {
       console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
-      // Don't close modal on error - let user retry
+    }
+  };
+  
+  // Schedule post handler
+  const handleSchedulePost = (scheduledAt: Date) => {
+    if (!hasMedia || !user) return;
+    
+    if (selectedCategories.length === 0) {
+      setShowScheduleSheet(false);
+      setShowCategorySheet(true);
+      return;
+    }
+    
+    const files = media.map(item => item.file).filter((f): f is File => f instanceof File);
+    if (files.length === 0) return;
+    
+    setIsScheduling(true);
+    
+    try {
+      enqueuePostUpload({
+        userId: user.id,
+        actorType: activeActor?.type === 'business' ? 'business' : 'personal',
+        actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+        caption,
+        courseInfo: course ? { id: course.id, name: course.name, country: course.country || '' } : undefined,
+        selectedTags,
+        files,
+        mediaItems: media,
+        studioEditsByMediaId: {},
+        categories: selectedCategories,
+        visibility,
+        badges: selectedBadges,
+        scheduledAt,
+      });
+      
+      setShowScheduleSheet(false);
+      toast.success(`Post scheduled for ${scheduledAt.toLocaleDateString()}`);
+      onClose();
+    } catch (error) {
+      console.error('[CreateMomentModal] Failed to schedule post:', error);
+      toast.error('Failed to schedule post');
+    } finally {
+      setIsScheduling(false);
     }
   };
 
@@ -1063,6 +1107,14 @@ export default function CreateMomentModal({
         isOpen={showDraftsSheet}
         onClose={() => setShowDraftsSheet(false)}
         onLoadDraft={handleLoadDraft}
+      />
+      
+      {/* Schedule Sheet */}
+      <ScheduleSheet
+        isOpen={showScheduleSheet}
+        onClose={() => setShowScheduleSheet(false)}
+        onSchedule={handleSchedulePost}
+        isScheduling={isScheduling}
       />
     </div>
   );

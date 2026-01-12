@@ -38,6 +38,9 @@ class UploadManager {
       categories: input.categories,
       visibility: input.visibility,
       badges: input.badges,
+      
+      // Scheduling
+      scheduledAt: input.scheduledAt,
 
       createdAt: new Date().toISOString(),
       status: 'queued',

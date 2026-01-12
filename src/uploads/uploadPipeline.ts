@@ -163,6 +163,9 @@ async function processJob(jobId: string): Promise<void> {
       categories: job.categories || [],
       visibility: job.visibility || 'anyone',
       badges: job.badges || [],
+      // Scheduling support
+      scheduledAt: job.scheduledAt || null,
+      status: job.scheduledAt ? 'scheduled' : 'published',
     });
 
     const postId = postData.id;

@@ -5,3 +5,4 @@ export { default as MomentBadgesSheet } from './MomentBadgesSheet';
 export { default as AiCaptionSheet } from './AiCaptionSheet';
 export { default as SmartCompilationSheet } from './SmartCompilationSheet';
 export { default as DraftsListSheet } from './DraftsListSheet';
+export { default as ScheduleSheet } from './ScheduleSheet';
