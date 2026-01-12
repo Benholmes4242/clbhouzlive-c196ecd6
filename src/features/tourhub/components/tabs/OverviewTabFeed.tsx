@@ -9,7 +9,6 @@ import {
   PlayersFeed,
   LeadersPhotoCards,
   CoursesPhotoGrid,
-  HistoryStrip,
   DataUnlocking,
 } from '../overview-feed';
 import { useTourOverviewData } from '../../hooks/useTourOverviewData';
@@ -23,7 +22,6 @@ export function OverviewTabFeed() {
     topPlayersData,
     seasonLeaders,
     featuredCourses,
-    historyMoments,
     unlockingSoonItems,
     isLoading,
   } = useTourOverviewData();
@@ -81,10 +79,9 @@ export function OverviewTabFeed() {
         />
       )}
 
-      {/* 2. Feature Strip */}
+      {/* 2. Season Snapshot Strip */}
       <FeatureStrip
         topPlayers={seasonLeaders}
-        historyMoments={historyMoments}
         courseImages={courseImages}
       />
 
@@ -104,12 +101,7 @@ export function OverviewTabFeed() {
         courseImages={courseImages}
       />
 
-      {/* 6. Golf History */}
-      {historyMoments.length > 0 && (
-        <HistoryStrip moments={historyMoments} />
-      )}
-
-      {/* 7. Data Unlocking - quiet at bottom */}
+      {/* 6. Data Unlocking - quiet at bottom */}
       {unlockingSoonItems.length > 0 && (
         <DataUnlocking items={unlockingSoonItems} />
       )}

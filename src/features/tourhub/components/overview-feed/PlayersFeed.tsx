@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
-type SortOption = 'events' | 'cuts' | 'world_rank';
+type SortOption = 'world_rank' | 'cuts' | 'events';
 
 interface PlayersFeedProps {
   players: (TourPlayerStatistics & { raw_data?: any })[];
@@ -18,10 +18,11 @@ interface PlayersFeedProps {
   maxCuts: number;
 }
 
+// Reordered: World Rank first (default), then Cuts, then Events
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'events', label: 'Most Events' },
-  { value: 'cuts', label: 'Most Cuts' },
   { value: 'world_rank', label: 'World Rank' },
+  { value: 'cuts', label: 'Most Cuts' },
+  { value: 'events', label: 'Most Events' },
 ];
 
 function getNarrativeTag(stat: any, sortBy: SortOption): string {
@@ -49,7 +50,8 @@ function getNarrativeTag(stat: any, sortBy: SortOption): string {
 }
 
 export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
-  const [sortBy, setSortBy] = useState<SortOption>('events');
+  // Default to World Rank (first/premium tab)
+  const [sortBy, setSortBy] = useState<SortOption>('world_rank');
 
   const sortedPlayers = useMemo(() => {
     return [...players]

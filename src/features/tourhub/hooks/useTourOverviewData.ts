@@ -131,52 +131,34 @@ export function useTourOverviewData() {
     };
   }, [playerStats]);
 
-  // Season leaders with computed stats
+  // Season leaders with computed stats - ORDERED: World Rank, Scoring, Cuts, Events
   const seasonLeaders = useMemo((): SeasonLeader[] => {
     if (!playerStats) return [];
 
     const stats = playerStats as (TourPlayerStatistics & { raw_data?: any })[];
     const leaders: SeasonLeader[] = [];
 
-    // Most Events
-    const byEvents = [...stats]
-      .filter(s => s.player && s.events_played)
-      .sort((a, b) => (b.events_played || 0) - (a.events_played || 0));
-    if (byEvents[0]?.player) {
+    // 1. World Rank Leader (FIRST - premium position)
+    const byRank = [...stats]
+      .filter(s => s.player && s.raw_data?.statistics?.world_rank)
+      .sort((a, b) => (a.raw_data?.statistics?.world_rank || 9999) - (b.raw_data?.statistics?.world_rank || 9999));
+    if (byRank[0]?.player) {
+      const rank = byRank[0].raw_data?.statistics?.world_rank;
       leaders.push({
-        category: 'events',
-        label: 'Most Events',
+        category: 'world_rank',
+        label: 'World No.1',
         player: { 
-          id: byEvents[0].player_id, 
-          name: byEvents[0].player.full_name, 
-          country: byEvents[0].player.country,
-          photoUrl: byEvents[0].player.photo_url || null,
+          id: byRank[0].player_id, 
+          name: byRank[0].player.full_name, 
+          country: byRank[0].player.country,
+          photoUrl: byRank[0].player.photo_url || null,
         },
-        value: byEvents[0].events_played!,
-        formattedValue: `${byEvents[0].events_played} events`,
+        value: rank,
+        formattedValue: `#${rank}`,
       });
     }
 
-    // Most Cuts
-    const byCuts = [...stats]
-      .filter(s => s.player && s.cuts_made)
-      .sort((a, b) => (b.cuts_made || 0) - (a.cuts_made || 0));
-    if (byCuts[0]?.player) {
-      leaders.push({
-        category: 'cuts',
-        label: 'Most Cuts Made',
-        player: { 
-          id: byCuts[0].player_id, 
-          name: byCuts[0].player.full_name, 
-          country: byCuts[0].player.country,
-          photoUrl: byCuts[0].player.photo_url || null,
-        },
-        value: byCuts[0].cuts_made!,
-        formattedValue: `${byCuts[0].cuts_made} cuts`,
-      });
-    }
-
-    // Lowest Scoring Avg
+    // 2. Lowest Scoring Avg
     const byScoring = [...stats]
       .filter(s => s.player && s.raw_data?.statistics?.scoring_avg)
       .sort((a, b) => (a.raw_data?.statistics?.scoring_avg || 999) - (b.raw_data?.statistics?.scoring_avg || 999));
@@ -196,23 +178,41 @@ export function useTourOverviewData() {
       });
     }
 
-    // World Rank Leader
-    const byRank = [...stats]
-      .filter(s => s.player && s.raw_data?.statistics?.world_rank)
-      .sort((a, b) => (a.raw_data?.statistics?.world_rank || 9999) - (b.raw_data?.statistics?.world_rank || 9999));
-    if (byRank[0]?.player) {
-      const rank = byRank[0].raw_data?.statistics?.world_rank;
+    // 3. Most Cuts
+    const byCuts = [...stats]
+      .filter(s => s.player && s.cuts_made)
+      .sort((a, b) => (b.cuts_made || 0) - (a.cuts_made || 0));
+    if (byCuts[0]?.player) {
       leaders.push({
-        category: 'world_rank',
-        label: `World No. ${rank}`,
+        category: 'cuts',
+        label: 'Most Cuts Made',
         player: { 
-          id: byRank[0].player_id, 
-          name: byRank[0].player.full_name, 
-          country: byRank[0].player.country,
-          photoUrl: byRank[0].player.photo_url || null,
+          id: byCuts[0].player_id, 
+          name: byCuts[0].player.full_name, 
+          country: byCuts[0].player.country,
+          photoUrl: byCuts[0].player.photo_url || null,
         },
-        value: rank,
-        formattedValue: `#${rank}`,
+        value: byCuts[0].cuts_made!,
+        formattedValue: `${byCuts[0].cuts_made} cuts`,
+      });
+    }
+
+    // 4. Most Events (LAST)
+    const byEvents = [...stats]
+      .filter(s => s.player && s.events_played)
+      .sort((a, b) => (b.events_played || 0) - (a.events_played || 0));
+    if (byEvents[0]?.player) {
+      leaders.push({
+        category: 'events',
+        label: 'Most Events',
+        player: { 
+          id: byEvents[0].player_id, 
+          name: byEvents[0].player.full_name, 
+          country: byEvents[0].player.country,
+          photoUrl: byEvents[0].player.photo_url || null,
+        },
+        value: byEvents[0].events_played!,
+        formattedValue: `${byEvents[0].events_played} events`,
       });
     }
 
