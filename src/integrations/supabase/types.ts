@@ -5046,6 +5046,133 @@ export type Database = {
           },
         ]
       }
+      post_draft_media: {
+        Row: {
+          aspect_ratio: number | null
+          created_at: string | null
+          display_order: number | null
+          draft_id: string
+          duration_seconds: number | null
+          file_name: string | null
+          file_size: number | null
+          filter_id: string | null
+          height: number | null
+          id: string
+          media_type: string
+          media_url: string
+          poster_url: string | null
+          stream_id: string | null
+          studio_edits: Json | null
+          width: number | null
+        }
+        Insert: {
+          aspect_ratio?: number | null
+          created_at?: string | null
+          display_order?: number | null
+          draft_id: string
+          duration_seconds?: number | null
+          file_name?: string | null
+          file_size?: number | null
+          filter_id?: string | null
+          height?: number | null
+          id?: string
+          media_type: string
+          media_url: string
+          poster_url?: string | null
+          stream_id?: string | null
+          studio_edits?: Json | null
+          width?: number | null
+        }
+        Update: {
+          aspect_ratio?: number | null
+          created_at?: string | null
+          display_order?: number | null
+          draft_id?: string
+          duration_seconds?: number | null
+          file_name?: string | null
+          file_size?: number | null
+          filter_id?: string | null
+          height?: number | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          poster_url?: string | null
+          stream_id?: string | null
+          studio_edits?: Json | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_draft_media_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "post_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_drafts: {
+        Row: {
+          actor_id: string
+          actor_type: string | null
+          audio_mode: string | null
+          badges: string[] | null
+          categories: string[] | null
+          content: string | null
+          course_country: string | null
+          course_id: string | null
+          course_name: string | null
+          created_at: string | null
+          id: string
+          studio_music: Json | null
+          updated_at: string | null
+          user_id: string
+          visibility: string | null
+        }
+        Insert: {
+          actor_id: string
+          actor_type?: string | null
+          audio_mode?: string | null
+          badges?: string[] | null
+          categories?: string[] | null
+          content?: string | null
+          course_country?: string | null
+          course_id?: string | null
+          course_name?: string | null
+          created_at?: string | null
+          id?: string
+          studio_music?: Json | null
+          updated_at?: string | null
+          user_id: string
+          visibility?: string | null
+        }
+        Update: {
+          actor_id?: string
+          actor_type?: string | null
+          audio_mode?: string | null
+          badges?: string[] | null
+          categories?: string[] | null
+          content?: string | null
+          course_country?: string | null
+          course_id?: string | null
+          course_name?: string | null
+          created_at?: string | null
+          id?: string
+          studio_music?: Json | null
+          updated_at?: string | null
+          user_id?: string
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_drafts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_likes: {
         Row: {
           created_at: string
