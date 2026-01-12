@@ -137,8 +137,8 @@ export function TourHubNavOverlay({
   
   const portalRoot = document.getElementById('portal-root') || document.body;
 
-  // Take top 3 for mini cards
-  const displayPlayers = topPlayers.slice(0, 3);
+  // Take top 5 for mini cards
+  const displayPlayers = topPlayers.slice(0, 5);
   
   return createPortal(
     <AnimatePresence>

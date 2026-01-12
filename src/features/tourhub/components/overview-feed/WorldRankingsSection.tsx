@@ -47,10 +47,10 @@ export function WorldRankingsSection() {
       
       {/* Horizontal scroll of player cards - wider cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {displayPlayers.map((player, index) => {
+      {displayPlayers.map((player, index) => {
           const isFirst = index === 0;
-          // Get last name for display - allow up to 2 lines if needed
-          const lastName = player.playerName.split(' ').slice(-1)[0];
+          // Use full player name
+          const displayName = player.playerName;
           
           return (
             <Link
@@ -104,9 +104,9 @@ export function WorldRankingsSection() {
                   </div>
                 </div>
                 
-                {/* Player last name */}
+                {/* Player full name */}
                 <p className="font-semibold text-sm leading-tight text-center line-clamp-2" style={{ color: '#1e293b' }}>
-                  {lastName}
+                  {displayName}
                 </p>
                 
                 {/* Country */}
