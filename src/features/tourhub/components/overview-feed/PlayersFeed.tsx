@@ -1,11 +1,13 @@
 /**
- * PlayersFeed - Flat rows on page background (no cards)
- * Image-first with subtle dividers
+ * PlayersFeed - Top Players with intelligent tabs
+ * Improved tab styling with underline + accent
+ * Smooth crossfade animation when switching tabs
  */
 
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
@@ -18,7 +20,6 @@ interface PlayersFeedProps {
   maxCuts: number;
 }
 
-// Reordered: World Rank first (default), then Cuts, then Events
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'world_rank', label: 'World Rank' },
   { value: 'cuts', label: 'Most Cuts' },
@@ -43,7 +44,6 @@ function getNarrativeTag(stat: any, sortBy: SortOption): string {
   
   if (sortBy === 'world_rank') {
     if (rawStats?.wins) return `${rawStats.wins} wins`;
-    // No redundant "Top ranked" - they're already in the World Rank tab
     return '';
   }
   
@@ -51,7 +51,6 @@ function getNarrativeTag(stat: any, sortBy: SortOption): string {
 }
 
 export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
-  // Default to World Rank (first/premium tab)
   const [sortBy, setSortBy] = useState<SortOption>('world_rank');
 
   const sortedPlayers = useMemo(() => {
@@ -79,9 +78,9 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header - standardized */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
+        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
           Top Players
         </h3>
         <Link 
@@ -92,8 +91,8 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
         </Link>
       </div>
 
-      {/* Sort Tabs - matching courses page tabs (orange underline) */}
-      <div className="grid w-full grid-cols-3">
+      {/* Improved Tab styling - underline + soft accent */}
+      <div className="grid w-full grid-cols-3 border-b border-border/30">
         {sortOptions.map((opt) => {
           const isActive = sortBy === opt.value;
           return (
@@ -102,90 +101,103 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
               onClick={() => setSortBy(opt.value)}
               className={cn(
                 "w-full inline-flex items-center justify-center",
-                "relative text-sm px-3 py-2.5 font-medium whitespace-nowrap",
+                "relative text-sm px-3 py-3 font-medium whitespace-nowrap",
                 "bg-transparent border-0 shadow-none rounded-none",
-                "transition-colors duration-200 ease-out",
-                // Orange underline using after pseudo-element
-                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                "after:transition-all after:duration-200 after:ease-out",
+                "transition-all duration-200 ease-out",
                 isActive
-                  ? "text-foreground after:w-full after:opacity-[0.85]"
-                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {opt.label}
+              {/* Underline indicator */}
+              <motion.span
+                layoutId="player-tab-indicator"
+                className={cn(
+                  "absolute bottom-0 left-0 right-0 h-[2px] rounded-full",
+                  isActive ? "bg-primary" : "bg-transparent"
+                )}
+                transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+              />
             </button>
           );
         })}
       </div>
 
-      {/* Player List - Flat rows on page background */}
-      <div>
-        {sortedPlayers.map((stat, index) => {
-          const rawStats = stat.raw_data?.statistics;
-          const worldRank = rawStats?.world_rank;
-          const narrativeTag = getNarrativeTag(stat, sortBy);
-          
-          return (
-            <Link
-              key={stat.id}
-              to={`/tourhub/player/${stat.player_id}`}
-              className="flex items-center gap-3 py-3 group transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
-            >
-              {/* Player photo - circular - NOW LEFT-MOST ELEMENT */}
-              <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
-                {stat.player?.photo_url ? (
-                  <img 
-                    src={stat.player.photo_url} 
-                    alt={stat.player.full_name}
-                    className="w-full h-full object-cover object-top"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                    <span className="text-sm font-bold text-muted-foreground/50">
-                      {stat.player?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Player Info - center */}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate text-[15px]">
-                  {stat.player?.full_name}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs text-muted-foreground">
-                    {toTitleCase(stat.player?.country)}
-                  </span>
-                  {narrativeTag && (
-                    <>
-                      <span className="text-muted-foreground/30">·</span>
-                      <span className="text-xs text-muted-foreground font-medium">
-                        {narrativeTag}
+      {/* Player List with crossfade animation */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={sortBy}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          {sortedPlayers.map((stat, index) => {
+            const rawStats = stat.raw_data?.statistics;
+            const worldRank = rawStats?.world_rank;
+            const narrativeTag = getNarrativeTag(stat, sortBy);
+            
+            return (
+              <Link
+                key={stat.id}
+                to={`/tourhub/player/${stat.player_id}`}
+                className="flex items-center gap-3 py-3.5 group transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
+              >
+                {/* Player photo */}
+                <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
+                  {stat.player?.photo_url ? (
+                    <img 
+                      src={stat.player.photo_url} 
+                      alt={stat.player.full_name}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                      <span className="text-sm font-bold text-muted-foreground/50">
+                        {stat.player?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </span>
-                    </>
+                    </div>
                   )}
                 </div>
-              </div>
-              
-              {/* Primary Stat - right aligned - NO REDUNDANT LABELS */}
-              <div className="text-right flex-shrink-0">
-                {sortBy === 'events' && (
-                  <p className="text-lg font-bold text-foreground">{stat.events_played || 0}</p>
-                )}
-                {sortBy === 'cuts' && (
-                  <p className="text-lg font-bold text-foreground">{stat.cuts_made || 0}</p>
-                )}
-                {sortBy === 'world_rank' && worldRank && (
-                  <p className="text-lg font-bold text-foreground">#{worldRank}</p>
-                )}
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+
+                {/* Player Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate text-[15px]">
+                    {stat.player?.full_name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs text-muted-foreground">
+                      {toTitleCase(stat.player?.country)}
+                    </span>
+                    {narrativeTag && (
+                      <>
+                        <span className="text-muted-foreground/30">·</span>
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {narrativeTag}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Primary Stat with count-up animation feel */}
+                <div className="text-right flex-shrink-0">
+                  {sortBy === 'events' && (
+                    <p className="text-lg font-bold text-foreground">{stat.events_played || 0}</p>
+                  )}
+                  {sortBy === 'cuts' && (
+                    <p className="text-lg font-bold text-foreground">{stat.cuts_made || 0}</p>
+                  )}
+                  {sortBy === 'world_rank' && worldRank && (
+                    <p className="text-lg font-bold text-foreground">#{worldRank}</p>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

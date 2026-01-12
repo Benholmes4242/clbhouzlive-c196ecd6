@@ -1,6 +1,6 @@
 /**
- * DataUnlocking - Quiet premium lock panel near bottom
- * Subtle shimmer animation, not prominent
+ * DataUnlocking - "More Coming Soon" Tease Section
+ * Redesigned as intentional tease with greyed cards, lock icons, blur effect
  */
 
 import { Lock, Radio, Clock, BarChart3, Trophy } from 'lucide-react';
@@ -15,43 +15,97 @@ interface DataUnlockingProps {
   items: UnlockItem[];
 }
 
-const itemIcons: Record<string, React.ReactNode> = {
-  leaderboards: <BarChart3 className="w-3.5 h-3.5" />,
-  'tee-times': <Clock className="w-3.5 h-3.5" />,
-  'hole-stats': <Radio className="w-3.5 h-3.5" />,
-  fedex: <Trophy className="w-3.5 h-3.5" />,
+const itemConfig: Record<string, { icon: React.ReactNode; description: string }> = {
+  leaderboards: { 
+    icon: <BarChart3 className="w-5 h-5" />,
+    description: 'Real-time tournament scoring',
+  },
+  'tee-times': { 
+    icon: <Clock className="w-5 h-5" />,
+    description: 'Round-by-round pairings',
+  },
+  'hole-stats': { 
+    icon: <Radio className="w-5 h-5" />,
+    description: 'Per-hole scoring data',
+  },
+  fedex: { 
+    icon: <Trophy className="w-5 h-5" />,
+    description: 'Official tour rankings',
+  },
 };
 
 export function DataUnlocking({ items }: DataUnlockingProps) {
   if (!items.length) return null;
 
   return (
-    <div className="border-t border-border/30 pt-8 mt-8">
-      <div className="flex items-center gap-3">
-        {/* Subtle lock icon */}
-        <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
-          <Lock className="w-3 h-3 text-muted-foreground/60" />
+    <div className="pt-8 mt-4">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
+          <Lock className="w-4 h-4 text-muted-foreground/70" />
         </div>
-        
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-muted-foreground">
-            More coming soon
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            More Coming Soon
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Live leaderboards, tee times & hole stats
           </p>
         </div>
       </div>
       
-      {/* Items - inline, subtle */}
-      <div className="flex flex-wrap gap-2 mt-3 ml-9">
-        {items.map(item => (
-          <span
-            key={item.key}
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-muted-foreground/60 text-[10px] border border-border/30"
-          >
-            {itemIcons[item.key] || <Lock className="w-2.5 h-2.5" />}
-            {item.label}
-          </span>
-        ))}
+      {/* Greyed cards with lock icons and blur effect */}
+      <div className="grid grid-cols-2 gap-3">
+        {items.slice(0, 4).map(item => {
+          const config = itemConfig[item.key] || { 
+            icon: <Lock className="w-5 h-5" />, 
+            description: 'Coming soon' 
+          };
+          
+          return (
+            <div
+              key={item.key}
+              className={cn(
+                "relative p-4 rounded-xl",
+                "bg-muted/40 border border-border/40",
+                "overflow-hidden"
+              )}
+            >
+              {/* Subtle blur overlay */}
+              <div className="absolute inset-0 backdrop-blur-[1px] bg-gradient-to-br from-muted/20 to-muted/40 pointer-events-none" />
+              
+              {/* Content */}
+              <div className="relative">
+                {/* Icon with lock badge */}
+                <div className="relative w-10 h-10 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground/50">
+                    {config.icon}
+                  </div>
+                  {/* Lock badge */}
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-background border border-border flex items-center justify-center">
+                    <Lock className="w-2.5 h-2.5 text-muted-foreground/60" />
+                  </div>
+                </div>
+                
+                {/* Label */}
+                <p className="text-sm font-medium text-muted-foreground">
+                  {item.label}
+                </p>
+                
+                {/* Description */}
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5">
+                  {config.description}
+                </p>
+              </div>
+            </div>
+          );
+        })}
       </div>
+      
+      {/* Subtle footer text */}
+      <p className="text-[11px] text-muted-foreground/50 text-center mt-5">
+        Live data feeds will unlock automatically when available
+      </p>
     </div>
   );
 }

@@ -1,10 +1,13 @@
 /**
- * FeatureStrip - Horizontal swipe cards for Season Snapshot
- * Shows top players/leaders in priority order: World Rank, Scoring, Cuts, Events
+ * FeatureStrip - "Season Headlines" horizontal swipe cards
+ * Renamed from Season Snapshot, taller cards with full-bleed images
+ * Soft horizontal snap scroll with auto-peek hint
  */
 
 import { Link } from 'react-router-dom';
+import { useRef, useEffect } from 'react';
 import { Trophy, Target, Scissors, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { SeasonLeader } from '../../hooks/useTourOverviewData';
 
 interface FeatureCard {
@@ -24,12 +27,12 @@ interface FeatureStripProps {
   courseImages?: Map<string, { imageUrl: string | null; name: string }>;
 }
 
-// Category-specific gradients (premium feel)
+// Category-specific gradient tints
 const categoryGradients: Record<string, string> = {
-  world_rank: 'from-amber-600 via-yellow-700 to-amber-800',
-  scoring: 'from-emerald-700 to-teal-800',
-  cuts: 'from-blue-700 to-indigo-800',
-  events: 'from-slate-600 to-zinc-700',
+  world_rank: 'from-amber-700/90 via-yellow-800/70 to-amber-900/80',
+  scoring: 'from-emerald-700/90 via-teal-800/70 to-emerald-900/80',
+  cuts: 'from-blue-700/90 via-indigo-800/70 to-blue-900/80',
+  events: 'from-slate-700/90 via-zinc-800/70 to-slate-900/80',
 };
 
 // Category-specific icons
@@ -41,8 +44,25 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
-  // Build cards from season leaders (already ordered: World Rank, Scoring, Cuts, Events)
-  // Use index to ensure unique keys since same player may appear in multiple categories
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-peek animation: slight scroll to hint more content
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    // Small delay then peek scroll
+    const timeout = setTimeout(() => {
+      el.scrollTo({ left: 16, behavior: 'smooth' });
+      setTimeout(() => {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      }, 400);
+    }, 800);
+    
+    return () => clearTimeout(timeout);
+  }, []);
+
+  // Build cards from season leaders
   const cards: FeatureCard[] = topPlayers.slice(0, 4).map((leader, index) => {
     const labelMap: Record<string, string> = {
       world_rank: 'WORLD NO.1',
@@ -68,60 +88,76 @@ export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
 
   return (
     <div className="-mx-4 sm:-mx-6">
-      {/* Header - standardized */}
+      {/* Header - renamed to Season Headlines */}
       <div className="px-4 sm:px-6 pb-6">
-        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
-          Season Snapshot
+        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
+          Season Headlines
         </h3>
       </div>
       
-      <div className="flex gap-3 overflow-x-auto px-4 sm:px-6 pb-4 scrollbar-hide">
-        {cards.map((card) => {
+      <div 
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto px-4 sm:px-6 pb-4 scrollbar-hide snap-x snap-mandatory"
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        {cards.map((card, index) => {
           const gradient = categoryGradients[card.category] || categoryGradients.events;
           
           return (
-            <Link
+            <motion.div
               key={card.id}
-              to={card.href}
-              className="flex-shrink-0 w-[160px] group"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              whileTap={{ scale: 0.98, y: -2 }}
+              className="flex-shrink-0 snap-start"
             >
-              {/* Taller cards to show more of player image */}
-              <div className="relative h-[120px] rounded-xl overflow-hidden shadow-sm">
-                {/* Background - player photo or gradient */}
-                {card.imageUrl ? (
-                  <>
-                    <img
-                      src={card.imageUrl}
-                      alt={card.title}
-                      className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-                  </>
-                ) : (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-                )}
-                
-                {/* Label pill */}
-                <div className="absolute top-2 left-2">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wide">
-                    {card.icon}
-                    {card.label}
-                  </span>
-                </div>
-                
-                {/* Content */}
-                <div className="absolute bottom-2 left-2 right-2">
-                  <p className="text-white font-semibold text-sm leading-tight line-clamp-1 drop-shadow">
-                    {card.title}
-                  </p>
-                  {card.subtitle && (
-                    <p className="text-white/80 text-xs mt-0.5 font-medium">
-                      {card.subtitle}
-                    </p>
+              <Link
+                to={card.href}
+                className="block w-[170px] group"
+              >
+                {/* Taller card - improved aspect ratio */}
+                <div className="relative h-[180px] rounded-xl overflow-hidden shadow-md">
+                  {/* Background - player photo or gradient */}
+                  {card.imageUrl ? (
+                    <>
+                      <img
+                        src={card.imageUrl}
+                        alt={card.title}
+                        className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {/* Soft category-tinted gradient overlay */}
+                      <div className={`absolute inset-0 bg-gradient-to-t ${gradient} opacity-60`} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    </>
+                  ) : (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
                   )}
+                  
+                  {/* Category badge top-left */}
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/15 backdrop-blur-md text-white text-[10px] font-semibold tracking-wider border border-white/10">
+                      {card.icon}
+                      {card.label}
+                    </span>
+                  </div>
+                  
+                  {/* Content - bottom */}
+                  <div className="absolute bottom-3 left-3 right-3">
+                    {/* Large stat value */}
+                    {card.subtitle && (
+                      <p className="text-2xl font-bold text-white drop-shadow-lg mb-1">
+                        {card.subtitle}
+                      </p>
+                    )}
+                    {/* Player name - secondary */}
+                    <p className="text-white/90 font-medium text-sm leading-tight line-clamp-1 drop-shadow">
+                      {card.title}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           );
         })}
       </div>
