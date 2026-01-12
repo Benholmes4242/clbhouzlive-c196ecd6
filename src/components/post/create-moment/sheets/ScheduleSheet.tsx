@@ -1,4 +1,5 @@
 // Schedule post sheet - date/time picker for scheduling posts
+// Dark theme polished design
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
@@ -111,7 +112,7 @@ export default function ScheduleSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-[10000]"
+            className="fixed inset-0 bg-black/60 z-[10000]"
             onClick={onClose}
           />
           
@@ -121,114 +122,107 @@ export default function ScheduleSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-background rounded-t-2xl z-[10001] max-h-[80vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 bg-slate-900 rounded-t-3xl border-t border-slate-700 z-[10001] max-h-[80vh] overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <h2 className="text-lg font-semibold">Schedule Post</h2>
+            <div className="flex items-center justify-between p-4 border-b border-slate-700">
+              <h2 className="text-lg font-semibold text-white">Schedule Post</h2>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
             
-            <div className="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
-              {/* Calendar Header */}
-              <div className="flex items-center justify-between mb-4">
-                <button
-                  onClick={handlePrevMonth}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <span className="font-medium">
-                  {format(viewMonth, "MMMM yyyy")}
-                </span>
-                <button
-                  onClick={handleNextMonth}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-              
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-1 mb-6">
-                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
-                  <div key={day} className="text-center text-xs text-muted-foreground py-2">
-                    {day}
-                  </div>
-                ))}
-                {calendarDays.map((date, idx) => {
-                  const isValid = isDateValid(date);
-                  const isSelected = date && 
-                    format(date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
-                  const isToday = date && 
-                    format(date, "yyyy-MM-dd") === format(now, "yyyy-MM-dd");
-                  
-                  return (
-                    <button
-                      key={idx}
-                      disabled={!isValid}
-                      onClick={() => date && isValid && setSelectedDate(date)}
-                      className={`
-                        aspect-square flex items-center justify-center rounded-full text-sm
-                        transition-colors
-                        ${!date ? "invisible" : ""}
-                        ${!isValid ? "text-muted-foreground/40 cursor-not-allowed" : "hover:bg-muted"}
-                        ${isSelected ? "bg-primary text-primary-foreground" : ""}
-                        ${isToday && !isSelected ? "ring-1 ring-primary" : ""}
-                      `}
-                    >
-                      {date?.getDate()}
-                    </button>
-                  );
-                })}
+            <div className="p-4 overflow-y-auto max-h-[calc(80vh-140px)]">
+              {/* Calendar container */}
+              <div className="bg-slate-800/50 rounded-xl p-4 mb-4">
+                {/* Calendar Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    onClick={handlePrevMonth}
+                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="font-medium text-white">
+                    {format(viewMonth, "MMMM yyyy")}
+                  </span>
+                  <button
+                    onClick={handleNextMonth}
+                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+                
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
+                    <div key={day} className="text-center text-xs text-slate-400 uppercase py-2 font-medium">
+                      {day}
+                    </div>
+                  ))}
+                  {calendarDays.map((date, idx) => {
+                    const isValid = isDateValid(date);
+                    const isSelected = date && 
+                      format(date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
+                    const isToday = date && 
+                      format(date, "yyyy-MM-dd") === format(now, "yyyy-MM-dd");
+                    
+                    return (
+                      <button
+                        key={idx}
+                        disabled={!isValid}
+                        onClick={() => date && isValid && setSelectedDate(date)}
+                        className={`
+                          w-10 h-10 flex items-center justify-center rounded-full text-sm
+                          transition-colors mx-auto
+                          ${!date ? "invisible" : ""}
+                          ${!isValid ? "text-slate-600 cursor-not-allowed" : "hover:bg-slate-700 text-white"}
+                          ${isSelected ? "bg-amber-500 text-slate-900 font-semibold hover:bg-amber-400" : ""}
+                          ${isToday && !isSelected ? "ring-1 ring-amber-500/50" : ""}
+                        `}
+                      >
+                        {date?.getDate()}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               
               {/* Time Picker */}
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
                   <Clock size={16} />
                   <span>Select Time</span>
                 </div>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   {/* Hour */}
                   <select
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-300 text-base font-medium appearance-none cursor-pointer"
-                    style={{ 
-                      color: '#1f2937', 
-                      backgroundColor: '#ffffff',
-                      WebkitAppearance: 'menulist',
-                    }}
+                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
                   >
                     {Array.from({ length: 24 }, (_, i) => (
-                      <option key={i} value={i} style={{ color: '#1f2937' }}>
+                      <option key={i} value={i}>
                         {i.toString().padStart(2, "0")}
                       </option>
                     ))}
                   </select>
                   
-                  <span className="text-lg font-medium">:</span>
+                  <span className="text-xl text-slate-400 font-bold">:</span>
                   
                   {/* Minute */}
                   <select
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-300 text-base font-medium appearance-none cursor-pointer"
-                    style={{ 
-                      color: '#1f2937', 
-                      backgroundColor: '#ffffff',
-                      WebkitAppearance: 'menulist',
-                    }}
+                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
                   >
                     {[0, 15, 30, 45].map(m => (
-                      <option key={m} value={m} style={{ color: '#1f2937' }}>
+                      <option key={m} value={m}>
                         {m.toString().padStart(2, "0")}
                       </option>
                     ))}
@@ -236,28 +230,28 @@ export default function ScheduleSheet({
                 </div>
                 
                 {/* Timezone display */}
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-slate-500">
                   Timezone: {timezone}
                 </p>
               </div>
               
               {/* Selected DateTime Summary */}
-              <div className="mt-6 p-3 bg-muted rounded-lg">
+              <div className="mt-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
                 <div className="flex items-center gap-2 text-sm">
-                  <Calendar size={16} className="text-primary" />
-                  <span className="font-medium">
+                  <Calendar size={16} className="text-amber-500" />
+                  <span className="font-medium text-white">
                     {format(scheduledDateTime, "EEEE, MMMM d, yyyy")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm mt-1">
-                  <Clock size={16} className="text-primary" />
-                  <span className="font-medium">
+                  <Clock size={16} className="text-amber-500" />
+                  <span className="font-medium text-white">
                     {format(scheduledDateTime, "h:mm a")}
                   </span>
                 </div>
                 
                 {!isValidScheduleTime && (
-                  <p className="text-xs text-destructive mt-2">
+                  <p className="text-xs text-red-400 mt-2">
                     Schedule must be at least 15 minutes from now
                   </p>
                 )}
@@ -265,18 +259,11 @@ export default function ScheduleSheet({
             </div>
             
             {/* Footer */}
-            <div className="p-4 border-t border-border">
+            <div className="p-4 border-t border-slate-700">
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className={`
-                  w-full py-3 rounded-full font-medium text-white
-                  transition-all
-                  ${isValidScheduleTime && !isScheduling
-                    ? "bg-primary hover:bg-primary/90" 
-                    : "bg-muted-foreground/50 cursor-not-allowed"
-                  }
-                `}
+                className="w-full py-3.5 rounded-xl bg-amber-500 text-slate-900 font-semibold text-base hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>
