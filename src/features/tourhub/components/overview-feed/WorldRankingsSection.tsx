@@ -12,12 +12,12 @@ export function WorldRankingsSection() {
 
   if (isLoading) {
     return (
-      <section className="bg-[#1a1a1a] -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
+      <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
         <div className="animate-pulse">
-          <div className="h-4 w-40 bg-white/10 rounded mb-6" />
+          <div className="h-4 w-40 bg-slate-200 rounded mb-6" />
           <div className="flex gap-3">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex-shrink-0 w-[140px] h-[150px] bg-white/5 rounded-xl" />
+              <div key={i} className="flex-shrink-0 w-[140px] h-[150px] bg-slate-100 rounded-xl" />
             ))}
           </div>
         </div>
@@ -31,15 +31,15 @@ export function WorldRankingsSection() {
   const displayPlayers = topPlayers.slice(0, 5);
 
   return (
-    <section className="bg-[#1a1a1a] -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
+    <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
       {/* Header - standardized */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           World Rankings
         </h3>
         <Link 
           to="/tourhub?tab=players"
-          className="text-xs text-white/40 hover:text-white/70 flex items-center gap-1 transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
         >
           All Rankings <ArrowRight className="w-3 h-3" />
         </Link>
@@ -62,16 +62,16 @@ export function WorldRankingsSection() {
               <div 
                 className={`
                   relative h-[150px] rounded-xl p-3.5 flex flex-col
-                  bg-white/5 backdrop-blur-sm
-                  transition-all group-hover:bg-white/10
-                  ${isFirst ? 'ring-1 ring-amber-500/50' : ''}
+                  bg-white shadow-sm border border-slate-100
+                  transition-all group-hover:shadow-md group-hover:border-slate-200
+                  ${isFirst ? 'ring-2 ring-amber-400/60' : ''}
                 `}
               >
                 {/* Rank number - top left, large */}
                 <span 
                   className={`
                     text-2xl font-bold leading-none
-                    ${isFirst ? 'text-amber-400' : 'text-white/40'}
+                    ${isFirst ? 'text-amber-500' : 'text-slate-300'}
                   `}
                 >
                   {player.worldRank}
@@ -83,8 +83,8 @@ export function WorldRankingsSection() {
                     className={`
                       w-14 h-14 rounded-full flex items-center justify-center overflow-hidden
                       ${isFirst 
-                        ? 'bg-gradient-to-br from-amber-500/30 to-amber-600/20 ring-1 ring-amber-500/30' 
-                        : 'bg-white/10'
+                        ? 'bg-gradient-to-br from-amber-100 to-amber-200 ring-2 ring-amber-400/50' 
+                        : 'bg-slate-100'
                       }
                     `}
                   >
@@ -95,7 +95,7 @@ export function WorldRankingsSection() {
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
-                      <span className={`text-base font-bold ${isFirst ? 'text-amber-300' : 'text-white/60'}`}>
+                      <span className={`text-base font-bold ${isFirst ? 'text-amber-600' : 'text-slate-500'}`}>
                         {getInitials(player.playerName)}
                       </span>
                     )}
@@ -103,12 +103,12 @@ export function WorldRankingsSection() {
                 </div>
                 
                 {/* Player name - full last name */}
-                <p className="text-white font-semibold text-sm leading-tight text-center">
+                <p className="text-foreground font-semibold text-sm leading-tight text-center">
                   {displayName}
                 </p>
                 
                 {/* Country */}
-                <p className="text-white/40 text-[10px] text-center mt-0.5">
+                <p className="text-muted-foreground text-[10px] text-center mt-0.5">
                   {toTitleCase(player.country) || 'Unknown'}
                 </p>
               </div>
