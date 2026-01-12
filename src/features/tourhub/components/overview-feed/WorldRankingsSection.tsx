@@ -1,6 +1,6 @@
 /**
- * WorldRankingsSection - Dark charcoal section showing top 5 world ranked players
- * Horizontal scrollable cards with rank number, initials, name, and country
+ * WorldRankingsSection - Slate section showing top 5 world ranked players
+ * Horizontal scrollable cards with rank number, photo, full name, and country
  */
 
 import { Link } from 'react-router-dom';
