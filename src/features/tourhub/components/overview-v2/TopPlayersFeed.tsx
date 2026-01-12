@@ -91,29 +91,26 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
         </Link>
       </div>
 
-      {/* Sort Tabs - matching courses page style */}
+      {/* Sort Tabs - matching courses page style with orange underline */}
       <div className="flex mb-5 overflow-x-auto">
         {sortOptions.map(opt => (
           <button
             key={opt.value}
             onClick={() => setSortBy(opt.value)}
             className={cn(
-              "flex flex-col items-center gap-1 py-3 px-4 relative",
-              "transition-all duration-200 ease-out",
-              "hover:bg-muted/50",
+              "relative text-sm px-3 py-2.5 font-medium whitespace-nowrap",
+              "bg-transparent border-0 shadow-none rounded-none",
+              "transition-colors duration-200 ease-out",
+              // Orange underline using after pseudo-element
+              "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+              "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+              "after:transition-all after:duration-200 after:ease-out",
               sortBy === opt.value
-                ? 'text-foreground'
-                : 'text-muted-foreground'
+                ? 'text-foreground after:w-full after:opacity-[0.85]'
+                : 'text-muted-foreground hover:text-foreground after:w-0 after:opacity-0'
             )}
           >
-            <span className="text-sm font-medium whitespace-nowrap">{opt.label}</span>
-            {/* Orange dot indicator */}
-            {sortBy === opt.value && (
-              <div 
-                className="w-1.5 h-1.5 rounded-full bg-primary mt-1 animate-fade-in"
-                style={{ marginTop: '4px' }}
-              />
-            )}
+            {opt.label}
           </button>
         ))}
       </div>
