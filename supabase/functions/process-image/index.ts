@@ -45,10 +45,18 @@ interface TextOverlay {
 
 interface StudioEdits {
   filter?: string;
-  crop?: { ratio: string };
+  crop?: { ratio: 'original' | '1:1' | '4:5' | '16:9' };
   rotate?: number;
   textOverlays?: TextOverlay[];
 }
+
+// Crop ratio configurations
+const CROP_RATIOS: Record<string, number> = {
+  'original': 0, // Special case: don't crop
+  '1:1': 1,
+  '4:5': 4/5,
+  '16:9': 16/9,
+};
 
 interface ProcessImageRequest {
   mediaId: string;
@@ -88,9 +96,10 @@ serve(async (req) => {
     const filter = filterId || studioEdits?.filter;
     const hasTextOverlays = studioEdits?.textOverlays && studioEdits.textOverlays.length > 0;
     const hasRotation = studioEdits?.rotate && studioEdits.rotate !== 0;
+    const hasCrop = studioEdits?.crop?.ratio && studioEdits.crop.ratio !== 'original';
     
     if (!filter || filter === 'normal') {
-      if (!hasTextOverlays && !hasRotation) {
+      if (!hasTextOverlays && !hasRotation && !hasCrop) {
         console.log('⏭️ No processing needed, skipping');
         
         // Update status to skipped
@@ -139,13 +148,24 @@ serve(async (req) => {
     // Process using Canvas API (Deno has limited support, so we'll use a simplified approach)
     // For production, consider using Cloudflare Workers with wasm-based image processing
     
-    // Create processed image by generating an SVG with the filter and overlays
+    // Calculate crop dimensions
+    const cropRatio = studioEdits?.crop?.ratio;
+    const { outputWidth, outputHeight, cropViewBox } = calculateCropDimensions(
+      width,
+      height,
+      cropRatio
+    );
+    
+    // Create processed image by generating an SVG with the filter, crop and overlays
     // This approach works in Deno and produces consistent results
     const processedSvg = generateProcessedSvg({
       base64Image,
       mimeType,
       width,
       height,
+      outputWidth,
+      outputHeight,
+      cropViewBox,
       filter: filter as string,
       textOverlays: studioEdits?.textOverlays || [],
       rotation: studioEdits?.rotate || 0,
@@ -299,7 +319,56 @@ serve(async (req) => {
 });
 
 /**
- * Generate an SVG that embeds the original image with filters and text overlays
+ * Calculate crop dimensions based on ratio
+ */
+function calculateCropDimensions(
+  originalWidth: number,
+  originalHeight: number,
+  cropRatio?: string
+): { outputWidth: number; outputHeight: number; cropViewBox: string } {
+  // No crop or original - use full image
+  if (!cropRatio || cropRatio === 'original') {
+    return {
+      outputWidth: originalWidth,
+      outputHeight: originalHeight,
+      cropViewBox: `0 0 ${originalWidth} ${originalHeight}`,
+    };
+  }
+
+  const ratio = CROP_RATIOS[cropRatio];
+  if (!ratio) {
+    return {
+      outputWidth: originalWidth,
+      outputHeight: originalHeight,
+      cropViewBox: `0 0 ${originalWidth} ${originalHeight}`,
+    };
+  }
+
+  const originalRatio = originalWidth / originalHeight;
+  let cropX = 0;
+  let cropY = 0;
+  let cropWidth = originalWidth;
+  let cropHeight = originalHeight;
+
+  if (originalRatio > ratio) {
+    // Image is wider than target - crop sides
+    cropWidth = originalHeight * ratio;
+    cropX = (originalWidth - cropWidth) / 2;
+  } else {
+    // Image is taller than target - crop top/bottom
+    cropHeight = originalWidth / ratio;
+    cropY = (originalHeight - cropHeight) / 2;
+  }
+
+  return {
+    outputWidth: cropWidth,
+    outputHeight: cropHeight,
+    cropViewBox: `${cropX} ${cropY} ${cropWidth} ${cropHeight}`,
+  };
+}
+
+/**
+ * Generate an SVG that embeds the original image with filters, crop, and text overlays
  * This is a reliable approach that works in Deno without external image processing libraries
  */
 function generateProcessedSvg(params: {
@@ -307,11 +376,14 @@ function generateProcessedSvg(params: {
   mimeType: string;
   width: number;
   height: number;
+  outputWidth: number;
+  outputHeight: number;
+  cropViewBox: string;
   filter: string;
   textOverlays: TextOverlay[];
   rotation: number;
 }): string {
-  const { base64Image, mimeType, width, height, filter, textOverlays, rotation } = params;
+  const { base64Image, mimeType, width, height, outputWidth, outputHeight, cropViewBox, filter, textOverlays, rotation } = params;
   
   // Get filter CSS values
   const filterParams = FILTER_CONFIGS[filter] || {};
@@ -343,10 +415,10 @@ function generateProcessedSvg(params: {
     return styles[style] || styles.modern_bold;
   };
 
-  // Generate text overlay elements
+  // Generate text overlay elements - position relative to output (cropped) dimensions
   const textElements = textOverlays.map(overlay => {
-    const x = overlay.x * width;
-    const y = overlay.y * height;
+    const x = overlay.x * outputWidth;
+    const y = overlay.y * outputHeight;
     const fontSize = 20 * overlay.scale;
     const textStyle = getTextStyles(overlay.style, overlay.color);
     const transform = overlay.rotation ? `rotate(${overlay.rotation}, ${x}, ${y})` : '';
@@ -371,17 +443,18 @@ function generateProcessedSvg(params: {
     `;
   }).join('\n');
 
-  // Apply rotation transform if needed
+  // Apply rotation transform if needed - centered on output dimensions
   const rotationTransform = rotation !== 0 
-    ? `transform="rotate(${rotation}, ${width/2}, ${height/2})"`
+    ? `transform="rotate(${rotation}, ${outputWidth/2}, ${outputHeight/2})"`
     : '';
 
+  // Use cropViewBox to crop the image, output at cropped dimensions
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="${width}" 
-     height="${height}" 
-     viewBox="0 0 ${width} ${height}">
+     width="${outputWidth}" 
+     height="${outputHeight}" 
+     viewBox="${cropViewBox}">
   <defs>
     <filter id="imageFilter">
       <feColorMatrix type="matrix" values="
@@ -390,18 +463,22 @@ function generateProcessedSvg(params: {
     </filter>
   </defs>
   
-  <!-- Background/filtered image -->
+  <!-- Background/filtered image at original dimensions, cropped via viewBox -->
   <image 
     xlink:href="data:${mimeType};base64,${base64Image}"
     width="${width}" 
     height="${height}"
-    preserveAspectRatio="xMidYMid slice"
+    x="0"
+    y="0"
+    preserveAspectRatio="none"
     style="filter: ${filterString};"
     ${rotationTransform}
   />
   
-  <!-- Text overlays -->
-  ${textElements}
+  <!-- Text overlays positioned relative to crop area -->
+  <g transform="translate(${cropViewBox.split(' ')[0]}, ${cropViewBox.split(' ')[1]})">
+    ${textElements}
+  </g>
 </svg>`;
 }
 
