@@ -5,7 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, Zap, Trophy, Calendar, ChevronRight } from 'lucide-react';
+import { MapPin, Zap, Trophy, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
@@ -119,12 +119,7 @@ export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeaturePro
         )}
       </div>
 
-      {/* CTA arrow - bottom right */}
-      <div className="absolute bottom-6 right-6 sm:right-8">
-        <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors">
-          <ChevronRight className="w-5 h-5 text-white" />
-        </div>
-      </div>
+      {/* Removed non-functional carousel arrow */}
     </Link>
   );
 }
