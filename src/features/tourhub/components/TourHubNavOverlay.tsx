@@ -1,21 +1,33 @@
 /**
- * TourHubNavOverlay - Full-screen light mode overlay menu for Tour Hub navigation
- * Solid light background with Clbhouz logo mark watermark and World Rankings carousel
+ * TourHubNavOverlay - Premium full-screen overlay menu for Tour Hub navigation
+ * Clean design with icons, improved active states, and simplified rankings preview
  */
 
 import React, { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, GraduationCap } from 'lucide-react';
+import { 
+  X, 
+  ChevronRight, 
+  LayoutGrid, 
+  Calendar, 
+  Users, 
+  Trophy, 
+  FileText, 
+  Clock, 
+  Target,
+  GraduationCap 
+} from 'lucide-react';
 import { haptic } from '@/utils/haptics';
-import { WorldRankingsCarousel } from './WorldRankingsCarousel';
+import { useTopWorldRanked } from '../hooks/useWorldRankings';
 import type { TourHubTab } from './TourHubTabs';
 
 interface NavItem {
   value: TourHubTab;
   label: string;
   subtitle: string;
+  icon: React.ReactNode;
 }
 
 interface LinkItem {
@@ -23,18 +35,21 @@ interface LinkItem {
   label: string;
   subtitle: string;
   path: string;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   badge?: string;
 }
 
+// Clbhouz brand orange
+const CLBHOUZ_ORANGE = '#F97316';
+
 const NAV_ITEMS: NavItem[] = [
-  { value: 'overview', label: 'Overview', subtitle: 'Season snapshot' },
-  { value: 'schedule', label: 'Schedule', subtitle: 'All events' },
-  { value: 'players', label: 'Players', subtitle: 'Tour roster' },
-  { value: 'leaderboards', label: 'Leaders', subtitle: 'Season rankings' },
-  { value: 'summary', label: 'Summary', subtitle: 'Tournament recap' },
-  { value: 'tee-times', label: 'Tee Times', subtitle: 'Starting times' },
-  { value: 'hole-stats', label: 'Holes', subtitle: 'Course analytics' },
+  { value: 'overview', label: 'Overview', subtitle: 'Season snapshot', icon: <LayoutGrid className="w-5 h-5" /> },
+  { value: 'schedule', label: 'Schedule', subtitle: 'All events', icon: <Calendar className="w-5 h-5" /> },
+  { value: 'players', label: 'Players', subtitle: 'Tour roster', icon: <Users className="w-5 h-5" /> },
+  { value: 'leaderboards', label: 'Leaders', subtitle: 'Season rankings', icon: <Trophy className="w-5 h-5" /> },
+  { value: 'summary', label: 'Summary', subtitle: 'Tournament recap', icon: <FileText className="w-5 h-5" /> },
+  { value: 'tee-times', label: 'Tee Times', subtitle: 'Starting times', icon: <Clock className="w-5 h-5" /> },
+  { value: 'hole-stats', label: 'Holes', subtitle: 'Course analytics', icon: <Target className="w-5 h-5" /> },
 ];
 
 const LINK_ITEMS: LinkItem[] = [
@@ -43,13 +58,10 @@ const LINK_ITEMS: LinkItem[] = [
     label: 'College Golf', 
     subtitle: 'Alumni on Tour',
     path: '/tourhub/college-golf',
-    icon: <GraduationCap className="w-4 h-4" />,
+    icon: <GraduationCap className="w-5 h-5" />,
     badge: 'New',
   },
 ];
-
-// Clbhouz brand orange
-const CLBHOUZ_ORANGE = '#F97316';
 
 interface TourHubNavOverlayProps {
   isOpen: boolean;
@@ -65,6 +77,7 @@ export function TourHubNavOverlay({
   onNavigate 
 }: TourHubNavOverlayProps) {
   const navigate = useNavigate();
+  const { data: topPlayers } = useTopWorldRanked(3);
   
   // Lock body scroll when open
   useEffect(() => {
@@ -95,7 +108,6 @@ export function TourHubNavOverlay({
     haptic('light');
     onNavigate(tab);
     onClose();
-    // Scroll to top on section change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [onNavigate, onClose]);
 
@@ -116,6 +128,11 @@ export function TourHubNavOverlay({
   if (typeof document === 'undefined') return null;
   
   const portalRoot = document.getElementById('portal-root') || document.body;
+
+  // Build simplified rankings text
+  const rankingsText = topPlayers.length > 0
+    ? topPlayers.map((p, i) => `#${i + 1} ${p.playerName.split(' ').pop()}`).join(' • ')
+    : null;
   
   return createPortal(
     <AnimatePresence>
@@ -129,7 +146,7 @@ export function TourHubNavOverlay({
             transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
             className="fixed inset-0 z-[9998]"
             style={{
-              background: 'rgba(0, 0, 0, 0.15)',
+              background: 'rgba(0, 0, 0, 0.2)',
             }}
             onClick={onClose}
           />
@@ -145,25 +162,25 @@ export function TourHubNavOverlay({
             }}
             className="fixed inset-0 z-[10000] flex flex-col overflow-hidden"
             style={{
-              background: '#F8FAFC',
+              background: '#FAFBFC',
             }}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            {/* Clbhouz Logo Mark Watermark - large, off-screen right, orange */}
+            {/* Clbhouz Logo Mark Watermark */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.04, scale: 1 }}
+              animate={{ opacity: 0.03, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="absolute pointer-events-none"
               style={{
-                right: '-40%',
-                top: 'calc(50% + 28px)',
+                right: '-35%',
+                top: '55%',
                 transform: 'translateY(-50%)',
-                width: '500px',
-                height: '500px',
+                width: '450px',
+                height: '450px',
                 zIndex: 0,
               }}
             >
@@ -174,28 +191,60 @@ export function TourHubNavOverlay({
               />
             </motion.div>
             
-            {/* Close button header */}
+            {/* Header with close button */}
             <div className="flex items-center justify-between px-5 pt-safe-top py-4">
               <button
                 onClick={() => {
                   haptic('light');
                   onClose();
                 }}
-                className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95"
+                className="w-11 h-11 flex items-center justify-center rounded-full transition-all active:scale-95"
                 style={{ 
-                  background: 'rgba(0, 0, 0, 0.05)',
+                  background: 'rgba(0, 0, 0, 0.06)',
                 }}
                 aria-label="Close menu"
               >
-                <X className="w-5 h-5" style={{ color: '#64748B' }} />
+                <X className="w-5 h-5" style={{ color: '#475569' }} />
               </button>
               
-              {/* Placeholder for balance */}
-              <div className="w-10" />
+              <div className="w-11" />
             </div>
             
-            {/* World Rankings Carousel Header */}
-            <WorldRankingsCarousel onViewAll={handleViewAllRankings} />
+            {/* World Rankings - Simplified inline text */}
+            {rankingsText && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="px-5 pb-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 
+                      className="text-sm font-semibold mb-1"
+                      style={{ color: '#1e293b' }}
+                    >
+                      World Rankings
+                    </h3>
+                    <p 
+                      className="text-sm"
+                      style={{ color: '#64748B' }}
+                    >
+                      {rankingsText}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={handleViewAllRankings}
+                    className="flex items-center gap-0.5 text-sm font-medium transition-colors hover:opacity-70 active:scale-95"
+                    style={{ color: '#64748B' }}
+                  >
+                    View all
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
             
             {/* Subtle divider */}
             <div 
@@ -208,7 +257,7 @@ export function TourHubNavOverlay({
               className="flex-1 overflow-y-auto px-5 py-5"
               style={{ overscrollBehavior: 'contain' }}
             >
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
                   
@@ -218,39 +267,35 @@ export function TourHubNavOverlay({
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ 
-                        delay: 0.15 + index * 0.03,
+                        delay: 0.12 + index * 0.025,
                         duration: 0.25,
                         ease: [0.2, 0.8, 0.2, 1],
                       }}
                       onClick={() => handleItemClick(item.value)}
-                      className="w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
+                      className="w-full flex items-center gap-3.5 py-3.5 px-4 rounded-xl text-left transition-all active:scale-[0.98] relative overflow-hidden"
                       style={{
                         background: isActive 
-                          ? 'rgba(255, 255, 255, 0.9)' 
-                          : 'rgba(255, 255, 255, 0.6)',
-                        border: '1px solid rgba(0, 0, 0, 0.04)',
-                        boxShadow: isActive
-                          ? '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)'
-                          : '0 1px 3px rgba(0, 0, 0, 0.03)',
+                          ? 'rgba(249, 115, 22, 0.06)' 
+                          : 'transparent',
+                        borderLeft: isActive 
+                          ? `3px solid ${CLBHOUZ_ORANGE}`
+                          : '3px solid transparent',
                       }}
                     >
-                      {/* Active indicator dot */}
+                      {/* Icon */}
                       <div 
-                        className="w-2 h-2 rounded-full flex-shrink-0 transition-all"
+                        className="flex-shrink-0 transition-colors"
                         style={{
-                          background: isActive 
-                            ? CLBHOUZ_ORANGE
-                            : 'rgba(100, 116, 139, 0.25)',
-                          boxShadow: isActive 
-                            ? `0 0 8px ${CLBHOUZ_ORANGE}60`
-                            : 'none',
+                          color: isActive ? CLBHOUZ_ORANGE : '#94a3b8',
                         }}
-                      />
+                      >
+                        {item.icon}
+                      </div>
                       
                       {/* Text content */}
                       <div className="flex-1 min-w-0">
                         <div 
-                          className="text-[16px] font-semibold"
+                          className="text-[15px] font-semibold"
                           style={{ 
                             color: isActive ? '#1e293b' : '#475569',
                           }}
@@ -267,7 +312,7 @@ export function TourHubNavOverlay({
                       
                       {/* Chevron */}
                       <ChevronRight 
-                        className="w-5 h-5 flex-shrink-0 transition-transform"
+                        className="w-4.5 h-4.5 flex-shrink-0 transition-all"
                         style={{ 
                           color: isActive ? '#64748B' : '#CBD5E1',
                           transform: isActive ? 'translateX(2px)' : 'none',
@@ -285,29 +330,28 @@ export function TourHubNavOverlay({
               />
 
               {/* Special Link Items (College Golf, etc.) */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ 
-                      delay: 0.15 + (NAV_ITEMS.length + index) * 0.03,
+                      delay: 0.12 + (NAV_ITEMS.length + index) * 0.025,
                       duration: 0.25,
                       ease: [0.2, 0.8, 0.2, 1],
                     }}
                     onClick={() => handleLinkClick(item.path)}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
+                    className="w-full flex items-center gap-3.5 py-3.5 px-4 rounded-xl text-left transition-all active:scale-[0.98]"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.6)',
-                      border: '1px solid rgba(0, 0, 0, 0.04)',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+                      background: 'transparent',
+                      borderLeft: '3px solid transparent',
                     }}
                   >
                     {/* Icon */}
                     <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(249, 115, 22, 0.1)', color: CLBHOUZ_ORANGE }}
+                      className="flex-shrink-0"
+                      style={{ color: '#94a3b8' }}
                     >
                       {item.icon}
                     </div>
@@ -316,14 +360,14 @@ export function TourHubNavOverlay({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span 
-                          className="text-[16px] font-semibold"
+                          className="text-[15px] font-semibold"
                           style={{ color: '#475569' }}
                         >
                           {item.label}
                         </span>
                         {item.badge && (
                           <span 
-                            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase"
+                            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide"
                             style={{ 
                               background: CLBHOUZ_ORANGE, 
                               color: 'white',
@@ -343,7 +387,7 @@ export function TourHubNavOverlay({
                     
                     {/* Chevron */}
                     <ChevronRight 
-                      className="w-5 h-5 flex-shrink-0"
+                      className="w-4.5 h-4.5 flex-shrink-0"
                       style={{ color: '#CBD5E1' }}
                     />
                   </motion.button>
