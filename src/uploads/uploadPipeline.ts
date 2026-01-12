@@ -221,6 +221,7 @@ async function processJob(jobId: string): Promise<void> {
       id: string;
       mediaUrl: string;
       mediaType: 'image' | 'video';
+      streamId?: string | null;
       studioEdits?: any;
       filterId?: string | null;
     }> = [];
@@ -303,12 +304,13 @@ async function processJob(jobId: string): Promise<void> {
           pollAndUpdateVideoMetadata(streamId, mediaRecord.id);
         }
 
-        // Track for image processing
+        // Track for media processing (images and videos)
         if (mediaRecord?.id) {
           uploadedMediaForProcessing.push({
             id: mediaRecord.id,
             mediaUrl: publicUrl,
             mediaType: mediaType as 'image' | 'video',
+            streamId: streamId, // Include streamId for video processing
             studioEdits: studioEditsJson,
             filterId,
           });
@@ -324,7 +326,7 @@ async function processJob(jobId: string): Promise<void> {
       }
     }
 
-    // Queue image processing for images with edits (background, non-blocking)
+    // Queue media processing for images/videos with edits (background, non-blocking)
     if (uploadedMediaForProcessing.length > 0) {
       queueImageProcessing(uploadedMediaForProcessing);
     }
