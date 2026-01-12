@@ -1,8 +1,10 @@
 /**
- * PlayerRow - Editorial flat row for player list
- * Inspired by Apple Music / PGA leaderboard rows
+ * PlayerRow - College Gamification Focus
  * 
- * Layout: Avatar | Name + Country (line 2) + Context with college logo (line 3) | Stat
+ * Layout: [Avatar + Rank Badge] | [Name + Country] | [College Logo/Info]
+ * - Rank badge BELOW avatar (left side)
+ * - College logo prominent on RIGHT side (40px)
+ * - Clickable entire row
  */
 
 import { Link } from 'react-router-dom';
@@ -10,7 +12,6 @@ import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import { PlayerAvatar } from '../PlayerAvatar';
-import { CollegeDisplay } from '../CollegeLogo';
 
 interface PlayerRowProps {
   player: TourPlayer;
@@ -36,100 +37,86 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
   // Format country in Title Case
   const formattedCountry = player.country ? toTitleCase(player.country) : null;
 
-  // Determine stat to display on the right
-  const getStatValue = (): { value: string; style: 'gold' | 'bold' | 'muted' } | null => {
-    if (!stats) return null;
-    
-    switch (statDisplay) {
-      case 'rank':
-        // Use worldRank (from PlayersTab statsMap) or fall back to world_rank from stats
-        // This is the canonical source (OWGR), NOT fedex_rank
-        const worldRank = stats.worldRank ?? stats.world_rank;
-        if (!worldRank || worldRank < 1) return null;
-        
-        // Style based on rank tier
-        if (worldRank <= 10) return { value: `#${worldRank}`, style: 'gold' };
-        if (worldRank <= 50) return { value: `#${worldRank}`, style: 'bold' };
-        return { value: `#${worldRank}`, style: 'muted' };
-      case 'events':
-        return stats.events_played ? { value: `${stats.events_played} events`, style: 'muted' } : null;
-      case 'wins':
-        return stats.wins ? { value: `${stats.wins} win${stats.wins > 1 ? 's' : ''}`, style: 'bold' } : null;
-      default:
-        const defaultRank = stats.worldRank ?? stats.world_rank;
-        if (!defaultRank || defaultRank < 1) return null;
-        if (defaultRank <= 10) return { value: `#${defaultRank}`, style: 'gold' };
-        if (defaultRank <= 50) return { value: `#${defaultRank}`, style: 'bold' };
-        return { value: `#${defaultRank}`, style: 'muted' };
-    }
-  };
+  // Get world rank
+  const worldRank = stats?.worldRank ?? stats?.world_rank;
+  const hasValidRank = typeof worldRank === 'number' && worldRank >= 1;
 
-  const statResult = getStatValue();
+  // Get short college name
+  const collegeShortName = college?.short_name || college?.college_name || player.college;
 
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
       className={cn(
-        "flex items-center gap-4 py-3.5 px-1 transition-all duration-200",
-        "hover:bg-muted/40 rounded-lg -mx-1",
-        "active:bg-muted/60",
-        "border-b border-border/20 last:border-b-0",
+        "flex items-center justify-between py-3 px-2 transition-colors cursor-pointer",
+        "hover:bg-muted/50 rounded-lg -mx-2",
+        "active:bg-muted/70",
+        "border-b border-border/30 last:border-b-0",
         className
       )}
     >
-      {/* Avatar - now uses PlayerAvatar with headshot lookup */}
-      <PlayerAvatar
-        playerId={player.id}
-        playerName={player.full_name}
-        fallbackPhotoUrl={player.photo_url}
-        size="md"
-      />
+      {/* Left: Avatar + Rank Badge + Player Info */}
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        {/* Avatar with Rank Badge below */}
+        <div className="flex flex-col items-center gap-1 shrink-0">
+          <PlayerAvatar
+            playerId={player.id}
+            playerName={player.full_name}
+            fallbackPhotoUrl={player.photo_url}
+            size="md"
+          />
+          {/* Rank Badge - tiered colors */}
+          {hasValidRank && (
+            <span className={cn(
+              "text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none",
+              worldRank <= 10 
+                ? "bg-amber-500 text-white" 
+                : worldRank <= 50 
+                  ? "bg-zinc-800 text-white" 
+                  : "bg-zinc-200 text-zinc-600"
+            )}>
+              #{worldRank}
+            </span>
+          )}
+        </div>
 
-      {/* Name + Country (line 2) + Context (line 3) */}
-      <div className="flex-1 min-w-0 space-y-0.5">
-        {/* Line 1: Name */}
-        <h3 className="font-semibold text-foreground text-[15px] leading-tight truncate">
-          {player.full_name}
-        </h3>
-        
-        {/* Line 2: Country (Title Case) */}
-        {formattedCountry && (
-          <p className="text-sm text-muted-foreground truncate">
-            {formattedCountry}
-          </p>
-        )}
-        
-        {/* Line 3: College with logo OR Turned Pro */}
-        {player.college ? (
-          <p className="text-[13px] text-muted-foreground/60 flex items-center gap-1 truncate">
-            <span className="shrink-0">College:</span>
-            <CollegeDisplay 
-              collegeName={player.college} 
-              college={college || null}
-              size="xs"
-              className="text-muted-foreground/60"
-            />
-          </p>
-        ) : player.turned_pro ? (
-          <p className="text-[13px] text-muted-foreground/60 truncate">
-            Turned Pro: {player.turned_pro}
-          </p>
-        ) : null}
+        {/* Player Info: Name + Country */}
+        <div className="min-w-0 flex-1">
+          <h3 className="font-medium text-[15px] text-foreground leading-tight truncate">
+            {player.full_name}
+          </h3>
+          {formattedCountry && (
+            <p className="text-sm text-muted-foreground truncate">
+              {formattedCountry}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Stat with tiered styling */}
-      {statResult && (
-        <div className="shrink-0 text-right">
-          <span className={cn(
-            "text-sm",
-            statResult.style === 'gold' && "font-bold text-amber-600",
-            statResult.style === 'bold' && "font-semibold text-foreground",
-            statResult.style === 'muted' && "font-medium text-muted-foreground"
-          )}>
-            {statResult.value}
+      {/* Right: College Feature - THE STAR */}
+      <div className="flex flex-col items-center shrink-0 min-w-[60px] ml-2">
+        {college?.logo_url ? (
+          <>
+            <img 
+              src={college.logo_url} 
+              alt={college.college_name}
+              className="w-10 h-10 object-contain"
+              loading="lazy"
+            />
+            <span className="text-[10px] text-muted-foreground mt-1 text-center max-w-[70px] truncate leading-tight">
+              {collegeShortName}
+            </span>
+          </>
+        ) : player.college ? (
+          <span className="text-xs text-muted-foreground text-center max-w-[70px] line-clamp-2">
+            {player.college}
           </span>
-        </div>
-      )}
+        ) : player.turned_pro ? (
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            Pro {player.turned_pro}
+          </span>
+        ) : null}
+      </div>
     </Link>
   );
 }

@@ -2,11 +2,11 @@
  * PlayersTab - Redesigned Premium Players Experience
  * 
  * Features:
- * - Featured players carousel at top
+ * - World Rankings carousel at top (always visible)
  * - Search + filter chips with context descriptions
  * - Region chips for geographic filtering
- * - Flat editorial rows with labelled metadata
- * - Sort control
+ * - Flat editorial rows with college gamification
+ * - Auto-sort by tab (Top Ranked = World Rank)
  * - Human pagination messaging
  */
 
@@ -19,7 +19,7 @@ import { useWorldRankings } from '../../hooks/useWorldRankings';
 import { useCollegeLookup } from '../../hooks/useCollegeMedia';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import {
-  FeaturedPlayersCarousel,
+  WorldRankingsCarousel,
   PlayerFilterChips,
   type PlayerFilterType,
   PlayerSortControl,
@@ -51,6 +51,14 @@ const TAB_CONTEXT: Record<PlayerFilterType, { description: string; tooltip: stri
   },
 };
 
+// Default sort per tab
+const TAB_DEFAULT_SORT: Record<PlayerFilterType, PlayerSortType> = {
+  'all': 'alphabetical',
+  'top-ranked': 'world-rank',
+  'most-active': 'alphabetical',
+  'rookies': 'alphabetical',
+};
+
 export function PlayersTab() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<PlayerFilterType>('all');
@@ -64,6 +72,11 @@ export function PlayersTab() {
   const { getCollege, isLoading: collegeLoading } = useCollegeLookup();
 
   const isLoading = playersLoading || statsLoading || worldRankLoading || collegeLoading;
+
+  // Auto-set sort when filter changes
+  useEffect(() => {
+    setSort(TAB_DEFAULT_SORT[filter]);
+  }, [filter]);
 
   // Create stats lookup map with world rank data
   const statsMap = useMemo(() => {
@@ -182,26 +195,6 @@ export function PlayersTab() {
     return 'rank' as const;
   }, [filter, sort]);
   
-  // DEBUG: Log Top Ranked filter results
-  useEffect(() => {
-    if (filter === 'top-ranked') {
-      console.log('[PlayersTab] Top Ranked Debug:', {
-        filter,
-        worldRankedPlayersCount: worldRankedPlayers.length,
-        statsMapSize: statsMap.size,
-        processedPlayersCount: processedPlayers.length,
-        sampleWorldRanked: worldRankedPlayers.slice(0, 3).map(p => ({
-          name: p.playerName,
-          worldRank: p.worldRank,
-          playerId: p.playerId,
-        })),
-        sampleStatsMap: Array.from(statsMap.entries()).slice(0, 3).map(([id, s]) => ({
-          id,
-          worldRank: s.worldRank,
-        })),
-      });
-    }
-  }, [filter, worldRankedPlayers, statsMap, processedPlayers]);
   const currentContext = TAB_CONTEXT[filter];
 
   // Calculate filter counts - MUST be before any early returns
@@ -236,11 +229,14 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        {/* Featured carousel skeleton */}
-        <div className="flex gap-3 overflow-hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="w-40 h-48 bg-muted rounded-xl shrink-0" />
-          ))}
+        {/* World Rankings skeleton */}
+        <div className="space-y-3">
+          <div className="h-4 w-28 bg-muted rounded" />
+          <div className="flex gap-2 overflow-hidden">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="w-[100px] h-32 bg-muted rounded-xl shrink-0" />
+            ))}
+          </div>
         </div>
 
         {/* Search skeleton */}
@@ -270,10 +266,13 @@ export function PlayersTab() {
 
   return (
     <div className="space-y-5 bg-[#F8FAFC] -mx-4 px-4 py-6 min-h-screen">
-      {/* Featured Players Carousel */}
-      {playerStats && playerStats.length > 0 && !search && filter === 'all' && region === 'all' && (
-        <div className="mb-6">
-          <FeaturedPlayersCarousel players={players} stats={playerStats} />
+      {/* World Rankings Carousel - ALWAYS visible (no filter/search/region restrictions) */}
+      {players && players.length > 0 && worldRankedPlayers.length > 0 && (
+        <div className="mb-4">
+          <WorldRankingsCarousel 
+            worldRankedPlayers={worldRankedPlayers} 
+            players={players} 
+          />
         </div>
       )}
 
@@ -372,10 +371,10 @@ export function PlayersTab() {
       ) : (
         <div className="text-center py-12 space-y-2">
           <p className="text-sm text-muted-foreground">
-            No players match this filter.
+            No players found
           </p>
           <p className="text-xs text-muted-foreground/60">
-            Try adjusting your search or switching categories.
+            Try adjusting your search or filters
           </p>
         </div>
       )}
