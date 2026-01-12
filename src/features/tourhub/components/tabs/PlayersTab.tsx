@@ -61,6 +61,24 @@ const TAB_DEFAULT_SORT: Record<PlayerFilterType, PlayerSortType> = {
 };
 
 /**
+ * CDN base URL for player headshots
+ */
+const CDN_BASE_URL = 'https://media.clbhouz.co.uk';
+
+/**
+ * Resolve photo URL - prefix with CDN if it's a relative path
+ */
+function resolvePhotoUrl(photoUrl: string | null | undefined): string | null {
+  if (!photoUrl) return null;
+  // Already absolute URL
+  if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
+    return photoUrl;
+  }
+  // Relative path - prefix with CDN
+  return `${CDN_BASE_URL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
+}
+
+/**
  * Sub-component to batch-fetch headshots for visible players
  */
 interface PlayerListWithHeadshotsProps {
@@ -77,16 +95,22 @@ function PlayerListWithHeadshots({ players, statsMap, getCollege, statDisplay }:
 
   return (
     <div className="space-y-0">
-      {players.map((player) => (
-        <PlayerRow
-          key={player.id}
-          player={player}
-          stats={statsMap.get(player.id)}
-          college={getCollege(player.college)}
-          headshotUrl={headshotMap?.get(player.id)}
-          statDisplay={statDisplay}
-        />
-      ))}
+      {players.map((player) => {
+        // Resolve photo URL with CDN prefix
+        const resolvedPhotoUrl = resolvePhotoUrl(player.photo_url);
+        const headshotUrl = headshotMap?.get(player.id);
+        
+        return (
+          <PlayerRow
+            key={player.id}
+            player={player}
+            stats={statsMap.get(player.id)}
+            college={getCollege(player.college)}
+            headshotUrl={headshotUrl || resolvedPhotoUrl}
+            statDisplay={statDisplay}
+          />
+        );
+      })}
     </div>
   );
 }
