@@ -76,6 +76,7 @@ export const useUserProfilePosts = (userId: string | null) => {
           `)
           .eq('actor_type', 'personal')
           .eq('actor_id', userId)
+          .eq('status', 'published') // Only show published posts
           .order('created_at', { ascending: false })
           .limit(9); // Show latest 9 posts
         

@@ -115,6 +115,7 @@ export function useCreatorPosts(creatorPageId?: string) {
         `)
         .eq('actor_type', 'creator')
         .eq('actor_id', creatorPageId!)
+        .eq('status', 'published') // Only show published posts
         .or(visibilityFilter)
         .order('created_at', { ascending: false });
 

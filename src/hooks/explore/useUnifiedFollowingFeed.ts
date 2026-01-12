@@ -82,6 +82,7 @@ export function useUnifiedFollowingFeed(pageSize = 20) {
         `)
         .or(orFilters.join(','))
         .or(visibilityFilter)
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .range(nextOffset, nextOffset + pageSize - 1);
 

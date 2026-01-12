@@ -306,6 +306,7 @@ export function useCourseMoments(courseId: string, limit = 20) {
           )
         `)
         .eq('course_id', courseId)
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .limit(limit);
 

@@ -113,6 +113,7 @@ export const useRealPostsFetcher = () => {
       query = query
         .or(orFilters.join(','))
         .or(visibilityFilter)
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1)
         .limit(postsPerPage);
@@ -543,7 +544,8 @@ export const useRealPostsFetcher = () => {
           post_likes(count),
           post_comments(count)
         `)
-        .in('id', postIds);
+        .in('id', postIds)
+        .eq('status', 'published');
 
       if (postsError) {
         console.error('Error fetching posts by IDs:', postsError);
@@ -767,7 +769,7 @@ export const useRealPostsFetcher = () => {
       
       // Apply visibility filter - private posts only visible to owner
       const visibilityFilter = buildVisibilityFilter(currentUserId);
-      query = query.or(visibilityFilter);
+      query = query.or(visibilityFilter).eq('status', 'published');
 
       // IMPORTANT: Apply filters BEFORE range/limit for correct pagination
       // Add media type filter if specified
@@ -1274,6 +1276,7 @@ export const useRealPostsFetcher = () => {
           // Order post_media by display_order, then created_at for deterministic [0] selection
           .order('display_order', { ascending: true, foreignTable: 'post_media', nullsFirst: false })
           .order('created_at', { ascending: true, foreignTable: 'post_media' })
+          .eq('status', 'published') // Only show published posts
           .order('created_at', { ascending: false });
           // NOTE: Removed .eq('post_media.media_type', 'video') to allow images in Clubhouse feed
           // This enables review posts with photos to appear in the feed

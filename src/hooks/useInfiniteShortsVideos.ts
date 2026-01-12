@@ -88,7 +88,8 @@ export function useInfiniteShortsVideos(options: UseInfiniteShortsVideosOptions 
         .lt('post_media.duration_seconds', maxDuration) // <4 minutes
         .gt('post_media.duration_seconds', 0) // Has valid duration
         .not('post_media.duration_seconds', 'is', null)
-        .eq('visibility', 'anyone');
+        .eq('visibility', 'anyone')
+        .eq('status', 'published'); // Only show published posts
 
       // Filter by creator if specified
       if (creatorUserId) {
