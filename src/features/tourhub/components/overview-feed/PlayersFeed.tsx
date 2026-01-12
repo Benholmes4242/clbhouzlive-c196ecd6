@@ -92,22 +92,32 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
         </Link>
       </div>
 
-      {/* Sort Pills */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {sortOptions.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => setSortBy(opt.value)}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all",
-              sortBy === opt.value
-                ? 'bg-foreground text-background'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* Sort Tabs - matching courses page tabs (orange underline) */}
+      <div className="grid w-full grid-cols-3">
+        {sortOptions.map((opt) => {
+          const isActive = sortBy === opt.value;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => setSortBy(opt.value)}
+              className={cn(
+                "w-full inline-flex items-center justify-center",
+                "relative text-sm px-3 py-2.5 font-medium whitespace-nowrap",
+                "bg-transparent border-0 shadow-none rounded-none",
+                "transition-colors duration-200 ease-out",
+                // Orange underline using after pseudo-element
+                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                "after:transition-all after:duration-200 after:ease-out",
+                isActive
+                  ? "text-foreground after:w-full after:opacity-[0.85]"
+                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+              )}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Player List - Flat rows on page background */}
