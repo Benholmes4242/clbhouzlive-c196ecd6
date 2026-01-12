@@ -1,10 +1,9 @@
 /**
- * PlayerFilterChips - Filter pills for player discovery
- * Matches Discover page tab styling with underline + player counts
+ * PlayerFilterChips - Tab-style filters matching schedule page tabs exactly
+ * Uses orange underline indicator (same as Schedule tabs)
  */
 
 import { cn } from '@/lib/utils';
-import '@/styles/discover-tabs.css';
 
 export type PlayerFilterType = 'all' | 'top-ranked' | 'most-active' | 'rookies';
 
@@ -29,44 +28,40 @@ const filters: { value: PlayerFilterType; label: string; countKey: keyof NonNull
 export function PlayerFilterChips({ activeFilter, onFilterChange, counts }: PlayerFilterChipsProps) {
   return (
     <div 
-      className="discover-header relative w-full"
+      className="py-3"
       role="tablist"
       aria-label="Filter players"
     >
-      <div className="discover-tabs flex w-full items-center">
-        <div className="flex flex-1">
-          {filters.map((filter) => {
-            const isActive = activeFilter === filter.value;
-            const count = counts?.[filter.countKey];
+      {/* Grid layout matching schedule page - 4 columns, centered */}
+      <div className="grid w-full grid-cols-4 bg-transparent border-0 px-0 py-0 gap-0">
+        {filters.map((filter) => {
+          const isActive = activeFilter === filter.value;
 
-            return (
-              <button
-                key={filter.value}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => onFilterChange(filter.value)}
-                className={cn(
-                  "discover-tab flex-1 py-[10px] px-2 text-center relative z-10 text-[13px] font-medium leading-tight",
-                  "transition-all duration-motion-fast ease-standard",
-                  "active:scale-[0.97] motion-reduce:active:scale-100",
-                  isActive 
-                    ? "active text-foreground" 
-                    : "text-muted-foreground hover:text-foreground/80 motion-reduce:transition-none"
-                )}
-              >
-                <span>{filter.label}</span>
-                {count !== undefined && (
-                  <span className={cn(
-                    "ml-1",
-                    isActive ? "text-foreground/70" : "text-muted-foreground/60"
-                  )}>
-                    ({count})
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+          return (
+            <button
+              key={filter.value}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onFilterChange(filter.value)}
+              className={cn(
+                // Exact same styling as schedule page tabs
+                "relative text-sm px-3 py-2.5 font-medium",
+                "bg-transparent border-0 shadow-none rounded-none",
+                "transition-colors duration-200 ease-out",
+                "inline-flex items-center justify-center gap-1",
+                // Orange underline using after pseudo-element
+                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                "after:transition-all after:duration-200 after:ease-out",
+                isActive 
+                  ? "text-foreground after:w-full after:opacity-[0.85]" 
+                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+              )}
+            >
+              {filter.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
