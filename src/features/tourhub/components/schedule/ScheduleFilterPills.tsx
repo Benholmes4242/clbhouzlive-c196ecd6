@@ -1,7 +1,6 @@
 /**
- * ScheduleFilterPills - Premium pill-style filters
- * Active: solid dark background, white text, rounded-full
- * Inactive: transparent with subtle border
+ * ScheduleFilterPills - Tab-style filters matching Discover tabs
+ * Uses underline indicator instead of pills
  */
 
 import { cn } from '@/lib/utils';
@@ -46,7 +45,7 @@ export function ScheduleFilterPills({
       role="tablist"
       aria-label="Filter tournaments"
     >
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1">
         {options.map((option) => {
           const isActive = activeFilter === option.value;
           const count = counts[option.value];
@@ -58,13 +57,13 @@ export function ScheduleFilterPills({
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
               className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium",
+                "relative px-4 py-2.5 text-sm font-medium",
                 "transition-all duration-200 ease-out",
                 "active:scale-[0.97] motion-reduce:active:scale-100",
                 "flex items-center gap-2",
                 isActive 
-                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm" 
-                  : "bg-transparent border border-border text-foreground/80 hover:bg-muted/50 hover:border-border/80"
+                  ? "text-foreground" 
+                  : "text-muted-foreground hover:text-foreground/80"
               )}
             >
               <span>{option.label}</span>
@@ -79,11 +78,16 @@ export function ScheduleFilterPills({
                 <span className={cn(
                   "text-xs px-1.5 py-0.5 rounded-full font-normal",
                   isActive 
-                    ? "bg-white/20 text-white dark:bg-zinc-900/20 dark:text-zinc-900" 
-                    : "bg-muted text-muted-foreground"
+                    ? "bg-muted text-muted-foreground" 
+                    : "bg-muted/50 text-muted-foreground"
                 )}>
                   {count}
                 </span>
+              )}
+
+              {/* Orange underline indicator */}
+              {isActive && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
               )}
             </button>
           );
