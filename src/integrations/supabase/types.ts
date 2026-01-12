@@ -11199,6 +11199,10 @@ export type Database = {
         Returns: boolean
       }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
+      log_user_achievement: {
+        Args: { p_event: string; p_metadata: Json; p_user_id: string }
+        Returns: undefined
+      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       nearby_golfers: {
         Args: {
