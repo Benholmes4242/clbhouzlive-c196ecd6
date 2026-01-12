@@ -21,19 +21,20 @@ interface ScheduleTournamentCardProps {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; pulse?: boolean }> = {
+  const config: Record<string, { label: string; pulse?: boolean; isCompleted?: boolean }> = {
     inprogress: { label: 'Live', pulse: true },
     scheduled: { label: 'Upcoming' },
     created: { label: 'Upcoming' },
-    closed: { label: 'Completed' },
+    closed: { label: 'Final', isCompleted: true },
   };
   
   const c = config[status] || config.created;
   
   return (
     <span className={cn(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium',
-      'bg-black/30 text-white/90 backdrop-blur-sm'
+      // Softer, more translucent badge
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide',
+      'bg-black/20 text-white/80 backdrop-blur-md border border-white/10'
     )}>
       {c.pulse && (
         <span className="relative flex h-1.5 w-1.5">
@@ -57,6 +58,7 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
   );
 
   const hasImage = courseImage?.imageUrl && !imageLoading;
+  const isCompleted = tournament.status === 'closed';
 
   return (
     <Link
@@ -64,12 +66,14 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
       className={cn(
         "block relative -mr-4 h-[140px]",
         "transition-all duration-300 ease-out",
-        "hover:brightness-105",
+        // Completed events feel like history - slightly dimmed
+        isCompleted ? "hover:brightness-100" : "hover:brightness-105",
         className
       )}
       style={{
-        // Subtle inner shadow for softer edges
-        boxShadow: 'inset 0 0 40px rgba(0,0,0,0.08)'
+        // Subtle inner shadow for softer edges + completed dimming
+        boxShadow: 'inset 0 0 40px rgba(0,0,0,0.08)',
+        filter: isCompleted ? 'saturate(0.85) brightness(0.92)' : undefined,
       }}
     >
       {/* Background Image or Grey Fallback - edge to edge */}

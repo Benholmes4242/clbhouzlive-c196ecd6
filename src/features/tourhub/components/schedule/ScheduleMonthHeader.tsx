@@ -1,12 +1,12 @@
 /**
- * ScheduleMonthHeader - Clean editorial month section header
+ * ScheduleMonthHeader - Editorial chapter-style month section
  * 
  * Features:
- * - 10px orange dot
- * - Prominent month/year text
- * - Horizontal line extending to edge
- * - Event count right-aligned
- * - Equal spacing above and below (py-6) for centered feel between cards
+ * - Timeline marker with colored dot
+ * - Month + Year as chapter heading
+ * - Thin divider line extending right
+ * - Event count with editorial separator
+ * - Extra spacing for chapter feel
  */
 
 import { cn } from '@/lib/utils';
@@ -25,28 +25,28 @@ export function ScheduleMonthHeader({
   return (
     <div 
       className={cn(
-        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm py-4 mt-4 first:mt-0",
+        // Extra vertical spacing for chapter breathing room
+        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm pt-8 pb-4 mt-6 first:mt-0",
         className
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Timeline dot - 10px, primary/orange filled */}
+        {/* Timeline dot - 10px, primary/orange filled with subtle glow */}
         <div className="relative w-2.5 h-2.5 flex items-center justify-center">
-          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+          <div className="absolute w-4 h-4 rounded-full bg-primary/20" />
+          <div className="relative w-2.5 h-2.5 rounded-full bg-primary" />
         </div>
         
-        {/* Month label - prominent */}
+        {/* Month label with event count - editorial style */}
         <h3 className="text-lg font-semibold text-foreground tracking-tight whitespace-nowrap">
           {monthLabel}
+          <span className="text-muted-foreground font-normal ml-2">
+            · {eventCount} event{eventCount !== 1 ? 's' : ''}
+          </span>
         </h3>
         
-        {/* Horizontal line extending to edge */}
-        <div className="flex-1 h-px bg-border" />
-        
-        {/* Event count - muted, right-aligned */}
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {eventCount} event{eventCount !== 1 ? 's' : ''}
-        </span>
+        {/* Horizontal line extending to edge - thinner */}
+        <div className="flex-1 h-px bg-border/60" />
       </div>
     </div>
   );

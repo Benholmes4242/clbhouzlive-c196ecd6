@@ -163,9 +163,19 @@ export function ScheduleTab() {
   
   return (
     <div className="min-h-screen">
+      {/* Page Header - Editorial framing */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+          The Season Schedule
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          The full journey of the season — past, live, and still to come.
+        </p>
+      </div>
+
       {/* Featured Hero - Always visible, independent of tab selection */}
       {featured && !search && (
-        <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6">
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-8">
           <ScheduleHeroCard 
             tournament={featured.tournament} 
             type={featured.type}
@@ -174,19 +184,19 @@ export function ScheduleTab() {
       )}
       
       {/* Main content with spacing */}
-      <div className="space-y-6">
-        {/* Search Bar */}
+      <div className="space-y-5">
+        {/* Search Bar - Taller, softer */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
           <Input
-            placeholder="Search tournaments, venues, or cities..."
+            placeholder="Find an event, venue, or city..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-background border-border focus:ring-2 focus:ring-primary/20"
+            className="pl-11 h-11 bg-muted/40 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl placeholder:text-muted-foreground/50"
           />
         </div>
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs - Segmented control */}
         <ScheduleFilterPills
           activeFilter={filter}
           onFilterChange={setFilter}
@@ -202,33 +212,38 @@ export function ScheduleTab() {
         )}
         
         {/* Result Count - subtle */}
-        <p className="text-xs text-muted-foreground/60">
-          Showing {filteredResults.length} tournament{filteredResults.length !== 1 ? 's' : ''}
-          {search && tournaments && filteredResults.length !== tournaments.length && ' (filtered)'}
+        <p className="text-xs text-muted-foreground/50">
+          {filteredResults.length} event{filteredResults.length !== 1 ? 's' : ''}
+          {search && tournaments && filteredResults.length !== tournaments.length && ' matching'}
         </p>
         
         {/* Timeline Layout - Grouped by Month */}
         {monthGroups.length > 0 ? (
           <div className="space-y-0">
-            {monthGroups.map((group) => (
+            {monthGroups.map((group, groupIndex) => (
               <div key={group.monthKey}>
-                {/* Month Header */}
+                {/* Month Header - Chapter marker */}
                 <ScheduleMonthHeader 
                   monthLabel={group.monthLabel}
                   eventCount={group.tournaments.length}
                 />
 
-                {/* Tournaments - Flowing feed with reduced gap */}
-                <div className="pl-5 border-l border-border/40 ml-[5px] space-y-2">
-                  {group.tournaments.map((tournament) => (
-                    <ScheduleTournamentCard 
+                {/* Tournaments - Flowing feed with extra last-item spacing */}
+                <div className="pl-5 border-l border-border/30 ml-[5px] space-y-3">
+                  {group.tournaments.map((tournament, idx) => (
+                    <div 
                       key={tournament.id}
-                      tournament={tournament}
-                    />
+                      className={idx === group.tournaments.length - 1 ? 'pb-2' : ''}
+                    >
+                      <ScheduleTournamentCard tournament={tournament} />
+                    </div>
                   ))}
                 </div>
               </div>
             ))}
+            
+            {/* Bottom fade buffer - resolve the journey */}
+            <div className="h-16" />
           </div>
         ) : (
           <ScheduleEmptyMessage variant="no-results" />
@@ -236,7 +251,7 @@ export function ScheduleTab() {
 
         {/* Season Complete Message */}
         {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
-          <div className="pt-8 border-t border-border">
+          <div className="pt-8 border-t border-border/50">
             <ScheduleEmptyMessage variant="season-complete" />
           </div>
         )}
