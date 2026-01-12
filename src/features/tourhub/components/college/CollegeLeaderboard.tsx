@@ -1,18 +1,16 @@
 import { useState, useMemo } from 'react';
-import { Trophy, DollarSign, Target, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { CollegeCard } from './CollegeCard';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s';
 
-const METRIC_TABS: { value: MetricTab; label: string; icon: React.ElementType }[] = [
-  { value: 'earnings', label: 'Earnings', icon: DollarSign },
-  { value: 'wins', label: 'Wins', icon: Trophy },
-  { value: 'cuts', label: 'Cuts Made', icon: Target },
-  { value: 'top10s', label: 'Top 10s', icon: TrendingUp },
+const METRIC_TABS: { value: MetricTab; label: string }[] = [
+  { value: 'earnings', label: 'Earnings' },
+  { value: 'wins', label: 'Wins' },
+  { value: 'cuts', label: 'Cuts' },
+  { value: 'top10s', label: 'Top 10s' },
 ];
 
 interface CollegeLeaderboardProps {
@@ -46,22 +44,38 @@ export function CollegeLeaderboard({ limit = 25, className }: CollegeLeaderboard
   
   return (
     <div className={cn('', className)}>
-      {/* Metric Tabs */}
-      <Tabs value={activeMetric} onValueChange={(v) => setActiveMetric(v as MetricTab)}>
-        <TabsList className="w-full grid grid-cols-4 mb-4">
-          {METRIC_TABS.map(({ value, label, icon: Icon }) => (
-            <TabsTrigger 
-              key={value} 
-              value={value}
-              className="text-xs sm:text-sm flex items-center gap-1.5"
+      {/* Metric Tabs - Leaders page style with orange underline */}
+      <div 
+        className="flex justify-center mb-6"
+        role="tablist"
+        aria-label="College leaderboard metrics"
+      >
+        {METRIC_TABS.map(({ value, label }) => {
+          const isSelected = activeMetric === value;
+          return (
+            <button
+              key={value}
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => setActiveMetric(value)}
+              className={cn(
+                "relative text-sm px-4 py-2 font-medium whitespace-nowrap",
+                "bg-transparent border-0 shadow-none rounded-none",
+                "transition-colors duration-200 ease-out",
+                "inline-flex items-center justify-center",
+                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                "after:transition-all after:duration-200 after:ease-out",
+                isSelected 
+                  ? "text-foreground after:w-full after:opacity-[0.85]" 
+                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+              )}
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{label}</span>
-              <span className="sm:hidden">{label.split(' ')[0]}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+              {label}
+            </button>
+          );
+        })}
+      </div>
       
       {/* Leaderboard List */}
       <div className="space-y-2">
