@@ -114,10 +114,17 @@ export function FeaturedPlayersCarousel({ players, stats }: FeaturedPlayersCarou
     // Create a map of player stats for quick lookup
     const statsMap = new Map(stats.map(s => [s.player_id, s]));
     
-    // Top ranked players (by fedex_rank)
+    // Helper to extract world rank from raw_data
+    const getWorldRank = (s: TourPlayerStatistics): number | null => {
+      const rawData = s as unknown as { raw_data?: { statistics?: { world_rank?: number } } };
+      const rank = rawData?.raw_data?.statistics?.world_rank;
+      return typeof rank === 'number' && rank >= 1 ? rank : null;
+    };
+    
+    // Top ranked players (by OWGR world_rank from raw_data)
     const topRanked = stats
-      .filter(s => s.fedex_rank && s.player)
-      .sort((a, b) => (a.fedex_rank || 999) - (b.fedex_rank || 999))
+      .filter(s => getWorldRank(s) && s.player)
+      .sort((a, b) => (getWorldRank(a) || 999) - (getWorldRank(b) || 999))
       .slice(0, 2);
     
     topRanked.forEach(s => {
@@ -125,7 +132,7 @@ export function FeaturedPlayersCarousel({ players, stats }: FeaturedPlayersCarou
         featured.push({
           player: s.player,
           stats: s,
-          highlight: `World #${s.fedex_rank}`,
+          highlight: `World #${getWorldRank(s)}`,
         });
       }
     });
