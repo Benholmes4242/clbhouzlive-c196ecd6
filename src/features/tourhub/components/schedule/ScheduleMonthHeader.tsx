@@ -1,10 +1,10 @@
 /**
- * ScheduleMonthHeader - Editorial chapter-style month section
+ * ScheduleMonthHeader - Editorial chapter-style month section with progress
  * 
  * Features:
  * - Timeline marker with colored dot
- * - Month + Year as chapter heading
- * - Thin divider line extending right
+ * - Current month highlighted brighter
+ * - Past months softer, future months brighter
  * - Event count with editorial separator
  * - Extra spacing for chapter feel
  */
@@ -14,14 +14,20 @@ import { cn } from '@/lib/utils';
 interface ScheduleMonthHeaderProps {
   monthLabel: string;
   eventCount: number;
+  timelineStatus?: 'past' | 'current' | 'future';
   className?: string;
 }
 
 export function ScheduleMonthHeader({ 
   monthLabel, 
   eventCount,
+  timelineStatus = 'current',
   className 
 }: ScheduleMonthHeaderProps) {
+  const isPast = timelineStatus === 'past';
+  const isCurrent = timelineStatus === 'current';
+  const isFuture = timelineStatus === 'future';
+
   return (
     <div 
       className={cn(
@@ -31,22 +37,41 @@ export function ScheduleMonthHeader({
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Timeline dot - 10px, primary/orange filled with subtle glow */}
+        {/* Timeline dot - varies by status */}
         <div className="relative w-2.5 h-2.5 flex items-center justify-center">
-          <div className="absolute w-4 h-4 rounded-full bg-primary/20" />
-          <div className="relative w-2.5 h-2.5 rounded-full bg-primary" />
+          {/* Glow for current month */}
+          {isCurrent && (
+            <div className="absolute w-5 h-5 rounded-full bg-primary/30 animate-pulse" />
+          )}
+          <div className={cn(
+            "absolute w-4 h-4 rounded-full",
+            isCurrent ? "bg-primary/25" : isPast ? "bg-muted-foreground/10" : "bg-primary/15"
+          )} />
+          <div className={cn(
+            "relative w-2.5 h-2.5 rounded-full",
+            isCurrent ? "bg-primary" : isPast ? "bg-muted-foreground/50" : "bg-primary/70"
+          )} />
         </div>
         
         {/* Month label with event count - editorial style */}
-        <h3 className="text-lg font-semibold text-foreground tracking-tight whitespace-nowrap">
+        <h3 className={cn(
+          "text-lg font-semibold tracking-tight whitespace-nowrap",
+          isCurrent ? "text-foreground" : isPast ? "text-muted-foreground" : "text-foreground"
+        )}>
           {monthLabel}
-          <span className="text-muted-foreground font-normal ml-2">
+          <span className={cn(
+            "font-normal ml-2",
+            isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+          )}>
             · {eventCount} event{eventCount !== 1 ? 's' : ''}
           </span>
         </h3>
         
-        {/* Horizontal line extending to edge - thinner */}
-        <div className="flex-1 h-px bg-border/60" />
+        {/* Horizontal line extending to edge */}
+        <div className={cn(
+          "flex-1 h-px",
+          isPast ? "bg-border/40" : "bg-border/60"
+        )} />
       </div>
     </div>
   );
