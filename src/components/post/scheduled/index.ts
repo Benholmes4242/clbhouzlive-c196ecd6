@@ -1,1 +1,1 @@
-export { ScheduledPostsList } from './ScheduledPostsList';
+export { default as ScheduledPostsList } from './ScheduledPostsList';
