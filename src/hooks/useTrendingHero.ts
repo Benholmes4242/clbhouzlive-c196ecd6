@@ -94,19 +94,24 @@ export function useTrendingHero() {
         `)
         .gte('created_at', todayStart.toISOString())
         .eq('visibility', 'anyone')
-        .eq('post_media.media_type', 'video')
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(50);
+      
+      // Filter for video posts client-side (Supabase nested filters are unreliable)
+      const todayVideos = todayData?.filter(post => 
+        (post as any).post_media?.some((m: any) => m.media_type === 'video')
+      );
       
       console.log('[useTrendingHero] Today query result:', { 
-        count: todayData?.length, 
+        rawCount: todayData?.length, 
+        videoCount: todayVideos?.length,
         error: todayError?.message,
-        firstPostId: todayData?.[0]?.id?.slice(0, 8)
+        firstPostId: todayVideos?.[0]?.id?.slice(0, 8)
       });
 
-      if (!todayError && todayData && todayData.length > 0) {
+      if (!todayError && todayVideos && todayVideos.length > 0) {
         // Sort by views and pick the top one
-        const sorted = todayData.sort((a, b) => {
+        const sorted = todayVideos.sort((a, b) => {
           const aViews = (a as any).post_views?.[0]?.count || 0;
           const bViews = (b as any).post_views?.[0]?.count || 0;
           return bViews - aViews;
@@ -114,6 +119,7 @@ export function useTrendingHero() {
         
         const topPost = sorted[0];
         if (topPost) {
+          console.log('[useTrendingHero] Found TODAY hero:', topPost.id?.slice(0, 8));
           return {
             post: transformPostData(topPost),
             trendingPeriod: 'today',
@@ -158,19 +164,24 @@ export function useTrendingHero() {
         `)
         .gte('created_at', weekStart.toISOString())
         .eq('visibility', 'anyone')
-        .eq('post_media.media_type', 'video')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
+      
+      // Filter for video posts client-side
+      const weekVideos = weekData?.filter(post => 
+        (post as any).post_media?.some((m: any) => m.media_type === 'video')
+      );
         
       console.log('[useTrendingHero] Week query result:', { 
-        count: weekData?.length, 
+        rawCount: weekData?.length, 
+        videoCount: weekVideos?.length,
         error: weekError?.message,
-        firstPostId: weekData?.[0]?.id?.slice(0, 8)
+        firstPostId: weekVideos?.[0]?.id?.slice(0, 8)
       });
 
-      if (!weekError && weekData && weekData.length > 0) {
+      if (!weekError && weekVideos && weekVideos.length > 0) {
         // Sort by views and pick the top one
-        const sorted = weekData.sort((a, b) => {
+        const sorted = weekVideos.sort((a, b) => {
           const aViews = (a as any).post_views?.[0]?.count || 0;
           const bViews = (b as any).post_views?.[0]?.count || 0;
           return bViews - aViews;
@@ -178,6 +189,7 @@ export function useTrendingHero() {
         
         const topPost = sorted[0];
         if (topPost) {
+          console.log('[useTrendingHero] Found WEEK hero:', topPost.id?.slice(0, 8));
           return {
             post: transformPostData(topPost),
             trendingPeriod: 'this_week',
@@ -220,19 +232,24 @@ export function useTrendingHero() {
           post_likes (count)
         `)
         .eq('visibility', 'anyone')
-        .eq('post_media.media_type', 'video')
         .order('created_at', { ascending: false })
-        .limit(30);
+        .limit(100);
+      
+      // Filter for video posts client-side
+      const fallbackVideos = fallbackData?.filter(post => 
+        (post as any).post_media?.some((m: any) => m.media_type === 'video')
+      );
         
       console.log('[useTrendingHero] Fallback query result:', { 
-        count: fallbackData?.length, 
+        rawCount: fallbackData?.length, 
+        videoCount: fallbackVideos?.length,
         error: fallbackError?.message,
-        firstPostId: fallbackData?.[0]?.id?.slice(0, 8)
+        firstPostId: fallbackVideos?.[0]?.id?.slice(0, 8)
       });
 
-      if (fallbackData && fallbackData.length > 0) {
+      if (fallbackVideos && fallbackVideos.length > 0) {
         // Sort by likes
-        const sorted = fallbackData.sort((a, b) => {
+        const sorted = fallbackVideos.sort((a, b) => {
           const aLikes = (a as any).post_likes?.[0]?.count || 0;
           const bLikes = (b as any).post_likes?.[0]?.count || 0;
           return bLikes - aLikes;
@@ -240,6 +257,7 @@ export function useTrendingHero() {
         
         const topPost = sorted[0];
         if (topPost) {
+          console.log('[useTrendingHero] Found FALLBACK hero:', topPost.id?.slice(0, 8));
           return {
             post: transformPostData(topPost),
             trendingPeriod: 'this_week', // Label as this week even if fallback
