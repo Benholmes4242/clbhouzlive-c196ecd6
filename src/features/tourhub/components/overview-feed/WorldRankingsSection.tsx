@@ -54,11 +54,11 @@ export function WorldRankingsSection() {
             <Link
               key={player.playerId}
               to={`/tourhub/player/${player.playerId}`}
-              className="flex-shrink-0 w-[140px] group"
+              className="flex-shrink-0 w-[140px] min-h-[170px] group"
             >
               <div 
                 className={`
-                  relative h-[150px] rounded-xl p-3.5 flex flex-col
+                  relative min-h-[170px] rounded-xl p-3.5 flex flex-col
                   bg-white shadow-sm border border-slate-100
                   transition-all group-hover:shadow-lg group-hover:border-slate-200
                   ${isFirst 
