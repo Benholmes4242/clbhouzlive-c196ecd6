@@ -29,11 +29,22 @@ const getCloudflareR2 = async () => {
  * @throws Error if no files are provided (posts require at least one media file)
  */
 export function enqueuePostUpload(input: UploadJobInput): string {
-  // Validate: posts MUST have at least one media file
-  if (!input.files || input.files.length === 0) {
-    console.error('[uploadPipeline] enqueuePostUpload called with no files - rejecting');
+  // Check for restored media (already uploaded, no File objects)
+  const hasRestoredMedia = input.mediaItems?.some(m => m.isRestored && m.restoredMediaUrl);
+  const hasNewFiles = input.files && input.files.length > 0;
+  const hasCompiledVideo = input.mediaItems?.some(m => m.compiledVideo);
+  
+  // Validate: posts MUST have at least one media source (files, restored, or compiled)
+  if (!hasNewFiles && !hasRestoredMedia && !hasCompiledVideo) {
+    console.error('[uploadPipeline] enqueuePostUpload called with no media - rejecting');
     throw new Error('At least one media file is required to create a post');
   }
+
+  console.log('[uploadPipeline] Enqueueing job:', {
+    newFiles: input.files?.length || 0,
+    restoredMedia: input.mediaItems?.filter(m => m.isRestored).length || 0,
+    hasCompiledVideo,
+  });
 
   const jobId = uploadManager.enqueue(input);
   
@@ -139,14 +150,19 @@ async function processJob(jobId: string): Promise<void> {
   // Check for compiled video (Smart Compilation - already uploaded to Stream)
   const hasCompiledVideo = job.mediaItems?.some(m => m.compiledVideo);
   
-  // CRITICAL: Fail fast if no files and no compiled video - don't create orphaned posts
-  if ((!job.files || job.files.length === 0) && !hasCompiledVideo) {
-    console.error(`[uploadPipeline] Job ${jobId} has no files or compiled video - aborting`);
+  // Check for restored media (from drafts/scheduled posts - already uploaded)
+  const restoredMedia = job.mediaItems?.filter(m => m.isRestored && m.restoredMediaUrl) || [];
+  const hasRestoredMedia = restoredMedia.length > 0;
+  const hasNewFiles = job.files && job.files.length > 0;
+  
+  // CRITICAL: Fail fast if no media sources - don't create orphaned posts
+  if (!hasNewFiles && !hasCompiledVideo && !hasRestoredMedia) {
+    console.error(`[uploadPipeline] Job ${jobId} has no media - aborting`);
     uploadManager.markFailed(jobId, 'No media files to upload');
     return;
   }
 
-  console.log(`[uploadPipeline] Processing job ${jobId} with ${job.files.length} files, hasCompiledVideo: ${hasCompiledVideo}`);
+  console.log(`[uploadPipeline] Processing job ${jobId}: ${job.files?.length || 0} new files, ${restoredMedia.length} restored, hasCompiledVideo: ${hasCompiledVideo}`);
 
   // Track uploaded stream UIDs for cleanup on failure
   const uploadedStreamUids: string[] = [];
@@ -204,8 +220,8 @@ async function processJob(jobId: string): Promise<void> {
         uploadManager.updateProgress(jobId, 1);
         uploadedStreamUids.push(streamId);
       }
-    } else {
-      // Phase B: Upload media files sequentially (normal flow)
+    } else if (hasNewFiles && job.files.length > 0) {
+      // Phase B: Upload new media files sequentially (normal flow)
       const { uploadVideo } = await getCloudflareStream().then(m => ({
         uploadVideo: async (file: File) => {
           // Use the hook's upload function via a simple wrapper
@@ -331,6 +347,58 @@ async function processJob(jobId: string): Promise<void> {
       queueImageProcessing(uploadedMediaForProcessing);
     }
     } // End of else block for normal file upload flow
+
+    // Phase C: Handle restored media (from drafts/scheduled posts - already uploaded)
+    if (hasRestoredMedia && restoredMedia.length > 0) {
+      console.log(`[uploadPipeline] Processing ${restoredMedia.length} restored media items`);
+      
+      // Calculate display order offset (after any new uploads)
+      const displayOrderOffset = job.files?.length || 0;
+      
+      for (let idx = 0; idx < restoredMedia.length; idx++) {
+        const item = restoredMedia[idx];
+        const mediaType = item.type || (item.restoredStreamId ? 'video' : 'image');
+        
+        // Get studio edits for this item
+        const edits = item.id ? job.studioEditsByMediaId?.[item.id] : undefined;
+        const filterId = edits?.filter ?? null;
+        const studioEditsJson = edits ? JSON.parse(JSON.stringify(edits)) : null;
+        
+        console.log(`[uploadPipeline] Creating post_media for restored item: ${item.restoredMediaUrl}, type: ${mediaType}`);
+        
+        const { error: mediaError } = await supabase
+          .from('post_media')
+          .insert({
+            post_id: postId,
+            media_type: mediaType,
+            media_url: item.restoredMediaUrl!,
+            display_order: displayOrderOffset + idx,
+            stream_id: item.restoredStreamId || null,
+            poster_url: item.restoredStreamId 
+              ? `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${item.restoredStreamId}/thumbnails/thumbnail.jpg?width=1280&height=720&time=1s`
+              : null,
+            width: item.width || null,
+            height: item.height || null,
+            aspect_ratio: item.aspectRatio || null,
+            duration_seconds: item.duration || null,
+            studio_edits: studioEditsJson,
+            filter_id: filterId,
+          });
+
+        if (mediaError) {
+          console.error(`[uploadPipeline] Restored media record error:`, mediaError);
+          throw mediaError;
+        }
+        
+        // Track video stream IDs
+        if (item.restoredStreamId) {
+          uploadedStreamUids.push(item.restoredStreamId);
+        }
+      }
+      
+      // Update progress
+      uploadManager.updateProgress(jobId, (job.files?.length || 0) + restoredMedia.length);
+    }
 
     // Finalizing phase
     uploadManager.updateStatus(jobId, 'finalizing', postId);
