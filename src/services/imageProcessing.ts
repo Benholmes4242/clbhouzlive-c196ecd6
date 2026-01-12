@@ -1,11 +1,11 @@
 /**
- * Media Processing Service
+ * Image Processing Service
  * 
- * Handles queuing and triggering media processing to bake filters,
- * text overlays, and music into images and videos for external sharing/download.
+ * Handles queuing and triggering image processing to bake filters,
+ * text overlays, crop, and rotation into images for external sharing/download.
  * 
- * Phase 1: Images - Full processing with SVG compositing
- * Phase 2: Videos - Deferred to external service (marked for future processing)
+ * Note: Videos are NOT processed - edits are CSS-only preview.
+ * Video edits will display in-app but won't persist to downloads/external shares.
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -27,22 +27,40 @@ interface ProcessingResult {
   success: boolean;
   processedUrl?: string;
   skipped?: boolean;
-  deferred?: boolean;
   error?: string;
 }
 
 /**
- * Check if media needs processing
+ * Check if IMAGE needs processing (videos always return false)
  */
 function needsProcessing(media: ProcessableMedia): boolean {
+  // Videos are NEVER processed - CSS-only preview
+  if (media.mediaType === 'video') {
+    return false;
+  }
+
   const filter = media.filterId || media.studioEdits?.filter;
   const hasFilter = filter && filter !== 'normal';
   const hasTextOverlays = media.studioEdits?.textOverlays && media.studioEdits.textOverlays.length > 0;
   const hasRotation = media.studioEdits?.rotate && media.studioEdits.rotate !== 0;
   const hasCrop = media.studioEdits?.crop?.ratio && media.studioEdits.crop.ratio !== 'original';
-  const hasMusic = !!(media.studioEdits as any)?.music?.url;
   
-  return !!(hasFilter || hasTextOverlays || hasRotation || hasCrop || hasMusic);
+  return !!(hasFilter || hasTextOverlays || hasRotation || hasCrop);
+}
+
+/**
+ * Check if a video has studio edits applied (for showing user warnings)
+ */
+export function videoHasEdits(edits?: StudioEdits | null): boolean {
+  if (!edits) return false;
+
+  const hasFilter = edits.filter && edits.filter !== 'normal';
+  const hasTextOverlays = edits.textOverlays && edits.textOverlays.length > 0;
+  const hasCrop = edits.crop?.ratio && edits.crop.ratio !== 'original';
+  const hasRotation = edits.rotate && edits.rotate !== 0;
+  const hasMusic = !!edits.music?.url;
+
+  return !!(hasFilter || hasTextOverlays || hasCrop || hasRotation || hasMusic);
 }
 
 /**
@@ -98,124 +116,58 @@ async function processImage(media: ProcessableMedia): Promise<ProcessingResult> 
 }
 
 /**
- * Process a single video (Phase 2 - deferred processing)
- */
-async function processVideo(media: ProcessableMedia): Promise<ProcessingResult> {
-  try {
-    console.log('🎬 Queuing video for processing:', media.id);
-
-    const { data, error } = await supabase.functions.invoke('process-video', {
-      body: {
-        mediaId: media.id,
-        originalUrl: media.mediaUrl,
-        streamId: media.streamId,
-        studioEdits: media.studioEdits || {},
-        filterId: media.filterId,
-        width: media.width || 1080,
-        height: media.height || 1920,
-      },
-    });
-
-    if (error) {
-      console.error('❌ Video processing error:', error);
-      return { 
-        mediaId: media.id, 
-        success: false, 
-        error: error.message 
-      };
-    }
-
-    if (data.skipped) {
-      console.log('⏭️ Video processing skipped:', data.reason);
-      return { 
-        mediaId: media.id, 
-        success: true, 
-        skipped: true 
-      };
-    }
-
-    if (data.deferred) {
-      console.log('📝 Video processing deferred:', data.reason);
-      return {
-        mediaId: media.id,
-        success: true,
-        deferred: true,
-      };
-    }
-
-    console.log('✅ Video processing complete:', data.processedUrl);
-    return {
-      mediaId: media.id,
-      success: true,
-      processedUrl: data.processedUrl,
-    };
-  } catch (err) {
-    console.error('❌ Video processing failed:', err);
-    return {
-      mediaId: media.id,
-      success: false,
-      error: (err as Error).message,
-    };
-  }
-}
-
-/**
- * Process a single media item (image or video)
- */
-async function processMedia(media: ProcessableMedia): Promise<ProcessingResult> {
-  if (media.mediaType === 'video') {
-    return processVideo(media);
-  }
-  return processImage(media);
-}
-
-/**
- * Queue media processing for a list of post media items
+ * Queue image processing for a list of post media items
  * Runs in background - does not block the caller
- * Handles both images (full processing) and videos (deferred processing)
+ * 
+ * Note: Videos are automatically skipped (CSS-only preview)
  */
 export function queueImageProcessing(mediaItems: ProcessableMedia[]): void {
-  // Filter to only media that needs processing
-  const mediaToProcess = mediaItems.filter(needsProcessing);
+  // Filter to only IMAGES that need processing (videos are excluded)
+  const imagesToProcess = mediaItems.filter(m => m.mediaType === 'image' && needsProcessing(m));
   
-  if (mediaToProcess.length === 0) {
-    console.log('📷 No media needs processing');
+  // Mark videos as skipped immediately
+  const videos = mediaItems.filter(m => m.mediaType === 'video');
+  videos.forEach(v => {
+    markMediaSkipped(v.id).catch(err => 
+      console.warn('Failed to mark video as skipped:', err)
+    );
+  });
+
+  if (imagesToProcess.length === 0) {
+    console.log('📷 No images need processing');
     return;
   }
 
-  const imageCount = mediaToProcess.filter(m => m.mediaType === 'image').length;
-  const videoCount = mediaToProcess.filter(m => m.mediaType === 'video').length;
-  console.log(`🎨 Queuing ${imageCount} images and ${videoCount} videos for processing`);
+  console.log(`🎨 Queuing ${imagesToProcess.length} images for processing`);
 
   // Process in background - fire and forget
-  Promise.all(mediaToProcess.map(processMedia))
+  Promise.all(imagesToProcess.map(processImage))
     .then(results => {
-      const successful = results.filter(r => r.success && !r.skipped && !r.deferred).length;
+      const successful = results.filter(r => r.success && !r.skipped).length;
       const skipped = results.filter(r => r.skipped).length;
-      const deferred = results.filter(r => r.deferred).length;
       const failed = results.filter(r => !r.success).length;
-      console.log(`✅ Media processing complete: ${successful} processed, ${deferred} deferred, ${skipped} skipped, ${failed} failed`);
+      console.log(`✅ Image processing complete: ${successful} processed, ${skipped} skipped, ${failed} failed`);
     })
     .catch(err => {
-      console.error('❌ Background media processing error:', err);
+      console.error('❌ Background image processing error:', err);
     });
 }
 
 /**
- * Process media synchronously (for when you need to wait)
+ * Process images synchronously (for when you need to wait)
  */
-export async function processMediaSync(mediaItems: ProcessableMedia[]): Promise<ProcessingResult[]> {
-  const mediaToProcess = mediaItems.filter(needsProcessing);
+export async function processImagesSync(mediaItems: ProcessableMedia[]): Promise<ProcessingResult[]> {
+  const imagesToProcess = mediaItems.filter(m => m.mediaType === 'image' && needsProcessing(m));
   
-  if (mediaToProcess.length === 0) {
+  if (imagesToProcess.length === 0) {
     return [];
   }
 
-  return Promise.all(mediaToProcess.map(processMedia));
+  return Promise.all(imagesToProcess.map(processImage));
 }
 
 /**
- * Mark media as skipped for processing (no edits to apply)
+ * Mark media as skipped for processing (no edits to apply or is a video)
  */
 export async function markMediaSkipped(mediaId: string): Promise<void> {
   await supabase
