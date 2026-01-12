@@ -25,7 +25,7 @@ export function ScheduleMonthHeader({
   return (
     <div 
       className={cn(
-        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm py-6 first:pt-0",
+        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm py-4 mt-4 first:mt-0",
         className
       )}
     >
