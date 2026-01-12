@@ -3,6 +3,7 @@
  * Subtle, centered, neutral messages that don't break the flow
  */
 
+import { Link } from 'react-router-dom';
 import { Calendar, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +31,7 @@ export function ScheduleEmptyMessage({
     },
     'season-complete': {
       icon: <Calendar className="w-4 h-4" />,
-      message: 'Season complete — relive the highlights in Overview.',
+      message: null, // Special handling for clickable link
     },
   };
 
@@ -47,7 +48,20 @@ export function ScheduleEmptyMessage({
         {icon}
       </div>
       <p className="text-sm text-muted-foreground/80">
-        {message}
+        {variant === 'season-complete' ? (
+          <>
+            Season complete — relive the highlights in{' '}
+            <Link 
+              to="/tourhub?tab=overview" 
+              className="text-primary hover:underline font-medium"
+            >
+              Overview
+            </Link>
+            .
+          </>
+        ) : (
+          message
+        )}
       </p>
     </div>
   );

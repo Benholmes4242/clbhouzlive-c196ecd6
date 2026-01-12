@@ -3,6 +3,7 @@
  * Matches FeaturedMomentCard visual language from Overview
  * 
  * Logic: Shows Live > Upcoming > Most Recent tournament
+ * Uses useSingleCourseImage to resolve actual course images
  */
 
 import { Link } from 'react-router-dom';
@@ -10,6 +11,7 @@ import { format } from 'date-fns';
 import { MapPin, Zap, Calendar, Clock, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourTournament } from '../../hooks/useTourHubData';
+import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 
 interface ScheduleHeroCardProps {
   tournament: TourTournament;
@@ -24,6 +26,15 @@ const cinematicGradients = [
 ];
 
 export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
+  // Resolve course image for the tournament venue
+  const { courseImage, isLoading: imageLoading } = useSingleCourseImage(
+    tournament.venue_name ? {
+      venueName: tournament.venue_name,
+      city: tournament.venue_city,
+      country: tournament.venue_country,
+    } : null
+  );
+
   const labelConfig = {
     live: { 
       text: 'Live now', 
@@ -47,6 +58,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
 
   const label = labelConfig[type];
   const gradientIndex = tournament.name.length % cinematicGradients.length;
+  const hasImage = courseImage?.imageUrl && !imageLoading;
 
   return (
     <Link
@@ -55,25 +67,36 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
     >
       {/* Image/Gradient Band */}
       <div className="relative h-28 sm:h-32 overflow-hidden">
-        {/* Cinematic gradient fallback */}
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-br",
-          cinematicGradients[gradientIndex]
-        )} />
-        
-        {/* Course texture overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 400 130" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <pattern id="schedule-course-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1" fill="white" />
-              </pattern>
-            </defs>
-            <rect width="400" height="130" fill="url(#schedule-course-dots)" />
-            <path d="M0 80 Q100 60 200 80 T400 80" fill="none" stroke="white" strokeWidth="0.5" opacity="0.5" />
-            <path d="M0 100 Q100 80 200 100 T400 100" fill="none" stroke="white" strokeWidth="0.5" opacity="0.3" />
-          </svg>
-        </div>
+        {/* Course image or cinematic gradient fallback */}
+        {hasImage ? (
+          <img 
+            src={courseImage.imageUrl!} 
+            alt={tournament.venue_name || tournament.name}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <>
+            {/* Cinematic gradient fallback */}
+            <div className={cn(
+              "absolute inset-0 bg-gradient-to-br",
+              cinematicGradients[gradientIndex]
+            )} />
+            
+            {/* Course texture overlay */}
+            <div className="absolute inset-0 opacity-10">
+              <svg className="w-full h-full" viewBox="0 0 400 130" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                  <pattern id="schedule-course-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="10" cy="10" r="1" fill="white" />
+                  </pattern>
+                </defs>
+                <rect width="400" height="130" fill="url(#schedule-course-dots)" />
+                <path d="M0 80 Q100 60 200 80 T400 80" fill="none" stroke="white" strokeWidth="0.5" opacity="0.5" />
+                <path d="M0 100 Q100 80 200 100 T400 100" fill="none" stroke="white" strokeWidth="0.5" opacity="0.3" />
+              </svg>
+            </div>
+          </>
+        )}
         
         {/* Gradient to card - softer transition with inner shadow effect */}
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
