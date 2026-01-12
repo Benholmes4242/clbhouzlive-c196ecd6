@@ -24,7 +24,16 @@ export function UploadToastsBridge() {
     });
 
     const offComplete = uploadEventBus.on('upload:complete', (evt) => {
-      // Show success toast
+      // Don't show "Posted" toast for scheduled posts - they have their own toast
+      if (evt.isScheduled) {
+        console.log('[UploadToastsBridge] Skipping toast for scheduled post');
+        // Still invalidate scheduled posts query
+        queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
+        return;
+      }
+      
+      // Show success toast for immediately published posts
       toast({
         title: "Posted ✓",
         description: "Now live on clbhouz",

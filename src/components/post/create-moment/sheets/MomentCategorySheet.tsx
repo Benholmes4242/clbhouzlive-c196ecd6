@@ -16,6 +16,7 @@ interface MomentCategorySheetProps {
   onClose: () => void;
   selectedCategories: string[];
   onCategoriesChange: (categories: string[]) => void;
+  onConfirm?: (categories: string[]) => void; // Called when Continue is tapped with a selection
   caption?: string;
   hasCourse?: boolean;
   mediaTypes?: ('video' | 'photo')[];
@@ -33,6 +34,7 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
   onClose,
   selectedCategories,
   onCategoriesChange,
+  onConfirm,
   caption = '',
   hasCourse = false,
   mediaTypes = [],
@@ -337,7 +339,16 @@ export const MomentCategorySheet: React.FC<MomentCategorySheetProps> = ({
             }}
           >
             <button
-              onClick={onClose}
+              onClick={() => {
+                if (selectedCategoryId) {
+                  // Call onConfirm if provided (for pending schedule flow)
+                  if (onConfirm) {
+                    onConfirm([selectedCategoryId]);
+                  } else {
+                    onClose();
+                  }
+                }
+              }}
               disabled={!selectedCategoryId}
               className="w-full h-12 rounded-xl font-semibold text-sm transition-all duration-150"
               style={{

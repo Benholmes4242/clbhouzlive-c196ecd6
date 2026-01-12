@@ -29,6 +29,8 @@ export interface UploadCompleteEvent {
   postId: string;
   actorType: 'personal' | 'creator' | 'business';
   actorId: string;
+  isScheduled?: boolean;
+  scheduledAt?: string;
 }
 
 export interface UploadFailedEvent {
