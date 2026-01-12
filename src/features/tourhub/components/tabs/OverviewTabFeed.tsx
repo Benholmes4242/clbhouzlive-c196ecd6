@@ -70,7 +70,7 @@ export function OverviewTabFeed() {
   }
 
   return (
-    <div className="space-y-12 pb-8">
+    <div className="pb-8">
       {/* 1. Hero Feature - Full bleed */}
       {featuredTournament && (
         <HeroFeature
@@ -80,34 +80,37 @@ export function OverviewTabFeed() {
         />
       )}
 
-      {/* 2. World Rankings - Dark charcoal section */}
-      <WorldRankingsSection />
+      {/* Consistent 48px spacing between sections, 24px between header and content */}
+      <div className="mt-12 space-y-12">
+        {/* 2. World Rankings - Dark charcoal section */}
+        <WorldRankingsSection />
 
-      {/* 3. Season Snapshot Strip */}
-      <FeatureStrip
-        topPlayers={seasonLeaders}
-      />
+        {/* 3. Season Snapshot Strip */}
+        <FeatureStrip
+          topPlayers={seasonLeaders}
+        />
 
-      {/* 4. Top Players - Photo-led feed */}
-      <PlayersFeed
-        players={topPlayersData.players}
-        maxEvents={topPlayersData.maxEvents}
-        maxCuts={topPlayersData.maxCuts}
-      />
+        {/* 4. Top Players - Photo-led feed */}
+        <PlayersFeed
+          players={topPlayersData.players}
+          maxEvents={topPlayersData.maxEvents}
+          maxCuts={topPlayersData.maxCuts}
+        />
 
-      {/* 5. Season Leaders - Photo cards */}
-      <LeadersPhotoCards leaders={seasonLeaders} />
+        {/* 5. Season Leaders - Photo cards */}
+        <LeadersPhotoCards leaders={seasonLeaders} />
 
-      {/* 6. Tour Venues - Photo grid */}
-      <CoursesPhotoGrid 
-        courses={featuredCourses} 
-        courseImages={courseImages}
-      />
+        {/* 6. Tour Venues - Photo grid */}
+        <CoursesPhotoGrid 
+          courses={featuredCourses} 
+          courseImages={courseImages}
+        />
 
-      {/* 7. Coming Soon - subtle footer */}
-      {unlockingSoonItems.length > 0 && (
-        <DataUnlocking items={unlockingSoonItems} />
-      )}
+        {/* 7. Coming Soon - subtle footer */}
+        {unlockingSoonItems.length > 0 && (
+          <DataUnlocking items={unlockingSoonItems} />
+        )}
+      </div>
     </div>
   );
 }

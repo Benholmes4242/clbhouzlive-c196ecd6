@@ -30,7 +30,7 @@ function getNarrativeTag(stat: any, sortBy: SortOption): string {
   
   if (sortBy === 'events') {
     if (rawStats?.top_10) return `${rawStats.top_10} Top 10s`;
-    return 'Most appearances';
+    return '';
   }
   
   if (sortBy === 'cuts') {
@@ -38,12 +38,13 @@ function getNarrativeTag(stat: any, sortBy: SortOption): string {
       ? Math.round((stat.cuts_made / stat.events_played) * 100) 
       : null;
     if (cutRate) return `${cutRate}% cut rate`;
-    return 'Cuts leader';
+    return '';
   }
   
   if (sortBy === 'world_rank') {
     if (rawStats?.wins) return `${rawStats.wins} wins`;
-    return 'Top ranked';
+    // No redundant "Top ranked" - they're already in the World Rank tab
+    return '';
   }
   
   return '';
@@ -120,7 +121,7 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
             <Link
               key={stat.id}
               to={`/tourhub/player/${stat.player_id}`}
-              className="flex items-center gap-3 py-3 group transition-colors"
+              className="flex items-center gap-3 py-3 group transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
             >
               {/* Player photo - circular - NOW LEFT-MOST ELEMENT */}
               <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
@@ -128,7 +129,7 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                   <img 
                     src={stat.player.photo_url} 
                     alt={stat.player.full_name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">

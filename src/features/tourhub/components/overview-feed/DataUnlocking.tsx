@@ -26,7 +26,7 @@ export function DataUnlocking({ items }: DataUnlockingProps) {
   if (!items.length) return null;
 
   return (
-    <div className="border-t border-border/30 pt-6 mt-4">
+    <div className="border-t border-border/30 pt-8 mt-8">
       <div className="flex items-center gap-3">
         {/* Subtle lock icon */}
         <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
