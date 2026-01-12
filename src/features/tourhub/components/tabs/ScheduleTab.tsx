@@ -198,9 +198,9 @@ export function ScheduleTab() {
         />
       )}
       
-      {/* Result Count */}
-      <p className="text-sm text-muted-foreground">
-        {filteredResults.length} tournament{filteredResults.length !== 1 ? 's' : ''}
+      {/* Result Count - subtle and small */}
+      <p className="text-xs text-muted-foreground/70">
+        Showing {filteredResults.length} tournament{filteredResults.length !== 1 ? 's' : ''}
         {search && tournaments && filteredResults.length !== tournaments.length && ' (filtered)'}
       </p>
       
