@@ -13,7 +13,8 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useStudio } from "@/hooks/useStudio";
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDrafts } from '@/hooks/useDrafts';
-import { useScheduledPosts } from '@/hooks/useScheduledPosts';
+import { useScheduledPosts, type ScheduledPost } from '@/hooks/useScheduledPosts';
+import { publishNow as publishScheduledNow, updateScheduledPost } from '@/services/posts/scheduledPosts';
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import { enqueuePostUpload } from "@/uploads/uploadPipeline";
@@ -88,6 +89,11 @@ export default function CreateMomentModal({
   const [showScheduledPostsSheet, setShowScheduledPostsSheet] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   
+  // Edit mode state for scheduled posts
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editingScheduledAt, setEditingScheduledAt] = useState<Date | null>(null);
+  const [isLoadingEditPost, setIsLoadingEditPost] = useState(false);
+  
   // Get user session
   const { user } = useSupabaseSession();
 
@@ -105,7 +111,10 @@ export default function CreateMomentModal({
   } = useDrafts();
   
   // Scheduled posts
-  const { count: scheduledCount } = useScheduledPosts();
+  const { count: scheduledCount, refetch: refetchScheduledPosts } = useScheduledPosts();
+  
+  // Edit mode indicator
+  const isEditMode = !!editingPostId;
   
   // Auto-save timer ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -770,6 +779,150 @@ export default function CreateMomentModal({
     toast.success(`Draft loaded${draft.media?.length ? ` with ${draft.media.length} media` : ''}`);
   };
 
+  // Load scheduled post for editing
+  const handleEditScheduledPost = async (post: ScheduledPost) => {
+    if (!onMediaChange) return;
+    
+    setIsLoadingEditPost(true);
+    
+    try {
+      // Set edit mode
+      setEditingPostId(post.id);
+      setEditingScheduledAt(new Date(post.scheduledAt));
+      
+      // Restore caption
+      setCaption(post.content || '');
+      
+      // Restore visibility
+      setVisibility(post.visibility as MomentVisibility);
+      
+      // Restore categories and badges
+      setSelectedCategories(post.categories || []);
+      setSelectedBadges(post.badges || []);
+      
+      // Restore course if available
+      if (post.courseId) {
+        // We need to fetch the course details - for now use courseId only
+        // The course will be displayed by ID if we don't have full details
+        // Future: could add course lookup here
+      }
+      
+      // Restore media from scheduled post
+      if (post.media && post.media.length > 0) {
+        const restoredMedia: ComposerMediaItem[] = post.media.map((m, idx) => ({
+          id: m.id,
+          type: m.mediaType,
+          previewUrl: m.mediaUrl,
+          thumbnailUrl: m.posterUrl || undefined,
+          duration: m.durationSeconds || undefined,
+          width: m.width || undefined,
+          height: m.height || undefined,
+          aspectRatio: m.aspectRatio || undefined,
+          isRestored: true,
+          restoredMediaUrl: m.mediaUrl,
+          restoredStreamId: m.streamId || undefined,
+        }));
+        onMediaChange(restoredMedia);
+        
+        // Restore studio edits if present
+        post.media.forEach(m => {
+          if (m.studioEdits || m.filterId) {
+            updateEdits(m.id, {
+              ...(m.filterId ? { filter: m.filterId } : {}),
+              ...(m.studioEdits || {}),
+            });
+          }
+        });
+      }
+      
+      // Close scheduled posts sheet
+      setShowScheduledPostsSheet(false);
+      
+      toast.success('Editing scheduled post');
+    } catch (error) {
+      console.error('[CreateMomentModal] Failed to load scheduled post:', error);
+      toast.error('Failed to load scheduled post');
+      setEditingPostId(null);
+      setEditingScheduledAt(null);
+    } finally {
+      setIsLoadingEditPost(false);
+    }
+  };
+
+  // Clear edit mode
+  const clearEditMode = () => {
+    setEditingPostId(null);
+    setEditingScheduledAt(null);
+  };
+
+  // Update scheduled post handler
+  const handleUpdateScheduledPost = async (newScheduledAt?: Date) => {
+    if (!editingPostId || !user) return;
+    
+    setIsScheduling(true);
+    
+    try {
+      const success = await updateScheduledPost(editingPostId, {
+        content: caption || null,
+        categories: selectedCategories,
+        badges: selectedBadges,
+        visibility,
+        courseId: course?.id || null,
+        scheduledAt: newScheduledAt || editingScheduledAt || undefined,
+      });
+      
+      if (success) {
+        await refetchScheduledPosts();
+        setShowScheduleSheet(false);
+        toast.success(newScheduledAt ? 'Schedule updated' : 'Scheduled post updated');
+        clearEditMode();
+        onClose();
+      } else {
+        toast.error('Failed to update scheduled post');
+      }
+    } catch (error) {
+      console.error('[CreateMomentModal] Failed to update scheduled post:', error);
+      toast.error('Failed to update scheduled post');
+    } finally {
+      setIsScheduling(false);
+    }
+  };
+
+  // Publish scheduled post now (in edit mode)
+  const handlePublishScheduledNow = async () => {
+    if (!editingPostId) return;
+    
+    setIsScheduling(true);
+    
+    try {
+      // First update the content
+      await updateScheduledPost(editingPostId, {
+        content: caption || null,
+        categories: selectedCategories,
+        badges: selectedBadges,
+        visibility,
+        courseId: course?.id || null,
+      });
+      
+      // Then publish
+      const success = await publishScheduledNow(editingPostId);
+      
+      if (success) {
+        await refetchScheduledPosts();
+        toast.success('Post published!');
+        clearEditMode();
+        onClose();
+      } else {
+        toast.error('Failed to publish post');
+      }
+    } catch (error) {
+      console.error('[CreateMomentModal] Failed to publish scheduled post:', error);
+      toast.error('Failed to publish post');
+    } finally {
+      setIsScheduling(false);
+    }
+  };
+
   // View drafts handler
   const handleViewDrafts = () => {
     setShowDraftPrompt(false);
@@ -950,7 +1103,7 @@ export default function CreateMomentModal({
             onVisibilityClick={() => setShowAudienceSheet(true)}
           />
 
-          {/* Share + Schedule Buttons */}
+          {/* Share + Schedule Buttons - Different in edit mode */}
           <div
             className="flex-shrink-0 px-4 pt-2"
             style={{
@@ -958,42 +1111,83 @@ export default function CreateMomentModal({
               background: 'var(--cm-surface-card)',
             }}
           >
-            <div className="flex gap-2">
-              {/* Schedule button */}
-              <button
-                disabled={!hasMedia}
-                onClick={() => setShowScheduleSheet(true)}
-                className="h-10 px-4 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-                style={{
-                  background: 'var(--cm-surface-alt)',
-                  border: '1px solid var(--cm-border-subtle)',
-                  color: hasMedia ? 'var(--cm-text-secondary)' : 'var(--cm-text-tertiary)',
-                  opacity: hasMedia ? 1 : 0.7,
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                Schedule
-              </button>
-              
-              {/* Share Now button */}
-              <button
-                disabled={!hasMedia}
-                onClick={handlePost}
-                className="flex-1 h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
-                style={{
-                  background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                  border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
-                  color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
-                  boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
-                  opacity: hasMedia ? 1 : 0.7,
-                }}
-              >
-                Share Now
-              </button>
-            </div>
+            {isEditMode ? (
+              /* Edit mode buttons */
+              <div className="flex gap-2">
+                {/* Update Schedule button */}
+                <button
+                  disabled={!hasMedia || isScheduling}
+                  onClick={() => setShowScheduleSheet(true)}
+                  className="h-10 px-4 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                  style={{
+                    background: 'var(--cm-surface-alt)',
+                    border: '1px solid var(--cm-border-subtle)',
+                    color: hasMedia ? 'var(--cm-text-secondary)' : 'var(--cm-text-tertiary)',
+                    opacity: hasMedia && !isScheduling ? 1 : 0.7,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  {editingScheduledAt ? 'Reschedule' : 'Schedule'}
+                </button>
+                
+                {/* Post Now button (publishes immediately) */}
+                <button
+                  disabled={!hasMedia || isScheduling}
+                  onClick={handlePublishScheduledNow}
+                  className="flex-1 h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
+                  style={{
+                    background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                    border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
+                    color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
+                    boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
+                    opacity: hasMedia && !isScheduling ? 1 : 0.7,
+                  }}
+                >
+                  {isScheduling ? 'Publishing...' : 'Post Now'}
+                </button>
+              </div>
+            ) : (
+              /* Create mode buttons */
+              <div className="flex gap-2">
+                {/* Schedule button */}
+                <button
+                  disabled={!hasMedia}
+                  onClick={() => setShowScheduleSheet(true)}
+                  className="h-10 px-4 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                  style={{
+                    background: 'var(--cm-surface-alt)',
+                    border: '1px solid var(--cm-border-subtle)',
+                    color: hasMedia ? 'var(--cm-text-secondary)' : 'var(--cm-text-tertiary)',
+                    opacity: hasMedia ? 1 : 0.7,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  Schedule
+                </button>
+                
+                {/* Share Now button */}
+                <button
+                  disabled={!hasMedia}
+                  onClick={handlePost}
+                  className="flex-1 h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
+                  style={{
+                    background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                    border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
+                    color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
+                    boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
+                    opacity: hasMedia ? 1 : 0.7,
+                  }}
+                >
+                  Share Now
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
@@ -1153,18 +1347,20 @@ export default function CreateMomentModal({
         onLoadDraft={handleLoadDraft}
       />
       
-      {/* Schedule Sheet */}
+      {/* Schedule Sheet - handles both create and edit mode */}
       <ScheduleSheet
         isOpen={showScheduleSheet}
         onClose={() => setShowScheduleSheet(false)}
-        onSchedule={handleSchedulePost}
+        onSchedule={isEditMode ? handleUpdateScheduledPost : handleSchedulePost}
         isScheduling={isScheduling}
+        initialDate={editingScheduledAt || undefined}
       />
       
       {/* Scheduled Posts List */}
       <ScheduledPostsList
         isOpen={showScheduledPostsSheet}
         onClose={() => setShowScheduledPostsSheet(false)}
+        onEditPost={handleEditScheduledPost}
       />
     </div>
   );
