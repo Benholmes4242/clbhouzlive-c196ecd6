@@ -1,6 +1,6 @@
 /**
- * ScheduleFilterPills - Tab-style filters matching Discover tabs
- * Uses underline indicator instead of pills
+ * ScheduleFilterPills - Tab-style filters matching courses page tabs
+ * Uses orange underline indicator
  */
 
 import { cn } from '@/lib/utils';
@@ -45,7 +45,7 @@ export function ScheduleFilterPills({
       role="tablist"
       aria-label="Filter tournaments"
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center">
         {options.map((option) => {
           const isActive = activeFilter === option.value;
           const count = counts[option.value];
@@ -57,37 +57,37 @@ export function ScheduleFilterPills({
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
               className={cn(
-                "relative px-4 py-2.5 text-sm font-medium",
+                "flex flex-col items-center gap-1 py-3 px-4 relative",
                 "transition-all duration-200 ease-out",
                 "active:scale-[0.97] motion-reduce:active:scale-100",
-                "flex items-center gap-2",
+                "hover:bg-muted/50",
                 isActive 
                   ? "text-foreground" 
-                  : "text-muted-foreground hover:text-foreground/80"
+                  : "text-muted-foreground"
               )}
             >
-              <span>{option.label}</span>
-              
-              {/* Live indicator dot */}
-              {option.hasLiveIndicator && showLiveDot && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              )}
-              
-              {/* Completed count badge */}
-              {option.showCount && count > 0 && (
-                <span className={cn(
-                  "text-xs px-1.5 py-0.5 rounded-full font-normal",
-                  isActive 
-                    ? "bg-muted text-muted-foreground" 
-                    : "bg-muted/50 text-muted-foreground"
-                )}>
-                  {count}
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">{option.label}</span>
+                
+                {/* Live indicator dot */}
+                {option.hasLiveIndicator && showLiveDot && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                )}
+                
+                {/* Completed count badge */}
+                {option.showCount && count > 0 && (
+                  <span className="text-xs px-1.5 py-0.5 rounded-full font-normal bg-muted text-muted-foreground">
+                    {count}
+                  </span>
+                )}
+              </div>
 
               {/* Orange underline indicator */}
               {isActive && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                <div 
+                  className="w-1.5 h-1.5 rounded-full bg-primary mt-1 animate-fade-in"
+                  style={{ marginTop: '4px' }}
+                />
               )}
             </button>
           );
