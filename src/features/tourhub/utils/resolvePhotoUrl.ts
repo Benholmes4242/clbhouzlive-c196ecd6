@@ -2,12 +2,10 @@
  * Resolve player photo URLs to full URLs
  * 
  * Handles:
- * - Relative paths like /player-headshots/scottie-scheffler.png
+ * - Relative paths like /player-headshots/scottie-scheffler.png (served from public folder)
  * - Full URLs (https://...)
  * - Skips ui-avatars.com URLs (initials generators, not real photos)
  */
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export function resolvePhotoUrl(photoUrl: string | null | undefined): string | null {
   if (!photoUrl) return null;
@@ -20,15 +18,10 @@ export function resolvePhotoUrl(photoUrl: string | null | undefined): string | n
     return photoUrl;
   }
   
-  // If it's a relative path to player-headshots, resolve to Supabase Storage
-  if (photoUrl.startsWith('/player-headshots/')) {
-    const filename = photoUrl.replace('/player-headshots/', '');
-    return `${SUPABASE_URL}/storage/v1/object/public/player-headshots/${filename}`;
-  }
-  
-  // For other relative paths starting with /
+  // Relative paths starting with / are served from the public folder
+  // e.g., /player-headshots/scottie-scheffler.png works directly
   if (photoUrl.startsWith('/')) {
-    return `${SUPABASE_URL}/storage/v1/object/public${photoUrl}`;
+    return photoUrl;
   }
   
   return photoUrl;
