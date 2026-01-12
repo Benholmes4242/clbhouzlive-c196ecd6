@@ -140,3 +140,9 @@ verify_jwt = true
 
 [functions.game-request-decide]
 verify_jwt = true
+
+[functions.fetch-college-logos]
+verify_jwt = false
+
+[functions.upload-college-logo]
+verify_jwt = false
