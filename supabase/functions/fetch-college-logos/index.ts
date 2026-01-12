@@ -250,35 +250,151 @@ async function downloadImage(url: string): Promise<Uint8Array | null> {
   }
 }
 
-// Process a single college
+// Try SportsLogos.net as fallback
+async function searchSportsLogos(collegeName: string): Promise<string | null> {
+  // Common name mappings for SportsLogos.net search
+  const nameVariants = [
+    collegeName,
+    collegeName.replace(/\s+/g, '_'),
+    collegeName.replace(/\s+State$/i, ''),
+    collegeName.replace(/^University\s+of\s+/i, ''),
+  ];
+  
+  for (const name of nameVariants) {
+    try {
+      // Search via Google for SportsLogos.net pages
+      const searchTerm = `${name} logo site:sportslogos.net/logos/view`;
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}&num=5`;
+      
+      // Use DuckDuckGo HTML search as fallback (more reliable without API key)
+      const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(`${name} NCAA logo site:sportslogos.net`)}`;
+      
+      const response = await fetch(ddgUrl, {
+        headers: { 
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      });
+      
+      if (!response.ok) continue;
+      
+      const html = await response.text();
+      
+      // Look for SportsLogos.net view URLs
+      const viewMatch = html.match(/sportslogos\.net\/logos\/view\/(\d+)\/([^"'\s]+)/i);
+      if (viewMatch) {
+        const logoId = viewMatch[1];
+        console.log(`Found SportsLogos.net ID: ${logoId} for ${collegeName}`);
+        return `https://content.sportslogos.net/logos/34/${logoId}/full/${viewMatch[2]}.png`;
+      }
+      
+      // Alternative: look for direct image links
+      const imageMatch = html.match(/content\.sportslogos\.net\/logos\/\d+\/\d+\/full\/[^"'\s]+\.png/i);
+      if (imageMatch) {
+        console.log(`Found SportsLogos.net image: ${imageMatch[0]} for ${collegeName}`);
+        return `https://${imageMatch[0]}`;
+      }
+      
+    } catch (e) {
+      console.error(`SportsLogos search failed for ${name}:`, e);
+    }
+  }
+  
+  return null;
+}
+
+// Try ESPN as another fallback
+async function searchESPNLogo(collegeName: string): Promise<string | null> {
+  try {
+    // Search for NCAA teams on ESPN API
+    const searchUrl = `https://site.api.espn.com/apis/site/v2/sports/golf/college-golf/teams?limit=100`;
+    
+    const response = await fetch(searchUrl, {
+      headers: { 'User-Agent': 'ClubHouz/1.0' }
+    });
+    
+    if (!response.ok) return null;
+    
+    const data = await response.json();
+    const teams = data?.sports?.[0]?.leagues?.[0]?.teams || [];
+    
+    // Find matching team
+    const normalizedSearch = collegeName.toLowerCase().replace(/\s+/g, '');
+    for (const teamData of teams) {
+      const team = teamData?.team;
+      if (!team) continue;
+      
+      const teamName = team.displayName?.toLowerCase().replace(/\s+/g, '') || '';
+      const shortName = team.shortDisplayName?.toLowerCase().replace(/\s+/g, '') || '';
+      const location = team.location?.toLowerCase().replace(/\s+/g, '') || '';
+      
+      if (teamName.includes(normalizedSearch) || 
+          shortName.includes(normalizedSearch) || 
+          location.includes(normalizedSearch) ||
+          normalizedSearch.includes(location)) {
+        // Found a match, get the logo
+        const logo = team.logos?.[0]?.href;
+        if (logo) {
+          console.log(`Found ESPN logo for ${collegeName}: ${logo}`);
+          return logo;
+        }
+      }
+    }
+    
+  } catch (e) {
+    console.error(`ESPN search failed for ${collegeName}:`, e);
+  }
+  
+  return null;
+}
+
+// Process a single college with multiple source fallbacks
 async function processCollege(college: { normalized_name: string; college_name: string }): Promise<{
   normalized_name: string;
   success: boolean;
   logo_url?: string;
+  source?: string;
   error?: string;
 }> {
   console.log(`Processing: ${college.college_name} (${college.normalized_name})`);
   
+  let logoUrl: string | null = null;
+  let source = 'unknown';
+  
   try {
-    // Search Wikipedia for the college
+    // 1. Try Wikipedia first
     const pageTitle = await searchWikipedia(college.college_name);
-    
-    if (!pageTitle) {
-      return { normalized_name: college.normalized_name, success: false, error: 'No Wikipedia page found' };
+    if (pageTitle) {
+      logoUrl = await extractLogoFromWikipedia(pageTitle);
+      if (logoUrl) source = 'wikipedia';
     }
     
-    // Extract logo URL
-    const logoUrl = await extractLogoFromWikipedia(pageTitle);
+    // 2. Try ESPN as fallback
+    if (!logoUrl) {
+      console.log(`Wikipedia failed for ${college.college_name}, trying ESPN...`);
+      logoUrl = await searchESPNLogo(college.college_name);
+      if (logoUrl) source = 'espn';
+    }
+    
+    // 3. Try SportsLogos.net as last resort
+    if (!logoUrl) {
+      console.log(`ESPN failed for ${college.college_name}, trying SportsLogos.net...`);
+      logoUrl = await searchSportsLogos(college.college_name);
+      if (logoUrl) source = 'sportslogos';
+    }
     
     if (!logoUrl) {
-      return { normalized_name: college.normalized_name, success: false, error: 'No logo found on Wikipedia page' };
+      return { 
+        normalized_name: college.normalized_name, 
+        success: false, 
+        error: 'No logo found from any source (Wikipedia, ESPN, SportsLogos.net)' 
+      };
     }
     
     // Download the image
     const imageData = await downloadImage(logoUrl);
     
     if (!imageData) {
-      return { normalized_name: college.normalized_name, success: false, error: 'Failed to download logo' };
+      return { normalized_name: college.normalized_name, success: false, error: `Failed to download logo from ${source}` };
     }
     
     // Upload to R2
@@ -289,7 +405,7 @@ async function processCollege(college: { normalized_name: string; college_name: 
       .from('college_media')
       .update({
         logo_url: r2Url,
-        source: 'wikipedia',
+        source: source,
         updated_at: new Date().toISOString()
       })
       .eq('normalized_name', college.normalized_name);
@@ -298,8 +414,8 @@ async function processCollege(college: { normalized_name: string; college_name: 
       throw new Error(`Database update failed: ${updateError.message}`);
     }
     
-    console.log(`✅ Success: ${college.college_name} -> ${r2Url}`);
-    return { normalized_name: college.normalized_name, success: true, logo_url: r2Url };
+    console.log(`✅ Success: ${college.college_name} -> ${r2Url} (source: ${source})`);
+    return { normalized_name: college.normalized_name, success: true, logo_url: r2Url, source };
     
   } catch (error) {
     console.error(`❌ Failed: ${college.college_name}:`, error);
