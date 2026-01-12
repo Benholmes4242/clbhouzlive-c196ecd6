@@ -1,6 +1,6 @@
 /**
- * ScheduleMonthHeader - Premium month section header for timeline
- * Refined visual weight and alignment
+ * ScheduleMonthHeader - Enhanced month section header for timeline
+ * Features: larger dot, prominent month name, subtle line, event count pill
  */
 
 import { cn } from '@/lib/utils';
@@ -19,26 +19,26 @@ export function ScheduleMonthHeader({
   return (
     <div 
       className={cn(
-        "sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-3 -mx-1 px-1 mb-4",
+        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm py-3 -mx-1 px-1 mb-4",
         className
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Timeline dot - aligned with event dots */}
-        <div className="relative w-2.5 h-2.5 flex items-center justify-center ml-[1px]">
-          <div className="w-2.5 h-2.5 rounded-full bg-primary/40 ring-4 ring-background" />
+        {/* Timeline dot - 8px, orange/primary filled */}
+        <div className="relative w-2 h-2 flex items-center justify-center">
+          <div className="w-2 h-2 rounded-full bg-primary ring-4 ring-background" />
         </div>
         
-        {/* Month label - reduced weight */}
-        <h3 className="text-base font-medium text-foreground tracking-tight">
+        {/* Month label - more prominent */}
+        <h3 className="text-lg font-semibold text-foreground tracking-tight">
           {monthLabel}
         </h3>
         
-        {/* Divider line */}
-        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+        {/* Horizontal line extending to edge */}
+        <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
         
-        {/* Event count - lighter still */}
-        <span className="text-sm text-muted-foreground/70 font-normal">
+        {/* Event count as subtle pill */}
+        <span className="text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full font-medium">
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
