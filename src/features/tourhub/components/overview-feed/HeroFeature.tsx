@@ -23,9 +23,9 @@ export function HeroFeature({ tournament, type, courseImageUrl }: HeroFeaturePro
       className: 'bg-red-500 text-white animate-pulse' 
     },
     recent: { 
-      text: 'MOST RECENT', 
+      text: 'Most Recent', 
       icon: <Trophy className="w-3 h-3" />, 
-      className: 'bg-black/50 backdrop-blur-md text-white/90 border border-white/15' 
+      className: 'bg-black/50 backdrop-blur-md text-white/90 border border-white/15'
     },
     upcoming: { 
       text: 'UPCOMING', 

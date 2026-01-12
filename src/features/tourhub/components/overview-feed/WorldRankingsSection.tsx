@@ -34,7 +34,7 @@ export function WorldRankingsSection() {
     <section className="bg-slate-50 -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
       {/* Header - standardized */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide">
           World Rankings
         </h3>
         <Link 
