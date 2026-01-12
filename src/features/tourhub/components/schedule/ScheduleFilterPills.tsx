@@ -45,7 +45,7 @@ export function ScheduleFilterPills({
       role="tablist"
       aria-label="Filter tournaments"
     >
-      <div className="flex items-center">
+      <div className="flex items-center justify-center">
         {options.map((option) => {
           const isActive = activeFilter === option.value;
           const count = counts[option.value];
