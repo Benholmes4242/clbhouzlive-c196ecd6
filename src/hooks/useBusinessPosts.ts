@@ -94,6 +94,7 @@ export function useBusinessPosts(businessId?: string) {
         `)
         .eq('actor_type', 'business')
         .eq('actor_id', businessId!)
+        .eq('status', 'published') // Only show published posts
         .or(visibilityFilter) // Apply visibility filter
         .order('created_at', { ascending: false });
 
@@ -121,7 +122,8 @@ export function useBusinessPostsCount(businessId?: string) {
         .from('posts')
         .select('*', { count: 'exact', head: true })
         .eq('actor_type', 'business')
-        .eq('actor_id', businessId!);
+        .eq('actor_id', businessId!)
+        .eq('status', 'published');
 
       if (error) {
         console.error('[useBusinessPostsCount] error', error);

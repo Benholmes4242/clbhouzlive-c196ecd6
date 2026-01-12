@@ -74,6 +74,7 @@ export function useInfiniteBusinessTaggedPosts(options: UseInfiniteBusinessTagge
         `)
         .in('id', postIds as string[])
         .eq('visibility', 'anyone')
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .range(startRange, endRange);
 

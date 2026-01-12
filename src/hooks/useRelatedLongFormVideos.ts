@@ -146,6 +146,7 @@ export const useRelatedLongFormVideos = (
           .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
           .not('post_media.duration_seconds', 'is', null)
           .neq('id', videoId)
+          .eq('status', 'published') // Only show published posts
           .order('created_at', { ascending: false })
           .limit(5);
 
@@ -176,6 +177,7 @@ export const useRelatedLongFormVideos = (
               .eq('post_media.media_type', 'video')
               .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
               .not('post_media.duration_seconds', 'is', null)
+              .eq('status', 'published') // Only show published posts
               .order('created_at', { ascending: false })
               .limit(6);
 
@@ -201,6 +203,7 @@ export const useRelatedLongFormVideos = (
           .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
           .not('post_media.duration_seconds', 'is', null)
           .gte('created_at', sevenDaysAgo.toISOString())
+          .eq('status', 'published') // Only show published posts
           .order('created_at', { ascending: false })
           .limit(15);
 
@@ -220,6 +223,7 @@ export const useRelatedLongFormVideos = (
           .eq('post_media.media_type', 'video')
           .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
           .not('post_media.duration_seconds', 'is', null)
+          .eq('status', 'published') // Only show published posts
           .order('created_at', { ascending: false })
           .limit(20);
 

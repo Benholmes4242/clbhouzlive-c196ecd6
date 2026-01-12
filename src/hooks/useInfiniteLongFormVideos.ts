@@ -128,7 +128,8 @@ export function useInfiniteLongFormVideos(options: UseInfiniteLongFormVideosOpti
         .eq('post_media.media_type', 'video')
         .gte('post_media.duration_seconds', minDuration)
         .not('post_media.duration_seconds', 'is', null)
-        .eq('visibility', 'anyone');
+        .eq('visibility', 'anyone')
+        .eq('status', 'published'); // Only show published posts
 
       // Filter by specific creator if provided
       if (creatorUserId) {

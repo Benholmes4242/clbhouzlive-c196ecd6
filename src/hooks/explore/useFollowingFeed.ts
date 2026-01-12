@@ -54,6 +54,7 @@ export function useFollowingFeed(pageSize = 12) {
         .in('user_id', followedIds)
         .eq('post_media.media_type', 'video')
         .or(visibilityFilter)
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .range(nextOffset, nextOffset + pageSize - 1);
 
@@ -69,6 +70,7 @@ export function useFollowingFeed(pageSize = 12) {
         .in('user_id', followedIds)
         .eq('post_media.media_type', 'image')
         .or(visibilityFilter)
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .range(nextOffset, nextOffset + pageSize - 1);
 

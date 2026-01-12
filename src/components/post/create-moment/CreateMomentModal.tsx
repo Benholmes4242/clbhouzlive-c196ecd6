@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
-import { Bookmark, FileEdit } from "lucide-react";
+import { Bookmark, FileEdit, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -13,6 +13,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useStudio } from "@/hooks/useStudio";
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDrafts } from '@/hooks/useDrafts';
+import { useScheduledPosts } from '@/hooks/useScheduledPosts';
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import { enqueuePostUpload } from "@/uploads/uploadPipeline";
@@ -24,6 +25,7 @@ import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
 import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet, ScheduleSheet } from "./sheets";
+import { ScheduledPostsList } from "@/components/post/scheduled";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
 import type { DraftWithMedia } from "@/services/drafts";
 
@@ -83,6 +85,7 @@ export default function CreateMomentModal({
   const [showSmartCompilationSheet, setShowSmartCompilationSheet] = useState(false);
   const [showDraftsSheet, setShowDraftsSheet] = useState(false);
   const [showScheduleSheet, setShowScheduleSheet] = useState(false);
+  const [showScheduledPostsSheet, setShowScheduledPostsSheet] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   
   // Get user session
@@ -100,6 +103,9 @@ export default function CreateMomentModal({
     isUploadingMedia,
     draftMediaToComposerItem,
   } = useDrafts();
+  
+  // Scheduled posts
+  const { count: scheduledCount } = useScheduledPosts();
   
   // Auto-save timer ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -848,8 +854,24 @@ export default function CreateMomentModal({
             {/* Center: Grabber */}
             <div className="cm-grabber" />
             
-            {/* Right: Save Draft button */}
-            <div className="w-10 flex justify-end">
+            {/* Right: Scheduled + Save Draft buttons */}
+            <div className="flex items-center gap-1.5">
+              {/* Scheduled posts button */}
+              {scheduledCount > 0 && (
+                <button
+                  onClick={() => setShowScheduledPostsSheet(true)}
+                  className="flex items-center justify-center w-9 h-9 rounded-full transition-colors relative"
+                  style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
+                  aria-label={`View ${scheduledCount} scheduled posts`}
+                >
+                  <Clock size={16} style={{ color: 'var(--cm-text-secondary)' }} />
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-[10px] font-semibold text-primary-foreground flex items-center justify-center">
+                    {scheduledCount > 9 ? '9+' : scheduledCount}
+                  </span>
+                </button>
+              )}
+              
+              {/* Save Draft button */}
               {(hasMedia || caption.trim()) && (
                 <button
                   onClick={handleSaveDraft}
@@ -1137,6 +1159,12 @@ export default function CreateMomentModal({
         onClose={() => setShowScheduleSheet(false)}
         onSchedule={handleSchedulePost}
         isScheduling={isScheduling}
+      />
+      
+      {/* Scheduled Posts List */}
+      <ScheduledPostsList
+        isOpen={showScheduledPostsSheet}
+        onClose={() => setShowScheduledPostsSheet(false)}
       />
     </div>
   );
