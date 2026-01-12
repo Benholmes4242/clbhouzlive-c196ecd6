@@ -54,11 +54,11 @@ export function WorldRankingsSection() {
             <Link
               key={player.playerId}
               to={`/tourhub/player/${player.playerId}`}
-              className="flex-shrink-0 w-[140px] min-h-[170px] group"
+              className="flex-shrink-0 w-[140px] group"
             >
               <div 
                 className={`
-                  relative min-h-[170px] rounded-xl p-3.5 flex flex-col
+                  h-[175px] rounded-xl p-3.5 flex flex-col
                   bg-white shadow-sm border border-slate-100
                   transition-all group-hover:shadow-lg group-hover:border-slate-200
                   ${isFirst 
@@ -67,21 +67,21 @@ export function WorldRankingsSection() {
                   }
                 `}
               >
-                {/* Rank number - top left, larger and bolder */}
+                {/* Rank number - top left */}
                 <span 
                   className={`
-                    text-3xl font-extrabold leading-none
+                    text-2xl font-extrabold leading-none flex-shrink-0
                     ${isFirst ? 'text-amber-500' : 'text-slate-300'}
                   `}
                 >
                   {player.worldRank}
                 </span>
                 
-                {/* Player info (avatar + full name + country) */}
-                <div className="flex-1 flex flex-col items-center justify-center">
+                {/* Avatar - centered, fixed size */}
+                <div className="flex-shrink-0 flex justify-center mt-2">
                   <div 
                     className={`
-                      w-14 h-14 rounded-full flex items-center justify-center overflow-hidden
+                      w-12 h-12 rounded-full flex items-center justify-center overflow-hidden
                       ${isFirst 
                         ? 'bg-gradient-to-br from-amber-100 to-amber-200 ring-2 ring-amber-400' 
                         : 'bg-slate-100'
@@ -95,20 +95,24 @@ export function WorldRankingsSection() {
                         className="w-full h-full rounded-full object-cover object-top"
                       />
                     ) : (
-                      <span className={`text-base font-bold ${isFirst ? 'text-amber-600' : 'text-slate-500'}`}>
+                      <span className={`text-sm font-bold ${isFirst ? 'text-amber-600' : 'text-slate-500'}`}>
                         {getInitials(player.playerName)}
                       </span>
                     )}
                   </div>
+                </div>
 
-                  <p className="mt-2 text-sm font-medium text-foreground text-center leading-tight">
+                {/* Name area - fixed height for 2 lines */}
+                <div className="flex-shrink-0 h-[36px] flex items-start justify-center mt-2">
+                  <p className="text-sm font-medium text-foreground text-center leading-tight line-clamp-2">
                     {player.playerName}
                   </p>
-
-                  <p className="mt-0.5 text-[10px] text-muted-foreground text-center">
-                    {toTitleCase(player.country) || 'Unknown'}
-                  </p>
                 </div>
+
+                {/* Country - pinned to bottom */}
+                <p className="flex-shrink-0 text-[10px] text-muted-foreground text-center mt-auto">
+                  {toTitleCase(player.country) || 'Unknown'}
+                </p>
               </div>
             </Link>
           );
