@@ -36,6 +36,9 @@ export interface PostMediaContext {
   filterIds?: (string | null)[];      // filter IDs per media item
 }
 
+/** Processing status for media with studio edits */
+export type ProcessingStatus = 'pending' | 'processing' | 'complete' | 'failed' | null;
+
 /** Raw DB row shape(s). Extend if needed. */
 export interface DbMediaRow {
   id: string;
@@ -43,6 +46,8 @@ export interface DbMediaRow {
   media_url: string;
   poster_url?: string | null;
   file_name?: string | null;
+  original_media_url?: string | null;
+  processing_status?: ProcessingStatus;
   // optional extras
   display_order?: number | null;
   duration?: number | null;
