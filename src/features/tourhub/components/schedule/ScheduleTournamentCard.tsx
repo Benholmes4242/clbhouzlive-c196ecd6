@@ -1,8 +1,11 @@
 /**
- * ScheduleTournamentCard - Full-width cinematic card
+ * ScheduleTournamentCard - Full-width cinematic card with flowing design
  * 
- * Course image as background with dark gradient overlay
- * All text in white for legibility
+ * Features:
+ * - Course image as background with softer gradient overlay
+ * - Vignette effects for seamless transitions
+ * - Subtle status badge
+ * - Improved text hierarchy
  */
 
 import { Link } from 'react-router-dom';
@@ -29,13 +32,13 @@ function StatusBadge({ status }: { status: string }) {
   
   return (
     <span className={cn(
-      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
-      'bg-white/20 text-white backdrop-blur-sm'
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium',
+      'bg-black/30 text-white/90 backdrop-blur-sm'
     )}>
       {c.pulse && (
-        <span className="relative flex h-2 w-2">
+        <span className="relative flex h-1.5 w-1.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
         </span>
       )}
       {c.label}
@@ -59,11 +62,15 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn(
-        "block relative -mr-4 h-[150px]",
+        "block relative -mr-4 h-[140px]",
         "transition-all duration-300 ease-out",
-        "hover:brightness-110",
+        "hover:brightness-105",
         className
       )}
+      style={{
+        // Subtle inner shadow for softer edges
+        boxShadow: 'inset 0 0 40px rgba(0,0,0,0.08)'
+      }}
     >
       {/* Background Image or Grey Fallback - edge to edge */}
       {hasImage ? (
@@ -76,52 +83,55 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         <div className="absolute inset-0 bg-gray-300" />
       )}
       
-      {/* Dark Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      {/* Top vignette - subtle fade in from top */}
+      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/25 to-transparent" />
       
-      {/* Status Badge - Top Right */}
-      <div className="absolute top-3 right-4 z-10">
+      {/* Bottom gradient overlay - slightly lighter */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      
+      {/* Status Badge - Top Right, more subtle */}
+      <div className="absolute top-2.5 right-4 z-10">
         <StatusBadge status={tournament.status} />
       </div>
       
       {/* Content - Bottom with internal padding */}
-      <div className="absolute inset-0 px-4 py-4 flex flex-col justify-end">
+      <div className="absolute inset-0 px-4 py-3 flex flex-col justify-end">
         {/* Tournament Name */}
-        <h3 className="text-lg font-semibold text-white leading-tight line-clamp-1 mb-1">
+        <h3 className="text-lg font-semibold text-white leading-tight line-clamp-1 mb-0.5">
           {tournament.name}
         </h3>
         
-        {/* Date */}
-        <p className="text-sm text-white/80 mb-1">
+        {/* Date - slightly brighter */}
+        <p className="text-sm text-white/90 mb-0.5">
           {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
         </p>
         
-        {/* Venue */}
+        {/* Venue - medium opacity */}
         {(tournament.venue_name || tournament.venue_city) && (
-          <div className="flex items-center gap-1.5 text-sm text-white/70 mb-2">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
+          <div className="flex items-center gap-1.5 text-sm text-white/70 mb-1.5">
+            <MapPin className="w-3 h-3 shrink-0" />
             <span className="truncate">
               {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(' • ')}
             </span>
           </div>
         )}
         
-        {/* Stats row */}
-        <div className="flex flex-wrap items-center gap-1.5 text-sm text-white/70">
+        {/* Stats row - most subtle */}
+        <div className="flex flex-wrap items-center gap-1.5 text-sm text-white/60">
           {tournament.purse && (
-            <span className="font-semibold text-emerald-400">
+            <span className="font-medium text-emerald-400/90">
               ${(tournament.purse / 1_000_000).toFixed(1)}M
             </span>
           )}
           {tournament.venue_par && (
             <>
-              <span className="text-white/40">•</span>
+              <span className="text-white/30">•</span>
               <span>Par {tournament.venue_par}</span>
             </>
           )}
           {tournament.venue_yardage && (
             <>
-              <span className="text-white/40">•</span>
+              <span className="text-white/30">•</span>
               <span>{tournament.venue_yardage.toLocaleString()} yds</span>
             </>
           )}

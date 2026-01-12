@@ -215,8 +215,8 @@ export function ScheduleTab() {
                 eventCount={group.tournaments.length}
               />
 
-              {/* Tournaments - Full-bleed right side only */}
-              <div className="pl-5 border-l border-border/40 ml-[5px] space-y-4 mt-4">
+              {/* Tournaments - Flowing feed with reduced gap */}
+              <div className="pl-5 border-l border-border/40 ml-[5px] space-y-2">
                 {group.tournaments.map((tournament) => (
                   <ScheduleTournamentCard 
                     key={tournament.id}

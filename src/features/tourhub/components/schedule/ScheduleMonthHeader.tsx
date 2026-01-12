@@ -6,7 +6,7 @@
  * - Prominent month/year text
  * - Horizontal line extending to edge
  * - Event count right-aligned
- * - 32px top margin
+ * - Equal spacing above and below (py-6) for centered feel between cards
  */
 
 import { cn } from '@/lib/utils';
@@ -25,7 +25,7 @@ export function ScheduleMonthHeader({
   return (
     <div 
       className={cn(
-        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm pt-8 pb-4 first:pt-0",
+        "sticky top-12 z-10 bg-background/95 backdrop-blur-sm py-6 first:pt-0",
         className
       )}
     >
