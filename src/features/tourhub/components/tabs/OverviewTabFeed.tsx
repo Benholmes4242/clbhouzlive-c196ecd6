@@ -70,43 +70,55 @@ export function OverviewTabFeed() {
   }
 
   return (
-    <div className="space-y-12 pb-8">
-      {/* 1. Hero Feature - Full bleed */}
-      {featuredTournament && (
-        <HeroFeature
-          tournament={featuredTournament.tournament}
-          type={featuredTournament.type}
-          courseImageUrl={heroImageUrl}
+    <div className="pb-8">
+      {/* 1. Hero Feature - Full bleed (white background) */}
+      <div className="bg-white -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+        {featuredTournament && (
+          <HeroFeature
+            tournament={featuredTournament.tournament}
+            type={featuredTournament.type}
+            courseImageUrl={heroImageUrl}
+          />
+        )}
+      </div>
+
+      {/* 2. World Rankings - slate-50 background */}
+      <div className="bg-slate-50 -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+        <WorldRankingsSection />
+      </div>
+
+      {/* 3. Season Snapshot Strip - white background */}
+      <div className="bg-white -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+        <FeatureStrip topPlayers={seasonLeaders} />
+      </div>
+
+      {/* 4. Top Players - slate-50 background */}
+      <div className="bg-slate-50 -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+        <PlayersFeed
+          players={topPlayersData.players}
+          maxEvents={topPlayersData.maxEvents}
+          maxCuts={topPlayersData.maxCuts}
         />
-      )}
+      </div>
 
-      {/* 2. World Rankings - Dark charcoal section */}
-      <WorldRankingsSection />
+      {/* 5. Season Leaders - white background */}
+      <div className="bg-white -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+        <LeadersPhotoCards leaders={seasonLeaders} />
+      </div>
 
-      {/* 3. Season Snapshot Strip */}
-      <FeatureStrip
-        topPlayers={seasonLeaders}
-      />
+      {/* 6. Tour Venues - slate-50 background */}
+      <div className="bg-slate-50 -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+        <CoursesPhotoGrid 
+          courses={featuredCourses} 
+          courseImages={courseImages}
+        />
+      </div>
 
-      {/* 4. Top Players - Photo-led feed */}
-      <PlayersFeed
-        players={topPlayersData.players}
-        maxEvents={topPlayersData.maxEvents}
-        maxCuts={topPlayersData.maxCuts}
-      />
-
-      {/* 5. Season Leaders - Photo cards */}
-      <LeadersPhotoCards leaders={seasonLeaders} />
-
-      {/* 6. Tour Venues - Photo grid */}
-      <CoursesPhotoGrid 
-        courses={featuredCourses} 
-        courseImages={courseImages}
-      />
-
-      {/* 7. Coming Soon - subtle footer */}
+      {/* 7. Coming Soon - white background */}
       {unlockingSoonItems.length > 0 && (
-        <DataUnlocking items={unlockingSoonItems} />
+        <div className="bg-white -mx-4 px-4 py-6 sm:-mx-6 sm:px-6">
+          <DataUnlocking items={unlockingSoonItems} />
+        </div>
       )}
     </div>
   );
