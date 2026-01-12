@@ -59,7 +59,7 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn(
-        "block relative -mx-4 h-[150px]",
+        "block relative -mr-4 h-[150px]",
         "transition-all duration-300 ease-out",
         "hover:brightness-110",
         className
