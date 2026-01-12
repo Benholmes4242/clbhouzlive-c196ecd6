@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
+import { Bookmark, FileEdit } from "lucide-react";
+import { toast } from "sonner";
 import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useModalContext } from '@/contexts/ModalContext';
@@ -10,6 +12,7 @@ import { useChromeState } from '@/hooks/useChromeState';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useStudio } from "@/hooks/useStudio";
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useDrafts } from '@/hooks/useDrafts';
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import { enqueuePostUpload } from "@/uploads/uploadPipeline";
@@ -20,9 +23,9 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentCanvas from "./CreateMomentCanvas";
 import CreateMomentControlBar from "./CreateMomentControlBar";
-import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet } from "./sheets";
-import { useDraftPersistence } from "./useDraftPersistence";
+import { MomentCategorySheet, MomentAudienceSheet, EnhanceMomentSheet, MomentBadgesSheet, AiCaptionSheet, SmartCompilationSheet, DraftsListSheet } from "./sheets";
 import { CreateMomentProps, GolfCourse, TaggableEntity, MomentVisibility } from "./types";
+import type { DraftWithMedia } from "@/services/drafts";
 
 // Animation constants
 const ECM_ENTRY_DURATION = 500;
@@ -78,9 +81,20 @@ export default function CreateMomentModal({
   const [showBadgesSheet, setShowBadgesSheet] = useState(false);
   const [showAiCaptionSheet, setShowAiCaptionSheet] = useState(false);
   const [showSmartCompilationSheet, setShowSmartCompilationSheet] = useState(false);
+  const [showDraftsSheet, setShowDraftsSheet] = useState(false);
   
   // Get user session
   const { user } = useSupabaseSession();
+
+  // Database-backed drafts
+  const { 
+    drafts, 
+    draftCount, 
+    createDraft, 
+    deleteDraft, 
+    canCreateDraft,
+    isCreating: isSavingDraft,
+  } = useDrafts();
 
   // Hooks
   const {
@@ -123,8 +137,6 @@ export default function CreateMomentModal({
   const handleTogglePositionMode = () => {
     setIsPositioningText(prev => !prev);
   };
-
-  const { hasDraft, saveDraft, clearDraft, restoreDraft } = useDraftPersistence();
 
   // Derived state
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
@@ -259,8 +271,8 @@ export default function CreateMomentModal({
       setSelectedBadges([]);
       setVisibility('anyone');
       
-      // Check for draft
-      if (hasDraft) {
+      // Check for drafts (DB-backed)
+      if (draftCount > 0) {
         setShowDraftPrompt(true);
       }
       
@@ -273,7 +285,7 @@ export default function CreateMomentModal({
     }
 
     wasOpenRef.current = isOpen;
-  }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility, mediaItems, hasEdits, clearEdits, hasDraft]);
+  }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility, mediaItems, hasEdits, clearEdits, draftCount]);
 
   // Slide-in animation
   useEffect(() => {
@@ -295,19 +307,9 @@ export default function CreateMomentModal({
     });
   }, [isOpen]);
 
-  // Animated close
+  // Animated close - no longer auto-saves to draft on close
+  // Users must explicitly save drafts via the Save Draft button
   const animateAndClose = useCallback(() => {
-    // Save draft on close if there's content
-    if (caption.trim() || course) {
-      saveDraft({
-        caption,
-        actorType: activeActor?.type || 'personal',
-        actorId: activeActor?.id,
-        course,
-        visibility: snapVisibility,
-      });
-    }
-
     if (prefersReduced() || typeof window === 'undefined') {
       onClose();
       return;
@@ -319,7 +321,7 @@ export default function CreateMomentModal({
     setTimeout(() => {
       onClose();
     }, ECM_EXIT_DURATION);
-  }, [onClose, caption, course, saveDraft, activeActor, snapVisibility]);
+  }, [onClose]);
 
   // Touch handlers for swipe-to-dismiss - HANDLE-ONLY
   // Only allow dismiss from the grabber handle area, not from hero/thumbnails
@@ -548,7 +550,6 @@ export default function CreateMomentModal({
         badges: selectedBadges,
       });
       
-      clearDraft();
       onClose();
     } catch (error) {
       console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
@@ -556,23 +557,75 @@ export default function CreateMomentModal({
     }
   };
 
-  // Restore draft handler
-  const handleRestoreDraft = () => {
-    const draft = restoreDraft();
-    if (draft) {
-      setCaption(draft.caption);
-      if (draft.course) {
-        setSelectedCourse(draft.course);
-        onCourseSelect?.(draft.course);
+  // Save draft handler (new DB-backed approach)
+  const handleSaveDraft = async () => {
+    if (!user || !canCreateDraft) {
+      if (!canCreateDraft) {
+        toast.error('Draft limit reached (10 max)');
       }
-      setSnapVisibility(draft.visibility);
+      return;
     }
-    setShowDraftPrompt(false);
+    
+    try {
+      await createDraft({
+        actorType: activeActor?.type || 'personal',
+        actorId: activeActor?.id || user.id,
+        content: caption || null,
+        visibility,
+        categories: selectedCategories,
+        badges: selectedBadges,
+        courseId: course?.id || null,
+        courseName: course?.name || null,
+        courseCountry: course?.country || null,
+        studioMusic: null, // TODO: extract from studio edits
+        audioMode: null,
+      });
+      toast.success('Draft saved');
+    } catch (error) {
+      console.error('[CreateMomentModal] Failed to save draft:', error);
+      toast.error('Failed to save draft');
+    }
   };
 
-  // Discard draft handler
-  const handleDiscardDraft = () => {
-    clearDraft();
+  // Load draft handler (from DraftsListSheet)
+  const handleLoadDraft = (draft: DraftWithMedia) => {
+    // Restore caption
+    setCaption(draft.content || '');
+    
+    // Restore visibility
+    setVisibility(draft.visibility);
+    
+    // Restore categories and badges
+    setSelectedCategories(draft.categories || []);
+    setSelectedBadges(draft.badges || []);
+    
+    // Restore course if available
+    if (draft.courseId && draft.courseName && draft.courseCountry) {
+      const restoredCourse: GolfCourse = {
+        id: draft.courseId,
+        name: draft.courseName,
+        country: draft.courseCountry,
+      };
+      setSelectedCourse(restoredCourse);
+      onCourseSelect?.(restoredCourse);
+    }
+    
+    // Note: Media restoration would require downloading from storage
+    // For now, drafts restore text content only
+    // Media can be added fresh after loading a draft
+    
+    setShowDraftPrompt(false);
+    toast.success('Draft loaded');
+  };
+
+  // View drafts handler
+  const handleViewDrafts = () => {
+    setShowDraftPrompt(false);
+    setShowDraftsSheet(true);
+  };
+
+  // Dismiss draft prompt
+  const handleDismissDraftPrompt = () => {
     setShowDraftPrompt(false);
   };
 
@@ -620,13 +673,49 @@ export default function CreateMomentModal({
             background: 'var(--cm-surface-alt)',
           }}
         >
-          {/* Grabber bar - swipe-to-dismiss handle area */}
+          {/* Header bar with grabber, save draft, and drafts access */}
           <div 
             data-ecm-handle="true"
-            className="absolute left-0 right-0 flex justify-center py-3 z-30"
+            className="absolute left-0 right-0 flex items-center justify-between px-4 py-3 z-30"
             style={{ top: 'env(safe-area-inset-top, 0px)' }}
           >
+            {/* Left: Drafts button (if has drafts) */}
+            <div className="w-10">
+              {draftCount > 0 && (
+                <button
+                  onClick={() => setShowDraftsSheet(true)}
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+                  style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
+                  aria-label="View drafts"
+                >
+                  <FileEdit size={16} style={{ color: 'var(--cm-text-secondary)' }} />
+                  <span 
+                    className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-semibold rounded-full"
+                    style={{ background: 'var(--cm-surface-slate)', color: 'white' }}
+                  >
+                    {draftCount}
+                  </span>
+                </button>
+              )}
+            </div>
+            
+            {/* Center: Grabber */}
             <div className="cm-grabber" />
+            
+            {/* Right: Save Draft button */}
+            <div className="w-10 flex justify-end">
+              {(hasMedia || caption.trim()) && (
+                <button
+                  onClick={handleSaveDraft}
+                  disabled={isSavingDraft || !canCreateDraft}
+                  className="flex items-center justify-center w-9 h-9 rounded-full transition-colors disabled:opacity-50"
+                  style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
+                  aria-label="Save draft"
+                >
+                  <Bookmark size={16} style={{ color: 'var(--cm-text-secondary)' }} />
+                </button>
+              )}
+            </div>
           </div>
           {hasMedia ? (
             <CreateMomentMediaStage
@@ -725,9 +814,9 @@ export default function CreateMomentModal({
           className="pointer-events-none absolute inset-0 z-[1010]"
         />
 
-        {/* Draft prompt - light slate */}
+        {/* Draft prompt - updated for DB-backed drafts */}
         <AnimatePresence>
-          {showDraftPrompt && (
+          {showDraftPrompt && draftCount > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -739,21 +828,23 @@ export default function CreateMomentModal({
                 boxShadow: 'var(--cm-shadow-soft)',
               }}
             >
-              <p className="text-sm font-medium mb-3" style={{ color: 'var(--cm-text-primary)' }}>Resume your draft?</p>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--cm-text-primary)' }}>
+                You have {draftCount} saved draft{draftCount !== 1 ? 's' : ''}
+              </p>
               <div className="flex gap-2">
                 <button
-                  onClick={handleRestoreDraft}
+                  onClick={handleViewDrafts}
                   className="flex-1 py-2 rounded-xl text-sm font-medium"
                   style={{ background: 'var(--cm-surface-slate)', color: 'white' }}
                 >
-                  Resume
+                  View Drafts
                 </button>
                 <button
-                  onClick={handleDiscardDraft}
+                  onClick={handleDismissDraftPrompt}
                   className="flex-1 py-2 rounded-xl text-sm"
                   style={{ background: 'var(--cm-surface-alt)', color: 'var(--cm-text-secondary)', border: '1px solid var(--cm-border-subtle)' }}
                 >
-                  Discard
+                  Start Fresh
                 </button>
               </div>
             </motion.div>
@@ -863,6 +954,13 @@ export default function CreateMomentModal({
           setActiveMediaId(compiledMedia.id);
           setCoverMediaId(compiledMedia.id);
         }}
+      />
+
+      {/* Drafts List Sheet */}
+      <DraftsListSheet
+        isOpen={showDraftsSheet}
+        onClose={() => setShowDraftsSheet(false)}
+        onLoadDraft={handleLoadDraft}
       />
     </div>
   );
