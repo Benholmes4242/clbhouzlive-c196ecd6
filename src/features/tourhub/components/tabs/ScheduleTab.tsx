@@ -163,8 +163,8 @@ export function ScheduleTab() {
   
   return (
     <div className="min-h-screen">
-      {/* Featured Hero - Full Width Full Bleed (no borders, no padding) */}
-      {featured && filter === 'all' && !search && (
+      {/* Featured Hero - Always visible, independent of tab selection */}
+      {featured && !search && (
         <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6">
           <ScheduleHeroCard 
             tournament={featured.tournament} 
