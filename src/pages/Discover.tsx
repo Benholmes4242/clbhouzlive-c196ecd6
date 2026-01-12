@@ -256,7 +256,8 @@ const Discover = () => {
     
     if (clickedIndex !== -1) {
       setCurrentFullscreenPostId(item.id); // Set initial post
-      openFullscreen(playlist, clickedIndex);
+      // CRITICAL: Pass focusItemId so fullscreen viewer can find the item after deduplication
+      openFullscreen(playlist, clickedIndex, item.id);
     }
   }, [allContent, openFullscreen]);
 

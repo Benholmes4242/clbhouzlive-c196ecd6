@@ -202,23 +202,66 @@ export function UnifiedFullscreenViewer<T>({
   const deduplicatedItems = useMemo(() => {
     const seen = new Set<string>();
     const result: T[] = [];
+    const duplicateIds: string[] = [];
     for (const item of items) {
       const id = adapter.getId(item);
       if (!seen.has(id)) {
         seen.add(id);
         result.push(item);
+      } else {
+        duplicateIds.push(id.slice(0, 8));
       }
+    }
+    if (duplicateIds.length > 0) {
+      console.log('[Fullscreen] Deduplication removed:', duplicateIds.length, 'items:', duplicateIds.slice(0, 5));
     }
     return result;
   }, [items, adapter]);
 
-  // Recalculate initialIndex after deduplication
+  // CRITICAL FIX: Recalculate initialIndex after deduplication by finding the item
+  // The old logic just clamped the index, but if items were removed BEFORE the index,
+  // the index would point to the wrong item!
   const adjustedInitialIndex = useMemo(() => {
-    if (initialIndex >= deduplicatedItems.length) {
-      return Math.max(0, deduplicatedItems.length - 1);
+    let resolvedIndex = initialIndex;
+    let method = 'fallback';
+    
+    // If we have a focusItemId, use that to find the correct index
+    if (focusItemId) {
+      const focusIndex = deduplicatedItems.findIndex(item => adapter.getId(item) === focusItemId);
+      if (focusIndex !== -1) {
+        resolvedIndex = focusIndex;
+        method = 'focusItemId';
+      }
     }
-    return initialIndex;
-  }, [initialIndex, deduplicatedItems.length]);
+    
+    // Otherwise, try to find the original item at initialIndex in the original array
+    // and locate it in the deduplicated array
+    if (method === 'fallback' && initialIndex >= 0 && initialIndex < items.length) {
+      const originalItem = items[initialIndex];
+      const originalId = adapter.getId(originalItem);
+      const newIndex = deduplicatedItems.findIndex(item => adapter.getId(item) === originalId);
+      if (newIndex !== -1) {
+        resolvedIndex = newIndex;
+        method = 'originalItem';
+      }
+    }
+    
+    // Fallback: clamp to valid range
+    if (resolvedIndex >= deduplicatedItems.length) {
+      resolvedIndex = Math.max(0, deduplicatedItems.length - 1);
+      method = 'clamped';
+    }
+    
+    console.log('[Fullscreen] Index adjustment:', {
+      initialIndex,
+      adjustedIndex: resolvedIndex,
+      method,
+      focusItemId: focusItemId?.slice(0, 8),
+      targetItemId: deduplicatedItems[resolvedIndex] ? adapter.getId(deduplicatedItems[resolvedIndex])?.slice(0, 8) : 'none',
+    });
+    
+    return resolvedIndex;
+  }, [initialIndex, items, deduplicatedItems, adapter, focusItemId]);
 
   const queryClient = useQueryClient();
   const { softResume } = useSoftResume();
