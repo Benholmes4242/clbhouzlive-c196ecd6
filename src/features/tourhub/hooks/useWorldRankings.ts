@@ -54,24 +54,6 @@ export function getInitials(name: string): string {
 }
 
 /**
- * CDN base URL for player headshots
- */
-const CDN_BASE_URL = 'https://media.clbhouz.co.uk';
-
-/**
- * Resolve photo URL - prefix with CDN if it's a relative path
- */
-function resolvePhotoUrl(photoUrl: string | null | undefined): string | null {
-  if (!photoUrl) return null;
-  // Already absolute URL
-  if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
-    return photoUrl;
-  }
-  // Relative path - prefix with CDN
-  return `${CDN_BASE_URL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
-}
-
-/**
  * Extract world rank from player stats raw_data
  */
 function extractWorldRank(stat: any): number | null {
@@ -124,7 +106,7 @@ export function useWorldRankings(options?: { limit?: number }) {
           playerName: stat.player?.full_name || 'Unknown',
           country: stat.player?.country,
           countryCode: stat.player?.country_code,
-          photoUrl: resolvePhotoUrl(stat.player?.photo_url),
+          photoUrl: stat.player?.photo_url,
           worldRank,
           earnings: extractEarnings(stat),
           eventsPlayed: stat.events_played,

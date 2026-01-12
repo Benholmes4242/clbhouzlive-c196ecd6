@@ -17,7 +17,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings } from '../../hooks/useWorldRankings';
 import { useCollegeLookup } from '../../hooks/useCollegeMedia';
-import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import {
   WorldRankingsCarousel,
@@ -59,61 +58,6 @@ const TAB_DEFAULT_SORT: Record<PlayerFilterType, PlayerSortType> = {
   'most-active': 'alphabetical',
   'rookies': 'alphabetical',
 };
-
-/**
- * CDN base URL for player headshots
- */
-const CDN_BASE_URL = 'https://media.clbhouz.co.uk';
-
-/**
- * Resolve photo URL - prefix with CDN if it's a relative path
- */
-function resolvePhotoUrl(photoUrl: string | null | undefined): string | null {
-  if (!photoUrl) return null;
-  // Already absolute URL
-  if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
-    return photoUrl;
-  }
-  // Relative path - prefix with CDN
-  return `${CDN_BASE_URL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
-}
-
-/**
- * Sub-component to batch-fetch headshots for visible players
- */
-interface PlayerListWithHeadshotsProps {
-  players: TourPlayer[];
-  statsMap: Map<string, TourPlayerStatistics & { worldRank?: number | null }>;
-  getCollege: (collegeName: string | null | undefined) => import('../../hooks/useCollegeMedia').CollegeMedia | null;
-  statDisplay: 'rank' | 'events' | 'wins';
-}
-
-function PlayerListWithHeadshots({ players, statsMap, getCollege, statDisplay }: PlayerListWithHeadshotsProps) {
-  // Batch fetch headshots for all visible players
-  const playerIds = useMemo(() => players.map(p => p.id), [players]);
-  const { data: headshotMap } = usePlayerHeadshots(playerIds);
-
-  return (
-    <div className="space-y-0">
-      {players.map((player) => {
-        // Resolve photo URL with CDN prefix
-        const resolvedPhotoUrl = resolvePhotoUrl(player.photo_url);
-        const headshotUrl = headshotMap?.get(player.id);
-        
-        return (
-          <PlayerRow
-            key={player.id}
-            player={player}
-            stats={statsMap.get(player.id)}
-            college={getCollege(player.college)}
-            headshotUrl={headshotUrl || resolvedPhotoUrl}
-            statDisplay={statDisplay}
-          />
-        );
-      })}
-    </div>
-  );
-}
 
 export function PlayersTab() {
   const [search, setSearch] = useState('');
@@ -413,12 +357,17 @@ export function PlayersTab() {
         </div>
       ) : processedPlayers.length > 0 ? (
         // Flat list with subtle dividers
-        <PlayerListWithHeadshots 
-          players={processedPlayers.slice(0, 200)}
-          statsMap={statsMap}
-          getCollege={getCollege}
-          statDisplay={statDisplay}
-        />
+        <div className="space-y-0">
+          {processedPlayers.slice(0, 200).map((player) => (
+            <PlayerRow
+              key={player.id}
+              player={player}
+              stats={statsMap.get(player.id)}
+              college={getCollege(player.college)}
+              statDisplay={statDisplay}
+            />
+          ))}
+        </div>
       ) : (
         <div className="text-center py-12 space-y-2">
           <p className="text-sm text-muted-foreground">
