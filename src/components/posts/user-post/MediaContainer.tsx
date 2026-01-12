@@ -4,15 +4,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
-import ProcessingIndicator from '@/components/ui/processing-indicator';
 
-import { MediaItem, ProcessingStatus } from '@/types/media';
+import { MediaItem } from '@/types/media';
 
 interface LocalMediaItem {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
-  processing_status?: ProcessingStatus;
 }
 
 interface MediaContainerProps {
@@ -68,8 +66,6 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       className="relative w-full h-full group"
       style={{ touchAction: 'pan-y' }} // Only allow vertical scrolling
     >
-      {/* Processing indicator for media with pending edits */}
-      <ProcessingIndicator status={currentMedia.processing_status} />
       {currentMedia.media_type === 'video' ? (
         <EnhancedVideoPlayer
           ref={videoRefCallback}
