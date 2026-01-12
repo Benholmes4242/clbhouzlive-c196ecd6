@@ -1,12 +1,14 @@
 // Upload pipeline - processes jobs asynchronously
 // Includes stream asset tracking for orphan cleanup
 // Includes video metadata polling for dimension/duration population
+// Includes image processing for baking filters/text overlays
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { createPost } from '@/services/posts/createPost';
 import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
+import { queueImageProcessing } from '@/services/imageProcessing';
 import type { UploadJobInput } from './types';
 
 // Import upload utilities dynamically to avoid circular deps
@@ -214,6 +216,15 @@ async function processJob(jobId: string): Promise<void> {
       
       const { uploadToCloudflareR2 } = await getCloudflareR2();
 
+    // Track uploaded media for image processing
+    const uploadedMediaForProcessing: Array<{
+      id: string;
+      mediaUrl: string;
+      mediaType: 'image' | 'video';
+      studioEdits?: any;
+      filterId?: string | null;
+    }> = [];
+
     for (let index = 0; index < job.files.length; index++) {
       const file = job.files[index];
       console.log(`[uploadPipeline] Uploading file ${index + 1}/${job.files.length}: ${file.name}`);
@@ -292,6 +303,17 @@ async function processJob(jobId: string): Promise<void> {
           pollAndUpdateVideoMetadata(streamId, mediaRecord.id);
         }
 
+        // Track for image processing
+        if (mediaRecord?.id) {
+          uploadedMediaForProcessing.push({
+            id: mediaRecord.id,
+            mediaUrl: publicUrl,
+            mediaType: mediaType as 'image' | 'video',
+            studioEdits: studioEditsJson,
+            filterId,
+          });
+        }
+
         // Update progress
         uploadManager.updateProgress(jobId, index + 1);
         console.log(`[uploadPipeline] Uploaded file ${index + 1}/${job.files.length}`);
@@ -300,6 +322,11 @@ async function processJob(jobId: string): Promise<void> {
         console.error(`[uploadPipeline] Failed to upload file ${file.name}:`, fileError);
         throw fileError;
       }
+    }
+
+    // Queue image processing for images with edits (background, non-blocking)
+    if (uploadedMediaForProcessing.length > 0) {
+      queueImageProcessing(uploadedMediaForProcessing);
     }
     } // End of else block for normal file upload flow
 
