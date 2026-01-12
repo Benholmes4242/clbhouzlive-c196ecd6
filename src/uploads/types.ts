@@ -65,6 +65,9 @@ export interface UploadJob {
   categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
   badges?: string[];
+  
+  // Scheduling fields
+  scheduledAt?: Date | null;
 
   files: File[];
   createdAt: string;
@@ -94,6 +97,8 @@ export interface UploadJobInput {
   categories?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
   badges?: string[];
+  // Scheduling
+  scheduledAt?: Date | null;
 }
 
 // Serializable job for localStorage (no File objects)

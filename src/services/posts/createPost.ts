@@ -15,6 +15,9 @@ export interface CreatePostInput {
   categories?: string[];
   badges?: string[];
   visibility?: 'anyone' | 'followers' | 'private';
+  // Scheduling fields
+  scheduledAt?: Date | null;
+  status?: 'published' | 'scheduled';
 }
 
 export interface CreatePostResult {
@@ -28,6 +31,8 @@ export interface CreatePostResult {
   categories: string[];
   badges: string[];
   visibility: string;
+  status: string;
+  scheduled_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -35,8 +40,15 @@ export interface CreatePostResult {
 /**
  * Creates a post and emits the unified post:created event.
  * All post creation should go through this function.
+ * 
+ * For scheduled posts:
+ * - Set scheduledAt to the target publish time
+ * - Set status to 'scheduled'
+ * - The post:created event is NOT emitted for scheduled posts
  */
 export async function createPost(input: CreatePostInput): Promise<CreatePostResult> {
+  const isScheduled = input.scheduledAt && input.status === 'scheduled';
+  
   const { data, error } = await supabase
     .from('posts')
     .insert({
@@ -49,23 +61,27 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
       categories: input.categories ?? [],
       badges: input.badges ?? [],
       visibility: input.visibility ?? 'anyone',
+      status: isScheduled ? 'scheduled' : 'published',
+      scheduled_at: input.scheduledAt?.toISOString() ?? null,
     })
-    .select('id, user_id, content, actor_type, actor_id, achievement_id, course_id, categories, badges, visibility, created_at, updated_at')
+    .select('id, user_id, content, actor_type, actor_id, achievement_id, course_id, categories, badges, visibility, status, scheduled_at, created_at, updated_at')
     .single();
 
   if (error) throw error;
 
-  // Emit the unified event exactly once, only on success
-  const evt: PostCreatedEvent = {
-    type: 'post:created',
-    postId: data.id,
-    actorType: data.actor_type as ActorType,
-    actorId: data.actor_id,
-    userId: data.user_id,
-    createdAt: data.created_at,
-  };
+  // Only emit event for immediately published posts (not scheduled)
+  if (!isScheduled) {
+    const evt: PostCreatedEvent = {
+      type: 'post:created',
+      postId: data.id,
+      actorType: data.actor_type as ActorType,
+      actorId: data.actor_id,
+      userId: data.user_id,
+      createdAt: data.created_at,
+    };
 
-  postEventBus.emit('post:created', evt);
+    postEventBus.emit('post:created', evt);
+  }
 
   return data;
 }

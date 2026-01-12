@@ -5398,7 +5398,9 @@ export type Database = {
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
+          scheduled_at: string | null
           source_review_id: string | null
+          status: string
           studio_music: Json | null
           updated_at: string
           user_id: string
@@ -5422,7 +5424,9 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          scheduled_at?: string | null
           source_review_id?: string | null
+          status?: string
           studio_music?: Json | null
           updated_at?: string
           user_id: string
@@ -5446,7 +5450,9 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          scheduled_at?: string | null
           source_review_id?: string | null
+          status?: string
           studio_music?: Json | null
           updated_at?: string
           user_id?: string
@@ -11250,6 +11256,7 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      publish_scheduled_posts: { Args: never; Returns: undefined }
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
         Returns: undefined
