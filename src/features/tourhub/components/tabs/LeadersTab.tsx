@@ -1,13 +1,14 @@
 /**
  * LeadersTab - Premium Leaders Page
  * 
- * Editorial layout: premium podium with photos, polished category chips, clean rows
+ * Editorial layout: premium podium with photos, polished category tabs, clean rows
  * Category selection synced to URL for shareability
+ * Organized into Season Performance + Ball Striking sections
  */
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Trophy, Target, Gauge, Calendar, TrendingUp, DollarSign, Globe, Info } from 'lucide-react';
+import { Trophy, Target, Gauge, Calendar, DollarSign, Globe, Info, Zap, Crosshair, Circle, Flag, Sun, RefreshCw, Scissors } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings, toTitleCase, getInitials } from '../../hooks/useWorldRankings';
 import { resolvePhotoUrl } from '../../utils/resolvePhotoUrl';
@@ -24,9 +25,11 @@ interface LeaderCategory {
   formatShort: (value: number) => string;
   sortOrder: 'desc' | 'asc';
   isWorldRank?: boolean;
+  section: 'season' | 'stats';
 }
 
-const leaderCategories: LeaderCategory[] = [
+// Season Performance categories
+const seasonCategories: LeaderCategory[] = [
   {
     key: 'world_rank',
     label: 'World Ranking',
@@ -38,6 +41,7 @@ const leaderCategories: LeaderCategory[] = [
     formatShort: (v) => `#${v}`,
     sortOrder: 'asc',
     isWorldRank: true,
+    section: 'season',
   },
   {
     key: 'events_played',
@@ -49,17 +53,19 @@ const leaderCategories: LeaderCategory[] = [
     format: (v) => `${v}`,
     formatShort: (v) => `${v}`,
     sortOrder: 'desc',
+    section: 'season',
   },
   {
     key: 'cuts_made',
     label: 'Cuts Made',
     shortLabel: 'Cuts',
     description: 'Most weekends made this season',
-    icon: <Target className="w-3.5 h-3.5" />,
+    icon: <Scissors className="w-3.5 h-3.5" />,
     getValue: (s) => s.cuts_made,
     format: (v) => `${v}`,
     formatShort: (v) => `${v}`,
     sortOrder: 'desc',
+    section: 'season',
   },
   {
     key: 'top_10',
@@ -71,6 +77,7 @@ const leaderCategories: LeaderCategory[] = [
     format: (v) => `${v}`,
     formatShort: (v) => `${v}`,
     sortOrder: 'desc',
+    section: 'season',
   },
   {
     key: 'earnings',
@@ -82,7 +89,12 @@ const leaderCategories: LeaderCategory[] = [
     format: (v) => `$${(v / 1_000_000).toFixed(2)}M`,
     formatShort: (v) => `$${(v / 1_000_000).toFixed(1)}M`,
     sortOrder: 'desc',
+    section: 'season',
   },
+];
+
+// Ball Striking & Short Game categories
+const statsCategories: LeaderCategory[] = [
   {
     key: 'scoring_avg',
     label: 'Scoring Average',
@@ -93,9 +105,84 @@ const leaderCategories: LeaderCategory[] = [
     format: (v) => v.toFixed(3),
     formatShort: (v) => v.toFixed(2),
     sortOrder: 'asc',
+    section: 'stats',
+  },
+  {
+    key: 'drive_avg',
+    label: 'Driving Distance',
+    shortLabel: 'Distance',
+    description: 'Longest average driving distance',
+    icon: <Zap className="w-3.5 h-3.5" />,
+    getValue: (s) => s.raw_data?.statistics?.drive_avg,
+    format: (v) => `${v.toFixed(1)} yds`,
+    formatShort: (v) => `${v.toFixed(1)}`,
+    sortOrder: 'desc',
+    section: 'stats',
+  },
+  {
+    key: 'drive_acc',
+    label: 'Driving Accuracy',
+    shortLabel: 'Accuracy',
+    description: 'Highest fairway hit percentage',
+    icon: <Crosshair className="w-3.5 h-3.5" />,
+    getValue: (s) => s.raw_data?.statistics?.drive_acc,
+    format: (v) => `${v.toFixed(1)}%`,
+    formatShort: (v) => `${v.toFixed(1)}%`,
+    sortOrder: 'desc',
+    section: 'stats',
+  },
+  {
+    key: 'gir_pct',
+    label: 'Greens in Regulation',
+    shortLabel: 'GIR',
+    description: 'Highest greens in regulation percentage',
+    icon: <Circle className="w-3.5 h-3.5" />,
+    getValue: (s) => s.raw_data?.statistics?.gir_pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    formatShort: (v) => `${v.toFixed(1)}%`,
+    sortOrder: 'desc',
+    section: 'stats',
+  },
+  {
+    key: 'putt_avg',
+    label: 'Putting Average',
+    shortLabel: 'Putting',
+    description: 'Lowest putts per hole',
+    icon: <Flag className="w-3.5 h-3.5" />,
+    getValue: (s) => s.raw_data?.statistics?.putt_avg,
+    format: (v) => v.toFixed(3),
+    formatShort: (v) => v.toFixed(3),
+    sortOrder: 'asc',
+    section: 'stats',
+  },
+  {
+    key: 'sand_saves_pct',
+    label: 'Sand Saves',
+    shortLabel: 'Sand Saves',
+    description: 'Highest sand save percentage',
+    icon: <Sun className="w-3.5 h-3.5" />,
+    getValue: (s) => s.raw_data?.statistics?.sand_saves_pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    formatShort: (v) => `${v.toFixed(1)}%`,
+    sortOrder: 'desc',
+    section: 'stats',
+  },
+  {
+    key: 'scrambling_pct',
+    label: 'Scrambling',
+    shortLabel: 'Scrambling',
+    description: 'Highest scrambling percentage',
+    icon: <RefreshCw className="w-3.5 h-3.5" />,
+    getValue: (s) => s.raw_data?.statistics?.scrambling_pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    formatShort: (v) => `${v.toFixed(1)}%`,
+    sortOrder: 'desc',
+    section: 'stats',
   },
 ];
 
+// Combined categories for lookup
+const leaderCategories: LeaderCategory[] = [...seasonCategories, ...statsCategories];
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category');
@@ -235,41 +322,78 @@ export function LeadersTab() {
 
   return (
     <div className="space-y-5">
-      {/* Category Tabs - matching Players page style with orange underline */}
+      {/* Category Tabs - Two-row layout with section labels */}
       <div 
-        className="py-3"
+        className="space-y-4"
         role="tablist"
         aria-label="Leaderboard categories"
       >
-        {/* Grid layout matching Players page tabs - centered */}
-        <div className="grid w-full grid-cols-6 bg-transparent border-0 px-0 py-0 gap-0 overflow-x-auto">
-          {leaderCategories.map((cat) => {
-            const isSelected = selectedCategory.key === cat.key;
-            return (
-              <button
-                key={cat.key}
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => handleCategoryChange(cat)}
-                className={cn(
-                  // Exact same styling as Players page tabs
-                  "relative text-sm px-3 py-2.5 font-medium",
-                  "bg-transparent border-0 shadow-none rounded-none",
-                  "transition-colors duration-200 ease-out",
-                  "inline-flex items-center justify-center gap-1",
-                  // Orange underline using after pseudo-element
-                  "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                  "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                  "after:transition-all after:duration-200 after:ease-out",
-                  isSelected 
-                    ? "text-foreground after:w-full after:opacity-[0.85]" 
-                    : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
-                )}
-              >
-                {cat.shortLabel}
-              </button>
-            );
-          })}
+        {/* Row 1: Season Performance */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 px-1">
+            Season Performance
+          </p>
+          <div className="flex overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {seasonCategories.map((cat) => {
+              const isSelected = selectedCategory.key === cat.key;
+              return (
+                <button
+                  key={cat.key}
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => handleCategoryChange(cat)}
+                  className={cn(
+                    "relative text-sm px-3 py-2 font-medium whitespace-nowrap",
+                    "bg-transparent border-0 shadow-none rounded-none",
+                    "transition-colors duration-200 ease-out",
+                    "inline-flex items-center justify-center gap-1",
+                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                    "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                    "after:transition-all after:duration-200 after:ease-out",
+                    isSelected 
+                      ? "text-foreground after:w-full after:opacity-[0.85]" 
+                      : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                  )}
+                >
+                  {cat.shortLabel}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Row 2: Ball Striking & Short Game */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 px-1">
+            Ball Striking & Short Game
+          </p>
+          <div className="flex overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {statsCategories.map((cat) => {
+              const isSelected = selectedCategory.key === cat.key;
+              return (
+                <button
+                  key={cat.key}
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => handleCategoryChange(cat)}
+                  className={cn(
+                    "relative text-sm px-3 py-2 font-medium whitespace-nowrap",
+                    "bg-transparent border-0 shadow-none rounded-none",
+                    "transition-colors duration-200 ease-out",
+                    "inline-flex items-center justify-center gap-1",
+                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                    "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                    "after:transition-all after:duration-200 after:ease-out",
+                    isSelected 
+                      ? "text-foreground after:w-full after:opacity-[0.85]" 
+                      : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                  )}
+                >
+                  {cat.shortLabel}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
