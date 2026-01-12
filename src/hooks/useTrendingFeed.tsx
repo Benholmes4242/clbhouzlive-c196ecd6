@@ -59,6 +59,7 @@ export const useTrendingFeed = () => {
         .in('user_id', allConnectedUserIds)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .or(visibilityFilter) // Apply visibility filter
+        .eq('status', 'published') // Only show published posts
         .order('created_at', { ascending: false })
         .limit(6); // Optimized limit for performance
 

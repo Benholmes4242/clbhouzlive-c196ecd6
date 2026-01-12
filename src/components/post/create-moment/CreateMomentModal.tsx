@@ -928,7 +928,7 @@ export default function CreateMomentModal({
             onVisibilityClick={() => setShowAudienceSheet(true)}
           />
 
-          {/* Share Button */}
+          {/* Share + Schedule Buttons */}
           <div
             className="flex-shrink-0 px-4 pt-2"
             style={{
@@ -936,20 +936,42 @@ export default function CreateMomentModal({
               background: 'var(--cm-surface-card)',
             }}
           >
-            <button
-              disabled={!hasMedia}
-              onClick={handlePost}
-              className="w-full h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
-              style={{
-                background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
-                border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
-                color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
-                boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
-                opacity: hasMedia ? 1 : 0.7,
-              }}
-            >
-              Share
-            </button>
+            <div className="flex gap-2">
+              {/* Schedule button */}
+              <button
+                disabled={!hasMedia}
+                onClick={() => setShowScheduleSheet(true)}
+                className="h-10 px-4 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                style={{
+                  background: 'var(--cm-surface-alt)',
+                  border: '1px solid var(--cm-border-subtle)',
+                  color: hasMedia ? 'var(--cm-text-secondary)' : 'var(--cm-text-tertiary)',
+                  opacity: hasMedia ? 1 : 0.7,
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Schedule
+              </button>
+              
+              {/* Share Now button */}
+              <button
+                disabled={!hasMedia}
+                onClick={handlePost}
+                className="flex-1 h-10 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
+                style={{
+                  background: hasMedia ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                  border: hasMedia ? 'none' : '1px solid var(--cm-border-subtle)',
+                  color: hasMedia ? 'white' : 'var(--cm-text-tertiary)',
+                  boxShadow: hasMedia ? '0 4px 12px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08)' : 'none',
+                  opacity: hasMedia ? 1 : 0.7,
+                }}
+              >
+                Share Now
+              </button>
+            </div>
           </div>
         </section>
 
