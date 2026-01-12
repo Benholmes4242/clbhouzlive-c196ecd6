@@ -39,8 +39,8 @@ function FeaturedPlayerCard({ player, stats, highlight, className }: FeaturedPla
     <Link
       to={`/tourhub/player/${player.id}`}
       className={cn(
-        "group relative flex-shrink-0 w-40 h-48 rounded-xl overflow-hidden transition-all",
-        "hover:scale-[1.02] hover:shadow-xl",
+        "group relative flex-shrink-0 w-36 h-44 rounded-xl overflow-hidden transition-all snap-start",
+        "hover:scale-[1.02] shadow-lg hover:shadow-xl",
         className
       )}
     >
@@ -125,7 +125,7 @@ export function FeaturedPlayersCarousel({ players, stats }: FeaturedPlayersCarou
     const topRanked = stats
       .filter(s => getWorldRank(s) && s.player)
       .sort((a, b) => (getWorldRank(a) || 999) - (getWorldRank(b) || 999))
-      .slice(0, 2);
+      .slice(0, 3);
     
     topRanked.forEach(s => {
       if (s.player) {
@@ -200,14 +200,14 @@ export function FeaturedPlayersCarousel({ players, stats }: FeaturedPlayersCarou
       });
     }
 
-    return featured.slice(0, 6);
+    return featured.slice(0, 5);
   }, [players, stats]);
 
   if (featuredPlayers.length === 0) return null;
 
   return (
     <div className="relative -mx-4 px-4">
-      <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+      <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-3 snap-x snap-mandatory">
         {featuredPlayers.map(({ player, stats, highlight }) => (
           <FeaturedPlayerCard
             key={player.id}

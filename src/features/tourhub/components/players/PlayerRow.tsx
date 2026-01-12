@@ -37,7 +37,7 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
   const formattedCountry = player.country ? toTitleCase(player.country) : null;
 
   // Determine stat to display on the right
-  const getStatValue = () => {
+  const getStatValue = (): { value: string; style: 'gold' | 'bold' | 'muted' } | null => {
     if (!stats) return null;
     
     switch (statDisplay) {
@@ -45,26 +45,35 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
         // Use worldRank (from PlayersTab statsMap) or fall back to world_rank from stats
         // This is the canonical source (OWGR), NOT fedex_rank
         const worldRank = stats.worldRank ?? stats.world_rank;
-        return worldRank && worldRank >= 1 ? `#${worldRank}` : null;
+        if (!worldRank || worldRank < 1) return null;
+        
+        // Style based on rank tier
+        if (worldRank <= 10) return { value: `#${worldRank}`, style: 'gold' };
+        if (worldRank <= 50) return { value: `#${worldRank}`, style: 'bold' };
+        return { value: `#${worldRank}`, style: 'muted' };
       case 'events':
-        return stats.events_played ? `${stats.events_played} events` : null;
+        return stats.events_played ? { value: `${stats.events_played} events`, style: 'muted' } : null;
       case 'wins':
-        return stats.wins ? `${stats.wins} win${stats.wins > 1 ? 's' : ''}` : null;
+        return stats.wins ? { value: `${stats.wins} win${stats.wins > 1 ? 's' : ''}`, style: 'bold' } : null;
       default:
         const defaultRank = stats.worldRank ?? stats.world_rank;
-        return defaultRank && defaultRank >= 1 ? `#${defaultRank}` : null;
+        if (!defaultRank || defaultRank < 1) return null;
+        if (defaultRank <= 10) return { value: `#${defaultRank}`, style: 'gold' };
+        if (defaultRank <= 50) return { value: `#${defaultRank}`, style: 'bold' };
+        return { value: `#${defaultRank}`, style: 'muted' };
     }
   };
 
-  const statValue = getStatValue();
+  const statResult = getStatValue();
 
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
       className={cn(
         "flex items-center gap-4 py-3.5 px-1 transition-all duration-200",
-        "hover:bg-muted/30 rounded-lg -mx-1",
-        "active:bg-muted/50",
+        "hover:bg-muted/40 rounded-lg -mx-1",
+        "active:bg-muted/60",
+        "border-b border-border/20 last:border-b-0",
         className
       )}
     >
@@ -108,11 +117,16 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
         ) : null}
       </div>
 
-      {/* Stat */}
-      {statValue && (
+      {/* Stat with tiered styling */}
+      {statResult && (
         <div className="shrink-0 text-right">
-          <span className="text-sm font-medium text-muted-foreground">
-            {statValue}
+          <span className={cn(
+            "text-sm",
+            statResult.style === 'gold' && "font-bold text-amber-600",
+            statResult.style === 'bold' && "font-semibold text-foreground",
+            statResult.style === 'muted' && "font-medium text-muted-foreground"
+          )}>
+            {statResult.value}
           </span>
         </div>
       )}
