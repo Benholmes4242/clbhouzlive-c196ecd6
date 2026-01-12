@@ -45,15 +45,15 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
       pulse: true
     },
     upcoming: { 
-      text: 'Next up', 
+      text: 'Next chapter', 
       icon: <Calendar className="w-3.5 h-3.5" />, 
-      className: 'bg-white/20 backdrop-blur-sm text-white',
+      className: 'bg-white/15 backdrop-blur-md text-white border border-white/20',
       pulse: false
     },
     recent: { 
-      text: 'Most recent', 
+      text: 'Current chapter', 
       icon: <Clock className="w-3.5 h-3.5" />, 
-      className: 'bg-black/60 backdrop-blur-sm text-white',
+      className: 'bg-black/50 backdrop-blur-md text-white border border-white/10',
       pulse: false
     },
   };
@@ -68,7 +68,8 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
       className="group block relative overflow-hidden"
     >
       {/* Full-width immersive image container */}
-      <div className="relative h-[50vh] min-h-[300px] max-h-[400px] overflow-hidden">
+      {/* Increased height for anchor-worthy hero */}
+      <div className="relative h-[55vh] min-h-[340px] max-h-[450px] overflow-hidden">
         {/* Course image or cinematic gradient fallback */}
         {hasImage ? (
           <img 
@@ -100,8 +101,8 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
           </>
         )}
         
-        {/* Strong gradient overlay from bottom for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+        {/* Stronger gradient overlay from bottom for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
         {/* Type Label - top left */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
