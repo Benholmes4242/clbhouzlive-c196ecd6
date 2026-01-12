@@ -58,7 +58,7 @@ export function useTrendingHero() {
       // We need to fetch posts and then sort by views since Supabase doesn't support
       // ordering by aggregated count in the same query
       // Query posts with video media from TODAY
-+      console.log('[useTrendingHero] Fetching today videos since:', todayStart.toISOString());
+      console.log('[useTrendingHero] Fetching today videos since:', todayStart.toISOString());
       const { data: todayData, error: todayError } = await supabase
         .from('posts')
         .select(`
