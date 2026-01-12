@@ -1,10 +1,10 @@
 /**
- * ScheduleEmptyMessage - Inline empty states for schedule
- * Subtle, centered, neutral messages that don't break the flow
+ * ScheduleEmptyMessage - Clean inline empty states (no card container)
+ * Simple centered text with icon, no background box
  */
 
 import { Link } from 'react-router-dom';
-import { Calendar, Radio } from 'lucide-react';
+import { Calendar, Radio, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScheduleEmptyMessageProps {
@@ -20,17 +20,17 @@ export function ScheduleEmptyMessage({
 }: ScheduleEmptyMessageProps) {
   const content = {
     'no-live': {
-      icon: <Radio className="w-4 h-4" />,
+      icon: <Radio className="w-5 h-5" />,
       message: nextTournamentName 
         ? `No live tournaments right now — next up: ${nextTournamentName}` 
         : 'No live tournaments right now.',
     },
     'no-results': {
-      icon: <Calendar className="w-4 h-4" />,
+      icon: <Calendar className="w-5 h-5" />,
       message: 'No tournaments match your filter.',
     },
     'season-complete': {
-      icon: <Calendar className="w-4 h-4" />,
+      icon: <Trophy className="w-5 h-5" />,
       message: null, // Special handling for clickable link
     },
   };
@@ -40,14 +40,14 @@ export function ScheduleEmptyMessage({
   return (
     <div 
       className={cn(
-        "flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl bg-muted/30 border border-border/40 text-center",
+        "flex flex-col items-center justify-center gap-3 py-12 text-center",
         className
       )}
     >
-      <div className="text-muted-foreground/60">
+      <div className="text-muted-foreground/50">
         {icon}
       </div>
-      <p className="text-sm text-muted-foreground/80">
+      <p className="text-sm text-muted-foreground max-w-sm">
         {variant === 'season-complete' ? (
           <>
             Season complete — relive the highlights in{' '}
@@ -57,7 +57,6 @@ export function ScheduleEmptyMessage({
             >
               Overview
             </Link>
-            .
           </>
         ) : (
           message
