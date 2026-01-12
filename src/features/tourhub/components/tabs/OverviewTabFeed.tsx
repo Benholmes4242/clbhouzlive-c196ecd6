@@ -70,7 +70,7 @@ export function OverviewTabFeed() {
   }
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-12 pb-8">
       {/* 1. Hero Feature - Full bleed */}
       {featuredTournament && (
         <HeroFeature
@@ -88,23 +88,23 @@ export function OverviewTabFeed() {
         topPlayers={seasonLeaders}
       />
 
-      {/* 3. Top Players - Photo-led feed */}
+      {/* 4. Top Players - Photo-led feed */}
       <PlayersFeed
         players={topPlayersData.players}
         maxEvents={topPlayersData.maxEvents}
         maxCuts={topPlayersData.maxCuts}
       />
 
-      {/* 4. Season Leaders - Photo cards */}
+      {/* 5. Season Leaders - Photo cards */}
       <LeadersPhotoCards leaders={seasonLeaders} />
 
-      {/* 5. Featured Courses - Photo grid */}
+      {/* 6. Tour Venues - Photo grid */}
       <CoursesPhotoGrid 
         courses={featuredCourses} 
         courseImages={courseImages}
       />
 
-      {/* 6. Data Unlocking - quiet at bottom */}
+      {/* 7. Coming Soon - subtle footer */}
       {unlockingSoonItems.length > 0 && (
         <DataUnlocking items={unlockingSoonItems} />
       )}
