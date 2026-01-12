@@ -64,6 +64,17 @@ export default function CarouselSlide({
   // Generate base URL for media
   const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
   
+  // Debug logging for video rendering issues
+  if (item.type === 'video') {
+    console.log('[CarouselSlide] Video item:', {
+      type: item.type,
+      hasFile: !!item.file,
+      hasPreviewUrl: !!item.previewUrl,
+      hasUrl: !!item.url,
+      baseUrl: baseUrl ? baseUrl.substring(0, 50) + '...' : 'EMPTY',
+    });
+  }
+  
   // Use thumbnail URLs for poster images
   const posterUrl = item.type === 'video' 
     ? buildVideoPosterUrl(baseUrl, { width: 600, height: 600 })

@@ -248,7 +248,8 @@ export async function addDraftMedia(
     width: options?.width ?? null,
     height: options?.height ?? null,
     aspect_ratio: options?.aspectRatio ?? null,
-    duration_seconds: options?.durationSeconds ?? null,
+    // Round duration to integer - database column is INTEGER
+    duration_seconds: options?.durationSeconds != null ? Math.round(options.durationSeconds) : null,
     studio_edits: (options?.studioEdits ?? null) as Json,
     filter_id: options?.filterId ?? null,
     file_name: options?.fileName ?? null,

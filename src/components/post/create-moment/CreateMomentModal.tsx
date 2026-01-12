@@ -991,8 +991,13 @@ export default function CreateMomentModal({
             <div className="w-10">
               {draftCount > 0 && (
                 <button
-                  onClick={() => setShowDraftsSheet(true)}
-                  className="relative flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[Drafts] Icon clicked, opening sheet');
+                    setShowDraftsSheet(true);
+                  }}
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full transition-colors z-40"
                   style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
                   aria-label="View drafts"
                 >
@@ -1220,14 +1225,23 @@ export default function CreateMomentModal({
               </p>
               <div className="flex gap-2">
                 <button
-                  onClick={handleViewDrafts}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[DraftPrompt] View Drafts clicked');
+                    handleViewDrafts();
+                  }}
                   className="flex-1 py-2 rounded-xl text-sm font-medium"
                   style={{ background: 'var(--cm-surface-slate)', color: 'white' }}
                 >
                   View Drafts
                 </button>
                 <button
-                  onClick={handleDismissDraftPrompt}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDismissDraftPrompt();
+                  }}
                   className="flex-1 py-2 rounded-xl text-sm"
                   style={{ background: 'var(--cm-surface-alt)', color: 'var(--cm-text-secondary)', border: '1px solid var(--cm-border-subtle)' }}
                 >
