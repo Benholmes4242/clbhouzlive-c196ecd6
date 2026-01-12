@@ -1,23 +1,21 @@
 /**
- * ScheduleTab - Premium Editorial Schedule Experience
+ * ScheduleTab - Premium Editorial Schedule Experience (Card-Free)
  * 
  * Features:
- * - Full-width immersive hero
- * - Major Championships with gravitas styling
- * - Ryder Cup / Olympics with chapter dividers
- * - Season progress timeline (past/current/future months)
+ * - Full-width immersive hero (full bleed, no borders/padding)
+ * - Clean filter pills on page background
+ * - Editorial tournament list (no cards)
  * - Timeline layout grouped by month
  */
 
 import { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
-import { format, isAfter, isBefore, startOfMonth, endOfMonth } from 'date-fns';
+import { format, isAfter } from 'date-fns';
 
-// Import schedule components
+// Import new schedule components
 import {
   ScheduleHeroCard,
   getFeaturedTournament,
@@ -26,27 +24,12 @@ import {
   ScheduleTournamentCard,
   ScheduleMonthHeader,
   ScheduleEmptyMessage,
-  isMajor,
-  isGlobalChapter,
-  ScheduleChapterDivider,
-  getChapterText,
 } from '../schedule';
 
 interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
-  timelineStatus: 'past' | 'current' | 'future';
-}
-
-// Determine timeline status for a month
-function getMonthTimelineStatus(monthKey: string): 'past' | 'current' | 'future' {
-  const now = new Date();
-  const currentMonthKey = format(now, 'yyyy-MM');
-  
-  if (monthKey < currentMonthKey) return 'past';
-  if (monthKey === currentMonthKey) return 'current';
-  return 'future';
 }
 
 export function ScheduleTab() {
@@ -86,7 +69,7 @@ export function ScheduleTab() {
     return upcoming[0]?.name;
   }, [tournaments]);
 
-  // Filter tournaments
+  // Filter tournaments (excluding featured from the list to avoid duplication)
   const filteredResults = useMemo(() => {
     if (!tournaments) return [];
     
@@ -119,7 +102,7 @@ export function ScheduleTab() {
     return filtered;
   }, [tournaments, filter, search]);
 
-  // Group by month for timeline layout with timeline status
+  // Group by month for timeline layout
   const monthGroups = useMemo((): MonthGroup[] => {
     if (!filteredResults.length) return [];
 
@@ -138,7 +121,6 @@ export function ScheduleTab() {
         monthKey,
         monthLabel: format(new Date(tournaments[0].start_date), 'MMMM yyyy'),
         tournaments,
-        timelineStatus: getMonthTimelineStatus(monthKey),
       }));
   }, [filteredResults]);
 
@@ -146,14 +128,26 @@ export function ScheduleTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-[340px] bg-muted -mx-4 sm:-mx-6 lg:-mx-8" />
+        {/* Hero skeleton - full bleed */}
+        <div className="h-[300px] bg-muted -mx-4 sm:-mx-6 lg:-mx-8" />
+        
+        {/* Filters skeleton */}
         <div className="h-12 bg-muted rounded-xl w-full max-w-md" />
+        
+        {/* Timeline skeleton */}
         <div className="space-y-8">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="space-y-3">
               <div className="h-6 bg-muted rounded w-32" />
               <div className="space-y-4">
-                <div className="h-[140px] bg-muted rounded-lg" />
+                <div className="flex gap-4">
+                  <div className="w-[140px] h-[100px] bg-muted rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-5 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                    <div className="h-4 bg-muted rounded w-2/3" />
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -162,26 +156,16 @@ export function ScheduleTab() {
     );
   }
   
-  // Empty state
+  // Empty state - no tournaments at all
   if (!tournaments || tournaments.length === 0) {
     return <TourHubEmptyState variant="schedule" />;
   }
   
   return (
     <div className="min-h-screen">
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">
-          The Season Schedule
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          The full journey of the season — past, live, and still to come.
-        </p>
-      </div>
-
-      {/* Featured Hero */}
+      {/* Featured Hero - Always visible, independent of tab selection */}
       {featured && !search && (
-        <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-8">
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 mb-6">
           <ScheduleHeroCard 
             tournament={featured.tournament} 
             type={featured.type}
@@ -189,16 +173,16 @@ export function ScheduleTab() {
         </div>
       )}
       
-      {/* Main content */}
-      <div className="space-y-5">
+      {/* Main content with spacing */}
+      <div className="space-y-6">
         {/* Search Bar */}
         <div className="relative max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Find an event, venue, or city..."
+            placeholder="Search tournaments, venues, or cities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-11 h-11 bg-muted/40 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl placeholder:text-muted-foreground/50"
+            className="pl-9 bg-background border-border focus:ring-2 focus:ring-primary/20"
           />
         </div>
 
@@ -209,7 +193,7 @@ export function ScheduleTab() {
           counts={filterStats}
         />
 
-        {/* No Live Message */}
+        {/* No Live Message (if filtering by Live and none exist) */}
         {filter === 'live' && filterStats.live === 0 && (
           <ScheduleEmptyMessage 
             variant="no-live" 
@@ -217,87 +201,34 @@ export function ScheduleTab() {
           />
         )}
         
-        {/* Result Count */}
-        <p className="text-xs text-muted-foreground/50">
-          {filteredResults.length} event{filteredResults.length !== 1 ? 's' : ''}
-          {search && tournaments && filteredResults.length !== tournaments.length && ' matching'}
+        {/* Result Count - subtle */}
+        <p className="text-xs text-muted-foreground/60">
+          Showing {filteredResults.length} tournament{filteredResults.length !== 1 ? 's' : ''}
+          {search && tournaments && filteredResults.length !== tournaments.length && ' (filtered)'}
         </p>
         
-        {/* Timeline Layout */}
+        {/* Timeline Layout - Grouped by Month */}
         {monthGroups.length > 0 ? (
-          <div className="space-y-0 relative">
-            {/* Subtle vertical timeline line */}
-            <div 
-              className="absolute left-[5px] top-16 bottom-16 w-px"
-              style={{
-                background: 'linear-gradient(to bottom, transparent, hsl(var(--border)) 5%, hsl(var(--border)) 95%, transparent)'
-              }}
-            />
-            
-            {monthGroups.map((group) => {
-              // Track if we've shown a chapter divider
-              let shownChapterDivider = false;
-              
-              return (
-                <div key={group.monthKey}>
-                  {/* Month Header with timeline status */}
-                  <ScheduleMonthHeader 
-                    monthLabel={group.monthLabel}
-                    eventCount={group.tournaments.length}
-                    timelineStatus={group.timelineStatus}
-                  />
+          <div className="space-y-0">
+            {monthGroups.map((group) => (
+              <div key={group.monthKey}>
+                {/* Month Header */}
+                <ScheduleMonthHeader 
+                  monthLabel={group.monthLabel}
+                  eventCount={group.tournaments.length}
+                />
 
-                  {/* Tournaments */}
-                  <div className={cn(
-                    "pl-5 border-l ml-[5px] space-y-3",
-                    group.timelineStatus === 'past' ? "border-border/20" : "border-border/30"
-                  )}>
-                    {group.tournaments.map((tournament, idx) => {
-                      const major = isMajor(tournament.name);
-                      const global = isGlobalChapter(tournament.name);
-                      const chapterText = global ? getChapterText(tournament.name) : null;
-                      const showChapter = global && chapterText && !shownChapterDivider;
-                      
-                      if (showChapter) {
-                        shownChapterDivider = true;
-                      }
-                      
-                      return (
-                        <div 
-                          key={tournament.id}
-                          className={cn(
-                            // Extra spacing for majors and global events
-                            major && 'pt-4 pb-4',
-                            global && 'pt-2 pb-2',
-                            idx === group.tournaments.length - 1 && 'pb-2'
-                          )}
-                        >
-                          {/* Chapter divider for global events */}
-                          {showChapter && (
-                            <ScheduleChapterDivider 
-                              title={chapterText.title}
-                              subtitle={chapterText.subtitle}
-                            />
-                          )}
-                          
-                          <ScheduleTournamentCard tournament={tournament} />
-                        </div>
-                      );
-                    })}
-                  </div>
+                {/* Tournaments - Flowing feed with reduced gap */}
+                <div className="pl-5 border-l border-border/40 ml-[5px] space-y-2">
+                  {group.tournaments.map((tournament) => (
+                    <ScheduleTournamentCard 
+                      key={tournament.id}
+                      tournament={tournament}
+                    />
+                  ))}
                 </div>
-              );
-            })}
-            
-            {/* Bottom fade buffer */}
-            <div className="h-20 relative">
-              <div 
-                className="absolute inset-0"
-                style={{
-                  background: 'linear-gradient(to bottom, transparent, hsl(var(--background)))'
-                }}
-              />
-            </div>
+              </div>
+            ))}
           </div>
         ) : (
           <ScheduleEmptyMessage variant="no-results" />
@@ -305,7 +236,7 @@ export function ScheduleTab() {
 
         {/* Season Complete Message */}
         {filterStats.upcoming === 0 && filterStats.live === 0 && filterStats.completed > 0 && filter === 'all' && !search && (
-          <div className="pt-8 border-t border-border/50">
+          <div className="pt-8 border-t border-border">
             <ScheduleEmptyMessage variant="season-complete" />
           </div>
         )}

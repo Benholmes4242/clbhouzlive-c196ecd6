@@ -1,19 +1,19 @@
-// Schedule post sheet - Premium glass design
-// Clean frosted glass aesthetic with unified visual language
+// Schedule post sheet - date/time picker for scheduling posts
+// Dark theme polished design
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addDays, addMonths, isBefore, isAfter, startOfDay, setHours, setMinutes } from "date-fns";
-import { cn } from "@/lib/utils";
 
 interface ScheduleSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onSchedule: (scheduledAt: Date) => void;
   isScheduling?: boolean;
-  initialDate?: Date;
+  initialDate?: Date; // For edit mode - pre-fill with existing scheduled time
 }
 
+// Constants
 const MIN_MINUTES_FROM_NOW = 15;
 const MAX_DAYS_AHEAD = 90;
 
@@ -28,6 +28,7 @@ export default function ScheduleSheet({
   const minDate = addDays(startOfDay(now), 0);
   const maxDate = addDays(startOfDay(now), MAX_DAYS_AHEAD);
   
+  // Use initialDate if provided (edit mode), otherwise use current time
   const defaultDate = initialDate || now;
   const [selectedDate, setSelectedDate] = useState<Date>(defaultDate);
   const [selectedHour, setSelectedHour] = useState(defaultDate.getHours());
@@ -36,27 +37,35 @@ export default function ScheduleSheet({
   );
   const [viewMonth, setViewMonth] = useState(defaultDate);
   
+  // Generate calendar days for current view month
   const calendarDays = useMemo(() => {
     const firstDay = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1);
     const lastDay = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0);
     const startDayOfWeek = firstDay.getDay();
     
     const days: (Date | null)[] = [];
+    
+    // Add empty slots for days before first of month
     for (let i = 0; i < startDayOfWeek; i++) {
       days.push(null);
     }
+    
+    // Add days of the month
     for (let d = 1; d <= lastDay.getDate(); d++) {
       days.push(new Date(viewMonth.getFullYear(), viewMonth.getMonth(), d));
     }
+    
     return days;
   }, [viewMonth]);
   
+  // Check if a date is valid for selection
   const isDateValid = (date: Date | null) => {
     if (!date) return false;
     const dayStart = startOfDay(date);
     return !isBefore(dayStart, startOfDay(minDate)) && !isAfter(dayStart, maxDate);
   };
   
+  // Build final scheduled datetime
   const scheduledDateTime = useMemo(() => {
     let dt = startOfDay(selectedDate);
     dt = setHours(dt, selectedHour);
@@ -64,11 +73,13 @@ export default function ScheduleSheet({
     return dt;
   }, [selectedDate, selectedHour, selectedMinute]);
   
+  // Validate the combined datetime is at least 15 minutes in future
   const isValidScheduleTime = useMemo(() => {
     const minTime = new Date(now.getTime() + MIN_MINUTES_FROM_NOW * 60 * 1000);
     return isAfter(scheduledDateTime, minTime);
   }, [scheduledDateTime, now]);
   
+  // Get user's timezone
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   
   const handleSchedule = () => {
@@ -95,105 +106,61 @@ export default function ScheduleSheet({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[10000]"
-          onClick={onClose}
-        >
+        <>
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-[10000]"
+            onClick={onClose}
+          />
           
           {/* Sheet */}
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "tween", duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="absolute bottom-0 left-0 right-0 rounded-t-[28px] max-h-[85vh] overflow-hidden flex flex-col"
-            style={{ 
-              background: 'var(--cm-surface-card)',
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
-              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-            }}
-            onClick={(e) => e.stopPropagation()}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 bg-slate-900 rounded-t-3xl border-t border-slate-700 z-[10001] max-h-[80vh] overflow-hidden"
           >
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 rounded-full bg-slate-300/60" />
-            </div>
-            
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-4">
-              <div>
-                <h2 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--cm-text-primary)' }}>
-                  Schedule Post
-                </h2>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--cm-text-tertiary)' }}>
-                  Choose when to publish
-                </p>
-              </div>
+            <div className="flex items-center justify-between p-4 border-b border-slate-700">
+              <h2 className="text-lg font-semibold text-white">Schedule Post</h2>
               <button
                 onClick={onClose}
-                className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center",
-                  "bg-slate-100/80 dark:bg-slate-800/80",
-                  "backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50",
-                  "transition-all duration-200 active:scale-95"
-                )}
+                className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
               >
-                <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                <X size={16} />
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-4">
-              {/* Calendar Card */}
-              <div 
-                className="rounded-2xl p-4"
-                style={{ 
-                  background: 'var(--cm-surface-alt)',
-                  border: '1px solid var(--cm-border-subtle)',
-                }}
-              >
-                {/* Month Navigation */}
+            <div className="p-4 overflow-y-auto max-h-[calc(80vh-140px)]">
+              {/* Calendar container */}
+              <div className="bg-slate-800/50 rounded-xl p-4 mb-4">
+                {/* Calendar Header */}
                 <div className="flex items-center justify-between mb-4">
                   <button
                     onClick={handlePrevMonth}
-                    className={cn(
-                      "w-9 h-9 rounded-full flex items-center justify-center",
-                      "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md",
-                      "border border-slate-200/50 dark:border-slate-700/50",
-                      "transition-all duration-200 active:scale-95"
-                    )}
+                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
                   >
-                    <ChevronLeft className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                    <ChevronLeft size={20} />
                   </button>
-                  <span className="font-semibold text-sm" style={{ color: 'var(--cm-text-primary)' }}>
+                  <span className="font-medium text-white">
                     {format(viewMonth, "MMMM yyyy")}
                   </span>
                   <button
                     onClick={handleNextMonth}
-                    className={cn(
-                      "w-9 h-9 rounded-full flex items-center justify-center",
-                      "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md",
-                      "border border-slate-200/50 dark:border-slate-700/50",
-                      "transition-all duration-200 active:scale-95"
-                    )}
+                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-slate-400 hover:text-white"
                   >
-                    <ChevronRight className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
+                    <ChevronRight size={20} />
                   </button>
                 </div>
                 
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1">
                   {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
-                    <div 
-                      key={day} 
-                      className="text-center text-[11px] font-medium uppercase tracking-wider py-2"
-                      style={{ color: 'var(--cm-text-tertiary)' }}
-                    >
+                    <div key={day} className="text-center text-xs text-slate-400 uppercase py-2 font-medium">
                       {day}
                     </div>
                   ))}
@@ -209,18 +176,14 @@ export default function ScheduleSheet({
                         key={idx}
                         disabled={!isValid}
                         onClick={() => date && isValid && setSelectedDate(date)}
-                        className={cn(
-                          "w-10 h-10 flex items-center justify-center rounded-full text-sm mx-auto",
-                          "transition-all duration-200",
-                          !date && "invisible",
-                          !isValid && "opacity-30 cursor-not-allowed",
-                          isValid && !isSelected && "hover:bg-slate-200/50 dark:hover:bg-slate-700/50",
-                          isSelected && "bg-gradient-to-br from-orange-500 to-orange-600 text-white font-semibold shadow-lg",
-                          isToday && !isSelected && "ring-2 ring-orange-500/30"
-                        )}
-                        style={{ 
-                          color: isSelected ? 'white' : isValid ? 'var(--cm-text-primary)' : 'var(--cm-text-tertiary)'
-                        }}
+                        className={`
+                          w-10 h-10 flex items-center justify-center rounded-full text-sm
+                          transition-colors mx-auto
+                          ${!date ? "invisible" : ""}
+                          ${!isValid ? "text-slate-600 cursor-not-allowed" : "hover:bg-slate-700 text-white"}
+                          ${isSelected ? "bg-amber-500 text-slate-900 font-semibold hover:bg-amber-400" : ""}
+                          ${isToday && !isSelected ? "ring-1 ring-amber-500/50" : ""}
+                        `}
                       >
                         {date?.getDate()}
                       </button>
@@ -229,33 +192,19 @@ export default function ScheduleSheet({
                 </div>
               </div>
               
-              {/* Time Picker Card */}
-              <div 
-                className="rounded-2xl p-4"
-                style={{ 
-                  background: 'var(--cm-surface-alt)',
-                  border: '1px solid var(--cm-border-subtle)',
-                }}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-4 h-4" style={{ color: 'var(--cm-icon-secondary)' }} />
-                  <span className="text-sm font-medium" style={{ color: 'var(--cm-text-primary)' }}>
-                    Select Time
-                  </span>
+              {/* Time Picker */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Clock size={16} />
+                  <span>Select Time</span>
                 </div>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  {/* Hour */}
                   <select
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                    className={cn(
-                      "flex-1 h-12 px-4 rounded-xl text-base font-medium",
-                      "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md",
-                      "border border-slate-200/50 dark:border-slate-700/50",
-                      "focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400/50",
-                      "transition-all duration-200 appearance-none cursor-pointer"
-                    )}
-                    style={{ color: 'var(--cm-text-primary)' }}
+                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
                   >
                     {Array.from({ length: 24 }, (_, i) => (
                       <option key={i} value={i}>
@@ -264,19 +213,13 @@ export default function ScheduleSheet({
                     ))}
                   </select>
                   
-                  <span className="text-xl font-bold" style={{ color: 'var(--cm-text-tertiary)' }}>:</span>
+                  <span className="text-xl text-slate-400 font-bold">:</span>
                   
+                  {/* Minute */}
                   <select
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                    className={cn(
-                      "flex-1 h-12 px-4 rounded-xl text-base font-medium",
-                      "bg-white/80 dark:bg-slate-800/80 backdrop-blur-md",
-                      "border border-slate-200/50 dark:border-slate-700/50",
-                      "focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400/50",
-                      "transition-all duration-200 appearance-none cursor-pointer"
-                    )}
-                    style={{ color: 'var(--cm-text-primary)' }}
+                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
                   >
                     {[0, 15, 30, 45].map(m => (
                       <option key={m} value={m}>
@@ -286,67 +229,47 @@ export default function ScheduleSheet({
                   </select>
                 </div>
                 
-                <p className="text-xs mt-2" style={{ color: 'var(--cm-text-tertiary)' }}>
+                {/* Timezone display */}
+                <p className="text-xs text-slate-500">
                   Timezone: {timezone}
                 </p>
               </div>
               
-              {/* Summary Strip */}
-              <div 
-                className="rounded-xl p-4 flex items-center gap-3"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.04))',
-                  border: '1px solid rgba(245, 158, 11, 0.2)',
-                }}
-              >
-                <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ background: 'rgba(245, 158, 11, 0.15)' }}
-                >
-                  <Calendar className="w-5 h-5 text-orange-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium" style={{ color: 'var(--cm-text-primary)' }}>
+              {/* Selected DateTime Summary */}
+              <div className="mt-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar size={16} className="text-amber-500" />
+                  <span className="font-medium text-white">
                     {format(scheduledDateTime, "EEEE, MMMM d, yyyy")}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--cm-text-secondary)' }}>
-                    {format(scheduledDateTime, "h:mm a")}
-                  </p>
+                  </span>
                 </div>
+                <div className="flex items-center gap-2 text-sm mt-1">
+                  <Clock size={16} className="text-amber-500" />
+                  <span className="font-medium text-white">
+                    {format(scheduledDateTime, "h:mm a")}
+                  </span>
+                </div>
+                
+                {!isValidScheduleTime && (
+                  <p className="text-xs text-red-400 mt-2">
+                    Schedule must be at least 15 minutes from now
+                  </p>
+                )}
               </div>
-              
-              {!isValidScheduleTime && (
-                <p className="text-xs text-center px-4" style={{ color: 'var(--cm-text-error, #ef4444)' }}>
-                  Schedule must be at least 15 minutes from now
-                </p>
-              )}
             </div>
             
             {/* Footer */}
-            <div className="px-5 pt-2 pb-4">
+            <div className="p-4 border-t border-slate-700">
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className={cn(
-                  "w-full h-12 rounded-2xl font-semibold text-base",
-                  "transition-all duration-200 active:scale-[0.98]",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-                style={{
-                  background: isValidScheduleTime 
-                    ? 'linear-gradient(135deg, #f59e0b, #d97706)' 
-                    : 'var(--cm-surface-alt)',
-                  color: isValidScheduleTime ? 'white' : 'var(--cm-text-tertiary)',
-                  boxShadow: isValidScheduleTime 
-                    ? '0 4px 16px rgba(245, 158, 11, 0.25)' 
-                    : 'none',
-                }}
+                className="w-full py-3.5 rounded-xl bg-amber-500 text-slate-900 font-semibold text-base hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>
             </div>
           </motion.div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

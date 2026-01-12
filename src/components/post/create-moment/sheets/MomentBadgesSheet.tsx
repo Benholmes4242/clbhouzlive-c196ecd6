@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Award, Check, Sparkles } from 'lucide-react';
+import { X, Award, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MOMENT_BADGES, getBadgeById } from '../categoryDefinitions';
 import { getBadgeIcon } from '@/components/post/badges/AchievementBadgeIcon';
@@ -15,8 +15,9 @@ interface MomentBadgesSheetProps {
 }
 
 /**
- * MomentBadgesSheet - Premium gamification sheet for achievement badges
- * Collectible-style tiles with glow effects
+ * MomentBadgesSheet - Bottom sheet for selecting achievement badges
+ * V1: 15 badges across scoring, shot, performance, experience categories
+ * Max 2 selections
  */
 export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
   isOpen,
@@ -24,10 +25,13 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
   selectedBadges,
   onBadgesChange,
 }) => {
+  // Toggle badge selection
   const toggleBadge = (badgeId: string) => {
     if (selectedBadges.includes(badgeId)) {
+      // Remove badge
       onBadgesChange(selectedBadges.filter(id => id !== badgeId));
     } else if (selectedBadges.length < MAX_BADGES) {
+      // Add badge
       onBadgesChange([...selectedBadges, badgeId]);
     }
   };
@@ -46,66 +50,55 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
         onClick={onClose}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-black/40" />
         
         {/* Sheet */}
         <motion.div
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-          className="absolute bottom-0 left-0 right-0 rounded-t-[28px] flex flex-col max-h-[85vh]"
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          className="absolute bottom-0 left-0 right-0 rounded-t-2xl flex flex-col max-h-[85vh]"
           style={{ 
             background: 'var(--cm-surface-card)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 rounded-full bg-slate-300/60" />
+            <div 
+              className="w-10 h-1 rounded-full"
+              style={{ background: 'var(--cm-border)' }}
+            />
           </div>
 
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 pb-2">
-            <div className="flex items-center gap-3">
-              <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ 
-                  background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1))',
-                }}
+          {/* Header with counter */}
+          <div className="flex items-center justify-between px-4 pb-2">
+            <div className="flex items-center gap-2">
+              <Award className="w-5 h-5" style={{ color: 'var(--cm-accent-gold)' }} />
+              <h3 
+                className="text-lg font-semibold"
+                style={{ color: 'var(--cm-text-primary)' }}
               >
-                <Award className="w-5 h-5" style={{ color: '#fbbf24' }} />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--cm-text-primary)' }}>
-                  Add Achievement Badge
-                </h3>
-              </div>
+                Add Achievement Badge
+              </h3>
             </div>
             <div className="flex items-center gap-3">
+              {/* Selection counter */}
               <span 
-                className="text-xs font-semibold px-3 py-1 rounded-full"
+                className="text-xs font-medium px-2 py-0.5 rounded-full"
                 style={{ 
-                  background: atMax 
-                    ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1))' 
-                    : 'var(--cm-surface-alt)',
-                  color: atMax ? '#fbbf24' : 'var(--cm-text-secondary)',
-                  border: atMax ? '1px solid rgba(251, 191, 36, 0.3)' : '1px solid var(--cm-border-subtle)',
+                  background: atMax ? 'rgba(251, 191, 36, 0.2)' : 'var(--cm-surface-alt)',
+                  color: atMax ? 'var(--cm-accent-gold)' : 'var(--cm-text-secondary)',
                 }}
               >
                 {selectedBadges.length}/{MAX_BADGES}
               </span>
               <button
                 onClick={onClose}
-                className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center",
-                  "bg-slate-100/80 dark:bg-slate-800/80",
-                  "backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50",
-                  "transition-all duration-200 active:scale-95"
-                )}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--cm-surface-alt)' }}
               >
                 <X className="w-4 h-4" style={{ color: 'var(--cm-icon-primary)' }} />
               </button>
@@ -113,13 +106,16 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
           </div>
 
           {/* Description */}
-          <p className="px-5 pb-4 text-sm" style={{ color: 'var(--cm-text-secondary)' }}>
-            Show it on your post • Earn more by playing & reviewing courses
+          <p 
+            className="px-4 pb-3 text-sm"
+            style={{ color: 'var(--cm-text-secondary)' }}
+          >
+            Celebrate your achievement. Select up to {MAX_BADGES} badges.
           </p>
 
-          {/* Badge Grid */}
-          <div className="flex-1 overflow-y-auto px-5 pb-4">
-            <div className="grid grid-cols-3 gap-3">
+          {/* Badge grid - scrollable */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4">
+            <div className="grid grid-cols-3 gap-2">
               {MOMENT_BADGES.map(badge => {
                 const isSelected = selectedBadges.includes(badge.id);
                 const isDisabled = !isSelected && atMax;
@@ -132,49 +128,47 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
                     onClick={() => !isDisabled && toggleBadge(badge.id)}
                     disabled={isDisabled}
                     className={cn(
-                      "relative flex flex-col items-center gap-2 p-4 rounded-2xl transition-all",
+                      "relative flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
                       isDisabled && "opacity-40 cursor-not-allowed"
                     )}
                     style={{
                       background: isSelected 
-                        ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05))'
+                        ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.08))'
                         : 'var(--cm-surface-alt)',
                       border: isSelected 
                         ? '1.5px solid rgba(251, 191, 36, 0.5)' 
                         : '1px solid var(--cm-border-subtle)',
                       boxShadow: isSelected 
-                        ? '0 0 20px rgba(251, 191, 36, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)' 
+                        ? '0 0 12px rgba(251, 191, 36, 0.15)' 
                         : 'none',
                     }}
                   >
                     {/* Selected checkmark */}
                     {isSelected && (
-                      <motion.div 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+                      <div 
+                        className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                        style={{ background: 'var(--cm-accent-gold)' }}
                       >
-                        <Check className="w-3 h-3 text-white" />
-                      </motion.div>
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
                     )}
                     
-                    {/* Icon */}
+                    {/* Icon container */}
                     <div 
-                      className="w-10 h-10 flex items-center justify-center"
-                      style={{ color: isSelected ? '#fbbf24' : 'var(--cm-text-primary)' }}
+                      className="w-8 h-8 flex items-center justify-center"
+                      style={{ color: isSelected ? 'var(--cm-accent-gold)' : 'var(--cm-text-primary)' }}
                     >
                       {IconComponent ? (
-                        <IconComponent className="w-7 h-7" />
+                        <IconComponent className="w-6 h-6" />
                       ) : (
-                        <Award className="w-7 h-7" />
+                        <Award className="w-6 h-6" />
                       )}
                     </div>
                     
                     {/* Label */}
                     <span 
                       className="text-xs font-medium text-center leading-tight"
-                      style={{ color: isSelected ? '#fbbf24' : 'var(--cm-text-primary)' }}
+                      style={{ color: 'var(--cm-text-primary)' }}
                     >
                       {badge.label}
                     </span>
@@ -184,22 +178,14 @@ export const MomentBadgesSheet: React.FC<MomentBadgesSheetProps> = ({
             </div>
           </div>
 
-          {/* Done Button */}
-          <div className="px-5 pt-2 pb-4">
+          {/* Done button */}
+          <div className="px-4 pt-2 pb-2">
             <button
               onClick={onClose}
-              className={cn(
-                "w-full h-12 rounded-2xl font-semibold text-base",
-                "transition-all duration-200 active:scale-[0.98]"
-              )}
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all"
               style={{
-                background: selectedBadges.length > 0 
-                  ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
-                  : 'var(--cm-surface-slate)',
+                background: 'var(--cm-surface-slate)',
                 color: 'white',
-                boxShadow: selectedBadges.length > 0 
-                  ? '0 4px 16px rgba(251, 191, 36, 0.25)' 
-                  : '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
             >
               Done
