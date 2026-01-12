@@ -43,20 +43,20 @@ interface LinkItem {
 const CLBHOUZ_ORANGE = '#F97316';
 
 const NAV_ITEMS: NavItem[] = [
-  { value: 'overview', label: 'Overview', subtitle: 'The global golf season', icon: <LayoutGrid className="w-5 h-5" /> },
-  { value: 'schedule', label: 'Schedule', subtitle: 'All events', icon: <Calendar className="w-5 h-5" /> },
-  { value: 'players', label: 'Players', subtitle: 'Tour roster', icon: <Users className="w-5 h-5" /> },
-  { value: 'leaderboards', label: 'Leaders', subtitle: 'Season rankings', icon: <Trophy className="w-5 h-5" /> },
-  { value: 'summary', label: 'Summary', subtitle: 'Tournament recap', icon: <FileText className="w-5 h-5" /> },
-  { value: 'tee-times', label: 'Tee Times', subtitle: 'Starting times', icon: <Clock className="w-5 h-5" /> },
-  { value: 'hole-stats', label: 'Holes', subtitle: 'Course analytics', icon: <Target className="w-5 h-5" /> },
+  { value: 'overview', label: 'The Global Golf Season', subtitle: 'Every tour. Every event. Every moment.', icon: <LayoutGrid className="w-5 h-5" /> },
+  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening — past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
+  { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <Users className="w-5 h-5" /> },
+  { value: 'leaderboards', label: 'Leaders', subtitle: 'Who\'s on top — and who\'s chasing them.', icon: <Trophy className="w-5 h-5" /> },
+  { value: 'summary', label: 'Event Recaps', subtitle: 'How tournaments were won and lost.', icon: <FileText className="w-5 h-5" /> },
+  { value: 'tee-times', label: 'Tee Times', subtitle: 'When players begin their rounds.', icon: <Clock className="w-5 h-5" /> },
+  { value: 'hole-stats', label: 'Course Insights', subtitle: 'Hole-by-hole strategy and course breakdowns.', icon: <Target className="w-5 h-5" /> },
 ];
 
 const LINK_ITEMS: LinkItem[] = [
   { 
     id: 'college-golf', 
     label: 'College Golf', 
-    subtitle: 'Alumni on Tour',
+    subtitle: 'From campus standout to Tour contender.',
     path: '/tourhub/college-golf',
     icon: <GraduationCap className="w-5 h-5" />,
     badge: 'New',
@@ -350,7 +350,7 @@ export function TourHubNavOverlay({
               className="flex-1 overflow-y-auto px-5 py-5"
               style={{ overscrollBehavior: 'contain' }}
             >
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
                   
@@ -396,8 +396,8 @@ export function TourHubNavOverlay({
                           {item.label}
                         </div>
                         <div 
-                          className="text-[13px] mt-0.5"
-                          style={{ color: '#94a3b8' }}
+                          className="text-[12px] mt-0.5"
+                          style={{ color: '#a1a1aa' }}
                         >
                           {item.subtitle}
                         </div>
@@ -423,7 +423,7 @@ export function TourHubNavOverlay({
               />
 
               {/* Special Link Items (College Golf, etc.) */}
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
