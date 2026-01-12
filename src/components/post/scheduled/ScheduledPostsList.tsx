@@ -2,7 +2,7 @@ import React from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Clock, Edit2, Trash2, Play, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScheduledPosts } from '@/hooks/useScheduledPosts';
+import { useScheduledPosts, type ScheduledPost } from '@/hooks/useScheduledPosts';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 interface ScheduledPostsListProps {
   isOpen: boolean;
   onClose: () => void;
-  onEditPost?: (postId: string) => void;
+  onEditPost?: (post: ScheduledPost) => void;
 }
 
 export const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
@@ -27,7 +27,6 @@ export const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
     scheduledPosts, 
     isLoading, 
     publishNow, 
-    reschedule, 
     deletePost,
     isPublishing,
     isDeleting 
@@ -51,8 +50,16 @@ export const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
     }
   };
 
+  const handleEdit = (post: ScheduledPost) => {
+    onClose();
+    // Small delay to let sheet close animation complete
+    setTimeout(() => {
+      onEditPost?.(post);
+    }, 150);
+  };
+
   // Get first media thumbnail
-  const getThumbnail = (post: typeof scheduledPosts[0]) => {
+  const getThumbnail = (post: ScheduledPost) => {
     if (post.media.length === 0) return null;
     const first = post.media[0];
     return first.posterUrl || first.mediaUrl;
@@ -135,6 +142,10 @@ export const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEdit(post)}>
+                            <Edit2 className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handlePublishNow(post.id)}
                             disabled={isPublishing}
@@ -142,12 +153,6 @@ export const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
                             <Play className="w-4 h-4 mr-2" />
                             Post Now
                           </DropdownMenuItem>
-                          {onEditPost && (
-                            <DropdownMenuItem onClick={() => onEditPost(post.id)}>
-                              <Edit2 className="w-4 h-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                          )}
                           <DropdownMenuItem
                             onClick={() => handleDelete(post.id)}
                             disabled={isDeleting}

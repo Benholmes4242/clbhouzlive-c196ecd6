@@ -9,6 +9,7 @@ interface ScheduleSheetProps {
   onClose: () => void;
   onSchedule: (scheduledAt: Date) => void;
   isScheduling?: boolean;
+  initialDate?: Date; // For edit mode - pre-fill with existing scheduled time
 }
 
 // Constants
@@ -19,18 +20,21 @@ export default function ScheduleSheet({
   isOpen, 
   onClose, 
   onSchedule,
-  isScheduling = false
+  isScheduling = false,
+  initialDate
 }: ScheduleSheetProps) {
   const now = new Date();
   const minDate = addDays(startOfDay(now), 0);
   const maxDate = addDays(startOfDay(now), MAX_DAYS_AHEAD);
   
-  const [selectedDate, setSelectedDate] = useState<Date>(now);
-  const [selectedHour, setSelectedHour] = useState(now.getHours());
+  // Use initialDate if provided (edit mode), otherwise use current time
+  const defaultDate = initialDate || now;
+  const [selectedDate, setSelectedDate] = useState<Date>(defaultDate);
+  const [selectedHour, setSelectedHour] = useState(defaultDate.getHours());
   const [selectedMinute, setSelectedMinute] = useState(
-    Math.ceil(now.getMinutes() / 15) * 15 % 60
+    initialDate ? defaultDate.getMinutes() : Math.ceil(now.getMinutes() / 15) * 15 % 60
   );
-  const [viewMonth, setViewMonth] = useState(now);
+  const [viewMonth, setViewMonth] = useState(defaultDate);
   
   // Generate calendar days for current view month
   const calendarDays = useMemo(() => {

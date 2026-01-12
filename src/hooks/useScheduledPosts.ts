@@ -4,14 +4,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   fetchScheduledPosts,
+  fetchScheduledPostForEdit,
   reschedulePost,
   publishNow,
   deleteScheduledPost,
   getScheduledPostCount,
+  updateScheduledPost,
+  type ScheduledPost,
+  type ScheduledPostForEdit,
+  type UpdateScheduledPostData,
 } from '@/services/posts/scheduledPosts';
 
 const SCHEDULED_POSTS_KEY = ['scheduled-posts'];
 const SCHEDULED_COUNT_KEY = ['scheduled-posts-count'];
+
+export type { ScheduledPost, ScheduledPostForEdit };
 
 export function useScheduledPosts() {
   const queryClient = useQueryClient();
@@ -40,6 +47,19 @@ export function useScheduledPosts() {
     },
     onError: () => {
       toast.error('Failed to reschedule');
+    },
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ postId, data }: { postId: string; data: UpdateScheduledPostData }) =>
+      updateScheduledPost(postId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SCHEDULED_POSTS_KEY });
+      queryClient.invalidateQueries({ queryKey: SCHEDULED_COUNT_KEY });
+    },
+    onError: () => {
+      toast.error('Failed to update');
     },
   });
 
@@ -74,11 +94,15 @@ export function useScheduledPosts() {
     count,
     isLoading,
     refetch,
+    fetchForEdit: fetchScheduledPostForEdit,
     reschedule: (postId: string, newTime: Date) =>
       rescheduleMutation.mutateAsync({ postId, newTime }),
+    update: (postId: string, data: UpdateScheduledPostData) =>
+      updateMutation.mutateAsync({ postId, data }),
     publishNow: publishNowMutation.mutateAsync,
     deletePost: deleteMutation.mutateAsync,
     isRescheduling: rescheduleMutation.isPending,
+    isUpdating: updateMutation.isPending,
     isPublishing: publishNowMutation.isPending,
     isDeleting: deleteMutation.isPending,
   };
