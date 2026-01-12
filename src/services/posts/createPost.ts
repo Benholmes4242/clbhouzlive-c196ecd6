@@ -49,6 +49,14 @@ export interface CreatePostResult {
 export async function createPost(input: CreatePostInput): Promise<CreatePostResult> {
   const isScheduled = input.scheduledAt && input.status === 'scheduled';
   
+  console.log('[createPost] Creating post:', {
+    userId: input.userId,
+    actorType: input.actorType,
+    actorId: input.actorId,
+    isScheduled,
+    status: isScheduled ? 'scheduled' : 'published',
+  });
+  
   const { data, error } = await supabase
     .from('posts')
     .insert({
@@ -67,7 +75,12 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
     .select('id, user_id, content, actor_type, actor_id, achievement_id, course_id, categories, badges, visibility, status, scheduled_at, created_at, updated_at')
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('[createPost] Database error:', error.message, error.code, error.details);
+    throw error;
+  }
+  
+  console.log('[createPost] Post created:', data.id);
 
   // Only emit event for immediately published posts (not scheduled)
   if (!isScheduled) {
