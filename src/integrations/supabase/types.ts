@@ -5219,8 +5219,12 @@ export type Database = {
           media_url: string
           media_width: number | null
           orientation: string | null
+          original_media_url: string | null
           post_id: string
           poster_url: string | null
+          processed_at: string | null
+          processing_error: string | null
+          processing_status: string | null
           stream_id: string | null
           studio_edits: Json | null
           width: number | null
@@ -5241,8 +5245,12 @@ export type Database = {
           media_url: string
           media_width?: number | null
           orientation?: string | null
+          original_media_url?: string | null
           post_id: string
           poster_url?: string | null
+          processed_at?: string | null
+          processing_error?: string | null
+          processing_status?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
           width?: number | null
@@ -5263,8 +5271,12 @@ export type Database = {
           media_url?: string
           media_width?: number | null
           orientation?: string | null
+          original_media_url?: string | null
           post_id?: string
           poster_url?: string | null
+          processed_at?: string | null
+          processing_error?: string | null
+          processing_status?: string | null
           stream_id?: string | null
           studio_edits?: Json | null
           width?: number | null

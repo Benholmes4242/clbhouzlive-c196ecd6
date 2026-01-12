@@ -6,6 +6,8 @@ export interface PostMedia {
     filter?: string;
   } | null;
   filter_id?: string | null;
+  processing_status?: 'pending' | 'processing' | 'complete' | 'failed' | 'skipped' | null;
+  original_media_url?: string | null;
 }
 
 export interface PostTag {
