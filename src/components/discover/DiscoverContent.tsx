@@ -96,7 +96,13 @@ function VideosGridWrapper({
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
-  onMediaClick: (item: any, index?: number) => void;
+  /** 
+   * Click handler for media items
+   * @param item - The clicked item
+   * @param index - Position in the items array
+   * @param items - Optional: The source data array (for fullscreen playlist)
+   */
+  onMediaClick: (item: any, index?: number, items?: any[]) => void;
   searchQuery?: string;
   selectedTags?: string[];
 }
@@ -498,18 +504,37 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           isLoading={trendingHeroLoading && !heroItem}
           onWatch={(item) => {
             // Hero click: open fullscreen with the hero video
-            // Hero is independent of grid content, so we pass it directly
+            // CRITICAL: Pass the hero video directly as a single-item playlist
+            // Do NOT use allContent[0] which is a DIFFERENT video!
             if (trendingHeroData?.post) {
-              // Create a compatible item structure for onMediaClick
+              const heroPost = trendingHeroData.post;
+              // Create a compatible ExploreContentItem structure
               const heroContent = {
-                id: trendingHeroData.post.id,
-                src: trendingHeroData.post.media?.[0]?.media_url,
+                id: heroPost.id,
+                src: heroPost.media?.[0]?.media_url,
                 type: 'video' as const,
-                user: trendingHeroData.post.user,
-                title: trendingHeroData.post.caption,
-                golfCourse: trendingHeroData.post.course,
+                user: {
+                  id: heroPost.user?.id,
+                  name: heroPost.user?.display_name || heroPost.user?.username,
+                  username: heroPost.user?.username,
+                  avatar: heroPost.user?.profile_photo_url,
+                },
+                title: heroPost.caption,
+                golfCourse: heroPost.course ? {
+                  id: heroPost.course.id,
+                  name: heroPost.course.name,
+                  country: heroPost.course.country || '',
+                  region: heroPost.course.region,
+                  sub_country: heroPost.course.sub_country,
+                } : undefined,
+                likes: heroPost.likes_count,
+                durationSeconds: heroPost.media?.[0]?.duration_seconds,
+                aspectRatio: heroPost.media?.[0]?.aspect_ratio,
+                width: heroPost.media?.[0]?.width,
+                height: heroPost.media?.[0]?.height,
               };
-              onMediaClick(heroContent, 0);
+              // FIX: Pass hero as index 0 of its own array, NOT allContent
+              onMediaClick(heroContent, 0, [heroContent]);
             }
           }}
         />
@@ -522,13 +547,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         <div className="h-4" /> {/* 16px gap: Suggested Golfers → Grid */}
         
         {/* Feed Grid - uses new WatchGridV2 with ActivityGrid layout */}
-        {/* CRITICAL FIX: WatchGridV2 now passes its own items array, 
-            so we use that directly instead of searching in 'content' */}
+        {/* CRITICAL FIX: WatchGridV2 passes its own items array (gridItems),
+            which MUST be forwarded to the fullscreen player */}
         <WatchGridV2 
           onMediaClick={(item, index, gridItems) => {
-            // Use the grid's own data array directly - this ensures we open 
-            // the correct video since gridItems IS the displayed playlist
-            onMediaClick(item as any, index);
+            // FIX: Pass gridItems to parent so fullscreen uses the CORRECT data source
+            // The grid's data is from useWatchPostsV2, NOT allContent from useInfiniteExploreContent
+            onMediaClick(item as any, index, gridItems as any);
           }}
         />
       </div>

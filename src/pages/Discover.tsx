@@ -235,12 +235,17 @@ const Discover = () => {
   }, []);
 
   // Handle media click from DiscoverContent - opens unified fullscreen player
-  const handleMediaClick = useCallback((item: ExploreContentItem, index?: number) => {
+  // CRITICAL FIX: Accept optional items array to use the correct data source
+  const handleMediaClick = useCallback((item: ExploreContentItem, index?: number, items?: any[]) => {
+    // If items array is provided, use it (e.g., from WatchGridV2 or Hero)
+    // Otherwise fall back to allContent (legacy behavior)
+    const playlist = items && items.length > 0 ? items : allContent;
+    
     // Find the index if not provided
-    const clickedIndex = index ?? allContent.findIndex(c => c.id === item.id);
+    const clickedIndex = index ?? playlist.findIndex(c => c.id === item.id);
     if (clickedIndex !== -1) {
       setCurrentFullscreenPostId(item.id); // Set initial post
-      openFullscreen(allContent, clickedIndex);
+      openFullscreen(playlist, clickedIndex);
     }
   }, [allContent, openFullscreen]);
 
