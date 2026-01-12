@@ -1,6 +1,6 @@
 /**
- * RegionChips - Region filter chips for player discovery
- * Horizontal scrollable chips for geographic filtering
+ * RegionChips - Tab-style region filters matching schedule page tabs exactly
+ * Uses orange underline indicator (same as Schedule tabs)
  */
 
 import { cn } from '@/lib/utils';
@@ -23,31 +23,41 @@ const regions: { value: RegionType; label: string }[] = [
 export function RegionChips({ activeRegion, onRegionChange }: RegionChipsProps) {
   return (
     <div 
-      className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide"
-      style={{ 
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-      }}
+      className="py-3"
+      role="tablist"
+      aria-label="Filter by region"
     >
-      {regions.map((region) => {
-        const isActive = activeRegion === region.value;
+      {/* Grid layout matching schedule page - 5 columns, centered */}
+      <div className="grid w-full grid-cols-5 bg-transparent border-0 px-0 py-0 gap-0">
+        {regions.map((region) => {
+          const isActive = activeRegion === region.value;
 
-        return (
-          <button
-            key={region.value}
-            onClick={() => onRegionChange(region.value)}
-            className={cn(
-              "shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200",
-              "active:scale-[0.97] motion-reduce:active:scale-100",
-              isActive 
-                ? "bg-foreground text-background" 
-                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            {region.label}
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={region.value}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onRegionChange(region.value)}
+              className={cn(
+                // Exact same styling as schedule page tabs
+                "relative text-sm px-2 py-2.5 font-medium",
+                "bg-transparent border-0 shadow-none rounded-none",
+                "transition-colors duration-200 ease-out",
+                "inline-flex items-center justify-center text-center",
+                // Orange underline using after pseudo-element
+                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                "after:transition-all after:duration-200 after:ease-out",
+                isActive 
+                  ? "text-foreground after:w-full after:opacity-[0.85]" 
+                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+              )}
+            >
+              {region.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

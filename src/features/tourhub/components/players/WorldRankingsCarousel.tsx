@@ -1,13 +1,14 @@
 /**
  * WorldRankingsCarousel - Top 5 world-ranked players carousel
  * Always visible on ALL tabs in the Players page
+ * Shows full name on two lines, full country, player photos
  */
 
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
+import type { TourPlayer } from '../../hooks/useTourHubData';
 import { PlayerAvatar } from '../PlayerAvatar';
 
 interface WorldRankCardProps {
@@ -16,22 +17,33 @@ interface WorldRankCardProps {
   className?: string;
 }
 
+/**
+ * Convert country to Title Case (handles "UNITED STATES" -> "United States")
+ */
+function toTitleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 function WorldRankCard({ player, worldRank, className }: WorldRankCardProps) {
-  // Format country - get 3-letter code or abbreviated
-  const countryCode = player.country?.toUpperCase().slice(0, 3) || '';
+  // Format country - full name in Title Case
+  const formattedCountry = player.country ? toTitleCase(player.country) : '';
 
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
       className={cn(
-        "group flex-shrink-0 w-[100px] snap-start",
-        "flex flex-col items-center gap-1.5 p-3 rounded-xl",
+        "group flex-shrink-0 w-[120px] snap-start",
+        "flex flex-col items-center gap-2 p-3 rounded-xl",
         "bg-card border border-border/50 shadow-sm",
         "hover:shadow-md hover:border-border transition-all",
         className
       )}
     >
-      {/* Avatar */}
+      {/* Avatar with photo */}
       <div className="relative">
         <PlayerAvatar
           playerId={player.id}
@@ -45,14 +57,14 @@ function WorldRankCard({ player, worldRank, className }: WorldRankCardProps) {
         </div>
       </div>
 
-      {/* Name - truncated */}
-      <p className="font-medium text-xs text-center leading-tight line-clamp-1 w-full">
-        {player.full_name.split(' ').pop()}
+      {/* Full Name - two lines allowed */}
+      <p className="font-medium text-xs text-center leading-tight line-clamp-2 w-full min-h-[2rem]">
+        {player.full_name}
       </p>
 
-      {/* Country code */}
-      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-        {countryCode}
+      {/* Full Country */}
+      <p className="text-[11px] text-muted-foreground text-center leading-tight line-clamp-2 w-full">
+        {formattedCountry}
       </p>
 
       {/* World Rank Badge */}
