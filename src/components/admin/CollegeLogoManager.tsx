@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Search, Upload, RefreshCw, Image as ImageIcon, Check, X } from 'lucide-react';
+import { Search, Upload, RefreshCw, Image as ImageIcon, Check, X, Wand2, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 
 interface CollegeMedia {
   id: string;
@@ -17,12 +18,36 @@ interface CollegeMedia {
   logo_url: string | null;
 }
 
+interface FetchResult {
+  success: boolean;
+  message?: string;
+  processed?: number;
+  successful?: number;
+  failed?: number;
+  results?: Array<{
+    normalized_name: string;
+    success: boolean;
+    logo_url?: string;
+    error?: string;
+  }>;
+  error?: string;
+}
+
+// Top 20 colleges by player count
+const TOP_20_COLLEGES = [
+  'georgia', 'oklahomastate', 'texas', 'wakeforest', 'florida',
+  'alabama', 'georgiatech', 'stanford', 'floridastate', 'sandiegostate',
+  'northcarolina', 'southerncalifornia', 'louisianastate', 'virginia',
+  'texastech', 'tennessee', 'ucla', 'clemson', 'california', 'duke'
+];
+
 export default function CollegeLogoManager() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [uploadingCollege, setUploadingCollege] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCollege, setSelectedCollege] = useState<CollegeMedia | null>(null);
+  const [fetchResult, setFetchResult] = useState<FetchResult | null>(null);
 
   // Fetch all colleges
   const { data: colleges, isLoading, refetch } = useQuery({
@@ -81,6 +106,33 @@ export default function CollegeLogoManager() {
     },
   });
 
+  // Fetch logos from Wikipedia mutation
+  const fetchLogosMutation = useMutation({
+    mutationFn: async (params: { normalized_names?: string[]; limit?: number }) => {
+      const response = await supabase.functions.invoke('fetch-college-logos', {
+        body: params,
+      });
+
+      if (response.error) throw response.error;
+      return response.data as FetchResult;
+    },
+    onSuccess: (data) => {
+      setFetchResult(data);
+      if (data.successful && data.successful > 0) {
+        toast.success(`Fetched ${data.successful} logos from Wikipedia`);
+        queryClient.invalidateQueries({ queryKey: ['college-media'] });
+      } else if (data.error) {
+        toast.error(data.error);
+      } else {
+        toast.info(data.message || 'No logos fetched');
+      }
+    },
+    onError: (error) => {
+      toast.error(`Fetch failed: ${error.message}`);
+      setFetchResult({ success: false, error: error.message });
+    },
+  });
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedCollege) return;
@@ -111,6 +163,24 @@ export default function CollegeLogoManager() {
     fileInputRef.current?.click();
   };
 
+  const handleFetchTop20 = () => {
+    // Filter to only colleges that don't have logos yet
+    const missingLogos = TOP_20_COLLEGES.filter(name => 
+      !colleges?.find(c => c.normalized_name === name && c.logo_url)
+    );
+    
+    if (missingLogos.length === 0) {
+      toast.info('All top 20 colleges already have logos!');
+      return;
+    }
+    
+    fetchLogosMutation.mutate({ normalized_names: missingLogos });
+  };
+
+  const handleFetchNext = (count: number) => {
+    fetchLogosMutation.mutate({ limit: count });
+  };
+
   const stats = {
     total: colleges?.length || 0,
     withLogos: colleges?.filter(c => c.logo_url).length || 0,
@@ -137,6 +207,92 @@ export default function CollegeLogoManager() {
           onChange={handleFileSelect}
           className="hidden"
         />
+
+        {/* Auto-fetch section */}
+        <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold">Wikipedia Logo Fetcher</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Automatically fetch college logos from Wikipedia athletics pages and upload to CDN.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={handleFetchTop20}
+              disabled={fetchLogosMutation.isPending}
+              className="gap-2"
+            >
+              {fetchLogosMutation.isPending ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Fetch Top 20 Colleges
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleFetchNext(10)}
+              disabled={fetchLogosMutation.isPending}
+              className="gap-2"
+            >
+              {fetchLogosMutation.isPending ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Fetch Next 10 Missing
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleFetchNext(50)}
+              disabled={fetchLogosMutation.isPending}
+              className="gap-2"
+            >
+              Fetch Next 50
+            </Button>
+          </div>
+
+          {/* Fetch results */}
+          {fetchResult && (
+            <div className="mt-3 p-3 bg-background rounded-md border text-sm">
+              {fetchResult.success ? (
+                <div className="space-y-2">
+                  <div className="font-medium text-green-600 dark:text-green-400">
+                    {fetchResult.message}
+                  </div>
+                  {fetchResult.results && fetchResult.results.length > 0 && (
+                    <ScrollArea className="max-h-40">
+                      <div className="space-y-1">
+                        {fetchResult.results.map((r, i) => (
+                          <div key={i} className="flex items-center gap-2 text-xs">
+                            {r.success ? (
+                              <Check className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <X className="h-3 w-3 text-red-500" />
+                            )}
+                            <span className="font-mono">{r.normalized_name}</span>
+                            {r.error && (
+                              <span className="text-muted-foreground truncate">
+                                - {r.error}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
+              ) : (
+                <div className="text-red-600 dark:text-red-400">
+                  Error: {fetchResult.error}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <Separator />
 
         {/* Stats */}
         <div className="flex flex-wrap gap-2">
