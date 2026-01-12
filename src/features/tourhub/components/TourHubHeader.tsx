@@ -36,7 +36,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
         </motion.button>
         
         {/* Center: Title - Premium rebrand */}
-        <h1 className="text-lg font-bold uppercase tracking-[-0.02em] text-foreground">
+        <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground">
           The Tour
         </h1>
         
