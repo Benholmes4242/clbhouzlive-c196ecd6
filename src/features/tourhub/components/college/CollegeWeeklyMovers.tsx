@@ -52,40 +52,42 @@ export function CollegeWeeklyMovers({ limit = 8, className }: CollegeWeeklyMover
         </p>
       )}
       
-      {/* Direction Tabs - Leaders page style with orange underline */}
+      {/* Direction Tabs - Same grid layout as Schedule page tabs */}
       <div 
-        className="flex justify-center mb-6"
+        className="py-3 mb-6"
         role="tablist"
         aria-label="Mover direction"
       >
-        {[
-          { value: 'up' as Direction, label: 'Rising' },
-          { value: 'down' as Direction, label: 'Falling' },
-        ].map(({ value, label }) => {
-          const isSelected = direction === value;
-          return (
-            <button
-              key={value}
-              role="tab"
-              aria-selected={isSelected}
-              onClick={() => setDirection(value)}
-              className={cn(
-                "relative text-sm px-4 py-2 font-medium whitespace-nowrap",
-                "bg-transparent border-0 shadow-none rounded-none",
-                "transition-colors duration-200 ease-out",
-                "inline-flex items-center justify-center",
-                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                "after:transition-all after:duration-200 after:ease-out",
-                isSelected 
-                  ? "text-foreground after:w-full after:opacity-[0.85]" 
-                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
-              )}
-            >
-              {label}
-            </button>
-          );
-        })}
+        <div className="grid w-full grid-cols-2 bg-transparent border-0 px-0 py-0 gap-0">
+          {[
+            { value: 'up' as Direction, label: 'Rising' },
+            { value: 'down' as Direction, label: 'Falling' },
+          ].map(({ value, label }) => {
+            const isSelected = direction === value;
+            return (
+              <button
+                key={value}
+                role="tab"
+                aria-selected={isSelected}
+                onClick={() => setDirection(value)}
+                className={cn(
+                  "relative text-sm px-3 py-2.5 font-medium",
+                  "bg-transparent border-0 shadow-none rounded-none",
+                  "transition-colors duration-200 ease-out",
+                  "inline-flex items-center justify-center",
+                  "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                  "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                  "after:transition-all after:duration-200 after:ease-out",
+                  isSelected 
+                    ? "text-foreground after:w-full after:opacity-[0.85]" 
+                    : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
       
       {/* Movers List */}
