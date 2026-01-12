@@ -235,32 +235,38 @@ export function LeadersTab() {
 
   return (
     <div className="space-y-5">
-      {/* Category Chips - using design tokens */}
-      <div className="relative">
-        {/* Fade edges for scroll indication */}
-        <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-        
-        <div 
-          className="flex gap-2 overflow-x-auto pb-1 px-1 scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
+      {/* Category Tabs - matching Players page style with orange underline */}
+      <div 
+        className="py-3"
+        role="tablist"
+        aria-label="Leaderboard categories"
+      >
+        {/* Grid layout matching Players page tabs - centered */}
+        <div className="grid w-full grid-cols-6 bg-transparent border-0 px-0 py-0 gap-0 overflow-x-auto">
           {leaderCategories.map((cat) => {
             const isSelected = selectedCategory.key === cat.key;
             return (
               <button
                 key={cat.key}
+                role="tab"
+                aria-selected={isSelected}
                 onClick={() => handleCategoryChange(cat)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all shrink-0",
-                  "active:scale-[0.97]",
+                  // Exact same styling as Players page tabs
+                  "relative text-sm px-3 py-2.5 font-medium",
+                  "bg-transparent border-0 shadow-none rounded-none",
+                  "transition-colors duration-200 ease-out",
+                  "inline-flex items-center justify-center gap-1",
+                  // Orange underline using after pseudo-element
+                  "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
+                  "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
+                  "after:transition-all after:duration-200 after:ease-out",
                   isSelected 
-                    ? "bg-zinc-900 text-white shadow-md" 
-                    : "bg-transparent text-muted-foreground border border-border hover:border-zinc-400 hover:text-foreground"
+                    ? "text-foreground after:w-full after:opacity-[0.85]" 
+                    : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
                 )}
               >
-                <span className={cn(isSelected ? "opacity-90" : "opacity-70")}>{cat.icon}</span>
-                <span>{cat.shortLabel}</span>
+                {cat.shortLabel}
               </button>
             );
           })}
