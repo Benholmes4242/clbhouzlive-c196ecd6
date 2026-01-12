@@ -53,7 +53,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
     recent: { 
       text: 'Most recent', 
       icon: <Clock className="w-3.5 h-3.5" />, 
-      className: 'bg-white/20 backdrop-blur-sm text-white',
+      className: 'bg-black/60 backdrop-blur-sm text-white',
       pulse: false
     },
   };
@@ -65,7 +65,7 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className="group block relative overflow-hidden rounded-2xl -mx-4 sm:-mx-6"
+      className="group block relative overflow-hidden -mx-4 sm:-mx-6"
     >
       {/* Full-width immersive image container */}
       <div className="relative h-[50vh] min-h-[300px] max-h-[400px] overflow-hidden">
