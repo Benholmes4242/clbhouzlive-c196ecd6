@@ -19,10 +19,11 @@ import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
 import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
-import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
+import DiscoverHero, { createHeroItem, createHeroItemFromTrending } from '@/components/discover/DiscoverHero';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 import { MOMENT_CATEGORIES } from '@/components/post/create-moment/categoryDefinitions';
-import { useHeroPreload } from '@/hooks/useHeroPreload';
+import { useTrendingHero } from '@/hooks/useTrendingHero';
+// Hero preload is now handled by useTrendingHero's queryFn
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
   durationKey,
@@ -232,9 +233,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     loadMore 
   } = useInfiniteExploreContent(filterType, sub, durationFilter, watchSortOption);
 
-  // CRITICAL: Preload hero video manifest as soon as content arrives
-  // This eliminates the 2.2s delay where preload only starts when Hero mounts
-  useHeroPreload(content);
+  // Hero preloading is now handled by useTrendingHero (runs its own query)
+  // No longer need useHeroPreload(content) here
 
   // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {
@@ -348,99 +348,19 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Create hero item using 3-TIER FALLBACK algorithm from UNFILTERED content
-  // Priority 1: Most liked from last 24h
-  // Priority 2: Most liked from last 7 days
-  // Priority 3: Most recent landscape video
-  // IMPORTANT: Hero is NEVER affected by search/tags - only grid is filtered
+  // === HERO DATA - INDEPENDENT, ALGORITHM-BASED ===
+  // The hero uses a SEPARATE query and is NEVER affected by search/sort/tags
+  const { data: trendingHeroData, isLoading: trendingHeroLoading } = useTrendingHero();
+
+  // Create hero item from trending data (independent of grid filters)
   const heroItem = useMemo(() => {
-    // Use UNFILTERED content for hero selection
-    if (!content || content.length === 0) return null;
-    
-    const LANDSCAPE_THRESHOLD = 1.25;
-    const MIN_DURATION = 1; // Has duration (not 0)
-    const MAX_DURATION = 240; // Match Watch grid (<4 min)
-    
-    const now = new Date();
-    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-    // Filter landscape videos with duration requirements
-    const landscapeVideos = content.filter(item => {
-      if (item.type !== 'video') return false;
-      const aspectRatio = item.aspectRatio || 
-        (item.width && item.height && item.height > 0 ? item.width / item.height : 0);
-      if (aspectRatio < LANDSCAPE_THRESHOLD && !item.landscapeSuitable) return false;
-      const duration = item.durationSeconds || 0;
-      if (duration > 0 && (duration < MIN_DURATION || duration > MAX_DURATION)) return false;
-      return true;
-    });
-
-    if (landscapeVideos.length === 0) {
-      // No landscape videos at all - hero section will hide
-      return null;
-    }
-
-    // Helper to get age in hours
-    const getAgeHours = (item: ExploreContentItem) => {
-      const createdAt = item.createdAt || (item as any).created_at;
-      if (!createdAt) return 24 * 7; // Default to 1 week if no date
-      return (now.getTime() - new Date(createdAt).getTime()) / (1000 * 60 * 60);
-    };
-
-    // PRIORITY 1: Most liked video from last 24 hours
-    const todayVideos = landscapeVideos
-      .filter(item => {
-        const createdAt = item.createdAt || (item as any).created_at;
-        if (!createdAt) return false;
-        return new Date(createdAt) >= oneDayAgo;
-      })
-      .filter(item => (item.likes || 0) > 0)
-      .sort((a, b) => (b.likes || 0) - (a.likes || 0));
-
-    if (todayVideos.length > 0) {
-      const heroVideo = todayVideos[0];
-      const ageHours = getAgeHours(heroVideo);
-      // Use high score to trigger "TRENDING NOW" label
-      return createHeroItem(heroVideo, 300, ageHours);
-    }
-
-    // PRIORITY 2: Most liked video from last 7 days
-    const weekVideos = landscapeVideos
-      .filter(item => {
-        const createdAt = item.createdAt || (item as any).created_at;
-        if (!createdAt) return false;
-        return new Date(createdAt) >= oneWeekAgo;
-      })
-      .filter(item => (item.likes || 0) > 0)
-      .sort((a, b) => (b.likes || 0) - (a.likes || 0));
-
-    if (weekVideos.length > 0) {
-      const heroVideo = weekVideos[0];
-      const ageHours = getAgeHours(heroVideo);
-      // Use medium score for "POPULAR THIS WEEK" label
-      return createHeroItem(heroVideo, 250, ageHours);
-    }
-
-    // PRIORITY 3: Any landscape video (most recent)
-    const mostRecentLandscape = [...landscapeVideos]
-      .sort((a, b) => {
-        const aDate = new Date(a.createdAt || (a as any).created_at || 0).getTime();
-        const bDate = new Date(b.createdAt || (b as any).created_at || 0).getTime();
-        return bDate - aDate;
-      })[0];
-
-    if (mostRecentLandscape) {
-      const ageHours = getAgeHours(mostRecentLandscape);
-      // Use low score for "FEATURED" or generic label
-      return createHeroItem(mostRecentLandscape, 50, ageHours);
-    }
-
-    return null;
-  }, [content]); // Uses UNFILTERED content - hero never changes with search/tags
+    if (!trendingHeroData?.post) return null;
+    return createHeroItemFromTrending(trendingHeroData.post, trendingHeroData.trendingPeriod);
+  }, [trendingHeroData]);
 
   // Grid content: Start with unfiltered content, remove hero, THEN apply search/tag filters
   // This ensures hero stays constant while grid responds to filters
+  // === GRID DATA - AFFECTED BY SEARCH & SORT ===
   const gridContent = useMemo(() => {
     if (!content || content.length === 0) return [];
 
@@ -448,11 +368,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     let filtered = [...content];
 
     // STEP 2: Remove hero item first (before filtering)
-    if (heroItem) {
-      filtered = filtered.filter(item => item.id !== heroItem.id);
+    // Hero is selected independently via useTrendingHero, so exclude it from grid
+    if (trendingHeroData?.post?.id) {
+      filtered = filtered.filter(item => item.id !== trendingHeroData.post.id);
     }
 
     // STEP 3: Apply search filter (with category label matching)
+    // Search only affects the grid, NOT the hero
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       
@@ -489,6 +411,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }
 
     // STEP 4: Apply tag filter (watchActiveFilter for shorts tab)
+    // Tags only affect the grid, NOT the hero
     const activeTags = watchActiveFilter !== 'all' ? [watchActiveFilter] : selectedTags;
     if (activeTags.length > 0) {
       filtered = applyTagFilter(filtered, activeTags);
@@ -503,7 +426,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }));
 
     return unique;
-  }, [content, heroItem, searchQuery, selectedTags, watchActiveFilter, likedItems]);
+  }, [content, trendingHeroData?.post?.id, searchQuery, selectedTags, watchActiveFilter, likedItems]);
 
   // Apply course clustering when 3+ items from same course in top 15 (for Shorts tab)
   // MUST be called unconditionally to satisfy React hooks rules
@@ -569,18 +492,24 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         {/* Watch Section Gap Token: 16px between all major sections */}
         <div className="h-4" /> {/* 16px gap: CommandCenter → Hero */}
         
-        {/* Watch Hero - single featured item (uses unfiltered content) */}
+        {/* Watch Hero - INDEPENDENT of search/sort, algorithm-based selection */}
         <DiscoverHero 
           item={heroItem}
-          isLoading={loading && !content}
+          isLoading={trendingHeroLoading && !heroItem}
           onWatch={(item) => {
-            // Hero click: find the item in unfiltered content and open fullscreen
-            // Pass the full content array to maintain proper playlist order
-            if (content && content.length > 0) {
-              const index = content.findIndex(c => c.id === item.id);
-              if (index !== -1) {
-                onMediaClick(content[index], index);
-              }
+            // Hero click: open fullscreen with the hero video
+            // Hero is independent of grid content, so we pass it directly
+            if (trendingHeroData?.post) {
+              // Create a compatible item structure for onMediaClick
+              const heroContent = {
+                id: trendingHeroData.post.id,
+                src: trendingHeroData.post.media?.[0]?.media_url,
+                type: 'video' as const,
+                user: trendingHeroData.post.user,
+                title: trendingHeroData.post.caption,
+                golfCourse: trendingHeroData.post.course,
+              };
+              onMediaClick(heroContent, 0);
             }
           }}
         />

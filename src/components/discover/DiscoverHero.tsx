@@ -399,3 +399,54 @@ export function createHeroItem(
     } : undefined,
   };
 }
+
+/**
+ * Creates a HeroItem from TrendingHeroPost data (from useTrendingHero hook)
+ * This is the preferred method for the Watch tab hero
+ */
+export function createHeroItemFromTrending(
+  post: any,
+  trendingPeriod: 'today' | 'this_week'
+): HeroItem | null {
+  if (!post) return null;
+
+  const mediaUrl = post.media?.[0]?.media_url;
+  const mediaType = post.media?.[0]?.media_type === 'video' ? 'video' : 'image';
+  
+  let posterUrl: string | undefined;
+  if (mediaType === 'video' && mediaUrl) {
+    posterUrl = post.media?.[0]?.poster_url || post.media?.[0]?.thumbnail_url || (getStreamPoster(mediaUrl, '1s') ?? undefined);
+  }
+
+  // Context label based on trending period
+  const contextLabel = trendingPeriod === 'today' 
+    ? "TRENDING TODAY" 
+    : "TRENDING THIS WEEK";
+
+  return {
+    id: post.id,
+    contextLabel,
+    title: post.caption || 'Featured moment',
+    subContext: post.user?.display_name || post.user?.username || '',
+    mediaUrl,
+    mediaType,
+    posterUrl,
+    ctaLabel: 'Watch',
+    durationSeconds: post.media?.[0]?.duration_seconds,
+    isPopular: true,
+    isTrending: true,
+    golfCourse: post.course ? {
+      id: post.course.id,
+      name: post.course.name,
+      country: post.course.country || '',
+      region: post.course.region,
+      sub_country: post.course.sub_country,
+    } : undefined,
+    likes: post.likes_count,
+    creator: {
+      id: post.user?.id || post.user_id,
+      name: post.user?.display_name || post.user?.username || 'Unknown',
+      avatarUrl: post.user?.profile_photo_url,
+    },
+  };
+}
