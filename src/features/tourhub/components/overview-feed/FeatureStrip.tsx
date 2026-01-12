@@ -53,18 +53,26 @@ export function FeatureStrip({ nextTournament, topPlayers = [], historyMoments =
     });
   }
 
-  // Add top players (season leaders)
-  topPlayers.slice(0, 3).forEach((leader, idx) => {
-    const labels = ['Most Active', 'Lowest Scoring', 'World No.1'];
+  // Add top players (season leaders) - with correct labels matching their category
+  topPlayers.slice(0, 3).forEach((leader) => {
+    // Use category-specific labels instead of hardcoded array
+    const labelMap: Record<string, string> = {
+      events: 'Most Active',
+      cuts: 'Most Cuts',
+      scoring: 'Lowest Scoring',
+      world_rank: 'World No.1',
+    };
+    const label = labelMap[leader.category] || leader.label;
+    
     cards.push({
       id: `player-${leader.player.id}`,
       type: 'player',
-      label: labels[idx] || leader.label,
+      label,
       title: leader.player.name,
       subtitle: leader.formattedValue,
       imageUrl: null, // Player images to be added
       href: `/tourhub/player/${leader.player.id}`,
-      icon: idx === 0 ? <TrendingUp className="w-3 h-3" /> : <Globe className="w-3 h-3" />,
+      icon: leader.category === 'events' ? <TrendingUp className="w-3 h-3" /> : <Globe className="w-3 h-3" />,
     });
   });
 
