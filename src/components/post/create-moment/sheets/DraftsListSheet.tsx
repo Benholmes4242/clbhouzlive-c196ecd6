@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { formatDistanceToNow } from 'date-fns';
 import { Trash2, FileEdit, AlertCircle } from 'lucide-react';
 import { useDrafts } from '@/hooks/useDrafts';
@@ -49,6 +50,11 @@ export default function DraftsListSheet({ isOpen, onClose, onLoadDraft }: Drafts
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent className="max-h-[85vh] bg-background">
+        {/* Accessibility: Screen reader title */}
+        <VisuallyHidden>
+          <DrawerTitle>Your Drafts</DrawerTitle>
+        </VisuallyHidden>
+        
         <div className="flex flex-col h-full max-h-[85vh]">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">

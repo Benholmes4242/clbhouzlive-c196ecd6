@@ -200,10 +200,15 @@ export default function ScheduleSheet({
                   <select
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                    className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-300 text-base font-medium appearance-none cursor-pointer"
+                    style={{ 
+                      color: '#1f2937', 
+                      backgroundColor: '#ffffff',
+                      WebkitAppearance: 'menulist',
+                    }}
                   >
                     {Array.from({ length: 24 }, (_, i) => (
-                      <option key={i} value={i}>
+                      <option key={i} value={i} style={{ color: '#1f2937' }}>
                         {i.toString().padStart(2, "0")}
                       </option>
                     ))}
@@ -215,10 +220,15 @@ export default function ScheduleSheet({
                   <select
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                    className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-gray-300 text-base font-medium appearance-none cursor-pointer"
+                    style={{ 
+                      color: '#1f2937', 
+                      backgroundColor: '#ffffff',
+                      WebkitAppearance: 'menulist',
+                    }}
                   >
                     {[0, 15, 30, 45].map(m => (
-                      <option key={m} value={m}>
+                      <option key={m} value={m} style={{ color: '#1f2937' }}>
                         {m.toString().padStart(2, "0")}
                       </option>
                     ))}
