@@ -1,6 +1,6 @@
 /**
- * PlayerFilterChips - Tab-style filters matching schedule page tabs exactly
- * Uses orange underline indicator (same as Schedule tabs)
+ * PlayerFilterChips - Mode-switch style tabs with pill backgrounds
+ * Premium segmented control feel
  */
 
 import { cn } from '@/lib/utils';
@@ -18,22 +18,23 @@ interface PlayerFilterChipsProps {
   };
 }
 
+// Cleaner, shorter labels
 const filters: { value: PlayerFilterType; label: string; countKey: keyof NonNullable<PlayerFilterChipsProps['counts']> }[] = [
-  { value: 'all', label: 'All Players', countKey: 'all' },
-  { value: 'top-ranked', label: 'Top Ranked', countKey: 'topRanked' },
-  { value: 'most-active', label: 'Most Active', countKey: 'mostActive' },
+  { value: 'all', label: 'All', countKey: 'all' },
+  { value: 'top-ranked', label: 'Ranked', countKey: 'topRanked' },
+  { value: 'most-active', label: 'Active', countKey: 'mostActive' },
   { value: 'rookies', label: 'Rookies', countKey: 'rookies' },
 ];
 
 export function PlayerFilterChips({ activeFilter, onFilterChange, counts }: PlayerFilterChipsProps) {
   return (
     <div 
-      className="py-3"
+      className="py-2"
       role="tablist"
       aria-label="Filter players"
     >
-      {/* Grid layout matching schedule page - 4 columns, centered */}
-      <div className="grid w-full grid-cols-4 bg-transparent border-0 px-0 py-0 gap-0">
+      {/* Mode-switch segmented control */}
+      <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-muted/50">
         {filters.map((filter) => {
           const isActive = activeFilter === filter.value;
 
@@ -44,18 +45,12 @@ export function PlayerFilterChips({ activeFilter, onFilterChange, counts }: Play
               aria-selected={isActive}
               onClick={() => onFilterChange(filter.value)}
               className={cn(
-                // Exact same styling as schedule page tabs
-                "relative text-sm px-3 py-2.5 font-medium",
-                "bg-transparent border-0 shadow-none rounded-none",
-                "transition-colors duration-200 ease-out",
-                "inline-flex items-center justify-center gap-1",
-                // Orange underline using after pseudo-element
-                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                "after:transition-all after:duration-200 after:ease-out",
+                "relative px-4 py-2 text-sm font-medium rounded-lg",
+                "transition-all duration-200 ease-out",
+                "inline-flex items-center justify-center gap-1.5",
                 isActive 
-                  ? "text-foreground after:w-full after:opacity-[0.85]" 
-                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                  ? "bg-background text-foreground shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
               {filter.label}

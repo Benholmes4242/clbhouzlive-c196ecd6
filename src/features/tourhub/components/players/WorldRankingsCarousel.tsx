@@ -1,7 +1,11 @@
 /**
- * WorldRankingsCarousel - Top 5 world-ranked players carousel
- * Always visible on ALL tabs in the Players page
- * Shows full name on two lines, full country, player photos
+ * WorldRankingsCarousel - Premium prestige-styled top world rankings
+ * 
+ * Features:
+ * - Top 3 with medal tints (gold, silver, bronze)
+ * - #1 slightly larger than #2/#3
+ * - Rank as subtle background typography
+ * - Apple Sports prestige feel
  */
 
 import { useMemo } from 'react';
@@ -17,9 +21,6 @@ interface WorldRankCardProps {
   className?: string;
 }
 
-/**
- * Convert country to Title Case (handles "UNITED STATES" -> "United States")
- */
 function toTitleCase(str: string): string {
   return str
     .toLowerCase()
@@ -29,52 +30,78 @@ function toTitleCase(str: string): string {
 }
 
 function WorldRankCard({ player, worldRank, className }: WorldRankCardProps) {
-  // Format country - full name in Title Case
   const formattedCountry = player.country ? toTitleCase(player.country) : '';
+  
+  // Medal tints for top 3
+  const medalConfig = {
+    1: { bg: 'bg-gradient-to-b from-amber-50 to-amber-100/50', border: 'border-amber-200/60', glow: 'shadow-amber-200/30' },
+    2: { bg: 'bg-gradient-to-b from-slate-50 to-slate-100/50', border: 'border-slate-200/60', glow: 'shadow-slate-200/30' },
+    3: { bg: 'bg-gradient-to-b from-orange-50 to-orange-100/40', border: 'border-orange-200/50', glow: 'shadow-orange-200/20' },
+  };
+  
+  const medal = medalConfig[worldRank as keyof typeof medalConfig];
+  const isTop3 = worldRank <= 3;
+  const isNumber1 = worldRank === 1;
 
   return (
     <Link
       to={`/tourhub/player/${player.id}`}
       className={cn(
-        "group flex-shrink-0 w-[120px] snap-start",
-        "flex flex-col items-center gap-2 p-3 rounded-xl",
-        "bg-card border border-border/50 shadow-sm",
-        "hover:shadow-md hover:border-border transition-all",
+        "group flex-shrink-0 snap-start relative overflow-hidden",
+        "flex flex-col items-center gap-2 rounded-2xl",
+        "border transition-all duration-200",
+        "hover:shadow-lg active:scale-[0.98]",
+        // Size varies by rank
+        isNumber1 ? "w-[130px] p-4" : "w-[115px] p-3",
+        // Medal styling for top 3
+        isTop3 && medal 
+          ? cn(medal.bg, medal.border, `shadow-md ${medal.glow}`)
+          : "bg-card border-border/50 shadow-sm hover:shadow-md hover:border-border",
         className
       )}
     >
-      {/* Avatar with photo */}
-      <div className="relative">
+      {/* Background rank number (low opacity) */}
+      <div className={cn(
+        "absolute inset-0 flex items-center justify-center pointer-events-none select-none",
+        "font-bold text-[80px] leading-none",
+        isTop3 ? "text-black/[0.03]" : "text-muted-foreground/[0.03]"
+      )}>
+        {worldRank}
+      </div>
+
+      {/* Avatar */}
+      <div className="relative z-10">
         <PlayerAvatar
           playerId={player.id}
           playerName={player.full_name}
           fallbackPhotoUrl={player.photo_url}
-          size="lg"
+          size={isNumber1 ? "lg" : "md"}
         />
-        {/* Hover indicator */}
-        <div className="absolute -right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <ChevronRight className="w-3 h-3 text-muted-foreground" />
-        </div>
       </div>
 
-      {/* Full Name - two lines allowed */}
-      <p className="font-medium text-xs text-center leading-tight line-clamp-2 w-full min-h-[2rem]">
+      {/* Full Name */}
+      <p className={cn(
+        "font-semibold text-center leading-tight line-clamp-2 w-full min-h-[2rem] z-10",
+        isNumber1 ? "text-sm" : "text-xs"
+      )}>
         {player.full_name}
       </p>
 
-      {/* Full Country */}
-      <p className="text-[11px] text-muted-foreground text-center leading-tight line-clamp-2 w-full">
+      {/* Country */}
+      <p className="text-[11px] text-muted-foreground text-center leading-tight line-clamp-1 w-full z-10">
         {formattedCountry}
       </p>
 
-      {/* World Rank Badge */}
+      {/* World Rank Badge - smaller and cleaner */}
       <span className={cn(
-        "text-[10px] font-semibold px-2 py-0.5 rounded-full",
-        worldRank === 1 ? "bg-amber-500 text-white" :
-        worldRank <= 5 ? "bg-amber-100 text-amber-700" :
-        "bg-zinc-100 text-zinc-600"
+        "text-[9px] font-medium px-2 py-0.5 rounded-full z-10",
+        isNumber1 
+          ? "bg-amber-500/90 text-white" 
+          : isTop3 
+            ? "bg-black/5 text-foreground/70" 
+            : "bg-muted text-muted-foreground"
       )}>
-        World #{worldRank}
+        #{worldRank}
       </span>
     </Link>
   );
@@ -118,9 +145,9 @@ export function WorldRankingsCarousel({ worldRankedPlayers, players }: WorldRank
         </h3>
         <Link 
           to="/tourhub?tab=players&filter=top-ranked"
-          className="text-xs text-primary hover:underline flex items-center gap-0.5"
+          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5 transition-colors"
         >
-          View All
+          Full Rankings
           <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
