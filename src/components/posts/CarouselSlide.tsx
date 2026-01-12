@@ -143,7 +143,8 @@ export default function CarouselSlide({
   if (item.type === 'video') {
     return (
       <div 
-        className={cn(cropClass, "select-none")} 
+        className={cn(cropClass, "select-none relative w-full h-full")} 
+        style={{ minHeight: '200px' }}
         {...longPressProps}
         onClick={handleVideoTap}
       >
@@ -163,12 +164,23 @@ export default function CarouselSlide({
           muted={forceVideoMuted}
           loop
           className={cn(
-            "w-full h-full object-cover transition-all duration-300",
+            "w-full h-full object-cover transition-all duration-300 block",
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
             filterClass
           )}
-          style={pixelStyle}
-          onLoadedMetadata={handleLoadedMetadata}
+          style={{ 
+            ...pixelStyle,
+            width: '100%',
+            height: '100%',
+            minHeight: '200px',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+          onLoadedMetadata={() => {
+            console.log('[CarouselSlide] Video metadata loaded for:', item.id);
+            handleLoadedMetadata();
+          }}
+          onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
           onTimeUpdate={handleTimeUpdate}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
