@@ -11,13 +11,14 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
-import { PlayerAvatar } from '../PlayerAvatar';
 
 interface PlayerRowProps {
   player: TourPlayer;
   stats?: TourPlayerStatistics & { worldRank?: number | null };
   /** Pre-resolved college media for efficient rendering */
   college?: CollegeMedia | null;
+  /** Pre-fetched headshot URL from batch query */
+  headshotUrl?: string | null;
   statDisplay?: 'rank' | 'events' | 'wins';
   className?: string;
 }
@@ -33,7 +34,7 @@ function toTitleCase(str: string): string {
     .join(' ');
 }
 
-export function PlayerRow({ player, stats, college, statDisplay = 'rank', className }: PlayerRowProps) {
+export function PlayerRow({ player, stats, college, headshotUrl, statDisplay = 'rank', className }: PlayerRowProps) {
   // Format country in Title Case
   const formattedCountry = player.country ? toTitleCase(player.country) : null;
 
@@ -59,12 +60,21 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
       <div className="flex items-center gap-3 min-w-0 flex-1">
         {/* Avatar with Rank Badge below */}
         <div className="flex flex-col items-center gap-1 shrink-0">
-          <PlayerAvatar
-            playerId={player.id}
-            playerName={player.full_name}
-            fallbackPhotoUrl={player.photo_url}
-            size="md"
-          />
+          {/* Avatar - use pre-fetched headshot or fallback */}
+          <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+            {(headshotUrl || player.photo_url) ? (
+              <img 
+                src={headshotUrl || player.photo_url || ''} 
+                alt={player.full_name}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <span className="font-medium text-sm text-muted-foreground">
+                {player.full_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+              </span>
+            )}
+          </div>
           {/* Rank Badge - tiered colors */}
           {hasValidRank && (
             <span className={cn(

@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer, type TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankings } from '../../hooks/useWorldRankings';
 import { useCollegeLookup } from '../../hooks/useCollegeMedia';
+import { usePlayerHeadshots } from '../../hooks/usePlayerMedia';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import {
   WorldRankingsCarousel,
@@ -58,6 +59,37 @@ const TAB_DEFAULT_SORT: Record<PlayerFilterType, PlayerSortType> = {
   'most-active': 'alphabetical',
   'rookies': 'alphabetical',
 };
+
+/**
+ * Sub-component to batch-fetch headshots for visible players
+ */
+interface PlayerListWithHeadshotsProps {
+  players: TourPlayer[];
+  statsMap: Map<string, TourPlayerStatistics & { worldRank?: number | null }>;
+  getCollege: (collegeName: string | null | undefined) => import('../../hooks/useCollegeMedia').CollegeMedia | null;
+  statDisplay: 'rank' | 'events' | 'wins';
+}
+
+function PlayerListWithHeadshots({ players, statsMap, getCollege, statDisplay }: PlayerListWithHeadshotsProps) {
+  // Batch fetch headshots for all visible players
+  const playerIds = useMemo(() => players.map(p => p.id), [players]);
+  const { data: headshotMap } = usePlayerHeadshots(playerIds);
+
+  return (
+    <div className="space-y-0">
+      {players.map((player) => (
+        <PlayerRow
+          key={player.id}
+          player={player}
+          stats={statsMap.get(player.id)}
+          college={getCollege(player.college)}
+          headshotUrl={headshotMap?.get(player.id)}
+          statDisplay={statDisplay}
+        />
+      ))}
+    </div>
+  );
+}
 
 export function PlayersTab() {
   const [search, setSearch] = useState('');
@@ -357,17 +389,12 @@ export function PlayersTab() {
         </div>
       ) : processedPlayers.length > 0 ? (
         // Flat list with subtle dividers
-        <div className="space-y-0">
-          {processedPlayers.slice(0, 200).map((player) => (
-            <PlayerRow
-              key={player.id}
-              player={player}
-              stats={statsMap.get(player.id)}
-              college={getCollege(player.college)}
-              statDisplay={statDisplay}
-            />
-          ))}
-        </div>
+        <PlayerListWithHeadshots 
+          players={processedPlayers.slice(0, 200)}
+          statsMap={statsMap}
+          getCollege={getCollege}
+          statDisplay={statDisplay}
+        />
       ) : (
         <div className="text-center py-12 space-y-2">
           <p className="text-sm text-muted-foreground">
