@@ -1,15 +1,21 @@
 /**
  * PlayerAvatar - Displays player headshot with fallback initials
- * Uses player_media table for high-quality headshots
+ * 
+ * Priority order:
+ * 1. sr_players.photo_url (real headshots from storage)
+ * 2. player_media.headshot_url (if not ui-avatars.com)
+ * 3. Initials fallback
  */
 
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { usePlayerHeadshot } from '../hooks/usePlayerMedia';
+import { resolvePhotoUrl } from '../utils/resolvePhotoUrl';
 
 interface PlayerAvatarProps {
   playerId: string;
   playerName: string;
-  /** Fallback photo URL from sr_players.photo_url */
+  /** Fallback photo URL from sr_players.photo_url - this is the primary source */
   fallbackPhotoUrl?: string | null;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
@@ -22,6 +28,15 @@ const SIZE_CLASSES = {
   xl: 'w-24 h-24 text-3xl',
 };
 
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
 export function PlayerAvatar({ 
   playerId, 
   playerName, 
@@ -29,17 +44,18 @@ export function PlayerAvatar({
   size = 'md',
   className 
 }: PlayerAvatarProps) {
+  const [imageError, setImageError] = useState(false);
   const { data: headshotUrl } = usePlayerHeadshot(playerId);
   
-  // Use headshot from player_media, fallback to sr_players.photo_url, then initials
-  const photoUrl = headshotUrl || fallbackPhotoUrl;
+  // Priority: sr_players.photo_url (resolved) > player_media.headshot_url (resolved) > initials
+  const primaryPhotoUrl = resolvePhotoUrl(fallbackPhotoUrl);
+  const secondaryPhotoUrl = resolvePhotoUrl(headshotUrl);
+  const finalPhotoUrl = primaryPhotoUrl || secondaryPhotoUrl;
   
-  const initials = playerName
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  const initials = getInitials(playerName);
+  
+  // Show photo if available and not errored
+  const showPhoto = finalPhotoUrl && !imageError;
   
   return (
     <div className={cn(
@@ -47,12 +63,13 @@ export function PlayerAvatar({
       SIZE_CLASSES[size],
       className
     )}>
-      {photoUrl ? (
+      {showPhoto ? (
         <img 
-          src={photoUrl} 
+          src={finalPhotoUrl} 
           alt={playerName}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
           loading="lazy"
+          onError={() => setImageError(true)}
         />
       ) : (
         <span className="font-medium text-muted-foreground">{initials}</span>
@@ -81,15 +98,16 @@ export function BatchPlayerAvatar({
   size = 'md',
   className 
 }: BatchPlayerAvatarProps) {
-  // Use headshot from map if available, otherwise fallback
-  const photoUrl = headshotMap?.get(playerId) || fallbackPhotoUrl;
+  const [imageError, setImageError] = useState(false);
   
-  const initials = playerName
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  // Priority: sr_players.photo_url > headshotMap > initials
+  const primaryPhotoUrl = resolvePhotoUrl(fallbackPhotoUrl);
+  const secondaryPhotoUrl = resolvePhotoUrl(headshotMap?.get(playerId));
+  const finalPhotoUrl = primaryPhotoUrl || secondaryPhotoUrl;
+  
+  const initials = getInitials(playerName);
+  
+  const showPhoto = finalPhotoUrl && !imageError;
   
   return (
     <div className={cn(
@@ -97,12 +115,13 @@ export function BatchPlayerAvatar({
       SIZE_CLASSES[size],
       className
     )}>
-      {photoUrl ? (
+      {showPhoto ? (
         <img 
-          src={photoUrl} 
+          src={finalPhotoUrl} 
           alt={playerName}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
           loading="lazy"
+          onError={() => setImageError(true)}
         />
       ) : (
         <span className="font-medium text-muted-foreground">{initials}</span>
