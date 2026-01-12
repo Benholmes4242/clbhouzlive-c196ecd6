@@ -18,9 +18,9 @@ interface TopPlayersFeedProps {
 }
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'events', label: 'Most Events' },
-  { value: 'cuts', label: 'Most Cuts' },
   { value: 'world_rank', label: 'World Rank' },
+  { value: 'cuts', label: 'Most Cuts' },
+  { value: 'events', label: 'Most Events' },
 ];
 
 function getNarrativeTag(stat: any, sortBy: SortOption): string {
@@ -50,7 +50,7 @@ function getNarrativeTag(stat: any, sortBy: SortOption): string {
 }
 
 export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedProps) {
-  const [sortBy, setSortBy] = useState<SortOption>('events');
+  const [sortBy, setSortBy] = useState<SortOption>('world_rank');
 
   const sortedPlayers = useMemo(() => {
     return [...players]
