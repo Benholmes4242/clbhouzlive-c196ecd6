@@ -371,19 +371,46 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   }, [trendingHeroData, trendingHeroLoading, trendingHeroError]);
 
   // Create hero item from trending data (independent of grid filters)
+  // FALLBACK: If no trending hero, use first video from grid content
   const heroItem = useMemo(() => {
-    if (!trendingHeroData?.post) {
-      console.log('[DiscoverContent] No trending hero post available');
-      return null;
+    // Primary: Use algorithm-selected trending hero
+    if (trendingHeroData?.post) {
+      const item = createHeroItemFromTrending(trendingHeroData.post, trendingHeroData.trendingPeriod);
+      console.log('[DiscoverContent] Created heroItem from trending:', { 
+        id: item?.id?.slice(0, 8), 
+        mediaUrl: item?.mediaUrl?.slice(0, 50),
+        contextLabel: item?.contextLabel 
+      });
+      return item;
     }
-    const item = createHeroItemFromTrending(trendingHeroData.post, trendingHeroData.trendingPeriod);
-    console.log('[DiscoverContent] Created heroItem:', { 
-      id: item?.id?.slice(0, 8), 
-      mediaUrl: item?.mediaUrl?.slice(0, 50),
-      contextLabel: item?.contextLabel 
-    });
-    return item;
-  }, [trendingHeroData]);
+    
+    // Fallback: Use first video from grid content
+    if (content && content.length > 0) {
+      const firstVideo = content.find(item => item.type === 'video');
+      if (firstVideo) {
+        console.log('[DiscoverContent] Using FALLBACK hero from grid:', firstVideo.id?.slice(0, 8));
+        return createHeroItem({
+          id: firstVideo.id,
+          caption: firstVideo.title,
+          media: [{
+            media_url: firstVideo.src,
+            media_type: 'video',
+          }],
+          user: firstVideo.user ? {
+            id: firstVideo.user.id,
+            username: firstVideo.user.username,
+            display_name: firstVideo.user.name,
+            profile_photo_url: firstVideo.user.avatar,
+          } : undefined,
+          golfCourse: firstVideo.golfCourse,
+          likes: firstVideo.likes,
+        });
+      }
+    }
+    
+    console.log('[DiscoverContent] No hero available (no trending, no grid fallback)');
+    return null;
+  }, [trendingHeroData, content]);
 
   // Grid content: Start with unfiltered content, remove hero, THEN apply search/tag filters
   // This ensures hero stays constant while grid responds to filters
