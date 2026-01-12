@@ -7626,7 +7626,7 @@ export type Database = {
         }
         Relationships: []
       }
-      tourhub_events: {
+      tourhub_events_deprecated: {
         Row: {
           course_name: string | null
           created_at: string
@@ -7710,7 +7710,7 @@ export type Database = {
         }
         Relationships: []
       }
-      tourhub_players: {
+      tourhub_players_deprecated: {
         Row: {
           bio: string | null
           country: string | null
