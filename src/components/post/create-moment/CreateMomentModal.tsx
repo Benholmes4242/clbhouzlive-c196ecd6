@@ -18,6 +18,7 @@ import { publishNow as publishScheduledNow, updateScheduledPost } from '@/servic
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import { enqueuePostUpload } from "@/uploads/uploadPipeline";
+import { enqueuePostUploadWithResilience } from "@/hooks/usePostUploadResilience";
 import StudioShelf from "@/components/studio/StudioShelf";
 import { OverlayPortalProvider } from "@/context/OverlayPortalContext";
 
@@ -539,7 +540,7 @@ export default function CreateMomentModal({
   }, []);
 
   // Post handler - soft-gated flow (auto-open category sheet if missing)
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!hasMedia || !user) return;
     
     // Soft-gated: if no categories, open category sheet instead of blocking
@@ -613,8 +614,8 @@ export default function CreateMomentModal({
     }, {} as Record<string, { filter?: string; crop?: { ratio: string }; rotate?: number; music?: { trackId: string; title: string; artist?: string; url: string; startAt?: number; volume?: number }; textOverlays?: Array<{ id: string; text: string; x: number; y: number; scale: number; style: string; color?: string }>; audioMode?: 'original' | 'music_only' }>);
     
     try {
-      // Enqueue upload and close immediately
-      enqueuePostUpload({
+      // Use resilient upload with IndexedDB persistence
+      await enqueuePostUploadWithResilience({
         userId: user.id,
         actorType: activeActor?.type === 'business' ? 'business' : 'personal',
         actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
@@ -632,11 +633,12 @@ export default function CreateMomentModal({
       onClose();
     } catch (error) {
       console.error('[CreateMomentModal] Failed to enqueue post upload:', error);
+      toast.error('Failed to start upload');
     }
   };
   
   // Schedule post handler
-  const handleSchedulePost = (scheduledAt: Date) => {
+  const handleSchedulePost = async (scheduledAt: Date) => {
     if (!hasMedia || !user) return;
     
     if (selectedCategories.length === 0) {
@@ -651,7 +653,8 @@ export default function CreateMomentModal({
     setIsScheduling(true);
     
     try {
-      enqueuePostUpload({
+      // Use resilient upload with IndexedDB persistence for scheduled posts
+      await enqueuePostUploadWithResilience({
         userId: user.id,
         actorType: activeActor?.type === 'business' ? 'business' : 'personal',
         actorId: activeActor?.type === 'business' ? activeActor.id : user.id,

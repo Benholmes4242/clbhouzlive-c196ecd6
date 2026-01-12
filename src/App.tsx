@@ -38,6 +38,7 @@ import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
 import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
+import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
@@ -704,24 +705,26 @@ const AppInner: React.FC = () => {
                                 {/* All playback control is now centralized in MediaSystemProvider */}
                                 <TopTenProvider>
                                   <VideoPlaybackProvider>
-                                    <ErrorBoundary>
-                                      <AuthWrapper>
-                                        <SeasonWrapModal />
-                                        <AchievementToastWrapper />
-                                        <Suspense fallback={null}>
-                                          <div className="app-depth">
-                                            {/* Global header for all pages except Clubhouse/Auth/Admin */}
-                                            <GlobalHeader />
-                                            <AppRoutes />
-                                          </div>
-                                        </Suspense>
-                                        {/* Mini Player - persists across navigation */}
-                                        <Suspense fallback={null}>
-                                          <MiniPlayer />
-                                          <GlobalQueueDrawer />
-                                        </Suspense>
-                                      </AuthWrapper>
-                                    </ErrorBoundary>
+                                      <ErrorBoundary>
+                                        <AuthWrapper>
+                                          <UploadResilienceProvider>
+                                            <SeasonWrapModal />
+                                            <AchievementToastWrapper />
+                                            <Suspense fallback={null}>
+                                              <div className="app-depth">
+                                                {/* Global header for all pages except Clubhouse/Auth/Admin */}
+                                                <GlobalHeader />
+                                                <AppRoutes />
+                                              </div>
+                                            </Suspense>
+                                            {/* Mini Player - persists across navigation */}
+                                            <Suspense fallback={null}>
+                                              <MiniPlayer />
+                                              <GlobalQueueDrawer />
+                                            </Suspense>
+                                          </UploadResilienceProvider>
+                                        </AuthWrapper>
+                                      </ErrorBoundary>
                                   </VideoPlaybackProvider>
                                 </TopTenProvider>
                               </FullscreenPlayerProvider>
