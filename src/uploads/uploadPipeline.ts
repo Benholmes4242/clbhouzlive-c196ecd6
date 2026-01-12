@@ -1,6 +1,7 @@
 // Upload pipeline - processes jobs asynchronously
 // Includes stream asset tracking for orphan cleanup
 // Includes video metadata polling for dimension/duration population
+// Includes image processing for baked-in studio edits (filters, text overlays)
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
@@ -8,6 +9,51 @@ import { createPost } from '@/services/posts/createPost';
 import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import type { UploadJobInput } from './types';
+
+/**
+ * Queue image processing for baked-in edits (filters, text overlays, rotation)
+ * Runs in background - doesn't block post creation
+ */
+async function queueImageProcessing(
+  postMediaId: string,
+  originalUrl: string,
+  studioEdits: Record<string, unknown> | undefined
+): Promise<void> {
+  // Skip if no edits to process
+  if (!studioEdits) return;
+  
+  const hasFilter = studioEdits.filter && studioEdits.filter !== 'normal';
+  const hasTextOverlays = Array.isArray(studioEdits.textOverlays) && studioEdits.textOverlays.length > 0;
+  const hasRotation = studioEdits.rotate && studioEdits.rotate !== 0;
+  
+  if (!hasFilter && !hasTextOverlays && !hasRotation) {
+    console.log(`[uploadPipeline] No edits to process for ${postMediaId}`);
+    return;
+  }
+
+  console.log(`[uploadPipeline] Queuing image processing for ${postMediaId}`);
+  
+  try {
+    // Invoke edge function (fire and forget - runs in background)
+    supabase.functions.invoke('process-image', {
+      body: {
+        postMediaId,
+        originalUrl,
+        studioEdits,
+      },
+    }).then(({ error }) => {
+      if (error) {
+        console.error(`[uploadPipeline] Image processing failed for ${postMediaId}:`, error);
+      } else {
+        console.log(`[uploadPipeline] Image processing completed for ${postMediaId}`);
+      }
+    }).catch(err => {
+      console.error(`[uploadPipeline] Image processing error for ${postMediaId}:`, err);
+    });
+  } catch (err) {
+    console.error(`[uploadPipeline] Failed to queue image processing:`, err);
+  }
+}
 
 // Import upload utilities dynamically to avoid circular deps
 const getCloudflareStream = async () => {
@@ -290,6 +336,12 @@ async function processJob(jobId: string): Promise<void> {
         // This runs in background - don't block on it
         if (mediaType === 'video' && streamId && mediaRecord?.id) {
           pollAndUpdateVideoMetadata(streamId, mediaRecord.id);
+        }
+
+        // For images with studio edits, queue background processing
+        // This bakes filters, text overlays, and rotation into the actual image
+        if (mediaType === 'image' && mediaRecord?.id && edits) {
+          queueImageProcessing(mediaRecord.id, publicUrl, edits as unknown as Record<string, unknown>);
         }
 
         // Update progress
