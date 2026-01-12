@@ -14,10 +14,10 @@ export function WorldRankingsSection() {
     return (
       <section className="bg-[#1a1a1a] -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
         <div className="animate-pulse">
-          <div className="h-4 w-40 bg-white/10 rounded mb-4" />
+          <div className="h-4 w-40 bg-white/10 rounded mb-6" />
           <div className="flex gap-3">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex-shrink-0 w-[120px] h-[140px] bg-white/5 rounded-xl" />
+              <div key={i} className="flex-shrink-0 w-[140px] h-[150px] bg-white/5 rounded-xl" />
             ))}
           </div>
         </div>
@@ -32,33 +32,36 @@ export function WorldRankingsSection() {
 
   return (
     <section className="bg-[#1a1a1a] -mx-4 sm:-mx-6 px-4 sm:px-6 py-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wide">
+      {/* Header - standardized */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">
           World Rankings
         </h3>
         <Link 
           to="/tourhub?tab=players"
-          className="text-sm text-white/50 hover:text-white/80 flex items-center gap-1 transition-colors"
+          className="text-xs text-white/40 hover:text-white/70 flex items-center gap-1 transition-colors"
         >
-          All Rankings <ArrowRight className="w-3.5 h-3.5" />
+          All Rankings <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
       
-      {/* Horizontal scroll of player cards */}
+      {/* Horizontal scroll of player cards - wider cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {displayPlayers.map((player, index) => {
           const isFirst = index === 0;
+          // Get last name for display, but show full if short
+          const lastName = player.playerName.split(' ').slice(-1)[0];
+          const displayName = lastName.length > 10 ? lastName.substring(0, 9) + '…' : lastName;
           
           return (
             <Link
               key={player.playerId}
               to={`/tourhub/player/${player.playerId}`}
-              className="flex-shrink-0 w-[120px] group"
+              className="flex-shrink-0 w-[140px] group"
             >
               <div 
                 className={`
-                  relative h-[140px] rounded-xl p-3 flex flex-col
+                  relative h-[150px] rounded-xl p-3.5 flex flex-col
                   bg-white/5 backdrop-blur-sm
                   transition-all group-hover:bg-white/10
                   ${isFirst ? 'ring-1 ring-amber-500/50' : ''}
@@ -74,11 +77,11 @@ export function WorldRankingsSection() {
                   {player.worldRank}
                 </span>
                 
-                {/* Player initials circle - centered */}
+                {/* Player photo/initials circle - centered */}
                 <div className="flex-1 flex items-center justify-center my-2">
                   <div 
                     className={`
-                      w-12 h-12 rounded-full flex items-center justify-center
+                      w-14 h-14 rounded-full flex items-center justify-center overflow-hidden
                       ${isFirst 
                         ? 'bg-gradient-to-br from-amber-500/30 to-amber-600/20 ring-1 ring-amber-500/30' 
                         : 'bg-white/10'
@@ -92,20 +95,20 @@ export function WorldRankingsSection() {
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
-                      <span className={`text-sm font-bold ${isFirst ? 'text-amber-300' : 'text-white/60'}`}>
+                      <span className={`text-base font-bold ${isFirst ? 'text-amber-300' : 'text-white/60'}`}>
                         {getInitials(player.playerName)}
                       </span>
                     )}
                   </div>
                 </div>
                 
-                {/* Player name */}
-                <p className="text-white font-semibold text-xs leading-tight text-center truncate">
-                  {player.playerName.split(' ').slice(-1)[0]}
+                {/* Player name - full last name */}
+                <p className="text-white font-semibold text-sm leading-tight text-center">
+                  {displayName}
                 </p>
                 
                 {/* Country */}
-                <p className="text-white/40 text-[10px] text-center truncate mt-0.5">
+                <p className="text-white/40 text-[10px] text-center mt-0.5">
                   {toTitleCase(player.country) || 'Unknown'}
                 </p>
               </div>
