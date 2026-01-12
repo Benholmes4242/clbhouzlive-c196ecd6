@@ -65,7 +65,7 @@ function HeroStat({ label, value, icon: Icon, highlight = false, iconEmoji }: {
       "text-center px-3 py-4 rounded-xl transition-all",
       highlight && hasValue 
         ? "bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/20" 
-        : "bg-white/5 dark:bg-white/5 border border-white/10"
+        : "bg-muted/50 border border-border/50"
     )}>
       <div className="flex items-center justify-center gap-1.5 mb-1.5">
         {iconEmoji && <span className="text-sm">{iconEmoji}</span>}
@@ -273,21 +273,15 @@ export function PlayerProfilePage() {
           <ArrowLeft className="w-4 h-4" /> Back to Players
         </Link>
         
-        {/* FIX 1: Hero Section with Gradient Background */}
-        <div className="relative mb-8 rounded-2xl overflow-hidden">
-          {/* Cinematic gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-          {/* Subtle texture overlay */}
-          <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0iI2ZmZiI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxLjUiIGZpbGw9IiMwMDAiPjwvY2lyY2xlPgo8L3N2Zz4=')]" />
-          
+        {/* Hero Section with White Background */}
+        <div className="relative mb-8 rounded-2xl overflow-hidden bg-card border border-border/50 shadow-sm">
           <div className="relative px-6 py-10">
             {/* Top row: Avatar + Name + World Rank */}
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8">
               <div className="flex items-center gap-6">
                 {/* Larger avatar with ring */}
                 <div className="relative">
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden ring-4 ring-primary/40 ring-offset-4 ring-offset-slate-900 shadow-2xl">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-muted flex items-center justify-center overflow-hidden ring-4 ring-primary/40 ring-offset-4 ring-offset-card shadow-xl">
                     {photoUrl && !imageError ? (
                       <img 
                         src={photoUrl} 
@@ -296,23 +290,23 @@ export function PlayerProfilePage() {
                         onError={() => setImageError(true)}
                       />
                     ) : (
-                      <span className="text-4xl font-bold text-slate-400">{initials}</span>
+                      <span className="text-4xl font-bold text-muted-foreground">{initials}</span>
                     )}
                   </div>
                 </div>
                 
                 {/* Name + Country + Age */}
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{player.full_name}</h1>
-                  <div className="flex flex-wrap items-center gap-3 text-slate-300">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{player.full_name}</h1>
+                  <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
                     {player.country && (
                       <span className="flex items-center gap-1.5 text-sm">
-                        <Globe className="w-4 h-4 text-slate-400" />
+                        <Globe className="w-4 h-4 text-muted-foreground" />
                         {player.country.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
                       </span>
                     )}
                     {age && (
-                      <span className="text-sm text-slate-400">Age {age}</span>
+                      <span className="text-sm text-muted-foreground">Age {age}</span>
                     )}
                   </div>
                 </div>
@@ -320,15 +314,15 @@ export function PlayerProfilePage() {
               
               {/* World Rank Badge */}
               {playerStats?.world_rank && playerStats.world_rank > 0 && (
-                <div className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-full shadow-lg">
-                  <Globe className="w-4 h-4 text-slate-900" />
-                  <span className="text-sm font-medium text-slate-900">World Rank</span>
-                  <span className="text-xl font-bold text-slate-900">#{playerStats.world_rank}</span>
+                <div className="flex items-center gap-2 px-5 py-2.5 bg-primary/10 rounded-full border border-primary/20">
+                  <Globe className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">World Rank</span>
+                  <span className="text-xl font-bold text-primary">#{playerStats.world_rank}</span>
                 </div>
               )}
             </div>
             
-            {/* FIX 3: Stats Strip with Enhanced Styling */}
+            {/* Stats Strip with Enhanced Styling */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <HeroStat 
                 label="World Rank" 
