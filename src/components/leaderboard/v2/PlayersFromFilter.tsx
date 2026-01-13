@@ -254,7 +254,7 @@ export function PlayersFromFilter({
             </SelectItem>
           ))}
           <SelectItem value="search">
-            <div className="flex items-center gap-2 text-primary">
+            <div className="flex items-center gap-2 text-slate-500">
               <Search className="w-4 h-4" />
               Search all countries...
             </div>

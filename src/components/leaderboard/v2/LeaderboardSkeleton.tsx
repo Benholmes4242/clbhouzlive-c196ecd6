@@ -1,5 +1,5 @@
 /**
- * LeaderboardSkeleton - Enhanced loading states with shimmer animations
+ * LeaderboardSkeleton - Loading states matching the updated layout
  */
 
 import React from 'react';
@@ -10,24 +10,15 @@ import { cn } from '@/lib/utils';
 const shimmerClass = "relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent";
 
 export function LeaderboardHeroSkeleton() {
+  // Centered content on page background (no card)
   return (
-    <div 
-      className={cn(
-        "relative w-full overflow-hidden rounded-2xl",
-        shimmerClass
-      )}
-      style={{
-        background: 'linear-gradient(135deg, #1F1F1F 0%, #2A2A2A 50%, #1F1F1F 100%)',
-        border: '1px solid rgba(255,255,255,0.08)',
-      }}
-    >
-      <div className="px-4 py-3.5 space-y-2">
-        <div className="flex items-center gap-2.5">
-          <Skeleton className="w-5 h-5 rounded bg-white/10" />
-          <Skeleton className="h-5 w-36 bg-white/10" />
-        </div>
-        <Skeleton className="h-3 w-56 bg-white/10" />
-      </div>
+    <div className="flex flex-col items-center text-center py-6 space-y-2">
+      {/* Trophy icon placeholder */}
+      <Skeleton className="h-8 w-8 rounded-full" />
+      {/* Title */}
+      <Skeleton className="h-6 w-48" />
+      {/* Subtitle */}
+      <Skeleton className="h-4 w-64" />
     </div>
   );
 }
@@ -35,61 +26,73 @@ export function LeaderboardHeroSkeleton() {
 export function LeaderboardStatusSkeleton() {
   return (
     <div className={cn(
-      "mx-4 mt-4 rounded-2xl border border-border/40 bg-card/50 p-4",
+      "mx-4 p-4 rounded-xl border border-border/60 bg-card shadow-sm",
       shimmerClass
     )}>
-      <div className="flex items-start gap-3.5">
-        {/* Avatar skeleton with ring effect */}
-        <div className="relative">
-          <Skeleton className="w-14 h-14 rounded-xl" />
-          <div className="absolute inset-0 rounded-xl ring-2 ring-muted/30" />
-        </div>
+      <div className="flex items-center gap-4">
+        {/* Avatar */}
+        <Skeleton className="h-16 w-16 rounded-full" />
+        {/* Rank info */}
         <div className="flex-1 space-y-2">
-          <Skeleton className="h-2.5 w-14" />
-          <Skeleton className="h-6 w-28" />
-          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-16" /> {/* "YOUR RANK" label */}
+          <Skeleton className="h-6 w-24" /> {/* "#52 Global" */}
+          <Skeleton className="h-3 w-20" /> {/* "Founders Club" */}
         </div>
-        <div className="text-right space-y-1.5">
-          <Skeleton className="h-8 w-10 ml-auto" />
-          <Skeleton className="h-3 w-8 ml-auto" />
+        {/* Score */}
+        <div className="text-right space-y-1">
+          <Skeleton className="h-8 w-10 ml-auto" /> {/* "22" */}
+          <Skeleton className="h-3 w-8 ml-auto" /> {/* "/ 100" */}
         </div>
       </div>
-      {/* Progress bar skeleton */}
+      {/* Progress bar */}
       <div className="mt-4 space-y-2">
         <div className="flex justify-between">
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-28" /> {/* "Next: Heritage Club" */}
+          <Skeleton className="h-3 w-20" /> {/* "28 courses away" */}
         </div>
-        <div className="h-2 w-full rounded-full bg-muted/40 overflow-hidden">
-          <Skeleton className="h-full w-1/3 rounded-full" />
-        </div>
+        <Skeleton className="h-2 w-full rounded-full" /> {/* Progress bar */}
       </div>
-      {/* CTA buttons skeleton */}
-      <div className="flex border-t border-border/40 mt-4 pt-3 -mx-4 -mb-4 px-4 pb-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex-1 flex items-center justify-center gap-2 py-2">
-            <Skeleton className="w-4 h-4 rounded" />
-            <Skeleton className="h-3 w-12" />
-          </div>
-        ))}
+      {/* Tabs (Rivals, History, Log) */}
+      <div className="flex gap-4 mt-4 pt-4 border-t border-border/40">
+        <Skeleton className="h-8 w-20 rounded-full" />
+        <Skeleton className="h-8 w-20 rounded-full" />
+        <Skeleton className="h-8 w-16 rounded-full" />
       </div>
     </div>
   );
 }
 
 export function LeaderboardTabsSkeleton() {
+  // Underlined tabs matching header style, no bottom border
   return (
-    <div className="px-4 py-3">
-      <div className="flex gap-1.5 overflow-hidden">
-        {[80, 100, 110, 90, 70].map((width, i) => (
-          <Skeleton 
-            key={i} 
-            className="h-8 rounded-full flex-shrink-0" 
-            style={{ width: `${width}px` }}
-          />
+    <div className="px-4 pt-5 pb-2">
+      <div className="flex items-center gap-6">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="py-2.5">
+            <Skeleton className="h-4 w-16" />
+          </div>
         ))}
       </div>
-      <Skeleton className="h-3 w-48 mt-2" />
+      {/* Description text */}
+      <div className="mt-3">
+        <Skeleton className="h-3 w-48 mx-auto" />
+      </div>
+    </div>
+  );
+}
+
+export function LeaderboardFiltersSkeleton() {
+  // Two side-by-side dropdowns (50% width each)
+  return (
+    <div className="flex gap-3 px-4 pb-4">
+      {/* Golfers Based In dropdown skeleton */}
+      <div className="flex-1">
+        <Skeleton className="h-11 w-full rounded-lg" />
+      </div>
+      {/* Time Range dropdown skeleton */}
+      <div className="flex-1">
+        <Skeleton className="h-11 w-full rounded-lg" />
+      </div>
     </div>
   );
 }
@@ -132,9 +135,9 @@ export function LeaderboardRivalsSkeleton() {
   );
 }
 
-export function LeaderboardListSkeleton({ count = 10 }: { count?: number }) {
+export function LeaderboardListSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="divide-y divide-border/30">
+    <div className="divide-y divide-border/40">
       {Array.from({ length: count }).map((_, i) => (
         <div 
           key={i} 
@@ -144,22 +147,23 @@ export function LeaderboardListSkeleton({ count = 10 }: { count?: number }) {
           )}
           style={{ animationDelay: `${i * 50}ms` }}
         >
+          {/* Rank */}
+          <Skeleton className="h-5 w-8" />
           {/* Avatar */}
-          <div className="relative flex-shrink-0">
-            <Skeleton className="w-11 h-11 rounded-xl" />
-          </div>
-          {/* Info */}
+          <Skeleton className="h-12 w-12 rounded-xl" />
+          {/* Name & club */}
           <div className="flex-1 space-y-1.5">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-3 w-40" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-24" />
           </div>
-          {/* Count */}
-          <Skeleton className="h-4 w-6" />
-          {/* Rank badge */}
-          <Skeleton className={cn(
-            "rounded-full",
-            i < 3 ? "w-9 h-9" : "w-8 h-7"
-          )} />
+          {/* Score & badge */}
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-8" />
+            <Skeleton className={cn(
+              "rounded-full",
+              i < 3 ? "h-8 w-10" : "h-6 w-10"
+            )} />
+          </div>
         </div>
       ))}
     </div>
@@ -168,13 +172,21 @@ export function LeaderboardListSkeleton({ count = 10 }: { count?: number }) {
 
 export function LeaderboardFullSkeleton() {
   return (
-    <div className="w-full animate-in fade-in duration-300">
+    <div className="w-full animate-in fade-in duration-300 space-y-0">
+      {/* Hero - centered, no card */}
       <LeaderboardHeroSkeleton />
+      
+      {/* User rank card */}
       <LeaderboardStatusSkeleton />
+      
+      {/* Arena tabs - underlined style */}
       <LeaderboardTabsSkeleton />
-      <LeaderboardRivalsSkeleton />
-      <div className="h-px bg-border/30 mx-4 my-4" />
-      <LeaderboardListSkeleton count={8} />
+      
+      {/* Filter dropdowns - side by side */}
+      <LeaderboardFiltersSkeleton />
+      
+      {/* Leaderboard rows */}
+      <LeaderboardListSkeleton count={6} />
     </div>
   );
 }
