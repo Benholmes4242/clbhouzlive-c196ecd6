@@ -76,6 +76,33 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const [sheetState, setSheetState] = useState<SheetState>('half');
+  const sheetRef = React.useRef<HTMLDivElement>(null);
+
+  // Reset sheet state when course changes (for seamless marker switching)
+  React.useEffect(() => {
+    if (course) {
+      setSheetState('half');
+    }
+  }, [course?.id]);
+
+  // Keyboard handler for Escape to close
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && course) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [course, onClose]);
+
+  // Focus management when sheet opens
+  React.useEffect(() => {
+    if (course && sheetRef.current) {
+      const firstButton = sheetRef.current.querySelector('button');
+      firstButton?.focus();
+    }
+  }, [course?.id]);
   
   const { data: thumbnailImage } = useCourseImage(course?.id);
   const { data: shortlistStatus } = useCourseShortlistStatus(course?.id, user?.id);
@@ -188,7 +215,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
       />
       
       <motion.div
-        key="sheet"
+        ref={sheetRef}
+        key={`sheet-${course.id}`}
         initial={{ y: '100%' }}
         animate={{ y: 0, height: SHEET_HEIGHTS[sheetState] }}
         exit={{ y: '100%' }}
@@ -198,6 +226,9 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         dragElastic={0.15}
         onDragEnd={handleDragEnd}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="course-sheet-title"
         className={cn(
           'absolute bottom-0 left-0 right-0 z-40',
           'rounded-t-[20px]',
@@ -261,13 +292,20 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
           {/* Course info - below hero */}
           <div className="px-5 pt-4 pb-6">
-            {/* Course name */}
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+            {/* Course name with tooltip for truncated text */}
+            <h3 
+              id="course-sheet-title"
+              className="text-lg font-bold text-slate-900 dark:text-white leading-tight line-clamp-2"
+              title={course.name}
+            >
               {course.name}
             </h3>
 
-            {/* Location */}
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {/* Location with tooltip */}
+            <p 
+              className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-1"
+              title={`${course.sub_country ? `${course.sub_country}, ` : ''}${course.country}${course.region ? ` · ${course.region}` : ''}`}
+            >
               {course.sub_country && `${course.sub_country}, `}
               {course.country}
               {course.region && ` · ${course.region}`}

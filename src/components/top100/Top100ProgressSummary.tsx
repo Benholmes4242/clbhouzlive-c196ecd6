@@ -4,10 +4,13 @@ import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 type Props = {
   ratedCount: number;
   listCount: number;
+  /** Actual total courses across all lists the user has progress in */
+  totalCourses?: number;
 };
 
-export function Top100ProgressSummary({ ratedCount, listCount }: Props) {
-  const totalCoursesPossible = listCount * 100;
+export function Top100ProgressSummary({ ratedCount, listCount, totalCourses }: Props) {
+  // Use actual totals if provided, otherwise estimate based on list count
+  const totalCoursesPossible = totalCourses ?? listCount * 100;
   const progressPercent =
     totalCoursesPossible > 0
       ? Math.min(100, (ratedCount / totalCoursesPossible) * 100)
