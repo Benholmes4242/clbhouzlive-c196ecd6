@@ -173,17 +173,25 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           }}
         />
         
-        {/* Gradient overlay for better text visibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Cinematic gradient overlay for premium look */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
         
-        {/* Course Title & Location - Bottom Left */}
+        {/* Course Title & Location - Bottom Left with text shadows */}
         <div className="absolute bottom-8 left-6 text-white z-10">
-          <h1 className="text-4xl md:text-5xl font-semibold mb-1.5 drop-shadow-2xl">{course.name}</h1>
-          <p className="text-lg md:text-xl opacity-90 mb-2.5 drop-shadow-lg">
+          <h1 
+            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-1.5"
+            style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}
+          >
+            {course.name}
+          </h1>
+          <p 
+            className="text-base md:text-lg text-white/90 mb-3"
+            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}
+          >
             {formatCourseLocation(course)}
           </p>
           
-          {/* Top 100 Pills */}
+          {/* Top 100 Pills - Premium styled */}
           {(course.global_rank || course.regional_rank || course.usa_rank) && (
             <CourseRankBadges 
               globalRank={course.global_rank ?? null}
