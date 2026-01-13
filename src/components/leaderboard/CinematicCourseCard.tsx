@@ -124,17 +124,18 @@ export function CinematicCourseCard({
         {/* Very subtle slate tint - NO dark overlays */}
         <div className="absolute inset-0 bg-slate-900/5 pointer-events-none" />
 
-        {/* Rank Badges - Top Left (unified with Explore page) */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+        {/* Rank Badges - Top Left (unified with Explore page, horizontal layout) */}
+        <div className="absolute top-3 left-3 flex flex-row gap-1.5">
           {/* Global rank first if available */}
           {course.global_rank && (
             <Top100RankBadge listSlug="global" rank={course.global_rank} />
           )}
-          {/* Regional rank (USA, GB&I, Europe) - show alongside global if both exist */}
+          {/* USA rank - only show if not already covered by global */}
           {course.usa_rank && (
             <Top100RankBadge listSlug="usa" rank={course.usa_rank} />
           )}
-          {course.regional_rank && (
+          {/* Regional rank (GB&I, Europe) - only show if no USA rank to avoid duplicates */}
+          {course.regional_rank && !course.usa_rank && (
             <Top100RankBadge 
               listSlug={getListSlug(course.country)} 
               rank={course.regional_rank}
