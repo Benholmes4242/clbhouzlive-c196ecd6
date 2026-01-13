@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils"
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & { 'data-tier'?: string }
+>(({ className, 'data-tier': dataTier, ...props }, ref) => {
   // Check if this slider is in "outstanding" tier (9.0+)
-  const isOutstanding = props['data-tier'] === 'outstanding';
+  const isOutstanding = dataTier === 'outstanding';
   
   return (
     <SliderPrimitive.Root
