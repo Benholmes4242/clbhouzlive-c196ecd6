@@ -27,7 +27,7 @@ interface CourseLeaderboardHeroProps {
  */
 export function CourseLeaderboardHero({ 
   course,
-  label = "Course of the Week" 
+  label = "#1 Most Played" 
 }: CourseLeaderboardHeroProps) {
   const navigate = useNavigate();
 

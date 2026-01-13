@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Image, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CourseRankBadge } from './CourseRankBadge';
+import { Top100RankBadge, type Top100RankBadgeProps } from '@/components/top100/Top100RankBadge';
 import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
 import { haptic } from '@/utils/haptics';
 
@@ -89,12 +89,28 @@ export function CinematicCourseCard({
     ? `${course.sub_country}, ${course.country}`
     : course.country;
 
+  // Map region string to listSlug for Top100RankBadge
+  const getListSlug = (region: string): Top100RankBadgeProps['listSlug'] => {
+    const gbCountries = ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland', 'Britain & Ireland'];
+    if (gbCountries.includes(region)) return 'gb-i';
+    if (region === 'usa' || region === 'USA') return 'usa';
+    if (region === 'europe') return 'europe';
+    return 'global';
+  };
+
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       className={cn(
-        'w-full overflow-hidden bg-card text-left',
+        'w-full overflow-hidden bg-card text-left cursor-pointer',
         'border-b border-border/40',
         'hover:bg-muted/30 transition-colors duration-200',
         'animate-fadeIn',
@@ -127,33 +143,28 @@ export function CinematicCourseCard({
         {/* Very subtle slate tint - NO dark overlays */}
         <div className="absolute inset-0 bg-slate-900/5 pointer-events-none" />
 
-        {/* Rank Badges - Top Left */}
+        {/* Rank Badges - Top Left (unified with Explore page) */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {course.global_rank && (
-            <CourseRankBadge rank={course.global_rank} region="global" />
+            <Top100RankBadge listSlug="global" rank={course.global_rank} />
           )}
           {course.usa_rank && !course.global_rank && (
-            <CourseRankBadge rank={course.usa_rank} region="usa" />
+            <Top100RankBadge listSlug="usa" rank={course.usa_rank} />
           )}
           {course.regional_rank && !course.global_rank && !course.usa_rank && (
-            <CourseRankBadge 
-              rank={course.regional_rank} 
-              region={
-                ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland'].includes(course.country) 
-                  ? 'gb-i' 
-                  : 'europe'
-              } 
+            <Top100RankBadge 
+              listSlug={getListSlug(course.country)} 
+              rank={course.regional_rank}
             />
           )}
         </div>
 
-        {/* Flair Badge - Top Right (optional) */}
+        {/* Flair Badge - Top Right (optional, using unified badge) */}
         {flairBadge && (
           <div className="absolute top-3 right-3">
-            <CourseRankBadge 
-              rank={flairBadge.rank} 
-              region={flairBadge.region} 
-              variant="flair" 
+            <Top100RankBadge 
+              listSlug={flairBadge.region as Top100RankBadgeProps['listSlug']} 
+              rank={flairBadge.rank}
             />
           </div>
         )}
@@ -219,6 +230,6 @@ export function CinematicCourseCard({
           </button>
         )}
       </div>
-    </button>
+    </div>
   );
 }

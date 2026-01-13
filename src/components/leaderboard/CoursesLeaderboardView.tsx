@@ -164,7 +164,16 @@ export function CoursesLeaderboardView() {
       case 'highest_rated':
         return courses.sort((a, b) => (b.avg_rating ?? 0) - (a.avg_rating ?? 0));
       case 'rising':
-        return courses.sort((a, b) => b.times_played - a.times_played);
+        // Trending: courses with highest rating relative to play count (discovery potential)
+        // Prioritize highly-rated courses that haven't been played as much yet
+        return courses
+          .filter(c => c.avg_rating && c.avg_rating >= 7.0) // Only quality courses
+          .sort((a, b) => {
+            // Calculate "discovery score" - high rating but lower plays = more trending
+            const aScore = (a.avg_rating ?? 0) / Math.log10(Math.max(a.times_played, 10));
+            const bScore = (b.avg_rating ?? 0) / Math.log10(Math.max(b.times_played, 10));
+            return bScore - aScore;
+          });
       case 'friends':
         return courses
           .filter((c) => (c.friends_count ?? 0) > 0)
