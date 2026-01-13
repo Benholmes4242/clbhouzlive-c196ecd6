@@ -82,7 +82,6 @@ const Top100List = () => {
     }
   };
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
-  const [isFilterSticky, setIsFilterSticky] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const listTopRef = useRef<HTMLDivElement | null>(null);
@@ -115,19 +114,6 @@ const Top100List = () => {
     sessionStorage.removeItem('top100:list:scrollY');
   }, []);
 
-  // Sticky filter detection
-  useEffect(() => {
-    const handleScroll = () => {
-      if (filterRef.current) {
-        const rect = filterRef.current.getBoundingClientRect();
-        setIsFilterSticky(rect.top <= 0);
-      }
-    };
-
-    const scrollContainer = document.getElementById('root');
-    scrollContainer?.addEventListener('scroll', handleScroll);
-    return () => scrollContainer?.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
@@ -460,38 +446,17 @@ const Top100List = () => {
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
 
-        {/* 5. Filter Chips (sticky) - with scroll-to-top inside when sticky */}
+        {/* 5. Filter Chips */}
         {/* Spacing: Token rail → Filter = 16px (M) */}
-        <div 
-          ref={filterRef} 
-          className={`mt-4 ${isFilterSticky ? 'sticky top-0 z-10' : ''}`}
-        >
+        <div ref={filterRef} className="mt-4">
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={handleFilterChange}
             activeSort={sortMode}
             onSortChange={setSortMode}
             counts={{ played: filterPlayedCount, unplayed: unplayedCount }}
-            isSticky={isFilterSticky}
             hasReviewData={hasReviewData}
           />
-          
-          {/* Scroll-to-top arrow positioned below sticky filters - matching ScrollToTopGlass style */}
-          {isFilterSticky && (
-            <div className="flex justify-center py-2">
-              <button
-                type="button"
-                onClick={scrollToTop}
-                aria-label="Back to top"
-                className="h-8 w-8 rounded-full flex items-center justify-center bg-slate-800/70 backdrop-blur-sm border border-white/10 opacity-60 hover:opacity-100 hover:scale-105 active:scale-95 transition-all duration-150 touch-manipulation"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </button>
-            </div>
-          )}
         </div>
 
         {/* 6. Course List with Journey Insights */}
@@ -591,8 +556,8 @@ const Top100List = () => {
         />
       )}
 
-      {/* Global scroll to top button - only show when filters are not sticky */}
-      {!isFilterSticky && <ScrollToTopGlass />}
+      {/* Global scroll to top button */}
+      <ScrollToTopGlass />
     </PageRoot>
   );
 };
