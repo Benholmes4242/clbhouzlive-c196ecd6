@@ -142,7 +142,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     if (categories.length === 0) return null;
     
     const sorted = [...categories]
-      .filter(c => c.score && c.score >= 4.0) // 4/5 = 8/10 equivalent
+      .filter(c => c.score && c.score >= 8.0) // 8/10 threshold for highlights
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, 3);
     
@@ -283,7 +283,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className={`h-full ${barColorClass} rounded-full transition-all duration-700`}
-                    style={{ width: `${(score / 5) * 100}%` }}
+                    style={{ width: `${(score / 10) * 100}%` }}
                   />
                 </div>
               </div>
