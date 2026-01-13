@@ -3,4 +3,9 @@
  * Re-exports the existing hook for backwards compatibility
  */
 
-export { useHostPendingRequests as usePendingRequests } from './useHostPendingRequests';
+export { 
+  useHostPendingRequests as usePendingRequests,
+  type PendingRequest,
+  type PendingGameRequest,
+  type PendingTripRequest,
+} from './useHostPendingRequests';

@@ -22,8 +22,6 @@ import { SearchInput } from './SearchInput';
 import { UpcomingTab } from './UpcomingTab';
 import { PastTab } from './PastTab';
 import { TripsTab } from './TripsTab';
-import { GameDetailSheetV2 } from '../game-detail-v2';
-import { TripDetailSheetV2 } from '../trip/TripDetailSheetV2';
 import type { SheetTab } from './types';
 
 interface YourGamesTripsSheetV2Props {
@@ -43,14 +41,6 @@ export function YourGamesTripsSheetV2({
 }: YourGamesTripsSheetV2Props) {
   const [activeTab, setActiveTab] = useState<SheetTab>(defaultTab);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Game detail sheet state
-  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
-  const [gameSheetOpen, setGameSheetOpen] = useState(false);
-  
-  // Trip detail sheet state
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
-  const [tripSheetOpen, setTripSheetOpen] = useState(false);
   
   // Scroll lock refs
   const scrollYRef = useRef(0);
@@ -103,39 +93,29 @@ export function YourGamesTripsSheetV2({
       const timer = setTimeout(() => {
         setActiveTab(defaultTab);
         setSearchQuery('');
-        setSelectedGameId(null);
-        setGameSheetOpen(false);
-        setSelectedTripId(null);
-        setTripSheetOpen(false);
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen, defaultTab]);
 
-  // Handler for opening game detail sheet (no navigation)
+  // Handler for opening game detail - navigate to full page
   const handleOpenGameDetail = useCallback((gameId: string) => {
     haptic('light');
-    setSelectedGameId(gameId);
-    setGameSheetOpen(true);
-  }, []);
+    onClose();
+    // Small delay to let sheet close animation start
+    setTimeout(() => {
+      window.location.href = `/hub/games/${gameId}`;
+    }, 100);
+  }, [onClose]);
 
-  const handleCloseGameDetail = useCallback(() => {
-    setGameSheetOpen(false);
-    // Keep selectedGameId for animation, clear after close
-    setTimeout(() => setSelectedGameId(null), 300);
-  }, []);
-
-  // Handler for opening trip detail sheet (no navigation)
+  // Handler for opening trip detail - navigate to full page
   const handleOpenTripDetail = useCallback((tripId: string) => {
     haptic('light');
-    setSelectedTripId(tripId);
-    setTripSheetOpen(true);
-  }, []);
-
-  const handleCloseTripDetail = useCallback(() => {
-    setTripSheetOpen(false);
-    setTimeout(() => setSelectedTripId(null), 300);
-  }, []);
+    onClose();
+    setTimeout(() => {
+      window.location.href = `/hub/trips/${tripId}`;
+    }, 100);
+  }, [onClose]);
 
   const handleClose = useCallback(() => {
     haptic('light');
@@ -161,9 +141,6 @@ export function YourGamesTripsSheetV2({
   if (!isOpen) return null;
 
   const portalRoot = document.getElementById('portal-root') || document.body;
-  
-  // Determine if any nested sheet is open for stacking effect
-  const hasStackedSheet = gameSheetOpen || tripSheetOpen;
 
   return createPortal(
     <AnimatePresence>
@@ -190,7 +167,7 @@ export function YourGamesTripsSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${hasStackedSheet ? 'stacked-behind trip-stacked-behind' : ''}`}
+            className="fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper"
             style={{
               height: '85svh',
               maxHeight: '85svh',
@@ -287,24 +264,6 @@ export function YourGamesTripsSheetV2({
               )}
             </div>
           </motion.div>
-
-          {/* Game Detail Sheet (stacked) */}
-          {selectedGameId && (
-            <GameDetailSheetV2
-              isOpen={gameSheetOpen}
-              onClose={handleCloseGameDetail}
-              gameId={selectedGameId}
-            />
-          )}
-
-          {/* Trip Detail Sheet (stacked) */}
-          {selectedTripId && (
-            <TripDetailSheetV2
-              isOpen={tripSheetOpen}
-              onClose={handleCloseTripDetail}
-              tripId={selectedTripId}
-            />
-          )}
         </>
       )}
     </AnimatePresence>,

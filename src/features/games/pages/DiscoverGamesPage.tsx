@@ -17,7 +17,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 import { useDiscoverGamesV2, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '@/features/hub/hooks/useDiscoverGamesV2';
 import { useDiscoverTrips, type DiscoverTripsFilters } from '@/features/hub/hooks/useDiscoverTrips';
-import { GameDetailSheetV2 } from '@/features/hub/components/game-detail-v2';
 import { DiscoverSearchInput } from '@/features/hub/components/discover-games/DiscoverSearchInput';
 import { DiscoverFilterChips } from '@/features/hub/components/discover-games/DiscoverFilterChips';
 import { DiscoverTabPills, type DiscoverTab } from '@/features/hub/components/discover-games/DiscoverTabPills';
@@ -36,10 +35,6 @@ export function DiscoverGamesPage() {
   const [when, setWhen] = useState<DiscoverWhen>('any');
   const [visibility, setVisibility] = useState<DiscoverVisibility>('all');
   const [activeTab, setActiveTab] = useState<DiscoverTab>('games');
-
-  // Game detail sheet state
-  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
-  const [gameSheetOpen, setGameSheetOpen] = useState(false);
 
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -90,14 +85,9 @@ export function DiscoverGamesPage() {
 
   const handleOpenGameDetail = useCallback((gameId: string) => {
     haptic('light');
-    setSelectedGameId(gameId);
-    setGameSheetOpen(true);
-  }, []);
-
-  const handleCloseGameDetail = useCallback(() => {
-    setGameSheetOpen(false);
-    setTimeout(() => setSelectedGameId(null), 300);
-  }, []);
+    // Navigate to full page instead of opening sheet
+    navigate(`/hub/games/${gameId}`);
+  }, [navigate]);
 
   const handleTabChange = useCallback((tab: DiscoverTab) => {
     haptic('light');
@@ -234,15 +224,6 @@ export function DiscoverGamesPage() {
           )
         )}
       </div>
-
-      {/* Game Detail Sheet (stacked) */}
-      {selectedGameId && (
-        <GameDetailSheetV2
-          isOpen={gameSheetOpen}
-          onClose={handleCloseGameDetail}
-          gameId={selectedGameId}
-        />
-      )}
     </div>
   );
 }
