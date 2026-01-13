@@ -735,14 +735,14 @@ export function PlayersLeaderboardViewV2() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="py-8 px-6 text-center"
+                className="py-10 px-6 text-center border-t border-border/20 mt-2"
               >
                 <p className="text-sm text-muted-foreground/60 font-medium">
                   End of leaderboard
                 </p>
                 {arenaMode !== 'climbers' && (
-                  <p className="text-xs text-muted-foreground/40 mt-1">
-                    Check Fast Climbers to see who's moving up.
+                  <p className="text-xs text-muted-foreground/40 mt-1.5">
+                    Check Most Active to see who's logging courses this month
                   </p>
                 )}
               </motion.div>

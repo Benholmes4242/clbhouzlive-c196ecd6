@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Users, TrendingUp, MapPin, Star, Filter } from 'lucide-react';
+import { Users, TrendingUp, MapPin, Star, Filter, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type EmptyStateType = 
@@ -24,38 +24,41 @@ interface LeaderboardEmptyStateProps {
 
 const EMPTY_STATES: Record<EmptyStateType, {
   icon: React.ElementType;
+  iconColor?: string;
   title: string;
   body: string;
   cta?: { label: string; action: 'find-friends' | 'invite-friend' | 'show-top100' | 'switch-list' | 'reset-filters' };
 }> = {
   'friends-no-friends': {
     icon: Users,
-    title: 'Friends leaderboard',
-    body: 'Add a few friends to see how you stack up.',
+    title: 'Friends League',
+    body: 'Add a few friends to see how you stack up against them.',
     cta: { label: 'Find friends', action: 'find-friends' },
   },
   'friends-no-activity': {
     icon: Users,
-    title: 'Friends leaderboard',
-    body: "Your friends haven't logged any Top 100 courses yet.",
+    title: 'Friends League',
+    body: "Your friends haven't logged any Top 100 courses yet. Be the first to set the pace!",
     cta: { label: 'Invite a friend', action: 'invite-friend' },
   },
   'around-you-no-rank': {
     icon: MapPin,
     title: 'Around you',
-    body: 'Log your first Top 100 course to unlock your position.',
-    cta: { label: 'Show Top 100 courses', action: 'show-top100' },
+    body: 'Log your first Top 100 course to unlock your position on the leaderboard.',
+    cta: { label: 'Explore Top 100s', action: 'show-top100' },
   },
   'rising-no-data': {
     icon: TrendingUp,
-    title: 'Rising players',
-    body: 'Not enough recent activity to show movers yet. Check back soon.',
+    iconColor: 'text-emerald-500',
+    title: 'Most Active',
+    body: 'Not enough recent activity to show movers yet. Check back soon!',
   },
   'rising-coming-soon': {
-    icon: TrendingUp,
+    icon: Flame,
+    iconColor: 'text-orange-500',
     title: 'Most Active This Month',
-    body: 'No players have logged Top 100 courses in the last 30 days. Be the first!',
-    cta: { label: 'Explore Top 100', action: 'show-top100' },
+    body: 'No players have logged Top 100 courses in the last 30 days. Be the first to get on the board!',
+    cta: { label: 'Explore Top 100s', action: 'show-top100' },
   },
   'courses-friends-no-friends': {
     icon: Users,
@@ -123,9 +126,9 @@ export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmpty
   return (
     <div className="max-w-[520px] w-full mx-auto px-6 py-12">
       <div className="flex flex-col items-center text-center gap-5">
-        {/* Icon disc with glass feel - matching FriendsCoursesEmpty */}
-        <div className="w-20 h-20 rounded-full bg-white/40 backdrop-blur-sm border border-white/40 flex items-center justify-center">
-          <Icon className="w-9 h-9 text-muted-foreground" />
+        {/* Icon disc with glass feel */}
+        <div className="w-20 h-20 rounded-full bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/40 dark:border-white/10 flex items-center justify-center shadow-sm">
+          <Icon className={cn('w-9 h-9', state.iconColor || 'text-muted-foreground')} />
         </div>
 
         {/* Headline */}
@@ -134,7 +137,7 @@ export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmpty
         </h2>
 
         {/* Body */}
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-[360px]">
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-[320px]">
           {state.body}
         </p>
 
@@ -142,7 +145,7 @@ export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmpty
         {state.cta && (
           <Button
             onClick={handleCta}
-            className="w-full h-12 rounded-xl"
+            className="w-full max-w-[280px] h-12 rounded-xl font-medium"
           >
             {state.cta.label}
           </Button>
