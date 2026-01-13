@@ -80,35 +80,24 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 animate={{ opacity: imageLoaded ? 1 : 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-              {/* Top gradient for back button */}
-              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 via-black/25 to-transparent pointer-events-none" />
-              {/* Bottom gradient for title */}
-              <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 via-black/40 to-transparent pointer-events-none" />
+              {/* Top gradient for back button - reduced */}
+              <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />
+              {/* Bottom gradient for title - reduced */}
+              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
             </>
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
           
-          {/* Back button - glassmorphism style */}
+          {/* Back button - matches course detail page style */}
           {onBack && (
-            <motion.button
+            <button
               onClick={onBack}
-              className="absolute top-3 left-3 z-20 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-              style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}
-              whileHover={{ 
-                scale: 1.05, 
-                background: 'rgba(0, 0, 0, 0.4)',
-              }}
-              whileTap={{ scale: 0.95 }}
+              className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
               aria-label="Go back"
             >
-              <ArrowLeft className="h-5 w-5 text-white" />
-            </motion.button>
+              <ArrowLeft className="!h-5 !w-5 text-white" />
+            </button>
           )}
           
           {/* Top-right rank badge */}
