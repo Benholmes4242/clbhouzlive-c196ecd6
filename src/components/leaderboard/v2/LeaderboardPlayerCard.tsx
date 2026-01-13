@@ -123,11 +123,14 @@ export function LeaderboardPlayerCard({
       {/* Info block */}
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-1.5">
-          <span className={cn(
-            'text-sm font-medium truncate',
-            isCurrentUser && 'font-semibold',
-            isTop3 && 'text-[15px] font-semibold',
-          )}>
+          <span 
+            className={cn(
+              'text-sm font-medium truncate',
+              isCurrentUser && 'font-semibold',
+              isTop3 && 'text-[15px] font-semibold',
+            )}
+            title={player.display_name}
+          >
             {player.display_name}
           </span>
           {isCurrentUser && (
@@ -136,7 +139,7 @@ export function LeaderboardPlayerCard({
         </div>
         
         {subline && (
-          <p className="text-xs text-muted-foreground truncate mt-0.5">
+          <p className="text-xs text-muted-foreground truncate mt-0.5" title={subline}>
             {subline}
           </p>
         )}

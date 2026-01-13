@@ -468,7 +468,8 @@ export function PlayersLeaderboardViewV2() {
       }
     }
     if (arenaMode === 'climbers') {
-      return <LeaderboardEmptyState type="rising-no-data" />;
+      // Fast Climbers requires delta_rank from backend - show coming soon until implemented
+      return <LeaderboardEmptyState type="rising-coming-soon" />;
     }
     if (playersFrom !== 'worldwide' && displayedEntries.length === 0) {
       const countryName = playersFrom === 'my-country' 
