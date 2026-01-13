@@ -556,7 +556,7 @@ export function PlayersLeaderboardViewV2() {
         </motion.div>
       )}
 
-      {/* C) Arena Tabs with animation */}
+      {/* C) Arena Tabs with animation - centered */}
       <div className="px-4 pt-5 pb-2">
         <LeaderboardArenaTabs
           activeMode={arenaMode}
@@ -565,7 +565,7 @@ export function PlayersLeaderboardViewV2() {
         />
       </div>
 
-      {/* Filters row: Players From + Time Range (for applicable modes) */}
+      {/* Filters row: Players From + Time Range (for applicable modes) - centered, full width */}
       <AnimatePresence mode="wait">
         {(showPlayersFromFilter || showTimeRangeFilter) && (
           <motion.div
@@ -573,19 +573,21 @@ export function PlayersLeaderboardViewV2() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="px-4 pb-2 flex flex-wrap gap-3"
+            className="px-4 pb-4 space-y-4"
           >
             {showPlayersFromFilter && (
               <PlayersFromFilter
                 value={playersFrom}
                 onChange={handlePlayersFromChange}
                 userCountry={currentUserProfile?.homeClubCountry}
+                className="w-full"
               />
             )}
             {showTimeRangeFilter && (
               <TimeRangeFilter
                 value={timeRange}
                 onChange={handleTimeRangeChange}
+                className="w-full"
               />
             )}
           </motion.div>

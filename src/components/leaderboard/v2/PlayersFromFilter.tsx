@@ -1,23 +1,16 @@
 /**
  * PlayersFromFilter - Country-based player filter
- * Allows filtering leaderboard by player's home country
+ * Matches ExploreFiltersSheet pill style
  */
 
 import React, { useState } from 'react';
-import { Globe, MapPin, ChevronDown, Search, Check, X, Info } from 'lucide-react';
+import { Globe, MapPin, Search, Check, X, Info } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { 
   Drawer, 
   DrawerContent, 
@@ -101,6 +94,27 @@ function getCountryName(code: string): string {
   const country = ALL_COUNTRIES.find(c => c.code === code);
   return country?.name || code;
 }
+
+// Filter pill style matching ExploreFiltersSheet
+const FilterPill: React.FC<{
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+  icon?: React.ReactNode;
+}> = ({ label, selected, onClick, icon }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-1.5",
+      selected
+        ? "bg-foreground text-background"
+        : "bg-muted text-muted-foreground hover:bg-muted/80"
+    )}
+  >
+    {icon}
+    {label}
+  </button>
+);
 
 // Country Bottom Sheet Component (iOS-style)
 interface CountryBottomSheetProps {
@@ -189,12 +203,6 @@ export function PlayersFromFilter({
   const [countrySearchOpen, setCountrySearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const getDisplayLabel = () => {
-    if (value === 'worldwide') return 'Worldwide';
-    if (value === 'my-country') return userCountry ? getCountryName(userCountry) : 'My Country';
-    return getCountryName(value);
-  };
-
   const filteredCountries = ALL_COUNTRIES.filter(
     (c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
            c.code.toLowerCase().includes(searchQuery.toLowerCase())
@@ -208,9 +216,10 @@ export function PlayersFromFilter({
 
   return (
     <>
-      <div className="space-y-1">
-        <div className="flex items-center gap-1.5 px-0.5">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+      <div className={cn('space-y-2', className)}>
+        {/* Label row */}
+        <div className="flex items-center gap-1.5">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             Golfers based in
           </p>
           <TooltipProvider delayDuration={0}>
@@ -229,69 +238,32 @@ export function PlayersFromFilter({
             </Tooltip>
           </TooltipProvider>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              aria-label="Filter golfers by location"
-              className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg',
-                'bg-muted/40 hover:bg-muted/60 transition-colors',
-                'text-xs font-medium text-muted-foreground hover:text-foreground',
-                'border border-border/40',
-                className
-              )}
-            >
-              {value === 'worldwide' ? (
-                <Globe className="w-3.5 h-3.5" />
-              ) : (
-                <MapPin className="w-3.5 h-3.5" />
-              )}
-              <span className="font-semibold text-foreground">{getDisplayLabel()}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <div className="px-2 py-1.5 text-[10px] text-muted-foreground/70">
-              Based on each golfer's primary home club
-            </div>
-            <DropdownMenuItem
-              onClick={() => onChange('worldwide')}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <Globe className="w-4 h-4 text-muted-foreground" />
-              <span>Worldwide</span>
-              {value === 'worldwide' && (
-                <Check className="w-4 h-4 text-primary ml-auto" />
-              )}
-            </DropdownMenuItem>
-
+        
+        {/* Pills row - full width flex wrap */}
+        <div className="flex flex-wrap gap-2">
+          <FilterPill
+            label="Worldwide"
+            selected={value === 'worldwide'}
+            onClick={() => onChange('worldwide')}
+            icon={<Globe className="w-3.5 h-3.5" />}
+          />
+          
           {userCountry && (
-            <DropdownMenuItem
+            <FilterPill
+              label={getCountryName(userCountry)}
+              selected={value === 'my-country' || value === userCountry}
               onClick={() => onChange('my-country')}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 text-muted-foreground" />
-              <span>My Country ({getCountryName(userCountry)})</span>
-              {value === 'my-country' && (
-                <Check className="w-4 h-4 text-primary ml-auto" />
-              )}
-            </DropdownMenuItem>
+              icon={<MapPin className="w-3.5 h-3.5" />}
+            />
           )}
-
-          <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              onSelect={() => {
-                // Defer opening so the selecting click doesn't immediately dismiss the drawer
-                window.setTimeout(() => setCountrySearchOpen(true), 0);
-              }}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <span>Choose Country...</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          
+          <FilterPill
+            label="Choose country..."
+            selected={value !== 'worldwide' && value !== 'my-country' && value !== userCountry}
+            onClick={() => setCountrySearchOpen(true)}
+            icon={<Search className="w-3.5 h-3.5" />}
+          />
+        </div>
       </div>
 
       {/* Country Search Bottom Sheet */}
