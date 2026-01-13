@@ -1,18 +1,18 @@
 /**
- * AlumniDepthChart - Grouped alumni sections with contribution chips
+ * AlumniDepthChart - Squad-style depth chart with expand/collapse sections
  * 
- * Sections:
- * - Stars: Top ranked / winners
- * - Core Contributors: Made cuts / earnings
- * - Next Wave: Rookies / newer pros
+ * Sections (franchise-style naming):
+ * - Headliners: Top ranked / winners (formerly "Stars")
+ * - Engine Room: Made cuts / earnings (formerly "Core Contributors")
+ * - Pipeline: Rookies / newer pros (formerly "Next Wave")
  * 
- * Each player shows contribution chip: "+$420k this season"
+ * Each player shows contribution chips: earnings, wins (if any), rank (if notable)
  */
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Star, Users, Sparkles, DollarSign, Trophy, Globe } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Crown, Cog, Rocket, DollarSign, Trophy, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { PlayerAvatar } from '../PlayerAvatar';
@@ -75,13 +75,13 @@ function AlumniRow({ alumnus, index }: AlumniRowProps) {
             {fullName}
           </p>
           
-          {/* Contribution Chips */}
+          {/* Contribution Chips - earnings, wins, rank */}
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
             {/* Earnings chip - primary contribution */}
             {hasEarnings && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600">
                 <DollarSign className="w-3 h-3" />
-                +{formatCurrency(alumnus.earnings || 0)}
+                {formatCurrency(alumnus.earnings || 0)}
               </span>
             )}
             
@@ -113,24 +113,89 @@ interface SectionProps {
   icon: React.ElementType;
   iconColor: string;
   alumni: CollegeAlumnus[];
+  defaultExpanded?: boolean;
 }
 
-function Section({ title, subtitle, icon: Icon, iconColor, alumni }: SectionProps) {
+function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpanded = true }: SectionProps) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const COLLAPSED_COUNT = 3;
+  
   if (alumni.length === 0) return null;
   
+  const displayedAlumni = isExpanded ? alumni : alumni.slice(0, COLLAPSED_COUNT);
+  const hasMore = alumni.length > COLLAPSED_COUNT;
+  
   return (
-    <div className="mb-8">
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className={cn('w-4 h-4', iconColor)} />
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-        <span className="text-xs text-muted-foreground">({alumni.length})</span>
-      </div>
-      <p className="text-xs text-muted-foreground mb-3">{subtitle}</p>
-      <div className="space-y-2">
-        {alumni.map((alumnus, index) => (
-          <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} />
-        ))}
-      </div>
+    <div className="mb-6">
+      {/* Section Header - Tappable */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex items-center justify-between w-full mb-3 group"
+      >
+        <div className="flex items-center gap-2">
+          <div className={cn(
+            "w-7 h-7 rounded-lg flex items-center justify-center",
+            "bg-muted/50"
+          )}>
+            <Icon className={cn('w-4 h-4', iconColor)} />
+          </div>
+          <div className="text-left">
+            <h3 className="text-sm font-bold text-foreground">{title}</h3>
+            <p className="text-[11px] text-muted-foreground">{subtitle}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+            {alumni.length}
+          </span>
+          {hasMore && (
+            <motion.div
+              animate={{ rotate: isExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-muted-foreground group-hover:text-foreground transition-colors"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </motion.div>
+          )}
+        </div>
+      </button>
+      
+      {/* Alumni List */}
+      <AnimatePresence initial={false}>
+        <motion.div 
+          className="space-y-2"
+          initial={false}
+          animate={{ height: 'auto' }}
+        >
+          {displayedAlumni.map((alumnus, index) => (
+            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} />
+          ))}
+        </motion.div>
+      </AnimatePresence>
+      
+      {/* View All / Collapse toggle */}
+      {hasMore && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={cn(
+            "w-full mt-2 py-2 text-xs font-medium text-primary",
+            "hover:bg-primary/5 rounded-lg transition-colors",
+            "flex items-center justify-center gap-1"
+          )}
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp className="w-3.5 h-3.5" />
+              Show less
+            </>
+          ) : (
+            <>
+              View all {alumni.length}
+              <ChevronDown className="w-3.5 h-3.5" />
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }
@@ -142,30 +207,30 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     limit: 50 
   });
   
-  // Categorize alumni into sections
-  const { stars, core, nextWave } = useMemo(() => {
-    if (!alumni) return { stars: [], core: [], nextWave: [] };
+  // Categorize alumni into sections (franchise-style)
+  const { headliners, engineRoom, pipeline } = useMemo(() => {
+    if (!alumni) return { headliners: [], engineRoom: [], pipeline: [] };
     
-    const stars: CollegeAlumnus[] = [];
-    const core: CollegeAlumnus[] = [];
-    const nextWave: CollegeAlumnus[] = [];
+    const headliners: CollegeAlumnus[] = [];
+    const engineRoom: CollegeAlumnus[] = [];
+    const pipeline: CollegeAlumnus[] = [];
     
     alumni.forEach(a => {
-      // Stars: Top 50 world rank OR has wins
+      // Headliners: Top 50 world rank OR has wins
       if ((a.world_ranking && a.world_ranking <= 50) || (a.wins || 0) > 0) {
-        stars.push(a);
+        headliners.push(a);
       }
-      // Core: Made cuts and significant earnings but not a star
+      // Engine Room: Made cuts and significant earnings but not a headliner
       else if ((a.cuts_made || 0) >= 5 || (a.earnings || 0) >= 100_000) {
-        core.push(a);
+        engineRoom.push(a);
       }
-      // Next Wave: Everyone else with some activity
+      // Pipeline: Everyone else with some activity
       else if ((a.earnings || 0) > 0) {
-        nextWave.push(a);
+        pipeline.push(a);
       }
     });
     
-    return { stars, core, nextWave };
+    return { headliners, engineRoom, pipeline };
   }, [alumni]);
   
   if (isLoading) {
@@ -192,27 +257,30 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   return (
     <div className={className}>
       <Section
-        title="Stars"
-        subtitle="Top ranked players and winners"
-        icon={Star}
+        title="Headliners"
+        subtitle="Elite performers and winners"
+        icon={Crown}
         iconColor="text-amber-500"
-        alumni={stars}
+        alumni={headliners}
+        defaultExpanded={true}
       />
       
       <Section
-        title="Core Contributors"
-        subtitle="Consistent performers making cuts"
-        icon={Users}
+        title="Engine Room"
+        subtitle="Reliable contributors making cuts"
+        icon={Cog}
         iconColor="text-primary"
-        alumni={core}
+        alumni={engineRoom}
+        defaultExpanded={engineRoom.length <= 5}
       />
       
       <Section
-        title="Next Wave"
-        subtitle="Rising players building their careers"
-        icon={Sparkles}
+        title="Pipeline"
+        subtitle="Rising talent building careers"
+        icon={Rocket}
         iconColor="text-purple-500"
-        alumni={nextWave}
+        alumni={pipeline}
+        defaultExpanded={false}
       />
     </div>
   );

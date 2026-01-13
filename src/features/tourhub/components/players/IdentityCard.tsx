@@ -116,16 +116,21 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
               className={cn(
                 "group/college flex flex-col items-center",
                 "transition-transform hover:scale-105 active:scale-95",
-                "focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg p-1 -m-1"
+                "focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg p-1.5 -m-1.5"
               )}
               aria-label={`View ${college.college_name} alumni`}
             >
+              {/* "College" label above logo */}
+              <span className="text-[9px] font-medium text-muted-foreground/70 uppercase tracking-wider mb-1">
+                College
+              </span>
               <div className={cn(
                 "w-11 h-11 rounded-xl overflow-hidden",
                 "bg-background border border-border/50",
                 "flex items-center justify-center",
                 "shadow-sm",
                 "group-hover/college:border-primary/40 group-hover/college:shadow-md",
+                "group-active/college:scale-95",
                 "transition-all duration-200"
               )}>
                 <img 

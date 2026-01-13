@@ -3,6 +3,7 @@ import { ArrowLeft, Swords, GitCompare } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { 
   FranchiseHero, 
+  FranchiseStoryStrip,
   AlumniDepthChart, 
   CollegeRivalsCarousel,
   FollowCollegeButton 
@@ -64,7 +65,10 @@ export function CollegeProfilePage() {
         ) : stats ? (
           <>
             {/* Franchise Hero */}
-            <FranchiseHero stats={stats} college={college} className="mb-8" />
+            <FranchiseHero stats={stats} college={college} className="mb-6" />
+            
+            {/* Franchise Story Strip - This week's activity */}
+            <FranchiseStoryStrip normalizedName={collegeSlug || ''} className="mb-8" />
             
             {/* Action Buttons */}
             <div className="flex items-center justify-center gap-3 mb-10">
