@@ -211,11 +211,11 @@ const Top100CoursesHubPanel = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > PAGE_SIZE;
 
   return (
-    <div className="space-y-section pb-section">
+    <div className="space-y-section pb-6">
       {/* 1. Header / Identity Section */}
       <section className="text-center pt-sub">
         <h1 className="text-xl font-bold text-foreground tracking-tight">Top 100 Club</h1>
-        <p className="text-sm text-muted-foreground mt-sub">
+        <p className="text-sm text-muted-foreground mt-1.5">
           Your journey across the world's greatest courses
         </p>
       </section>
@@ -230,7 +230,7 @@ const Top100CoursesHubPanel = () => {
               <span className="font-medium text-foreground">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}
             </p>
             
-            {/* Progress bar - h-[5px], rounded-full, animated */}
+            {/* Progress bar - premium animated gradient */}
             <div className="max-w-md mx-auto">
               <div 
                 role="progressbar"
@@ -238,21 +238,21 @@ const Top100CoursesHubPanel = () => {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label={`Top 100 progress: ${totalRated} courses rated`}
-                className="h-[5px] w-full overflow-hidden rounded-full bg-slate-200/60"
+                className="h-[6px] w-full overflow-hidden rounded-full bg-gradient-to-r from-slate-200/80 to-slate-200/60 shadow-inner"
               >
                 <div
-                  className="h-[5px] rounded-full bg-amber-500/90 transition-all duration-500 ease-out"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-[0_0_8px_rgba(251,191,36,0.4)] transition-all duration-700 ease-out animate-fade-in"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Club Status Card - FULLY CLICKABLE */}
+          {/* Club Status Card - FULLY CLICKABLE with polished hover state */}
           <button
             type="button"
             onClick={handleOpenTop100Club}
-            className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-3 text-left cursor-pointer hover:bg-muted/30 hover:shadow-md active:scale-[0.99] transition-all duration-150"
+            className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-3 text-left cursor-pointer hover:bg-muted/30 hover:shadow-md hover:border-border active:scale-[0.99] transition-all duration-200"
             aria-label="Open Top 100 Club"
             role="link"
           >
@@ -271,8 +271,12 @@ const Top100CoursesHubPanel = () => {
                     quality="medium"
                   />
                 ) : (
-                  <div className="h-[88px] w-[180px] rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">
-                    <Award className="w-6 h-6 text-muted-foreground/50" />
+                  /* Empty state - inviting gradient placeholder */
+                  <div className="h-[88px] w-[180px] rounded-sq-md bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 border border-dashed border-slate-300/60 flex flex-col items-center justify-center gap-1.5 transition-colors group-hover:border-slate-400/60">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+                      <Award className="w-5 h-5 text-amber-500/70" />
+                    </div>
+                    <span className="text-[10px] font-medium text-muted-foreground">Your badge awaits</span>
                   </div>
                 )}
               </div>
@@ -405,27 +409,57 @@ const Top100CoursesHubPanel = () => {
 
       {/* 5. Rankings List - mt-4 from controls */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        /* Premium skeleton loading state */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="space-y-3">
-              <Skeleton className="h-44 w-full rounded-sq-md" />
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
+            <div key={i} className="space-y-3 p-3 rounded-sq-md bg-card border border-border/40">
+              <Skeleton className="h-40 w-full rounded-sq-sm" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="flex gap-2 pt-1">
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                </div>
+              </div>
             </div>
           ))}
         </div>
       ) : displayedCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center">
-            <Award className="w-4 h-4 text-muted-foreground" />
+        /* Empty state - friendly with search-specific messaging */
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200/60 flex items-center justify-center shadow-sm">
+            {searchTerm ? (
+              <Search className="w-5 h-5 text-slate-400" />
+            ) : (
+              <Award className="w-5 h-5 text-slate-400" />
+            )}
           </div>
-          <h3 className="text-sm font-semibold">No courses match your filters</h3>
-          <p className="text-sm text-muted-foreground max-w-xs">
-            Try clearing your search or choosing a different Top 100 list.
-          </p>
-          <Button variant="outline" size="sm" onClick={handleResetFilters} className="mt-2">
-            Reset filters
-          </Button>
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-foreground">
+              {searchTerm ? 'No courses found' : 'No courses match your filters'}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              {searchTerm 
+                ? `No courses matching "${searchTerm}" in this Top 100 list.`
+                : 'Try choosing a different Top 100 list.'}
+            </p>
+          </div>
+          {searchTerm ? (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setSearchTerm('')}
+              className="mt-1 gap-1.5"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear search
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" onClick={handleResetFilters} className="mt-1">
+              Reset filters
+            </Button>
+          )}
         </div>
       ) : (
         <VirtualizedCourseList 
@@ -441,12 +475,12 @@ const Top100CoursesHubPanel = () => {
                     size="sm"
                     onClick={loadMore}
                     disabled={isLoadingMore}
-                    className="w-full max-w-xs gap-1.5 transition-all duration-150 hover:shadow-sm active:scale-[0.98]"
+                    className="w-full max-w-xs gap-1.5 transition-all duration-200 hover:shadow-sm hover:border-border active:scale-[0.98]"
                   >
                     {isLoadingMore ? (
                       <>
                         <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-                        Loading next courses…
+                        Loading…
                       </>
                     ) : (
                       <>
@@ -455,15 +489,15 @@ const Top100CoursesHubPanel = () => {
                       </>
                     )}
                   </Button>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
                   </p>
                 </div>
               )}
 
-              {/* End message */}
+              {/* End message with proper bottom spacing */}
               {showEndMessage && (
-                <p className="text-center text-[11px] text-muted-foreground pt-4">
+                <p className="text-center text-sm text-muted-foreground pt-4 pb-6">
                   You've reached the end • {totalCount.toLocaleString()} courses total
                 </p>
               )}
