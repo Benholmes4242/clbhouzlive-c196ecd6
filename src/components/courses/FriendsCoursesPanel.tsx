@@ -266,17 +266,22 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
       
-      {/* Filter Dropdowns */}
+      {/* Filter Dropdowns - matching Explore page exactly */}
       <div className="flex items-center gap-3">
-        {/* Time Range Dropdown - Primary visual emphasis */}
+        {/* Time Range Dropdown */}
         <div className="flex-1">
           <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
             <SelectTrigger 
               aria-label="Select time period"
-              className="h-11 w-full bg-card border border-slate-300 rounded-xl justify-between text-base font-medium focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
-              <SelectValue placeholder="Select time range" />
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                timeframe !== '30d' 
+                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  : 'border-slate-200'
+              }`}
+            >
+              <SelectValue placeholder="Last 30 days" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
+            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               <SelectItem value="7d">Last 7 days</SelectItem>
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
@@ -286,15 +291,20 @@ const FriendsCoursesPanel: React.FC = () => {
           </Select>
         </div>
         
-        {/* Course Filter Dropdown - Secondary */}
+        {/* Course Filter Dropdown */}
         <div className="flex-1">
           <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
             <SelectTrigger 
               aria-label="Filter courses"
-              className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
-              <SelectValue placeholder="Select filter" />
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                courseFilter !== 'all' 
+                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  : 'border-slate-200'
+              }`}
+            >
+              <SelectValue placeholder="All courses" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
+            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               <SelectItem value="all">All courses</SelectItem>
               <SelectItem value="new">New this period</SelectItem>
               <SelectItem value="most_played">Most played</SelectItem>

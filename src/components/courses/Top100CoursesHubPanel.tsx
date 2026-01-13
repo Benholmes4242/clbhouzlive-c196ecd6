@@ -376,15 +376,22 @@ const Top100CoursesHubPanel = () => {
           )}
         </div>
 
-        {/* List + Sort selectors - grid on mobile */}
+        {/* List + Sort selectors - matching Explore page exactly */}
         <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
           {/* List selector */}
           <div className="flex-1">
             <Select value={selectedList} onValueChange={setSelectedList}>
-              <SelectTrigger aria-label="Select Top 100 list" className="h-11 w-full bg-card border border-border/60 rounded-sq-sm text-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:ring-2 focus:ring-slate-200/60 focus:border-slate-300 focus:outline-none">
-                <SelectValue placeholder="Choose list" />
+              <SelectTrigger 
+                aria-label="Select Top 100 list" 
+                className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                  selectedList !== 'global' 
+                    ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                    : 'border-slate-200'
+                }`}
+              >
+                <SelectValue placeholder="Global Top 100" />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
+              <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
                 {listOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -396,13 +403,25 @@ const Top100CoursesHubPanel = () => {
 
           {/* Sort selector */}
           <div className="flex-1">
-            <AppSelect
-              value={sortOption}
-              onChange={(v) => setSortOption(v as Top100SortOption)}
-              options={sortOptions}
-              ariaLabel="Sort courses"
-              triggerClassName="h-11"
-            />
+            <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
+              <SelectTrigger 
+                aria-label="Sort courses" 
+                className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                  sortOption !== 'official' 
+                    ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                    : 'border-slate-200'
+                }`}
+              >
+                <SelectValue placeholder="Official ranking" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </section>
