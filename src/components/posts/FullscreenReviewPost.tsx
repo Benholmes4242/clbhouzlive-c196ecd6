@@ -189,62 +189,30 @@ export function FullscreenReviewPost({
       {/* Main Media - only render if renderMedia is true */}
       {renderMedia && (
         <div className="absolute inset-0">
-          {(() => {
-            console.log('[FullscreenReviewPost] 🎬 RENDERING MEDIA:', {
-              index: currentIndex,
-              type: currentMedia.media_type,
-              id: currentMedia.id?.substring(0, 8),
-              isVideo: currentMedia.media_type === 'video',
-            });
-            
-            if (currentMedia.media_type === 'video') {
-              console.log('[FullscreenReviewPost] 🎥 Rendering HLSPlayer:', {
-                key: `review-video-${currentMedia.id}-${currentIndex}`,
-                src: currentMedia.media_url?.substring(0, 50),
-                autoplay: true,
-                muted: isMuted,
-                poster: currentMedia.poster_url?.substring(0, 50),
-                mediaId: `review-preview-${currentMedia.id}`,
-              });
-              
-              return (
-                <HLSPlayer
-                  key={`review-video-${currentMedia.id}-${currentIndex}`}
-                  ref={videoPlayerRef}
-                  src={currentMedia.media_url}
-                  className="w-full h-full object-cover"
-                  muted={isMuted}
-                  loop={true}
-                  autoplay={true}
-                  showMuteButton={false}
-                  showPlayButton={false}
-                  mediaId={`review-preview-${currentMedia.id}`}
-                />
-              );
-            } else {
-              console.log('[FullscreenReviewPost] 🖼️ Rendering image element');
-              return (
-                <img
-                  src={currentMedia.media_url}
-                  alt={courseName}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
-              );
-            }
-          })()}
+          {currentMedia.media_type === 'video' ? (
+            <HLSPlayer
+              key={`review-video-${currentMedia.id}-${currentIndex}`}
+              ref={videoPlayerRef}
+              src={currentMedia.media_url}
+              className="w-full h-full object-cover"
+              muted={isMuted}
+              loop={true}
+              autoplay={true}
+              showMuteButton={false}
+              showPlayButton={false}
+              mediaId={`review-preview-${currentMedia.id}`}
+            />
+          ) : (
+            <img
+              src={currentMedia.media_url}
+              alt={courseName}
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
+          )}
         </div>
       )}
       
-      {/* DEBUG: Log when renderMedia is false */}
-      {!renderMedia && (() => {
-        console.log('[FullscreenReviewPost] ⚠️ renderMedia=false - parent owns media rendering', {
-          currentIndex,
-          currentMediaType: currentMedia?.media_type,
-          currentMediaId: currentMedia?.id?.substring(0, 8),
-        });
-        return null;
-      })()}
       
       {/* Top gradient - subtle fade behind panel */}
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/30 via-black/15 to-transparent pointer-events-none z-[4]" />
@@ -252,19 +220,19 @@ export function FullscreenReviewPost({
       {/* Bottom gradient - softer fade */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
-      {/* Premium Top Overlay Panel - Matches CreatorCapsule review styling */}
+      {/* Premium Top Overlay Panel - Uses brand orange for outstanding ratings */}
       <div 
         className={cn(
           "absolute left-4 right-4 z-20 top-[66px]",
           "rounded-xl backdrop-blur-xl border",
           "shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]",
           isOutstanding 
-            ? "bg-[rgba(210,180,97,0.08)]" 
+            ? "bg-[rgba(247,158,27,0.08)]" 
             : "bg-black/50"
         )}
         style={{
           borderColor: isOutstanding 
-            ? 'rgba(210, 180, 97, 0.3)' 
+            ? 'rgba(247, 158, 27, 0.3)' 
             : 'rgba(255, 255, 255, 0.08)',
           padding: '16px',
         }}
@@ -294,7 +262,7 @@ export function FullscreenReviewPost({
               <button className="flex flex-col items-center gap-0.5 flex-shrink-0">
                 <span 
                   className="text-3xl sm:text-4xl font-bold tabular-nums drop-shadow-lg leading-none"
-                  style={{ color: isOutstanding ? '#D2B461' : '#FFFFFF' }}
+                  style={{ color: isOutstanding ? '#F79E1B' : '#FFFFFF' }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>

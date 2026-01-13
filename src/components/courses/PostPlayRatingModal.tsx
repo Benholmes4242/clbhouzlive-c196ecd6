@@ -395,18 +395,12 @@ const PostPlayRatingModal = ({
       // Attach pending videos to the review (if any ready)
       try {
         if (videoDrafts.some(d => d.status === 'ready')) {
-          const { attached } = await attachToReview(ratingId);
-          console.log('[Rating] Attached', attached, 'videos to review:', ratingId);
+          await attachToReview(ratingId);
         }
       } catch (attachError) {
-        console.error('[Rating] Failed to attach videos:', attachError);
         // Non-blocking - rating succeeded, videos will be orphaned but cleaned up by TTL
       } finally {
         // Always clear ALL local media state to prevent duplicate display with existingMediaItems
-        console.log('[Rating] Clearing local media state:', {
-          selectedImages: selectedImages.length,
-          videoDrafts: videoDrafts.length,
-        });
         
         resetVideoDrafts();
         
@@ -434,13 +428,10 @@ const PostPlayRatingModal = ({
           
           if (mediaData) {
             setExistingMediaItems(mediaData);
-            console.log('[Rating] Refreshed media for confirmation:', mediaData.length, 'items');
           }
         } catch {
           // Non-blocking - confirmation will just show whatever was already in state
         }
-        
-        console.log('[Rating] Local media state cleared');
       }
       
       // Get userId for proper query invalidation
@@ -448,20 +439,6 @@ const PostPlayRatingModal = ({
       const userId = userResponse?.user?.id;
 
       const isNewReview = !isEditMode;
-
-      console.log('[Rating Mutation onSuccess]', {
-        courseId: course?.id,
-        isNewReview,
-        ratingId,
-        payload: {
-          rating: variables.rating,
-          reviewText: variables.reviewText,
-          design: variables.design,
-          condition: variables.condition,
-          clubhouse: variables.clubhouse,
-          facilities: variables.facilities,
-        },
-      });
 
       // Track submission success
       analyticsEvents.ratings.submitted({
@@ -1525,7 +1502,6 @@ const PostPlayRatingModal = ({
               onBack={handleClose}
               onShareReview={async () => {
                 if (!submittedRatingId && !existingRating?.id) {
-                  console.error('[ShareReview] No rating ID available');
                   return { success: false };
                 }
                 const result = await shareReview({
@@ -1592,7 +1568,8 @@ const PostPlayRatingModal = ({
 // Confirmation Components
 // ============================================
 
-type RatingConfirmationProps = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for reference
+type _RatingConfirmationProps = {
   course: Course;
   userRating: { rating: number | null; review: string };
   onBackToCourse: () => void;
@@ -1600,31 +1577,6 @@ type RatingConfirmationProps = {
 
 // ===== RATING CONFIRMATION VIEW =====
 // Uses unified System-2 rating bands from getScoreTier()
-
-function getComparisonCopy(user: number, community: number | null) {
-  if (community == null) return null;
-
-  const delta = user - community;
-  const abs = Math.abs(delta);
-
-  if (abs < 0.2) {
-    return { icon: '✓', text: 'You rated this course on par with the community.', color: '#22C55E' };
-  }
-
-  if (delta > 0) {
-    return {
-      icon: '↑',
-      text: `You rated this course ${abs.toFixed(1)} point${abs === 1.0 ? '' : 's'} higher than the community.`,
-      color: '#22C55E',
-    };
-  }
-
-  return {
-    icon: '↓',
-    text: `You rated this course ${abs.toFixed(1)} point${abs === 1.0 ? '' : 's'} lower than the community.`,
-    color: '#E85151',
-  };
-}
 
 type BreakdownItem = { label: string; value: number };
 
@@ -1691,8 +1643,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
       } else {
         setShareState('idle');
       }
-    } catch (err) {
-      console.error('[RatingConfirmation] Share failed:', err);
+    } catch {
       setShareState('idle');
     }
   };
@@ -1771,8 +1722,8 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
-  // Breakdown bars use unified gray color system
-  const BREAKDOWN_BAR_FILL = '#d1d5db'; // gray-300 - unified color
+  // Breakdown bars use unified gray gradient end color for consistency
+  const BREAKDOWN_BAR_FILL = '#9ca3af'; // gray-400 - matches unified system
 
   // Convert submittedMedia to the format expected by FullscreenReviewPost
   const previewMedia = submittedMedia.map((item, index) => ({

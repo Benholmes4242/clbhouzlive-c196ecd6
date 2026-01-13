@@ -53,14 +53,14 @@ const slateOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   overlayText: '#FFFFFF',
 };
 
-// Gold theme for outstanding ratings (on dark backgrounds)
-// Must match CreatorCapsule exactly: bg-[rgba(210,180,97,0.08)], border-[rgba(210,180,97,0.3)]
+// Brand orange theme for outstanding ratings (on dark backgrounds)
+// Uses unified brand orange (#F79E1B) instead of old gold
 const goldOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(210, 180, 97, 0.15)',
-  pillBorder: 'rgba(210, 180, 97, 0.5)',
-  pillText: '#D2B461', // gold accent
-  containerBg: 'rgba(210, 180, 97, 0.08)', // matches CreatorCapsule outstanding
-  containerBorder: 'rgba(210, 180, 97, 0.3)', // matches CreatorCapsule outstanding
+  pillBg: 'rgba(247, 158, 27, 0.15)',        // Brand orange with 15% opacity
+  pillBorder: 'rgba(247, 158, 27, 0.5)',     // Brand orange with 50% opacity
+  pillText: '#F79E1B',                        // Brand orange
+  containerBg: 'rgba(247, 158, 27, 0.08)',   // Brand orange with 8% opacity
+  containerBorder: 'rgba(247, 158, 27, 0.3)', // Brand orange with 30% opacity
   overlayText: '#FFFFFF',
 };
 
