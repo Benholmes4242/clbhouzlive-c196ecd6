@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Image, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -51,6 +51,7 @@ export function CinematicCourseCard({
   onCreateGame,
 }: CinematicCourseCardProps) {
   const navigate = useNavigate();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleClick = () => {
     navigate(`/courses/${course.course_id}`);
@@ -99,24 +100,37 @@ export function CinematicCourseCard({
       )}
       style={{ animationDelay: `${listPosition * 50}ms` }}
     >
-      {/* Hero Image - wider aspect ratio (reduced height by ~50%) */}
+      {/* Hero Image - wider aspect ratio with smooth loading */}
       <div className="relative w-full aspect-[16/9] overflow-hidden group">
         {course.thumbnail_image ? (
-          <img
-            src={course.thumbnail_image}
-            alt={course.course_name}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder.svg';
-            }}
-          />
+          <>
+            {/* Loading placeholder */}
+            <div className={cn(
+              "absolute inset-0 bg-muted transition-opacity duration-300",
+              imageLoaded ? "opacity-0" : "opacity-100"
+            )} />
+            <img
+              src={course.thumbnail_image}
+              alt={course.course_name}
+              onLoad={() => setImageLoaded(true)}
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder.svg';
+                setImageLoaded(true);
+              }}
+              className={cn(
+                "w-full h-full object-cover transition-all duration-500 ease-out",
+                "group-hover:scale-[1.02]",
+                imageLoaded ? "opacity-100" : "opacity-0"
+              )}
+            />
+          </>
         ) : (
-          <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+          <div className="w-full h-full bg-muted flex items-center justify-center">
             <div className="text-center space-y-1.5">
-              <div className="w-10 h-10 mx-auto rounded-sq-sm bg-slate-200/60 flex items-center justify-center">
-                <Image className="w-5 h-5 text-slate-400" />
+              <div className="w-10 h-10 mx-auto rounded-sq-sm bg-muted-foreground/10 flex items-center justify-center">
+                <Image className="w-5 h-5 text-muted-foreground/50" />
               </div>
-              <span className="text-[11px] text-slate-400 font-medium">No image</span>
+              <span className="text-[11px] text-muted-foreground font-medium">No image</span>
             </div>
           </div>
         )}
@@ -145,10 +159,13 @@ export function CinematicCourseCard({
       </div>
 
       {/* Metadata Block - Below Image */}
-      <div className="px-4 py-3.5 bg-white space-y-1">
+      <div className="px-4 py-3.5 bg-card space-y-1">
         {/* Course Name + Active Games Badge Row */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-foreground truncate flex-1">
+          <h3 
+            className="text-sm font-semibold text-foreground truncate flex-1"
+            title={course.course_name}
+          >
             {course.course_name}
           </h3>
           
@@ -156,7 +173,7 @@ export function CinematicCourseCard({
           {activeGamesCount > 0 && (
             <button
               onClick={handleCreateGame}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 hover:bg-emerald-500/20 active:scale-95 transition-all"
             >
               <Users className="w-3 h-3" />
               {activeGamesCount} {activeGamesCount === 1 ? 'game' : 'games'}
@@ -165,7 +182,7 @@ export function CinematicCourseCard({
         </div>
 
         {/* Location */}
-        <p className="text-xs text-muted-foreground truncate">
+        <p className="text-xs text-muted-foreground truncate" title={locationText}>
           {locationText}
         </p>
 
@@ -177,7 +194,7 @@ export function CinematicCourseCard({
             <span className="text-[13px] font-medium text-muted-foreground">—</span>
           )}
           {course.ratings_count && course.ratings_count > 0 && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground tabular-nums">
               • Rated by {course.ratings_count} member{course.ratings_count === 1 ? '' : 's'}
             </span>
           )}
@@ -187,17 +204,17 @@ export function CinematicCourseCard({
         {showFriendsContext && course.friends_count && course.friends_count > 0 && (
           <div className="flex items-center gap-1.5 pt-1">
             <Users className="w-3 h-3 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground tabular-nums">
               {course.friends_count} friend{course.friends_count === 1 ? '' : 's'} played
             </span>
           </div>
         )}
 
-        {/* V3: Create Game CTA */}
+        {/* V3: Create Game CTA - Orange outline style */}
         {onCreateGame && (
           <button
             onClick={handleCreateGame}
-            className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors w-full justify-center"
+            className="flex items-center gap-1.5 mt-2.5 px-3 py-2 rounded-sq-sm text-xs font-medium border border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/50 active:scale-[0.98] transition-all w-full justify-center"
           >
             <Plus className="w-3.5 h-3.5" />
             Create game here

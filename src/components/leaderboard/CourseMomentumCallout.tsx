@@ -81,15 +81,16 @@ export function CourseMomentumCallout({
   return (
     <div 
       className={cn(
-        'flex items-center gap-2 px-3.5 py-2.5 rounded-sq-sm',
-        'border',
+        'flex items-center gap-2.5 px-4 py-3 mx-4 rounded-sq-sm',
+        'border shadow-sm',
+        'animate-fade-in',
         config.bgColor,
         config.borderColor,
         className
       )}
     >
       <Icon className={cn('w-4 h-4 flex-shrink-0', config.iconColor)} />
-      <span className="text-[13px] font-medium text-slate-700">
+      <span className="text-[13px] font-medium text-foreground flex-1">
         {config.text}
       </span>
       
@@ -97,7 +98,7 @@ export function CourseMomentumCallout({
         <button
           type="button"
           onClick={onDismiss}
-          className="ml-auto text-slate-400 hover:text-slate-600 transition-colors p-0.5"
+          className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-1 rounded-sq-xs hover:bg-muted/50"
           aria-label="Dismiss"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
