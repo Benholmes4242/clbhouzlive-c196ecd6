@@ -5711,6 +5711,64 @@ export type Database = {
         }
         Relationships: []
       }
+      push_notification_queue: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          data: Json | null
+          device_id: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string | null
+          data?: Json | null
+          device_id: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string | null
+          data?: Json | null
+          device_id?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_notification_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "push_notification_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_notification_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_notification_tokens: {
         Row: {
           created_at: string | null
@@ -11314,6 +11372,15 @@ export type Database = {
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
       publish_scheduled_posts: { Args: never; Returns: undefined }
+      queue_push_notification: {
+        Args: {
+          p_body: string
+          p_data?: Json
+          p_title: string
+          p_user_id: string
+        }
+        Returns: number
+      }
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
         Returns: undefined

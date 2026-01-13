@@ -50,12 +50,21 @@ export type ActivityType =
   | 'course_update'
   | 'event'
   // Games & Trips
+  | 'game_request'
+  | 'game_request_accepted'
+  | 'game_request_declined'
   | 'game_invite'
+  | 'game_cancelled'
   | 'rsvp_update'
   | 'game_reminder_24h'
   | 'game_reminder_2h'
   | 'game_updated'
   | 'game_completed'
+  | 'trip_request'
+  | 'trip_request_accepted'
+  | 'trip_request_declined'
+  | 'trip_invite'
+  | 'trip_cancelled'
   | 'trip_created'
   | 'trip_game_added'
   | 'trip_reminder'
@@ -148,8 +157,11 @@ const CLUB_COURSE_TYPES = new Set([
 
 // Types that are game/trip related
 const GAME_TRIP_TYPES = new Set([
-  'game_invite', 'rsvp_update', 'game_reminder_24h', 'game_reminder_2h',
-  'game_updated', 'game_completed', 'trip_created', 'trip_game_added', 'trip_reminder'
+  'game_request', 'game_request_accepted', 'game_request_declined',
+  'game_invite', 'game_cancelled', 'rsvp_update', 'game_reminder_24h', 'game_reminder_2h',
+  'game_updated', 'game_completed', 
+  'trip_request', 'trip_request_accepted', 'trip_request_declined',
+  'trip_invite', 'trip_cancelled', 'trip_created', 'trip_game_added', 'trip_reminder'
 ]);
 
 function getTimeAgo(dateString: string): string {
