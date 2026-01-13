@@ -66,25 +66,6 @@ export function CinematicCourseCard({
     });
   };
 
-  // Determine if course qualifies for flair badge
-  const getFlairBadge = () => {
-    if (course.global_rank && course.global_rank <= 10) {
-      return { rank: course.global_rank, region: 'global' };
-    }
-    if (course.usa_rank && course.usa_rank <= 10) {
-      return { rank: course.usa_rank, region: 'usa' };
-    }
-    if (course.regional_rank && course.regional_rank <= 10) {
-      const gbCountries = ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland', 'Britain & Ireland'];
-      if (gbCountries.includes(course.country)) {
-        return { rank: course.regional_rank, region: 'gb-i' };
-      }
-      return { rank: course.regional_rank, region: 'europe' };
-    }
-    return null;
-  };
-
-  const flairBadge = getFlairBadge();
   const locationText = course.sub_country 
     ? `${course.sub_country}, ${course.country}`
     : course.country;
@@ -145,29 +126,21 @@ export function CinematicCourseCard({
 
         {/* Rank Badges - Top Left (unified with Explore page) */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {/* Global rank first if available */}
           {course.global_rank && (
             <Top100RankBadge listSlug="global" rank={course.global_rank} />
           )}
-          {course.usa_rank && !course.global_rank && (
+          {/* Regional rank (USA, GB&I, Europe) - show alongside global if both exist */}
+          {course.usa_rank && (
             <Top100RankBadge listSlug="usa" rank={course.usa_rank} />
           )}
-          {course.regional_rank && !course.global_rank && !course.usa_rank && (
+          {course.regional_rank && (
             <Top100RankBadge 
               listSlug={getListSlug(course.country)} 
               rank={course.regional_rank}
             />
           )}
         </div>
-
-        {/* Flair Badge - Top Right (optional, using unified badge) */}
-        {flairBadge && (
-          <div className="absolute top-3 right-3">
-            <Top100RankBadge 
-              listSlug={flairBadge.region as Top100RankBadgeProps['listSlug']} 
-              rank={flairBadge.rank}
-            />
-          </div>
-        )}
       </div>
 
       {/* Metadata Block - Below Image */}
