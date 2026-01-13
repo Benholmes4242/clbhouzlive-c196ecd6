@@ -27,8 +27,8 @@ type SheetState = 'peek' | 'half' | 'full';
 // Adjusted heights: half state shows all content without scroll
 const SHEET_HEIGHTS: Record<SheetState, string> = {
   peek: '25%',
-  half: '78%',  // Increased to ensure all content visible including buttons
-  full: '92%',
+  half: '100%',  // Full height to show all content
+  full: '100%',
 };
 
 // Fetch course thumbnail image
