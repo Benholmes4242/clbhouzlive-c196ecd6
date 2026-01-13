@@ -3,10 +3,9 @@
  * V2 itinerary list style, View all pill button, dashed footer
  */
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Plane, ChevronRight, Plus } from 'lucide-react';
-import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
-import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 import { HUB_DEMO_MODE, MOCK_DIARY_ITEMS } from '../hubDemoConfig';
 
@@ -15,12 +14,11 @@ interface YourGamesGradientCTAProps {
 }
 
 export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
-  const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
+  const navigate = useNavigate();
 
   const openYourGames = () => {
     haptic('light');
-    setGamesHubOpen(true);
+    navigate('/hub/games');
   };
 
   const allItems = HUB_DEMO_MODE ? MOCK_DIARY_ITEMS : [];
@@ -56,9 +54,8 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
   const hasItems = displayItems.length > 0;
 
   return (
-    <>
-      <button
-        onClick={openYourGames}
+    <button
+      onClick={openYourGames}
         className={`w-full rounded-[18px] overflow-hidden relative flex flex-col transition-all duration-150 active:scale-[0.99] ${className || ''}`}
         style={{
           background: 'var(--hub-card)',
@@ -203,17 +200,5 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
           </div>
         )}
       </button>
-
-      <HubGamesTripsSheet
-        isOpen={gamesHubOpen}
-        onClose={() => setGamesHubOpen(false)}
-        onOpenCreate={() => setCreateOpen(true)}
-      />
-
-      <CreateGameTripSheetV2
-        isOpen={createOpen}
-        onClose={() => setCreateOpen(false)}
-      />
-    </>
   );
 }

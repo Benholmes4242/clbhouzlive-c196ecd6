@@ -4,9 +4,8 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
-import { HubGamesTripsSheet } from '@/features/hub/components/HubGamesTripsSheet';
-import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { HUB_DEMO_MODE, MOCK_NEARBY_GAMES } from '../hubDemoConfig';
@@ -21,9 +20,8 @@ function formatShortDate(isoDate: string): string {
 }
 
 export function ActiveGamesNearYouTile() {
+  const navigate = useNavigate();
   const { data: realGames = [], isLoading: realLoading } = useGamesQuery();
-  const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
@@ -51,7 +49,7 @@ export function ActiveGamesNearYouTile() {
 
   const openGamesHub = () => {
     haptic('light');
-    setGamesHubOpen(true);
+    navigate('/hub/discover');
   };
 
   const slotsLabel = nearbyGame 
@@ -59,124 +57,111 @@ export function ActiveGamesNearYouTile() {
     : '0/0';
 
   return (
-    <>
-      <button
-        onClick={openGamesHub}
-        className="w-full h-[140px] rounded-[18px] p-4 text-left transition-all duration-150 active:scale-[0.99] flex flex-col relative overflow-hidden"
-        style={{
-          background: 'var(--hub-card)',
-          border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-soft)',
+    <button
+      onClick={openGamesHub}
+      className="w-full h-[140px] rounded-[18px] p-4 text-left transition-all duration-150 active:scale-[0.99] flex flex-col relative overflow-hidden"
+      style={{
+        background: 'var(--hub-card)',
+        border: '1px solid var(--hub-card-border)',
+        boxShadow: 'var(--hub-shadow-soft)',
+      }}
+    >
+      {/* Title */}
+      <div 
+        className="text-[14px] font-semibold"
+        style={{ 
+          color: 'var(--hub-text)',
+          lineHeight: '1.1',
+          letterSpacing: '-0.2px',
         }}
       >
-        {/* Title */}
+        Active Games<br/>Near You
+      </div>
+
+      {/* Badge - top right */}
+      {gamesCount > 0 && (
         <div 
-          className="text-[14px] font-semibold"
-          style={{ 
-            color: 'var(--hub-text)',
-            lineHeight: '1.1',
-            letterSpacing: '-0.2px',
+          className="absolute top-3 right-3 h-5 min-w-[20px] px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
+          style={{
+            background: 'var(--hub-badge-green-bg)',
+            color: 'var(--hub-badge-green-text)',
+            border: '1px solid var(--hub-badge-green-border)',
           }}
         >
-          Active Games<br/>Near You
+          {gamesCount}
         </div>
+      )}
 
-        {/* Badge - top right */}
-        {gamesCount > 0 && (
+      {/* Game details - with spacing from title */}
+      <div className="mt-auto">
+        {isLoading ? (
           <div 
-            className="absolute top-3 right-3 h-5 min-w-[20px] px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
-            style={{
-              background: 'var(--hub-badge-green-bg)',
-              color: 'var(--hub-badge-green-text)',
-              border: '1px solid var(--hub-badge-green-border)',
-            }}
+            className="h-3 w-20 rounded animate-pulse"
+            style={{ background: 'var(--hub-skeleton-base)' }}
+          />
+        ) : nearbyGame ? (
+          <div
+            className="transition-opacity duration-150"
+            style={{ opacity: isTransitioning ? 0 : 1 }}
           >
-            {gamesCount}
+            {/* Course name */}
+            <div 
+              className="text-[11px] leading-tight line-clamp-1"
+              style={{ color: 'var(--hub-text-dim)' }}
+            >
+              {nearbyGame.course_name || 'Golf Course'}
+            </div>
+            
+            {/* Date/time */}
+            <div 
+              className="text-[11px] leading-tight mt-0.5"
+              style={{ color: 'var(--hub-text-dimmer)' }}
+            >
+              {formatShortDate(nearbyGame.start_time)}
+            </div>
+
+            {/* Mini progress pill */}
+            <div 
+              className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold mt-1.5"
+              style={{
+                background: 'rgba(15, 23, 42, 0.04)',
+                color: 'rgba(15, 23, 42, 0.75)',
+                border: '1px solid rgba(15, 23, 42, 0.06)',
+                padding: '2px 8px',
+                borderRadius: '999px',
+              }}
+            >
+              {slotsLabel}
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="text-[11px] leading-tight line-clamp-2"
+            style={{ color: 'var(--hub-text-muted)' }}
+          >
+            No games nearby – create one to be the first.
           </div>
         )}
+      </div>
 
-        {/* Game details - with spacing from title */}
-        <div className="mt-auto">
-          {isLoading ? (
-            <div 
-              className="h-3 w-20 rounded animate-pulse"
-              style={{ background: 'var(--hub-skeleton-base)' }}
-            />
-          ) : nearbyGame ? (
+      {/* Carousel dots */}
+      {hasCarousel && (
+        <div className="absolute bottom-3 right-3 flex gap-0.5">
+          {allGames.map((_, idx) => (
             <div
-              className="transition-opacity duration-150"
-              style={{ opacity: isTransitioning ? 0 : 1 }}
-            >
-              {/* Course name */}
-              <div 
-                className="text-[11px] leading-tight line-clamp-1"
-                style={{ color: 'var(--hub-text-dim)' }}
-              >
-                {nearbyGame.course_name || 'Golf Course'}
-              </div>
-              
-              {/* Date/time */}
-              <div 
-                className="text-[11px] leading-tight mt-0.5"
-                style={{ color: 'var(--hub-text-dimmer)' }}
-              >
-                {formatShortDate(nearbyGame.start_time)}
-              </div>
-
-              {/* Mini progress pill */}
-              <div 
-                className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold mt-1.5"
-                style={{
-                  background: 'rgba(15, 23, 42, 0.04)',
-                  color: 'rgba(15, 23, 42, 0.75)',
-                  border: '1px solid rgba(15, 23, 42, 0.06)',
-                  padding: '2px 8px',
-                  borderRadius: '999px',
-                }}
-              >
-                {slotsLabel}
-              </div>
-            </div>
-          ) : (
-            <div 
-              className="text-[11px] leading-tight line-clamp-2"
-              style={{ color: 'var(--hub-text-muted)' }}
-            >
-              No games nearby – create one to be the first.
-            </div>
-          )}
+              key={idx}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: idx === activeIndex ? '8px' : '4px',
+                height: '4px',
+                background: idx === activeIndex 
+                  ? 'var(--hub-badge-green-text)' 
+                  : 'var(--hub-badge-green-bg)',
+              }}
+            />
+          ))}
         </div>
-
-        {/* Carousel dots */}
-        {hasCarousel && (
-          <div className="absolute bottom-3 right-3 flex gap-0.5">
-            {allGames.map((_, idx) => (
-              <div
-                key={idx}
-                className="rounded-full transition-all duration-300"
-                style={{
-                  width: idx === activeIndex ? '8px' : '4px',
-                  height: '4px',
-                  background: idx === activeIndex 
-                    ? 'var(--hub-badge-green-text)' 
-                    : 'var(--hub-badge-green-bg)',
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </button>
-
-      <HubGamesTripsSheet
-        isOpen={gamesHubOpen}
-        onClose={() => setGamesHubOpen(false)}
-        onOpenCreate={() => setCreateOpen(true)}
-      />
-
-      <CreateGameTripSheetV2
-        isOpen={createOpen}
-        onClose={() => setCreateOpen(false)}
-      />
-    </>
+      )}
+    </button>
   );
 }
