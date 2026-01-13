@@ -1,10 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
 import { cn } from '@/lib/utils';
+
+// Respect reduced motion preference
+const prefersReducedMotion = typeof window !== 'undefined' 
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+  : false;
 
 interface ReviewBottomPanelUser {
   id: string;
@@ -54,7 +60,10 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: 'easeOut', delay: 0.15 }}
       className={cn(
         'absolute left-4 z-50 pointer-events-auto',
         // Match CreatorCapsule review width (leaves room for right-side UI in some contexts)
@@ -65,13 +74,14 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
     >
       <div
         className={cn(
-          'overflow-hidden rounded-xl backdrop-blur-xl border',
-          // Match CreatorCapsule shadow exactly
-          'shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]'
+          'overflow-hidden rounded-2xl border',
+          'shadow-[0_-4px_24px_rgba(0,0,0,0.2)]'
         )}
         style={{
-          backgroundColor: theme.containerBg,
-          borderColor: theme.containerBorder,
+          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
         }}
       >
         <div className="flex flex-col gap-2.5 p-3">
@@ -98,7 +108,7 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
             </div>
           </div>
 
-          {/* CTA */}
+          {/* CTA - Enhanced with gradient for outstanding */}
           <button
             type="button"
             onClick={(e) => {
@@ -106,22 +116,24 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
               handleClick();
             }}
             className={cn(
-              'w-full rounded-full py-2.5 px-4',
+              'w-full py-3.5 rounded-xl',
               'flex items-center justify-center gap-2',
-              'font-semibold text-sm',
-              'transition-colors duration-200'
+              'font-semibold text-base',
+              'transition-all duration-200',
+              'active:scale-[0.98]',
+              'focus:outline-none focus:ring-2 focus:ring-white/50',
+              rating >= 9 
+                ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B] text-black shadow-lg shadow-orange-500/25'
+                : 'bg-white/15 text-white border border-white/10 hover:bg-white/20'
             )}
-            style={{
-              backgroundColor: rating >= 9 ? theme.pillText : 'rgba(255, 255, 255, 0.15)',
-              color: rating >= 9 ? '#000000' : theme.overlayText,
-            }}
+            style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
           >
             <span>Read full review</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

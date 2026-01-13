@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -1597,6 +1598,11 @@ type RatingConfirmationViewProps = {
   onBack: () => void;
   onShareReview: () => Promise<{ success: boolean; postId?: string; alreadyShared?: boolean } | void>;
 };
+
+// Respect reduced motion preference
+const prefersReducedMotion = typeof window !== 'undefined' 
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+  : false;
 
 function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const navigate = useNavigate();

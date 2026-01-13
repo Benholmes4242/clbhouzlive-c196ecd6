@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { getReviewOverlayTheme } from '@/lib/postHelpers';
@@ -8,6 +9,11 @@ import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ReviewOverlayCore } from '@/components/shared/overlay/ReviewOverlayCore';
+
+// Respect reduced motion preference
+const prefersReducedMotion = typeof window !== 'undefined' 
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+  : false;
 
 export interface ReviewMediaItem {
   id: string;
@@ -186,31 +192,40 @@ export function FullscreenReviewPost({
       {...swipeHandlers}
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Main Media - only render if renderMedia is true */}
+      {/* Main Media with crossfade animation - only render if renderMedia is true */}
       {renderMedia && (
-        <div className="absolute inset-0">
-          {currentMedia.media_type === 'video' ? (
-            <HLSPlayer
-              key={`review-video-${currentMedia.id}-${currentIndex}`}
-              ref={videoPlayerRef}
-              src={currentMedia.media_url}
-              className="w-full h-full object-cover"
-              muted={isMuted}
-              loop={true}
-              autoplay={true}
-              showMuteButton={false}
-              showPlayButton={false}
-              mediaId={`review-preview-${currentMedia.id}`}
-            />
-          ) : (
-            <img
-              src={currentMedia.media_url}
-              alt={courseName}
-              className="w-full h-full object-cover"
-              draggable={false}
-            />
-          )}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={`media-${currentIndex}`}
+            className="absolute inset-0"
+            initial={{ opacity: prefersReducedMotion ? 1 : 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: prefersReducedMotion ? 1 : 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeInOut' }}
+          >
+            {currentMedia.media_type === 'video' ? (
+              <HLSPlayer
+                key={`review-video-${currentMedia.id}-${currentIndex}`}
+                ref={videoPlayerRef}
+                src={currentMedia.media_url}
+                className="w-full h-full object-cover"
+                muted={isMuted}
+                loop={true}
+                autoplay={true}
+                showMuteButton={false}
+                showPlayButton={false}
+                mediaId={`review-preview-${currentMedia.id}`}
+              />
+            ) : (
+              <img
+                src={currentMedia.media_url}
+                alt={courseName}
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       )}
       
       
@@ -221,20 +236,25 @@ export function FullscreenReviewPost({
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/45 via-black/15 to-transparent pointer-events-none z-[5]" />
       
       {/* Premium Top Overlay Panel - Uses brand orange for outstanding ratings */}
-      <div 
+      <motion.div 
+        initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: 'easeOut', delay: 0.1 }}
         className={cn(
           "absolute left-4 right-4 z-20 top-[66px]",
-          "rounded-xl backdrop-blur-xl border",
-          "shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]",
-          isOutstanding 
-            ? "bg-[rgba(247,158,27,0.08)]" 
-            : "bg-black/50"
+          "rounded-2xl border",
+          "shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
         )}
         style={{
+          background: isOutstanding 
+            ? 'linear-gradient(135deg, rgba(247, 158, 27, 0.12) 0%, rgba(247, 158, 27, 0.06) 100%)'
+            : 'linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           borderColor: isOutstanding 
-            ? 'rgba(247, 158, 27, 0.3)' 
-            : 'rgba(255, 255, 255, 0.08)',
-          padding: '16px',
+            ? 'rgba(247, 158, 27, 0.25)' 
+            : 'rgba(255, 255, 255, 0.1)',
+          padding: '16px 20px',
         }}
       >
         <Sheet>
@@ -259,10 +279,17 @@ export function FullscreenReviewPost({
             
             {/* Right: Rating Number + Badge (centered stack) */}
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center gap-0.5 flex-shrink-0">
+              <button className="flex flex-col items-center gap-0.5 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black rounded-lg">
                 <span 
-                  className="text-3xl sm:text-4xl font-bold tabular-nums drop-shadow-lg leading-none"
-                  style={{ color: isOutstanding ? '#F79E1B' : '#FFFFFF' }}
+                  className="font-bold tracking-tight leading-none"
+                  style={{ 
+                    fontSize: '2.75rem',
+                    fontVariantNumeric: 'tabular-nums',
+                    color: isOutstanding ? '#F79E1B' : '#FFFFFF',
+                    textShadow: isOutstanding 
+                      ? '0 0 20px rgba(247, 158, 27, 0.5), 0 0 40px rgba(247, 158, 27, 0.3)' 
+                      : 'none',
+                  }}
                 >
                   {rating === 10 ? '10' : rating.toFixed(1)}
                 </span>
@@ -274,9 +301,9 @@ export function FullscreenReviewPost({
           {/* Sheet Content (review details) */}
           <SheetContent side="bottom" className="max-h-[70vh] rounded-t-3xl">
             <SheetHeader className="text-left pb-2">
-              <SheetTitle className="text-lg">{courseName}</SheetTitle>
+              <SheetTitle className="text-lg font-bold leading-tight line-clamp-2">{courseName}</SheetTitle>
               {heroSubtitle && (
-                <p className="text-sm text-muted-foreground">{heroSubtitle}</p>
+                <p className="text-sm text-muted-foreground font-medium tracking-wide uppercase">{heroSubtitle}</p>
               )}
             </SheetHeader>
             
@@ -309,11 +336,14 @@ export function FullscreenReviewPost({
             </div>
           </SheetContent>
         </Sheet>
-      </div>
+      </motion.div>
       
       {/* Media counter - positioned dynamically to avoid CTA overlap */}
       {hasMultipleMedia && (
-        <div 
+        <motion.div 
+          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: 'easeOut', delay: 0.2 }}
           className="absolute left-1/2 -translate-x-1/2 z-20"
           style={{ 
             bottom: dotsBottomOffset 
@@ -321,45 +351,79 @@ export function FullscreenReviewPost({
               : mode === 'preview' ? '108px' : '80px' 
           }}
         >
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10">
             {sortedMedia.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
                 className={cn(
-                  "w-1.5 h-1.5 rounded-full transition-all",
+                  "rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50",
                   idx === currentIndex 
-                    ? "bg-white w-4" 
-                    : "bg-white/50 hover:bg-white/70"
+                    ? "bg-white w-6 h-2 shadow-lg shadow-white/30" 
+                    : "bg-white/40 hover:bg-white/60 w-2 h-2"
                 )}
-                aria-label={`Go to media ${idx + 1}`}
+                aria-label={`View photo ${idx + 1} of ${sortedMedia.length}`}
               />
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
       
-      {/* Navigation arrows - matching Clubhouse feed styling */}
+      {/* Navigation arrows - refined styling with hover effects */}
       {hasMultipleMedia && !hideCarouselArrows && (
         <>
-          {currentIndex > 0 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
-              aria-label="Previous media"
-            >
-              <ChevronLeft className="w-6 h-6 text-white" />
-            </button>
-          )}
-          {currentIndex < sortedMedia.length - 1 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); goToNext(); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm"
-              aria-label="Next media"
-            >
-              <ChevronRight className="w-6 h-6 text-white" />
-            </button>
-          )}
+          <AnimatePresence>
+            {currentIndex > 0 && (
+              <motion.button
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, x: prefersReducedMotion ? 0 : -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
+                className={cn(
+                  "absolute left-3 top-1/2 -translate-y-1/2 z-30",
+                  "w-10 h-10 rounded-full",
+                  "bg-black/40 backdrop-blur-sm",
+                  "flex items-center justify-center",
+                  "border border-white/10",
+                  "transition-all duration-200",
+                  "hover:bg-black/60 hover:scale-105",
+                  "active:scale-95",
+                  "focus:outline-none focus:ring-2 focus:ring-white/50"
+                )}
+                style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {currentIndex < sortedMedia.length - 1 && (
+              <motion.button
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, x: prefersReducedMotion ? 0 : 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                className={cn(
+                  "absolute right-3 top-1/2 -translate-y-1/2 z-30",
+                  "w-10 h-10 rounded-full",
+                  "bg-black/40 backdrop-blur-sm",
+                  "flex items-center justify-center",
+                  "border border-white/10",
+                  "transition-all duration-200",
+                  "hover:bg-black/60 hover:scale-105",
+                  "active:scale-95",
+                  "focus:outline-none focus:ring-2 focus:ring-white/50"
+                )}
+                style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </motion.button>
+            )}
+          </AnimatePresence>
         </>
       )}
       
