@@ -33,8 +33,8 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
       onClick={() => onClick(item)}
       className={cn(
         "relative aspect-square overflow-hidden bg-muted",
-        "rounded-xl ring-1 ring-black/5",
-        "hover:ring-black/10 hover:scale-[1.02] transition-all duration-150",
+        "ring-1 ring-black/5",
+        "hover:ring-black/10 transition-all duration-150",
         "active:scale-[0.98]"
       )}
     >

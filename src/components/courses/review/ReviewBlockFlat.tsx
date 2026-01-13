@@ -131,10 +131,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         </div>
 
-        {/* Score badge with tier color */}
+        {/* Score badge - amber for Outstanding (9+), grey otherwise */}
         <div className={cn(
           "px-2.5 py-1 rounded-lg text-sm font-bold",
-          tierStyles.badge
+          score >= 9 
+            ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white'
+            : 'bg-gray-100 text-gray-700 border border-gray-200'
         )}>
           {score.toFixed(1)}
         </div>
@@ -175,25 +177,32 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         </div>
       )}
 
-      {/* Category breakdown */}
+      {/* Category breakdown - amber bars only for Outstanding (9+) reviews */}
       {categories.length > 0 && (
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-gray-100">
-          {categories.map(cat => (
-            <div key={cat.key} className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">{categoryLabels[cat.key]}</span>
-              <div className="flex items-center gap-2">
-                <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
-                    style={{ width: `${((cat.value || 0) / 5) * 100}%` }}
-                  />
+          {categories.map(cat => {
+            // Determine bar color based on OVERALL review score
+            const barColorClass = score >= 9 
+              ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+              : 'bg-gray-300';
+            
+            return (
+              <div key={cat.key} className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">{categoryLabels[cat.key]}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${barColorClass} rounded-full`}
+                      style={{ width: `${((cat.value || 0) / 5) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 w-6 tabular-nums">
+                    {(cat.value || 0).toFixed(1)}
+                  </span>
                 </div>
-                <span className="text-xs font-medium text-gray-700 w-6 tabular-nums">
-                  {(cat.value || 0).toFixed(1)}
-                </span>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
