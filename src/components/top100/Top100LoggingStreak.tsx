@@ -117,7 +117,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
       </div>
 
       {/* Visual month indicators (last 6 months) */}
-      <div className="flex items-center gap-1.5 mt-3">
+      <div className="flex items-center gap-1.5 mt-3" role="list" aria-label="Monthly activity indicators">
         {Array.from({ length: 6 }).map((_, idx) => {
           const monthDate = subMonths(new Date(), 5 - idx);
           const monthStart = startOfMonth(monthDate);
@@ -127,9 +127,15 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
             return isWithinInterval(playedDate, { start: monthStart, end: monthEnd });
           });
           const isCurrent = isSameMonth(monthDate, new Date());
+          const monthName = format(monthDate, 'MMMM');
 
           return (
-            <div key={idx} className="flex flex-col items-center gap-1 flex-1">
+            <div 
+              key={idx} 
+              className="flex flex-col items-center gap-1 flex-1"
+              role="listitem"
+              aria-label={`${monthName}: ${hasLog ? 'Round logged' : 'No activity'}`}
+            >
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
@@ -139,10 +145,11 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
                     ? 'bg-muted border-2 border-dashed border-muted-foreground/50 text-muted-foreground'  // Thicker current ring (item 4)
                     : 'bg-muted/50 text-muted-foreground/60'
                 )}
+                aria-hidden="true"
               >
                 {hasLog ? '✓' : ''}
               </div>
-              <span className="text-[9px] text-muted-foreground">
+              <span className="text-[9px] text-muted-foreground" aria-hidden="true">
                 {format(monthDate, 'MMM')}
               </span>
             </div>

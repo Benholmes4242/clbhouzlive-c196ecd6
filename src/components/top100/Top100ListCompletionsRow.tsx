@@ -2,12 +2,19 @@ import React from 'react';
 import type { Top100ListProgress } from '@/hooks/useTop100ProgressForUser';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 
-const LIST_LABELS: Record<string, string> = {
-  global: 'World Complete',
-  'gb-i': 'GB&I Complete',
-  usa: 'USA Complete',
-  europe: 'Europe Complete',
+// Base labels - "Complete" suffix added dynamically when list is finished
+const LIST_BASE_LABELS: Record<string, string> = {
+  global: 'World Top 100',
+  'gb-i': 'GB&I Top 100',
+  usa: 'USA Top 100',
+  europe: 'Europe Top 100',
 };
+
+// Get label based on completion status
+function getListLabel(slug: string, isComplete: boolean): string {
+  const base = LIST_BASE_LABELS[slug] || 'Top 100';
+  return isComplete ? `${base} ✓` : base;
+}
 
 const TIER_MAP: Record<string, EliteCardTier> = {
   global: 'WORLD',
@@ -52,14 +59,15 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
               type="button"
               onClick={() => onCardClick(slug, played, total)}
               className="text-left"
+              aria-label={`${getListLabel(slug, complete)}: ${played} of ${total} courses played`}
             >
               <EliteGameCard
                 tier={TIER_MAP[slug]}
                 earned={complete}
                 currentProgress={played}
                 targetProgress={total}
-                title={LIST_LABELS[slug]}
-                subtitle={`${played} / ${total} courses`}
+                title={getListLabel(slug, complete)}
+                subtitle={complete ? `${total} / ${total} courses` : `${played} / ${total} courses`}
                 enableAnimations={false}
                 quality="medium"
               />

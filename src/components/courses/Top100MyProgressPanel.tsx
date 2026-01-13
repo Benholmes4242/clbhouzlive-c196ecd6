@@ -334,10 +334,10 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </section>
 
       {/* ============================================
-          SECTION F: LIST COMPLETIONS (SECONDARY)
-          Lighter visual emphasis, mt-10
+          SECTION F: LIST COMPLETIONS
+          Full visibility, mt-10
           ============================================ */}
-      <section className="mt-10 opacity-90">
+      <section className="mt-10">
         <Top100ListCompletionsRow 
           lists={data.lists} 
           onCardClick={openRegionalSheet}

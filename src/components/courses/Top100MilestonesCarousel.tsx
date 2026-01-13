@@ -150,10 +150,10 @@ export function Top100MilestonesCarousel({
                     onClick={onMilestoneClick ? () => onMilestoneClick(milestone) : undefined}
                   />
 
-                  {/* Labels - locked tiles have better clarity (item 5) */}
-                  <div className="mt-2 text-center">
+                  {/* Labels - allow wrapping for long names, add tooltip */}
+                  <div className="mt-2 text-center" title={milestone.tierName}>
                     <p className={cn(
-                      "text-[11px] font-medium whitespace-nowrap",
+                      "text-[11px] font-medium line-clamp-2 leading-tight",
                       isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground/80"
                     )}>
                       {milestone.tierName}
@@ -174,7 +174,14 @@ export function Top100MilestonesCarousel({
 
       {/* Progress line (C3) - bumped height 1-2px (item 5) */}
       <div className="mx-2.5 mt-4">
-        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div 
+          className="h-1.5 rounded-full bg-muted overflow-hidden"
+          role="progressbar"
+          aria-valuenow={Math.round(progressPct)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Overall milestone progress: ${totalPlayed} courses played`}
+        >
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ 
