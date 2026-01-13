@@ -75,7 +75,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="bg-card border border-border/60 rounded-xl overflow-hidden hover:shadow-sm transition-shadow cursor-pointer"
+      className="bg-card border border-border/60 rounded-xl overflow-hidden hover:shadow-md active:shadow-sm transition-shadow cursor-pointer group"
       onClick={handleCourseClick}
     >
       <div className="p-4">
@@ -87,14 +87,14 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
               {friends.length} friends played {courseName}
             </p>
             {/* Subline */}
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Most recent: <span className="text-slate-500">{mostRecentName}</span> · {formatTimeCompact(mostRecentPlayedAt)} ago
             </p>
           </div>
 
           {/* Right side: Thumbnail only */}
           <div className="shrink-0">
-            <Squircle width={56} height={56}>
+            <Squircle width={56} height={56} className="ring-1 ring-border/30 transition-transform group-hover:scale-105">
               <img
                 src={thumbnailUrl || '/placeholder.svg'}
                 alt={courseName}
@@ -111,27 +111,27 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
         <div className="flex items-center justify-between mt-3">
           <div className="flex -space-x-2">
             {sortedFriends.slice(0, 4).map((friend, idx) => (
-              <div
+              <button
                 key={friend.friend_id}
-                className="relative"
+                className="relative focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg hover:z-20 transition-transform hover:scale-110"
                 style={{ zIndex: 10 - idx }}
                 onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
               >
-                <Squircle width={32} height={32}>
+                <Squircle width={32} height={32} className="ring-2 ring-card shadow-sm">
                   <img
                     src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
-                    alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                    alt={`${friend.friend_profile.display_name || friend.friend_profile.username}'s profile`}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={(e) => {
                       e.currentTarget.src = '/placeholder.svg';
                     }}
                   />
                 </Squircle>
-              </div>
+              </button>
             ))}
             {friends.length > 4 && (
               <div
-                className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600"
+                className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 border-2 border-card shadow-sm text-xs font-medium text-slate-600"
                 style={{ zIndex: 5 }}
               >
                 +{friends.length - 4}
@@ -143,7 +143,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           {communityRating && (
             <div className="flex items-center gap-1 w-14 justify-center">
               <ClubhouseLogo className="h-4 w-4" />
-              <span className="text-xs font-semibold text-foreground">{communityRating.toFixed(1)}</span>
+              <span className="text-xs font-semibold text-foreground tabular-nums">{communityRating.toFixed(1)}</span>
             </div>
           )}
         </div>
@@ -152,7 +152,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
           <button
             onClick={handleCourseClick}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors min-h-[36px]"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             View course
@@ -161,14 +161,15 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
           {friends.length > 1 && (
             <button
               onClick={toggleExpand}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors px-2 py-1.5 min-h-[36px] rounded-md hover:bg-slate-100"
             >
               {isExpanded ? 'Hide' : 'Show friends'}
-              {isExpanded ? (
-                <ChevronUp className="w-3.5 h-3.5" />
-              ) : (
+              <motion.div
+                animate={{ rotate: isExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
                 <ChevronDown className="w-3.5 h-3.5" />
-              )}
+              </motion.div>
             </button>
           )}
         </div>
@@ -185,18 +186,20 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pt-0">
-              <div className="border-t border-border/40 pt-3 space-y-2">
+              <div className="border-t border-border/40 pt-3 space-y-1">
                 {sortedFriends.map((friend) => (
-                  <div
+                  <motion.button
                     key={`${friend.friend_id}-${friend.played_at}`}
-                    className="flex items-center justify-between py-1"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="w-full flex items-center justify-between py-2 px-2 -mx-2 rounded-lg hover:bg-muted/40 transition-colors"
                     onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <Squircle width={28} height={28} className="shrink-0">
                         <img
                           src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
-                          alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                          alt={`${friend.friend_profile.display_name || friend.friend_profile.username}'s profile`}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           onError={(e) => {
                             e.currentTarget.src = '/placeholder.svg';
@@ -211,13 +214,13 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                       {friend.rating ? (
                         <>
                           <ClubhouseLogo size="xs" />
-                          <span className="text-sm font-semibold text-foreground">{friend.rating.toFixed(1)}</span>
+                          <span className="text-sm font-semibold text-foreground tabular-nums">{friend.rating.toFixed(1)}</span>
                         </>
                       ) : (
-                        <span className="text-xs text-slate-400">—</span>
+                        <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </div>
-                  </div>
+                  </motion.button>
                 ))}
               </div>
             </div>
