@@ -3274,13 +3274,18 @@ html[data-immersive="true"] .app-shell--topSpacer {
    Triggered by data-tier="outstanding" attribute on Slider root
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Outstanding: Amber filled range - UNIFIED COLOR */
+/* Outstanding: Amber filled range - UNIFIED COLOR - High specificity override */
+.rating-slider-primary[data-tier="outstanding"] > span > span[data-radix-slider-range],
+.rating-slider-breakdown[data-tier="outstanding"] > span > span[data-radix-slider-range],
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-range],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-range] {
+  background-color: #f59e0b !important; /* amber-500 */
   background: linear-gradient(to right, #f59e0b, #fbbf24) !important; /* amber-500 to amber-400 */
 }
 
-/* Outstanding: Amber thumb - UNIFIED COLOR */
+/* Outstanding: Amber thumb - UNIFIED COLOR - High specificity override */
+.rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb],
+.rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb],
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb] {
   background-color: #f59e0b !important; /* amber-500 */
@@ -3288,6 +3293,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 /* Outstanding: Amber thumb hover */
+.rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb]:hover,
+.rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb]:hover,
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:hover {
   background-color: #d97706 !important; /* amber-600 - darker on hover */
@@ -3295,11 +3302,13 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 /* Outstanding: Amber focus ring */
+.rating-slider-primary[data-tier="outstanding"] > span[data-radix-slider-thumb]:focus,
+.rating-slider-breakdown[data-tier="outstanding"] > span[data-radix-slider-thumb]:focus,
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:focus,
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:focus {
   box-shadow: 
     0 2px 6px rgba(0, 0, 0, 0.15),
-    0 0 0 3px rgba(245, 158, 11, 0.3); /* Amber focus ring */
+    0 0 0 3px rgba(245, 158, 11, 0.3) !important; /* Amber focus ring */
 }
 
 /* Phase 3A: Outstanding glow pulse animation (one-time) */
