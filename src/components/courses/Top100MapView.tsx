@@ -450,17 +450,21 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Top overlay zone - Legend as micro-pills */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-3">
-          <div className="pointer-events-auto flex items-center gap-1.5 w-fit">
+          <div 
+            className="pointer-events-auto flex items-center gap-1.5 w-fit"
+            role="group"
+            aria-label="Map legend"
+          >
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" aria-hidden="true" />
               <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Played</span>
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.3)]" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.3)]" aria-hidden="true" />
               <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Want to Play</span>
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
-              <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400 bg-transparent" />
+              <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400 bg-transparent" aria-hidden="true" />
               <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Not Played</span>
             </div>
           </div>
@@ -481,13 +485,17 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           {/* Unified control buttons */}
           <div className="pointer-events-auto flex flex-col gap-1.5">
             {/* Zoom controls */}
-            <div className="flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-slate-200/60 dark:border-slate-700/50 overflow-hidden">
+            <div 
+              className="flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-slate-200/60 dark:border-slate-700/50 overflow-hidden"
+              role="group"
+              aria-label="Map zoom controls"
+            >
               <button
                 onClick={() => mapRef.current?.zoomIn({ duration: 300 })}
                 className="flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-800"
-                title="Zoom in"
+                aria-label="Zoom in"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
@@ -495,9 +503,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <button
                 onClick={() => mapRef.current?.zoomOut({ duration: 300 })}
                 className="flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors"
-                title="Zoom out"
+                aria-label="Zoom out"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </button>
@@ -514,9 +522,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700',
                 'transition-colors duration-150'
               )}
-              title="Reset view"
+              aria-label="Reset map view"
             >
-              <RotateCcw className="h-3.5 w-3.5" />
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -533,7 +541,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       <div className="flex-shrink-0 mx-3 mb-3">
         <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border border-white/60 dark:border-slate-700/40 p-2.5 space-y-2">
           {/* Status filter row */}
-          <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100/70 dark:bg-slate-800/70">
+          <div 
+            className="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100/70 dark:bg-slate-800/70"
+            role="group"
+            aria-label="Filter courses by status"
+          >
             {(['all', 'played', 'want_to_play', 'not_played'] as StatusFilter[]).map((filter) => {
               const isActive = statusFilter === filter;
               const labels: Record<StatusFilter, string> = {
@@ -546,6 +558,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 <button
                   key={filter}
                   onClick={() => setStatusFilter(filter)}
+                  aria-pressed={isActive}
+                  aria-label={`Show ${labels[filter].toLowerCase()} courses`}
                   className={cn(
                     'flex-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200',
                     isActive
@@ -566,7 +580,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
 
           {/* Region chips row */}
-          <div className="flex items-center gap-1">
+          <div 
+            className="flex items-center gap-1"
+            role="group"
+            aria-label="Filter by region"
+          >
             {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
               const isActive = scope === regionScope;
               const labels = { global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' };
@@ -574,6 +592,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 <button
                   key={regionScope}
                   onClick={() => onScopeChange?.(regionScope)}
+                  aria-pressed={isActive}
+                  aria-label={`Show ${labels[regionScope]} Top 100`}
                   className={cn(
                     'flex-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-all duration-200',
                     isActive

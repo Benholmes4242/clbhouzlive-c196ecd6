@@ -143,7 +143,10 @@ const Top100Hub = () => {
               {/* Progress Summary */}
               {session && progress && (() => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
-                const listsCount = listSummaries?.filter(list => list.played_count > 0).length || 0;
+                const listsWithProgress = listSummaries?.filter(list => list.played_count > 0) || [];
+                const listsCount = listsWithProgress.length;
+                // Sum actual course counts from lists user has progress in
+                const totalCourses = listsWithProgress.reduce((sum, list) => sum + (list.total_courses || 0), 0);
                 
                 if (totalRated === 0) return null;
                 
@@ -151,6 +154,7 @@ const Top100Hub = () => {
                   <Top100ProgressSummary
                     ratedCount={totalRated}
                     listCount={listsCount}
+                    totalCourses={totalCourses}
                   />
                 );
               })()}
