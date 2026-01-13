@@ -20,12 +20,12 @@ interface EditGameSheetProps {
   onClose: () => void;
   game: {
     id: string;
-    course_id: string | null;
-    course_name: string;
+    course_id?: string | null;
+    course_name?: string | null;
     start_time: string;
-    visibility: string;
-    note: string | null;
-    slots_total: number;
+    visibility?: string | null;
+    note?: string | null;
+    slots_total?: number | null;
     host_user_id: string;
   };
   onSuccess?: () => void;
@@ -41,7 +41,7 @@ const VISIBILITY_OPTIONS: { value: GameVisibility; label: string }[] = [
 export function EditGameSheet({ open, onClose, game, onSuccess }: EditGameSheetProps) {
   // Form state - initialized from game prop
   const [courseId, setCourseId] = useState<string | null>(game.course_id);
-  const [courseName, setCourseName] = useState(game.course_name);
+  const [courseName, setCourseName] = useState(game.course_name || '');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(game.start_time));
   const [selectedTime, setSelectedTime] = useState(format(new Date(game.start_time), 'HH:mm'));
   const [visibility, setVisibility] = useState<GameVisibility>((game.visibility || 'private') as GameVisibility);
