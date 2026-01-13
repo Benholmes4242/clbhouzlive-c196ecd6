@@ -28,7 +28,7 @@ import {
 
 const PAGE_SIZE = 10;
 
-type Top100SortOption = 'official' | 'user_rating' | 'friends_rated';
+type Top100SortOption = 'official' | 'user_rating';
 
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   switch (slug) {
@@ -111,11 +111,10 @@ const Top100CoursesHubPanel = () => {
     return [...courses].sort((a, b) => {
       switch (sortOption) {
         case 'user_rating':
-          // Sort by any available rating if exists
-          return 0; // Courses don't have user rating in this context
-        case 'friends_rated':
-          // Sort by friends who rated - not available in this data
-          return 0;
+          // Sort by community average rating - highest rated first, unrated last
+          const ratingA = a.average_rating ?? -1;
+          const ratingB = b.average_rating ?? -1;
+          return ratingB - ratingA;
         case 'official':
         default:
           const rankA = selectedList.includes('global') ? a.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
@@ -184,10 +183,10 @@ const Top100CoursesHubPanel = () => {
         { value: 'europe', label: 'Continental Europe Top 100' },
       ];
 
+  // TODO: Add 'friends_rated' sort option when friends rating data is available
   const sortOptions: AppSelectOption<Top100SortOption>[] = [
     { value: 'official', label: 'Official ranking' },
     { value: 'user_rating', label: 'User rating' },
-    { value: 'friends_rated', label: 'Friends rated' },
   ];
 
   const handleOpenTop100Club = () => {
@@ -233,7 +232,14 @@ const Top100CoursesHubPanel = () => {
             
             {/* Progress bar - h-[5px], rounded-full, animated */}
             <div className="max-w-md mx-auto">
-              <div className="h-[5px] w-full overflow-hidden rounded-full bg-slate-200/60">
+              <div 
+                role="progressbar"
+                aria-valuenow={Math.min(100, Math.round((totalRated / 100) * 100))}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Top 100 progress: ${totalRated} courses rated`}
+                className="h-[5px] w-full overflow-hidden rounded-full bg-slate-200/60"
+              >
                 <div
                   className="h-[5px] rounded-full bg-amber-500/90 transition-all duration-500 ease-out"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
@@ -275,10 +281,10 @@ const Top100CoursesHubPanel = () => {
               <div className="flex-1 min-w-0 flex flex-col justify-between text-right">
                 {/* Row 1: Title/Sub */}
                 <div className="min-w-0">
-                  <p className="font-semibold text-foreground truncate">
+                  <p className="font-semibold text-foreground line-clamp-1">
                     {totalRated >= 5 ? club.tierName : 'Start your journey'}
                   </p>
-                  <p className="text-xs text-muted-foreground truncate">
+                  <p className="text-xs text-muted-foreground line-clamp-2">
                     {totalRated >= 5 ? 'Unlocked' : `Rate ${5 - totalRated} more Top 100 courses to unlock`}
                   </p>
                 </div>
@@ -352,6 +358,7 @@ const Top100CoursesHubPanel = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
+            aria-label="Search within Top 100 list"
             className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 focus-visible:outline-none"
           />
           {searchTerm && (
@@ -370,7 +377,7 @@ const Top100CoursesHubPanel = () => {
           {/* List selector */}
           <div className="flex-1">
             <Select value={selectedList} onValueChange={setSelectedList}>
-              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-sq-sm text-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:ring-2 focus:ring-slate-200/60 focus:border-slate-300 focus:outline-none">
+              <SelectTrigger aria-label="Select Top 100 list" className="h-11 w-full bg-card border border-border/60 rounded-sq-sm text-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:ring-2 focus:ring-slate-200/60 focus:border-slate-300 focus:outline-none">
                 <SelectValue placeholder="Choose list" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
