@@ -18,7 +18,8 @@ export interface LeaderboardPlayerEntry {
   home_club?: string | null;
   total_top100_played: number;
   rank: number;
-  delta_rank?: number | null; // For Fast Climbers
+  delta_rank?: number | null; // For Fast Climbers (future: true rank delta)
+  courses_logged_recently?: number | null; // For Most Active tab
   highlighted_course?: string | null; // Last played Top 100
   badges?: string[]; // Achievement badge codes
 }
@@ -27,6 +28,7 @@ interface LeaderboardPlayerCardProps {
   player: LeaderboardPlayerEntry;
   isCurrentUser?: boolean;
   showTrend?: boolean;
+  showRecentActivity?: boolean; // For "Most Active" tab
   onClick?: () => void;
 }
 
@@ -61,6 +63,7 @@ export function LeaderboardPlayerCard({
   player,
   isCurrentUser = false,
   showTrend = false,
+  showRecentActivity = false,
   onClick,
 }: LeaderboardPlayerCardProps) {
   const navigate = useNavigate();
@@ -165,19 +168,35 @@ export function LeaderboardPlayerCard({
         )}
       </div>
 
-      {/* Top 100 count */}
+      {/* Top 100 count / Recent activity */}
       <div className="flex-shrink-0 text-right mr-2">
-        <p className={cn(
-          'text-sm font-bold',
-          isTop3 && 'text-base',
-        )}>
-          {player.total_top100_played}
-        </p>
-        {showTrend && player.delta_rank && player.delta_rank > 0 && (
-          <div className="flex items-center justify-end gap-0.5 text-emerald-500 mt-0.5">
-            <TrendingUp className="w-3 h-3" />
-            <span className="text-[10px] font-medium">↑{player.delta_rank}</span>
-          </div>
+        {showRecentActivity && player.courses_logged_recently ? (
+          // Most Active mode: show recent activity prominently
+          <>
+            <div className="flex items-center justify-end gap-1 text-emerald-600 dark:text-emerald-400">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span className="text-sm font-bold">+{player.courses_logged_recently}</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              this month
+            </p>
+          </>
+        ) : (
+          // Standard mode: show total count
+          <>
+            <p className={cn(
+              'text-sm font-bold',
+              isTop3 && 'text-base',
+            )}>
+              {player.total_top100_played}
+            </p>
+            {showTrend && player.delta_rank && player.delta_rank > 0 && (
+              <div className="flex items-center justify-end gap-0.5 text-emerald-500 mt-0.5">
+                <TrendingUp className="w-3 h-3" />
+                <span className="text-[10px] font-medium">↑{player.delta_rank}</span>
+              </div>
+            )}
+          </>
         )}
       </div>
 

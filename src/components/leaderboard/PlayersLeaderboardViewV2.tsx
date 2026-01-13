@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTop100Leaderboard, LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { useNearbyPlayers } from '@/hooks/useNearbyPlayers';
 import { useLeaderboardMilestones } from '@/hooks/useLeaderboardMilestones';
+import { useFastClimbers } from '@/hooks/useFastClimbers';
 import { FLAGS } from '@/config/flags';
 import { getMockLeaderboardV2Entries, mergeWithMockEntries } from '@/mocks/leaderboardV2MockGenerator';
 
@@ -73,7 +74,7 @@ const ARENA_DESCRIPTIONS: Record<ArenaMode, string> = {
   global: 'All-time Top 100 explorers worldwide',
   regional: 'Compete within your chosen Top 100 region list',
   friends: 'Your private competition',
-  climbers: 'Biggest movers this month',
+  climbers: 'Players logging the most Top 100s recently',
   nearby: 'Within 50 miles of your home club',
 };
 
@@ -149,6 +150,13 @@ export function PlayersLeaderboardViewV2() {
 
   // Nearby players hook
   const nearbyData = useNearbyPlayers(currentUserId);
+
+  // Fast Climbers / Most Active This Month hook
+  const { data: fastClimbersData = [], isLoading: fastClimbersLoading } = useFastClimbers({
+    days: 30,
+    limit: 50,
+    enabled: arenaMode === 'climbers',
+  });
 
   // Friends are identified by is_friend flag from the RPC
   // No separate query needed - the RPC already marks friends
@@ -308,20 +316,16 @@ export function PlayersLeaderboardViewV2() {
       }
 
       case 'climbers':
-        // Sort by delta_rank (if available) or just show top movers
-        return [...filteredByCountry]
-          .filter((e: any) => e.delta_rank && e.delta_rank > 0)
-          .sort((a: any, b: any) => (b.delta_rank || 0) - (a.delta_rank || 0))
-          .slice(0, 50)
-          .map((e: any, i) => ({
-            user_id: e.user_id,
-            display_name: e.display_name,
-            avatar_url: e.avatar_url,
-            home_club: e.home_club,
-            total_top100_played: e.total_top100_played,
-            rank: i + 1,
-            delta_rank: e.delta_rank,
-          }));
+        // Use Fast Climbers / Most Active This Month data from dedicated RPC
+        return fastClimbersData.map((entry, i) => ({
+          user_id: entry.user_id,
+          display_name: entry.display_name,
+          avatar_url: entry.avatar_url,
+          home_club: entry.home_club,
+          total_top100_played: entry.total_top100_played,
+          rank: i + 1,
+          courses_logged_recently: entry.courses_logged_recently,
+        }));
 
       case 'nearby':
         // Use nearby players hook data
@@ -344,7 +348,7 @@ export function PlayersLeaderboardViewV2() {
           rank: i + 1,
         }));
     }
-  }, [filteredByCountry, allEntries, arenaMode, myIndex, nearbyData.players, currentUserId]);
+  }, [filteredByCountry, allEntries, arenaMode, myIndex, nearbyData.players, currentUserId, fastClimbersData]);
 
   // Check if user is new (no Top 100s played)
   const isNewUser = !currentUserEntry || currentUserEntry.total_top100_played === 0;
@@ -467,8 +471,8 @@ export function PlayersLeaderboardViewV2() {
         return <LeaderboardEmptyState type="friends-no-friends" />;
       }
     }
-    if (arenaMode === 'climbers') {
-      // Fast Climbers requires delta_rank from backend - show coming soon until implemented
+    if (arenaMode === 'climbers' && displayedEntries.length === 0 && !fastClimbersLoading) {
+      // No recent activity - show empty state
       return <LeaderboardEmptyState type="rising-coming-soon" />;
     }
     if (playersFrom !== 'worldwide' && displayedEntries.length === 0) {
@@ -622,6 +626,26 @@ export function PlayersLeaderboardViewV2() {
         </motion.div>
       )}
 
+      {/* Most Active section header */}
+      {arenaMode === 'climbers' && displayedEntries.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="px-4 pb-3 pt-1"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Most Active This Month
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Players who logged the most Top 100 courses in the last 30 days
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* D) Your Rivals Section (only when user has rank) */}
       {rivals.current && !isNewUser && (arenaMode === 'global' || arenaMode === 'regional') && (
         <motion.div
@@ -652,7 +676,7 @@ export function PlayersLeaderboardViewV2() {
       {/* E) Leaderboard List with staggered animation */}
       <div className="w-full">
         <AnimatePresence mode="wait">
-          {isFilterTransitioning ? (
+          {isFilterTransitioning || (arenaMode === 'climbers' && fastClimbersLoading) ? (
             <motion.div
               key="skeleton"
               initial={{ opacity: 0 }}
@@ -698,7 +722,8 @@ export function PlayersLeaderboardViewV2() {
                     <LeaderboardPlayerCard
                       player={player}
                       isCurrentUser={isMe}
-                      showTrend={arenaMode === 'climbers'}
+                      showTrend={false}
+                      showRecentActivity={arenaMode === 'climbers'}
                       onClick={() => handleViewRival(player.user_id)}
                     />
                   </motion.div>
