@@ -1,16 +1,17 @@
 /**
- * PlayersFromFilter - Country-based player filter
- * Matches ExploreFiltersSheet pill style
+ * PlayersFromFilter - Country-based player filter dropdown
+ * Matches CourseExplorer region/sub-region dropdown style
  */
 
 import React, { useState } from 'react';
-import { Globe, MapPin, Search, Check, X, Info } from 'lucide-react';
+import { Globe, MapPin, Search, Check, X, ChevronDown } from 'lucide-react';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   Drawer, 
   DrawerContent, 
@@ -95,28 +96,15 @@ function getCountryName(code: string): string {
   return country?.name || code;
 }
 
-// Filter pill style matching ExploreFiltersSheet
-const FilterPill: React.FC<{
-  label: string;
-  selected: boolean;
-  onClick: () => void;
-  icon?: React.ReactNode;
-}> = ({ label, selected, onClick, icon }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-1.5",
-      selected
-        ? "bg-foreground text-background"
-        : "bg-muted text-muted-foreground hover:bg-muted/80"
-    )}
-  >
-    {icon}
-    {label}
-  </button>
-);
+function getDisplayLabel(value: PlayersFromValue, userCountry?: string | null): string {
+  if (value === 'worldwide') return 'Worldwide';
+  if (value === 'my-country' && userCountry) {
+    return getCountryName(userCountry);
+  }
+  return getCountryName(value);
+}
 
-// Country Bottom Sheet Component (iOS-style)
+// Country Bottom Sheet Component (iOS-style) for search
 interface CountryBottomSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -214,57 +202,65 @@ export function PlayersFromFilter({
     setSearchQuery('');
   };
 
+  const isActive = value !== 'worldwide';
+
   return (
     <>
-      <div className={cn('space-y-2', className)}>
-        {/* Label row */}
-        <div className="flex items-center gap-1.5">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            Golfers based in
-          </p>
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
-                  <Info className="w-3 h-3" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[220px] text-center">
-                <p className="text-xs font-medium mb-1">How this works</p>
-                <p className="text-xs text-muted-foreground">
-                  Golfers are grouped by the country of their primary home club — not where they live.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        
-        {/* Pills row - full width flex wrap */}
-        <div className="flex flex-wrap gap-2">
-          <FilterPill
-            label="Worldwide"
-            selected={value === 'worldwide'}
-            onClick={() => onChange('worldwide')}
-            icon={<Globe className="w-3.5 h-3.5" />}
-          />
-          
-          {userCountry && (
-            <FilterPill
-              label={getCountryName(userCountry)}
-              selected={value === 'my-country' || value === userCountry}
-              onClick={() => onChange('my-country')}
-              icon={<MapPin className="w-3.5 h-3.5" />}
-            />
+      <Select 
+        value={value} 
+        onValueChange={(v) => {
+          if (v === 'search') {
+            setCountrySearchOpen(true);
+          } else {
+            onChange(v as PlayersFromValue);
+          }
+        }}
+      >
+        <SelectTrigger 
+          className={cn(
+            'h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150',
+            isActive
+              ? 'border-primary/40 ring-1 ring-primary/20 text-foreground'
+              : 'border-slate-200',
+            className
           )}
-          
-          <FilterPill
-            label="Choose country..."
-            selected={value !== 'worldwide' && value !== 'my-country' && value !== userCountry}
-            onClick={() => setCountrySearchOpen(true)}
-            icon={<Search className="w-3.5 h-3.5" />}
-          />
-        </div>
-      </div>
+          aria-label="Select golfer location"
+        >
+          <div className="flex items-center">
+            <Globe className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <SelectValue placeholder="Worldwide">
+              {getDisplayLabel(value, userCountry)}
+            </SelectValue>
+          </div>
+        </SelectTrigger>
+        <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+          <SelectItem value="worldwide">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              Worldwide
+            </div>
+          </SelectItem>
+          {userCountry && (
+            <SelectItem value="my-country">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                {getCountryName(userCountry)}
+              </div>
+            </SelectItem>
+          )}
+          {POPULAR_COUNTRIES.slice(0, 10).map((country) => (
+            <SelectItem key={country.code} value={country.code}>
+              {country.name}
+            </SelectItem>
+          ))}
+          <SelectItem value="search">
+            <div className="flex items-center gap-2 text-primary">
+              <Search className="w-4 h-4" />
+              Search all countries...
+            </div>
+          </SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Country Search Bottom Sheet */}
       <CountryBottomSheet
