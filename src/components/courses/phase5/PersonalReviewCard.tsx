@@ -139,10 +139,10 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         {categories.length > 0 && (
           <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
             {categories.map(cat => {
-              // Determine bar color based on OVERALL score (not individual category)
-              const barColorClass = rating.rating >= 9 
-                ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
-                : 'bg-gray-300';
+              // UNIFIED: Determine bar color based on INDIVIDUAL category score (9+ = Outstanding)
+              const barColorClass = cat.score >= 9 
+                ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+                : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]';
               
               return (
                 <div key={cat.label} className="space-y-1">
@@ -150,7 +150,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
                     <span className="text-gray-500">{cat.label}</span>
                     <span className="font-medium text-gray-700">{cat.score.toFixed(1)}</span>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
                       style={{ width: `${(cat.score / 10) * 100}%` }}
