@@ -218,14 +218,14 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Backdrop - fixed overlay for the whole screen */}
+      {/* Backdrop - tap to dismiss, no blur */}
       <motion.div
         key="sheet-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-30 bg-black/10 backdrop-blur-[1px]"
+        className="fixed inset-0 z-30 bg-black/20"
         onClick={onClose}
       />
       
@@ -251,12 +251,10 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         aria-modal="true"
         aria-labelledby="course-sheet-title"
         className={cn(
-          'rounded-t-[24px]',
           'bg-white dark:bg-slate-900',
-          'border-t border-x border-slate-200/50 dark:border-slate-700/50',
-          'shadow-[0_-12px_50px_rgba(0,0,0,0.2)]',
-          'flex flex-col',
-          'mx-3'
+          'border-t border-slate-200/50 dark:border-slate-700/50',
+          'shadow-[0_-4px_20px_rgba(0,0,0,0.1)]',
+          'flex flex-col'
         )}
       >
         {/* Drag handle pill - premium centered */}
