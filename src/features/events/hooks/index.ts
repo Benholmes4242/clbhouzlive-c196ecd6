@@ -61,3 +61,15 @@ export {
   useMovePlayerToGroup,
   useSwapPlayers,
 } from './useTeeTimeGroups';
+
+// Scores
+export {
+  useRoundScores,
+  useMyScore,
+  useCreateScore,
+  useUpdateHoleScore,
+  useCompleteScore,
+  useEventLeaderboard,
+  type HoleScore,
+  type Score,
+} from './useScores';

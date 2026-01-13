@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Clock, Users, Shuffle, Plus } from 'lucide-react';
+import { Clock, Users, Shuffle, Plus, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { EventWithDetails } from '@/features/events/hooks/useEvent';
 import { useAutoGenerateGroups } from '@/features/events/hooks/useTeeTimeGroups';
+import { ScoreEntrySheet } from '../scoring/ScoreEntrySheet';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 export function EventGroupsTab({ event }: Props) {
   const [selectedRound, setSelectedRound] = useState(event.rounds?.[0]?.id || '');
+  const [scoreEntryOpen, setScoreEntryOpen] = useState(false);
   const { mutate: autoGenerate, isPending: isGenerating } = useAutoGenerateGroups();
 
   const currentRound = event.rounds?.find(r => r.id === selectedRound);
@@ -109,6 +111,27 @@ export function EventGroupsTab({ event }: Props) {
             </Button>
           )}
         </div>
+      )}
+
+      {/* Score Entry Button */}
+      {event.currentParticipant && currentRound && (
+        <>
+          <div className="pt-4 border-t border-border">
+            <Button onClick={() => setScoreEntryOpen(true)} className="w-full h-12 rounded-xl">
+              <ClipboardList className="w-5 h-5 mr-2" />
+              Enter My Score
+            </Button>
+          </div>
+          
+          <ScoreEntrySheet
+            open={scoreEntryOpen}
+            onClose={() => setScoreEntryOpen(false)}
+            roundId={currentRound.id}
+            participantId={event.currentParticipant.id}
+            playingHandicap={event.currentParticipant.playing_handicap || event.currentParticipant.handicap_index || 0}
+            courseName={currentRound.course_name}
+          />
+        </>
       )}
     </div>
   );
