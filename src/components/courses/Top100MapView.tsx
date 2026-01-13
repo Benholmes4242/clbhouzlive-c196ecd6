@@ -12,9 +12,7 @@ import { RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
-
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
+import { MAP_CONFIG } from '@/config/maps';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
@@ -119,13 +117,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   // Initialise map
   useEffect(() => {
-    if (!mapContainerRef.current || !MAPBOX_TOKEN || mapRef.current) return;
+    if (!mapContainerRef.current || !MAP_CONFIG.TOKEN || mapRef.current) return;
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    mapboxgl.accessToken = MAP_CONFIG.TOKEN;
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: MAPBOX_STYLE,
+      style: MAP_CONFIG.STYLE_URL,
       center: regionConfig.center,
       zoom: regionConfig.zoom,
       minZoom: 1.5,
@@ -394,7 +392,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     setSelectedCourse(null);
   }, [regionConfig]);
 
-  if (!MAPBOX_TOKEN) {
+  if (!MAP_CONFIG.TOKEN) {
     return (
       <div className="rounded-sq-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
         <p className="font-semibold">Map Temporarily Unavailable</p>
