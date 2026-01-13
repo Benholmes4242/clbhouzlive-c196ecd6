@@ -35,40 +35,43 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="bg-card/60 border border-border/50 rounded-xl p-3.5 hover:shadow-sm transition-shadow cursor-pointer"
+      className="bg-card/60 border border-border/50 rounded-xl p-3.5 hover:shadow-md active:shadow-sm transition-shadow cursor-pointer group"
       onClick={handleCourseClick}
     >
       <div className="flex gap-3">
         {/* Friend Avatar */}
-        <div className="shrink-0" onClick={handleFriendClick}>
-          <Squircle width={40} height={40}>
+        <button 
+          className="shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg hover:scale-105 transition-transform" 
+          onClick={handleFriendClick}
+        >
+          <Squircle width={40} height={40} className="ring-1 ring-border/30">
             <img
               src={hit.friend_profile.profile_photo_url || '/placeholder.svg'}
-              alt={friendName}
+              alt={`${friendName}'s profile`}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
                 e.currentTarget.src = '/placeholder.svg';
               }}
             />
           </Squircle>
-        </div>
+        </button>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Action line */}
           <p className="text-sm">
-            <span
-              className="font-semibold text-foreground hover:underline cursor-pointer"
+            <button
+              className="font-semibold text-foreground hover:underline cursor-pointer focus:outline-none"
               onClick={handleFriendClick}
             >
               {friendName}
-            </span>
+            </button>
             <span className="text-muted-foreground"> played </span>
             <span className="font-medium text-foreground">{hit.course_name}</span>
           </p>
 
           {/* Meta line */}
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
             {isTrending && (
               <>
@@ -84,7 +87,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
 
         {/* Course Thumbnail */}
         <div className="shrink-0">
-          <Squircle width={56} height={56}>
+          <Squircle width={56} height={56} className="ring-1 ring-border/30 transition-transform group-hover:scale-105">
             <img
               src={hit.thumbnail_url || '/placeholder.svg'}
               alt={hit.course_name}
@@ -101,7 +104,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/40">
         <button
           onClick={handleCourseClick}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors min-h-[36px]"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           View course

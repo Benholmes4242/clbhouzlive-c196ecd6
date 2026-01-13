@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
+import { motion } from 'framer-motion';
 import type { CourseWithFriends } from '@/hooks/useFriendsCourses';
 
 interface FriendsHeroCourseCardProps {
@@ -30,10 +31,23 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
   };
 
   const friendName = mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username;
+  const friendUsername = mostRecentFriend.friend_profile.username;
+
+  // Get up to 3 friend avatars for stacking
+  const avatarFriends = course.friends.slice(0, 3);
+  const extraCount = course.total_friends_played - 3;
+
+  const handleFriendClick = (e: React.MouseEvent, username: string) => {
+    e.stopPropagation();
+    navigate(`/user/${username}`);
+  };
 
   return (
-    <div 
-      className="relative overflow-hidden rounded-none hover:shadow-lg transition-all cursor-pointer bg-card border border-border/60 shadow-md"
+    <motion.div 
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="relative overflow-hidden rounded-none hover:shadow-lg transition-all duration-200 cursor-pointer bg-card border border-border/60 shadow-md group"
       onClick={() => navigate(`/courses/${course.course_id}`)}
     >
       {/* Course Image - 6% taller aspect ratio */}
@@ -42,7 +56,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           <img
             src={course.thumbnail_url}
             alt={course.course_name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             onError={(e) => {
               e.currentTarget.src = '/placeholder.svg';
             }}
@@ -82,36 +96,60 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           </span>
         </div>
 
-        {/* Friend meta + avatar - vertically centered, 2-line meta block */}
+        {/* Friend meta + avatar stack */}
         <div className="flex items-center justify-between gap-3">
           {/* 2-line meta text block */}
           <div className="flex flex-col leading-snug">
             <p className="text-sm text-muted-foreground">
               Played by{" "}
-              <span className="font-medium text-foreground">{friendName}</span>
+              <button
+                onClick={(e) => handleFriendClick(e, friendUsername)}
+                className="font-medium text-foreground hover:underline focus:outline-none"
+              >
+                {friendName}
+              </button>
               {course.total_friends_played > 1 && (
                 <span> & {course.total_friends_played - 1} more</span>
               )}
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
             </p>
           </div>
 
-          {/* Avatar squircle */}
-          <Squircle width={36} height={36} className="shrink-0">
-            <img 
-              src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-              alt={friendName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder.svg';
-              }}
-            />
-          </Squircle>
+          {/* Avatar stack with shadows */}
+          <div className="flex -space-x-2.5">
+            {avatarFriends.map((friend, idx) => (
+              <button
+                key={friend.friend_id}
+                onClick={(e) => handleFriendClick(e, friend.friend_profile.username)}
+                className="relative focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded-lg hover:z-20 transition-transform hover:scale-110"
+                style={{ zIndex: 10 - idx }}
+              >
+                <Squircle width={36} height={36} className="ring-2 ring-card shadow-sm">
+                  <img 
+                    src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                    alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </Squircle>
+              </button>
+            ))}
+            {extraCount > 0 && (
+              <div 
+                className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 border-2 border-card shadow-sm text-xs font-medium text-slate-600"
+                style={{ zIndex: 6 }}
+              >
+                +{extraCount}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

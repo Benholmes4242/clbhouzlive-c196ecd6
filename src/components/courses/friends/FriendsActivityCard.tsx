@@ -4,6 +4,7 @@ import { Squircle } from '@/components/ui/squircle';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LeaderboardEntry {
   friendId: string;
@@ -65,82 +66,104 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
   }
 
   return (
-    <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
-      {/* Header - Tighter padding */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[56px] focus:outline-none focus:ring-1 focus:ring-slate-200/60"
-      >
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-50 border border-amber-200/80">
-            <Trophy className="w-3.5 h-3.5 text-amber-600" />
-          </div>
-          <div className="text-left">
-            <h3 className="text-sm font-semibold text-foreground">Friends activity</h3>
-            <p className="text-[11px] text-muted-foreground">Top players this period</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span 
-            className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600"
-            aria-label={`Showing top ${Math.min(10, trimmedLeaderboard.length)} players`}
-          >
-            Top {Math.min(10, trimmedLeaderboard.length)}
-          </span>
-          {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
-          )}
-        </div>
-      </button>
-
-      {/* Leaderboard List - Tighter padding */}
-      <ol className="border-t border-border/60" aria-label="Top players leaderboard">
-        {visibleEntries.map((entry, index) => (
-          <li
-            key={entry.friendId}
-            onClick={() => navigate(`/user/${entry.friendName}`)}
-            className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
-          >
-            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              <Squircle width={36} height={36} className="shrink-0">
-                <img 
-                  src={entry.avatarUrl || '/placeholder.svg'} 
-                  alt={entry.friendName}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-              </Squircle>
-              
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{entry.friendName}</p>
-                <p className="text-[11px] text-muted-foreground">
-                  {entry.roundCount} round{entry.roundCount !== 1 ? 's' : ''} · Last played {formatDistanceToNow(new Date(entry.lastPlayedAt), { addSuffix: true })}
-                </p>
-              </div>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
+    >
+      <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+        {/* Header - Tighter padding */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+          aria-expanded={isExpanded}
+          aria-controls="leaderboard-list"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-50 border border-amber-200/80">
+              <Trophy className="w-3.5 h-3.5 text-amber-600" />
             </div>
-
-            {getRankBadge(index)}
-          </li>
-        ))}
-      </ol>
-
-      {/* Show more indicator - with divider */}
-      {!isExpanded && trimmedLeaderboard.length > 3 && (
-        <>
-          <div className="mx-4 h-px bg-slate-200/60" />
-          <div className="px-4 py-2 text-center">
-            <p className="text-[11px] text-muted-foreground">
-              +{trimmedLeaderboard.length - 3} more player{trimmedLeaderboard.length - 3 !== 1 ? 's' : ''}
-            </p>
+            <div className="text-left">
+              <h3 className="text-sm font-semibold text-foreground">Friends activity</h3>
+              <p className="text-[11px] text-muted-foreground">Top players this period</p>
+            </div>
           </div>
-        </>
-      )}
-    </Card>
+
+          <div className="flex items-center gap-2">
+            <span 
+              className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+              aria-label={`Showing top ${Math.min(10, trimmedLeaderboard.length)} players`}
+            >
+              Top {Math.min(10, trimmedLeaderboard.length)}
+            </span>
+            <motion.div
+              animate={{ rotate: isExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            </motion.div>
+          </div>
+        </button>
+
+        {/* Leaderboard List - Proper semantics */}
+        <ol 
+          id="leaderboard-list"
+          className="border-t border-border/60" 
+          aria-label="Top players leaderboard"
+        >
+          <AnimatePresence mode="sync">
+            {visibleEntries.map((entry, index) => (
+              <motion.li
+                key={entry.friendId}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2, delay: isExpanded ? index * 0.02 : 0 }}
+                onClick={() => navigate(`/user/${entry.friendName}`)}
+                className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/40 active:bg-muted/60 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
+              >
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <Squircle width={36} height={36} className="shrink-0 ring-1 ring-border/30">
+                    <img 
+                      src={entry.avatarUrl || '/placeholder.svg'} 
+                      alt={`${entry.friendName}'s profile`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                  </Squircle>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{entry.friendName}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {entry.roundCount} round{entry.roundCount !== 1 ? 's' : ''} · Last played {formatDistanceToNow(new Date(entry.lastPlayedAt), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+
+                {getRankBadge(index)}
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </ol>
+
+        {/* Show more indicator - with divider */}
+        {!isExpanded && trimmedLeaderboard.length > 3 && (
+          <>
+            <div className="mx-4 h-px bg-slate-200/60" />
+            <button 
+              onClick={() => setIsExpanded(true)}
+              className="w-full px-4 py-2.5 text-center hover:bg-muted/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+            >
+              <p className="text-[11px] text-primary font-medium">
+                +{trimmedLeaderboard.length - 3} more player{trimmedLeaderboard.length - 3 !== 1 ? 's' : ''}
+              </p>
+            </button>
+          </>
+        )}
+      </Card>
+    </motion.div>
   );
 };
 
