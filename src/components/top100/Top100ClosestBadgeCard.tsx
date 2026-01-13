@@ -114,7 +114,14 @@ export function Top100ClosestBadgeCard({
             </p>
 
             {/* Progress bar - increased contrast bg (item 8) */}
-            <div className="mt-3 h-2 rounded-full bg-border/80 overflow-hidden">
+            <div 
+              className="mt-3 h-2 rounded-full bg-border/80 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={Math.round(progressPercent)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${closest.label} progress: ${progress} of ${target} courses`}
+            >
               <div
                 className="h-full rounded-full transition-[width] duration-700 ease-out"
                 style={{ 

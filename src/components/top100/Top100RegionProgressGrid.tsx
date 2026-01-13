@@ -170,8 +170,15 @@ export function Top100RegionProgressGrid({
                     {remainingPercent}% remaining
                   </span>
 
-                  {/* Progress bar with region-colored fill */}
-                  <div className="w-full h-1.5 rounded-full bg-border/60 overflow-hidden">
+                {/* Progress bar with region-colored fill */}
+                  <div 
+                    className="w-full h-1.5 rounded-full bg-border/60 overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={Math.round(progressPercent)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${displayName} progress: ${list.played} of ${list.total} courses played`}
+                  >
                     <div
                       className={cn(
                         "h-full rounded-full transition-all duration-200 group-hover:opacity-90",
