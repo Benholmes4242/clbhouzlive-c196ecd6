@@ -418,7 +418,7 @@ const CourseExplorer = () => {
       <div className="max-w-xl mx-auto flex items-center justify-center gap-3" role="group" aria-label="Course filters">
         {/* Primary region */}
         <div className="flex-1 relative">
-          {isFetching && !searchTerm && (
+          {isFetching && selectedRegion !== PRIMARY_REGIONS.ALL && (
             <div className="absolute -top-1 -right-1 z-10">
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             </div>
@@ -570,7 +570,7 @@ const CourseExplorer = () => {
                       </>
                     )}
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-muted-foreground mt-1 pb-6">
                     Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
                   </p>
                 </div>
@@ -578,7 +578,7 @@ const CourseExplorer = () => {
 
               {/* End message */}
               {showEndMessage && (
-                <p className="text-center text-[11px] text-muted-foreground pt-4">
+                <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
                   You've reached the end • {totalCount.toLocaleString()} courses total
                 </p>
               )}
