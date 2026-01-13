@@ -61,7 +61,7 @@ const ScrollToTopGlass = () => {
     <div 
       className={`
         fixed
-        bottom-20
+        bottom-18
         right-6
         z-[39]
         transition-all
