@@ -25,9 +25,9 @@ const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistribu
   { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
 ];
 
-// UNIFIED COLOR SYSTEM - amber for Outstanding only, gray-300 for rest
-const OUTSTANDING_COLOR = '#f59e0b'; // amber-500
-const NEUTRAL_COLOR = '#d1d5db';     // gray-300 - matches breakdown bars
+// UNIFIED COLOR SYSTEM - brand color for Outstanding only, darker grey for rest
+const OUTSTANDING_COLOR = '#F79E1B'; // Brand orange
+const NEUTRAL_COLOR = '#9ca3af';     // Darker grey - matches breakdown bars
 const EMPTY_COLOR = '#f3f4f6';       // gray-100
 
 /**
@@ -78,7 +78,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
             </span>
 
             {/* Bar track */}
-            <div className="flex-1 h-[6px] bg-gray-100 rounded-full overflow-hidden">
+            <div className="flex-1 h-[6px] bg-[#e5e7eb] rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
