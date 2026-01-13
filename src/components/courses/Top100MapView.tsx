@@ -686,7 +686,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       {/* Fixed bottom control tray - always visible */}
       <div className={cn(
         'fixed bottom-0 left-0 right-0 z-30',
-        'bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl',
+        'bg-slate-50 dark:bg-slate-900',
         'border-t border-slate-200/50 dark:border-slate-700/50',
         'px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
       )}>
