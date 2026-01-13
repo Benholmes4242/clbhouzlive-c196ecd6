@@ -180,6 +180,8 @@ const HubEchoTagsPage = lazy(() => import("./features/hub/pages/HubEchoTagsPage"
 const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHistoryPage").then(m => ({ default: m.HubSwingHistoryPage })));
 const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
+const GameDetailPage = lazy(() => import("./features/hub/pages/GameDetailPage").then(m => ({ default: m.GameDetailPage })));
+const TripDetailPage = lazy(() => import("./features/hub/pages/TripDetailPage").then(m => ({ default: m.TripDetailPage })));
 const HubTripPage = lazy(() => import("./features/hub/pages/HubTripPage"));
 
 // Games feature pages
@@ -498,6 +500,8 @@ function AppRoutes() {
             <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
             <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
             <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
+            <Route path="/hub/games/:gameId" element={<Suspense fallback={<HubSkeleton />}><GameDetailPage /></Suspense>} />
+            <Route path="/hub/trips/:tripId" element={<Suspense fallback={<HubSkeleton />}><TripDetailPage /></Suspense>} />
             <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
             <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
             <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
