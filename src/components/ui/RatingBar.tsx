@@ -30,31 +30,25 @@ export function RatingBar({
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   
-  // UNIFIED COLOR SYSTEM: amber for Outstanding (9.0+), grey for rest
+  // UNIFIED COLOR SYSTEM: amber gradient for Outstanding (9.0+), gray-300 for rest
+  // Matches breakdown bars in PersonalReviewCard, CommunityScoreCard, ReviewBlockFlat
   const isOutstanding = showOutstandingGold && value >= 9.0;
-  const fillColor = isOutstanding 
-    ? '#f59e0b'  // amber-500
-    : '#9ca3af'; // gray-400
 
   return (
     <div
       className={cn(
-        'relative w-full overflow-hidden',
+        'relative w-full h-1.5 bg-gray-100 rounded-full overflow-hidden',
         className
       )}
-      style={{
-        height: 'var(--rating-bar-height-sm)',
-        backgroundColor: '#f3f4f6', // gray-100
-        borderRadius: 'var(--rating-bar-radius)',
-      }}
     >
       <div
-        className="absolute inset-y-0 left-0 transition-all duration-300"
-        style={{
-          width: `${pct}%`,
-          backgroundColor: fillColor,
-          borderRadius: 'var(--rating-bar-radius)',
-        }}
+        className={cn(
+          'absolute inset-y-0 left-0 rounded-full transition-all duration-300',
+          isOutstanding 
+            ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+            : 'bg-gray-300'
+        )}
+        style={{ width: `${pct}%` }}
       />
     </div>
   );
