@@ -20,16 +20,14 @@ interface MapCourseSheetProps {
   course: Top100MapCourse | null;
   onClose: () => void;
   scope: string;
+  /** Height of the filter tray in pixels - sheet positions above this */
+  filterTrayHeight?: number;
 }
 
 type SheetState = 'peek' | 'half' | 'full';
 
-// Sheet uses auto height - content determines size, no scroll
-const SHEET_HEIGHTS: Record<SheetState, string> = {
-  peek: 'auto',
-  half: 'auto',
-  full: 'auto',
-};
+// Filter tray height constant (matches the fixed filter tray)
+const DEFAULT_FILTER_TRAY_HEIGHT = 120;
 
 // Fetch course thumbnail image
 const useCourseImage = (courseId: string | undefined) => {
@@ -72,6 +70,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   course,
   onClose,
   scope,
+  filterTrayHeight = DEFAULT_FILTER_TRAY_HEIGHT,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -159,25 +158,15 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     (_: any, info: PanInfo) => {
       const { velocity, offset } = info;
       
-      // If swiped down fast or far, close
-      if (velocity.y > 500 || offset.y > 150) {
+      // If swiped down fast or far, close the sheet
+      if (velocity.y > 400 || offset.y > 80) {
         onClose();
         return;
       }
       
-      // If swiped up fast, expand
-      if (velocity.y < -300) {
-        setSheetState(sheetState === 'peek' ? 'half' : 'full');
-        return;
-      }
-      
-      // If swiped down moderately, collapse
-      if (offset.y > 50) {
-        setSheetState(sheetState === 'full' ? 'half' : 'peek');
-        return;
-      }
+      // Otherwise snap back (no state changes since we only have one state now)
     },
-    [onClose, sheetState]
+    [onClose]
   );
 
   const getRegionLabel = (scopeKey: string): string => {
@@ -225,17 +214,17 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-30"
+        className="fixed inset-0 z-40"
         onClick={onClose}
       />
       
-      {/* Sheet - slides up from bottom, positioned above filters */}
+      {/* Sheet - fixed, positioned above filter tray */}
       <motion.div
         ref={sheetRef}
         key={`sheet-${course.id}`}
-        initial={{ y: 300, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 300, opacity: 0 }}
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
         transition={{ 
           type: 'spring', 
           damping: 32, 
@@ -244,22 +233,24 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         }}
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.1}
+        dragElastic={0.2}
         onDragEnd={handleDragEnd}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="course-sheet-title"
         className={cn(
+          'fixed left-0 right-0 z-50',
           'bg-white dark:bg-slate-900',
           'border-t border-slate-200/50 dark:border-slate-700/50',
           'shadow-[0_-4px_20px_rgba(0,0,0,0.1)]',
           'flex flex-col'
         )}
+        style={{ bottom: filterTrayHeight }}
       >
-        {/* Drag handle pill - premium centered */}
-        <div className="flex-shrink-0 pt-3 pb-2 flex justify-center">
-          <div className="w-10 h-1 rounded-full bg-slate-300/80 dark:bg-slate-600/80" />
+        {/* Drag handle pill - visual affordance for swiping */}
+        <div className="flex-shrink-0 pt-3 pb-2 flex justify-center cursor-grab active:cursor-grabbing">
+          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
         </div>
 
         {/* Expand/collapse hint button */}
