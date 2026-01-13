@@ -53,11 +53,11 @@ export default function HubPageRedesign() {
   const handleEventClick = (event: typeof nextEvent) => {
     if (!event) return;
     if (event.legacy_game_id) {
-      navigate(`/game/${event.legacy_game_id}`);
+      navigate(`/hub/games/${event.legacy_game_id}`);
     } else if (event.legacy_trip_id) {
-      navigate(`/hub/trip/${event.legacy_trip_id}`);
+      navigate(`/hub/trips/${event.legacy_trip_id}`);
     } else {
-      navigate(`/events/${event.id}`);
+      navigate(`/hub/games`);
     }
   };
 
@@ -117,7 +117,7 @@ export default function HubPageRedesign() {
             <Calendar className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="font-medium mb-1">No upcoming games</p>
             <p className="text-sm text-muted-foreground mb-4">Your next round starts here</p>
-            <Button onClick={() => navigate('/hub/create')} size="sm">
+            <Button onClick={() => navigate('/hub/create-game')} size="sm">
               <Plus className="w-4 h-4 mr-1" />
               Create Game
             </Button>
@@ -151,7 +151,7 @@ export default function HubPageRedesign() {
           </button>
 
           <button
-            onClick={() => navigate('/hub/create')}
+            onClick={() => navigate('/hub/create-game')}
             className="flex flex-col items-center gap-2 p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all"
           >
             <div className="w-11 h-11 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -252,9 +252,9 @@ function PendingRequestCard({ request }: { request: any }) {
         onClick={(e) => {
           e.stopPropagation();
           if (isGame && request.game_id) {
-            navigate(`/game/${request.game_id}`);
+            navigate(`/hub/games/${request.game_id}`);
           } else if (request.trip_id) {
-            navigate(`/hub/trip/${request.trip_id}`);
+            navigate(`/hub/trips/${request.trip_id}`);
           }
         }}
       >
