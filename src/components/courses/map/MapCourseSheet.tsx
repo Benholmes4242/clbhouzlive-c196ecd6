@@ -218,14 +218,14 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Backdrop - tap to dismiss, no blur */}
+      {/* Invisible backdrop - tap to dismiss */}
       <motion.div
         key="sheet-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-30 bg-black/20"
+        className="fixed inset-0 z-30"
         onClick={onClose}
       />
       
