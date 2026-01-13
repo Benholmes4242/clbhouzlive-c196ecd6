@@ -123,7 +123,7 @@ export const ReviewBottomPanel: React.FC<ReviewBottomPanelProps> = ({
               'active:scale-[0.98]',
               'focus:outline-none focus:ring-2 focus:ring-white/50',
               rating >= 9 
-                ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B] text-black shadow-lg shadow-orange-500/25'
+                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/25'
                 : 'bg-white/15 text-white border border-white/10 hover:bg-white/20'
             )}
             style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}

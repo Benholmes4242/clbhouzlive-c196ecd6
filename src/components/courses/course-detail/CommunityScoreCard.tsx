@@ -199,8 +199,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   {communityAverage >= 9 ? (
                     <>
-                      <stop offset="0%" stopColor="#FFAF30" />
-                      <stop offset="100%" stopColor="#F79E1B" />
+                      <stop offset="0%" stopColor="#fbbf24" />
+                      <stop offset="100%" stopColor="#f59e0b" />
                     </>
                   ) : (
                     <>
@@ -271,7 +271,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             const score = cat.score || 0;
             // Determine bar color based on individual category score (9+ = Outstanding)
             const barColorClass = score >= 9 
-              ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+              ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
               : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]';
             
             return (

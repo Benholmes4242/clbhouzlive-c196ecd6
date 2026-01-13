@@ -45,7 +45,7 @@ export function RatingBar({
         className={cn(
           'absolute inset-y-0 left-0 rounded-full transition-all duration-300',
           isOutstanding 
-            ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+            ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
             : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]'
         )}
         style={{ width: `${pct}%` }}

@@ -8,15 +8,15 @@ export const courseDetailTokens = {
   // All other tiers use grey for a clean, prestigious feel
   tiers: {
     outstanding: {
-      bg: 'bg-[#FFF4E5]',
-      border: 'border-[#FFD699]',
-      text: 'text-[#C67800]',
-      fill: 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]',
-      badge: 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B] text-white',
-      activeBg: 'bg-[#F79E1B]',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
+      text: 'text-amber-700',
+      fill: 'bg-gradient-to-r from-amber-400 to-amber-500',
+      badge: 'bg-gradient-to-r from-amber-400 to-amber-500 text-white',
+      activeBg: 'bg-amber-500',
       activeText: 'text-white',
-      chipBg: 'bg-[#FFF4E5]',
-      chipText: 'text-[#C67800]',
+      chipBg: 'bg-amber-50',
+      chipText: 'text-amber-700',
     },
     excellent: {
       bg: 'bg-gray-50',
@@ -97,9 +97,9 @@ export const courseDetailTokens = {
     chipActive: 'ring-2 ring-offset-2',
   },
 
-  // Score ring gradient colors - BRAND COLOR FOR OUTSTANDING ONLY, darker grey gradient for rest
+  // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, darker grey gradient for rest
   scoreRing: {
-    outstanding: { from: '#FFAF30', to: '#F79E1B' }, // Brand orange
+    outstanding: { from: '#fbbf24', to: '#f59e0b' }, // amber-400 to amber-500
     excellent: { from: '#c4c8ce', to: '#9ca3af' },   // Darker grey gradient
     veryGood: { from: '#c4c8ce', to: '#9ca3af' },    // Darker grey gradient
     good: { from: '#c4c8ce', to: '#9ca3af' },        // Darker grey gradient
@@ -107,9 +107,9 @@ export const courseDetailTokens = {
   },
 } as const;
 
-// Tier gradient mapping for distribution bars - BRAND COLOR FOR OUTSTANDING ONLY, darker grey gradient for rest
+// Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, darker grey gradient for rest
 export const tierGradients: Record<string, string> = {
-  Outstanding: 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]',
+  Outstanding: 'bg-gradient-to-r from-amber-400 to-amber-500',
   Excellent: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',
   'Very Good': 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',
   Good: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',

@@ -141,7 +141,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
             {categories.map(cat => {
               // UNIFIED: Determine bar color based on INDIVIDUAL category score (9+ = Outstanding)
               const barColorClass = cat.score >= 9 
-                ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+                ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
                 : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]';
               
               return (

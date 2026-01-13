@@ -101,7 +101,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
                 <div
                   className={`relative h-full rounded-full transition-[width] duration-500 ease-out ${
                     row.you >= 9 
-                      ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+                      ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
                       : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]'
                   }`}
                   style={{ width: `${getPercentage(row.you)}%` }}
