@@ -15,7 +15,7 @@ import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { TimeRangeFilter } from './v2/TimeRangeFilter';
 import { LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { useActiveGameCounts } from '@/features/nearby/hooks/useActiveGameCounts';
 import { track } from '@/utils/analytics';
 import {
@@ -51,10 +51,8 @@ export function CoursesLeaderboardView() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [dismissedCallout, setDismissedCallout] = useState(false);
   
-  // V3: Games Hub sheet state for deep-link from leaderboard
+  // V3: Create Game sheet state for deep-link from leaderboard
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [gamesHubPrefillCourse, setGamesHubPrefillCourse] = useState<{ id: string; name: string; country: string } | null>(null);
-  const [gamesHubAutoCreate, setGamesHubAutoCreate] = useState(false);
 
   // Real data hooks (disabled in mock mode)
   const { data, isLoading } = useTop100CourseLeaderboard({
@@ -233,8 +231,6 @@ export function CoursesLeaderboardView() {
   // V3: Handler for "Create game at this course"
   const handleCreateGameAtCourse = useCallback((course: { id: string; name: string; country: string }) => {
     track('course_create_game_click', { course_id: course.id });
-    setGamesHubPrefillCourse(course);
-    setGamesHubAutoCreate(true);
     setGamesHubOpen(true);
   }, []);
 
@@ -498,17 +494,10 @@ export function CoursesLeaderboardView() {
         )}
       </section>
 
-      {/* V3: Games Hub Sheet for deep-link from leaderboard */}
-      <HubGamesHubSheet
+      {/* V3: Create Game Sheet */}
+      <CreateGameTripSheetV2
         isOpen={gamesHubOpen}
-        onClose={() => {
-          setGamesHubOpen(false);
-          setGamesHubPrefillCourse(null);
-          setGamesHubAutoCreate(false);
-        }}
-        initialTab="discover"
-        prefillCourse={gamesHubPrefillCourse || undefined}
-        autoOpenCreate={gamesHubAutoCreate}
+        onClose={() => setGamesHubOpen(false)}
       />
     </div>
   );

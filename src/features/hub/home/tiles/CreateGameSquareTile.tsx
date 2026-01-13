@@ -5,15 +5,15 @@
 
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 
 export function CreateGameSquareTile() {
-  const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const openCreateGame = () => {
     haptic('light');
-    setGamesHubOpen(true);
+    setCreateOpen(true);
   };
 
   return (
@@ -44,10 +44,9 @@ export function CreateGameSquareTile() {
         </div>
       </button>
 
-      <HubGamesHubSheet
-        isOpen={gamesHubOpen}
-        onClose={() => setGamesHubOpen(false)}
-        initialTab="yours"
+      <CreateGameTripSheetV2
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
       />
     </>
   );

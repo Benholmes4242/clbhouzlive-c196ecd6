@@ -11,7 +11,7 @@ import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequest
 import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
 import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
@@ -43,7 +43,6 @@ export function YourGamesTile() {
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [gamesHubInitialTab, setGamesHubInitialTab] = useState<'discover' | 'yours'>('discover');
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -78,19 +77,16 @@ export function YourGamesTile() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setGamesHubInitialTab('yours');
     setGamesHubOpen(true);
   };
 
   const openSearchGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setGamesHubInitialTab('discover');
     setGamesHubOpen(true);
   };
 
   const openYourGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setGamesHubInitialTab('yours');
     setGamesHubOpen(true);
   };
 
@@ -338,10 +334,9 @@ export function YourGamesTile() {
       </div>
       </div>
       
-      <HubGamesHubSheet
+      <HubYourGamesSheet
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
-        initialTab={gamesHubInitialTab}
       />
     </Tile>
   );

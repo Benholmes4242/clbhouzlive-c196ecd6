@@ -5,18 +5,18 @@
 
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 
 // Fallback gradient image for the CTA
 const GRADIENT_BG = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=200&fit=crop&q=80';
 
 export function CreateGameGradientCTA() {
-  const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const openCreateGame = () => {
     haptic('light');
-    setGamesHubOpen(true);
+    setCreateOpen(true);
   };
 
   return (
@@ -56,10 +56,9 @@ export function CreateGameGradientCTA() {
         </div>
       </button>
 
-      <HubGamesHubSheet
-        isOpen={gamesHubOpen}
-        onClose={() => setGamesHubOpen(false)}
-        initialTab="yours"
+      <CreateGameTripSheetV2
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
       />
     </>
   );

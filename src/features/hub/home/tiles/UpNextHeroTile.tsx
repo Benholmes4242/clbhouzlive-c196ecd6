@@ -7,7 +7,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Plane, Users } from 'lucide-react';
 import { useHubHeroData, HeroGameData, HeroTripData, HeroFallbackData } from '../hooks/useHubHeroData';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
 import { SlotsPill } from '@/features/nearby/components/your-games/SlotsPill';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -260,7 +260,6 @@ export function UpNextHeroTile() {
   const { data: heroData, isLoading } = useHubHeroData();
   const [activeIndex, setActiveIndex] = useState(0);
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [gamesHubInitialTab, setGamesHubInitialTab] = useState<'discover' | 'yours'>('yours');
   const touchStartX = useRef<number | null>(null);
   const autoRotateTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -326,16 +325,8 @@ export function UpNextHeroTile() {
     
     if (!currentSlide) return;
 
-    if (currentSlide.type === 'game') {
-      setGamesHubInitialTab('yours');
-      setGamesHubOpen(true);
-    } else if (currentSlide.type === 'trip') {
-      setGamesHubInitialTab('yours');
-      setGamesHubOpen(true);
-    } else if (currentSlide.type === 'fallback') {
-      setGamesHubInitialTab('discover');
-      setGamesHubOpen(true);
-    }
+    // Open games sheet for all slide types
+    setGamesHubOpen(true);
   };
 
   const handleDotClick = (index: number) => {
@@ -391,10 +382,9 @@ export function UpNextHeroTile() {
         />
       </div>
 
-      <HubGamesHubSheet
+      <HubYourGamesSheet
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
-        initialTab={gamesHubInitialTab}
       />
     </>
   );
