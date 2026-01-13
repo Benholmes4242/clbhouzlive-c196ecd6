@@ -141,7 +141,7 @@ const CourseExplorer = () => {
   }, [selectedRegion, selectedSubregion, debouncedSearch, sortOption]);
 
   // Fetch initial courses
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption, 0],
     // PERF-TUNING OVERRIDE: ratings need to be fresh when returning to Explore
     refetchOnMount: 'always',
@@ -223,7 +223,7 @@ const CourseExplorer = () => {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
-    retry: 1,
+    retry: 2,
     enabled: mountedRef.current,
   });
 
@@ -311,16 +311,38 @@ const CourseExplorer = () => {
     }
   };
 
-  // Skeleton loading component
+  // Skeleton loading component with shimmer effect
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="h-48 w-full rounded-sq-sm" />
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+        <div key={i} className="space-y-3 animate-pulse">
+          <Skeleton className="h-48 w-full rounded-sq-sm bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+          <Skeleton className="h-6 w-3/4 bg-gradient-to-r from-muted via-muted/50 to-muted" />
+          <Skeleton className="h-4 w-1/2 bg-gradient-to-r from-muted via-muted/50 to-muted" />
         </div>
       ))}
+    </div>
+  );
+
+  // Error state component
+  const ErrorState = () => (
+    <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+      <div className="w-10 h-10 rounded-full border border-dashed border-destructive/40 flex items-center justify-center text-destructive mb-1">
+        <X className="w-4 h-4" />
+      </div>
+      <h3 className="text-sm font-semibold">Unable to load courses</h3>
+      <p className="text-sm text-muted-foreground max-w-xs">
+        We couldn't fetch the courses. Please check your connection and try again.
+      </p>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-2 gap-1.5"
+        onClick={() => refetch()}
+      >
+        <ChevronDown className="h-4 w-4 rotate-180" />
+        Retry
+      </Button>
     </div>
   );
 
@@ -367,15 +389,17 @@ const CourseExplorer = () => {
     <div className="w-full space-y-block pb-section">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" aria-hidden="true" />
         <Input
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 pr-10 h-11 rounded-sq-sm bg-white border border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 transition-all duration-150 text-base placeholder:text-[15px]"
+          aria-label="Search golf courses"
+          role="searchbox"
         />
         {isFetching && searchTerm && (
-          <div className="absolute right-10 top-1/2 -translate-y-1/2">
+          <div className="absolute right-10 top-1/2 -translate-y-1/2" aria-label="Searching">
             <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
           </div>
         )}
@@ -383,6 +407,7 @@ const CourseExplorer = () => {
           <button
             onClick={() => setSearchTerm('')}
             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Clear search"
           >
             <X className="h-4 w-4" />
           </button>
@@ -390,24 +415,32 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region + sub-region filters */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3" role="group" aria-label="Course filters">
         {/* Primary region */}
-        <div className="flex-1">
+        <div className="flex-1 relative">
+          {isFetching && !searchTerm && (
+            <div className="absolute -top-1 -right-1 z-10">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            </div>
+          )}
           <Select value={selectedRegion} onValueChange={(value) => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
-              selectedRegion !== PRIMARY_REGIONS.ALL 
-                ? 'border-slate-300 text-foreground' 
-                : 'border-slate-200'
-            }`}>
+            <SelectTrigger 
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 ${
+                selectedRegion !== PRIMARY_REGIONS.ALL 
+                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  : 'border-slate-200'
+              }`}
+              aria-label="Select region"
+            >
               <div className="flex items-center">
-                <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                <MapPin className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <SelectValue placeholder="All Regions" />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm">
+            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               {regionOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -418,20 +451,28 @@ const CourseExplorer = () => {
         </div>
 
         {/* Sub-region */}
-        <div className="flex-1">
+        <div className="flex-1 relative">
+          {isFetching && selectedSubregion !== 'all' && (
+            <div className="absolute -top-1 -right-1 z-10">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            </div>
+          )}
           <Select
             value={selectedSubregion}
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
-              selectedSubregion !== 'all' 
-                ? 'border-slate-300 text-foreground' 
-                : 'border-slate-200'
-            }`}>
+            <SelectTrigger 
+              className={`h-11 w-full rounded-sq-sm bg-white justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
+                selectedSubregion !== 'all' 
+                  ? 'border-primary/40 ring-1 ring-primary/20 text-foreground' 
+                  : 'border-slate-200'
+              }`}
+              aria-label="Select sub-region"
+            >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
             </SelectTrigger>
-            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm">
+            <SelectContent className="bg-white border-slate-200 z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
               <SelectItem value="all">All sub-regions</SelectItem>
               {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
                 <SelectItem key={s} value={normalizeLabel(s)}>
@@ -479,8 +520,10 @@ const CourseExplorer = () => {
       
       {isLoading ? (
         <LoadingSkeleton />
+      ) : isError ? (
+        <ErrorState />
       ) : displayedCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-in fade-in duration-300">
           <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
             <Search className="w-4 h-4" />
           </div>
@@ -492,7 +535,7 @@ const CourseExplorer = () => {
             <Button
               variant="outline"
               size="sm"
-              className="mt-2"
+              className="mt-2 gap-1.5"
               onClick={handleResetFilters}
             >
               Reset filters

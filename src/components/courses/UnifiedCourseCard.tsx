@@ -100,7 +100,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       <button
         type="button"
         onClick={handleClick}
-        className={`w-full bg-card border border-border/60 rounded-sq-sm overflow-hidden text-left hover:border-border transition-colors ${className}`}
+        className={`group w-full bg-card border border-border/60 rounded-sq-sm overflow-hidden text-left hover:border-border hover:shadow-sm active:scale-[0.99] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
       >
         <div className="flex">
           {/* Thumbnail */}
@@ -155,7 +155,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all ${className}`}
+      className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-lg hover:sm:scale-[1.01] active:sm:scale-[0.99] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
     >
       {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
@@ -163,7 +163,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           <img
             src={course.imageUrl}
             alt={course.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
             onError={(e) => {
               e.currentTarget.src = '/placeholder.svg';
             }}
