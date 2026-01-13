@@ -82,8 +82,11 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-px text-[10px] font-medium text-slate-600">
-            Top 10
+          <span 
+            className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+            aria-label={`Showing top ${Math.min(10, trimmedLeaderboard.length)} players`}
+          >
+            Top {Math.min(10, trimmedLeaderboard.length)}
           </span>
           {isExpanded ? (
             <ChevronUp className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
@@ -94,9 +97,9 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
       </button>
 
       {/* Leaderboard List - Tighter padding */}
-      <div className="border-t border-border/60">
+      <ol className="border-t border-border/60" aria-label="Top players leaderboard">
         {visibleEntries.map((entry, index) => (
-          <div
+          <li
             key={entry.friendId}
             onClick={() => navigate(`/user/${entry.friendName}`)}
             className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
@@ -122,9 +125,9 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
             </div>
 
             {getRankBadge(index)}
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
 
       {/* Show more indicator - with divider */}
       {!isExpanded && trimmedLeaderboard.length > 3 && (
