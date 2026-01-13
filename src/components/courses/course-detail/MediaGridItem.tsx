@@ -56,25 +56,15 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
         onLoad={() => setIsLoaded(true)}
       />
 
-      {/* Video overlays */}
+      {/* Video overlays - using same VideoPlayIndicator as explore/discover pages */}
       {isVideo && (
         <>
-          {/* Play button - frosted glass style */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
-            <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <svg 
-                className="w-5 h-5 text-gray-900 ml-0.5" 
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-          </div>
+          {/* Play icon - bottom left, matching explore/discover pages */}
+          <VideoPlayIndicator size="md" />
 
           {/* Duration badge - bottom right, only show if valid duration */}
           {durationText && (
-            <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm">
+            <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm">
               <span className="text-xs text-white font-medium tabular-nums">
                 {durationText}
               </span>
