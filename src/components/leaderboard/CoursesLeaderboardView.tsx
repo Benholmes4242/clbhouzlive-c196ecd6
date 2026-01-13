@@ -9,7 +9,7 @@ import { CourseLeaderboardHero } from './CourseLeaderboardHero';
 import { CinematicCourseCard } from './CinematicCourseCard';
 import { CourseMomentumCallout } from './CourseMomentumCallout';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Star, ChevronRight } from 'lucide-react';
+import { Star, ChevronRight, Play, TrendingUp, Users, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, startOfMonth, startOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -31,11 +31,11 @@ type CourseSortOption = 'most_played' | 'highest_rated' | 'rising' | 'friends';
 const PAGE_SIZE = 10;
 const MAX_COURSES = 100;
 
-const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
-  { value: 'most_played', label: 'Most Played' },
-  { value: 'highest_rated', label: 'Highest Rated' },
-  { value: 'rising', label: 'Trending Courses' },
-  { value: 'friends', label: 'Friends Played' },
+const SORT_OPTIONS: { value: CourseSortOption; label: string; icon: React.ElementType }[] = [
+  { value: 'most_played', label: 'Most Played', icon: Play },
+  { value: 'highest_rated', label: 'Highest Rated', icon: Star },
+  { value: 'rising', label: 'Trending', icon: TrendingUp },
+  { value: 'friends', label: 'Friends', icon: Users },
 ];
 
 const TIME_RANGE_SUBTITLES: Record<LeaderboardTimeRange, string> = {
@@ -50,6 +50,7 @@ export function CoursesLeaderboardView() {
   const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [dismissedCallout, setDismissedCallout] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   
   // V3: Create Game sheet state for deep-link from leaderboard
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
@@ -258,7 +259,12 @@ export function CoursesLeaderboardView() {
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    setVisibleCount(prev => Math.min(prev + PAGE_SIZE, MAX_COURSES));
+    setIsLoadingMore(true);
+    // Small delay for smooth UX
+    setTimeout(() => {
+      setVisibleCount(prev => Math.min(prev + PAGE_SIZE, MAX_COURSES));
+      setIsLoadingMore(false);
+    }, 300);
   }, []);
 
   // Circle rounds to display
@@ -293,14 +299,55 @@ export function CoursesLeaderboardView() {
     return undefined;
   }, [allCourses, mockData]);
 
+  // Enhanced loading skeleton with shimmer
   if (isLoading && !USE_MOCK_COURSE_LEADERBOARD_DATA) {
     return (
-      <div className="space-y-4 px-4">
-        <Skeleton className="h-48 w-full rounded-sq-md" />
-        <Skeleton className="h-10 w-full rounded-sq-pill" />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-80 w-full rounded-sq-md" />
-        ))}
+      <div className="space-y-6 pb-8 animate-fade-in">
+        {/* Hero Skeleton */}
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw]">
+          <div className="relative w-full aspect-[16/10] sm:aspect-[2.2/1] overflow-hidden bg-muted">
+            <Skeleton className="absolute inset-0 w-full h-full" />
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+              <div className="rounded-sq-sm border border-border/20 bg-card/80 backdrop-blur-sm p-4 sm:p-5 space-y-3">
+                <Skeleton className="h-6 w-32 rounded-sq-pill" />
+                <Skeleton className="h-7 w-48 rounded-sq-xs" />
+                <Skeleton className="h-4 w-36 rounded-sq-xs" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-20 rounded-sq-xs" />
+                  <Skeleton className="h-6 w-20 rounded-sq-xs" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className="px-4 space-y-4">
+          <div>
+            <Skeleton className="h-6 w-40 rounded-sq-xs mb-1" />
+            <Skeleton className="h-4 w-56 rounded-sq-xs" />
+          </div>
+          <div className="flex justify-center gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-10 w-20 rounded-sq-xs" />
+            ))}
+          </div>
+          <Skeleton className="h-10 w-full rounded-sq-sm" />
+        </div>
+
+        {/* Course Card Skeletons */}
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw]">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="border-b border-border/40" style={{ animationDelay: `${i * 50}ms` }}>
+              <Skeleton className="w-full aspect-[16/9]" />
+              <div className="px-4 py-3.5 space-y-2 bg-card">
+                <Skeleton className="h-5 w-3/4 rounded-sq-xs" />
+                <Skeleton className="h-4 w-1/2 rounded-sq-xs" />
+                <Skeleton className="h-4 w-1/3 rounded-sq-xs" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -417,25 +464,34 @@ export function CoursesLeaderboardView() {
           </p>
         </div>
 
-        {/* Sort Tabs - Underline style matching main page tabs */}
-        <div className="px-4">
+        {/* Sort Tabs - Underline style with icons */}
+        <div className="px-4" role="tablist" aria-label="Course sort options">
           <div className="flex justify-center gap-0">
-            {SORT_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => handleSortChange(opt.value)}
-                className={cn(
-                  'relative flex-1 max-w-[100px] px-2 py-2.5 text-sm font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out',
-                  'after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out',
-                  sort === opt.value
-                    ? 'text-foreground after:w-full after:opacity-[0.85]'
-                    : 'text-muted-foreground hover:text-foreground after:w-0 after:opacity-0'
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
+            {SORT_OPTIONS.map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="tab"
+                  aria-selected={sort === opt.value}
+                  onClick={() => handleSortChange(opt.value)}
+                  className={cn(
+                    'relative flex-1 max-w-[90px] px-1.5 py-2.5 flex flex-col items-center gap-1 bg-transparent border-0 shadow-none rounded-none transition-all duration-200 ease-out',
+                    'after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out',
+                    sort === opt.value
+                      ? 'text-foreground after:w-full after:opacity-[0.85]'
+                      : 'text-muted-foreground hover:text-foreground after:w-0 after:opacity-0'
+                  )}
+                >
+                  <Icon className={cn(
+                    'w-4 h-4 transition-colors',
+                    sort === opt.value ? 'text-[hsl(var(--tab-orange))]' : ''
+                  )} />
+                  <span className="text-[11px] font-medium leading-none">{opt.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -484,19 +540,29 @@ export function CoursesLeaderboardView() {
 
         {/* Pagination - "Continue the journey" */}
         {displayCourses.length > 0 && (
-          <div className="flex flex-col items-center gap-3 pt-4">
+          <div className="flex flex-col items-center gap-3 pt-4 pb-6">
             {hasMore && (
               <Button
                 variant="outline"
                 size="default"
                 onClick={handleLoadMore}
+                disabled={isLoadingMore}
                 className="w-full max-w-xs gap-2 rounded-sq-sm"
               >
-                Continue the journey
-                <ChevronRight className="h-4 w-4" />
+                {isLoadingMore ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    Continue the journey
+                    <ChevronRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
             )}
-            <p className="text-[11px] text-muted-foreground text-center">
+            <p className="text-[11px] text-muted-foreground text-center tabular-nums">
               Showing 1–{Math.min(visibleCount, totalCount)} of the world's greatest courses
             </p>
           </div>
