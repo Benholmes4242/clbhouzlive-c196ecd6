@@ -31,7 +31,6 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
 
       if (ratedError) throw ratedError;
 
-      console.log('All rated courses for user:', userId, ratedData);
       return ratedData || [];
     },
     enabled: !!userId,
@@ -48,7 +47,6 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         .order('global_rank', { nullsFirst: false });
 
       if (error) throw error;
-      console.log('All Top 100 courses:', data);
       return data || [];
     },
   });
@@ -60,8 +58,6 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
     const playedCourseIds = new Set(
       playedCoursesData.map(pc => pc.course_id)
     );
-
-    console.log('Played course IDs:', Array.from(playedCourseIds));
 
     const progress: Record<string, { played: number; total: number }> = {
       'britain-ireland': { played: 0, total: 0 },
@@ -89,21 +85,15 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         if (isPlayed) progress['britain-ireland'].played++;
       } else if (course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100) {
         progress['europe'].total++;
-        if (isPlayed) {
-          console.log('Continental Europe course marked as played:', course);
-          progress['europe'].played++;
-        }
+        if (isPlayed) progress['europe'].played++;
       }
     });
 
-    console.log('Final progress calculation:', progress);
     setRegionProgress(progress);
   }, [allCoursesData, playedCoursesData]);
 
   const handleVisibilityToggle = async (checked: boolean) => {
     if (!isOwnProfile) return;
-    
-    console.log('handleVisibilityToggle called with:', checked);
     
     try {
       const { error } = await supabase
@@ -112,17 +102,15 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         .eq("id", userId);
 
       if (error) {
-        console.error('Error updating top100 visibility:', error);
         throw error;
       }
-
-      console.log('Successfully updated top100_visible to:', checked);
 
       // Invalidate the profile query to refresh the UI
       queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });
       
     } catch (error) {
-      console.error('Error updating top100 visibility:', error);
+      // Error is thrown and handled by caller
+      throw error;
     }
   };
 
