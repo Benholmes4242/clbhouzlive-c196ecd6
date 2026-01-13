@@ -673,8 +673,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </div>
           </div>
         )}
+      </div>
 
-        {/* Course bottom sheet */}
+      {/* Course bottom sheet - positioned above filters */}
+      <div className="relative z-50">
         <MapCourseSheet
           course={selectedCourse}
           onClose={() => setSelectedCourse(null)}
