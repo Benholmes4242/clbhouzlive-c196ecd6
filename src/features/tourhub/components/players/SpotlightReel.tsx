@@ -219,17 +219,19 @@ export function SpotlightReel({
   }, []);
 
   // Pause on touch/mouse interaction
-  const handleInteractionStart = () => {
+  const handleInteractionStart = useCallback(() => {
     setIsPaused(true);
     if (autoScrollRef.current) {
       clearInterval(autoScrollRef.current);
+      autoScrollRef.current = null;
     }
-  };
+  }, []);
 
-  const handleInteractionEnd = () => {
-    // Resume after 3 seconds of no interaction
-    setTimeout(() => setIsPaused(false), 3000);
-  };
+  const handleInteractionEnd = useCallback(() => {
+    // Resume after 4 seconds of no interaction
+    const timeoutId = setTimeout(() => setIsPaused(false), 4000);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   if (spotlightPlayers.length === 0) return null;
 
