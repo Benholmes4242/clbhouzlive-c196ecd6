@@ -6,6 +6,7 @@ import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { type Timeframe } from '@/lib/timeWindow';
+import { FLAGS } from '@/config/flags';
 
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
@@ -17,6 +18,9 @@ import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
+// TEMP: Mock data for UI "busy state" testing – safe to delete
+import { MOCK_FRIENDS_COURSES_BUSY } from './mockFriendsCoursesBusy';
+
 type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
 
 const FriendsCoursesPanel: React.FC = () => {
@@ -25,7 +29,11 @@ const FriendsCoursesPanel: React.FC = () => {
   const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
 
   // Fetch data with timeframe passed to hook (server-side filtering)
-  const { data: sourceData, isLoading, isError, error } = useFriendsCourses(user?.id, timeframe);
+  const { data: realData, isLoading: isRealLoading, isError, error } = useFriendsCourses(user?.id, timeframe);
+  
+  // TEMP: Use mock data when flag is enabled – safe to delete this block
+  const sourceData = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIENDS_COURSES_BUSY : realData;
+  const isLoading = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? false : isRealLoading;
 
   // Error handling: log and toast once when error occurs
   useEffect(() => {
