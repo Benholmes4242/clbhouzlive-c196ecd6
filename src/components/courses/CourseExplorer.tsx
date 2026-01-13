@@ -417,12 +417,7 @@ const CourseExplorer = () => {
       {/* Region + sub-region filters */}
       <div className="max-w-xl mx-auto flex items-center justify-center gap-3" role="group" aria-label="Course filters">
         {/* Primary region */}
-        <div className="flex-1 relative">
-          {isFetching && selectedRegion !== PRIMARY_REGIONS.ALL && (
-            <div className="absolute -top-1 -right-1 z-10">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            </div>
-          )}
+        <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
@@ -451,12 +446,7 @@ const CourseExplorer = () => {
         </div>
 
         {/* Sub-region */}
-        <div className="flex-1 relative">
-          {isFetching && selectedSubregion !== 'all' && (
-            <div className="absolute -top-1 -right-1 z-10">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            </div>
-          )}
+        <div className="flex-1">
           <Select
             value={selectedSubregion}
             onValueChange={setSelectedSubregion}
