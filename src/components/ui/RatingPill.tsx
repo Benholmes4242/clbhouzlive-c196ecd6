@@ -74,9 +74,10 @@ export function RatingPill({ score, tier, label, showRatingInPill = false, class
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
         'border rating-label-transition',
+        // UNIFIED: amber-500 bg for Outstanding, gray-500 bg for rest
         isOutstanding 
-          ? 'bg-amber-100 border-amber-300 text-amber-700'
-          : 'bg-gray-100 border-gray-200 text-gray-600',
+          ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white border-amber-500'
+          : 'bg-gray-500 text-white border-gray-500',
         className
       )}
       data-transitioning={isTransitioning}

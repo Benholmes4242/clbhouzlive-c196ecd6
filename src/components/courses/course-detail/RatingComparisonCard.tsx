@@ -82,12 +82,16 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
               </span>
             </div>
 
-            {/* Dual bars */}
-            <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
+            {/* Dual bars - amber for Outstanding (9+), grey otherwise */}
+            <div className="relative h-2.5 w-full rounded-full bg-gray-100 overflow-hidden">
               {/* Community bar (background) */}
               {row.community !== null && (
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/40"
+                  className={`absolute inset-y-0 left-0 rounded-full ${
+                    row.community >= 9 
+                      ? 'bg-amber-300' 
+                      : 'bg-gray-200'
+                  }`}
                   style={{ width: `${getPercentage(row.community)}%` }}
                 />
               )}
@@ -95,7 +99,11 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
               {/* Your bar (foreground) */}
               {row.you !== null && (
                 <div
-                  className="relative h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
+                  className={`relative h-full rounded-full transition-[width] duration-500 ease-out ${
+                    row.you >= 9 
+                      ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+                      : 'bg-gray-300'
+                  }`}
                   style={{ width: `${getPercentage(row.you)}%` }}
                 />
               )}
