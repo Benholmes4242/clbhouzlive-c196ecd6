@@ -1,7 +1,7 @@
 /**
- * MapCourseSheet - Bottom sheet for selected course on the Top 100 Map
+ * MapCourseSheet - World-class bottom sheet for selected course on the Top 100 Map
  * Draggable between peek, half, and full states with course photo hero
- * Includes journey actions: Mark Played, Want to Play (Wishlist removed)
+ * Features premium glassmorphism, smooth spring animations, and journey actions
  */
 
 import React, { useState, useCallback } from 'react';
@@ -76,12 +76,14 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const [sheetState, setSheetState] = useState<SheetState>('half');
+  const [imageLoaded, setImageLoaded] = useState(false);
   const sheetRef = React.useRef<HTMLDivElement>(null);
 
   // Reset sheet state when course changes (for seamless marker switching)
   React.useEffect(() => {
     if (course) {
       setSheetState('half');
+      setImageLoaded(false);
     }
   }, [course?.id]);
 
@@ -187,14 +189,25 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     return labels[scopeKey] || 'Global';
   };
 
-  const getStatusLabel = (): { text: string; className: string } => {
+  const getStatusLabel = (): { text: string; className: string; icon?: React.ReactNode } => {
     if (course?.user_has_rated) {
-      return { text: '✓ Played', className: 'bg-emerald-500/90 text-white' };
+      return { 
+        text: 'Played', 
+        className: 'bg-emerald-500/95 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]',
+        icon: <Check className="h-3 w-3 mr-1" />
+      };
     }
     if (isWantToPlay) {
-      return { text: 'Want to Play', className: 'bg-[#F7931E]/90 text-white' };
+      return { 
+        text: 'Want to Play', 
+        className: 'bg-[#F7931E]/95 text-white shadow-[0_2px_8px_rgba(247,147,30,0.3)]',
+        icon: <Bookmark className="h-3 w-3 mr-1 fill-current" />
+      };
     }
-    return { text: 'Not Played', className: 'bg-white/90 text-slate-600 dark:bg-slate-800/90 dark:text-slate-300' };
+    return { 
+      text: 'Not Played', 
+      className: 'bg-white/95 text-slate-600 dark:bg-slate-800/95 dark:text-slate-300 shadow-sm' 
+    };
   };
 
   if (!course) return null;
@@ -203,14 +216,15 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
   const statusBadge = getStatusLabel();
 
   return (
-    <AnimatePresence>
-      {/* Backdrop - tap to dismiss */}
+    <AnimatePresence mode="wait">
+      {/* Backdrop - tap to dismiss with subtle blur */}
       <motion.div
         key="sheet-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 z-30"
+        transition={{ duration: 0.2 }}
+        className="absolute inset-0 z-30 bg-black/10 backdrop-blur-[1px]"
         onClick={onClose}
       />
       
@@ -220,10 +234,15 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         initial={{ y: '100%' }}
         animate={{ y: 0, height: SHEET_HEIGHTS[sheetState] }}
         exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+        transition={{ 
+          type: 'spring', 
+          damping: 32, 
+          stiffness: 400,
+          mass: 0.8
+        }}
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.15}
+        dragElastic={0.1}
         onDragEnd={handleDragEnd}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -231,71 +250,87 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         aria-labelledby="course-sheet-title"
         className={cn(
           'absolute bottom-0 left-0 right-0 z-40',
-          'rounded-t-[20px]',
+          'rounded-t-[24px]',
           'bg-white dark:bg-slate-900',
           'border-t border-slate-200/50 dark:border-slate-700/50',
-          'shadow-[0_-8px_40px_rgba(0,0,0,0.15)]',
+          'shadow-[0_-12px_50px_rgba(0,0,0,0.2)]',
           'flex flex-col',
           'overflow-hidden'
         )}
       >
-        {/* Drag handle pill */}
-        <div className="flex-shrink-0 pt-2.5 pb-1.5 flex justify-center">
-          <div className="w-9 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+        {/* Drag handle pill - premium centered */}
+        <div className="flex-shrink-0 pt-3 pb-2 flex justify-center">
+          <div className="w-10 h-1 rounded-full bg-slate-300/80 dark:bg-slate-600/80" />
         </div>
 
-        {/* Expand/collapse hint */}
+        {/* Expand/collapse hint button */}
         <button
           onClick={() => setSheetState(sheetState === 'full' ? 'half' : 'full')}
-          className="absolute top-2 right-3 p-2 text-slate-400 hover:text-slate-600"
+          className={cn(
+            'absolute top-2.5 right-3 p-2 rounded-full',
+            'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
+            'hover:bg-slate-100 dark:hover:bg-slate-800',
+            'transition-colors duration-150'
+          )}
+          aria-label={sheetState === 'full' ? 'Collapse sheet' : 'Expand sheet'}
         >
           <ChevronUp
             className={cn(
-              'h-4 w-4 transition-transform duration-200',
+              'h-4 w-4 transition-transform duration-300',
               sheetState === 'full' && 'rotate-180'
             )}
           />
         </button>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Course hero image - full width, rounded top */}
-          <div className="relative w-full h-36 overflow-hidden">
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          {/* Course hero image - full width with smooth loading */}
+          <div className="relative w-full h-40 overflow-hidden">
             {thumbnailImage ? (
               <>
+                {/* Blur-up placeholder */}
+                {!imageLoaded && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 animate-pulse" />
+                )}
                 <img
                   src={thumbnailImage}
                   alt={course.name}
-                  className="w-full h-full object-cover"
+                  className={cn(
+                    'w-full h-full object-cover transition-opacity duration-300',
+                    imageLoaded ? 'opacity-100' : 'opacity-0'
+                  )}
+                  onLoad={() => setImageLoaded(true)}
                 />
                 {/* Gradient overlay for text legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
               </>
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/30 dark:to-emerald-800/30 flex items-center justify-center">
-                <Flag className="h-10 w-10 text-emerald-400 dark:text-emerald-600" />
+                <Flag className="h-12 w-12 text-emerald-400 dark:text-emerald-600 opacity-60" />
               </div>
             )}
             
-            {/* Status badge overlaid on image */}
+            {/* Status badge overlaid on image - premium pill */}
             <div className="absolute top-3 right-3">
               <span
                 className={cn(
-                  'inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm',
+                  'inline-flex items-center px-2.5 py-1 rounded-full',
+                  'text-[11px] font-semibold backdrop-blur-md',
                   statusBadge.className
                 )}
               >
+                {statusBadge.icon}
                 {statusBadge.text}
               </span>
             </div>
           </div>
 
-          {/* Course info - below hero */}
+          {/* Course info - below hero with refined spacing */}
           <div className="px-5 pt-4 pb-6">
             {/* Course name with tooltip for truncated text */}
             <h3 
               id="course-sheet-title"
-              className="text-lg font-bold text-slate-900 dark:text-white leading-tight line-clamp-2"
+              className="text-xl font-bold text-slate-900 dark:text-white leading-tight line-clamp-2"
               title={course.name}
             >
               {course.name}
@@ -303,7 +338,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
             {/* Location with tooltip */}
             <p 
-              className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-1"
+              className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-1"
               title={`${course.sub_country ? `${course.sub_country}, ` : ''}${course.country}${course.region ? ` · ${course.region}` : ''}`}
             >
               {course.sub_country && `${course.sub_country}, `}
@@ -311,31 +346,46 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               {course.region && ` · ${course.region}`}
             </p>
 
-            {/* Pill badges row */}
-            <div className="flex flex-wrap items-center gap-2 mt-3">
-              {/* Rank pill */}
+            {/* Pill badges row - premium styling */}
+            <div className="flex flex-wrap items-center gap-2 mt-4">
+              {/* Rank pill with icon */}
               {typeof course.rank === 'number' && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-900 text-white text-xs font-medium">
-                  <Globe className="h-3 w-3" />
+                <span className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full',
+                  'bg-slate-900 dark:bg-white text-white dark:text-slate-900',
+                  'text-xs font-semibold shadow-sm'
+                )}>
+                  <Globe className="h-3.5 w-3.5" />
                   #{course.rank} {getRegionLabel(scope)}
                 </span>
               )}
               
-              {/* User rating pill */}
+              {/* User rating pill - gold accent */}
               {course.user_has_rated && course.user_rating && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 text-xs font-medium">
-                  <Star className="h-3 w-3 fill-current" />
+                <span className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full',
+                  'bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+                  'text-xs font-semibold',
+                  'border border-amber-200/50 dark:border-amber-700/50'
+                )}>
+                  <Star className="h-3.5 w-3.5 fill-current" />
                   Your rating: {course.user_rating.toFixed(1)}
                 </span>
               )}
             </div>
 
-            {/* CTAs - only visible when half/full */}
+            {/* CTAs - only visible when half/full - premium button styling */}
             {showCtAs && (
-              <div className="space-y-3 mt-5">
-                {/* Primary action */}
+              <div className="space-y-3 mt-6">
+                {/* Primary action - View course */}
                 <Button
-                  className="w-full"
+                  className={cn(
+                    'w-full h-11',
+                    'bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100',
+                    'text-white dark:text-slate-900',
+                    'font-medium shadow-sm',
+                    'active:scale-[0.98] transition-all duration-150'
+                  )}
                   onClick={() => navigate(`/courses/${course.id}`)}
                 >
                   View course
@@ -343,11 +393,16 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 
                 {/* Journey actions - only if not played */}
                 {!course.user_has_rated && user && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2.5">
                     {/* Mark as Played */}
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className={cn(
+                        'flex-1 h-10',
+                        'border-slate-200 dark:border-slate-700',
+                        'hover:bg-slate-50 dark:hover:bg-slate-800',
+                        'active:scale-[0.98] transition-all duration-150'
+                      )}
                       onClick={() => navigate(`/courses/${course.id}/rate`)}
                     >
                       <Check className="h-4 w-4 mr-1.5" />
@@ -358,8 +413,11 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     <Button
                       variant={isWantToPlay ? 'default' : 'outline'}
                       className={cn(
-                        "flex-1",
-                        isWantToPlay && 'bg-[#F7931E] hover:bg-[#F7931E]/90'
+                        "flex-1 h-10 transition-all duration-200",
+                        isWantToPlay 
+                          ? 'bg-[#F7931E] hover:bg-[#F7931E]/90 text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]' 
+                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800',
+                        'active:scale-[0.98]'
                       )}
                       onClick={() => toggleWantToPlayMutation.mutate()}
                       disabled={isUpdating}
