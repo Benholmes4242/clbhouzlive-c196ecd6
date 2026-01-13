@@ -25,16 +25,16 @@ interface RatingBarProps {
 export function RatingBar({
   value,
   max = 10,
-  showOutstandingGold = false,
+  showOutstandingGold = true,
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   
-  // New color system: slate for all, gold only for Outstanding (9.0+)
+  // UNIFIED COLOR SYSTEM: amber for Outstanding (9.0+), grey for rest
   const isOutstanding = showOutstandingGold && value >= 9.0;
   const fillColor = isOutstanding 
-    ? 'var(--rating-bar-fill-outstanding)' 
-    : 'var(--rating-bar-fill-neutral)';
+    ? '#f59e0b'  // amber-500
+    : '#9ca3af'; // gray-400
 
   return (
     <div
@@ -44,7 +44,7 @@ export function RatingBar({
       )}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: '#E8ECEF',
+        backgroundColor: '#f3f4f6', // gray-100
         borderRadius: 'var(--rating-bar-radius)',
       }}
     >
