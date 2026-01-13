@@ -111,8 +111,16 @@ function getNotificationBadgeIcon(type: string) {
     case 'golfer_verification_removed':
       return <ShieldOff className={cn(iconClass, "text-red-500")} />;
     // Game & Trip notifications
+    case 'game_request':
+      return <UserPlus className={cn(iconClass, "text-amber-500")} />;
+    case 'game_request_accepted':
+      return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
+    case 'game_request_declined':
+      return <X className={cn(iconClass, "text-red-500")} />;
     case 'game_invite':
       return <CalendarDays className={cn(iconClass, "text-emerald-500")} />;
+    case 'game_cancelled':
+      return <X className={cn(iconClass, "text-red-500")} />;
     case 'rsvp_update':
       return <UserCheck className={cn(iconClass, "text-emerald-500")} />;
     case 'game_reminder_24h':
@@ -122,6 +130,16 @@ function getNotificationBadgeIcon(type: string) {
       return <CalendarDays className={cn(iconClass, "text-blue-500")} />;
     case 'game_completed':
       return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
+    case 'trip_request':
+      return <UserPlus className={cn(iconClass, "text-amber-500")} />;
+    case 'trip_request_accepted':
+      return <CheckCircle2 className={cn(iconClass, "text-emerald-500")} />;
+    case 'trip_request_declined':
+      return <X className={cn(iconClass, "text-red-500")} />;
+    case 'trip_invite':
+      return <MapPin className={cn(iconClass, "text-emerald-500")} />;
+    case 'trip_cancelled':
+      return <X className={cn(iconClass, "text-red-500")} />;
     case 'trip_created':
     case 'trip_game_added':
     case 'trip_reminder':
@@ -1000,9 +1018,145 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 17) GAME INVITE - You've been invited to a game
+     * 17) GAME REQUEST - Someone wants to join your game (Host receives)
      */
-    case 'game_invite': {
+    case 'game_request': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      const requesterName = actorName;
+      const requestMessage = data?.request_message;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{requesterName}</span>{' '}
+              <span className="font-normal text-muted-foreground">wants to join your game</span>
+            </>
+          }
+          subtext={requestMessage || courseName}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View requests
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 18) GAME REQUEST ACCEPTED - Your request was accepted (Requester receives)
+     */
+    case 'game_request_accepted': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_request_accepted.title}
+            </span>
+          }
+          subtext={`Your request to join ${courseName} was accepted`}
+          meta={notification.time_ago}
+          actions={
+            <div className="flex items-center gap-2">
+              <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+                <CheckCircle2 className="h-3 w-3" />
+                Accepted
+              </span>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onClick(); }}
+                className={getNotificationButtonClass('primary')}
+              >
+                View game
+              </button>
+            </div>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 19) GAME REQUEST DECLINED - Your request was declined (Requester receives)
+     */
+    case 'game_request_declined': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_request_declined.title}
+            </span>
+          }
+          subtext={`Your request to join ${courseName} was declined`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              <X className="h-3 w-3" />
+              Declined
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 20) GAME CANCELLED - Game has been cancelled
+     */
+    case 'game_cancelled': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const courseName = data?.course_name || 'Golf Course';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.game_cancelled.title}
+            </span>
+          }
+          subtext={`The game at ${courseName} has been cancelled`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              Cancelled
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 21) GAME INVITE - You've been invited to a game
       const statusIcon = getNotificationBadgeIcon(type);
       const courseName = data?.course_name || 'Golf Course';
       const date = data?.date || '';
@@ -1215,7 +1369,182 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 23) TRIP CREATED - You've been added to a trip
+     * 27) TRIP REQUEST - Someone wants to join your trip (Organizer receives)
+     */
+    case 'trip_request': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      const requesterName = actorName;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{requesterName}</span>{' '}
+              <span className="font-normal text-muted-foreground">wants to join your trip</span>
+            </>
+          }
+          subtext={tripName}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View requests
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 28) TRIP REQUEST ACCEPTED - Your request was accepted (Requester receives)
+     */
+    case 'trip_request_accepted': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.trip_request_accepted.title}
+            </span>
+          }
+          subtext={`Your request to join ${tripName} was accepted`}
+          meta={notification.time_ago}
+          actions={
+            <div className="flex items-center gap-2">
+              <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+                <CheckCircle2 className="h-3 w-3" />
+                Accepted
+              </span>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onClick(); }}
+                className={getNotificationButtonClass('primary')}
+              >
+                View trip
+              </button>
+            </div>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 29) TRIP REQUEST DECLINED - Your request was declined (Requester receives)
+     */
+    case 'trip_request_declined': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.trip_request_declined.title}
+            </span>
+          }
+          subtext={`Your request to join ${tripName} was declined`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              <X className="h-3 w-3" />
+              Declined
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 30) TRIP INVITE - You've been invited to a trip
+     */
+    case 'trip_invite': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      const organizerName = data?.organizer_name || actorName;
+      const tripDates = data?.trip_dates || '';
+      const subcopy = [tripName, tripDates].filter(Boolean).join(' · ');
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{organizerName}</span>{' '}
+              <span className="font-normal text-muted-foreground">invited you to a trip</span>
+            </>
+          }
+          subtext={subcopy}
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className={getNotificationButtonClass('primary')}
+            >
+              View trip
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 31) TRIP CANCELLED - Trip has been cancelled
+     */
+    case 'trip_cancelled': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const tripName = data?.trip_name || 'Golf Trip';
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {GAME_NOTIFICATION_COPY.trip_cancelled.title}
+            </span>
+          }
+          subtext={`${tripName} has been cancelled`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              Cancelled
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 32) TRIP CREATED - You've been added to a trip
      */
     case 'trip_created': {
       const statusIcon = getNotificationBadgeIcon(type);
