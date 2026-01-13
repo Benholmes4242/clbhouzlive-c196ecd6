@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, Share2, MoreVertical, MapPin, Calendar, Users, Bell, UserPlus, Flag } from 'lucide-react';
+import { ChevronLeft, Share2, MoreVertical, MapPin, Calendar, Users, Bell, UserPlus, Flag, Pencil, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { useGameDetail } from '@/features/game/hooks/useGameDetail';
 import { useGameRsvp, RsvpStatus } from '@/features/hub/hooks/useGameRsvp';
@@ -14,12 +14,15 @@ import { RsvpStrip } from '@/features/hub/components/rsvp/RsvpStrip';
 import { InviteToGameModal } from '@/features/hub/components/invite/InviteToGameModal';
 import { GameRemindersSheet } from '@/features/hub/components/reminders/GameRemindersSheet';
 import { EndGameSheet } from '@/features/hub/components/game/EndGameSheet';
+import { EditGameSheet } from '@/features/hub/components/edit-game/EditGameSheet';
+import { CancelGameDialog } from '@/features/hub/components/CancelGameDialog';
 import { cn } from '@/lib/utils';
 import HcpBadge from '@/components/HcpBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
@@ -58,6 +61,8 @@ export function GameDetailPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [remindersOpen, setRemindersOpen] = useState(false);
   const [endGameOpen, setEndGameOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
   
   // Computed flags
   const isHost = !!currentUserId && game?.host_user_id === currentUserId;
@@ -128,6 +133,18 @@ export function GameDetailPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                {isHost && !isCompleted && (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => setEditOpen(true)}
+                      className="gap-2"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Edit game
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem 
                   onClick={() => setRemindersOpen(true)}
                   disabled={isCompleted}
@@ -137,13 +154,23 @@ export function GameDetailPage() {
                   Reminders
                 </DropdownMenuItem>
                 {isHost && !isCompleted && (
-                  <DropdownMenuItem 
-                    onClick={() => setEndGameOpen(true)} 
-                    className="gap-2 text-orange-600 focus:text-orange-600"
-                  >
-                    <Flag className="w-4 h-4" />
-                    End game
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => setEndGameOpen(true)} 
+                      className="gap-2 text-orange-600 focus:text-orange-600"
+                    >
+                      <Flag className="w-4 h-4" />
+                      End game
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => setCancelOpen(true)} 
+                      className="gap-2 text-red-600 focus:text-red-600"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Cancel game
+                    </DropdownMenuItem>
+                  </>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -234,6 +261,25 @@ export function GameDetailPage() {
         gameId={gameId!}
         onSuccess={refetch}
       />
+
+      {isHost && (
+        <>
+          <EditGameSheet
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            game={game}
+            onSuccess={refetch}
+          />
+          <CancelGameDialog
+            open={cancelOpen}
+            onClose={() => setCancelOpen(false)}
+            gameId={gameId!}
+            courseName={game.course_name}
+            participantCount={participants.length}
+            onSuccess={() => navigate('/hub')}
+          />
+        </>
+      )}
     </div>
   );
 }
