@@ -24,7 +24,7 @@ const Slider = React.forwardRef<
           className={cn(
             "absolute h-full transition-colors",
             isOutstanding 
-              ? "bg-gradient-to-r from-amber-500 to-amber-400" 
+              ? "bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]" 
               : "bg-gray-300"
           )} 
         />
@@ -33,7 +33,7 @@ const Slider = React.forwardRef<
         className={cn(
           "block h-5 w-5 rounded-full border-2 shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           isOutstanding 
-            ? "bg-amber-500 border-amber-500 focus-visible:ring-amber-400 hover:bg-amber-600 hover:border-amber-600" 
+            ? "bg-[#F79E1B] border-[#F79E1B] focus-visible:ring-[#FFAF30] hover:bg-[#E8890F] hover:border-[#E8890F]" 
             : "bg-gray-400 border-gray-400 focus-visible:ring-gray-400"
         )} 
       />
