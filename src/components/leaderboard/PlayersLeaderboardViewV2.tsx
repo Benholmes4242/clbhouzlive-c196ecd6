@@ -565,7 +565,7 @@ export function PlayersLeaderboardViewV2() {
         />
       </div>
 
-      {/* Filters row: Players From + Time Range (for applicable modes) - centered, full width */}
+      {/* Filters row: Players From + Time Range side by side (for applicable modes) */}
       <AnimatePresence mode="wait">
         {(showPlayersFromFilter || showTimeRangeFilter) && (
           <motion.div
@@ -573,23 +573,27 @@ export function PlayersLeaderboardViewV2() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="px-4 pb-4 space-y-4"
+            className="px-4 pb-4"
           >
-            {showPlayersFromFilter && (
-              <PlayersFromFilter
-                value={playersFrom}
-                onChange={handlePlayersFromChange}
-                userCountry={currentUserProfile?.homeClubCountry}
-                className="w-full"
-              />
-            )}
-            {showTimeRangeFilter && (
-              <TimeRangeFilter
-                value={timeRange}
-                onChange={handleTimeRangeChange}
-                className="w-full"
-              />
-            )}
+            <div className="flex gap-3">
+              {showPlayersFromFilter && (
+                <div className="flex-1">
+                  <PlayersFromFilter
+                    value={playersFrom}
+                    onChange={handlePlayersFromChange}
+                    userCountry={currentUserProfile?.homeClubCountry}
+                  />
+                </div>
+              )}
+              {showTimeRangeFilter && (
+                <div className="flex-1">
+                  <TimeRangeFilter
+                    value={timeRange}
+                    onChange={handleTimeRangeChange}
+                  />
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

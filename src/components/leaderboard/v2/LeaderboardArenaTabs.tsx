@@ -77,7 +77,7 @@ export function LeaderboardArenaTabs({
         <div 
           role="tablist" 
           aria-label="Leaderboard views"
-          className="inline-flex gap-0 min-w-max border-b border-border/30"
+        className="inline-flex gap-0 min-w-max"
         >
           {ARENA_TABS.map((tab) => {
             const Icon = tab.icon;
