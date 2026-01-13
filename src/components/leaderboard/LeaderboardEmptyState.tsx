@@ -53,8 +53,9 @@ const EMPTY_STATES: Record<EmptyStateType, {
   },
   'rising-coming-soon': {
     icon: TrendingUp,
-    title: 'Fast Climbers',
-    body: "We're building the rank tracking system. This feature will show the biggest movers each month — coming soon!",
+    title: 'Most Active This Month',
+    body: 'No players have logged Top 100 courses in the last 30 days. Be the first!',
+    cta: { label: 'Explore Top 100', action: 'show-top100' },
   },
   'courses-friends-no-friends': {
     icon: Users,

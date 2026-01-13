@@ -4576,6 +4576,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_rank_snapshots: {
+        Row: {
+          created_at: string | null
+          global_rank: number | null
+          id: string
+          snapshot_date: string
+          total_top100_played: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          global_rank?: number | null
+          id?: string
+          snapshot_date: string
+          total_top100_played?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          global_rank?: number | null
+          id?: string
+          snapshot_date?: string
+          total_top100_played?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       logos: {
         Row: {
           category: string
@@ -10321,6 +10348,7 @@ export type Database = {
         Returns: boolean
       }
       canonical_club_name_v2: { Args: { p_name: string }; Returns: string }
+      capture_leaderboard_snapshot: { Args: never; Returns: undefined }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {
@@ -10910,6 +10938,19 @@ export type Database = {
         Returns: string[]
       }
       get_default_creator_page: { Args: { p_user_id: string }; Returns: string }
+      get_fast_climbers: {
+        Args: { days_param?: number; limit_param?: number }
+        Returns: {
+          courses_logged_recently: number
+          display_name: string
+          global_rank: number
+          home_club: string
+          profile_photo_url: string
+          total_top100_played: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_friends_first_post_ids: {
         Args: {
           p_current_user_id: string

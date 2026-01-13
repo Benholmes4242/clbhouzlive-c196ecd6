@@ -38,9 +38,9 @@ const ARENA_TABS: ArenaTab[] = [
   },
   { 
     id: 'climbers', 
-    label: 'Fast Climbers', 
+    label: 'Most Active', 
     icon: TrendingUp,
-    description: 'Biggest movers this month'
+    description: 'Players logging the most Top 100 courses this month'
   },
   { 
     id: 'nearby', 
@@ -108,7 +108,7 @@ export function LeaderboardArenaTabs({
                   <Icon className="w-3.5 h-3.5" />
                   {/* Shorter labels on mobile */}
                   <span className="hidden xs:inline">{tab.label}</span>
-                  <span className="xs:hidden">{tab.id === 'friends' ? 'Friends' : tab.id === 'climbers' ? 'Climbers' : tab.id === 'regional' ? 'Regional' : tab.label}</span>
+                  <span className="xs:hidden">{tab.id === 'friends' ? 'Friends' : tab.id === 'climbers' ? 'Active' : tab.id === 'regional' ? 'Regional' : tab.label}</span>
                 </span>
               </motion.button>
             );
