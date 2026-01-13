@@ -164,15 +164,15 @@ export function Top100RegionProgressGrid({
                   </div>
                 </div>
 
-                {/* Right side: percentage above bar + region-colored progress fill */}
+                {/* Right side: percentage above bar + region-colored progress fill with gradient */}
                 <div className="flex flex-col items-end gap-1 flex-shrink-0 min-w-[100px]">
-                  <span className="text-[9px] text-muted-foreground font-medium">
+                  <span className="text-[9px] text-muted-foreground font-medium tabular-nums">
                     {remainingPercent}% remaining
                   </span>
 
-                {/* Progress bar with region-colored fill */}
+                {/* Progress bar with gradient fill */}
                   <div 
-                    className="w-full h-1.5 rounded-full bg-border/60 overflow-hidden"
+                    className="w-full h-1.5 rounded-full bg-slate-200/70 overflow-hidden"
                     role="progressbar"
                     aria-valuenow={Math.round(progressPercent)}
                     aria-valuemin={0}
@@ -181,10 +181,14 @@ export function Top100RegionProgressGrid({
                   >
                     <div
                       className={cn(
-                        "h-full rounded-full transition-all duration-200 group-hover:opacity-90",
+                        "h-full rounded-full transition-all duration-300 group-hover:shadow-sm",
                         regionColors.fill
                       )}
-                      style={{ width: `${progressPercent}%` }}
+                      style={{ 
+                        width: `${progressPercent}%`,
+                        // Add subtle gradient overlay
+                        backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 100%)',
+                      }}
                     />
                   </div>
                 </div>

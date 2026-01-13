@@ -41,12 +41,12 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
 
   return (
     <div className="mt-10 px-4">
-      {/* Section header */}
-      <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">
+      {/* Section header - consistent styling */}
+      <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
         Top 100 list completions
       </p>
 
-      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide scroll-smooth snap-x snap-mandatory">
         {ordered.map((progress, idx) => {
           const slug = COMPLETION_LIST_SLUGS[idx];
           const played = progress?.played ?? 0;
@@ -58,7 +58,7 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
               key={slug}
               type="button"
               onClick={() => onCardClick(slug, played, total)}
-              className="text-left"
+              className="text-left snap-start flex-shrink-0 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
               aria-label={`${getListLabel(slug, complete)}: ${played} of ${total} courses played`}
             >
               <EliteGameCard
