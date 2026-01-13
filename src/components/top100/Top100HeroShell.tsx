@@ -136,34 +136,29 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </motion.div>
         </div>
 
-        {/* FULL-BLEED PROGRESS SLAB - uses design system tokens */}
+        {/* PROGRESS SECTION - on page background with slate text */}
         {showProgress && (
-          <div 
-            className="w-full px-4 py-3"
-            style={{ 
-              background: 'linear-gradient(to bottom, var(--surface-slate) 0%, hsl(215 16% 47%) 50%, hsl(215 16% 60%) 100%)',
-            }}
-          >
+          <div className="w-full px-4 py-4 bg-slate-50">
             {/* Top row: X / total (primary) + % complete (secondary) */}
             <div className="flex items-baseline justify-between gap-4">
-              <div className="text-white">
+              <div className="text-slate-800">
                 <AnimatedNumber 
                   value={playedCount}
                   minCh={1}
-                  className="text-3xl font-semibold leading-none drop-shadow-sm tabular-nums"
+                  className="text-3xl font-semibold leading-none tabular-nums"
                 />
-                <span className="text-white/70 text-lg ml-0.5 font-light">/{totalCount}</span>
+                <span className="text-slate-500 text-lg ml-0.5 font-light">/{totalCount}</span>
               </div>
 
-              <div className="flex items-baseline gap-1.5 text-white">
+              <div className="flex items-baseline gap-1.5 text-slate-800">
                 <AnimatedNumber 
                   value={Math.round(percent)}
                   suffix="%"
                   minCh={1}
                   delay={0.1}
-                  className="text-lg font-semibold drop-shadow-sm tabular-nums"
+                  className="text-lg font-semibold tabular-nums"
                 />
-                <span className="text-[11px] text-white/70 font-medium">
+                <span className="text-[11px] text-slate-500 font-medium">
                   complete
                 </span>
               </div>
@@ -171,7 +166,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
 
             {/* Progress bar - uses regional accent color with glow */}
             <div className="mt-2.5">
-              <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   initial={{ width: 0 }}
