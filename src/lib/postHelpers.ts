@@ -53,14 +53,14 @@ const slateOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   overlayText: '#FFFFFF',
 };
 
-// Brand orange theme for outstanding ratings (on dark backgrounds)
-// Uses unified brand orange (#F79E1B) instead of old gold
+// Brand orange gradient theme for outstanding ratings (on dark backgrounds)
+// Uses amber→orange gradient (#FFAF30 → #F79E1B) for warmth and depth
 const goldOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(247, 158, 27, 0.15)',        // Brand orange with 15% opacity
-  pillBorder: 'rgba(247, 158, 27, 0.5)',     // Brand orange with 50% opacity
-  pillText: '#F79E1B',                        // Brand orange
-  containerBg: 'rgba(247, 158, 27, 0.08)',   // Brand orange with 8% opacity
-  containerBorder: 'rgba(247, 158, 27, 0.3)', // Brand orange with 30% opacity
+  pillBg: 'linear-gradient(135deg, rgba(255, 175, 48, 0.15) 0%, rgba(247, 158, 27, 0.2) 100%)',
+  pillBorder: 'rgba(255, 175, 48, 0.5)',       // Lighter amber border
+  pillText: '#F79E1B',                          // Brand orange for text
+  containerBg: 'linear-gradient(135deg, rgba(255, 175, 48, 0.1) 0%, rgba(247, 158, 27, 0.08) 100%)',
+  containerBorder: 'rgba(255, 175, 48, 0.3)',   // Lighter amber for border
   overlayText: '#FFFFFF',
 };
 
