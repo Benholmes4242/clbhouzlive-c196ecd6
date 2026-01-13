@@ -29,12 +29,12 @@ const tierConfig: Record<ScoreTier, {
   activeBorder: string;
 }> = {
   outstanding: { 
-    bg: 'bg-amber-50', 
-    text: 'text-amber-700', 
-    activeBg: 'bg-amber-500', 
+    bg: 'bg-gradient-to-r from-amber-500 to-amber-400', 
+    text: 'text-white', 
+    activeBg: 'bg-gradient-to-r from-amber-600 to-amber-500', 
     activeText: 'text-white',
-    border: 'border-amber-200',
-    activeBorder: 'border-amber-500',
+    border: 'border-amber-500',
+    activeBorder: 'border-amber-600',
   },
   excellent: { 
     bg: 'bg-gray-100', 
