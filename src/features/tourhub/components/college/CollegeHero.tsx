@@ -44,22 +44,34 @@ export function CollegeHero({ stats, college, className }: CollegeHeroProps) {
   
   return (
     <div className={cn('', className)}>
-      {/* Header with logo */}
-      <div className="flex items-center gap-4 mb-6">
-        {/* Logo */}
-        <div className="shrink-0 w-20 h-20 rounded-sq-xl bg-surface-card border border-border-subtle flex items-center justify-center overflow-hidden">
-          {college?.logo_url ? (
-            <img 
-              src={college.logo_url} 
-              alt={displayName}
-              className="w-16 h-16 object-contain"
-            />
-          ) : (
-            <GraduationCap className="w-10 h-10 text-text-tertiary" />
-          )}
+      {/* Header with premium logo */}
+      <div className="flex items-center gap-5 mb-6">
+        {/* Logo with premium depth */}
+        <div className="relative shrink-0">
+          {/* Subtle glow */}
+          <div className="absolute inset-0 rounded-sq-xl bg-primary/8 blur-xl scale-125" />
+          
+          <div className={cn(
+            "w-20 h-20 rounded-sq-xl bg-surface-card border border-border-subtle",
+            "flex items-center justify-center overflow-hidden relative",
+            "shadow-[0_4px_20px_-4px_rgba(0,0,0,0.12),0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+          )}>
+            {/* Glossy highlight */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none rounded-sq-xl" />
+            
+            {college?.logo_url ? (
+              <img 
+                src={college.logo_url} 
+                alt={displayName}
+                className="w-16 h-16 object-contain relative z-10"
+              />
+            ) : (
+              <GraduationCap className="w-10 h-10 text-text-tertiary relative z-10" />
+            )}
+          </div>
         </div>
         
-        {/* Name & subtitle */}
+        {/* Name & subtitle - Enhanced hierarchy */}
         <div>
           <h1 className="text-heading-xl font-bold text-text-primary">
             {displayName}

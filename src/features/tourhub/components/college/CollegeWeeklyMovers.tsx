@@ -99,13 +99,14 @@ export function CollegeWeeklyMovers({ limit = 8, className }: CollegeWeeklyMover
         ) : enrichedMovers && enrichedMovers.length > 0 ? (
           enrichedMovers.map((mover, idx) => {
             const displayName = mover.college?.short_name || mover.college?.college_name || mover.normalized_name;
+            const isTopThree = idx < 3;
             
             return (
               <Link
                 key={mover.id}
                 to={`/tourhub/college-golf/${mover.normalized_name}`}
                 className={cn(
-                  'flex items-center gap-3 p-3 rounded-sq-lg',
+                  'flex items-center gap-4 p-4 rounded-sq-lg',
                   'bg-surface-card border border-border-subtle',
                   'hover:border-primary/30 hover:bg-surface-card-hover transition-all duration-200',
                   'group'
@@ -113,62 +114,78 @@ export function CollegeWeeklyMovers({ limit = 8, className }: CollegeWeeklyMover
               >
                 {/* Rank */}
                 <div className="shrink-0 w-6 text-center">
-                  <span className="text-body-sm font-semibold text-text-tertiary">
+                  <span className={cn(
+                    "text-sm font-bold tabular-nums",
+                    isTopThree ? "text-primary" : "text-text-tertiary"
+                  )}>
                     {idx + 1}
                   </span>
                 </div>
                 
-                {/* Logo */}
-                <div className="shrink-0 w-12 h-12 rounded-sq-lg bg-background-secondary flex items-center justify-center overflow-hidden">
-                  {mover.college?.logo_url ? (
-                    <img 
-                      src={mover.college.logo_url} 
-                      alt={displayName}
-                      className="w-10 h-10 object-contain"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <span className="text-lg font-bold text-text-tertiary">
-                      {displayName.charAt(0).toUpperCase()}
-                    </span>
+                {/* Logo with premium depth */}
+                <div className="relative shrink-0">
+                  {isTopThree && (
+                    <div className="absolute inset-0 rounded-sq-lg bg-primary/10 blur-md scale-110" />
                   )}
-                </div>
-                
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-body-md font-medium text-text-primary truncate group-hover:text-primary transition-colors">
-                    {displayName}
-                  </p>
-                  <div className="flex items-center gap-3 text-body-xs text-text-secondary mt-0.5">
-                    <span className={cn(
-                      'inline-flex items-center gap-1',
-                      mover.earnings_delta >= 0 ? 'text-accent-success' : 'text-accent-error'
-                    )}>
-                      <DollarSign className="w-3 h-3" />
-                      {formatDelta(mover.earnings_delta, '$')}
-                    </span>
-                    {mover.wins_delta !== 0 && (
-                      <span className={cn(
-                        'inline-flex items-center gap-1',
-                        mover.wins_delta > 0 ? 'text-accent-warning' : 'text-text-secondary'
-                      )}>
-                        <Trophy className="w-3 h-3" />
-                        {formatDelta(mover.wins_delta)} win{Math.abs(mover.wins_delta) !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                    {mover.cuts_delta !== 0 && (
-                      <span className="inline-flex items-center gap-1">
-                        <Target className="w-3 h-3" />
-                        {formatDelta(mover.cuts_delta)} cuts
+                  <div className={cn(
+                    "w-12 h-12 rounded-sq-lg bg-background-secondary flex items-center justify-center overflow-hidden relative",
+                    "shadow-[0_2px_6px_-2px_rgba(0,0,0,0.1)]",
+                    isTopThree && "shadow-[0_2px_12px_-2px_rgba(var(--primary),0.15)]"
+                  )}>
+                    {/* Glossy highlight */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+                    
+                    {mover.college?.logo_url ? (
+                      <img 
+                        src={mover.college.logo_url} 
+                        alt={displayName}
+                        className="w-10 h-10 object-contain relative z-10"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="text-lg font-bold text-text-tertiary relative z-10">
+                        {displayName.charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>
                 </div>
                 
-                {/* Rank Change */}
+                {/* Info - Enhanced hierarchy */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-body-md font-bold text-text-primary truncate group-hover:text-primary transition-colors">
+                    {displayName}
+                  </p>
+                  <div className="flex items-center gap-3 text-body-xs mt-1">
+                    {/* Primary metric - emphasized */}
+                    <span className={cn(
+                      'inline-flex items-center gap-1 font-semibold',
+                      mover.earnings_delta >= 0 ? 'text-accent-success' : 'text-accent-error'
+                    )}>
+                      <DollarSign className="w-3.5 h-3.5" />
+                      {formatDelta(mover.earnings_delta, '$')}
+                    </span>
+                    {mover.wins_delta !== 0 && (
+                      <span className={cn(
+                        'inline-flex items-center gap-1 font-medium',
+                        mover.wins_delta > 0 ? 'text-accent-warning' : 'text-text-secondary'
+                      )}>
+                        <Trophy className="w-3.5 h-3.5" />
+                        {formatDelta(mover.wins_delta)}
+                      </span>
+                    )}
+                    {mover.cuts_delta !== 0 && (
+                      <span className="inline-flex items-center gap-1 text-text-tertiary">
+                        <Target className="w-3 h-3" />
+                        {formatDelta(mover.cuts_delta)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Rank Change - consistent alignment */}
                 {mover.earnings_rank_change !== null && mover.earnings_rank_change !== 0 && (
                   <div className={cn(
-                    'shrink-0 px-2 py-1 rounded-full text-body-xs font-semibold',
+                    'shrink-0 px-2.5 py-1 rounded-full text-xs font-bold self-center',
                     mover.earnings_rank_change > 0 
                       ? 'bg-accent-success/10 text-accent-success' 
                       : 'bg-accent-error/10 text-accent-error'

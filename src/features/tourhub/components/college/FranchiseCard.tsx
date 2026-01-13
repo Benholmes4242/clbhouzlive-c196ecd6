@@ -43,12 +43,14 @@ interface PerformanceRingProps {
   progress: number; // 0-1
   size?: number;
   strokeWidth?: number;
+  isTopThree?: boolean;
 }
 
-function PerformanceRing({ progress, size = 56, strokeWidth = 2.5 }: PerformanceRingProps) {
+function PerformanceRing({ progress, size = 56, strokeWidth = 2.5, isTopThree = false }: PerformanceRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - Math.min(1, Math.max(0, progress)));
+  const gradientId = isTopThree ? "performanceGradientGold" : "performanceGradient";
 
   return (
     <svg
@@ -72,7 +74,7 @@ function PerformanceRing({ progress, size = 56, strokeWidth = 2.5 }: Performance
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="url(#performanceGradient)"
+        stroke={`url(#${gradientId})`}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}
@@ -85,8 +87,68 @@ function PerformanceRing({ progress, size = 56, strokeWidth = 2.5 }: Performance
           <stop offset="0%" stopColor="hsl(var(--primary))" />
           <stop offset="100%" stopColor="hsl(var(--tab-orange))" />
         </linearGradient>
+        <linearGradient id="performanceGradientGold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="hsl(45, 93%, 47%)" />
+          <stop offset="100%" stopColor="hsl(36, 100%, 50%)" />
+        </linearGradient>
       </defs>
     </svg>
+  );
+}
+
+/** Premium medallion with glossy highlight + shadow depth */
+interface MedallionProps {
+  logoUrl?: string | null;
+  displayName: string;
+  isTopThree?: boolean;
+  progress: number;
+}
+
+function Medallion({ logoUrl, displayName, isTopThree = false, progress }: MedallionProps) {
+  return (
+    <div className="relative shrink-0">
+      {/* Subtle radial glow for top 3 */}
+      {isTopThree && (
+        <div 
+          className="absolute inset-0 rounded-full bg-amber-400/15 blur-xl scale-150"
+          style={{ animation: 'pulse 3s ease-in-out infinite' }}
+        />
+      )}
+      
+      {/* Performance Ring */}
+      <PerformanceRing progress={progress} size={56} isTopThree={isTopThree} />
+      
+      {/* Medallion Container with premium depth */}
+      <div className={cn(
+        "w-14 h-14 rounded-full relative z-10",
+        "bg-gradient-to-br from-background via-background to-muted/30",
+        "border border-border/50",
+        "flex items-center justify-center overflow-hidden",
+        // Premium shadow depth - soft and diffused
+        isTopThree 
+          ? "shadow-[0_4px_20px_-4px_rgba(251,191,36,0.25),0_2px_8px_-2px_rgba(0,0,0,0.08)]"
+          : "shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1),0_4px_16px_-4px_rgba(0,0,0,0.06)]"
+      )}>
+        {/* Glossy highlight overlay - top-left sheen */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
+        
+        {/* Inner shadow for depth */}
+        <div className="absolute inset-0 rounded-full shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.05)] pointer-events-none" />
+        
+        {logoUrl ? (
+          <img 
+            src={logoUrl} 
+            alt={displayName}
+            className="w-10 h-10 object-contain relative z-10"
+            loading="lazy"
+          />
+        ) : (
+          <span className="text-xl font-bold text-muted-foreground/60 relative z-10">
+            {displayName.charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -134,6 +196,8 @@ export function FranchiseCard({
 
   const metricDisplay = getMetricDisplay();
 
+  const isTopThree = rank <= 3;
+
   return (
     <motion.div
       whileTap={{ scale: 0.98 }}
@@ -142,7 +206,7 @@ export function FranchiseCard({
       <Link
         to={`/tourhub/college-golf/${slug}`}
         className={cn(
-          'flex items-center gap-3 p-4 rounded-xl',
+          'flex items-center gap-4 p-4 rounded-xl',
           'bg-card/80 backdrop-blur-sm',
           'border border-border/40',
           'hover:border-primary/30 hover:bg-card hover:shadow-lg hover:shadow-primary/5',
@@ -155,7 +219,7 @@ export function FranchiseCard({
         <div className="flex flex-col items-center shrink-0 w-8">
           <span className={cn(
             "text-lg font-bold tabular-nums",
-            rank <= 3 ? "text-primary" : "text-muted-foreground"
+            isTopThree ? "text-primary" : "text-muted-foreground"
           )}>
             {rank}
           </span>
@@ -170,49 +234,25 @@ export function FranchiseCard({
           )}
         </div>
         
-        {/* Medallion with Performance Ring */}
-        <div className="relative shrink-0">
-          {/* Performance Ring */}
-          <PerformanceRing progress={progress} size={56} />
-          
-          {/* Medallion Container */}
-          <div className={cn(
-            "w-14 h-14 rounded-full",
-            "bg-gradient-to-br from-background via-background to-muted/50",
-            "border border-border/60",
-            "shadow-inner",
-            "flex items-center justify-center overflow-hidden",
-            "relative z-10"
-          )}>
-            {college?.logo_url ? (
-              <img 
-                src={college.logo_url} 
-                alt={displayName}
-                className="w-10 h-10 object-contain"
-                loading="lazy"
-              />
-            ) : (
-              <span className="text-xl font-bold text-muted-foreground/60">
-                {displayName.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-        </div>
+        {/* Premium Medallion */}
+        <Medallion 
+          logoUrl={college?.logo_url}
+          displayName={displayName}
+          isTopThree={isTopThree}
+          progress={progress}
+        />
         
-        {/* Content */}
+        {/* Content - Enhanced hierarchy */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-[15px] font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+          <h3 className="text-[15px] font-bold text-foreground truncate group-hover:text-primary transition-colors">
             {displayName}
           </h3>
           
-          {/* Stats Row */}
-          <div className="flex items-center gap-3 mt-1.5 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <Users className="w-3.5 h-3.5 text-muted-foreground/60" />
-              {stats.player_count}
-            </span>
+          {/* Stats Row - metric emphasized, player count subdued */}
+          <div className="flex items-center gap-3 mt-1.5">
+            {/* Primary metric - emphasized */}
             <span className={cn(
-              "font-medium",
+              "text-sm font-semibold",
               activeMetric === 'earnings' ? "text-emerald-600" : "text-foreground"
             )}>
               {typeof metricDisplay.value === 'string' 
@@ -220,11 +260,16 @@ export function FranchiseCard({
                 : `${metricDisplay.value} ${metricDisplay.label}`
               }
             </span>
+            {/* Player count - subdued */}
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground/60">
+              <Users className="w-3 h-3" />
+              {stats.player_count}
+            </span>
           </div>
         </div>
         
-        {/* Arrow */}
-        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+        {/* Arrow - consistent alignment */}
+        <ChevronRight className="w-5 h-5 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
       </Link>
     </motion.div>
   );
