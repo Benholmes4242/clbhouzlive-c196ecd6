@@ -222,7 +222,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0 space-y-1">
             {/* Course name */}
-            <h3 className="text-sm font-semibold text-foreground truncate">
+            <h3 className="text-sm font-semibold text-foreground truncate" title={course.name}>
               {course.name}
             </h3>
 

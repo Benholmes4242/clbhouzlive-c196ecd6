@@ -184,7 +184,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             </div>
           ))}
         </div>
-        {footer && <div className="mt-6">{footer}</div>}
+        {footer && <div className="pt-8">{footer}</div>}
       </div>
     );
   }
@@ -212,7 +212,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             </div>
           ))}
         </div>
-        {footer && <div className="mt-6">{footer}</div>}
+        {footer && <div className="pt-8">{footer}</div>}
       </div>
     );
   }
@@ -256,7 +256,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         </div>
       </div>
       {/* Footer (pagination) sits after the grid - z-index 10 ensures it appears above cards */}
-      {footer && <div className="mt-6 relative z-10 bg-background">{footer}</div>}
+      {footer && <div className="pt-8 relative z-10 bg-background">{footer}</div>}
     </div>
   );
 };
