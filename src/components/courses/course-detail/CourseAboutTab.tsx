@@ -135,7 +135,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     : 'Add your rating to see how it compares';
 
   return (
-    <div>
+    <div className="animate-in fade-in duration-200">
       {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
       <CourseLocationBreadcrumb course={course} />
 
@@ -143,10 +143,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {user && (
         <PersonalSection courseId={course.id} courseName={course.name} />
       )}
-      {/* 2. Community Score Section - Card-based design */}
-      <section className="px-4 pt-5 pb-5 bg-slate-100 md:px-6 md:pt-7 space-y-4">
+      {/* 2. Community Score Section - Card-based design with more spacing */}
+      <section className="px-4 pt-6 pb-6 bg-slate-100 md:px-6 md:pt-8 space-y-6">
         <CommunityScoreCard
           courseId={course.id}
+          courseName={course.name}
           ratingAggregates={ratingAggregates}
           userRating={userRating}
           distribution={distribution}
@@ -187,13 +188,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* 3. About Section with fade gradient */}
+      {/* 3. About Section with improved typography */}
       {course.description && (
-        <section className="pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
-          <h2 className="px-5 text-lg md:text-xl font-semibold">About</h2>
+        <section className="pt-8 pb-6 bg-slate-50 space-y-4 md:pt-10">
+          <div className="px-5 flex items-center gap-2">
+            <div className="w-8 h-0.5 bg-gradient-to-r from-amber-400 to-transparent rounded-full" />
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900">About</h2>
+          </div>
           <div className="px-5 relative">
             <div 
-              className={`text-base md:text-lg leading-relaxed text-foreground ${
+              className={`text-base md:text-lg leading-relaxed text-gray-700 ${
                 !showFullDescription && shouldShowReadMore ? 'relative' : ''
               }`}
             >

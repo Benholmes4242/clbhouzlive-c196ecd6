@@ -1,11 +1,11 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ScorePill } from '../common/ScorePill';
 import { ThumbButton } from '@/components/common/ThumbButton';
 import { ExpandableText } from '@/components/common/ExpandableText';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
-import { ReviewBreakdownGrid } from './ReviewBreakdownGrid';
+import { Play } from 'lucide-react';
+import { useTierStyles } from '@/hooks/useTierStyles';
 
 interface Review {
   id: string;
@@ -58,6 +58,14 @@ const formatDate = (dateString: string) => {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 };
 
+// Category labels for breakdown
+const categoryLabels: Record<string, string> = {
+  design_score: 'Design',
+  condition_score: 'Condition',
+  clubhouse_score: 'Clubhouse',
+  facilities_score: 'Facilities',
+};
+
 export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
   review,
   isMine,
@@ -70,75 +78,127 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
     review;
 
   const votingDisabled = disabled || isMock || false;
+  const tierStyles = useTierStyles(score);
+
+  // Build category scores
+  const categories = [
+    { key: 'design_score', value: review.design_score },
+    { key: 'condition_score', value: review.condition_score },
+    { key: 'clubhouse_score', value: review.clubhouse_score },
+    { key: 'facilities_score', value: review.facilities_score },
+  ].filter(c => c.value !== null && c.value !== undefined);
 
   return (
     <article
-      className={clsx(
-        'py-4 border-b border-slate-200',
+      className={cn(
+        'bg-white rounded-2xl border p-5 transition-all',
+        isMine ? 'border-green-200 ring-1 ring-green-100' : 'border-gray-100',
         isHighlighted && 'animate-soft-pulse'
       )}
     >
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-3 mb-2">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          {user.avatarUrl ? (
-            <SquircleAvatar
-              src={user.avatarUrl}
-              alt={user.name}
-              size={40}
-              fallback={user.initials}
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center text-sm font-semibold text-slate-700">
-              {user.initials}
-            </div>
-          )}
+          {/* Avatar with ring for own review */}
+          <div className={cn(
+            "relative",
+            isMine && "ring-2 ring-green-500 ring-offset-2 rounded-lg"
+          )}>
+            {user.avatarUrl ? (
+              <SquircleAvatar
+                src={user.avatarUrl}
+                alt={user.name}
+                size={40}
+                fallback={user.initials}
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-700">
+                {user.initials}
+              </div>
+            )}
+          </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-slate-900">{user.name}</p>
+              <span className="font-semibold text-gray-900">{user.name}</span>
               {isMine && (
-                <span 
-                  className="bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"
-                  style={{ borderRadius: 'var(--radius)' }}
-                >
+                <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
                   You
                 </span>
               )}
             </div>
-
-            <p className="mt-0.5 text-xs text-slate-500">{formatDate(createdAt)}</p>
+            <span className="text-sm text-gray-500">{formatDate(createdAt)}</span>
           </div>
         </div>
 
-        {/* Numeric rating chip */}
-        <ScorePill score={score} size="sm" />
+        {/* Score badge with tier color */}
+        <div className={cn(
+          "px-2.5 py-1 rounded-lg text-sm font-bold",
+          tierStyles.badge
+        )}>
+          {score.toFixed(1)}
+        </div>
       </div>
 
-      {/* Body - expandable text */}
+      {/* Review text */}
       {text && text.trim().length > 0 && (
-        <div className="mt-1">
-          <ExpandableText text={text} lines={4} />
+        <div className="mb-4">
+          <ExpandableText 
+            text={text} 
+            lines={4} 
+            className="text-gray-600 leading-relaxed"
+          />
         </div>
       )}
 
       {/* Media strip */}
       {media && media.length > 0 && onMediaClick && (
-        <ReviewMediaStrip media={media} onMediaClick={onMediaClick} />
+        <div className="flex gap-2 mb-4 overflow-x-auto -mx-5 px-5 pb-2">
+          {media.map((item, i) => (
+            <div
+              key={item.id}
+              onClick={() => onMediaClick(i)}
+              className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer ring-1 ring-black/5 hover:ring-black/10 transition-all active:scale-[0.97]"
+            >
+              <img 
+                src={item.poster_url || item.media_url} 
+                alt=""
+                className="w-full h-full object-cover" 
+              />
+              {item.media_type === 'video' && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <Play className="w-4 h-4 text-white" fill="currentColor" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
-      {/* Breakdown grid */}
-      <ReviewBreakdownGrid
-        scores={{
-          design_score: review.design_score,
-          condition_score: review.condition_score,
-          clubhouse_score: review.clubhouse_score,
-          facilities_score: review.facilities_score,
-        }}
-      />
+      {/* Category breakdown */}
+      {categories.length > 0 && (
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-gray-100">
+          {categories.map(cat => (
+            <div key={cat.key} className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">{categoryLabels[cat.key]}</span>
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
+                    style={{ width: `${((cat.value || 0) / 5) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-medium text-gray-700 w-6 tabular-nums">
+                  {(cat.value || 0).toFixed(1)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Footer actions */}
-      <div className="mt-3 flex items-center justify-end gap-2">
+      <div className="flex items-center gap-4">
         <ThumbButton
           type="up"
           active={isHelpful || false}

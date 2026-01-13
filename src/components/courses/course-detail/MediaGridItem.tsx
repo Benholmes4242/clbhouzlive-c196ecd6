@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import type { ExtendedMediaItem } from '@/components/media-grid';
 import { VideoPlayIndicator } from '@/components/ui/VideoPlayIndicator';
+import { cn } from '@/lib/utils';
 
 interface MediaGridItemProps {
   item: ExtendedMediaItem;
@@ -10,8 +11,7 @@ interface MediaGridItemProps {
 }
 
 /**
- * Phase 1 Fix #4: Memoized grid item to prevent unnecessary re-renders on filter changes
- * Polish: skeleton placeholder, centered play icon, consistent styling
+ * Memoized grid item with polish: skeleton, centered play icon, hover effects
  */
 export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overflowCount }: MediaGridItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -31,7 +31,12 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
   return (
     <button
       onClick={() => onClick(item)}
-      className="relative aspect-square overflow-hidden bg-muted border-[0.5px] border-border/30 hover:brightness-95 active:scale-[0.98] transition-all duration-150"
+      className={cn(
+        "relative aspect-square overflow-hidden bg-muted",
+        "rounded-xl ring-1 ring-black/5",
+        "hover:ring-black/10 hover:scale-[1.02] transition-all duration-150",
+        "active:scale-[0.98]"
+      )}
     >
       {/* Skeleton placeholder - shows until image loads */}
       {!isLoaded && (
@@ -42,35 +47,46 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
       <img
         src={imageSrc}
         alt={item.alt || 'Media'}
-        className={`w-full h-full object-cover transition-opacity duration-200 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={cn(
+          "w-full h-full object-cover transition-opacity duration-200",
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        )}
         loading="lazy"
         decoding="async"
         onLoad={() => setIsLoaded(true)}
       />
 
-      {/* Video overlays: bottom-left play icon + duration pill */}
+      {/* Video overlays */}
       {isVideo && (
         <>
-          {/* Bottom-left play icon - matching VideoPlayIndicator */}
-          <VideoPlayIndicator size="md" />
+          {/* Play button - frosted glass style */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+            <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+              <svg 
+                className="w-5 h-5 text-gray-900 ml-0.5" 
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
 
-          {/* Duration pill - bottom right, only show if valid duration */}
+          {/* Duration badge - bottom right, only show if valid duration */}
           {durationText && (
-            <div className="absolute bottom-2 right-2">
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
-                <span className="text-[10px] font-medium text-white tabular-nums">
-                  {durationText}
-                </span>
-              </div>
+            <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm">
+              <span className="text-xs text-white font-medium tabular-nums">
+                {durationText}
+              </span>
             </div>
           )}
         </>
       )}
 
-      {/* "+X more" overlay for overflow indication */}
+      {/* "+X more" overlay - frosted glass style */}
       {overflowCount && overflowCount > 0 && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
-          <span className="text-lg font-semibold text-white">+{overflowCount}</span>
+          <span className="text-xl font-semibold text-white">+{overflowCount}</span>
         </div>
       )}
     </button>

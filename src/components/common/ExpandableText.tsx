@@ -4,11 +4,13 @@ import { ChevronDown } from 'lucide-react';
 interface ExpandableTextProps {
   text: string;
   lines?: number;
+  className?: string;
 }
 
 export const ExpandableText: React.FC<ExpandableTextProps> = ({
   text,
   lines = 4,
+  className,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -22,8 +24,8 @@ export const ExpandableText: React.FC<ExpandableTextProps> = ({
         <p
           className={
             expanded
-              ? 'text-sm leading-relaxed text-slate-800'
-              : `text-sm leading-relaxed text-slate-800 line-clamp-${lines}`
+              ? `text-sm leading-relaxed text-slate-800 ${className || ''}`
+              : `text-sm leading-relaxed text-slate-800 line-clamp-${lines} ${className || ''}`
           }
         >
           {text}
