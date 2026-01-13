@@ -173,6 +173,7 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
           onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
           onPrev={() => setPage((p) => Math.max(0, p - 1))}
           itemLabel="items"
+          disabled={false}
         />
       )}
     </div>

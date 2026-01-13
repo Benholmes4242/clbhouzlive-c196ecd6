@@ -47,17 +47,35 @@ const FriendsCoursesPanel: React.FC = () => {
     }
   }, [isError, error, user?.id, timeframe]);
 
+  // Calculate how many of the friends' courses the user has also played (for "You vs Friends" nudge)
+  // NOTE: Moved before filteredData memo since 'new' filter depends on this
+  const { data: userPlayedCourseIds } = useQuery({
+    queryKey: ['user-played-course-ids', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_courses' as any)
+        .select('course_id')
+        .eq('user_id', user!.id)
+        .eq('played', true);
+      
+      if (error) throw error;
+      return new Set((data || []).map((r: any) => r.course_id));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Filter data by course type only (time filtering now happens server-side)
   const filteredData = useMemo(() => {
     if (!sourceData) return null;
     
     // Filter by course type (Top 100 only or other filters)
+    // For 'new' filter, we need to filter out courses the user has already played
+    // This is done after grouping since userPlayedCourseIds operates on course_id
     const courseTypeFilteredRecent = courseFilter === 'most_played'
       ? sourceData.recent
       : courseFilter === 'highest_rated'
       ? sourceData.recent.filter(hit => hit.rating != null)
-      : courseFilter === 'new'
-      ? sourceData.recent
       : sourceData.recent;
     
     // Group into courses
@@ -87,7 +105,13 @@ const FriendsCoursesPanel: React.FC = () => {
       }
     }
     
-    const filteredCourses = Array.from(courseMap.values()).sort((a, b) => {
+    // Apply 'new' filter: only courses the user hasn't played
+    let filteredCourses = Array.from(courseMap.values());
+    if (courseFilter === 'new' && userPlayedCourseIds) {
+      filteredCourses = filteredCourses.filter(c => !userPlayedCourseIds.has(c.course_id));
+    }
+    
+    filteredCourses.sort((a, b) => {
       if (b.total_friends_played !== a.total_friends_played) {
         return b.total_friends_played - a.total_friends_played;
       }
@@ -102,7 +126,7 @@ const FriendsCoursesPanel: React.FC = () => {
       totalCourses: filteredCourses.length,
       totalFriendsActive: uniqueFriends.size,
     };
-  }, [sourceData, courseFilter]);
+  }, [sourceData, courseFilter, userPlayedCourseIds]);
 
   // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
@@ -125,23 +149,6 @@ const FriendsCoursesPanel: React.FC = () => {
   }, [courses]);
 
   const totalRounds = recent.length;
-
-  // Calculate how many of the friends' courses the user has also played (for "You vs Friends" nudge)
-  const { data: userPlayedCourseIds } = useQuery({
-    queryKey: ['user-played-course-ids', user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_courses' as any)
-        .select('course_id')
-        .eq('user_id', user!.id)
-        .eq('played', true);
-      
-      if (error) throw error;
-      return new Set((data || []).map((r: any) => r.course_id));
-    },
-    staleTime: 5 * 60 * 1000,
-  });
 
   const userPlayedCount = useMemo(() => {
     if (!userPlayedCourseIds || courses.length === 0) return 0;
@@ -264,7 +271,9 @@ const FriendsCoursesPanel: React.FC = () => {
         {/* Time Range Dropdown - Primary visual emphasis */}
         <div className="flex-1">
           <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
-            <SelectTrigger className="h-11 w-full bg-card border border-slate-300 rounded-xl justify-between text-base font-medium focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
+            <SelectTrigger 
+              aria-label="Select time period"
+              className="h-11 w-full bg-card border border-slate-300 rounded-xl justify-between text-base font-medium focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
               <SelectValue placeholder="Select time range" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -280,7 +289,9 @@ const FriendsCoursesPanel: React.FC = () => {
         {/* Course Filter Dropdown - Secondary */}
         <div className="flex-1">
           <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
+            <SelectTrigger 
+              aria-label="Filter courses"
+              className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-1 focus:ring-slate-200/60 focus:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-200/60 focus-visible:border-slate-300 data-[state=open]:ring-1 data-[state=open]:ring-slate-200/60 data-[state=open]:border-slate-300 transition-shadow">
               <SelectValue placeholder="Select filter" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
