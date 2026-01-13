@@ -241,7 +241,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         aria-labelledby="course-sheet-title"
         className={cn(
           'fixed left-0 right-0 z-50',
-          'bg-white dark:bg-slate-900',
+          'bg-slate-50 dark:bg-slate-900',
           'border-t border-slate-200/50 dark:border-slate-700/50',
           'shadow-[0_-4px_20px_rgba(0,0,0,0.1)]',
           'flex flex-col'
