@@ -27,7 +27,7 @@ type SheetState = 'peek' | 'half' | 'full';
 // Adjusted heights: half state shows all content without scroll
 const SHEET_HEIGHTS: Record<SheetState, string> = {
   peek: '25%',
-  half: '68%',  // Increased from 55% - all content visible without scroll
+  half: '78%',  // Increased to ensure all content visible including buttons
   full: '92%',
 };
 
@@ -349,12 +349,12 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
             {/* Pill badges row - premium styling */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
-              {/* Rank pill with icon */}
+              {/* Rank pill with icon - slate-50 background */}
               {typeof course.rank === 'number' && (
                 <span className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full',
-                  'bg-slate-900 dark:bg-white text-white dark:text-slate-900',
-                  'text-xs font-semibold shadow-sm'
+                  'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200',
+                  'text-xs font-semibold shadow-sm border border-slate-200/50 dark:border-slate-700/50'
                 )}>
                   <Globe className="h-3.5 w-3.5" />
                   #{course.rank} {getRegionLabel(scope)}
@@ -378,13 +378,13 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
             {/* CTAs - only visible when half/full - premium button styling */}
             {showCtAs && (
               <div className="space-y-3 mt-6">
-                {/* Primary action - View course */}
+                {/* Primary action - View course - slate-50 background */}
                 <Button
                   className={cn(
                     'w-full h-11',
-                    'bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100',
-                    'text-white dark:text-slate-900',
-                    'font-medium shadow-sm',
+                    'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700',
+                    'text-slate-700 dark:text-slate-200',
+                    'font-medium shadow-sm border border-slate-200/50 dark:border-slate-700/50',
                     'active:scale-[0.98] transition-all duration-150'
                   )}
                   onClick={() => navigate(`/courses/${course.id}`)}

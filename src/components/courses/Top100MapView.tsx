@@ -264,7 +264,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // NOT PLAYED points (render first, bottom layer) - muted grey, zoom-responsive sizing
+      // NOT PLAYED points (render first, bottom layer) - muted grey, zoom-responsive sizing with larger tap targets
       mapInstance.addLayer({
         id: 'not-played-points',
         type: 'circle',
@@ -273,10 +273,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 4,    // Small at world view
-            8, 6,    // Medium at country view  
-            12, 10,  // Larger when zoomed to region
-            16, 14,  // Even larger when very zoomed in
+            4, 8,    // Larger tap target at world view
+            8, 10,   // Medium at country view  
+            12, 14,  // Larger when zoomed to region
+            16, 18,  // Even larger when very zoomed in
           ],
           'circle-color': 'rgba(255,255,255,0.7)',
           'circle-stroke-width': 1.5,
@@ -293,17 +293,17 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 10,
-            8, 14,
-            12, 18,
-            16, 22,
+            4, 14,
+            8, 18,
+            12, 22,
+            16, 26,
           ],
           'circle-color': 'rgba(247, 147, 30, 0.2)',
           'circle-blur': 0.8,
         },
       });
 
-      // WANT TO PLAY points (middle layer) - outlined orange, zoom-responsive sizing
+      // WANT TO PLAY points (middle layer) - outlined orange, larger tap targets
       mapInstance.addLayer({
         id: 'want-to-play-points',
         type: 'circle',
@@ -312,10 +312,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 5,
-            8, 7,
-            12, 11,
-            16, 15,
+            4, 8,    // Larger tap target
+            8, 10,
+            12, 14,
+            16, 18,
           ],
           'circle-color': 'rgba(255,255,255,0.95)',
           'circle-stroke-width': 2.5,
@@ -323,7 +323,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // PLAYED points (render on top) - filled dark, zoom-responsive sizing
+      // PLAYED points (render on top) - filled dark, larger tap targets
       mapInstance.addLayer({
         id: 'played-points',
         type: 'circle',
@@ -332,10 +332,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
-            4, 6,    // Small at world view
-            8, 8,    // Medium at country view
-            12, 12,  // Larger when zoomed to region
-            16, 16,  // Even larger when very zoomed in
+            4, 8,    // Larger tap target at world view
+            8, 10,   // Medium at country view
+            12, 14,  // Larger when zoomed to region
+            16, 18,  // Even larger when very zoomed in
           ],
           'circle-color': PLAYED_COLOR,
           'circle-stroke-width': 2.5,
@@ -343,22 +343,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // Course name labels - only visible when zoomed in (zoom > 9)
+      // Course name labels - visible when courses are no longer clustered (zoom > 7)
       mapInstance.addLayer({
         id: 'course-labels',
         type: 'symbol',
         source: 'courses',
         filter: ['!', ['has', 'point_count']],
-        minzoom: 9,
+        minzoom: 7,  // Show labels as soon as courses are individually visible
         layout: {
           'text-field': ['get', 'name'],
           'text-size': [
             'interpolate', ['linear'], ['zoom'],
+            7, 9,
             9, 10,
             12, 12,
             16, 14,
           ],
-          'text-offset': [0, 1.2],
+          'text-offset': [0, 1.4],
           'text-anchor': 'top',
           'text-max-width': 8,
           'text-optional': true,
@@ -373,7 +374,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'text-halo-blur': 0.5,
           'text-opacity': [
             'interpolate', ['linear'], ['zoom'],
-            9, 0.7,
+            7, 0.6,
+            9, 0.85,
             11, 1,
           ],
         },
@@ -488,7 +490,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
         </p>
         
-        {/* Progress strip with glow */}
+        {/* Progress strip with glow - orange gradient to match list tab */}
         <div className="mt-3 relative">
           <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             {/* Glow behind */}
@@ -500,14 +502,16 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             />
-            {/* Main bar */}
+            {/* Main bar - orange gradient matching list tab */}
             <div 
               className={cn(
                 'h-full rounded-full relative z-10',
-                'bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300',
                 'transition-all duration-700 ease-out'
               )}
-              style={{ width: `${progressPercent}%` }}
+              style={{ 
+                width: `${progressPercent}%`,
+                background: 'linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))'
+              }}
             />
           </div>
         </div>
@@ -687,7 +691,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'border border-white/70 dark:border-slate-700/50',
           'p-3 space-y-2.5'
         )}>
-          {/* Status filter row */}
+          {/* Status filter row - all active states white */}
           <div 
             className={cn(
               'flex items-center gap-0.5 p-0.5 rounded-xl',
@@ -714,13 +718,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'flex-1 px-3 py-2 rounded-lg text-xs font-medium',
                     'transition-all duration-200',
                     isActive
-                      ? filter === 'played'
-                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
-                        : filter === 'want_to_play'
-                        ? 'bg-[#F7931E] text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]'
-                        : filter === 'not_played'
-                        ? 'bg-slate-500 dark:bg-slate-400 text-white dark:text-slate-900 shadow-sm'
-                        : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
                   )}
                 >
@@ -730,7 +728,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             })}
           </div>
 
-          {/* Region chips row */}
+          {/* Region chips row - active state uses slate-50 (#F8FAFC) */}
           <div 
             className="flex items-center gap-1.5"
             role="group"
@@ -749,7 +747,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'flex-1 px-3 py-2 rounded-lg text-xs font-medium border',
                     'transition-all duration-200',
                     isActive
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
+                      ? 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200/50 dark:border-slate-600 shadow-sm'
                       : 'bg-white/60 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800'
                   )}
                 >

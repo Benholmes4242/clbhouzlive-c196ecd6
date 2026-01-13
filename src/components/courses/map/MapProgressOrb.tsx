@@ -98,20 +98,20 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           className={cn(
             'relative flex items-center justify-center',
             'w-12 h-12 rounded-full',
-            'bg-slate-900 text-white',
-            'shadow-[0_4px_16px_rgba(0,0,0,0.25)]',
-            'hover:bg-slate-800 active:scale-95',
+            'bg-slate-50 text-slate-700 border border-slate-200/50',
+            'shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
+            'hover:bg-slate-100 active:scale-95',
             'transition-all duration-150'
           )}
         >
-          {/* Progress ring */}
+          {/* Progress ring - orange accent on slate-50 background */}
           <svg className="absolute inset-0 w-full h-full -rotate-90">
             <circle
               cx="24"
               cy="24"
               r="20"
               fill="none"
-              stroke="rgba(255,255,255,0.15)"
+              stroke="rgba(148,163,184,0.3)"
               strokeWidth="2.5"
             />
             <circle
