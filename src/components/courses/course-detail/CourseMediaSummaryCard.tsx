@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 interface CourseMediaSummaryCardProps {
   photoCount: number;
@@ -17,40 +17,41 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
   courseName,
   onAddMedia,
 }) => {
-  // This component only renders when there IS media (empty state handled by parent)
   return (
     <section className="px-4 pt-6">
       {/* Header row with title + Add media CTA */}
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-2">
+        <div className="space-y-1">
           {/* Title */}
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
             Course Media
           </p>
 
-          {/* Counts - 8px below title */}
-          <p className="text-sm font-semibold text-foreground tabular-nums">
-            {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
+          {/* Counts */}
+          <p className="text-sm text-gray-600">
+            <span className="font-semibold text-gray-900 tabular-nums">{photoCount}</span>
+            {' '}{photoCount === 1 ? 'photo' : 'photos'}
             {' · '}
-            {videoCount} {videoCount === 1 ? 'video' : 'videos'}
+            <span className="font-semibold text-gray-900 tabular-nums">{videoCount}</span>
+            {' '}{videoCount === 1 ? 'video' : 'videos'}
           </p>
 
-          {/* Contributors - 8px below counts */}
+          {/* Contributors */}
           {contributorsCount > 0 && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-400">
               Shared by {contributorsCount} {contributorsCount === 1 ? 'golfer' : 'golfers'}
             </p>
           )}
         </div>
 
-        {/* Add media CTA (right side) */}
+        {/* Add media CTA - primary button style */}
         {onAddMedia && (
           <button
             type="button"
             onClick={onAddMedia}
-            className="flex items-center gap-1.5 rounded-sq-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-foreground hover:bg-slate-50 active:scale-[0.97] transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-full hover:bg-green-700 transition-colors shadow-sm active:scale-[0.97]"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
             Add media
           </button>
         )}

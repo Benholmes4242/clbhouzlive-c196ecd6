@@ -1,15 +1,17 @@
-import React from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, ChevronRight, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, ChevronRight, Sparkles, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
+import { cn } from '@/lib/utils';
 
 import { RatingBar } from '@/components/ui/RatingBar';
-import { RatingPill } from '@/components/ui/RatingPill';
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
+import { useTierStyles } from '@/hooks/useTierStyles';
 
 interface CommunityScoreCardProps {
   courseId: string;
+  courseName?: string;
   ratingAggregates: CourseRatingAggregate | null | undefined;
   userRating: UserCourseRating | null | undefined;
   distribution?: RatingTierDistributionData | null;
@@ -20,8 +22,18 @@ interface CommunityScoreCardProps {
 // A3: Always show 1 decimal for consistency + tabular numerals
 const formatScore = (score: number) => score.toFixed(1);
 
+// Get tier label from score
+const getTierLabel = (score: number): string => {
+  if (score >= 9) return 'Outstanding';
+  if (score >= 8) return 'Excellent';
+  if (score >= 7) return 'Very Good';
+  if (score >= 6) return 'Good';
+  return 'Fair';
+};
+
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseId,
+  courseName,
   ratingAggregates,
   userRating,
   distribution,
@@ -30,28 +42,34 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 }) => {
   const totalRatings = ratingAggregates?.review_count || 0;
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
+  const tierStyles = useTierStyles(communityAverage);
+  const tierLabel = getTierLabel(communityAverage);
+  
+  // Animation state for circular progress
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Empty state - no ratings yet
   if (totalRatings === 0) {
     return (
-      <div className="rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
-        <h3 className="text-xl font-semibold text-slate-900">
-          Community Score
-        </h3>
-        <p className="mt-1 text-base text-slate-500">
-          No ratings yet
+      <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-6 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+          <Star className="w-8 h-8 text-gray-300" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">No ratings yet</h3>
+        <p className="text-sm text-gray-500 mb-4">
+          Be the first to share your experience{courseName ? ` at ${courseName}` : ''}.
         </p>
-
         <Button
           onClick={onRateClick}
-          className="mt-4 w-full"
-          variant="default"
+          className="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-full hover:bg-green-700 transition-colors shadow-sm"
         >
-          Be the first to rate this course
+          Rate this course
         </Button>
-        <p className="mt-2 text-xs text-slate-400 text-center">
-          Your rating helps other golfers discover great courses.
-        </p>
       </div>
     );
   }
@@ -67,7 +85,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     const absDiff = Math.abs(diff);
 
     if (absDiff < 0.2) {
-      // On par (within 0.2 points)
       comparisonMessage = (
         <div className="mt-4 flex items-start gap-2">
           <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
@@ -79,7 +96,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
       );
     } else if (diff > 0) {
-      // Higher
       comparisonMessage = (
         <div className="mt-4 flex items-start gap-2">
           <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
@@ -91,7 +107,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
       );
     } else {
-      // Lower
       comparisonMessage = (
         <div className="mt-4 flex items-start gap-2">
           <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-50">
@@ -107,29 +122,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   // Build category data
   const categories = [
-    {
-      id: 'design',
-      label: 'Course Design',
-      score: ratingAggregates?.avg_design_score,
-    },
-    {
-      id: 'condition',
-      label: 'Course Condition',
-      score: ratingAggregates?.avg_condition_score,
-    },
-    {
-      id: 'clubhouse',
-      label: 'Clubhouse',
-      score: ratingAggregates?.avg_clubhouse_score,
-    },
-    {
-      id: 'facilities',
-      label: 'Facilities',
-      score: ratingAggregates?.avg_facilities_score,
-    },
+    { id: 'design', label: 'Design', score: ratingAggregates?.avg_design_score },
+    { id: 'condition', label: 'Condition', score: ratingAggregates?.avg_condition_score },
+    { id: 'clubhouse', label: 'Clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+    { id: 'facilities', label: 'Facilities', score: ratingAggregates?.avg_facilities_score },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
-
-  
 
   // Check if we have distribution data
   const hasDistribution = distribution && (
@@ -140,72 +137,104 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     distribution.fair > 0
   );
 
-  // Community Highlights v1 - derive from highest scoring categories
+  // Community Highlights - derive from highest scoring categories
   const getCommunityHighlights = () => {
     if (categories.length === 0) return null;
     
-    // Sort categories by score descending, take top 2-3
     const sorted = [...categories]
-      .filter(c => c.score && c.score >= 8.0) // Only include high scores
+      .filter(c => c.score && c.score >= 4.0) // 4/5 = 8/10 equivalent
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, 3);
     
     if (sorted.length === 0) return null;
-    
-    return sorted.map(c => c.label.replace('Course ', ''));
+    return sorted.map(c => c.label);
   };
 
   const highlights = getCommunityHighlights();
 
+  // Calculate stroke dasharray for circular progress
+  const circumference = 2 * Math.PI * 42; // radius = 42
+  const progress = isVisible ? (communityAverage / 10) * circumference : 0;
+
   return (
-    <div className="rounded-3xl bg-white shadow-sm px-5 py-6">
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-4">
-        {/* Left - title + meta */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-xl font-semibold text-slate-900">
-            Community Rating
-          </h3>
-          
-          <p className="mt-1 text-sm text-slate-500">
-            Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
-          </p>
-
-          {onlyUserHasRated && (
-            <p className="mt-2 text-sm text-slate-500">
-              Only you have rated this course so far.
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="p-5 pb-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Community Rating</h3>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
             </p>
-          )}
+            {onlyUserHasRated && (
+              <p className="mt-2 text-sm text-gray-500">
+                Only you have rated this course so far.
+              </p>
+            )}
+          </div>
+          
+          {/* Large animated score ring */}
+          <div className="relative">
+            <svg className="w-24 h-24 -rotate-90">
+              <circle 
+                cx="48" 
+                cy="48" 
+                r="42" 
+                fill="none" 
+                stroke="#f3f4f6" 
+                strokeWidth="8" 
+              />
+              <circle 
+                cx="48" 
+                cy="48" 
+                r="42" 
+                fill="none" 
+                stroke="url(#communityScoreGradient)" 
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={`${progress} ${circumference}`}
+                className="transition-all duration-1000 ease-out"
+              />
+              <defs>
+                <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#f59e0b" />
+                  <stop offset="100%" stopColor="#fbbf24" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-3xl font-bold text-gray-900 tabular-nums">
+                {formatScore(communityAverage)}
+              </span>
+            </div>
+          </div>
         </div>
-
-        {/* Right - score + badge stack (centered) */}
-        <div className="inline-flex flex-col items-center gap-2">
-          {/* Score centered above badge */}
-          <span className="text-[34px] font-semibold text-slate-900 leading-none tabular-nums">
-            {formatScore(communityAverage)}
+        
+        {/* Tier badge */}
+        <div className="mt-3">
+          <span className={cn(
+            "inline-flex px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide",
+            tierStyles.badge
+          )}>
+            {tierLabel}
           </span>
-
-          {/* Quality chip centered under score */}
-          <RatingPill score={communityAverage} />
         </div>
       </div>
-
-      {/* Community Highlights v1 - under score, above distribution */}
+      
+      {/* Highlights */}
       {highlights && highlights.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-slate-100">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-            <span className="text-xs font-medium text-slate-500 tracking-wide">
-              Highlights
-            </span>
-          </div>
+        <div className="px-5 pb-4">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+            Highlights
+          </p>
           <div className="flex flex-wrap gap-2">
-            {highlights.map((highlight) => (
-              <span
-                key={highlight}
-                className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 rounded-full"
+            {highlights.map(h => (
+              <span 
+                key={h}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-700"
               >
-                {highlight}
+                <Sparkles className="w-3 h-3 text-amber-500" />
+                {h}
               </span>
             ))}
           </div>
@@ -213,52 +242,52 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       )}
 
       {/* User vs community comparison */}
-      {comparisonMessage}
+      {comparisonMessage && (
+        <div className="px-5 pb-4">
+          {comparisonMessage}
+        </div>
+      )}
 
-      {/* Rating tier distribution - mirrors Reviews tab */}
+      {/* Distribution */}
       {hasDistribution && (
-        <div className="mt-6 pt-5 border-t border-slate-100">
+        <div className="border-t border-gray-100 p-5">
           <RatingTierDistribution distribution={distribution} />
         </div>
       )}
 
-      {/* Category grid - 2x2 layout matching Reviews tab */}
+      {/* Category breakdown */}
       {categories.length > 0 && (
-        <div className="mt-6 pt-5 border-t border-slate-100">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            {categories.map((cat) => {
-              const score = cat.score || 0;
-
-              return (
-                <div key={cat.id} className="flex flex-col">
-                  <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
-                    {cat.label}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <RatingBar value={score} />
-                    <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
-                      {formatScore(score)}
-                    </span>
-                  </div>
+        <div className="border-t border-gray-100 p-5 grid grid-cols-2 gap-4">
+          {categories.map((cat) => {
+            const score = cat.score || 0;
+            return (
+              <div key={cat.id} className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">{cat.label}</span>
+                  <span className="font-semibold text-gray-700 tabular-nums">{formatScore(score)}</span>
                 </div>
-              );
-            })}
-          </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-700"
+                    style={{ width: `${(score / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* A1: See all reviews CTA - proper button styling with chevron */}
+      {/* See all reviews link */}
       {onSeeAllReviews && (
-        <div className="mt-4 pt-3 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={onSeeAllReviews}
-            className="flex items-center justify-between w-full py-2 text-sm font-medium text-slate-700 hover:text-slate-900 active:opacity-70 transition-colors min-h-[44px]"
-          >
-            <span>See all reviews</span>
-            <ChevronRight className="h-4 w-4 text-slate-400" />
-          </button>
-        </div>
+        <button 
+          type="button"
+          onClick={onSeeAllReviews}
+          className="w-full p-4 border-t border-gray-100 flex items-center justify-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors active:scale-[0.98]"
+        >
+          See all reviews
+          <ChevronRight className="w-4 h-4" />
+        </button>
       )}
     </div>
   );

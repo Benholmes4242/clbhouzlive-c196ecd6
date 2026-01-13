@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { getScoreTier, ScoreTier } from '@/utils/getScoreTier';
+import { cn } from '@/lib/utils';
 
 export type RatingFilterValue = ScoreTier | null;
 
@@ -17,28 +18,84 @@ const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] =
   { key: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
+// Tier-specific color configurations
+const tierConfig: Record<ScoreTier, { 
+  bg: string; 
+  text: string; 
+  activeBg: string; 
+  activeText: string;
+  border: string;
+  activeBorder: string;
+}> = {
+  outstanding: { 
+    bg: 'bg-amber-50', 
+    text: 'text-amber-700', 
+    activeBg: 'bg-amber-500', 
+    activeText: 'text-white',
+    border: 'border-amber-200',
+    activeBorder: 'border-amber-500',
+  },
+  excellent: { 
+    bg: 'bg-emerald-50', 
+    text: 'text-emerald-700', 
+    activeBg: 'bg-emerald-500', 
+    activeText: 'text-white',
+    border: 'border-emerald-200',
+    activeBorder: 'border-emerald-500',
+  },
+  veryGood: { 
+    bg: 'bg-blue-50', 
+    text: 'text-blue-700', 
+    activeBg: 'bg-blue-500', 
+    activeText: 'text-white',
+    border: 'border-blue-200',
+    activeBorder: 'border-blue-500',
+  },
+  good: { 
+    bg: 'bg-slate-100', 
+    text: 'text-slate-700', 
+    activeBg: 'bg-slate-500', 
+    activeText: 'text-white',
+    border: 'border-slate-200',
+    activeBorder: 'border-slate-500',
+  },
+  fair: { 
+    bg: 'bg-stone-100', 
+    text: 'text-stone-700', 
+    activeBg: 'bg-stone-500', 
+    activeText: 'text-white',
+    border: 'border-stone-200',
+    activeBorder: 'border-stone-500',
+  },
+};
+
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   value,
   onChange,
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2" role="group" aria-label="Filter reviews by rating">
+    <div 
+      className="flex flex-wrap items-center justify-center gap-2" 
+      role="group" 
+      aria-label="Filter reviews by rating"
+    >
       {FILTER_OPTIONS.map((option) => {
         const isSelected = value === option.key;
+        const config = tierConfig[option.key];
         
         return (
           <button
             key={option.key}
             type="button"
             onClick={() => onChange(isSelected ? null : option.key)}
-            className={`
-              inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium
-              whitespace-nowrap min-h-[28px] transition-all duration-100
-              ${isSelected 
-                ? 'bg-slate-900 text-white border border-slate-900' 
-                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:scale-[0.97]'
-              }
-            `}
+            className={cn(
+              "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium",
+              "whitespace-nowrap min-h-[32px] transition-all duration-150 border",
+              "active:scale-[0.97]",
+              isSelected 
+                ? `${config.activeBg} ${config.activeText} ${config.activeBorder}` 
+                : `${config.bg} ${config.text} ${config.border} hover:opacity-80`
+            )}
           >
             {option.label}
           </button>
@@ -50,9 +107,9 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium
-            whitespace-nowrap min-h-[28px] bg-slate-100 text-slate-600 
-            border border-slate-200 hover:bg-slate-200 active:scale-[0.97] transition-all"
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium
+            whitespace-nowrap min-h-[32px] bg-gray-100 text-gray-600 
+            border border-gray-200 hover:bg-gray-200 active:scale-[0.97] transition-all"
         >
           <X className="w-3 h-3" />
           Clear
