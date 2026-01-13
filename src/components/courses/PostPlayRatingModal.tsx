@@ -1157,7 +1157,11 @@ const PostPlayRatingModal = ({
                 maxLength={500}
               />
               <div className="mt-1 flex justify-end">
-                <p className="text-xs text-slate-400">
+                <p 
+                  className="text-xs text-slate-400"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
                   {review.length}/500
                 </p>
               </div>
@@ -1253,7 +1257,7 @@ const PostPlayRatingModal = ({
                         const isVideo = item.media_type === 'video';
                         
                         return (
-                          <div key={item.id} className="relative w-full aspect-square overflow-hidden rounded-md">
+                          <div key={item.id} className="relative w-full aspect-square overflow-hidden">
                             {isVideo ? (
                               // Video with Stream poster
                               <div className="relative h-full w-full">
@@ -1310,7 +1314,7 @@ const PostPlayRatingModal = ({
                         const preview = imagePreviews.get(fileKey) || '';
                         
                         return (
-                          <div key={`img-${index}`} className="relative w-full aspect-square overflow-hidden rounded-md">
+                          <div key={`img-${index}`} className="relative w-full aspect-square overflow-hidden">
                             <img
                               src={preview}
                               alt=""
@@ -1335,7 +1339,7 @@ const PostPlayRatingModal = ({
                           : draft.fileName;
                         
                         return (
-                          <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden rounded-md">
+                          <div key={draft.fileKey} className="relative w-full aspect-square overflow-hidden">
                             {draft.status === 'uploading' ? (
                               // Uploading state with spinner
                               <div className="relative h-full w-full bg-slate-700 flex flex-col items-center justify-center">
@@ -1767,8 +1771,8 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
-  // Breakdown bars are ALWAYS slate - never gold (gold is only for community overall)
-  const BREAKDOWN_BAR_FILL = '#64748B'; // slate-500
+  // Breakdown bars use unified gray color system
+  const BREAKDOWN_BAR_FILL = '#d1d5db'; // gray-300 - unified color
 
   // Convert submittedMedia to the format expected by FullscreenReviewPost
   const previewMedia = submittedMedia.map((item, index) => ({

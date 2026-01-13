@@ -64,9 +64,6 @@ const RateCoursePage = () => {
     }
   };
 
-  // Debug logging
-  console.log('[Rating Submission Mode]', existingRating ? 'edit' : 'create');
-  console.log('[Existing Rating Detected]', !!existingRating);
 
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
