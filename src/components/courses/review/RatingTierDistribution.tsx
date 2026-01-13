@@ -25,12 +25,10 @@ const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistribu
   { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
 ];
 
-// Premium muted gold for Outstanding tier
-const GOLD_COLOR = '#C9A94A';
-// Neutral charcoal/slate for all other tiers
-const NEUTRAL_COLOR = '#64748B';
-// Light grey for inactive/empty bars
-const INACTIVE_COLOR = '#E2E8F0';
+// UNIFIED COLOR SYSTEM - amber for Outstanding only, grey for rest
+const OUTSTANDING_COLOR = '#f59e0b'; // amber-500
+const NEUTRAL_COLOR = '#9ca3af';     // gray-400
+const EMPTY_COLOR = '#f3f4f6';       // gray-100
 
 /**
  * Simplified Rating Tier Distribution Component
@@ -63,14 +61,14 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
         const hasCount = item.count > 0;
         
         // Bar color logic:
-        // - Outstanding tier ALWAYS gets gold (when it has any count)
-        // - All other tiers with counts get neutral charcoal
+        // - Outstanding tier ALWAYS gets amber (when it has any count)
+        // - All other tiers with counts get neutral grey
         // - Empty bars get light grey
         const barColor = isOutstanding && hasCount
-          ? GOLD_COLOR 
+          ? OUTSTANDING_COLOR 
           : hasCount 
             ? NEUTRAL_COLOR 
-            : INACTIVE_COLOR;
+            : EMPTY_COLOR;
 
         return (
           <div key={item.key} className="flex items-center gap-2">
@@ -80,7 +78,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
             </span>
 
             {/* Bar track */}
-            <div className="flex-1 h-[6px] bg-slate-200/60 rounded-full overflow-hidden">
+            <div className="flex-1 h-[6px] bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{

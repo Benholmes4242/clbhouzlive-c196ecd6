@@ -18,7 +18,8 @@ const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] =
   { key: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
-// Tier-specific color configurations
+// Tier-specific color configurations - UNIFIED SYSTEM
+// Outstanding uses amber, everything else uses grey
 const tierConfig: Record<ScoreTier, { 
   bg: string; 
   text: string; 
@@ -36,36 +37,36 @@ const tierConfig: Record<ScoreTier, {
     activeBorder: 'border-amber-500',
   },
   excellent: { 
-    bg: 'bg-emerald-50', 
-    text: 'text-emerald-700', 
-    activeBg: 'bg-emerald-500', 
+    bg: 'bg-gray-100', 
+    text: 'text-gray-600', 
+    activeBg: 'bg-gray-500', 
     activeText: 'text-white',
-    border: 'border-emerald-200',
-    activeBorder: 'border-emerald-500',
+    border: 'border-gray-200',
+    activeBorder: 'border-gray-500',
   },
   veryGood: { 
-    bg: 'bg-blue-50', 
-    text: 'text-blue-700', 
-    activeBg: 'bg-blue-500', 
+    bg: 'bg-gray-100', 
+    text: 'text-gray-600', 
+    activeBg: 'bg-gray-500', 
     activeText: 'text-white',
-    border: 'border-blue-200',
-    activeBorder: 'border-blue-500',
+    border: 'border-gray-200',
+    activeBorder: 'border-gray-500',
   },
   good: { 
-    bg: 'bg-slate-100', 
-    text: 'text-slate-700', 
-    activeBg: 'bg-slate-500', 
+    bg: 'bg-gray-100', 
+    text: 'text-gray-600', 
+    activeBg: 'bg-gray-500', 
     activeText: 'text-white',
-    border: 'border-slate-200',
-    activeBorder: 'border-slate-500',
+    border: 'border-gray-200',
+    activeBorder: 'border-gray-500',
   },
   fair: { 
-    bg: 'bg-stone-100', 
-    text: 'text-stone-700', 
-    activeBg: 'bg-stone-500', 
+    bg: 'bg-gray-100', 
+    text: 'text-gray-600', 
+    activeBg: 'bg-gray-400', 
     activeText: 'text-white',
-    border: 'border-stone-200',
-    activeBorder: 'border-stone-500',
+    border: 'border-gray-200',
+    activeBorder: 'border-gray-400',
   },
 };
 
