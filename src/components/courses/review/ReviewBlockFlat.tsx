@@ -190,7 +190,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                   <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${barColorClass} rounded-full`}
-                      style={{ width: `${((cat.value || 0) / 5) * 100}%` }}
+                      style={{ width: `${((cat.value || 0) / 10) * 100}%` }}
                     />
                   </div>
                   <span className="text-xs font-medium text-gray-700 w-6 tabular-nums">
