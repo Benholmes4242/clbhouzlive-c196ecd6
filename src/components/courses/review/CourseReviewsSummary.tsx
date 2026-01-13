@@ -172,7 +172,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Design
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.design} />
+                  <RatingBar value={categoryAverages.design} showOutstandingGold={averageRating >= 9} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.design)}
                   </span>
@@ -187,7 +187,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Condition
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.condition} />
+                  <RatingBar value={categoryAverages.condition} showOutstandingGold={averageRating >= 9} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.condition)}
                   </span>
@@ -202,7 +202,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Clubhouse
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.clubhouse} />
+                  <RatingBar value={categoryAverages.clubhouse} showOutstandingGold={averageRating >= 9} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.clubhouse)}
                   </span>
@@ -217,7 +217,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Facilities
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.facilities} />
+                  <RatingBar value={categoryAverages.facilities} showOutstandingGold={averageRating >= 9} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.facilities)}
                   </span>
