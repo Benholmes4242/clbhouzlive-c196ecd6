@@ -165,7 +165,6 @@ const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 // Hub components (lazy load when feature flag is enabled)
-const HubPageRedesign = lazy(() => import("./pages/hub/HubPageRedesign"));
 const HubHomePage = lazy(() => import("./features/hub/pages/HubHomePage").then(m => ({ default: m.HubHomePage })));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubEchoChatPage = lazy(() => import("./features/hub/pages/HubEchoChatPage").then(m => ({ default: m.HubEchoChatPage })));
@@ -187,11 +186,6 @@ const HubTripPage = lazy(() => import("./features/hub/pages/HubTripPage"));
 
 // Games feature pages
 const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGamesPage"));
-
-// Events feature pages
-const EventDetailPage = lazy(() => import("./features/events/pages/EventDetailPage"));
-const JoinEventPage = lazy(() => import("./features/events/pages/JoinEventPage"));
-const EventsListPage = lazy(() => import("./features/events/pages/EventsListPage"));
 
 // Simple redirect component for /hub/game/:id → /game/:id
 function HubGameRedirect() {
@@ -283,18 +277,22 @@ function CreatorPageWrapper() {
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
   const location = useLocation();
-  const state = location.state as { backgroundLocation?: Location; fromVideo?: boolean } | null;
+  const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
   
-  // Render origin page when we have a background location (for video modal only)
+  // Render origin page when we have a background location
   const routesLocation = state?.backgroundLocation || location;
+  
+  // Hub overlay = /hub or /hub/* with backgroundLocation
+  const isHubRoute = location.pathname === '/hub' || location.pathname.startsWith('/hub/');
+  const showHubOverlay = isHubRoute && !!state?.backgroundLocation;
   
   // Video modal = /video/:id with backgroundLocation
   const isVideoRoute = location.pathname.startsWith('/video/');
   const showVideoModal = isVideoRoute && !!state?.backgroundLocation;
   
   // Global overlay detection - sync with <html> class
-  const overlayActive = showVideoModal || shouldHideHeader;
+  const overlayActive = showHubOverlay || showVideoModal || shouldHideHeader;
   
   useEffect(() => {
     const el = document.documentElement;
@@ -494,37 +492,58 @@ function AppRoutes() {
         <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeComparePage /></Suspense>} />
         <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeProfilePage /></Suspense>} />
         
-        {/* Hub routes - normal page navigation */}
-        <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubPageRedesign /></Suspense>} />
-        <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
-        <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
-        <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
-        <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
-        <Route path="/hub/games/:gameId" element={<Suspense fallback={<HubSkeleton />}><GameDetailPage /></Suspense>} />
-        <Route path="/hub/trips/:tripId" element={<Suspense fallback={<HubSkeleton />}><TripDetailPage /></Suspense>} />
-        <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
-        <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
-        <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
-        <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
-        <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
-        <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
-        <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
-        <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
-        <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
-        <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
-        <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
-        <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
-        {/* Redirect /hub/game/:id to /game/:id */}
-        <Route path="/hub/game/:id" element={<HubGameRedirect />} />
-        {/* Event routes */}
-        <Route path="/events" element={<Suspense fallback={<HubSkeleton />}><EventsListPage /></Suspense>} />
-        <Route path="/events/join/:shareCode" element={<Suspense fallback={<HubSkeleton />}><JoinEventPage /></Suspense>} />
-        <Route path="/events/:eventId" element={<Suspense fallback={<HubSkeleton />}><EventDetailPage /></Suspense>} />
-        
+        {/* Hub routes - only when NOT using background location */}
+        {!showHubOverlay && (
+          <>
+            <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
+            <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
+            <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
+            <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
+            <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
+            <Route path="/hub/games/:gameId" element={<Suspense fallback={<HubSkeleton />}><GameDetailPage /></Suspense>} />
+            <Route path="/hub/trips/:tripId" element={<Suspense fallback={<HubSkeleton />}><TripDetailPage /></Suspense>} />
+            <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
+            <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
+            <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
+            <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
+          <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
+          <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
+          <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
+          <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
+          <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
+          <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
+          <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
+          <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
+          {/* Redirect /hub/game/:id to /game/:id */}
+          <Route path="/hub/game/:id" element={<HubGameRedirect />} />
+          </>
+        )}
         
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 
+      {/* Hub Overlays - rendered over origin page when background location exists */}
+      {showHubOverlay && (
+        <Routes>
+          <Route path="/hub" element={<HubHomePage />} />
+          <Route path="/hub/golfers" element={<HubGolfersPage />} />
+          <Route path="/hub/echo" element={<HubEchoChatPage />} />
+          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
+          <Route path="/hub/games" element={<HubGamesPage />} />
+          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
+          <Route path="/hub/swing" element={<HubSwingPage />} />
+          <Route path="/hub/messages" element={<HubMessagesListPage />} />
+          <Route path="/hub/messages/:conversationId" element={<HubChatPlaceholderPage />} />
+          <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
+          <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
+          <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
+          <Route path="/hub/echo/history/chat/:id" element={<HubEchoHistoryDetailPage />} />
+          <Route path="/hub/echo/tags" element={<HubEchoTagsPage />} />
+          <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
+          <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
+          <Route path="/hub/trip/:tripId" element={<HubTripPage />} />
+        </Routes>
+      )}
       
       {/* Video Player Modal - rendered over origin page when navigating from video feed */}
       {showVideoModal && (

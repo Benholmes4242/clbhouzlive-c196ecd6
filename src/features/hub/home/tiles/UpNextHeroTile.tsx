@@ -4,10 +4,10 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Plane, Users } from 'lucide-react';
 import { useHubHeroData, HeroGameData, HeroTripData, HeroFallbackData } from '../hooks/useHubHeroData';
+import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
 import { SlotsPill } from '@/features/nearby/components/your-games/SlotsPill';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -257,9 +257,9 @@ function CarouselDots({
 
 // Main Component
 export function UpNextHeroTile() {
-  const navigate = useNavigate();
   const { data: heroData, isLoading } = useHubHeroData();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [gamesHubOpen, setGamesHubOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const autoRotateTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -325,15 +325,8 @@ export function UpNextHeroTile() {
     
     if (!currentSlide) return;
 
-    // Navigate to the appropriate detail page
-    if (currentSlide.type === 'game' && currentSlide.gameId) {
-      navigate(`/hub/games/${currentSlide.gameId}`);
-    } else if (currentSlide.type === 'trip' && currentSlide.tripId) {
-      navigate(`/hub/trips/${currentSlide.tripId}`);
-    } else {
-      // Fallback - go to games list
-      navigate('/hub/games');
-    }
+    // Open games sheet for all slide types
+    setGamesHubOpen(true);
   };
 
   const handleDotClick = (index: number) => {
@@ -361,31 +354,38 @@ export function UpNextHeroTile() {
   }
 
   return (
-    <div 
-      className="relative w-full overflow-hidden transition-shadow duration-200"
-      style={{
-        height: '150px',
-        borderRadius: 'var(--hub-radius-xl)',
-        boxShadow: 'var(--hub-shadow-hero)',
-        border: '1px solid rgba(255, 255, 255, 0.18)',
-      }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {slides.map((slide, index) => (
-        <HeroSlide
-          key={slide.type === 'game' ? slide.gameId : slide.type === 'trip' ? slide.tripId : 'fallback'}
-          data={slide}
-          onClick={handleSlideClick}
-          isActive={index === activeIndex}
-        />
-      ))}
+    <>
+      <div 
+        className="relative w-full overflow-hidden transition-shadow duration-200"
+        style={{
+          height: '150px',
+          borderRadius: 'var(--hub-radius-xl)', // 24px for hero
+          boxShadow: 'var(--hub-shadow-hero)',
+          border: '1px solid rgba(255, 255, 255, 0.18)', // Glass edge
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {slides.map((slide, index) => (
+          <HeroSlide
+            key={slide.type === 'game' ? slide.gameId : slide.type === 'trip' ? slide.tripId : 'fallback'}
+            data={slide}
+            onClick={handleSlideClick}
+            isActive={index === activeIndex}
+          />
+        ))}
 
-      <CarouselDots 
-        count={slides.length} 
-        activeIndex={activeIndex} 
-        onDotClick={handleDotClick}
+        <CarouselDots 
+          count={slides.length} 
+          activeIndex={activeIndex} 
+          onDotClick={handleDotClick}
+        />
+      </div>
+
+      <HubYourGamesSheet
+        isOpen={gamesHubOpen}
+        onClose={() => setGamesHubOpen(false)}
       />
-    </div>
+    </>
   );
 }
