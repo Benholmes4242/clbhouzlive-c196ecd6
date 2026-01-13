@@ -19,13 +19,13 @@ const Slider = React.forwardRef<
       )}
       {...props}
     >
-      <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-gray-100">
+      <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-[#e5e7eb]">
         <SliderPrimitive.Range 
           className={cn(
             "absolute h-full transition-colors",
             isOutstanding 
               ? "bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]" 
-              : "bg-gray-300"
+              : "bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]"
           )} 
         />
       </SliderPrimitive.Track>
@@ -34,7 +34,7 @@ const Slider = React.forwardRef<
           "block h-5 w-5 rounded-full border-2 shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           isOutstanding 
             ? "bg-[#F79E1B] border-[#F79E1B] focus-visible:ring-[#FFAF30] hover:bg-[#E8890F] hover:border-[#E8890F]" 
-            : "bg-gray-400 border-gray-400 focus-visible:ring-gray-400"
+            : "bg-[#9ca3af] border-[#9ca3af] focus-visible:ring-[#9ca3af] hover:bg-[#6b7280] hover:border-[#6b7280]"
         )} 
       />
     </SliderPrimitive.Root>

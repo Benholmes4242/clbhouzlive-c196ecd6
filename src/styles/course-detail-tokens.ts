@@ -97,23 +97,23 @@ export const courseDetailTokens = {
     chipActive: 'ring-2 ring-offset-2',
   },
 
-  // Score ring gradient colors - BRAND COLOR FOR OUTSTANDING ONLY, grey for rest
+  // Score ring gradient colors - BRAND COLOR FOR OUTSTANDING ONLY, darker grey gradient for rest
   scoreRing: {
     outstanding: { from: '#FFAF30', to: '#F79E1B' }, // Brand orange
-    excellent: { from: '#9ca3af', to: '#d1d5db' },   // Grey
-    veryGood: { from: '#9ca3af', to: '#d1d5db' },    // Grey
-    good: { from: '#9ca3af', to: '#d1d5db' },        // Grey
-    fair: { from: '#9ca3af', to: '#d1d5db' },        // Grey
+    excellent: { from: '#c4c8ce', to: '#9ca3af' },   // Darker grey gradient
+    veryGood: { from: '#c4c8ce', to: '#9ca3af' },    // Darker grey gradient
+    good: { from: '#c4c8ce', to: '#9ca3af' },        // Darker grey gradient
+    fair: { from: '#c4c8ce', to: '#9ca3af' },        // Darker grey gradient
   },
 } as const;
 
-// Tier gradient mapping for distribution bars - BRAND COLOR FOR OUTSTANDING ONLY
+// Tier gradient mapping for distribution bars - BRAND COLOR FOR OUTSTANDING ONLY, darker grey gradient for rest
 export const tierGradients: Record<string, string> = {
   Outstanding: 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]',
-  Excellent: 'bg-gray-300',
-  'Very Good': 'bg-gray-300',
-  Good: 'bg-gray-300',
-  Fair: 'bg-gray-300',
+  Excellent: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',
+  'Very Good': 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',
+  Good: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',
+  Fair: 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;
