@@ -143,8 +143,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     
     const sorted = [...categories]
       .filter(c => c.score && c.score >= 9.0) // 9/10 threshold for highlights (matches Outstanding)
-      .sort((a, b) => (b.score || 0) - (a.score || 0))
-      .slice(0, 3);
+      .sort((a, b) => (b.score || 0) - (a.score || 0));
+    // Show all qualifying highlights (no limit since we only show 9+ scores)
     
     if (sorted.length === 0) return null;
     return sorted.map(c => c.label);
