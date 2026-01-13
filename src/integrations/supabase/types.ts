@@ -3235,6 +3235,66 @@ export type Database = {
         }
         Relationships: []
       }
+      event_leaderboard: {
+        Row: {
+          event_id: string
+          id: string
+          movement: number | null
+          participant_id: string
+          position_gross: number | null
+          position_net: number | null
+          position_stableford: number | null
+          rounds_played: number | null
+          total_gross: number | null
+          total_net: number | null
+          total_stableford: number | null
+          updated_at: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          movement?: number | null
+          participant_id: string
+          position_gross?: number | null
+          position_net?: number | null
+          position_stableford?: number | null
+          rounds_played?: number | null
+          total_gross?: number | null
+          total_net?: number | null
+          total_stableford?: number | null
+          updated_at?: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          movement?: number | null
+          participant_id?: string
+          position_gross?: number | null
+          position_net?: number | null
+          position_stableford?: number | null
+          rounds_played?: number | null
+          total_gross?: number | null
+          total_net?: number | null
+          total_stableford?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_leaderboard_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_leaderboard_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_moments: {
         Row: {
           created_at: string
@@ -3279,6 +3339,267 @@ export type Database = {
             columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_participants: {
+        Row: {
+          amount_due: number | null
+          amount_paid: number | null
+          created_at: string
+          event_id: string
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          handicap_index: number | null
+          id: string
+          invitation_status: string
+          invited_at: string | null
+          invited_by: string | null
+          payment_status: string | null
+          playing_handicap: number | null
+          responded_at: string | null
+          role: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_due?: number | null
+          amount_paid?: number | null
+          created_at?: string
+          event_id: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          handicap_index?: number | null
+          id?: string
+          invitation_status?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          payment_status?: string | null
+          playing_handicap?: number | null
+          responded_at?: string | null
+          role?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_due?: number | null
+          amount_paid?: number | null
+          created_at?: string
+          event_id?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          handicap_index?: number | null
+          id?: string
+          invitation_status?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          payment_status?: string | null
+          playing_handicap?: number | null
+          responded_at?: string | null
+          role?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_rounds: {
+        Row: {
+          course_id: string | null
+          course_location: string | null
+          course_name: string
+          course_rating: number | null
+          created_at: string
+          event_id: string
+          first_tee_time: string
+          holes: number
+          id: string
+          legacy_game_id: string | null
+          par: number | null
+          round_date: string
+          round_number: number
+          shotgun_start: boolean | null
+          slope_rating: number | null
+          status: string
+          tee_color: string | null
+          tee_time_interval: number
+          updated_at: string
+        }
+        Insert: {
+          course_id?: string | null
+          course_location?: string | null
+          course_name: string
+          course_rating?: number | null
+          created_at?: string
+          event_id: string
+          first_tee_time: string
+          holes?: number
+          id?: string
+          legacy_game_id?: string | null
+          par?: number | null
+          round_date: string
+          round_number?: number
+          shotgun_start?: boolean | null
+          slope_rating?: number | null
+          status?: string
+          tee_color?: string | null
+          tee_time_interval?: number
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string | null
+          course_location?: string | null
+          course_name?: string
+          course_rating?: number | null
+          created_at?: string
+          event_id?: string
+          first_tee_time?: string
+          holes?: number
+          id?: string
+          legacy_game_id?: string | null
+          par?: number | null
+          round_date?: string
+          round_number?: number
+          shotgun_start?: boolean | null
+          slope_rating?: number | null
+          status?: string
+          tee_color?: string | null
+          tee_time_interval?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_rounds_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_rounds_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_rounds_legacy_game_id_fkey"
+            columns: ["legacy_game_id"]
+            isOneToOne: false
+            referencedRelation: "discover_games_anon"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_rounds_legacy_game_id_fkey"
+            columns: ["legacy_game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_scores: {
+        Row: {
+          attested_at: string | null
+          attested_by: string | null
+          back_nine_gross: number | null
+          created_at: string
+          front_nine_gross: number | null
+          group_id: string | null
+          hole_scores: Json | null
+          holes_halved: number | null
+          holes_lost: number | null
+          holes_won: number | null
+          id: string
+          participant_id: string
+          round_id: string
+          scorecard_image_url: string | null
+          stableford_points: number | null
+          status: string
+          total_gross: number | null
+          total_net: number | null
+          updated_at: string
+        }
+        Insert: {
+          attested_at?: string | null
+          attested_by?: string | null
+          back_nine_gross?: number | null
+          created_at?: string
+          front_nine_gross?: number | null
+          group_id?: string | null
+          hole_scores?: Json | null
+          holes_halved?: number | null
+          holes_lost?: number | null
+          holes_won?: number | null
+          id?: string
+          participant_id: string
+          round_id: string
+          scorecard_image_url?: string | null
+          stableford_points?: number | null
+          status?: string
+          total_gross?: number | null
+          total_net?: number | null
+          updated_at?: string
+        }
+        Update: {
+          attested_at?: string | null
+          attested_by?: string | null
+          back_nine_gross?: number | null
+          created_at?: string
+          front_nine_gross?: number | null
+          group_id?: string | null
+          hole_scores?: Json | null
+          holes_halved?: number | null
+          holes_lost?: number | null
+          holes_won?: number | null
+          id?: string
+          participant_id?: string
+          round_id?: string
+          scorecard_image_url?: string | null
+          stableford_points?: number | null
+          status?: string
+          total_gross?: number | null
+          total_net?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_scores_attested_by_fkey"
+            columns: ["attested_by"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_scores_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "tee_time_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_scores_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_scores_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "event_rounds"
             referencedColumns: ["id"]
           },
         ]
@@ -3339,6 +3660,86 @@ export type Database = {
             columns: ["tournament_id"]
             isOneToOne: true
             referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          allow_waitlist: boolean | null
+          club_id: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          end_date: string | null
+          event_type: string
+          handicap_allowance: number | null
+          id: string
+          max_handicap: number | null
+          max_participants: number | null
+          name: string
+          published_at: string | null
+          registration_deadline: string | null
+          scoring_format: string | null
+          share_code: string | null
+          start_date: string
+          status: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          allow_waitlist?: boolean | null
+          club_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_date?: string | null
+          event_type?: string
+          handicap_allowance?: number | null
+          id?: string
+          max_handicap?: number | null
+          max_participants?: number | null
+          name: string
+          published_at?: string | null
+          registration_deadline?: string | null
+          scoring_format?: string | null
+          share_code?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          allow_waitlist?: boolean | null
+          club_id?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_date?: string | null
+          event_type?: string
+          handicap_allowance?: number | null
+          id?: string
+          max_handicap?: number | null
+          max_participants?: number | null
+          name?: string
+          published_at?: string | null
+          registration_deadline?: string | null
+          scoring_format?: string | null
+          share_code?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -7733,6 +8134,89 @@ export type Database = {
         }
         Relationships: []
       }
+      tee_time_group_players: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          participant_id: string
+          playing_handicap: number | null
+          position: number
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          participant_id: string
+          playing_handicap?: number | null
+          position?: number
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          participant_id?: string
+          playing_handicap?: number | null
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tee_time_group_players_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "tee_time_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tee_time_group_players_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tee_time_groups: {
+        Row: {
+          created_at: string
+          group_name: string | null
+          group_number: number
+          id: string
+          round_id: string
+          starting_hole: number | null
+          status: string
+          tee_time: string
+        }
+        Insert: {
+          created_at?: string
+          group_name?: string | null
+          group_number: number
+          id?: string
+          round_id: string
+          starting_hole?: number | null
+          status?: string
+          tee_time: string
+        }
+        Update: {
+          created_at?: string
+          group_name?: string | null
+          group_number?: number
+          id?: string
+          round_id?: string
+          starting_hole?: number | null
+          status?: string
+          tee_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tee_time_groups_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "event_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       top100_lists: {
         Row: {
           created_at: string | null
@@ -10850,6 +11334,10 @@ export type Database = {
       generate_creator_slug: {
         Args: { p_display_name: string }
         Returns: string
+      }
+      generate_tee_time_groups: {
+        Args: { p_players_per_group?: number; p_round_id: string }
+        Returns: number
       }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
