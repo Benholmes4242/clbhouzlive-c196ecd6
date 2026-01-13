@@ -24,11 +24,11 @@ interface MapCourseSheetProps {
 
 type SheetState = 'peek' | 'half' | 'full';
 
-// Adjusted heights: half state shows all content without scroll
+// Sheet uses auto height - content determines size, no scroll
 const SHEET_HEIGHTS: Record<SheetState, string> = {
-  peek: '25%',
-  half: '100%',  // Full height to show all content
-  full: '100%',
+  peek: 'auto',
+  half: 'auto',
+  full: 'auto',
 };
 
 // Fetch course thumbnail image
@@ -218,23 +218,24 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
   return (
     <AnimatePresence mode="wait">
-      {/* Backdrop - tap to dismiss with subtle blur */}
+      {/* Backdrop - fixed overlay for the whole screen */}
       <motion.div
         key="sheet-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="absolute inset-0 z-30 bg-black/10 backdrop-blur-[1px]"
+        className="fixed inset-0 z-30 bg-black/10 backdrop-blur-[1px]"
         onClick={onClose}
       />
       
+      {/* Sheet - slides up from bottom, positioned above filters */}
       <motion.div
         ref={sheetRef}
         key={`sheet-${course.id}`}
-        initial={{ y: '100%' }}
-        animate={{ y: 0, height: SHEET_HEIGHTS[sheetState] }}
-        exit={{ y: '100%' }}
+        initial={{ y: 300, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 300, opacity: 0 }}
         transition={{ 
           type: 'spring', 
           damping: 32, 
@@ -250,13 +251,12 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         aria-modal="true"
         aria-labelledby="course-sheet-title"
         className={cn(
-          'absolute bottom-0 left-0 right-0 z-40',
           'rounded-t-[24px]',
           'bg-white dark:bg-slate-900',
-          'border-t border-slate-200/50 dark:border-slate-700/50',
+          'border-t border-x border-slate-200/50 dark:border-slate-700/50',
           'shadow-[0_-12px_50px_rgba(0,0,0,0.2)]',
           'flex flex-col',
-          'overflow-hidden'
+          'mx-3'
         )}
       >
         {/* Drag handle pill - premium centered */}
@@ -283,8 +283,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
           />
         </button>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        {/* Content - no scroll, auto height */}
+        <div className="flex-shrink-0">
           {/* Course hero image - optimized height for all content to fit in half state */}
           <div className="relative w-full h-36 flex-shrink-0 overflow-hidden">
             {thumbnailImage ? (
