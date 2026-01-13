@@ -34,10 +34,11 @@ interface VirtualizedCourseListProps {
   footer?: React.ReactNode;
 }
 
-// Card height for scroll calculations - used for virtualization positioning only
-// Cards render at natural height; this is for calculating scroll position
-const ITEM_HEIGHT = 280; // Approximate height for scroll math
-const ITEM_HEIGHT_SM = 260; // Desktop approximate
+// Card height for scroll calculations and grid height sizing
+// Must match actual rendered card height to prevent footer overlap
+// UnifiedCourseCard: 16:9 image (~200px) + name (~28px) + location (~24px) + rating (~32px) + padding (~40px) = ~324px
+const ITEM_HEIGHT = 340; // Mobile: actual card height with all metadata
+const ITEM_HEIGHT_SM = 320; // Desktop: slightly shorter due to narrower cards
 const BUFFER_SIZE = 3; // Number of items to render above/below viewport
 
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
