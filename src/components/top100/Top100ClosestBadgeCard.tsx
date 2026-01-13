@@ -64,19 +64,19 @@ export function Top100ClosestBadgeCard({
           <AnimatedNumber value={totalTop100Played} minCh={1} /> courses logged
         </span>
       </div>
-      {/* KEEP as card - stronger shadow for focal CTA */}
+      {/* Card with premium shadow and hover state */}
       <div 
         className={cn(
           "rounded-2xl border bg-white p-4 relative overflow-hidden",
-          "hover:bg-slate-50 transition-colors cursor-pointer",
-          "shadow-md"
+          "hover:bg-slate-50/80 transition-all duration-200 cursor-pointer",
+          "shadow-md hover:shadow-lg"
         )}
-        style={{ borderColor: `${accentColor}30` }}
+        style={{ borderColor: `${accentColor}25` }}
         onClick={() => onOpenDetail?.(closest)}
       >
         {/* Trophy silhouette watermark (E2) */}
         <div 
-          className="absolute top-0 right-0 w-24 h-24 pointer-events-none opacity-[0.03]"
+          className="absolute top-0 right-0 w-24 h-24 pointer-events-none opacity-[0.04]"
           style={{
             background: `radial-gradient(ellipse at top right, ${accentColor} 0%, transparent 70%)`,
           }}
@@ -85,12 +85,13 @@ export function Top100ClosestBadgeCard({
         </div>
 
         <div className="flex items-start gap-3 relative z-10">
-          {/* Trophy medallion */}
+          {/* Trophy medallion with subtle glow */}
           <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform hover:scale-105"
             style={{ 
-              backgroundColor: `${accentColor}15`,
-              border: `1px solid ${accentColor}25`,
+              backgroundColor: `${accentColor}12`,
+              border: `1px solid ${accentColor}20`,
+              boxShadow: `0 0 16px ${accentColor}15`,
             }}
           >
             <Trophy className="w-5 h-5" style={{ color: accentColor }} />
@@ -102,7 +103,7 @@ export function Top100ClosestBadgeCard({
               <h3 className="text-base font-semibold text-foreground">
                 {closest.label}
               </h3>
-              <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
             </div>
 
             {/* Progress text */}
@@ -113,9 +114,9 @@ export function Top100ClosestBadgeCard({
               </span>
             </p>
 
-            {/* Progress bar - increased contrast bg (item 8) */}
+            {/* Progress bar - gradient fill with glow */}
             <div 
-              className="mt-3 h-2 rounded-full bg-border/80 overflow-hidden"
+              className="mt-3 h-2 rounded-full bg-slate-200/80 overflow-hidden"
               role="progressbar"
               aria-valuenow={Math.round(progressPercent)}
               aria-valuemin={0}
@@ -126,22 +127,24 @@ export function Top100ClosestBadgeCard({
                 className="h-full rounded-full transition-[width] duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`, 
-                  backgroundColor: accentColor,
+                  background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}CC 100%)`,
+                  boxShadow: `0 0 8px ${accentColor}30`,
                 }}
               />
             </div>
 
-            {/* CTA - high contrast */}
+            {/* CTA - with arrow animation on hover */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenDetail?.(closest);
               }}
-              className="mt-3 text-xs font-semibold underline-offset-2 hover:underline"
+              className="mt-3 text-xs font-semibold underline-offset-2 hover:underline inline-flex items-center gap-1 group/cta"
               style={{ color: accentColor }}
             >
-              See requirements →
+              See requirements
+              <span className="transition-transform group-hover/cta:translate-x-0.5">→</span>
             </button>
           </div>
         </div>

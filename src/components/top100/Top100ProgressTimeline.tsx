@@ -97,11 +97,12 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
           </span>
         </div>
 
-        {/* Timeline bars */}
+        {/* Timeline bars - animated on first render */}
         <div className="flex items-end gap-1 h-16">
           {monthsData.map((month, idx) => {
             const heightPercent = month.count > 0 ? Math.max(20, (month.count / maxCount) * 100) : 8;
             const isActive = month.count > 0;
+            const isCurrent = idx === new Date().getMonth();
 
             return (
               <button
@@ -109,30 +110,57 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 type="button"
                 onClick={() => setSelectedMonth(month)}
                 className={cn(
-                  'flex-1 rounded-t transition-all cursor-pointer',
-                  'hover:opacity-80 active:scale-95',
+                  'flex-1 rounded-t cursor-pointer relative overflow-hidden',
+                  'hover:opacity-90 active:scale-[0.97] transition-all duration-200',
                   isActive
-                    ? 'bg-primary/80 hover:bg-primary'
-                    : 'bg-muted/60 hover:bg-muted/80'
+                    ? 'shadow-sm'
+                    : 'bg-slate-200/60 hover:bg-slate-200/80'
                 )}
-                style={{ height: `${heightPercent}%` }}
+                style={{ 
+                  height: `${heightPercent}%`,
+                  // Gradient fill for active bars
+                  background: isActive 
+                    ? 'linear-gradient(to top, hsl(var(--primary)), hsl(var(--primary) / 0.7))'
+                    : undefined,
+                  // Animate grow from bottom
+                  animation: `bar-grow 0.5s ease-out ${idx * 0.03}s both`,
+                }}
                 aria-label={`${month.label}: ${month.count} courses`}
-              />
+              >
+                {/* Current month indicator ring */}
+                {isCurrent && !isActive && (
+                  <div className="absolute inset-0 border-2 border-dashed border-primary/30 rounded-t" />
+                )}
+              </button>
             );
           })}
         </div>
 
         {/* Month labels */}
         <div className="flex gap-1 mt-1.5">
-          {monthsData.map((month, idx) => (
-            <span
-              key={idx}
-              className="flex-1 text-[9px] text-muted-foreground text-center truncate"
-            >
-              {month.shortLabel}
-            </span>
-          ))}
+          {monthsData.map((month, idx) => {
+            const isCurrent = idx === new Date().getMonth();
+            return (
+              <span
+                key={idx}
+                className={cn(
+                  "flex-1 text-[9px] text-center truncate transition-colors",
+                  isCurrent ? "text-foreground font-medium" : "text-muted-foreground"
+                )}
+              >
+                {month.shortLabel}
+              </span>
+            );
+          })}
         </div>
+        
+        {/* CSS animation for bar growth */}
+        <style>{`
+          @keyframes bar-grow {
+            from { transform: scaleY(0); transform-origin: bottom; }
+            to { transform: scaleY(1); transform-origin: bottom; }
+          }
+        `}</style>
       </section>
 
       {/* Month detail sheet */}

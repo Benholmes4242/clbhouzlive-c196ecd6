@@ -29,10 +29,10 @@ function StatItem({
   const deltaPrefix = delta && delta > 0 ? '+' : '';
   
   return (
-    <div className="text-center flex flex-col items-center gap-1">
-      {/* Icon - slightly reduced opacity */}
-      <Icon className="w-3.5 h-3.5 text-muted-foreground/60" />
-      <p className="text-sm font-semibold leading-tight text-foreground">
+    <div className="text-center flex flex-col items-center gap-1 group cursor-default transition-colors hover:bg-slate-50/50 rounded-lg py-1 -my-1">
+      {/* Icon - consistent muted color with hover state */}
+      <Icon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors" />
+      <p className="text-sm font-semibold leading-tight text-foreground tabular-nums">
         {value}
       </p>
       <p className="text-[11px] font-medium text-muted-foreground">
@@ -60,27 +60,44 @@ export function Top100YearSummary({
 
   return (
     <section>
-      {/* Stats Row - KEEP as card, p-5 internal padding, gap-6 between columns */}
-      <div className="bg-white border border-slate-200/60 rounded-2xl p-5 min-h-[72px]">
-        <div className="grid grid-cols-4 gap-6">
-          <StatItem 
-            icon={Calendar}
-            value={String(summary.year)}
-            label="Year"
-            delta={yearDelta}
-          />
-          <StatItem 
-            icon={Globe2}
-            value={regionsCount.toString()}
-            label="Regions"
-            delta={regionsDelta}
-          />
-          <StatItem 
-            icon={PlusCircle}
-            value={summary.newCourses.toString()}
-            label="New"
-            delta={newCoursesDelta}
-          />
+      {/* Stats Row - card with subtle dividers between columns */}
+      <div className="bg-white border border-slate-200/60 rounded-2xl p-5 min-h-[72px] shadow-sm">
+        <div className="grid grid-cols-4 gap-0">
+          {/* Year */}
+          <div className="relative">
+            <StatItem 
+              icon={Calendar}
+              value={String(summary.year)}
+              label="Year"
+              delta={yearDelta}
+            />
+            {/* Subtle divider */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+          </div>
+          
+          {/* Regions */}
+          <div className="relative">
+            <StatItem 
+              icon={Globe2}
+              value={regionsCount.toString()}
+              label="Regions"
+              delta={regionsDelta}
+            />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+          </div>
+          
+          {/* New */}
+          <div className="relative">
+            <StatItem 
+              icon={PlusCircle}
+              value={summary.newCourses.toString()}
+              label="New"
+              delta={newCoursesDelta}
+            />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+          </div>
+          
+          {/* Avg rating - no divider after last */}
           <StatItem 
             icon={Star}
             value={summary.avgRating?.toFixed(1) ?? '—'}

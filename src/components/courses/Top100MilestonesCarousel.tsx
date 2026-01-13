@@ -113,10 +113,11 @@ export function Top100MilestonesCarousel({
 
   return (
     <section className="space-y-2 mt-6">
-      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-2.5">
+      {/* Section header - consistent styling */}
+      <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2 px-4">
         Achievements
       </h3>
-      <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground/70 mb-3 px-2.5">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-3 px-4">
         Milestone achievements (all lists)
       </p>
 
@@ -130,7 +131,7 @@ export function Top100MilestonesCarousel({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 px-2.5">
+        <CarouselContent className="-ml-2 px-4">
           {MILESTONES.map((milestone, index) => {
             const isUnlocked = totalPlayed >= milestone.threshold;
             const isNext = !isUnlocked && index === nextIndex;
@@ -154,13 +155,13 @@ export function Top100MilestonesCarousel({
                   <div className="mt-2 text-center" title={milestone.tierName}>
                     <p className={cn(
                       "text-[11px] font-medium line-clamp-2 leading-tight",
-                      isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground/80"
+                      isUnlocked ? "text-foreground" : isNext ? "text-foreground" : "text-muted-foreground/60"
                     )}>
                       {milestone.tierName}
                     </p>
                     <p className={cn(
-                      "text-[10px] leading-[1.2] py-0.5",
-                      isUnlocked ? "text-emerald-500" : "text-foreground/60"
+                      "text-[10px] leading-[1.2] py-0.5 font-medium",
+                      isUnlocked ? "text-emerald-500" : "text-muted-foreground/70"
                     )}>
                       {isUnlocked ? 'Unlocked' : `${remaining} away`}
                     </p>
@@ -172,10 +173,10 @@ export function Top100MilestonesCarousel({
         </CarouselContent>
       </Carousel>
 
-      {/* Progress line (C3) - bumped height 1-2px (item 5) */}
-      <div className="mx-2.5 mt-4">
+      {/* Progress line (C3) - gradient fill with glow */}
+      <div className="mx-4 mt-4">
         <div 
-          className="h-1.5 rounded-full bg-muted overflow-hidden"
+          className="h-1.5 rounded-full bg-slate-200/80 overflow-hidden"
           role="progressbar"
           aria-valuenow={Math.round(progressPct)}
           aria-valuemin={0}
@@ -183,27 +184,27 @@ export function Top100MilestonesCarousel({
           aria-label={`Overall milestone progress: ${totalPlayed} courses played`}
         >
           <div
-            className="h-full rounded-full transition-all duration-500"
+            className="h-full rounded-full transition-all duration-700 ease-out"
             style={{ 
               width: `${progressPct}%`, 
-              backgroundColor: targetColor,
-              boxShadow: `0 0 8px ${targetColor}50`,
+              background: `linear-gradient(90deg, ${targetColor} 0%, ${targetColor}CC 100%)`,
+              boxShadow: `0 0 10px ${targetColor}40, 0 0 4px ${targetColor}30`,
             }}
           />
         </div>
       </div>
 
-      {/* Dot indicators (optional) */}
+      {/* Dot indicators - only show when scrollable */}
       {count > 4 && (
-        <div className="flex justify-center gap-1 mt-2">
+        <div className="flex justify-center gap-1.5 mt-3">
           {Array.from({ length: Math.min(count, 8) }).map((_, idx) => (
             <div
               key={idx}
               className={cn(
-                'h-1 rounded-full transition-all',
+                'h-1.5 rounded-full transition-all duration-200',
                 idx === current
-                  ? 'w-3 bg-foreground/50'
-                  : 'w-1 bg-foreground/15'
+                  ? 'w-4 bg-foreground/50'
+                  : 'w-1.5 bg-foreground/15'
               )}
             />
           ))}

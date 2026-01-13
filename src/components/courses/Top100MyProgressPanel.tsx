@@ -138,16 +138,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     );
   }
 
-  // Skeleton loading state (G2)
+  // Skeleton loading state (G2) - with smooth fade-in transition
   if (isLoading) {
     return (
-      <div className="w-full max-w-full pb-8">
+      <div className="w-full max-w-full pb-8 animate-fade-in">
         <Top100ProgressHeroSkeleton />
         <Top100YearSummarySkeleton />
-        <div className="mb-4">
+        <div className="px-4 mb-4">
           <Top100TimelineSkeleton />
         </div>
-        <div className="mb-6">
+        <div className="px-4 mb-6">
           <Top100StreakSkeleton />
         </div>
         <Top100MilestonesCarouselSkeleton />
@@ -217,7 +217,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   }
 
   return (
-    <div className="w-full max-w-full pb-10">
+    <div className="w-full max-w-full pb-24 animate-fade-in">
       {/* ============================================
           SECTION A: HERO / IDENTITY - section band, no card
           Background: bg-slate-50, pt-8 pb-10

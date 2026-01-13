@@ -100,7 +100,7 @@ export function Top100RecentRoundsCarousel({
 
   return (
     <section className={cn("w-full px-4", className)}>
-      {/* Section header - mb-4 */}
+      {/* Section header - consistent styling */}
       <div className="mb-4">
         <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
           Recent Top 100 rounds
@@ -116,9 +116,12 @@ export function Top100RecentRoundsCarousel({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 px-2.5">
+        <CarouselContent className="-ml-2 px-0.5">
           {rounds.slice(0, 25).map((round, index) => (
-            <CarouselItem key={`${round.course_id}-${round.played_at}`} className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%]">
+            <CarouselItem 
+              key={`${round.course_id}-${round.played_at}`} 
+              className="pl-2 basis-[85%] sm:basis-[70%] md:basis-[50%] snap-start"
+            >
               <UnifiedCourseCard
                 course={fromTop100Round(round)}
                 showRankBadges={true}
@@ -130,7 +133,7 @@ export function Top100RecentRoundsCarousel({
           ))}
         </CarouselContent>
 
-        {/* Navigation buttons - optional secondary controls */}
+        {/* Navigation buttons - cleaner styling with better hover states */}
         {count > 1 && (
           <div className="flex items-center justify-center gap-4 mt-4">
             <button
@@ -138,25 +141,26 @@ export function Top100RecentRoundsCarousel({
               onClick={() => api?.scrollPrev()}
               disabled={current === 0}
               className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+                'h-8 w-8 rounded-full flex items-center justify-center transition-all duration-200',
                 current === 0
-                  ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
-                  : 'bg-muted/50 text-foreground hover:bg-muted'
+                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-foreground active:scale-95'
               )}
+              aria-label="Previous round"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            {/* Dot indicators - wider dots (item 9) */}
+            {/* Dot indicators - wider active dot */}
             <div className="flex gap-1.5">
               {Array.from({ length: Math.min(count, 5) }).map((_, idx) => (
                 <div
                   key={idx}
                   className={cn(
-                    'h-1.5 rounded-full transition-all',
+                    'h-1.5 rounded-full transition-all duration-200',
                     idx === current
-                      ? 'w-5 bg-foreground/60'
-                      : 'w-2 bg-foreground/20'
+                      ? 'w-5 bg-slate-500'
+                      : 'w-2 bg-slate-300'
                   )}
                 />
               ))}
@@ -167,11 +171,12 @@ export function Top100RecentRoundsCarousel({
               onClick={() => api?.scrollNext()}
               disabled={current === count - 1}
               className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center transition-colors',
+                'h-8 w-8 rounded-full flex items-center justify-center transition-all duration-200',
                 current === count - 1
-                  ? 'bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
-                  : 'bg-muted/50 text-foreground hover:bg-muted'
+                  ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-foreground active:scale-95'
               )}
+              aria-label="Next round"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -179,14 +184,14 @@ export function Top100RecentRoundsCarousel({
         )}
       </Carousel>
 
-      {/* Add round CTA (F3) */}
+      {/* Add round CTA (F3) - better styling */}
       {isOwnProfile && onAddRound && (
-        <div className="mt-4 px-2.5">
+        <div className="mt-5">
           <Button
             variant="outline"
             size="sm"
             onClick={onAddRound}
-            className="w-full rounded-full border-dashed"
+            className="w-full rounded-full border-dashed border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-colors"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add another Top 100 round

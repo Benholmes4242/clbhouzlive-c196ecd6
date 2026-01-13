@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { Calendar } from 'lucide-react';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
@@ -9,6 +10,7 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 import { Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;
@@ -45,13 +47,20 @@ function CenteredHeroAvatar({
 
   return (
     <div className="flex justify-center mb-6">
-      <SquircleAvatar
-        size={136}
-        src={avatarUrl}
-        alt={displayName ?? 'Player avatar'}
-        fallback={initials}
-        ringColor={ringColor}
-      />
+      <div className="relative">
+        {/* Subtle shadow for depth */}
+        <div 
+          className="absolute inset-0 rounded-sq-md blur-xl opacity-20"
+          style={{ backgroundColor: ringColor || '#94a3b8' }}
+        />
+        <SquircleAvatar
+          size={136}
+          src={avatarUrl}
+          alt={displayName ?? 'Player avatar'}
+          fallback={initials}
+          ringColor={ringColor}
+        />
+      </div>
     </div>
   );
 }
@@ -103,8 +112,9 @@ function HeroWithMilestoneRow({
           columnGap: 'min(max(32px, 5vw), 56px)',
         }}
       >
-        {/* Avatar on the left - responsive size, no clipping wrapper */}
+        {/* Avatar on the left - with subtle shadow for depth */}
         <div
+          className="relative"
           style={{
             width: 'min(34vw, 140px)',
             height: 'min(34vw, 140px)',
@@ -112,24 +122,36 @@ function HeroWithMilestoneRow({
             minHeight: '90px',
           }}
         >
+          {/* Subtle glow behind avatar */}
+          <div 
+            className="absolute inset-2 rounded-sq-md blur-xl opacity-15 transition-opacity"
+            style={{ backgroundColor: ringColor || '#94a3b8' }}
+          />
           <SquircleAvatar
             size={140}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
             ringColor={ringColor}
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
           />
         </div>
 
-        {/* Achievement badge card on the right */}
+        {/* Achievement badge card on the right - with gold shimmer for earned */}
         <div
           style={{
             width: 'min(42vw, 260px)',
             minWidth: '140px',
           }}
-          className="flex flex-col items-center gap-2"
+          className="flex flex-col items-center gap-2 relative"
         >
+          {/* Subtle gold glow for earned badges */}
+          <div 
+            className="absolute inset-0 rounded-2xl blur-2xl opacity-10 pointer-events-none"
+            style={{ 
+              background: `radial-gradient(ellipse at center, ${ringColor || '#D4AF37'} 0%, transparent 70%)` 
+            }}
+          />
           <EliteGameCard
             tier={achievementTier}
             earned={true}
@@ -186,7 +208,12 @@ export function Top100ProgressHero({
   }) : null;
 
   return (
-    <section className="flex flex-col items-center gap-3">
+    <motion.section 
+      className="flex flex-col items-center gap-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
       {/* Hero: centered avatar OR avatar + milestone side by side */}
       {hasAchievement ? (
         <HeroWithMilestoneRow
@@ -210,7 +237,7 @@ export function Top100ProgressHero({
         <span className="text-base font-medium">
           {isOwnProfile ? "You've played " : `${displayName} has played `}
         </span>
-        <span className="text-3xl font-bold text-foreground">
+        <span className="text-3xl font-bold text-foreground tabular-nums">
           {totalTop100Played}
         </span>
         <span className="text-base font-medium">
@@ -218,9 +245,10 @@ export function Top100ProgressHero({
         </span>
       </p>
 
-      {/* Secondary summary line - human-friendly date (A3) */}
+      {/* Secondary summary line - human-friendly date with calendar icon (A3) */}
       {formattedDate && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
+          <Calendar className="w-3.5 h-3.5" />
           Last logged: {formattedDate}
         </p>
       )}
@@ -231,6 +259,6 @@ export function Top100ProgressHero({
           <NudgeBanner nudge={nudge} variant="hero" />
         </div>
       )}
-    </section>
+    </motion.section>
   );
 }

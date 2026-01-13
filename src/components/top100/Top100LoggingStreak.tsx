@@ -72,22 +72,27 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
       <div className="flex items-center justify-between">
         {/* Streak display */}
         <div className="flex items-center gap-3">
+          {/* Fire icon with orange/amber color */}
           <div
             className={cn(
-              'w-9 h-9 rounded-full flex items-center justify-center',
+              'w-9 h-9 rounded-full flex items-center justify-center transition-all',
               currentStreak > 0
-                ? 'bg-orange-500/12 text-orange-500'
+                ? 'bg-gradient-to-br from-orange-500/15 to-amber-500/15 text-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
                 : 'bg-muted text-muted-foreground'
             )}
           >
-            <Flame className="h-4.5 w-4.5" />
+            <Flame className={cn(
+              "h-4.5 w-4.5 transition-transform",
+              currentStreak > 0 && "animate-[pulse_2s_ease-in-out_infinite]"
+            )} />
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">
               {currentStreak > 0 ? (
-                <>
-                  {currentStreak} month{currentStreak !== 1 ? 's' : ''} streak
-                </>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="tabular-nums">{currentStreak}</span>
+                  <span>month{currentStreak !== 1 ? 's' : ''} streak</span>
+                </span>
               ) : (
                 'Start a streak'
               )}
@@ -140,16 +145,24 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
                   hasLog
-                    ? 'bg-orange-500/20 text-orange-600 shadow-[0_0_6px_rgba(249,115,22,0.25)]'  // Glow for streak months (item 4)
+                    ? 'bg-gradient-to-br from-orange-500/20 to-amber-500/20 text-orange-600 shadow-[0_0_8px_rgba(249,115,22,0.3)]'
                     : isCurrent
-                    ? 'bg-muted border-2 border-dashed border-muted-foreground/50 text-muted-foreground'  // Thicker current ring (item 4)
-                    : 'bg-muted/50 text-muted-foreground/60'
+                    ? 'bg-muted/80 border-2 border-dashed border-primary/40 text-muted-foreground animate-[pulse_3s_ease-in-out_infinite]'
+                    : 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'
                 )}
                 aria-hidden="true"
               >
-                {hasLog ? '✓' : ''}
+                {hasLog ? (
+                  <span className="text-emerald-600">✓</span>
+                ) : null}
               </div>
-              <span className="text-[9px] text-muted-foreground" aria-hidden="true">
+              <span 
+                className={cn(
+                  "text-[9px] transition-colors",
+                  isCurrent ? "text-foreground font-medium" : "text-muted-foreground"
+                )}
+                aria-hidden="true"
+              >
                 {format(monthDate, 'MMM')}
               </span>
             </div>
