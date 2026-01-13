@@ -45,17 +45,21 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
     <div className={cn("space-y-3", className)}>
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Camera className="h-4 w-4 text-slate-500" />
-        <h4 className="text-sm font-medium text-slate-700">Your Moments</h4>
-        <span className="text-xs text-slate-400">({moments.length})</span>
+        <Camera className="h-4 w-4 text-gray-400" />
+        <h4 className="text-base font-semibold text-gray-900">Your Moments</h4>
+        <span className="text-sm text-gray-400">({moments.length})</span>
       </div>
 
-      {/* Media grid */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+      {/* Gallery-style carousel */}
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
         {moments.slice(0, 6).map((moment) => (
           <div
             key={moment.id}
-            className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-slate-100"
+            className={cn(
+              "relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden",
+              "shadow-sm hover:shadow-md transition-shadow cursor-pointer",
+              "ring-1 ring-black/5"
+            )}
           >
             {moment.mediaType === 'video' ? (
               <>
@@ -65,7 +69,13 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
                   muted
                   playsInline
                 />
-                <VideoPlayIndicator size="md" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <div className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
               </>
             ) : (
               <img
@@ -80,12 +90,19 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
         {/* Show more indicator */}
         {moments.length > 6 && (
-          <div className="flex-shrink-0 w-20 h-20 rounded-lg bg-slate-100 flex items-center justify-center">
-            <span className="text-sm font-medium text-slate-500">
+          <div className="flex-shrink-0 w-20 h-20 rounded-xl bg-black/50 backdrop-blur-sm flex items-center justify-center ring-1 ring-black/5">
+            <span className="text-white text-lg font-semibold">
               +{moments.length - 6}
             </span>
           </div>
         )}
+
+        {/* Add moment button at end */}
+        <button className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center hover:border-gray-300 hover:bg-gray-50 transition-colors">
+          <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
       </div>
     </div>
   );

@@ -1,14 +1,14 @@
 /**
- * PersonalReviewCard - User's own review display (calm, reflective)
- * Phase 5: Memory-focused, not performative
+ * PersonalReviewCard - User's own review display with premium styling
+ * Features circular score ring and mini progress bars for categories
  */
 import React, { useState } from 'react';
-import { Edit3, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Pencil, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { getScoreRingColors, getTierKeyFromScore } from '@/hooks/useTierStyles';
 
 // ReviewText component with line clamping and "Read more"
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
@@ -16,9 +16,9 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
   const needsClamp = text.length > 180;
   
   return (
-    <div className="pt-3 border-t border-slate-100">
+    <div className="pt-4 border-t border-gray-100">
       <p className={cn(
-        "text-sm text-slate-600 leading-relaxed italic",
+        "text-sm text-gray-600 leading-relaxed italic",
         !expanded && needsClamp && "line-clamp-3"
       )}>
         "{text}"
@@ -26,11 +26,55 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
       {needsClamp && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-1 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+          className="mt-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
         >
           {expanded ? 'Show less' : 'Read more'}
         </button>
       )}
+    </div>
+  );
+};
+
+// Score ring SVG component
+const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 80 }) => {
+  const { from, to } = getScoreRingColors(score);
+  const radius = (size - 12) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = (score / 10) * circumference;
+  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
+  
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="w-full h-full -rotate-90">
+        <circle 
+          cx={size / 2} 
+          cy={size / 2} 
+          r={radius} 
+          fill="none" 
+          stroke="#f3f4f6" 
+          strokeWidth="6" 
+        />
+        <circle 
+          cx={size / 2} 
+          cy={size / 2} 
+          r={radius} 
+          fill="none" 
+          stroke={`url(#${gradientId})`}
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeDasharray={`${progress} ${circumference}`}
+          className="transition-all duration-700 ease-out"
+        />
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={from} />
+            <stop offset="100%" stopColor={to} />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-2xl font-bold text-gray-900">{score.toFixed(1)}</span>
+      </div>
     </div>
   );
 };
@@ -54,80 +98,69 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
 
   // Format the date with "Played on" prefix
   const dateValue = rating.updated_at || rating.created_at;
-  const dateLabel = `Played on ${format(new Date(dateValue), 'MMM d, yyyy')}`;
+  const dateLabel = format(new Date(dateValue), 'MMM d, yyyy');
 
-  // Calculate average of sub-scores if available
-  const subScores = [
-    rating.design_score,
-    rating.condition_score,
-    rating.clubhouse_score,
-    rating.facilities_score,
-  ].filter((s): s is number => s !== null);
+  // Build category data
+  const categories = [
+    { label: 'Design', score: rating.design_score },
+    { label: 'Condition', score: rating.condition_score },
+    { label: 'Clubhouse', score: rating.clubhouse_score },
+    { label: 'Facilities', score: rating.facilities_score },
+  ].filter((c): c is { label: string; score: number } => c.score !== null);
 
   return (
-    <div className={cn("bg-white rounded-xl border border-slate-200 p-4 space-y-4", className)}>
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <h3 className="text-base font-semibold text-slate-900">Your Rating</h3>
-          <div className="flex items-center gap-1.5 text-xs text-slate-500">
-            <Calendar className="h-3 w-3" />
-            <span>{dateLabel}</span>
-          </div>
+    <div className={cn(
+      "bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border border-gray-100 shadow-sm overflow-hidden",
+      className
+    )}>
+      {/* Header with date */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+        <div>
+          <h3 className="text-base font-semibold text-gray-900">Your Rating</h3>
+          <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5" />
+            Played on {dateLabel}
+          </p>
         </div>
-        
-        <Button
-          variant="ghost"
-          size="sm"
+        <button 
           onClick={handleEditClick}
-          className="text-slate-500 hover:text-slate-700 -mr-2"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors active:scale-95"
         >
-          <Edit3 className="h-4 w-4 mr-1.5" />
+          <Pencil className="w-4 h-4" />
           Edit
-        </Button>
+        </button>
       </div>
-
-      {/* Overall rating - score only, no stars */}
-      <div className="flex items-center">
-        <span className="text-2xl font-bold text-slate-900">
-          {rating.rating.toFixed(1)}
-        </span>
-        <span className="text-sm text-slate-500 ml-1.5">/10</span>
+      
+      {/* Large score with ring + category breakdown */}
+      <div className="flex items-center gap-6 px-5 pb-4">
+        <ScoreRing score={rating.rating} size={80} />
+        
+        {/* Category breakdown as mini bars */}
+        {categories.length > 0 && (
+          <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
+            {categories.map(cat => (
+              <div key={cat.label} className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">{cat.label}</span>
+                  <span className="font-medium text-gray-700">{cat.score}/5</span>
+                </div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
+                    style={{ width: `${(cat.score / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* Sub-scores if available */}
-      {subScores.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-          {rating.design_score !== null && (
-            <div className="space-y-1">
-              <p className="text-xs text-slate-500">Design</p>
-              <p className="text-sm font-medium text-slate-700">{rating.design_score}/5</p>
-            </div>
-          )}
-          {rating.condition_score !== null && (
-            <div className="space-y-1">
-              <p className="text-xs text-slate-500">Condition</p>
-              <p className="text-sm font-medium text-slate-700">{rating.condition_score}/5</p>
-            </div>
-          )}
-          {rating.clubhouse_score !== null && (
-            <div className="space-y-1">
-              <p className="text-xs text-slate-500">Clubhouse</p>
-              <p className="text-sm font-medium text-slate-700">{rating.clubhouse_score}/5</p>
-            </div>
-          )}
-          {rating.facilities_score !== null && (
-            <div className="space-y-1">
-              <p className="text-xs text-slate-500">Facilities</p>
-              <p className="text-sm font-medium text-slate-700">{rating.facilities_score}/5</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Review text with line clamping */}
+      
+      {/* Review text */}
       {rating.review && (
-        <ReviewText text={rating.review} />
+        <div className="px-5 pb-5">
+          <ReviewText text={rating.review} />
+        </div>
       )}
     </div>
   );
