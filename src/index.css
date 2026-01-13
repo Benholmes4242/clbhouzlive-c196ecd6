@@ -3185,7 +3185,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Shared slider track styling - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-track],
 .rating-slider-breakdown [data-radix-slider-track] {
-  background-color: #f3f4f6; /* gray-100 - matches bar tracks */
+  background-color: #f3f4f6 !important; /* gray-100 - matches bar tracks */
   height: 6px;
   border-radius: 999px;
   position: relative;
@@ -3200,7 +3200,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Filled range - Gray (neutral: Fair → Excellent) - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-range],
 .rating-slider-breakdown [data-radix-slider-range] {
-  background-color: #d1d5db; /* gray-300 - matches breakdown bars */
+  background-color: #d1d5db !important; /* gray-300 - matches breakdown bars */
+  background: #d1d5db !important;
   border-radius: 999px;
   /* Phase 3A: Smooth fill animation */
   transition: 
@@ -3211,8 +3212,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Thumb styling - Gray (neutral) - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-thumb],
 .rating-slider-breakdown [data-radix-slider-thumb] {
-  background-color: #9ca3af; /* gray-400 */
-  border: 2px solid #9ca3af;
+  background-color: #9ca3af !important; /* gray-400 */
+  border: 2px solid #9ca3af !important;
   border-radius: 50%;
   box-shadow: 
     0 2px 6px rgba(0, 0, 0, 0.15),
@@ -3241,8 +3242,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Thumb hover state - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown [data-radix-slider-thumb]:hover {
-  background-color: #6b7280; /* gray-500 */
-  border-color: #6b7280;
+  background-color: #6b7280 !important; /* gray-500 */
+  border-color: #6b7280 !important;
   box-shadow: 
     0 3px 8px rgba(0, 0, 0, 0.18),
     0 1px 3px rgba(0, 0, 0, 0.12);
@@ -3276,21 +3277,21 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Outstanding: Amber filled range - UNIFIED COLOR */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-range],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-range] {
-  background: linear-gradient(to right, #f59e0b, #fbbf24); /* amber-500 to amber-400 */
+  background: linear-gradient(to right, #f59e0b, #fbbf24) !important; /* amber-500 to amber-400 */
 }
 
 /* Outstanding: Amber thumb - UNIFIED COLOR */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb] {
-  background-color: #f59e0b; /* amber-500 */
-  border-color: #f59e0b;
+  background-color: #f59e0b !important; /* amber-500 */
+  border-color: #f59e0b !important;
 }
 
 /* Outstanding: Amber thumb hover */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:hover {
-  background-color: #d97706; /* amber-600 - darker on hover */
-  border-color: #d97706;
+  background-color: #d97706 !important; /* amber-600 - darker on hover */
+  border-color: #d97706 !important;
 }
 
 /* Outstanding: Amber focus ring */
