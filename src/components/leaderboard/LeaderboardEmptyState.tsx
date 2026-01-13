@@ -9,6 +9,7 @@ type EmptyStateType =
   | 'friends-no-activity'
   | 'around-you-no-rank'
   | 'rising-no-data'
+  | 'rising-coming-soon'
   | 'courses-friends-no-friends'
   | 'courses-friends-no-activity'
   | 'courses-trending'
@@ -49,6 +50,11 @@ const EMPTY_STATES: Record<EmptyStateType, {
     icon: TrendingUp,
     title: 'Rising players',
     body: 'Not enough recent activity to show movers yet. Check back soon.',
+  },
+  'rising-coming-soon': {
+    icon: TrendingUp,
+    title: 'Fast Climbers',
+    body: "We're building the rank tracking system. This feature will show the biggest movers each month — coming soon!",
   },
   'courses-friends-no-friends': {
     icon: Users,

@@ -67,7 +67,11 @@ export function LeaderboardArenaTabs({
     <div className="w-full">
       {/* Scrollable tabs - reduced pill height */}
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-        <div className="inline-flex gap-1.5 pb-1 min-w-max">
+        <div 
+          role="tablist" 
+          aria-label="Leaderboard views"
+          className="inline-flex gap-1.5 pb-1 min-w-max"
+        >
           {ARENA_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeMode === tab.id;
@@ -76,11 +80,15 @@ export function LeaderboardArenaTabs({
             return (
               <motion.button
                 key={tab.id}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`leaderboard-panel-${tab.id}`}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => !isDisabled && onChange(tab.id)}
                 disabled={isDisabled}
                 whileTap={!isDisabled ? { scale: 0.97 } : undefined}
                 className={cn(
-                  'relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                  'relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
                   'whitespace-nowrap',
                   isActive
                     ? 'text-white'
@@ -98,7 +106,9 @@ export function LeaderboardArenaTabs({
                 )}
                 <span className="relative z-10 flex items-center gap-1.5">
                   <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
+                  {/* Shorter labels on mobile */}
+                  <span className="hidden xs:inline">{tab.label}</span>
+                  <span className="xs:hidden">{tab.id === 'friends' ? 'Friends' : tab.id === 'climbers' ? 'Climbers' : tab.id === 'regional' ? 'Regional' : tab.label}</span>
                 </span>
               </motion.button>
             );

@@ -160,7 +160,14 @@ export function LeaderboardYourStatus({
                 {coursesAway} {coursesAway === 1 ? 'course' : 'courses'} away
               </motion.span>
             </div>
-            <div className="h-2 rounded-full bg-muted/40 overflow-hidden">
+            <div 
+              role="progressbar"
+              aria-valuenow={Math.round(animatedProgress)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Progress to ${nextClub.tierName}: ${user.total_top100_played} of ${nextClub.threshold} courses`}
+              className="h-2 rounded-full bg-muted/40 overflow-hidden"
+            >
               <motion.div
                 className="h-full rounded-full"
                 initial={{ width: 0 }}
