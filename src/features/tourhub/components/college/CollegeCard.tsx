@@ -24,6 +24,7 @@ function formatCurrency(amount: number): string {
 export function CollegeCard({ stats, college, rank, className }: CollegeCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
+  const isTopThree = rank !== undefined && rank <= 3;
   
   return (
     <Link
@@ -35,59 +36,80 @@ export function CollegeCard({ stats, college, rank, className }: CollegeCardProp
         className
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-4">
         {/* Rank Badge */}
         {rank !== undefined && (
-          <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-body-sm font-semibold text-primary">
+          <div className={cn(
+            "shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+            isTopThree 
+              ? "bg-primary/15 shadow-sm shadow-primary/10" 
+              : "bg-muted/50"
+          )}>
+            <span className={cn(
+              "text-body-sm font-bold",
+              isTopThree ? "text-primary" : "text-muted-foreground"
+            )}>
               {rank}
             </span>
           </div>
         )}
         
-        {/* Logo */}
-        <div className="shrink-0 w-12 h-12 rounded-sq-lg bg-background-secondary flex items-center justify-center overflow-hidden">
-          {college?.logo_url ? (
-            <img 
-              src={college.logo_url} 
-              alt={displayName}
-              className="w-10 h-10 object-contain"
-              loading="lazy"
-            />
-          ) : (
-            <span className="text-lg font-bold text-text-tertiary">
-              {displayName.charAt(0).toUpperCase()}
-            </span>
+        {/* Logo with premium depth */}
+        <div className="relative shrink-0">
+          {/* Subtle glow for top 3 */}
+          {isTopThree && (
+            <div className="absolute inset-0 rounded-sq-lg bg-primary/10 blur-md scale-110" />
           )}
-        </div>
-        
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-body-md font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
-            {displayName}
-          </h3>
-          
-          {/* Stats Row */}
-          <div className="flex items-center gap-4 mt-2 text-body-sm text-text-secondary">
-            <span className="inline-flex items-center gap-1">
-              <Users className="w-3.5 h-3.5 text-text-tertiary" />
-              {stats.player_count} players
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <DollarSign className="w-3.5 h-3.5 text-accent-success" />
-              {formatCurrency(stats.earnings_total)}
-            </span>
-            {stats.wins_total > 0 && (
-              <span className="inline-flex items-center gap-1">
-                <Trophy className="w-3.5 h-3.5 text-accent-warning" />
-                {stats.wins_total} win{stats.wins_total !== 1 ? 's' : ''}
+          <div className={cn(
+            "w-12 h-12 rounded-sq-lg bg-background-secondary flex items-center justify-center overflow-hidden relative",
+            "shadow-[0_2px_6px_-2px_rgba(0,0,0,0.1)]",
+            isTopThree && "shadow-[0_2px_12px_-2px_rgba(var(--primary),0.15)]"
+          )}>
+            {/* Glossy highlight */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
+            
+            {college?.logo_url ? (
+              <img 
+                src={college.logo_url} 
+                alt={displayName}
+                className="w-10 h-10 object-contain relative z-10"
+                loading="lazy"
+              />
+            ) : (
+              <span className="text-lg font-bold text-text-tertiary relative z-10">
+                {displayName.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
         </div>
         
-        {/* Arrow */}
-        <ArrowRight className="w-4 h-4 text-text-tertiary group-hover:text-primary transition-colors shrink-0" />
+        {/* Content - Enhanced hierarchy */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-body-md font-bold text-text-primary truncate group-hover:text-primary transition-colors">
+            {displayName}
+          </h3>
+          
+          {/* Stats Row - metric emphasized, player count subdued */}
+          <div className="flex items-center gap-4 mt-1.5">
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent-success">
+              <DollarSign className="w-3.5 h-3.5" />
+              {formatCurrency(stats.earnings_total)}
+            </span>
+            {stats.wins_total > 0 && (
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-accent-warning">
+                <Trophy className="w-3.5 h-3.5" />
+                {stats.wins_total}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 text-xs text-text-tertiary">
+              <Users className="w-3 h-3" />
+              {stats.player_count}
+            </span>
+          </div>
+        </div>
+        
+        {/* Arrow - consistent alignment */}
+        <ArrowRight className="w-5 h-5 text-text-tertiary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 self-center" />
       </div>
     </Link>
   );
