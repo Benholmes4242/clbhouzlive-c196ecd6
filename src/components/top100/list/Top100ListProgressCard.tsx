@@ -1,4 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Target, Trophy, ChevronRight } from 'lucide-react';
 import { getListMilestoneState } from '@/lib/listMilestoneSystem';
 import { getRegionTheme } from '@/lib/regionTheme';
 import { AnimatedNumber } from '@/components/ui/motion';
@@ -14,61 +17,99 @@ interface Top100ListProgressCardProps {
 /**
  * Progress card shown below hero with next milestone info and motivational copy.
  * Uses regional color theming for accent elements.
+ * 
+ * Polish applied:
+ * - Tappable card → navigates to achievements
+ * - Milestone icon
+ * - Hover/press states
+ * - Bold milestone number
  */
 export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   playedCount,
   listSlug,
-  listDisplayName,
 }) => {
+  const navigate = useNavigate();
+  
   // Use unified milestone system
   const { nextMilestone, toGo, isComplete, statusCopy } = getListMilestoneState(playedCount);
   
   // Get regional theme for accent color
   const theme = getRegionTheme(listSlug);
 
+  const handleClick = () => {
+    navigate('/achievements');
+  };
+
   // Spacing: Progress bar → Next milestone = 16px (M) - handled by mt-4
   if (isComplete) {
     return (
-      <div 
-        className="mx-4 mt-4 px-3.5 py-3 rounded-xl border"
+      <motion.button
+        onClick={handleClick}
+        className="mx-4 mt-4 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md border transition-all duration-150 group"
         style={{
-          background: `linear-gradient(135deg, ${theme.bgClass.replace('bg-', '').replace('/10', '')} 0%, transparent 100%)`,
+          background: `linear-gradient(135deg, rgba(var(--region-${listSlug === 'gb-i' ? 'gbi' : listSlug}), 0.08) 0%, transparent 100%)`,
           borderColor: theme.ringColor,
           borderWidth: '1px',
         }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
       >
         <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900">
-              Completed
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: theme.ringColor }}>
-              <AnimatedNumber value={100} minCh={1} /> of 100 played
-            </p>
+          <div className="flex items-center gap-3 min-w-0">
+            <div 
+              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `${theme.ringColor}20` }}
+            >
+              <Trophy className="w-5 h-5" style={{ color: theme.ringColor }} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-900">
+                Completed
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: theme.ringColor }}>
+                <AnimatedNumber value={100} minCh={1} /> of 100 played
+              </p>
+            </div>
           </div>
-          <p className="text-xs font-medium italic whitespace-nowrap" style={{ color: theme.ringColor }}>
-            {statusCopy}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-medium italic whitespace-nowrap" style={{ color: theme.ringColor }}>
+              {statusCopy}
+            </p>
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+          </div>
         </div>
-      </div>
+      </motion.button>
     );
   }
 
   return (
-    <div className="mx-4 mt-4 px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-100">
+    <motion.button
+      onClick={handleClick}
+      className="mx-4 mt-4 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-white border border-slate-200 shadow-sm transition-all duration-150 group hover:border-slate-300 hover:shadow-md"
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+    >
       <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-900">
-            Next milestone: <AnimatedNumber value={nextMilestone} minCh={1} />
-          </p>
-          <p className="text-xs text-slate-500 mt-0.5">
-            <AnimatedNumber value={toGo} minCh={1} delay={0.05} /> course{toGo !== 1 ? 's' : ''} to go
-          </p>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+            <Target className="w-5 h-5 text-slate-600" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-slate-900">
+              Next milestone: <span className="text-lg tabular-nums"><AnimatedNumber value={nextMilestone ?? 0} minCh={1} /></span>
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              <AnimatedNumber value={toGo} minCh={1} delay={0.05} /> course{toGo !== 1 ? 's' : ''} to go
+            </p>
+          </div>
         </div>
-        <p className="text-xs font-medium text-slate-500 italic whitespace-nowrap">
-          {statusCopy}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-medium text-slate-500 italic whitespace-nowrap">
+            {statusCopy}
+          </p>
+          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+        </div>
       </div>
-    </div>
+    </motion.button>
   );
 };
