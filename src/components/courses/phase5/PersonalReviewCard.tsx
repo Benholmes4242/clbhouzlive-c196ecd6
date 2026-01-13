@@ -135,23 +135,30 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
       <div className="flex items-center gap-6 px-5 pb-4">
         <ScoreRing score={rating.rating} size={80} />
         
-        {/* Category breakdown as mini bars */}
+        {/* Category breakdown as mini bars - amber only for Outstanding (9+) */}
         {categories.length > 0 && (
           <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
-            {categories.map(cat => (
-              <div key={cat.label} className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{cat.label}</span>
-                  <span className="font-medium text-gray-700">{cat.score}/5</span>
+            {categories.map(cat => {
+              // Determine bar color based on OVERALL score (not individual category)
+              const barColorClass = rating.rating >= 9 
+                ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+                : 'bg-gray-300';
+              
+              return (
+                <div key={cat.label} className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">{cat.label}</span>
+                    <span className="font-medium text-gray-700">{cat.score}/5</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
+                      style={{ width: `${(cat.score / 5) * 100}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
-                    style={{ width: `${(cat.score / 5) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

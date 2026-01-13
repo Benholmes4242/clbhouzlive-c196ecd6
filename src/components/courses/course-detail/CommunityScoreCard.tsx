@@ -173,7 +173,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             )}
           </div>
           
-          {/* Large animated score ring */}
+          {/* Large animated score ring - amber for Outstanding (9+), grey otherwise */}
           <div className="relative">
             <svg className="w-24 h-24 -rotate-90">
               <circle 
@@ -197,8 +197,17 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               />
               <defs>
                 <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#f59e0b" />
-                  <stop offset="100%" stopColor="#fbbf24" />
+                  {communityAverage >= 9 ? (
+                    <>
+                      <stop offset="0%" stopColor="#f59e0b" />
+                      <stop offset="100%" stopColor="#fbbf24" />
+                    </>
+                  ) : (
+                    <>
+                      <stop offset="0%" stopColor="#9ca3af" />
+                      <stop offset="100%" stopColor="#d1d5db" />
+                    </>
+                  )}
                 </linearGradient>
               </defs>
             </svg>
@@ -255,11 +264,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
       )}
 
-      {/* Category breakdown */}
+      {/* Category breakdown - amber bars only for Outstanding (9+), otherwise grey */}
       {categories.length > 0 && (
         <div className="border-t border-gray-100 p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
+            // Determine bar color based on overall community average
+            const barColorClass = communityAverage >= 9 
+              ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
+              : 'bg-gray-300';
+            
             return (
               <div key={cat.id} className="space-y-1.5">
                 <div className="flex justify-between text-xs">
@@ -268,7 +282,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-700"
+                    className={`h-full ${barColorClass} rounded-full transition-all duration-700`}
                     style={{ width: `${(score / 5) * 100}%` }}
                   />
                 </div>

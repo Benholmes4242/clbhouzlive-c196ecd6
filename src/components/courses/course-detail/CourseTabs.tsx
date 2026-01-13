@@ -11,17 +11,17 @@ interface CourseTabsProps {
   mediaCount?: number;
 }
 
-// Enhanced tab trigger with thicker green indicator
+// Enhanced tab trigger with thicker orange indicator (matches app theme)
 const tabTriggerClass = cn(
   "relative px-4 py-3 text-sm font-medium transition-colors",
   "bg-transparent border-0 shadow-none rounded-none",
   "data-[state=active]:bg-transparent data-[state=active]:shadow-none",
   "data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-500",
   "hover:text-gray-700",
-  // Active indicator - thicker green underline
+  // Active indicator - thicker orange underline
   "after:absolute after:bottom-0 after:left-0 after:right-0",
   "after:h-[3px] after:rounded-full after:transition-all after:duration-200",
-  "data-[state=active]:after:bg-green-600 data-[state=inactive]:after:bg-transparent"
+  "data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
 );
 
 /**
