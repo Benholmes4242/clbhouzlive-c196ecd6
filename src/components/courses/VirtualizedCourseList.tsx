@@ -34,10 +34,11 @@ interface VirtualizedCourseListProps {
   footer?: React.ReactNode;
 }
 
-// Card height calculation for 16:9 image + meta bar (~80px)
-// Mobile: screen width / (16/9) + meta = ~56% of width + 80px
-const ITEM_HEIGHT = 280; // Mobile: 16:9 aspect + meta bar
-const ITEM_HEIGHT_SM = 260; // Desktop: slightly shorter
+// Card height calculation for 16:9 image + meta bar (~100px including padding)
+// Mobile: screen width / (16/9) + meta = ~56% of width + 100px
+// Increased from 280/260 to prevent metadata cutoff
+const ITEM_HEIGHT = 320; // Mobile: 16:9 aspect + full meta bar with location/rating
+const ITEM_HEIGHT_SM = 300; // Desktop: slightly shorter due to narrower cards
 const BUFFER_SIZE = 3; // Number of items to render above/below viewport
 
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
