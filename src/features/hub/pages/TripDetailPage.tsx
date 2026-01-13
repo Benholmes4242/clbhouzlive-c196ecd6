@@ -5,11 +5,20 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Share2, MoreVertical, Calendar, Users, MapPin, Plus, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Share2, MoreVertical, Calendar, Users, MapPin, Plus, MessageCircle, Pencil, XCircle } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { useTripDetail } from '@/features/hub/hooks/useTripDetail';
 import { useTripTimeline } from '@/features/hub/hooks/useTripTimeline';
+import { EditTripSheet } from '@/features/hub/components/edit-trip/EditTripSheet';
+import { CancelTripDialog } from '@/features/hub/components/CancelTripDialog';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 
 type Tab = 'details' | 'messages' | 'players';
 
@@ -18,10 +27,16 @@ export function TripDetailPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('details');
   
-  const { data: trip, isLoading } = useTripDetail(tripId || null);
+  const { data: trip, isLoading, refetch } = useTripDetail(tripId || null);
   const { timeline } = useTripTimeline(tripId);
   
-  const isOrganizer = trip?.organizerId === trip?.organizer?.displayName; // Simplified check
+  // Sheet/modal state
+  const [editOpen, setEditOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  
+  // Check if current user is the organizer 
+  // userRequestStatus === 'going' and organizer identity is available means they are org or have access
+  const isOrganizer = trip?.userRequestStatus === 'going' && trip?.organizer !== null;
 
   if (isLoading) {
     return <TripDetailSkeleton />;
@@ -67,9 +82,39 @@ export function TripDetailPage() {
             <button className="p-2 hover:bg-muted rounded-full transition-colors">
               <Share2 className="w-5 h-5" />
             </button>
-            <button className="p-2 hover:bg-muted rounded-full transition-colors">
-              <MoreVertical className="w-5 h-5" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 hover:bg-muted rounded-full transition-colors">
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {isOrganizer && (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => setEditOpen(true)}
+                      className="gap-2"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Edit trip
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => setCancelOpen(true)} 
+                      className="gap-2 text-red-600 focus:text-red-600"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Cancel trip
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {!isOrganizer && (
+                  <DropdownMenuItem disabled className="gap-2 text-muted-foreground">
+                    No actions available
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         
@@ -99,7 +144,7 @@ export function TripDetailPage() {
             trip={trip} 
             timeline={timeline} 
             dayCount={dayCount}
-            isOrganizer={trip.userRequestStatus === 'going' && trip.organizerId === trip.organizer?.displayName}
+            isOrganizer={isOrganizer}
             onGameClick={(gameId) => navigate(`/hub/games/${gameId}`)}
           />
         )}
@@ -115,6 +160,41 @@ export function TripDetailPage() {
           />
         )}
       </main>
+
+      {/* Edit/Cancel Sheets */}
+      {isOrganizer && (
+        <>
+          <EditTripSheet
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            trip={{
+              id: trip.id,
+              name: trip.title,
+              description: trip.description,
+              start_date: trip.startDate,
+              end_date: trip.endDate,
+              visibility: trip.visibility,
+            }}
+            courses={timeline
+              ?.filter(item => item.type === 'game')
+              .map((item, index) => ({
+                id: item.gameId || `temp-${index}`,
+                courseId: item.courseId || '',
+                courseName: item.courseName || item.title || 'TBD',
+                dayNumber: item.dayNumber || index + 1,
+              })) || []}
+            onSuccess={() => refetch()}
+          />
+          <CancelTripDialog
+            open={cancelOpen}
+            onClose={() => setCancelOpen(false)}
+            tripId={tripId!}
+            tripName={trip.title}
+            participantCount={trip.participantCount}
+            onSuccess={() => navigate('/hub')}
+          />
+        </>
+      )}
     </div>
   );
 }
