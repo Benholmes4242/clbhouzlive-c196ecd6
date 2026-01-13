@@ -3,14 +3,15 @@
  * 
  * Shows:
  * - Both logos with rings
+ * - Select Rival row (horizontal chips)
  * - 4 metric tabs (earnings/wins/cuts/top10s)
  * - Winner highlight per tab
  * - Deep link to full compare page
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trophy, DollarSign, Scissors, Target, ArrowRight } from 'lucide-react';
+import { X, Trophy, DollarSign, Scissors, Target, ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,8 @@ interface CollegeCompareSheetProps {
   onClose: () => void;
   college1: string; // normalized_name
   college2: string; // normalized_name
+  rivals?: string[]; // array of rival normalized_names
+  onCollegeChange?: (rivalSlug: string) => void;
 }
 
 function formatValue(value: number, metric: CompareMetric): string {
@@ -94,6 +97,62 @@ function CollegeSide({ college, value, metric, isWinner }: CollegeSideProps) {
   );
 }
 
+/** Rival chip for the select row */
+interface RivalChipProps {
+  normalizedName: string;
+  college: CollegeMedia | null;
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+function RivalChip({ normalizedName, college, isSelected, onClick }: RivalChipProps) {
+  const displayName = college?.short_name || college?.college_name || normalizedName;
+  
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl",
+        "border transition-all duration-200",
+        isSelected 
+          ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
+          : "bg-surface-card border-border-subtle hover:border-primary/30"
+      )}
+    >
+      {/* Mini logo */}
+      <div className={cn(
+        "w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden",
+        "bg-background-secondary"
+      )}>
+        {college?.logo_url ? (
+          <img 
+            src={college.logo_url} 
+            alt={displayName}
+            className="w-5 h-5 object-contain"
+          />
+        ) : (
+          <span className="text-xs font-bold text-muted-foreground">
+            {displayName.charAt(0)}
+          </span>
+        )}
+      </div>
+      
+      {/* Name */}
+      <span className={cn(
+        "text-xs font-medium whitespace-nowrap",
+        isSelected ? "text-primary" : "text-foreground"
+      )}>
+        {displayName}
+      </span>
+      
+      {/* Selected indicator */}
+      {isSelected && (
+        <Check className="w-3.5 h-3.5 text-primary" />
+      )}
+    </button>
+  );
+}
+
 const METRICS: { key: CompareMetric; label: string; icon: React.ElementType }[] = [
   { key: 'earnings', label: 'Earnings', icon: DollarSign },
   { key: 'wins', label: 'Wins', icon: Trophy },
@@ -101,15 +160,31 @@ const METRICS: { key: CompareMetric; label: string; icon: React.ElementType }[] 
   { key: 'top10s', label: 'Top 10s', icon: Target },
 ];
 
-export function CollegeCompareSheet({ isOpen, onClose, college1, college2 }: CollegeCompareSheetProps) {
+export function CollegeCompareSheet({ 
+  isOpen, 
+  onClose, 
+  college1, 
+  college2, 
+  rivals = [],
+  onCollegeChange 
+}: CollegeCompareSheetProps) {
   const [activeMetric, setActiveMetric] = useState<CompareMetric>('earnings');
+  const [selectedCollege2, setSelectedCollege2] = useState(college2);
+  
   const { data: allStats } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
 
+  // Sync selectedCollege2 when college2 prop changes (opening from different rival)
+  useEffect(() => {
+    if (isOpen && college2) {
+      setSelectedCollege2(college2);
+    }
+  }, [college2, isOpen]);
+
   const stats1 = allStats?.find(s => s.normalized_name === college1);
-  const stats2 = allStats?.find(s => s.normalized_name === college2);
+  const stats2 = allStats?.find(s => s.normalized_name === selectedCollege2);
   const media1 = collegeMap?.get(college1) || null;
-  const media2 = collegeMap?.get(college2) || null;
+  const media2 = collegeMap?.get(selectedCollege2) || null;
 
   const getValue = (stats: typeof stats1, metric: CompareMetric): number => {
     if (!stats) return 0;
@@ -123,6 +198,13 @@ export function CollegeCompareSheet({ isOpen, onClose, college1, college2 }: Col
 
   const value1 = getValue(stats1, activeMetric);
   const value2 = getValue(stats2, activeMetric);
+  
+  const handleRivalSelect = (rivalSlug: string) => {
+    setSelectedCollege2(rivalSlug);
+    onCollegeChange?.(rivalSlug);
+  };
+  
+  const hasValidComparison = college1 && selectedCollege2;
 
   return (
     <AnimatePresence>
@@ -148,7 +230,7 @@ export function CollegeCompareSheet({ isOpen, onClose, college1, college2 }: Col
               "bg-background rounded-t-3xl",
               "border-t border-border/50",
               "shadow-2xl shadow-black/20",
-              "max-h-[80vh] overflow-hidden"
+              "max-h-[85vh] overflow-hidden"
             )}
           >
             {/* Handle */}
@@ -157,7 +239,7 @@ export function CollegeCompareSheet({ isOpen, onClose, college1, college2 }: Col
             </div>
             
             {/* Header */}
-            <div className="flex items-center justify-between px-4 pb-4">
+            <div className="flex items-center justify-between px-4 pb-3">
               <h3 className="text-lg font-semibold text-foreground">Head to Head</h3>
               <button
                 onClick={onClose}
@@ -166,6 +248,24 @@ export function CollegeCompareSheet({ isOpen, onClose, college1, college2 }: Col
                 <X className="w-5 h-5" />
               </button>
             </div>
+            
+            {/* Select Rival Row */}
+            {rivals.length > 0 && (
+              <div className="px-4 pb-4">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Select Rival</p>
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+                  {rivals.map((rivalSlug) => (
+                    <RivalChip
+                      key={rivalSlug}
+                      normalizedName={rivalSlug}
+                      college={collegeMap?.get(rivalSlug) || null}
+                      isSelected={selectedCollege2 === rivalSlug}
+                      onClick={() => handleRivalSelect(rivalSlug)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
             
             {/* Metric Tabs */}
             <div className="flex gap-2 px-4 pb-4">
@@ -188,35 +288,47 @@ export function CollegeCompareSheet({ isOpen, onClose, college1, college2 }: Col
             </div>
             
             {/* Comparison */}
-            <div className="flex items-center justify-around px-6 py-6">
-              <CollegeSide
-                college={media1}
-                value={value1}
-                metric={activeMetric}
-                isWinner={value1 > value2}
-              />
-              
-              {/* VS Badge */}
-              <div className="mx-4 px-3 py-1.5 rounded-full bg-muted text-xs font-bold text-muted-foreground">
-                VS
+            {hasValidComparison ? (
+              <div className="flex items-center justify-around px-6 py-6">
+                <CollegeSide
+                  college={media1}
+                  value={value1}
+                  metric={activeMetric}
+                  isWinner={value1 > value2}
+                />
+                
+                {/* VS Badge */}
+                <div className="mx-4 px-3 py-1.5 rounded-full bg-muted text-xs font-bold text-muted-foreground">
+                  VS
+                </div>
+                
+                <CollegeSide
+                  college={media2}
+                  value={value2}
+                  metric={activeMetric}
+                  isWinner={value2 > value1}
+                />
               </div>
-              
-              <CollegeSide
-                college={media2}
-                value={value2}
-                metric={activeMetric}
-                isWinner={value2 > value1}
-              />
-            </div>
+            ) : (
+              <div className="flex items-center justify-center py-12">
+                <p className="text-sm text-muted-foreground">Select a rival to compare</p>
+              </div>
+            )}
             
             {/* CTA */}
             <div className="px-4 pb-8">
-              <Link to={`/tourhub/college-golf/compare?c1=${college1}&c2=${college2}`}>
-                <Button className="w-full gap-2" onClick={onClose}>
-                  Full Comparison
-                  <ArrowRight className="w-4 h-4" />
+              {hasValidComparison ? (
+                <Link to={`/tourhub/college-golf/compare?c1=${college1}&c2=${selectedCollege2}`}>
+                  <Button className="w-full gap-2" onClick={onClose}>
+                    Full Comparison
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button className="w-full gap-2" disabled>
+                  Select a rival to compare
                 </Button>
-              </Link>
+              )}
             </div>
           </motion.div>
         </>

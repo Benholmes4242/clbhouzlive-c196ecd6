@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Swords, GitCompare } from 'lucide-react';
 import { TourHubShell } from '../components';
@@ -6,10 +7,12 @@ import {
   FranchiseStoryStrip,
   AlumniDepthChart, 
   CollegeRivalsCarousel,
+  CollegeCompareSheet,
   FollowCollegeButton 
 } from '../components/college';
 import { useCollegeStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -20,11 +23,40 @@ export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   const { data: stats, isLoading: statsLoading } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
+  const { data: rivalries } = useCollegeRivalries(collegeSlug);
+  
+  // Compare sheet state
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [compareCollege2, setCompareCollege2] = useState<string | null>(null);
   
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
   
   const isLoading = statsLoading || mediaLoading;
+  
+  // Get rival slugs for the sheet
+  const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
+  const firstRival = rivalSlugs[0] ?? null;
+  
+  // Reset compareCollege2 when collegeSlug changes
+  useEffect(() => {
+    setCompareCollege2(null);
+    setCompareOpen(false);
+  }, [collegeSlug]);
+  
+  // Handler for Compare button
+  const handleCompareClick = () => {
+    if (!compareCollege2 && firstRival) {
+      setCompareCollege2(firstRival);
+    }
+    setCompareOpen(true);
+  };
+  
+  // Handler for rival tile click (from carousel)
+  const handleRivalCompare = (rivalSlug: string) => {
+    setCompareCollege2(rivalSlug);
+    setCompareOpen(true);
+  };
   
   return (
     <TourHubShell>
@@ -73,12 +105,16 @@ export function CollegeProfilePage() {
             {/* Action Buttons */}
             <div className="flex items-center justify-center gap-3 mb-10">
               <FollowCollegeButton normalizedName={collegeSlug || ''} />
-              <Link to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=`}>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <GitCompare className="w-4 h-4" />
-                  Compare
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={handleCompareClick}
+                disabled={!firstRival}
+              >
+                <GitCompare className="w-4 h-4" />
+                Compare
+              </Button>
             </div>
             
             {/* Rivalries */}
@@ -87,7 +123,10 @@ export function CollegeProfilePage() {
                 <Swords className="w-4 h-4 text-muted-foreground" />
                 <h2 className="text-sm font-semibold text-foreground">Rivals</h2>
               </div>
-              <CollegeRivalsCarousel normalizedName={collegeSlug || ''} />
+              <CollegeRivalsCarousel 
+                normalizedName={collegeSlug || ''} 
+                onCompare={handleRivalCompare}
+              />
             </section>
             
             {/* Alumni Depth Chart */}
@@ -115,6 +154,18 @@ export function CollegeProfilePage() {
           </div>
         )}
       </div>
+      
+      {/* Compare Sheet */}
+      {collegeSlug && (
+        <CollegeCompareSheet
+          isOpen={compareOpen}
+          onClose={() => setCompareOpen(false)}
+          college1={collegeSlug}
+          college2={compareCollege2 ?? firstRival ?? ''}
+          rivals={rivalSlugs}
+          onCollegeChange={setCompareCollege2}
+        />
+      )}
     </TourHubShell>
   );
 }

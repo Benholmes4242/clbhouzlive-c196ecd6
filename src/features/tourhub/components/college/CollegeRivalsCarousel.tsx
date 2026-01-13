@@ -8,6 +8,8 @@ import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 interface CollegeRivalsCarouselProps {
   normalizedName: string;
   className?: string;
+  /** Optional callback for opening compare sheet instead of navigating */
+  onCompare?: (rivalNormalizedName: string) => void;
 }
 
 /** Format currency for compact display */
@@ -50,7 +52,7 @@ function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipPr
   );
 }
 
-export function CollegeRivalsCarousel({ normalizedName, className }: CollegeRivalsCarouselProps) {
+export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: CollegeRivalsCarouselProps) {
   const { data: rivalries, isLoading } = useCollegeRivalries(normalizedName);
   const { data: allStats } = useCollegeSeasonStats();
   
@@ -116,17 +118,9 @@ export function CollegeRivalsCarousel({ normalizedName, className }: CollegeRiva
         const college = rivalry.college;
         const displayName = college?.short_name || college?.college_name || rivalName;
         
-        return (
-          <Link
-            key={rivalry.id}
-            to={`/tourhub/college-golf/compare?c1=${normalizedName}&c2=${rivalName}`}
-            className={cn(
-              'shrink-0 w-28 p-3 rounded-sq-lg',
-              'bg-surface-card border border-border-subtle',
-              'hover:border-primary/30 hover:bg-surface-card-hover transition-all duration-200',
-              'flex flex-col items-center text-center group'
-            )}
-          >
+        // Common card content
+        const cardContent = (
+          <>
             {/* Logo with subtle depth */}
             <div className="relative w-12 h-12 rounded-sq-lg bg-background-secondary flex items-center justify-center overflow-hidden mb-2 shadow-sm">
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
@@ -160,6 +154,36 @@ export function CollegeRivalsCarousel({ normalizedName, className }: CollegeRiva
             <span className="text-[10px] text-text-tertiary mt-1.5 flex items-center gap-0.5 group-hover:text-primary transition-colors">
               Compare <ArrowRight className="w-2.5 h-2.5" />
             </span>
+          </>
+        );
+        
+        const cardStyles = cn(
+          'shrink-0 w-28 p-3 rounded-sq-lg',
+          'bg-surface-card border border-border-subtle',
+          'hover:border-primary/30 hover:bg-surface-card-hover transition-all duration-200',
+          'flex flex-col items-center text-center group'
+        );
+        
+        // If onCompare callback is provided, use button; otherwise use Link
+        if (onCompare) {
+          return (
+            <button
+              key={rivalry.id}
+              onClick={() => onCompare(rivalName)}
+              className={cardStyles}
+            >
+              {cardContent}
+            </button>
+          );
+        }
+        
+        return (
+          <Link
+            key={rivalry.id}
+            to={`/tourhub/college-golf/compare?c1=${normalizedName}&c2=${rivalName}`}
+            className={cardStyles}
+          >
+            {cardContent}
           </Link>
         );
       })}
