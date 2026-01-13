@@ -24,10 +24,11 @@ interface MapCourseSheetProps {
 
 type SheetState = 'peek' | 'half' | 'full';
 
+// Adjusted heights: half state shows all content without scroll
 const SHEET_HEIGHTS: Record<SheetState, string> = {
   peek: '25%',
-  half: '55%',
-  full: '90%',
+  half: '68%',  // Increased from 55% - all content visible without scroll
+  full: '92%',
 };
 
 // Fetch course thumbnail image
@@ -284,8 +285,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          {/* Course hero image - full width with smooth loading */}
-          <div className="relative w-full h-40 overflow-hidden">
+          {/* Course hero image - optimized height for all content to fit in half state */}
+          <div className="relative w-full h-36 flex-shrink-0 overflow-hidden">
             {thumbnailImage ? (
               <>
                 {/* Blur-up placeholder */}
