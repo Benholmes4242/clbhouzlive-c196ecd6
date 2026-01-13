@@ -128,12 +128,12 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         </div>
 
-        {/* Score badge - amber for Outstanding (9+), grey otherwise */}
+        {/* Score badge - brand color for Outstanding (9+), grey otherwise */}
         <div className={cn(
           "px-2.5 py-1 rounded-lg text-sm font-bold",
           score >= 9 
-            ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white'
-            : 'bg-gray-100 text-gray-700 border border-gray-200'
+            ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B] text-white'
+            : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] text-gray-700'
         )}>
           {score.toFixed(1)}
         </div>
@@ -174,20 +174,20 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         </div>
       )}
 
-      {/* Category breakdown - amber bars only for Outstanding (9+) reviews */}
+      {/* Category breakdown - brand color bars for scores 9+ (per category) */}
       {categories.length > 0 && (
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 py-3 border-y border-gray-100">
           {categories.map(cat => {
-            // Determine bar color based on OVERALL review score
-            const barColorClass = score >= 9 
-              ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
-              : 'bg-gray-300';
+            // Determine bar color based on individual category score (9+ = Outstanding)
+            const barColorClass = (cat.value || 0) >= 9 
+              ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+              : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]';
             
             return (
               <div key={cat.key} className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">{categoryLabels[cat.key]}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${barColorClass} rounded-full`}
                       style={{ width: `${((cat.value || 0) / 10) * 100}%` }}

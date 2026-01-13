@@ -142,7 +142,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     if (categories.length === 0) return null;
     
     const sorted = [...categories]
-      .filter(c => c.score && c.score >= 8.0) // 8/10 threshold for highlights
+      .filter(c => c.score && c.score >= 9.0) // 9/10 threshold for highlights (matches Outstanding)
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, 3);
     
@@ -199,13 +199,13 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   {communityAverage >= 9 ? (
                     <>
-                      <stop offset="0%" stopColor="#f59e0b" />
-                      <stop offset="100%" stopColor="#fbbf24" />
+                      <stop offset="0%" stopColor="#FFAF30" />
+                      <stop offset="100%" stopColor="#F79E1B" />
                     </>
                   ) : (
                     <>
-                      <stop offset="0%" stopColor="#9ca3af" />
-                      <stop offset="100%" stopColor="#d1d5db" />
+                      <stop offset="0%" stopColor="#c4c8ce" />
+                      <stop offset="100%" stopColor="#9ca3af" />
                     </>
                   )}
                 </linearGradient>
@@ -269,10 +269,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="border-t border-gray-100 p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            // Determine bar color based on overall community average
-            const barColorClass = communityAverage >= 9 
-              ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
-              : 'bg-gray-300';
+            // Determine bar color based on individual category score (9+ = Outstanding)
+            const barColorClass = score >= 9 
+              ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+              : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]';
             
             return (
               <div key={cat.id} className="space-y-1.5">
@@ -280,7 +280,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   <span className="text-gray-500">{cat.label}</span>
                   <span className="font-semibold text-gray-700 tabular-nums">{formatScore(score)}</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-[#e5e7eb] rounded-full overflow-hidden">
                   <div 
                     className={`h-full ${barColorClass} rounded-full transition-all duration-700`}
                     style={{ width: `${(score / 10) * 100}%` }}
