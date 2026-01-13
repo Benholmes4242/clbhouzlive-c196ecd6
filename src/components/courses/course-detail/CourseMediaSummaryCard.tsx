@@ -49,7 +49,7 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
           <button
             type="button"
             onClick={onAddMedia}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-full hover:bg-green-700 transition-colors shadow-sm active:scale-[0.97]"
+            className="flex items-center gap-2 px-4 py-2 bg-[#F8FAFC] text-gray-700 text-sm font-medium rounded-full hover:bg-gray-100 transition-colors shadow-sm ring-1 ring-gray-200 active:scale-[0.97]"
           >
             <Plus className="h-4 w-4" />
             Add media
