@@ -99,11 +99,8 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          {/* Avatar with ring for own review */}
-          <div className={cn(
-            "relative",
-            isMine && "ring-2 ring-green-500 ring-offset-2 rounded-lg"
-          )}>
+          {/* Avatar */}
+          <div className="relative">
             {user.avatarUrl ? (
               <SquircleAvatar
                 src={user.avatarUrl}
