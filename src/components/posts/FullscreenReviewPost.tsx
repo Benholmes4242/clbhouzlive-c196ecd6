@@ -247,15 +247,15 @@ export function FullscreenReviewPost({
         )}
         style={{
           background: isOutstanding 
-            ? 'linear-gradient(135deg, rgba(255, 175, 48, 0.12) 0%, rgba(247, 158, 27, 0.08) 100%)'
+            ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%)'
             : 'linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%)',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           borderColor: isOutstanding 
-            ? 'rgba(255, 175, 48, 0.3)' 
+            ? 'rgba(251, 191, 36, 0.3)' 
             : 'rgba(255, 255, 255, 0.1)',
           boxShadow: isOutstanding
-            ? '0 8px 32px rgba(247, 158, 27, 0.2), 0 0 60px rgba(255, 175, 48, 0.1)'
+            ? '0 8px 32px rgba(245, 158, 11, 0.2), 0 0 60px rgba(251, 191, 36, 0.1)'
             : '0 8px 32px rgba(0, 0, 0, 0.3)',
           padding: '16px 20px',
         }}
@@ -288,16 +288,16 @@ export function FullscreenReviewPost({
                   style={{ 
                     fontSize: '2.75rem',
                     fontVariantNumeric: 'tabular-nums',
-                    // Gradient text effect for outstanding ratings
+                    // Gradient text effect for outstanding ratings (amber-400 to amber-500)
                     background: isOutstanding 
-                      ? 'linear-gradient(135deg, #FFAF30 0%, #F79E1B 100%)' 
+                      ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' 
                       : 'transparent',
                     WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
                     WebkitTextFillColor: isOutstanding ? 'transparent' : '#FFFFFF',
                     color: isOutstanding ? 'transparent' : '#FFFFFF',
-                    // Enhanced dual-color glow
+                    // Enhanced dual-color glow with amber colors
                     textShadow: isOutstanding 
-                      ? '0 0 20px rgba(255, 175, 48, 0.6), 0 0 40px rgba(247, 158, 27, 0.4)' 
+                      ? '0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(245, 158, 11, 0.4)' 
                       : 'none',
                   }}
                 >

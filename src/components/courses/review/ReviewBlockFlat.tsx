@@ -132,7 +132,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         <div className={cn(
           "px-2.5 py-1 rounded-lg text-sm font-bold",
           score >= 9 
-            ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B] text-white'
+            ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white'
             : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af] text-gray-700'
         )}>
           {score.toFixed(1)}
@@ -180,7 +180,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           {categories.map(cat => {
             // Determine bar color based on individual category score (9+ = Outstanding)
             const barColorClass = (cat.value || 0) >= 9 
-              ? 'bg-gradient-to-r from-[#FFAF30] to-[#F79E1B]' 
+              ? 'bg-gradient-to-r from-amber-400 to-amber-500' 
               : 'bg-gradient-to-r from-[#c4c8ce] to-[#9ca3af]';
             
             return (
