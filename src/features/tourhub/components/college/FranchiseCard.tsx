@@ -4,6 +4,8 @@
  * Features:
  * - Medallion container with glass/metal feel for logo
  * - Performance ring around logo (normalized score visualization)
+ * - Momentum ring (inner ring showing weekly movement)
+ * - Status badges (🔥 Hot streak, 🛡️ Defending champ, ⚡ Rising)
  * - Rank badge with movement indicator
  * - Contextual metrics per tab
  * - Subtle tap scale animation
@@ -15,6 +17,7 @@ import { Users, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-rea
 import { cn } from '@/lib/utils';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
+import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
 
 interface FranchiseCardProps {
   stats: CollegeSeasonStats;
@@ -26,6 +29,10 @@ interface FranchiseCardProps {
   activeMetric?: 'earnings' | 'wins' | 'cuts' | 'top10s';
   /** Previous rank for movement indicator */
   previousRank?: number;
+  /** Status badge (hot streak, defending champ, etc.) */
+  status?: CollegeStatus | null;
+  /** Weekly momentum data for inner ring */
+  momentum?: CollegeMomentum | null;
   className?: string;
 }
 
@@ -46,7 +53,7 @@ interface PerformanceRingProps {
   isTopThree?: boolean;
 }
 
-function PerformanceRing({ progress, size = 56, strokeWidth = 2.5, isTopThree = false }: PerformanceRingProps) {
+function PerformanceRing({ progress, size = 60, strokeWidth = 2.5, isTopThree = false }: PerformanceRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - Math.min(1, Math.max(0, progress)));
@@ -96,17 +103,91 @@ function PerformanceRing({ progress, size = 56, strokeWidth = 2.5, isTopThree = 
   );
 }
 
-/** Premium medallion with glossy highlight + shadow depth */
+/** Inner momentum ring - shows weekly movement */
+interface MomentumRingProps {
+  isRising: boolean;
+  size?: number;
+  strokeWidth?: number;
+}
+
+function MomentumRing({ isRising, size = 60, strokeWidth = 1.5 }: MomentumRingProps) {
+  const radius = (size - 12) / 2; // Inner ring
+  const circumference = 2 * Math.PI * radius;
+  
+  if (!isRising) return null;
+  
+  return (
+    <svg
+      width={size}
+      height={size}
+      className="absolute inset-0 -rotate-90"
+    >
+      <motion.circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="url(#momentumGradient)"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={`${circumference * 0.3} ${circumference * 0.1}`}
+        initial={{ rotate: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        style={{ transformOrigin: 'center' }}
+      />
+      <defs>
+        <linearGradient id="momentumGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="hsl(142, 76%, 46%)" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="hsl(142, 76%, 46%)" stopOpacity="0.2" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+/** Status badge component */
+interface StatusBadgeProps {
+  status: CollegeStatus;
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+  const bgColors: Record<string, string> = {
+    hotStreak: 'bg-orange-500/15 border-orange-500/30',
+    defendingChamp: 'bg-amber-500/15 border-amber-500/30',
+    risingFast: 'bg-emerald-500/15 border-emerald-500/30',
+  };
+  
+  return (
+    <div className={cn(
+      "absolute -top-1 -right-1 z-20",
+      "w-5 h-5 rounded-full",
+      "flex items-center justify-center",
+      "text-xs",
+      "border",
+      "shadow-sm",
+      bgColors[status.type] || 'bg-muted'
+    )}>
+      {status.emoji}
+    </div>
+  );
+}
+
+/** Premium medallion with glossy highlight + shadow depth + status badge */
 interface MedallionProps {
   logoUrl?: string | null;
   displayName: string;
   isTopThree?: boolean;
   progress: number;
+  status?: CollegeStatus | null;
+  momentum?: CollegeMomentum | null;
 }
 
-function Medallion({ logoUrl, displayName, isTopThree = false, progress }: MedallionProps) {
+function Medallion({ logoUrl, displayName, isTopThree = false, progress, status, momentum }: MedallionProps) {
+  const isRising = momentum?.isRising ?? false;
+  
   return (
-    <div className="relative shrink-0">
+    <div className="relative shrink-0 w-[60px] h-[60px]">
       {/* Subtle radial glow for top 3 */}
       {isTopThree && (
         <div 
@@ -115,12 +196,18 @@ function Medallion({ logoUrl, displayName, isTopThree = false, progress }: Medal
         />
       )}
       
-      {/* Performance Ring */}
-      <PerformanceRing progress={progress} size={56} isTopThree={isTopThree} />
+      {/* Status Badge */}
+      {status && <StatusBadge status={status} />}
+      
+      {/* Outer Performance Ring */}
+      <PerformanceRing progress={progress} size={60} isTopThree={isTopThree} />
+      
+      {/* Inner Momentum Ring - pulses when rising */}
+      {isRising && <MomentumRing isRising={isRising} size={60} />}
       
       {/* Medallion Container with premium depth */}
       <div className={cn(
-        "w-14 h-14 rounded-full relative z-10",
+        "absolute inset-[6px] rounded-full z-10",
         "bg-gradient-to-br from-background via-background to-muted/30",
         "border border-border/50",
         "flex items-center justify-center overflow-hidden",
@@ -139,11 +226,11 @@ function Medallion({ logoUrl, displayName, isTopThree = false, progress }: Medal
           <img 
             src={logoUrl} 
             alt={displayName}
-            className="w-10 h-10 object-contain relative z-10"
+            className="w-9 h-9 object-contain relative z-10"
             loading="lazy"
           />
         ) : (
-          <span className="text-xl font-bold text-muted-foreground/60 relative z-10">
+          <span className="text-lg font-bold text-muted-foreground/60 relative z-10">
             {displayName.charAt(0).toUpperCase()}
           </span>
         )}
@@ -159,6 +246,8 @@ export function FranchiseCard({
   maxValue = 1,
   activeMetric = 'earnings',
   previousRank,
+  status,
+  momentum,
   className 
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
@@ -234,12 +323,14 @@ export function FranchiseCard({
           )}
         </div>
         
-        {/* Premium Medallion */}
+        {/* Premium Medallion with Status + Momentum */}
         <Medallion 
           logoUrl={college?.logo_url}
           displayName={displayName}
           isTopThree={isTopThree}
           progress={progress}
+          status={status}
+          momentum={momentum}
         />
         
         {/* Content - Enhanced hierarchy */}

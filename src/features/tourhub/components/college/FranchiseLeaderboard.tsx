@@ -4,6 +4,8 @@
  * Features:
  * - Glass bar tabs with sliding underline
  * - Franchise cards with medallion + performance ring
+ * - Status badges (hot streak, defending champ, rising)
+ * - Momentum rings showing weekly movement
  * - Normalized performance visualization
  */
 
@@ -12,6 +14,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
+import { useCollegeStatusMap, useTopMovers } from '../../hooks/useCollegeStatus';
 import { FranchiseCard } from './FranchiseCard';
 
 type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s';
@@ -32,6 +35,8 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
   const [activeMetric, setActiveMetric] = useState<MetricTab>('earnings');
   const { data: allStats, isLoading, error } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
+  const statusMap = useCollegeStatusMap();
+  const { data: moverInfo } = useTopMovers();
   
   const containerRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
@@ -148,16 +153,28 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             Failed to load leaderboard
           </div>
         ) : sortedStats.length > 0 ? (
-          sortedStats.map((collegeStats, index) => (
-            <FranchiseCard
-              key={collegeStats.normalized_name}
-              stats={collegeStats}
-              college={collegeMap?.get(collegeStats.normalized_name) || null}
-              rank={index + 1}
-              maxValue={maxValue}
-              activeMetric={activeMetric}
-            />
-          ))
+          sortedStats.map((collegeStats, index) => {
+            const status = statusMap.get(collegeStats.normalized_name) || null;
+            const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
+            const momentum = moverData ? {
+              rankChange: moverData.rankChange,
+              earningsDelta: moverData.earningsDelta,
+              isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
+            } : null;
+            
+            return (
+              <FranchiseCard
+                key={collegeStats.normalized_name}
+                stats={collegeStats}
+                college={collegeMap?.get(collegeStats.normalized_name) || null}
+                rank={index + 1}
+                maxValue={maxValue}
+                activeMetric={activeMetric}
+                status={status}
+                momentum={momentum}
+              />
+            );
+          })
         ) : (
           <div className="text-center py-12 text-sm text-muted-foreground">
             No colleges with stats this season
