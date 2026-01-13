@@ -50,10 +50,12 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   return (
     <>
       {/* Map card - identical styling for Course and Business */}
-      <div 
+      <button 
+        type="button"
         key={`map-${lat}-${lng}`}
-        className="relative w-full rounded-sq-md overflow-hidden border border-slate-200 cursor-pointer group"
+        className="relative w-full rounded-sq-md overflow-hidden border border-slate-200 cursor-pointer group text-left"
         onClick={() => setExpanded(true)}
+        aria-label={`Expand map for ${name}`}
       >
         <MapPreview
           lat={lat}
@@ -71,7 +73,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
             <span className="text-sm text-slate-700 font-medium">{locationText}</span>
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Unified expanded view */}
       <MapExpandedView
