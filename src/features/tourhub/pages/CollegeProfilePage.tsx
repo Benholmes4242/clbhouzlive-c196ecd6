@@ -1,9 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Users, Swords, GitCompare } from 'lucide-react';
+import { ArrowLeft, Swords, GitCompare } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { 
-  CollegeHero, 
-  CollegeAlumniList, 
+  FranchiseHero, 
+  AlumniDepthChart, 
   CollegeRivalsCarousel,
   FollowCollegeButton 
 } from '../components/college';
@@ -12,7 +12,7 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { Button } from '@/components/ui/button';
 
 /**
- * College Profile Page - Shows detailed stats and alumni for a specific college.
+ * College Profile Page - Premium alumni page with franchise identity
  * Route: /tourhub/college-golf/:collegeSlug
  */
 export function CollegeProfilePage() {
@@ -31,29 +31,43 @@ export function CollegeProfilePage() {
       <div className="pt-4">
         <Link 
           to="/tourhub/college-golf" 
-          className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary hover:text-text-primary transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          College Golf
+          College Rankings
         </Link>
       </div>
       
       {/* Content */}
       <div className="py-6">
         {isLoading ? (
-          <div className="space-y-4">
-            <div className="h-32 bg-surface-card border border-border-subtle rounded-sq-lg animate-pulse" />
-            <div className="h-24 bg-surface-card border border-border-subtle rounded-sq-lg animate-pulse" />
+          <div className="space-y-6">
+            {/* Hero skeleton */}
+            <div className="flex flex-col items-center">
+              <div className="w-[120px] h-[120px] rounded-full bg-muted animate-pulse mb-4" />
+              <div className="h-8 w-48 bg-muted rounded animate-pulse mb-2" />
+              <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+            </div>
+            {/* Stats skeleton */}
+            <div className="grid grid-cols-3 gap-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
+              ))}
+            </div>
+            {/* List skeleton */}
+            <div className="space-y-2 mt-8">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-[72px] bg-muted rounded-xl animate-pulse" />
+              ))}
+            </div>
           </div>
         ) : stats ? (
           <>
-            {/* Hero Section with Actions */}
-            <div className="flex items-start justify-between gap-4 mb-2">
-              <CollegeHero stats={stats} college={college} className="flex-1" />
-            </div>
+            {/* Franchise Hero */}
+            <FranchiseHero stats={stats} college={college} className="mb-8" />
             
             {/* Action Buttons */}
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center justify-center gap-3 mb-10">
               <FollowCollegeButton normalizedName={collegeSlug || ''} />
               <Link to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=`}>
                 <Button variant="outline" size="sm" className="gap-2">
@@ -64,34 +78,33 @@ export function CollegeProfilePage() {
             </div>
             
             {/* Rivalries */}
-            <section className="mb-8">
-              <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
-                <Swords className="w-5 h-5 text-text-tertiary" />
-                Rivals
-              </h2>
+            <section className="mb-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Swords className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Rivals</h2>
+              </div>
               <CollegeRivalsCarousel normalizedName={collegeSlug || ''} />
             </section>
             
-            {/* Top Alumni */}
+            {/* Alumni Depth Chart */}
             <section>
-              <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-text-tertiary" />
-                Top Alumni
+              <h2 className="text-lg font-semibold text-foreground mb-2">
+                Alumni Depth Chart
               </h2>
-              <p className="text-body-sm text-text-secondary mb-4">
-                Current PGA Tour players ranked by 2025 earnings
+              <p className="text-sm text-muted-foreground mb-6">
+                Current PGA Tour players ranked by contribution
               </p>
-              <CollegeAlumniList normalizedName={collegeSlug || ''} limit={15} />
+              <AlumniDepthChart normalizedName={collegeSlug || ''} />
             </section>
           </>
         ) : (
           <div className="text-center py-16">
-            <p className="text-body-md text-text-secondary">
+            <p className="text-sm text-muted-foreground">
               No stats found for "{displayName}"
             </p>
             <Link 
               to="/tourhub/college-golf" 
-              className="inline-block mt-4 text-primary hover:underline"
+              className="inline-block mt-4 text-primary hover:underline text-sm"
             >
               Browse all colleges
             </Link>
