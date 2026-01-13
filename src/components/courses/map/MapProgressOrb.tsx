@@ -105,7 +105,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           )}
         >
           {/* Progress ring - orange accent on slate-50 background */}
-          <svg className="absolute inset-0 w-full h-full -rotate-90">
+          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
             <circle
               cx="24"
               cy="24"
@@ -126,8 +126,8 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
             />
           </svg>
           
-          {/* Percentage */}
-          <span className="text-xs font-bold relative z-10">{percentage}%</span>
+          {/* Centered percentage text */}
+          <span className="relative z-10 text-xs font-bold text-center">{percentage}%</span>
         </motion.button>
       ) : (
         <motion.div
