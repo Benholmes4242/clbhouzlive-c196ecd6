@@ -189,6 +189,8 @@ const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGame
 
 // Events feature pages
 const EventDetailPage = lazy(() => import("./features/events/pages/EventDetailPage"));
+const JoinEventPage = lazy(() => import("./features/events/pages/JoinEventPage"));
+const EventsListPage = lazy(() => import("./features/events/pages/EventsListPage"));
 
 // Simple redirect component for /hub/game/:id → /game/:id
 function HubGameRedirect() {
@@ -519,7 +521,9 @@ function AppRoutes() {
           <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
           {/* Redirect /hub/game/:id to /game/:id */}
           <Route path="/hub/game/:id" element={<HubGameRedirect />} />
-          {/* Event detail page */}
+          {/* Event routes */}
+          <Route path="/events" element={<Suspense fallback={<HubSkeleton />}><EventsListPage /></Suspense>} />
+          <Route path="/events/join/:shareCode" element={<Suspense fallback={<HubSkeleton />}><JoinEventPage /></Suspense>} />
           <Route path="/events/:eventId" element={<Suspense fallback={<HubSkeleton />}><EventDetailPage /></Suspense>} />
           </>
         )}
