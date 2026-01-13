@@ -165,6 +165,7 @@ const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 // Hub components (lazy load when feature flag is enabled)
+const HubPageRedesign = lazy(() => import("./pages/hub/HubPageRedesign"));
 const HubHomePage = lazy(() => import("./features/hub/pages/HubHomePage").then(m => ({ default: m.HubHomePage })));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubEchoChatPage = lazy(() => import("./features/hub/pages/HubEchoChatPage").then(m => ({ default: m.HubEchoChatPage })));
@@ -500,7 +501,7 @@ function AppRoutes() {
         {/* Hub routes - only when NOT using background location */}
         {!showHubOverlay && (
           <>
-            <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
+          <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubPageRedesign /></Suspense>} />
             <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
             <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
             <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
@@ -534,7 +535,7 @@ function AppRoutes() {
       {/* Hub Overlays - rendered over origin page when background location exists */}
       {showHubOverlay && (
         <Routes>
-          <Route path="/hub" element={<HubHomePage />} />
+          <Route path="/hub" element={<HubPageRedesign />} />
           <Route path="/hub/golfers" element={<HubGolfersPage />} />
           <Route path="/hub/echo" element={<HubEchoChatPage />} />
           <Route path="/hub/create-game" element={<HubCreateGamePage />} />
