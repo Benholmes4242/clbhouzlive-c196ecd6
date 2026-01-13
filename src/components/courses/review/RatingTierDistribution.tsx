@@ -25,9 +25,9 @@ const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistribu
   { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
 ];
 
-// UNIFIED COLOR SYSTEM - amber for Outstanding only, grey for rest
+// UNIFIED COLOR SYSTEM - amber for Outstanding only, gray-300 for rest
 const OUTSTANDING_COLOR = '#f59e0b'; // amber-500
-const NEUTRAL_COLOR = '#9ca3af';     // gray-400
+const NEUTRAL_COLOR = '#d1d5db';     // gray-300 - matches breakdown bars
 const EMPTY_COLOR = '#f3f4f6';       // gray-100
 
 /**
