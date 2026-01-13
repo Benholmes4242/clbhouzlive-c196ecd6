@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +38,11 @@ const SORT_OPTIONS: { value: Top100SortMode; label: string; requiresReviewData?:
 
 /**
  * Two inline Explore-style dropdowns for filter (Show) and sort (Sort).
- * Active option uses slate highlight background (no checkmarks).
+ * 
+ * Polish applied:
+ * - Smooth transitions between states
+ * - Better visual hierarchy
+ * - Animated chevron on dropdown open
  */
 export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   activeFilter,
@@ -49,7 +54,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   hasReviewData = false,
 }) => {
   const currentFilterLabel = FILTER_OPTIONS.find(f => f.value === activeFilter)?.label || 'Official Rating';
-  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Rating: High to Low';
+  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'High to Low';
 
   // When Played/Unplayed is active, only rating_high is enabled
   const isPlayedOrUnplayed = activeFilter === 'played' || activeFilter === 'unplayed';
@@ -60,41 +65,48 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
   );
 
   return (
-    <div 
-      className={`px-4 py-3 transition-all ${
+    <motion.div 
+      className={`px-4 py-3 transition-all duration-200 ${
         isSticky 
-          ? 'bg-slate-50/95 backdrop-blur-md border-b border-slate-200/60 shadow-sm' 
+          ? 'bg-slate-50/98 backdrop-blur-md border-b border-slate-200/80 shadow-sm' 
           : 'bg-slate-50 border-b border-slate-200/60'
       }`}
+      initial={false}
+      animate={{ 
+        boxShadow: isSticky ? '0 4px 12px rgba(0,0,0,0.06)' : '0 0 0 rgba(0,0,0,0)' 
+      }}
+      transition={{ duration: 0.2 }}
     >
       <div className="flex items-center justify-center gap-2">
         {/* Show dropdown (Filter) */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-150 text-sm font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
-              <span>{currentFilterLabel}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              <span className="truncate">{currentFilterLabel}</span>
+              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200 shadow-lg">
             {FILTER_OPTIONS.map((option) => {
               const isActive = activeFilter === option.value;
               return (
                 <DropdownMenuItem
                   key={option.value}
                   onClick={() => onFilterChange(option.value)}
-                  className={`cursor-pointer ${
+                  className={`cursor-pointer transition-colors duration-100 ${
                     isActive 
-                      ? 'bg-[var(--surface-slate)] text-white font-medium' 
-                      : 'text-slate-700'
+                      ? 'bg-slate-800 text-white font-medium' 
+                      : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     {option.label}
                     {counts[option.value] !== undefined && counts[option.value]! > 0 && (
-                      <span className={isActive ? 'text-white/70' : 'text-slate-400'}> ({counts[option.value]})</span>
+                      <span className={`text-[11px] ${isActive ? 'text-white/70' : 'text-slate-400'}`}>
+                        ({counts[option.value]})
+                      </span>
                     )}
                   </span>
                 </DropdownMenuItem>
@@ -107,13 +119,13 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors text-sm font-medium text-slate-700"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-150 text-sm font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
-              <span>{currentSortLabel}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              <span className="truncate">{currentSortLabel}</span>
+              <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200">
+          <DropdownMenuContent align="start" className="min-w-[180px] bg-white border-slate-200 shadow-lg">
             {availableSortOptions.map((option) => {
               const isActive = activeSort === option.value;
               // When Played/Unplayed: only rating_high is enabled
@@ -127,12 +139,12 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                       onSortChange(option.value);
                     }
                   }}
-                  className={`${
+                  className={`transition-colors duration-100 ${
                     isDisabled
-                      ? 'text-slate-400 opacity-50 cursor-not-allowed'
+                      ? 'text-slate-300 cursor-not-allowed'
                       : isActive 
-                        ? 'bg-[var(--surface-slate)] text-white font-medium cursor-pointer' 
-                        : 'text-slate-700 cursor-pointer'
+                        ? 'bg-slate-800 text-white font-medium cursor-pointer' 
+                        : 'text-slate-700 hover:bg-slate-50 cursor-pointer'
                   }`}
                   disabled={isDisabled}
                 >
@@ -143,6 +155,6 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </motion.div>
   );
 };

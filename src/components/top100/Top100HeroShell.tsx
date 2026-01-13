@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Top100RankBadge } from './Top100RankBadge';
 import { getRegionTheme } from '@/lib/regionTheme';
 import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
@@ -17,6 +18,12 @@ interface Top100HeroShellProps {
 /**
  * Top100HeroShell - Unified hero image + full-bleed attached progress slab
  * Uses regional color theming for progress bar.
+ * 
+ * Polish applied:
+ * - Image fade-in on load
+ * - Glassmorphism back button with hover/press states
+ * - Progress bar glow effect
+ * - Smooth animated fill
  */
 export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   list,
@@ -25,6 +32,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   onBack,
   showProgress = true,
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const hero = list.hero_course;
   const topRank = hero?.rank_in_list ?? null;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
@@ -52,57 +60,88 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
       <div className="overflow-hidden">
         
         {/* HERO IMAGE SECTION - consistent height across all lists */}
-        <div className="relative h-[220px]">
+        <div className="relative h-[220px] bg-slate-800">
           {/* Background image with gradient overlay for text legibility */}
           {hero?.cover_image_url ? (
             <>
-              <img
+              {/* Blur placeholder while loading */}
+              <div 
+                className={`absolute inset-0 bg-slate-700 transition-opacity duration-500 ${
+                  imageLoaded ? 'opacity-0' : 'opacity-100'
+                }`}
+              />
+              <motion.img
                 src={hero.cover_image_url}
                 alt={hero.name}
                 className="h-full w-full object-cover"
-                loading="lazy"
+                loading="eager"
+                onLoad={() => setImageLoaded(true)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: imageLoaded ? 1 : 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
               />
               {/* Top gradient for back button */}
-              <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/50 via-black/25 to-transparent pointer-events-none" />
               {/* Bottom gradient for title */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 via-black/40 to-transparent pointer-events-none" />
             </>
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-slate-800 to-slate-900" />
+            <div className="h-full w-full bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
           
-          {/* Back button */}
+          {/* Back button - glassmorphism style */}
           {onBack && (
-            <button
+            <motion.button
               onClick={onBack}
-              className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/30 backdrop-blur-sm rounded-sq-sm flex items-center justify-center hover:bg-black/50 transition-colors focus:outline-none"
+              className="absolute top-3 left-3 z-20 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+              whileHover={{ 
+                scale: 1.05, 
+                background: 'rgba(0, 0, 0, 0.4)',
+              }}
+              whileTap={{ scale: 0.95 }}
               aria-label="Go back"
             >
               <ArrowLeft className="h-5 w-5 text-white" />
-            </button>
+            </motion.button>
           )}
           
           {/* Top-right rank badge */}
           {topRank && (
-            <div className="absolute right-4 top-4 z-10">
+            <motion.div 
+              className="absolute right-4 top-4 z-10"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
               <Top100RankBadge listSlug={listSlug} rank={topRank} />
-            </div>
+            </motion.div>
           )}
           
           {/* Title at bottom of hero */}
-          <div className="absolute bottom-3 left-4 right-4 z-10">
-            <h1 className="text-white text-2xl font-semibold drop-shadow-lg">
+          <motion.div 
+            className="absolute bottom-3 left-4 right-4 z-10"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <h1 className="text-white text-2xl font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
               {displayLabel}
             </h1>
-          </div>
+          </motion.div>
         </div>
 
-        {/* FULL-BLEED PROGRESS SLAB - uses regional color for bar */}
+        {/* FULL-BLEED PROGRESS SLAB - uses design system tokens */}
         {showProgress && (
           <div 
             className="w-full px-4 py-3"
             style={{ 
-              background: 'linear-gradient(to bottom, #4a5568 0%, #64748b 50%, #94a3b8 100%)',
+              background: 'linear-gradient(to bottom, var(--surface-slate) 0%, hsl(215 16% 47%) 50%, hsl(215 16% 60%) 100%)',
             }}
           >
             {/* Top row: X / total (primary) + % complete (secondary) */}
@@ -111,9 +150,9 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 <AnimatedNumber 
                   value={playedCount}
                   minCh={1}
-                  className="text-3xl font-semibold leading-none drop-shadow-sm"
+                  className="text-3xl font-semibold leading-none drop-shadow-sm tabular-nums"
                 />
-                <span className="text-white/70 text-lg ml-0.5">/{totalCount}</span>
+                <span className="text-white/70 text-lg ml-0.5 font-light">/{totalCount}</span>
               </div>
 
               <div className="flex items-baseline gap-1.5 text-white">
@@ -122,22 +161,25 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                   suffix="%"
                   minCh={1}
                   delay={0.1}
-                  className="text-lg font-semibold drop-shadow-sm"
+                  className="text-lg font-semibold drop-shadow-sm tabular-nums"
                 />
-                <span className="text-[11px] text-white/70">
+                <span className="text-[11px] text-white/70 font-medium">
                   complete
                 </span>
               </div>
             </div>
 
-            {/* Progress bar - uses regional accent color */}
+            {/* Progress bar - uses regional accent color with glow */}
             <div className="mt-2.5">
               <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full shadow-sm transition-[width] duration-700 ease-out"
+                <motion.div
+                  className="h-full rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percent}%` }}
+                  transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
                   style={{ 
                     backgroundColor: theme.ringColor,
-                    width: `${percent}%`,
+                    boxShadow: percent > 0 ? `0 0 12px ${theme.ringColor}, 0 0 4px ${theme.ringColor}` : 'none',
                   }}
                 />
               </div>

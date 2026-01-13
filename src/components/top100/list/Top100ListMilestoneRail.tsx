@@ -105,17 +105,26 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
 
   return (
     <section>
-      {/* Header - Spacing: Header → token rail = 12px (S) */}
-      <div className="px-4 flex items-center justify-between mb-3">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+      {/* Header - small caps styling with animated arrow */}
+      <div className="px-4 flex items-center justify-between mb-4">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">
           Your Milestones
         </h2>
-        <button
+        <motion.button
           onClick={handleTileClick}
-          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-0.5 group"
+          whileHover={{ x: 2 }}
         >
-          See all →
-        </button>
+          See all
+          <motion.span 
+            className="inline-block"
+            initial={{ x: 0 }}
+            whileHover={{ x: 3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+          >
+            →
+          </motion.span>
+        </motion.button>
       </div>
 
       {/* Horizontal scrolling rail */}
