@@ -180,8 +180,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     const mapInstance = mapRef.current;
 
     const addClustering = () => {
-      // Clean up existing layers
-      ['clusters', 'cluster-count', 'played-points', 'want-to-play-points', 'want-to-play-glow', 'not-played-points'].forEach((id) => {
+      // Clean up existing layers (including course-labels)
+      ['course-labels', 'clusters', 'cluster-count', 'played-points', 'want-to-play-points', 'want-to-play-glow', 'not-played-points'].forEach((id) => {
         if (mapInstance.getLayer(id)) mapInstance.removeLayer(id);
       });
       if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
@@ -264,14 +264,20 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // NOT PLAYED points (render first, bottom layer) - muted grey, minimal
+      // NOT PLAYED points (render first, bottom layer) - muted grey, zoom-responsive sizing
       mapInstance.addLayer({
         id: 'not-played-points',
         type: 'circle',
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'none']],
         paint: {
-          'circle-radius': 5,
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            4, 4,    // Small at world view
+            8, 6,    // Medium at country view  
+            12, 10,  // Larger when zoomed to region
+            16, 14,  // Even larger when very zoomed in
+          ],
           'circle-color': 'rgba(255,255,255,0.7)',
           'circle-stroke-width': 1.5,
           'circle-stroke-color': NOT_PLAYED_COLOR,
@@ -285,37 +291,91 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
         paint: {
-          'circle-radius': 14,
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            4, 10,
+            8, 14,
+            12, 18,
+            16, 22,
+          ],
           'circle-color': 'rgba(247, 147, 30, 0.2)',
           'circle-blur': 0.8,
         },
       });
 
-      // WANT TO PLAY points (middle layer) - outlined orange, hollow center
+      // WANT TO PLAY points (middle layer) - outlined orange, zoom-responsive sizing
       mapInstance.addLayer({
         id: 'want-to-play-points',
         type: 'circle',
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
         paint: {
-          'circle-radius': 7,
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            4, 5,
+            8, 7,
+            12, 11,
+            16, 15,
+          ],
           'circle-color': 'rgba(255,255,255,0.95)',
           'circle-stroke-width': 2.5,
           'circle-stroke-color': WANT_TO_PLAY_COLOR,
         },
       });
 
-      // PLAYED points (render on top) - filled dark with subtle depth
+      // PLAYED points (render on top) - filled dark, zoom-responsive sizing
       mapInstance.addLayer({
         id: 'played-points',
         type: 'circle',
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'played']],
         paint: {
-          'circle-radius': 8,
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            4, 6,    // Small at world view
+            8, 8,    // Medium at country view
+            12, 12,  // Larger when zoomed to region
+            16, 16,  // Even larger when very zoomed in
+          ],
           'circle-color': PLAYED_COLOR,
           'circle-stroke-width': 2.5,
           'circle-stroke-color': 'rgba(255,255,255,0.5)',
+        },
+      });
+
+      // Course name labels - only visible when zoomed in (zoom > 9)
+      mapInstance.addLayer({
+        id: 'course-labels',
+        type: 'symbol',
+        source: 'courses',
+        filter: ['!', ['has', 'point_count']],
+        minzoom: 9,
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-size': [
+            'interpolate', ['linear'], ['zoom'],
+            9, 10,
+            12, 12,
+            16, 14,
+          ],
+          'text-offset': [0, 1.2],
+          'text-anchor': 'top',
+          'text-max-width': 8,
+          'text-optional': true,
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
+          'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
+        },
+        paint: {
+          'text-color': '#1e293b',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 2,
+          'text-halo-blur': 0.5,
+          'text-opacity': [
+            'interpolate', ['linear'], ['zoom'],
+            9, 0.7,
+            11, 1,
+          ],
         },
       });
 
