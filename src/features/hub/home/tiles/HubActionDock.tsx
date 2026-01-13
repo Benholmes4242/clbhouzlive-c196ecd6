@@ -12,7 +12,7 @@ import { useHub } from '@/features/hub/useHub';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import { HubEchoSheet } from '../../components/HubEchoSheet';
-import { HubGamesHubSheet } from '../../components/HubGamesHubSheet';
+import { CreateGameTripSheetV2 } from '../../components/create-game-trip-v2';
 
 interface HubNavItem {
   id: string;
@@ -123,10 +123,9 @@ export function HubActionDock() {
         onClose={() => setIsEchoSheetOpen(false)} 
       />
       
-      <HubGamesHubSheet 
+      <CreateGameTripSheetV2 
         isOpen={isGamesHubOpen} 
         onClose={() => setIsGamesHubOpen(false)}
-        initialTab="discover"
       />
     </>
   );

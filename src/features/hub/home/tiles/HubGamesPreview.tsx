@@ -13,7 +13,7 @@ import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequest
 import { supabase } from '@/integrations/supabase/client';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Users, Clock } from 'lucide-react';
-import { HubGamesHubSheet } from '@/features/hub/components/HubGamesHubSheet';
+import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
 
 type GamePreview = {
   id: string;
@@ -103,8 +103,6 @@ function GameCard({ game, isPrimary = false, onClick }: GameCardProps) {
 export function HubGamesPreview() {
   const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
-  const [gamesHubInitialTab, setGamesHubInitialTab] = useState<'discover' | 'yours'>('yours');
-  const [focusGameId, setFocusGameId] = useState<string | undefined>();
   
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
@@ -146,20 +144,16 @@ export function HubGamesPreview() {
   const totalPendingRequests = useTotalPendingHostRequests(allGames, currentUserId);
 
   const openGame = (gameId: string) => {
-    setFocusGameId(gameId);
-    setGamesHubInitialTab('yours');
     setGamesHubOpen(true);
   };
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setGamesHubInitialTab('yours');
     setGamesHubOpen(true);
   };
 
   const openYourGames = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setGamesHubInitialTab('yours');
     setGamesHubOpen(true);
   };
 
@@ -284,14 +278,11 @@ export function HubGamesPreview() {
         )}
       </div>
       
-      <HubGamesHubSheet 
+      <HubYourGamesSheet 
         isOpen={gamesHubOpen} 
         onClose={() => {
           setGamesHubOpen(false);
-          setFocusGameId(undefined);
         }}
-        initialTab={gamesHubInitialTab}
-        initialFocusGameId={focusGameId}
       />
     </Tile>
   );
