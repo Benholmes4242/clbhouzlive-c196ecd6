@@ -1,9 +1,12 @@
 export { CollegeCard } from './CollegeCard';
+export { FranchiseCard } from './FranchiseCard';
 export { CollegeSearch } from './CollegeSearch';
 export { CollegeLeaderboard } from './CollegeLeaderboard';
+export { FranchiseLeaderboard } from './FranchiseLeaderboard';
 export { CollegeAlumniList } from './CollegeAlumniList';
 export { CollegeHero } from './CollegeHero';
 export { CollegeWeeklyMovers } from './CollegeWeeklyMovers';
+export { FranchiseMovers } from './FranchiseMovers';
 export { CollegeRivalsCarousel } from './CollegeRivalsCarousel';
 export { FollowCollegeButton } from './FollowCollegeButton';
 export { CollegeCompareHero } from './CollegeCompareHero';
