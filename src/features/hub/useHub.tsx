@@ -1,6 +1,6 @@
 /**
  * Hub Context & Provider
- * Manages Hub overlay navigation
+ * Manages Hub navigation (now uses normal page navigation, no overlays)
  */
 
 import React, { createContext, useContext } from 'react';
@@ -18,20 +18,18 @@ export function HubProvider({ children }: { children: React.ReactNode }) {
   const nav = useNavigate();
   const loc = useLocation();
 
+  // Navigate to Hub as a normal page (no overlay)
   const open = () => {
-    nav('/hub', { state: { backgroundLocation: loc } });
+    nav('/hub');
   };
 
+  // Navigate from Hub to another page (normal navigation)
   const navigateFromHub = (to: string) => {
-    const backgroundLocation = (loc.state as any)?.backgroundLocation || loc;
-    // Navigate to target page as an overlay over origin (not over Hub)
-    nav(to, { state: { backgroundLocation, fromHub: true } });
+    nav(to);
   };
 
+  // Close Hub - navigate back or to clubhouse
   const close = () => {
-    const state = loc.state as any;
-    const backgroundLocation = state?.backgroundLocation;
-
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'hub_closed', {
         event_category: 'hub',
@@ -39,17 +37,15 @@ export function HubProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-    if (backgroundLocation) {
-      nav(backgroundLocation.pathname + backgroundLocation.search, {
-        replace: true,
-      });
+    // Try to go back, or navigate to clubhouse as fallback
+    if (window.history.length > 1) {
+      nav(-1);
     } else {
-      // Fallback if no background location is found
       nav('/clubhouse', { replace: true });
     }
   };
 
-  // Centralized hub-open class management to prevent race conditions
+  // Track hub-open class for styling purposes
   React.useEffect(() => {
     const isHubRoute = loc.pathname.startsWith('/hub');
     
