@@ -92,11 +92,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   return (
     <CoursesErrorBoundary>
       <div className="space-y-section">
-        <div className="text-center space-y-sub pt-block mb-block">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <div className="text-center pt-block mb-block">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">
             {username ? `${username}'s Courses` : 'Golf Courses'}
           </h1>
-          <p className="text-muted-foreground text-base">
+          <p className="text-muted-foreground text-sm">
             {getSubtitle()}
           </p>
         </div>

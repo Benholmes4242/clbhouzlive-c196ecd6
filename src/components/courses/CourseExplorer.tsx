@@ -386,7 +386,7 @@ const CourseExplorer = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > 0 && totalCount > EXPLORE_PAGE_SIZE;
 
   return (
-    <div className="w-full space-y-block pb-section">
+    <div className="w-full space-y-block pb-28">
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" aria-hidden="true" />
@@ -487,7 +487,7 @@ const CourseExplorer = () => {
       {/* Context row with sort */}
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2">
-          <p className="text-[11px] text-muted-foreground/85 flex-1">
+          <p className="text-xs text-muted-foreground flex-1">
             {hasSearch ? (
               <>
                 Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
@@ -550,7 +550,7 @@ const CourseExplorer = () => {
             <>
               {/* Load more button */}
               {showLoadMoreButton && (
-                <div className="flex flex-col items-center gap-2 pt-4">
+                <div className="flex flex-col items-center gap-3 pt-6">
                   <Button
                     variant="outline"
                     size="sm"
@@ -570,7 +570,7 @@ const CourseExplorer = () => {
                       </>
                     )}
                   </Button>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
                   </p>
                 </div>
