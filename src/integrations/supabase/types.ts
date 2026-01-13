@@ -12216,6 +12216,7 @@ export type Database = {
         }
         Returns: string
       }
+      trigger_push_queue_processing: { Args: never; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
       update_business_member_role: {
         Args: {
