@@ -23,13 +23,7 @@ interface Top100MapViewProps {
   fullHeight?: boolean;
 }
 
-// Canonical list sizes
-const REGION_TOTALS: Record<Top100MapScope, number> = {
-  global: 77,
-  'gb-i': 100,
-  usa: 100,
-  europe: 99,
-};
+// Note: List totals are now derived dynamically from the query results
 
 // Region configs
 const REGION_CONFIG: Record<
@@ -95,8 +89,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     return courses;
   }, [courses, statusFilter]);
 
-  // Official list size
-  const officialTotal = REGION_TOTALS[scope] ?? courses.length;
+  // Official list size - derived dynamically from query results
+  const officialTotal = courses.length;
   const ratedCount = courses.filter((c) => c.journey_status === 'played').length;
   const wantToPlayCount = courses.filter((c) => c.journey_status === 'want_to_play').length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
