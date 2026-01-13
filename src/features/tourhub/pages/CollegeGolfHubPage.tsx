@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, GraduationCap, TrendingUp, Zap } from 'lucide-react';
+import { ArrowLeft, Trophy, Zap } from 'lucide-react';
 import { TourHubShell } from '../components';
-import { CollegeSearch, CollegeLeaderboard, CollegeWeeklyMovers } from '../components/college';
+import { CollegeSearch, FranchiseLeaderboard, FranchiseMovers } from '../components/college';
 import { useTourSeason } from '../hooks/useTourHubData';
 
 /**
- * College Golf Hub - Main landing page for college golf content.
- * Features search, leaderboards by various metrics, and weekly movers.
+ * College Golf Hub - Franchise Leaderboard
+ * Premium landing page for college golf rankings.
  */
 export function CollegeGolfHubPage() {
   const { data: season } = useTourSeason();
@@ -18,27 +18,22 @@ export function CollegeGolfHubPage() {
       <div className="pt-4">
         <Link 
           to="/tourhub" 
-          className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary hover:text-text-primary transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Tour Hub
         </Link>
       </div>
       
-      {/* Header */}
-      <header className="py-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-            <GraduationCap className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-heading-lg font-bold text-text-primary">
-              College Rankings
-            </h1>
-            <p className="text-body-sm text-text-secondary">
-              See how your college stacks up on the PGA Tour
-            </p>
-          </div>
+      {/* Premium Header */}
+      <header className="py-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+            College Rankings
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
+            See how your college stacks up on the PGA Tour. {seasonYear} Season.
+          </p>
         </div>
       </header>
       
@@ -47,25 +42,29 @@ export function CollegeGolfHubPage() {
         <CollegeSearch />
       </section>
       
-      {/* Leaderboards - Primary content */}
-      <section className="mb-8">
-        <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <TrendingUp className="w-5 h-5 text-text-tertiary" />
-          College Leaderboards
-        </h2>
-        <p className="text-body-sm text-text-secondary mb-4">
-          {seasonYear} Season rankings by total alumni performance
+      {/* Franchise Leaderboard */}
+      <section className="mb-10">
+        <div className="flex items-center gap-2 mb-4">
+          <Trophy className="w-5 h-5 text-amber-500" />
+          <h2 className="text-lg font-semibold text-foreground">
+            Franchise Leaderboard
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          Ranked by total alumni performance this season
         </p>
-        <CollegeLeaderboard limit={25} />
+        <FranchiseLeaderboard limit={25} />
       </section>
       
-      {/* Weekly Movers - Secondary content */}
-      <section className="mb-6">
-        <h2 className="text-heading-md font-semibold text-text-primary flex items-center gap-2 mb-4">
-          <Zap className="w-5 h-5 text-accent-warning" />
-          This Week's Movers
-        </h2>
-        <CollegeWeeklyMovers limit={8} />
+      {/* Weekly Movers */}
+      <section className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="w-5 h-5 text-amber-500" />
+          <h2 className="text-lg font-semibold text-foreground">
+            This Week's Movers
+          </h2>
+        </div>
+        <FranchiseMovers limit={8} />
       </section>
     </TourHubShell>
   );
