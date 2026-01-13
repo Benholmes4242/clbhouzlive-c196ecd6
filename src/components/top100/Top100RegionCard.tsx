@@ -63,18 +63,19 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   return (
     <div
       className={cn(
-        'relative overflow-hidden',
+        'group relative overflow-hidden',
         'bg-slate-900 text-white',
         isHero ? [
           // Full-width hero: no rounded corners, negative margins to break out of gutters
           'rounded-none -mx-4',
           'h-[17.5rem]' // Match course-hero-container height (280px)
         ] : [
-          // Default card style with rounded corners
-          'rounded-sq-lg shadow-md',
+          // Default card style with rounded corners - polished interactions
+          'rounded-sq-lg',
+          'shadow-[0_4px_20px_rgba(0,0,0,0.15)]',
           'transition-all duration-200 ease-out',
-          'hover:scale-[1.01] hover:shadow-lg',
-          'active:scale-[0.99]',
+          'hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-[1.01]',
+          'active:scale-[0.98]',
           'h-[300px] sm:h-[320px] cursor-pointer',
           // Subtle emphasis for primary (Worldwide) journey
           isPrimary && 'ring-1 ring-white/10'
@@ -171,13 +172,19 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
               {journeyPhrase}
             </p>
 
-            {/* View courses button */}
+            {/* View courses button - premium glass styling */}
             {showCta && (
               <div className="mt-2.5 flex justify-end">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="rounded-sq-sm px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none shadow-sm"
+                  className={cn(
+                    'rounded-sq-sm px-4 py-1.5 text-xs font-medium',
+                    'bg-white/95 backdrop-blur-sm text-slate-900',
+                    'border border-white/20 shadow-sm',
+                    'hover:bg-white hover:shadow-md',
+                    'active:scale-[0.97] transition-all duration-150'
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     onClick?.();

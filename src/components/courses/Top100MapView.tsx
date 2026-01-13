@@ -23,9 +23,7 @@ interface Top100MapViewProps {
   fullHeight?: boolean;
 }
 
-// Note: List totals are now derived dynamically from the query results
-
-// Region configs
+// Region configs with premium zoom levels
 const REGION_CONFIG: Record<
   Top100MapScope,
   { center: [number, number]; zoom: number; label: string }
@@ -73,6 +71,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   const {
     data: courses = [],
@@ -94,6 +93,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const ratedCount = courses.filter((c) => c.journey_status === 'played').length;
   const wantToPlayCount = courses.filter((c) => c.journey_status === 'want_to_play').length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
+  const progressPercent = officialTotal > 0 ? Math.round((ratedCount / officialTotal) * 100) : 0;
 
   // Count unique regions explored
   const regionsExplored = useMemo(() => {
@@ -109,7 +109,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     setStatusFilter('all');
   }, [scope]);
 
-  // Initialise map
+  // Initialise map with premium styling
   useEffect(() => {
     if (!mapContainerRef.current || !MAP_CONFIG.TOKEN || mapRef.current) return;
 
@@ -131,17 +131,21 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       new mapboxgl.AttributionControl({ compact: true }),
       'bottom-left'
     );
-    // Custom zoom controls - don't add Mapbox default nav control
+
+    mapInstance.on('load', () => {
+      setMapLoaded(true);
+    });
 
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
       }
       mapRef.current = null;
+      setMapLoaded(false);
     };
   }, [scope]);
 
-  // Fit to bounds when courses load
+  // Fit to bounds when courses load with smooth animation
   useEffect(() => {
     if (!mapRef.current || hasInitialFit || !courses.length || !regionConfig) {
       return;
@@ -157,7 +161,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     mapInstance.fitBounds(bounds, {
       padding: 40,
       maxZoom: regionConfig.zoom,
-      duration: 0,
+      duration: 600,
     });
 
     if (scope === 'usa') {
@@ -217,7 +221,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
-      // Cluster circles - color based on played ratio, stronger border for depth
+      // Cluster circles - color based on played ratio, premium depth styling
       mapInstance.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -227,10 +231,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-radius': [
             'step',
             ['get', 'point_count'],
-            18, 5,
-            22, 15,
-            26, 30,
-            30,
+            20, 5,
+            24, 15,
+            28, 30,
+            32,
           ],
           'circle-color': [
             'case',
@@ -239,7 +243,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             CLUSTER_COLOR_MIXED,
           ],
           'circle-stroke-width': 3,
-          'circle-stroke-color': 'rgba(255,255,255,0.5)',
+          'circle-stroke-color': 'rgba(255,255,255,0.6)',
           'circle-blur': 0,
         },
       });
@@ -253,7 +257,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         layout: {
           'text-field': '{point_count_abbreviated}',
           'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
-          'text-size': 12,
+          'text-size': 13,
         },
         paint: {
           'text-color': '#ffffff',
@@ -267,9 +271,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'none']],
         paint: {
-          'circle-radius': 4,
-          'circle-color': 'rgba(255,255,255,0.6)',
-          'circle-stroke-width': 1,
+          'circle-radius': 5,
+          'circle-color': 'rgba(255,255,255,0.7)',
+          'circle-stroke-width': 1.5,
           'circle-stroke-color': NOT_PLAYED_COLOR,
         },
       });
@@ -281,8 +285,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
         paint: {
-          'circle-radius': 12,
-          'circle-color': 'rgba(247, 147, 30, 0.15)',
+          'circle-radius': 14,
+          'circle-color': 'rgba(247, 147, 30, 0.2)',
           'circle-blur': 0.8,
         },
       });
@@ -294,8 +298,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'want_to_play']],
         paint: {
-          'circle-radius': 6,
-          'circle-color': 'rgba(255,255,255,0.9)',
+          'circle-radius': 7,
+          'circle-color': 'rgba(255,255,255,0.95)',
           'circle-stroke-width': 2.5,
           'circle-stroke-color': WANT_TO_PLAY_COLOR,
         },
@@ -308,10 +312,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         source: 'courses',
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'journey_status'], 'played']],
         paint: {
-          'circle-radius': 7,
+          'circle-radius': 8,
           'circle-color': PLAYED_COLOR,
-          'circle-stroke-width': 2,
-          'circle-stroke-color': 'rgba(255,255,255,0.4)',
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': 'rgba(255,255,255,0.5)',
         },
       });
 
@@ -330,7 +334,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           mapInstance.easeTo({
             center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
             zoom: zoom || mapInstance.getZoom() + 2,
-            duration: 500,
+            duration: 600,
           });
         });
       });
@@ -348,7 +352,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         mapInstance.flyTo({
           center: [course.longitude, course.latitude],
           zoom: Math.max(mapInstance.getZoom(), 6),
-          duration: 600,
+          duration: 700,
         });
       };
 
@@ -380,7 +384,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     mapRef.current.flyTo({
       center: regionConfig.center,
       zoom: regionConfig.zoom,
-      duration: 800,
+      duration: 900,
     });
 
     setSelectedCourse(null);
@@ -399,73 +403,117 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   return (
     <div className={cn('top100-map-shell', fullHeight ? 'h-full flex flex-col' : 'space-y-2')}>
-      {/* Premium header - compact with pill + progress bar */}
-      <div className="flex-shrink-0 px-4 pt-3 pb-2">
+      {/* Premium header - compact with pill + animated progress bar */}
+      <div className="flex-shrink-0 px-4 pt-3 pb-2.5">
         {/* Top row: Title + stats pill */}
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
             {regionConfig.label}
           </h2>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-medium text-slate-600 dark:text-slate-300">
-            <span className="text-slate-900 dark:text-white font-bold">{ratedCount}</span>
+          <div className={cn(
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
+            'bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm',
+            'text-[11px] font-medium text-slate-600 dark:text-slate-300',
+            'border border-slate-200/50 dark:border-slate-700/50'
+          )}>
+            <span className="text-slate-900 dark:text-white font-bold tabular-nums">{ratedCount}</span>
             <span className="text-slate-400">/</span>
-            <span>{officialTotal}</span>
+            <span className="tabular-nums">{officialTotal}</span>
             <span className="text-slate-400 ml-0.5">played</span>
           </div>
         </div>
         
         {/* Secondary line */}
-        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 leading-tight">
           {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
         </p>
         
-        {/* Progress strip */}
-        <div className="mt-2.5 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-500"
-            style={{ width: `${Math.min((ratedCount / officialTotal) * 100, 100)}%` }}
-          />
+        {/* Progress strip with glow */}
+        <div className="mt-3 relative">
+          <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            {/* Glow behind */}
+            <div 
+              className="absolute inset-0 rounded-full blur-sm opacity-40"
+              style={{
+                background: `linear-gradient(90deg, hsl(var(--tab-orange)), hsl(38, 95%, 60%))`,
+                width: `${progressPercent}%`,
+                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            />
+            {/* Main bar */}
+            <div 
+              className={cn(
+                'h-full rounded-full relative z-10',
+                'bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300',
+                'transition-all duration-700 ease-out'
+              )}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Map container */}
-      <div className={cn('relative overflow-hidden bg-muted/40', fullHeight ? 'flex-1 min-h-0' : 'rounded-sq-lg')}>
+      {/* Map container - immersive */}
+      <div className={cn(
+        'relative overflow-hidden',
+        fullHeight ? 'flex-1 min-h-0' : 'rounded-sq-lg',
+        'bg-slate-100 dark:bg-slate-900'
+      )}>
         <div
           ref={mapContainerRef}
-          className={cn('w-full', fullHeight ? 'h-full' : 'h-[500px]')}
+          className={cn(
+            'w-full transition-opacity duration-500',
+            fullHeight ? 'h-full' : 'h-[500px]',
+            mapLoaded ? 'opacity-100' : 'opacity-0'
+          )}
         />
 
-        {/* Loading overlay */}
-        {isLoading && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/60 text-xs text-slate-500">
-            Loading map...
+        {/* Loading overlay with shimmer */}
+        {(isLoading || !mapLoaded) && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-8 h-8 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin" />
+              <span className="text-xs text-slate-500 font-medium">Loading map...</span>
+            </div>
           </div>
         )}
 
-        {/* Top overlay zone - Legend as micro-pills */}
+        {/* Top overlay zone - Legend as premium glass pills */}
         <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-3">
           <div 
             className="pointer-events-auto flex items-center gap-1.5 w-fit"
             role="group"
             aria-label="Map legend"
           >
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
+            <div className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full',
+              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
+              'shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/50'
+            )}>
               <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-slate-200 shadow-sm" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Played</span>
+              <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">Played</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.3)]" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Want to Play</span>
+            <div className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full',
+              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
+              'shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/50'
+            )}>
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[#F7931E] bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.4)]" aria-hidden="true" />
+              <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">Want to Play</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-sm border border-slate-200/60 dark:border-slate-700/50">
+            <div className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full',
+              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
+              'shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-slate-200/60 dark:border-slate-700/50'
+            )}>
               <span className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400 bg-transparent" aria-hidden="true" />
-              <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Not Played</span>
+              <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">Not Played</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom-right control stack: orb + reset + zoom */}
-        <div className="pointer-events-none absolute right-3 bottom-24 z-20 flex flex-col items-center gap-2">
+        {/* Bottom-right control stack: orb + zoom controls */}
+        <div className="pointer-events-none absolute right-3 bottom-24 z-20 flex flex-col items-center gap-2.5">
           {/* Progress orb */}
           <div className="pointer-events-auto">
             <MapProgressOrb
@@ -476,30 +524,49 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             />
           </div>
           
-          {/* Unified control buttons */}
-          <div className="pointer-events-auto flex flex-col gap-1.5">
+          {/* Unified control buttons - premium glass */}
+          <div className="pointer-events-auto flex flex-col gap-2">
             {/* Zoom controls */}
             <div 
-              className="flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-slate-200/60 dark:border-slate-700/50 overflow-hidden"
+              className={cn(
+                'flex flex-col',
+                'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
+                'rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
+                'border border-slate-200/60 dark:border-slate-700/50',
+                'overflow-hidden'
+              )}
               role="group"
               aria-label="Map zoom controls"
             >
               <button
                 onClick={() => mapRef.current?.zoomIn({ duration: 300 })}
-                className="flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-800"
+                className={cn(
+                  'flex items-center justify-center w-10 h-10',
+                  'text-slate-600 dark:text-slate-300',
+                  'hover:bg-slate-50 dark:hover:bg-slate-800',
+                  'active:bg-slate-100 dark:active:bg-slate-700',
+                  'transition-colors duration-150',
+                  'border-b border-slate-100 dark:border-slate-800'
+                )}
                 aria-label="Zoom in"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </button>
               <button
                 onClick={() => mapRef.current?.zoomOut({ duration: 300 })}
-                className="flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors"
+                className={cn(
+                  'flex items-center justify-center w-10 h-10',
+                  'text-slate-600 dark:text-slate-300',
+                  'hover:bg-slate-50 dark:hover:bg-slate-800',
+                  'active:bg-slate-100 dark:active:bg-slate-700',
+                  'transition-colors duration-150'
+                )}
                 aria-label="Zoom out"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </button>
@@ -510,18 +577,38 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               onClick={handleResetView}
               className={cn(
                 'flex items-center justify-center',
-                'w-9 h-9 rounded-lg',
+                'w-10 h-10 rounded-xl',
                 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
-                'shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-slate-200/60 dark:border-slate-700/50',
-                'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700',
-                'transition-colors duration-150'
+                'shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
+                'border border-slate-200/60 dark:border-slate-700/50',
+                'text-slate-500 dark:text-slate-400',
+                'hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200',
+                'active:bg-slate-100 dark:active:bg-slate-700',
+                'transition-all duration-150'
               )}
               aria-label="Reset map view"
             >
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
+
+        {/* Empty state overlay for 0 courses played */}
+        {ratedCount === 0 && !isLoading && mapLoaded && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-32 z-10 flex justify-center">
+            <div className={cn(
+              'pointer-events-auto px-4 py-3 rounded-xl',
+              'bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl',
+              'shadow-[0_4px_20px_rgba(0,0,0,0.1)]',
+              'border border-slate-200/60 dark:border-slate-700/50',
+              'text-center'
+            )}>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                ⛳ Tap a course to start your journey
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Course bottom sheet */}
         <MapCourseSheet
@@ -531,12 +618,21 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         />
       </div>
 
-      {/* Floating bottom control tray - premium glass */}
+      {/* Floating bottom control tray - premium glassmorphism */}
       <div className="flex-shrink-0 mx-3 mb-3">
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border border-white/60 dark:border-slate-700/40 p-2.5 space-y-2">
+        <div className={cn(
+          'bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl',
+          'rounded-2xl',
+          'shadow-[0_4px_30px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)]',
+          'border border-white/70 dark:border-slate-700/50',
+          'p-3 space-y-2.5'
+        )}>
           {/* Status filter row */}
           <div 
-            className="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100/70 dark:bg-slate-800/70"
+            className={cn(
+              'flex items-center gap-0.5 p-0.5 rounded-xl',
+              'bg-slate-100/70 dark:bg-slate-800/70'
+            )}
             role="group"
             aria-label="Filter courses by status"
           >
@@ -555,16 +651,17 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   aria-pressed={isActive}
                   aria-label={`Show ${labels[filter].toLowerCase()} courses`}
                   className={cn(
-                    'flex-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200',
+                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium',
+                    'transition-all duration-200',
                     isActive
                       ? filter === 'played'
                         ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
                         : filter === 'want_to_play'
-                        ? 'bg-[#F7931E] text-white shadow-sm'
+                        ? 'bg-[#F7931E] text-white shadow-[0_2px_8px_rgba(247,147,30,0.25)]'
                         : filter === 'not_played'
                         ? 'bg-slate-500 dark:bg-slate-400 text-white dark:text-slate-900 shadow-sm'
                         : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-700/50'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
                   )}
                 >
                   {labels[filter]}
@@ -575,7 +672,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
           {/* Region chips row */}
           <div 
-            className="flex items-center gap-1"
+            className="flex items-center gap-1.5"
             role="group"
             aria-label="Filter by region"
           >
@@ -589,10 +686,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   aria-pressed={isActive}
                   aria-label={`Show ${labels[regionScope]} Top 100`}
                   className={cn(
-                    'flex-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-all duration-200',
+                    'flex-1 px-3 py-2 rounded-lg text-xs font-medium border',
+                    'transition-all duration-200',
                     isActive
                       ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-sm'
-                      : 'bg-white/50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800'
+                      : 'bg-white/60 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800'
                   )}
                 >
                   {labels[regionScope]}
