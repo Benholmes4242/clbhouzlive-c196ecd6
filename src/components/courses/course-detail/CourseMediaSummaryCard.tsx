@@ -24,8 +24,8 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-2">
           {/* Title */}
-          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
-            Course media
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground">
+            Course Media
           </p>
 
           {/* Counts - 8px below title */}

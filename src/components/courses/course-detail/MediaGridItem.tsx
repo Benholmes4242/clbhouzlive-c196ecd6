@@ -18,13 +18,15 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
   const isVideo = item.type === 'video';
   const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
   
-  // Format duration for display
-  const formatDuration = (seconds?: number) => {
-    if (!seconds || Number.isNaN(seconds)) return '0:00';
+  // Format duration for display - returns null if no valid duration
+  const formatDuration = (seconds?: number): string | null => {
+    if (!seconds || Number.isNaN(seconds) || seconds <= 0) return null;
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
+  
+  const durationText = formatDuration(item.duration);
 
   return (
     <button
@@ -52,14 +54,16 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overfl
           {/* Bottom-left play icon - matching VideoPlayIndicator */}
           <VideoPlayIndicator size="md" />
 
-          {/* Duration pill - bottom right */}
-          <div className="absolute bottom-2 right-2">
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
-              <span className="text-[10px] font-medium text-white tabular-nums">
-                {formatDuration(item.duration)}
-              </span>
+          {/* Duration pill - bottom right, only show if valid duration */}
+          {durationText && (
+            <div className="absolute bottom-2 right-2">
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
+                <span className="text-[10px] font-medium text-white tabular-nums">
+                  {durationText}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
 

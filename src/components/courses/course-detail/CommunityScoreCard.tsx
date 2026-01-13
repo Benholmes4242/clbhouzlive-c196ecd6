@@ -195,7 +195,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="mt-4 pt-4 border-t border-slate-100">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+            <span className="text-xs font-medium text-slate-500 tracking-wide">
               Highlights
             </span>
           </div>

@@ -39,6 +39,7 @@ export const ExpandableText: React.FC<ExpandableTextProps> = ({
           type="button"
           className="mt-1 text-xs font-semibold text-slate-700 flex items-center gap-1 hover:text-slate-900 transition-colors relative z-10"
           onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
         >
           {expanded ? 'Show less' : 'Read more'}
           <ChevronDown

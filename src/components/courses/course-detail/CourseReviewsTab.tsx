@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -21,6 +21,8 @@ import {
 } from '@/features/courses/config';
 import { ReviewMediaItem } from '../review/ReviewMediaStrip';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
+import type { ExploreContentItem } from '@/components/explore/types';
 
 export type SortOption = 'recent' | 'highest' | 'helpful';
 
@@ -277,6 +279,30 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
+  // Unified fullscreen for review media
+  const { openFullscreen } = useUnifiedFullscreen('explore', {
+    allowLandscape: true,
+  });
+
+  // Convert review media to ExploreContentItem format and open fullscreen
+  const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number) => {
+    if (!media || media.length === 0) return;
+    
+    const exploreItems: ExploreContentItem[] = media.map((item) => ({
+      id: item.id,
+      type: item.media_type === 'video' ? 'video' : 'image',
+      src: item.media_url,
+      url: item.media_url,
+      posterUrl: item.poster_url || undefined,
+      thumbnailSrc: item.poster_url || item.media_url,
+      title: '',
+      likes: 0,
+      aspectRatio: 1,
+    }));
+    
+    openFullscreen(exploreItems, startIndex);
+  }, [openFullscreen]);
+
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
   
@@ -517,7 +543,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Your review section */}
         {filteredMyReview && (
           <div className="mb-4">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+            <p className="mb-3 text-xs font-medium tracking-wide text-slate-500">
               Your review
             </p>
             <ReviewBlockFlat
@@ -526,8 +552,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               isHighlighted={isJustSubmittedOrUpdated}
               onToggleHelpful={handleToggleHelpful}
               onMediaClick={(index) => {
-                // TODO: Open media lightbox
-                console.log('Open media', index);
+                if (filteredMyReview.media) {
+                  handleReviewMediaClick(filteredMyReview.media, index);
+                }
               }}
             />
           </div>
@@ -542,8 +569,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 review={transformReview(review)}
                 onToggleHelpful={handleToggleHelpful}
                 onMediaClick={(index) => {
-                  // TODO: Open media lightbox
-                  console.log('Open media', index);
+                  if (review.media) {
+                    handleReviewMediaClick(review.media, index);
+                  }
                 }}
               />
             ))}
