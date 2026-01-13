@@ -3174,34 +3174,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
   pointer-events: none;
 }
 
-/* Custom Review Modal Slider Styles */
-.review-rating-slider [data-radix-slider-track] {
-  background-color: #FFE8D1 !important;
-  height: 6px !important;
-}
-
-.review-rating-slider [data-radix-slider-range] {
-  background-color: #F5A623 !important;
-}
-
-.review-rating-slider [data-radix-slider-thumb] {
-  background-color: #F5A623 !important;
-  border: 2px solid #F5A623 !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  width: 16px !important;
-  height: 16px !important;
-}
-
-.review-rating-slider [data-radix-slider-thumb]:hover {
-  background-color: #E6941F !important;
-  border-color: #E6941F !important;
-}
-
-.review-rating-slider [data-radix-slider-thumb]:focus {
-  outline: none !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    Rating Slider Styles (Primary & Breakdown)
    
