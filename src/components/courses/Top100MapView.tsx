@@ -675,24 +675,22 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         )}
       </div>
 
-      {/* Course bottom sheet - positioned above filters */}
-      <div className="relative z-50">
-        <MapCourseSheet
-          course={selectedCourse}
-          onClose={() => setSelectedCourse(null)}
-          scope={scope}
-        />
-      </div>
+      {/* Course bottom sheet - fixed, positioned above filters */}
+      <MapCourseSheet
+        course={selectedCourse}
+        onClose={() => setSelectedCourse(null)}
+        scope={scope}
+        filterTrayHeight={120}
+      />
 
-      {/* Floating bottom control tray - premium glassmorphism */}
-      <div className="flex-shrink-0 mx-3 mb-3">
-        <div className={cn(
-          'bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl',
-          'rounded-2xl',
-          'shadow-[0_4px_30px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)]',
-          'border border-white/70 dark:border-slate-700/50',
-          'p-3 space-y-2.5'
-        )}>
+      {/* Fixed bottom control tray - always visible */}
+      <div className={cn(
+        'fixed bottom-0 left-0 right-0 z-30',
+        'bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl',
+        'border-t border-slate-200/50 dark:border-slate-700/50',
+        'px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+      )}>
+        <div className="space-y-2.5">
           {/* Status filter row - all active states white */}
           <div 
             className={cn(
@@ -760,6 +758,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Spacer to account for fixed filter tray */}
+      <div className="h-[120px] flex-shrink-0" />
     </div>
   );
 };
