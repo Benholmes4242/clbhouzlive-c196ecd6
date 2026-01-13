@@ -3210,10 +3210,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
    Tier switching: data-tier="outstanding" triggers gold styling
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Shared slider track styling */
+/* Shared slider track styling - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-track],
 .rating-slider-breakdown [data-radix-slider-track] {
-  background-color: hsl(215 20% 90%); /* Light slate track */
+  background-color: #f3f4f6; /* gray-100 - matches bar tracks */
   height: 6px;
   border-radius: 999px;
   position: relative;
@@ -3225,10 +3225,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
   height: 8px;
 }
 
-/* Filled range - Slate (neutral: Fair → Excellent) */
+/* Filled range - Gray (neutral: Fair → Excellent) - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-range],
 .rating-slider-breakdown [data-radix-slider-range] {
-  background-color: hsl(215 16% 47%); /* Slate-500 */
+  background-color: #d1d5db; /* gray-300 - matches breakdown bars */
   border-radius: 999px;
   /* Phase 3A: Smooth fill animation */
   transition: 
@@ -3236,11 +3236,11 @@ html[data-immersive="true"] .app-shell--topSpacer {
     width 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Thumb styling - Slate (neutral) */
+/* Thumb styling - Gray (neutral) - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-thumb],
 .rating-slider-breakdown [data-radix-slider-thumb] {
-  background-color: hsl(215 25% 27%); /* Slate-700 */
-  border: 2px solid hsl(215 25% 27%);
+  background-color: #9ca3af; /* gray-400 */
+  border: 2px solid #9ca3af;
   border-radius: 50%;
   box-shadow: 
     0 2px 6px rgba(0, 0, 0, 0.15),
@@ -3266,11 +3266,11 @@ html[data-immersive="true"] .app-shell--topSpacer {
   height: 16px;
 }
 
-/* Thumb hover state */
+/* Thumb hover state - UNIFIED COLOR SYSTEM */
 .rating-slider-primary [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown [data-radix-slider-thumb]:hover {
-  background-color: hsl(215 25% 22%); /* Slate-800 */
-  border-color: hsl(215 25% 22%);
+  background-color: #6b7280; /* gray-500 */
+  border-color: #6b7280;
   box-shadow: 
     0 3px 8px rgba(0, 0, 0, 0.18),
     0 1px 3px rgba(0, 0, 0, 0.12);
@@ -3297,48 +3297,48 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Outstanding Tier - Gold Styling (9.0+)
+   Outstanding Tier - Amber Styling (9.0+) - UNIFIED COLOR SYSTEM
    Triggered by data-tier="outstanding" attribute on Slider root
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Outstanding: Gold filled range */
+/* Outstanding: Amber filled range - UNIFIED COLOR */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-range],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-range] {
-  background-color: #C9A94A; /* Gold - matches Reviews tab */
+  background: linear-gradient(to right, #f59e0b, #fbbf24); /* amber-500 to amber-400 */
 }
 
-/* Outstanding: Gold thumb */
+/* Outstanding: Amber thumb - UNIFIED COLOR */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb],
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb] {
-  background-color: #C9A94A;
-  border-color: #C9A94A;
+  background-color: #f59e0b; /* amber-500 */
+  border-color: #f59e0b;
 }
 
-/* Outstanding: Gold thumb hover */
+/* Outstanding: Amber thumb hover */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:hover,
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:hover {
-  background-color: #B8992F; /* Darker gold on hover */
-  border-color: #B8992F;
+  background-color: #d97706; /* amber-600 - darker on hover */
+  border-color: #d97706;
 }
 
-/* Outstanding: Gold focus ring */
+/* Outstanding: Amber focus ring */
 .rating-slider-primary[data-tier="outstanding"] [data-radix-slider-thumb]:focus,
 .rating-slider-breakdown[data-tier="outstanding"] [data-radix-slider-thumb]:focus {
   box-shadow: 
     0 2px 6px rgba(0, 0, 0, 0.15),
-    0 0 0 3px rgba(201, 169, 74, 0.3); /* Gold focus ring */
+    0 0 0 3px rgba(245, 158, 11, 0.3); /* Amber focus ring */
 }
 
 /* Phase 3A: Outstanding glow pulse animation (one-time) */
 @keyframes outstanding-glow-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(201, 169, 74, 0.4);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
   }
   50% {
-    box-shadow: 0 0 12px 4px rgba(201, 169, 74, 0.3);
+    box-shadow: 0 0 12px 4px rgba(245, 158, 11, 0.3);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(201, 169, 74, 0);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
   }
 }
 
