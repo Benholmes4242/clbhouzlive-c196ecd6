@@ -165,14 +165,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       {(categoryAverages.design || categoryAverages.condition || categoryAverages.clubhouse || categoryAverages.facilities) && (
         <div className="border-t border-slate-200/60 pt-4 mt-4 mb-4">
           <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-            {/* Design */}
+            {/* Design - UNIFIED: RatingBar uses its own value >= 9 threshold */}
             {categoryAverages.design !== null && (
               <div className="flex flex-col">
                 <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
                   Design
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.design} showOutstandingGold={averageRating >= 9} />
+                  <RatingBar value={categoryAverages.design} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.design)}
                   </span>
@@ -180,14 +180,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               </div>
             )}
 
-            {/* Condition */}
+            {/* Condition - UNIFIED: RatingBar uses its own value >= 9 threshold */}
             {categoryAverages.condition !== null && (
               <div className="flex flex-col">
                 <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
                   Condition
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.condition} showOutstandingGold={averageRating >= 9} />
+                  <RatingBar value={categoryAverages.condition} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.condition)}
                   </span>
@@ -195,14 +195,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               </div>
             )}
 
-            {/* Clubhouse */}
+            {/* Clubhouse - UNIFIED: RatingBar uses its own value >= 9 threshold */}
             {categoryAverages.clubhouse !== null && (
               <div className="flex flex-col">
                 <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
                   Clubhouse
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.clubhouse} showOutstandingGold={averageRating >= 9} />
+                  <RatingBar value={categoryAverages.clubhouse} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.clubhouse)}
                   </span>
@@ -210,14 +210,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               </div>
             )}
 
-            {/* Facilities */}
+            {/* Facilities - UNIFIED: RatingBar uses its own value >= 9 threshold */}
             {categoryAverages.facilities !== null && (
               <div className="flex flex-col">
                 <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
                   Facilities
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.facilities} showOutstandingGold={averageRating >= 9} />
+                  <RatingBar value={categoryAverages.facilities} />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.facilities)}
                   </span>
