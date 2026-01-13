@@ -1,6 +1,7 @@
 /**
- * LeaderboardArenaTabs - Competitive arena mode tabs
- * Global Elite | Regional Wars | Friends League | Fast Climbers | Nearby
+ * LeaderboardArenaTabs - Tab navigation matching header style
+ * Global Elite | Regional Wars | Friends League | Most Active | Nearby
+ * Uses underline-style tabs like Courses/My Progress/Leaderboard
  */
 
 import React from 'react';
@@ -13,6 +14,7 @@ export type ArenaMode = 'global' | 'regional' | 'friends' | 'climbers' | 'nearby
 interface ArenaTab {
   id: ArenaMode;
   label: string;
+  shortLabel: string;
   icon: React.ElementType;
   description: string;
 }
@@ -21,30 +23,35 @@ const ARENA_TABS: ArenaTab[] = [
   { 
     id: 'global', 
     label: 'Global Elite', 
+    shortLabel: 'Global',
     icon: Globe,
     description: 'All-time Top 100 explorers worldwide'
   },
   { 
     id: 'regional', 
     label: 'Regional Wars', 
+    shortLabel: 'Regional',
     icon: Flag,
     description: 'Compete within your chosen Top 100 region list'
   },
   { 
     id: 'friends', 
     label: 'Friends League', 
+    shortLabel: 'Friends',
     icon: Users,
     description: 'Your private competition with friends'
   },
   { 
     id: 'climbers', 
     label: 'Most Active', 
+    shortLabel: 'Active',
     icon: TrendingUp,
     description: 'Players logging the most Top 100 courses this month'
   },
   { 
     id: 'nearby', 
     label: 'Nearby', 
+    shortLabel: 'Nearby',
     icon: MapPin,
     description: 'Within 50 miles of your home club'
   },
@@ -65,12 +72,12 @@ export function LeaderboardArenaTabs({
 
   return (
     <div className="w-full">
-      {/* Scrollable tabs - reduced pill height */}
+      {/* Scrollable tabs - underline style matching header tabs */}
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div 
           role="tablist" 
           aria-label="Leaderboard views"
-          className="inline-flex gap-1.5 pb-1 min-w-max"
+          className="inline-flex gap-0 min-w-max border-b border-border/30"
         >
           {ARENA_TABS.map((tab) => {
             const Icon = tab.icon;
@@ -78,7 +85,7 @@ export function LeaderboardArenaTabs({
             const isDisabled = disabledModes.includes(tab.id);
 
             return (
-              <motion.button
+              <button
                 key={tab.id}
                 role="tab"
                 aria-selected={isActive}
@@ -86,31 +93,29 @@ export function LeaderboardArenaTabs({
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => !isDisabled && onChange(tab.id)}
                 disabled={isDisabled}
-                whileTap={!isDisabled ? { scale: 0.97 } : undefined}
                 className={cn(
-                  'relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-                  'whitespace-nowrap',
+                  'relative flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors duration-200',
+                  'whitespace-nowrap bg-transparent border-0',
                   isActive
-                    ? 'text-white'
+                    ? 'text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                   isDisabled && 'opacity-40 cursor-not-allowed'
                 )}
               >
-                {/* Animated background for active state */}
+                <Icon className="w-3.5 h-3.5" />
+                {/* Full label on larger screens, short on mobile */}
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
+                
+                {/* Underline indicator */}
                 {isActive && (
                   <motion.div
-                    layoutId="arena-tab-bg"
-                    className="absolute inset-0 bg-surface-slate rounded-full"
+                    layoutId="arena-tab-underline"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-full rounded-[1px] bg-[hsl(var(--tab-orange))] opacity-85"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                <span className="relative z-10 flex items-center gap-1.5">
-                  <Icon className="w-3.5 h-3.5" />
-                  {/* Shorter labels on mobile */}
-                  <span className="hidden xs:inline">{tab.label}</span>
-                  <span className="xs:hidden">{tab.id === 'friends' ? 'Friends' : tab.id === 'climbers' ? 'Active' : tab.id === 'regional' ? 'Regional' : tab.label}</span>
-                </span>
-              </motion.button>
+              </button>
             );
           })}
         </div>
@@ -125,7 +130,7 @@ export function LeaderboardArenaTabs({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.2 }}
-            className="text-xs text-muted-foreground mt-2 px-1"
+            className="text-xs text-muted-foreground mt-3 text-center"
           >
             {activeTab.description}
           </motion.p>

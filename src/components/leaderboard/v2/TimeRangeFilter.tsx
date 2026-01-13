@@ -1,16 +1,10 @@
 /**
  * TimeRangeFilter - Time-based leaderboard filter
- * All-time / This Year / This Month
+ * Matches ExploreFiltersSheet pill style
  */
 
 import React from 'react';
-import { Calendar, ChevronDown, Check, Info } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Calendar, Info } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -32,17 +26,35 @@ const TIME_RANGE_OPTIONS: { value: LeaderboardTimeRange; label: string }[] = [
   { value: 'this_month', label: 'This month' },
 ];
 
+// Filter pill style matching ExploreFiltersSheet
+const FilterPill: React.FC<{
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}> = ({ label, selected, onClick }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+      selected
+        ? "bg-foreground text-background"
+        : "bg-muted text-muted-foreground hover:bg-muted/80"
+    )}
+  >
+    {label}
+  </button>
+);
+
 export function TimeRangeFilter({
   value,
   onChange,
   className,
 }: TimeRangeFilterProps) {
-  const currentLabel = TIME_RANGE_OPTIONS.find(o => o.value === value)?.label || 'All-time';
-
   return (
-    <div className={cn('space-y-1', className)}>
-      <div className="flex items-center gap-1.5 px-0.5">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+    <div className={cn('space-y-2', className)}>
+      {/* Label row */}
+      <div className="flex items-center gap-1.5">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           Time Range
         </p>
         <TooltipProvider delayDuration={0}>
@@ -60,37 +72,18 @@ export function TimeRangeFilter({
           </Tooltip>
         </TooltipProvider>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            aria-label="Filter by time range"
-            className={cn(
-              'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg',
-              'bg-muted/40 hover:bg-muted/60 transition-colors',
-              'text-xs font-medium text-muted-foreground hover:text-foreground',
-              'border border-border/40'
-            )}
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span className="font-semibold text-foreground">{currentLabel}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-44">
-          {TIME_RANGE_OPTIONS.map((option) => (
-            <DropdownMenuItem
-              key={option.value}
-              onClick={() => onChange(option.value)}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <span>{option.label}</span>
-              {value === option.value && (
-                <Check className="w-4 h-4 text-primary ml-auto" />
-              )}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      
+      {/* Pills row - full width flex wrap */}
+      <div className="flex flex-wrap gap-2">
+        {TIME_RANGE_OPTIONS.map((option) => (
+          <FilterPill
+            key={option.value}
+            label={option.label}
+            selected={value === option.value}
+            onClick={() => onChange(option.value)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
