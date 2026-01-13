@@ -3507,6 +3507,20 @@ export type Database = {
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "event_rounds_legacy_game_id_fkey"
+            columns: ["legacy_game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_rounds_legacy_game_id_fkey"
+            columns: ["legacy_game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["legacy_game_id"]
+          },
         ]
       }
       event_scores: {
@@ -3982,6 +3996,20 @@ export type Database = {
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "game_join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["legacy_game_id"]
+          },
         ]
       }
       game_participants: {
@@ -4058,6 +4086,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "game_participants_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_participants_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["legacy_game_id"]
+          },
+          {
             foreignKeyName: "game_participants_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -4128,6 +4170,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_reminders_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_reminders_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["legacy_game_id"]
           },
         ]
       }
@@ -4244,6 +4300,20 @@ export type Database = {
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "game_threads_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
+            referencedRelation: "games_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_threads_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
+            referencedRelation: "games_as_events"
+            referencedColumns: ["legacy_game_id"]
+          },
         ]
       }
       games: {
@@ -4331,6 +4401,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trips"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips_as_events"
+            referencedColumns: ["legacy_trip_id"]
           },
         ]
       }
@@ -4875,6 +4959,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games_as_events"
+            referencedColumns: ["legacy_game_id"]
           },
           {
             foreignKeyName: "join_requests_requester_id_fkey"
@@ -8512,6 +8610,20 @@ export type Database = {
             referencedRelation: "trips"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "trip_participants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_participants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips_as_events"
+            referencedColumns: ["legacy_trip_id"]
+          },
         ]
       }
       trip_timeline_notes: {
@@ -8556,6 +8668,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "trips"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_timeline_notes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips_as_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_timeline_notes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips_as_events"
+            referencedColumns: ["legacy_trip_id"]
           },
         ]
       }
@@ -10246,6 +10372,86 @@ export type Database = {
         }
         Relationships: []
       }
+      games_as_events: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          creator_id: string | null
+          description: string | null
+          end_date: string | null
+          event_type: string | null
+          holes: number | null
+          id: string | null
+          lat: number | null
+          legacy_game_id: string | null
+          legacy_trip_id: string | null
+          lng: number | null
+          max_participants: number | null
+          name: string | null
+          scoring_format: string | null
+          share_code: string | null
+          start_date: string | null
+          start_time: string | null
+          status: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          creator_id?: string | null
+          description?: string | null
+          end_date?: never
+          event_type?: never
+          holes?: never
+          id?: string | null
+          lat?: number | null
+          legacy_game_id?: string | null
+          legacy_trip_id?: never
+          lng?: number | null
+          max_participants?: number | null
+          name?: string | null
+          scoring_format?: never
+          share_code?: never
+          start_date?: never
+          start_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          creator_id?: string | null
+          description?: string | null
+          end_date?: never
+          event_type?: never
+          holes?: never
+          id?: string | null
+          lat?: number | null
+          legacy_game_id?: string | null
+          legacy_trip_id?: never
+          lng?: number | null
+          max_participants?: number | null
+          name?: string | null
+          scoring_format?: never
+          share_code?: never
+          start_date?: never
+          start_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_beacons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       geography_columns: {
         Row: {
           coord_dimension: number | null
@@ -10285,6 +10491,47 @@ export type Database = {
           f_table_schema?: unknown
           srid?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      hub_events: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          creator_id: string | null
+          description: string | null
+          end_date: string | null
+          event_type: string | null
+          holes: number | null
+          id: string | null
+          lat: number | null
+          legacy_game_id: string | null
+          legacy_trip_id: string | null
+          lng: number | null
+          max_participants: number | null
+          name: string | null
+          scoring_format: string | null
+          share_code: string | null
+          start_date: string | null
+          start_time: string | null
+          status: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Relationships: []
+      }
+      hub_participants: {
+        Row: {
+          created_at: string | null
+          event_id: string | null
+          guest_name: string | null
+          handicap_index: number | null
+          id: string | null
+          is_organizer: boolean | null
+          normalized_status: string | null
+          source_type: string | null
+          status: string | null
+          user_id: string | null
         }
         Relationships: []
       }
@@ -10394,6 +10641,78 @@ export type Database = {
           round: number | null
           status: string | null
           tour: string | null
+        }
+        Relationships: []
+      }
+      trips_as_events: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          creator_id: string | null
+          description: string | null
+          end_date: string | null
+          event_type: string | null
+          holes: number | null
+          id: string | null
+          lat: number | null
+          legacy_game_id: string | null
+          legacy_trip_id: string | null
+          lng: number | null
+          max_participants: number | null
+          name: string | null
+          scoring_format: string | null
+          share_code: string | null
+          start_date: string | null
+          start_time: string | null
+          status: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          course_id?: never
+          created_at?: string | null
+          creator_id?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: never
+          holes?: never
+          id?: string | null
+          lat?: never
+          legacy_game_id?: never
+          legacy_trip_id?: string | null
+          lng?: never
+          max_participants?: never
+          name?: string | null
+          scoring_format?: never
+          share_code?: never
+          start_date?: string | null
+          start_time?: never
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          course_id?: never
+          created_at?: string | null
+          creator_id?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: never
+          holes?: never
+          id?: string | null
+          lat?: never
+          legacy_game_id?: never
+          legacy_trip_id?: string | null
+          lng?: never
+          max_participants?: never
+          name?: string | null
+          scoring_format?: never
+          share_code?: never
+          start_date?: string | null
+          start_time?: never
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
         }
         Relationships: []
       }
