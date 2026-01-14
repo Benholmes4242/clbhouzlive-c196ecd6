@@ -9,7 +9,7 @@ import { useHubHeroDataV3 } from '../../hooks/useHubHeroDataV3';
 import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
 import { HubSectionHeader } from './HubSectionHeader';
 import { HubCompactCardV3 } from './HubCompactCardV3';
-import { HubCountFooterPill } from './HubCountFooterPill';
+import { HubGamesTripsCard } from './HubGamesTripsCard';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { haptic } from '@/utils/haptics';
 import { HUB_DEMO_MODE, MOCK_DIARY_ITEMS } from '../../hubDemoConfig';
@@ -155,9 +155,9 @@ export function HubYourWorldV3() {
           </div>
         )}
 
-        <HubCountFooterPill 
-          gamesCount={moreGames} 
-          tripsCount={moreTrips}
+        <HubGamesTripsCard 
+          gamesCount={gamesCount} 
+          tripsCount={tripsCount}
           onClick={openSheet}
         />
       </div>
