@@ -28,33 +28,48 @@ function formatTripDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'd')}–${format(end, 'd MMM')}`;
 }
 
-// V2 Glass icon chip - top left (premium styling)
-function IconChip({ icon: Icon }: { icon: typeof MapPin }) {
+// V2 Glass icon chip - top left (premium glass styling with depth)
+function IconChip({ icon: Icon, variant = 'game' }: { icon: typeof MapPin; variant?: 'game' | 'trip' | 'fallback' }) {
+  const bgColor = variant === 'trip' 
+    ? 'rgba(59, 130, 246, 0.15)' 
+    : 'rgba(255, 255, 255, 0.88)';
+  const iconColor = variant === 'trip' ? '#3B82F6' : '#334155';
+  
   return (
     <div 
-      className="h-8 w-8 rounded-full flex items-center justify-center"
+      className="h-9 w-9 rounded-full flex items-center justify-center"
       style={{
-        background: 'rgba(255, 255, 255, 0.82)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        border: '1px solid rgba(15, 23, 42, 0.08)',
-        boxShadow: '0 6px 16px rgba(2, 6, 23, 0.08)',
+        background: bgColor,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255, 255, 255, 0.25)',
+        boxShadow: '0 8px 20px rgba(2, 6, 23, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
       }}
     >
-      <Icon className="w-4 h-4 text-slate-700" />
+      <Icon className="w-4 h-4" style={{ color: iconColor }} />
     </div>
   );
 }
 
-// V2 Progress pill
-function ProgressPill({ text }: { text: string }) {
+// V2 Progress pill - glass effect with subtle shadow
+function ProgressPill({ text, variant = 'default' }: { text: string; variant?: 'default' | 'full' | 'almost-full' }) {
+  const bgColor = variant === 'full' 
+    ? 'rgba(100, 116, 139, 0.85)' 
+    : variant === 'almost-full' 
+    ? 'rgba(245, 158, 11, 0.90)' 
+    : 'rgba(255, 255, 255, 0.92)';
+  const textColor = variant === 'default' ? 'var(--hub-text)' : '#FFFFFF';
+  
   return (
     <div
-      className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-semibold"
+      className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wide"
       style={{
-        background: 'rgba(255, 255, 255, 0.85)',
-        color: 'var(--hub-text)',
-        border: '1px solid var(--hub-card-border)',
+        background: bgColor,
+        color: textColor,
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
       }}
     >
       {text}
@@ -62,32 +77,60 @@ function ProgressPill({ text }: { text: string }) {
   );
 }
 
-// Game Variant - with RSVP summary
+// Game Variant - with RSVP summary and premium text shadows
 function GameHeroContent({ data }: { data: HeroGameData }) {
+  const slotsUsed = data.slotsTotal - data.slotsOpen;
+  const isFull = data.slotsOpen === 0;
+  const isAlmostFull = data.slotsOpen === 1;
+  const pillVariant = isFull ? 'full' : isAlmostFull ? 'almost-full' : 'default';
+  const isToday = data.startTimeISO && new Date(data.startTimeISO).toDateString() === new Date().toDateString();
+  
   return (
     <>
-      <div className="absolute left-4 top-4">
-        <IconChip icon={MapPin} />
+      <div className="absolute left-4 top-4 flex items-center gap-2">
+        <IconChip icon={MapPin} variant="game" />
+        {isToday && (
+          <div 
+            className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider animate-pulse"
+            style={{
+              background: 'rgba(34, 197, 94, 0.95)',
+              color: '#FFFFFF',
+              boxShadow: '0 4px 12px rgba(34, 197, 94, 0.35)',
+            }}
+          >
+            Today
+          </div>
+        )}
       </div>
       <div className="absolute left-4 bottom-4 right-4 text-white">
-        <div className="text-[20px] font-bold leading-tight line-clamp-1 drop-shadow-sm">
+        <div 
+          className="text-[22px] font-bold leading-tight line-clamp-1"
+          style={{ 
+            textShadow: '0 2px 8px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.25)',
+          }}
+        >
           {data.courseName}
         </div>
-        <div className="text-[14px] font-medium mt-1 opacity-95 drop-shadow-sm">
+        <div 
+          className="text-[14px] font-semibold mt-1.5"
+          style={{ 
+            color: 'rgba(255, 255, 255, 0.95)',
+            textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+          }}
+        >
           {formatGameDate(data.startTimeISO)}
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <ProgressPill text={`${data.slotsTotal - data.slotsOpen}/${data.slotsTotal}`} />
-          {/* RSVP summary - show if joinedCount exists (even 0) */}
+        <div className="flex items-center gap-2.5 mt-3">
+          <ProgressPill text={`${slotsUsed}/${data.slotsTotal}`} variant={pillVariant} />
           {data.joinedCount !== undefined && (
             <span 
-              className="flex items-center gap-1 text-[11px] font-medium"
+              className="flex items-center gap-1.5 text-[11px] font-semibold"
               style={{ 
-                color: 'rgba(255, 255, 255, 0.85)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                color: 'rgba(255, 255, 255, 0.92)',
+                textShadow: '0 1px 4px rgba(0,0,0,0.35)',
               }}
             >
-              <Users className="w-3 h-3" />
+              <Users className="w-3.5 h-3.5" />
               {data.joinedCount} joined
             </span>
           )}
@@ -97,18 +140,27 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
   );
 }
 
-// Trip Variant
+// Trip Variant - with premium styling
 function TripHeroContent({ data }: { data: HeroTripData }) {
   return (
     <>
       <div className="absolute left-4 top-4">
-        <IconChip icon={Plane} />
+        <IconChip icon={Plane} variant="trip" />
       </div>
       <div className="absolute left-4 bottom-4 right-4 text-white">
-        <div className="text-[20px] font-bold leading-tight line-clamp-1 drop-shadow-sm">
+        <div 
+          className="text-[22px] font-bold leading-tight line-clamp-1"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.25)' }}
+        >
           {data.tripName}
         </div>
-        <div className="text-[14px] font-medium mt-1 opacity-95 drop-shadow-sm">
+        <div 
+          className="text-[14px] font-semibold mt-1.5"
+          style={{ 
+            color: 'rgba(255, 255, 255, 0.95)',
+            textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+          }}
+        >
           {formatTripDateRange(data.startDate, data.endDate)}
         </div>
       </div>
@@ -358,10 +410,10 @@ export function UpNextHeroTile() {
       <div 
         className="relative w-full overflow-hidden transition-shadow duration-200"
         style={{
-          height: '150px',
-          borderRadius: 'var(--hub-radius-xl)', // 24px for hero
-          boxShadow: 'var(--hub-shadow-hero)',
-          border: '1px solid rgba(255, 255, 255, 0.18)', // Glass edge
+          height: '175px', // Slightly taller for premium presence
+          borderRadius: '20px', // Refined radius
+          boxShadow: '0 20px 50px rgba(2, 6, 23, 0.14), 0 8px 20px rgba(2, 6, 23, 0.08)', // Premium layered shadow
+          border: '1px solid rgba(255, 255, 255, 0.22)', // Glass edge
         }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}

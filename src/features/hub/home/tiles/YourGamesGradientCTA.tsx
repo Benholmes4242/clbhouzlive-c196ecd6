@@ -59,19 +59,19 @@ export function YourGamesGradientCTA({ className }: YourGamesGradientCTAProps) {
     <>
       <button
         onClick={openYourGames}
-        className={`w-full rounded-[18px] overflow-hidden relative flex flex-col transition-all duration-150 active:scale-[0.99] ${className || ''}`}
+        className={`w-full rounded-[20px] overflow-hidden relative flex flex-col transition-all duration-150 active:scale-[0.99] ${className || ''}`}
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)',
-          minHeight: '90px',
+          boxShadow: '0 8px 24px rgba(2, 6, 23, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+          minHeight: '100px',
         }}
       >
         {/* Subtle warm gradient overlay at top */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(600px 150px at 10% 0%, rgba(255, 140, 60, 0.06), transparent 50%)',
+            background: 'radial-gradient(600px 150px at 10% 0%, rgba(255, 140, 60, 0.07), transparent 50%)',
           }}
         />
 
