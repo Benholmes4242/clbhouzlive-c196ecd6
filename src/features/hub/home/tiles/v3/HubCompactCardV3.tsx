@@ -66,15 +66,16 @@ export function HubCompactCardV3({
       style={{
         background: 'var(--hub-card)',
         border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-        minHeight: '82px',
+        boxShadow: '0 12px 32px rgba(0,0,0,0.09), inset 0 1px 0 rgba(255,255,255,0.5)',
+        minHeight: '86px',
       }}
     >
-      {/* Icon badge - solid chip style */}
+      {/* Icon badge - solid chip style with refined styling */}
       <div 
-        className="h-10 w-10 rounded-[14px] flex items-center justify-center flex-shrink-0 relative"
+        className="h-11 w-11 rounded-[14px] flex items-center justify-center flex-shrink-0 relative"
         style={{ 
-          background: calmer ? 'rgba(15, 23, 42, 0.06)' : iconBg,
+          background: calmer ? 'rgba(15, 23, 42, 0.05)' : iconBg,
+          border: calmer ? '1px solid rgba(15, 23, 42, 0.06)' : 'none',
         }}
       >
         {icon}
@@ -123,13 +124,16 @@ export function HubCompactCardV3({
           </div>
         )}
         
-        {/* Chevron in faint circle */}
+        {/* Chevron in premium faint circle */}
         <div 
-          className="w-7 h-7 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(15, 23, 42, 0.04)' }}
+          className="w-8 h-8 rounded-full flex items-center justify-center"
+          style={{ 
+            background: 'rgba(15, 23, 42, 0.05)',
+            border: '1px solid rgba(15, 23, 42, 0.04)',
+          }}
         >
           <ChevronRight 
-            className="h-4 w-4" 
+            className="h-[18px] w-[18px]" 
             style={{ color: 'var(--hub-text-dimmer)' }} 
           />
         </div>

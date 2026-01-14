@@ -33,26 +33,26 @@ export function HubHeaderRowV3() {
         paddingRight: '16px',
       }}
     >
-      {/* Wordmark */}
+      {/* Wordmark - refined typography */}
       <div 
         className="font-bold tracking-tight"
         style={{ 
           color: 'var(--hub-text)',
-          fontSize: '22px',
-          letterSpacing: '-0.5px',
+          fontSize: '24px',
+          letterSpacing: '-0.6px',
         }}
       >
         clbhouz
       </div>
 
-      {/* Profile Avatar */}
+      {/* Profile Avatar - larger with premium ring */}
       <button
         onClick={handleProfileClick}
-        className="h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-150 active:scale-[0.95]"
+        className="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-150 active:scale-[0.95]"
         style={{
           background: avatarUrl ? 'transparent' : 'var(--hub-surface-2)',
-          border: '1px solid var(--hub-stroke)',
-          boxShadow: 'var(--hub-shadow-soft)',
+          border: '2px solid rgba(255, 255, 255, 0.9)',
+          boxShadow: '0 4px 14px rgba(2, 6, 23, 0.12), inset 0 1px 0 rgba(255,255,255,0.5)',
           overflow: 'hidden',
         }}
         aria-label="Profile"
@@ -65,7 +65,7 @@ export function HubHeaderRowV3() {
           />
         ) : (
           <span 
-            className="text-[11px] font-semibold"
+            className="text-[12px] font-semibold"
             style={{ color: 'var(--hub-text-dim)' }}
           >
             {initials}

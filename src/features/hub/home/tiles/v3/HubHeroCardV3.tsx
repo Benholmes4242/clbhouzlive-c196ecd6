@@ -26,18 +26,19 @@ function formatTripDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'd')}–${format(end, 'd MMM yyyy')}`;
 }
 
-// V3 Type pill - sporty solid fill style
+// V3 Type pill - sporty solid fill with glass effect + subtle shadow
 function TypePill({ type }: { type: 'TRIP' | 'GAME' }) {
   return (
     <div 
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider"
+      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider"
       style={{
-        height: '30px',
+        height: '32px',
         background: type === 'TRIP' 
           ? 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)' 
-          : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+          : 'linear-gradient(135deg, #F7931E 0%, #EA580C 100%)',
         color: '#fff',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+        boxShadow: '0 6px 16px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.25)',
+        border: '1px solid rgba(255,255,255,0.15)',
       }}
     >
       {type}
@@ -191,10 +192,10 @@ export function HubHeroCardV3() {
         onClick={handleClick}
         className="relative w-full overflow-hidden text-left transition-all duration-200 active:scale-[0.99]"
         style={{
-          height: '230px',
-          borderRadius: '24px',
-          boxShadow: '0 20px 50px rgba(2, 6, 23, 0.15), 0 8px 20px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          height: '250px', // 10% taller for more presence
+          borderRadius: '20px', // Slightly refined radius
+          boxShadow: '0 24px 60px rgba(2, 6, 23, 0.18), 0 12px 24px rgba(0,0,0,0.10)',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
         }}
       >
         {/* Background image */}
@@ -218,11 +219,11 @@ export function HubHeroCardV3() {
           />
         )}
 
-        {/* Strong bottom gradient overlay for text legibility */}
+        {/* Premium vignette gradient overlay for text legibility */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.08) 100%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.30) 45%, rgba(0,0,0,0.05) 100%)',
           }}
         />
         
@@ -235,15 +236,18 @@ export function HubHeroCardV3() {
           }}
         />
 
-        {/* Subtle tap affordance - chevron in circle */}
+        {/* Premium tap affordance - glass chevron circle */}
         <div 
-          className="absolute right-4 bottom-4 w-8 h-8 rounded-full flex items-center justify-center"
+          className="absolute right-4 bottom-4 w-10 h-10 rounded-full flex items-center justify-center"
           style={{
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(4px)',
+            background: 'rgba(255,255,255,0.18)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           }}
         >
-          <ChevronRight className="w-4 h-4 text-white/80" />
+          <ChevronRight className="w-5 h-5 text-white/90" />
         </div>
 
         {/* Content based on type */}
