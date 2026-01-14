@@ -4,7 +4,7 @@
  * Returns friends first, then searches all users when query is provided
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -41,11 +41,25 @@ export function usePlayerSearch({
   const [error, setError] = useState<Error | null>(null);
   const [friendsLoaded, setFriendsLoaded] = useState(false);
 
-  const debouncedQuery = useDebounce(searchQuery, 300);
+  // Refs to prevent re-entry and track state
+  const isSearchingRef = useRef(false);
+  const friendsRef = useRef<PlayerProfile[]>([]);
 
-  // Load friends on mount
+  const debouncedQuery = useDebounce(searchQuery, 300);
+  
+  // Memoize excludeIds to prevent dependency changes
+  const excludeIdsKey = excludeIds.join(',');
+
+  // Keep friendsRef in sync
+  useEffect(() => {
+    friendsRef.current = friends;
+  }, [friends]);
+
+  // Load friends on mount - only runs once per currentUserId
   useEffect(() => {
     if (!currentUserId || friendsLoaded) return;
+
+    let cancelled = false;
 
     async function loadFriends() {
       try {
@@ -57,6 +71,7 @@ export function usePlayerSearch({
           .eq('status', 'accepted')
           .limit(30);
 
+        if (cancelled) return;
         if (friendError) throw friendError;
 
         if (!friendships?.length) {
@@ -73,6 +88,8 @@ export function usePlayerSearch({
             .order('created_at', { ascending: false })
             .limit(20);
 
+          if (cancelled) return;
+
           if (!recentError && recentPlayers?.length) {
             const uniqueUserIds = [...new Set(recentPlayers.map(p => p.user_id).filter(Boolean))] as string[];
             
@@ -82,6 +99,8 @@ export function usePlayerSearch({
                 .select('id, display_name, username, profile_photo_url')
                 .in('id', uniqueUserIds.slice(0, 20));
 
+              if (cancelled) return;
+
               if (profiles) {
                 setFriends(profiles.map(p => ({
                   id: p.id,
@@ -89,7 +108,7 @@ export function usePlayerSearch({
                   display_name: p.display_name,
                   username: p.username,
                   profile_photo_url: p.profile_photo_url,
-                  isFriend: false, // These are recent co-players, not friends
+                  isFriend: false,
                 })));
               }
             }
@@ -106,6 +125,7 @@ export function usePlayerSearch({
           .select('id, display_name, username, profile_photo_url')
           .in('id', friendIds);
 
+        if (cancelled) return;
         if (profileError) throw profileError;
 
         setFriends((profiles || []).map(p => ({
@@ -118,6 +138,7 @@ export function usePlayerSearch({
         })));
         setFriendsLoaded(true);
       } catch (err) {
+        if (cancelled) return;
         console.error('Error loading friends:', err);
         setError(err instanceof Error ? err : new Error('Failed to load friends'));
         setFriendsLoaded(true);
@@ -125,16 +146,26 @@ export function usePlayerSearch({
     }
 
     loadFriends();
+    
+    return () => {
+      cancelled = true;
+    };
   }, [currentUserId, friendsLoaded]);
 
-  // Search users when query changes
+  // Search users when query changes - uses stable dependencies only
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setSearchResults([]);
       return;
     }
 
+    // Guard against re-entry
+    if (isSearchingRef.current) return;
+
+    let cancelled = false;
+
     async function searchUsers() {
+      isSearchingRef.current = true;
       setIsLoading(true);
       setError(null);
 
@@ -148,50 +179,67 @@ export function usePlayerSearch({
           .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
           .limit(30);
 
+        if (cancelled) return;
         if (searchError) throw searchError;
+
+        // Use ref for friends to avoid dependency
+        const currentFriends = friendsRef.current;
+        const currentExcludeIds = excludeIds;
 
         // Exclude current user and already selected
         const filtered = (profiles || [])
-          .filter(p => p.id !== currentUserId && !excludeIds.includes(p.id))
+          .filter(p => p.id !== currentUserId && !currentExcludeIds.includes(p.id))
           .map(p => ({
             id: p.id,
             name: p.display_name || p.username || 'Unknown',
             display_name: p.display_name,
             username: p.username,
             profile_photo_url: p.profile_photo_url,
-            isFriend: friends.some(f => f.id === p.id),
+            isFriend: currentFriends.some(f => f.id === p.id),
           }));
 
         setSearchResults(filtered);
       } catch (err) {
+        if (cancelled) return;
         console.error('Error searching users:', err);
         setError(err instanceof Error ? err : new Error('Search failed'));
       } finally {
-        setIsLoading(false);
+        isSearchingRef.current = false;
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
 
     searchUsers();
-  }, [debouncedQuery, currentUserId, excludeIds, friends]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQuery, currentUserId]); // Only stable primitives - excludeIds checked inside
 
   // Filter friends by search query (client-side for instant feedback)
   const filteredFriends = useMemo(() => {
     const lowerQuery = searchQuery.toLowerCase();
+    const excludeSet = new Set(excludeIds);
     return friends
-      .filter(f => !excludeIds.includes(f.id))
+      .filter(f => !excludeSet.has(f.id))
       .filter(f => 
         !searchQuery.trim() || 
         f.name.toLowerCase().includes(lowerQuery) ||
         f.display_name?.toLowerCase().includes(lowerQuery) ||
         f.username?.toLowerCase().includes(lowerQuery)
       );
-  }, [friends, searchQuery, excludeIds]);
+  }, [friends, searchQuery, excludeIdsKey]);
 
   // Dedupe search results from friends (friends already shown separately)
   const deduplicatedSearchResults = useMemo(() => {
     const friendIds = new Set(filteredFriends.map(f => f.id));
-    return searchResults.filter(r => !friendIds.has(r.id));
-  }, [searchResults, filteredFriends]);
+    const excludeSet = new Set(excludeIds);
+    return searchResults
+      .filter(r => !friendIds.has(r.id))
+      .filter(r => !excludeSet.has(r.id));
+  }, [searchResults, filteredFriends, excludeIdsKey]);
 
   return {
     friends: filteredFriends,
