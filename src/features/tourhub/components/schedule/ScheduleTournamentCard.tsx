@@ -2,10 +2,9 @@
  * ScheduleTournamentCard - Full-width cinematic event card
  * 
  * Features:
+ * - Full-bleed edge-to-edge design with pointed corners
  * - Large hero image with gradient overlay
- * - Full-bleed edge-to-edge design
- * - Taller card height for impact
- * - Text overlay with strong hierarchy
+ * - Purse, par, yardage meta info
  * - Neutral status badges (no orange)
  */
 
@@ -72,16 +71,25 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
 
   const hasImage = courseImage?.imageUrl && !imageLoading;
 
+  // Format purse
+  const formatPurse = (purse: number | null | undefined) => {
+    if (!purse) return null;
+    if (purse >= 1_000_000) return `$${(purse / 1_000_000).toFixed(1)}M`;
+    if (purse >= 1_000) return `$${(purse / 1_000).toFixed(0)}K`;
+    return `$${purse}`;
+  };
+
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn(
-        "block relative w-full rounded-2xl overflow-hidden",
+        "block relative w-full overflow-hidden",
         "transition-all duration-200 ease-out",
-        "active:scale-[0.98] hover:brightness-105",
+        "active:scale-[0.99] hover:brightness-105",
+        // Full-bleed with pointed corners (no rounded)
         className
       )}
-      style={{ height: '220px' }}
+      style={{ height: '180px' }}
     >
       {/* Background Image or Slate Fallback */}
       {hasImage ? (
@@ -95,7 +103,7 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
       )}
       
       {/* Gradient Overlay - Transparent to Dark (top to bottom) */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
       
       {/* Status Badge - Top Right */}
       <div className="absolute top-4 right-4 z-10">
@@ -103,9 +111,9 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
       </div>
       
       {/* Content - Bottom with text hierarchy */}
-      <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col">
+      <div className="absolute inset-x-0 bottom-0 p-4 flex flex-col">
         {/* Event Name - Headline */}
-        <h3 className="font-display text-xl font-semibold text-white leading-tight line-clamp-2 mb-2">
+        <h3 className="font-display text-lg font-semibold text-white leading-tight line-clamp-2 mb-1.5">
           {tournament.name}
         </h3>
         
@@ -116,13 +124,26 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         
         {/* Location - Smallest with icon */}
         {(tournament.venue_name || tournament.venue_city) && (
-          <div className="flex items-center gap-1.5 text-sm text-white/70">
+          <div className="flex items-center gap-1.5 text-sm text-white/70 mb-2">
             <MapPin className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">
               {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(' • ')}
             </span>
           </div>
         )}
+
+        {/* Meta Info - Purse, Par, Yardage */}
+        <div className="flex items-center gap-3 text-xs text-white/80">
+          {tournament.purse && (
+            <span className="font-semibold">{formatPurse(tournament.purse)}</span>
+          )}
+          {tournament.venue_par && (
+            <span>Par {tournament.venue_par}</span>
+          )}
+          {tournament.venue_yardage && (
+            <span>{tournament.venue_yardage.toLocaleString()} yds</span>
+          )}
+        </div>
       </div>
     </Link>
   );

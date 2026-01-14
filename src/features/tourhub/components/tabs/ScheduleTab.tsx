@@ -5,11 +5,11 @@
  * - Full-width immersive event cards (no timeline)
  * - Clean month headers with Clubhouse typography
  * - Premium card-dominant design inspired by LIV Golf
- * - No orange accents - slate/black only
+ * - Hero card for most recent/live/upcoming event
  */
 
 import { useState, useMemo } from 'react';
-import { Search, LayoutGrid } from 'lucide-react';
+import { Search, MoreHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -22,6 +22,8 @@ import {
   ScheduleTournamentCard,
   ScheduleMonthHeader,
   ScheduleEmptyMessage,
+  ScheduleHeroCard,
+  getFeaturedTournament,
 } from '../schedule';
 
 interface MonthGroup {
@@ -36,6 +38,12 @@ export function ScheduleTab() {
   
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading } = useTourTournaments(season?.id);
+
+  // Get featured tournament for hero card
+  const featured = useMemo(() => {
+    if (!tournaments) return null;
+    return getFeaturedTournament(tournaments);
+  }, [tournaments]);
 
   // Filter stats for pills
   const filterStats = useMemo(() => {
@@ -61,7 +69,7 @@ export function ScheduleTab() {
     return upcoming[0]?.name;
   }, [tournaments]);
 
-  // Filter tournaments
+  // Filter tournaments (exclude featured from list if showing hero)
   const filteredResults = useMemo(() => {
     if (!tournaments) return [];
     
@@ -90,9 +98,14 @@ export function ScheduleTab() {
         t.venue_city?.toLowerCase().includes(searchLower)
       );
     }
+
+    // Exclude featured tournament from the list when on 'all' filter and no search
+    if (filter === 'all' && !search && featured) {
+      filtered = filtered.filter(t => t.id !== featured.tournament.id);
+    }
     
     return filtered;
-  }, [tournaments, filter, search]);
+  }, [tournaments, filter, search, featured]);
 
   // Group by month
   const monthGroups = useMemo((): MonthGroup[] => {
@@ -121,7 +134,7 @@ export function ScheduleTab() {
     return (
       <div className="space-y-6 animate-pulse">
         {/* Header skeleton */}
-        <div className="h-10 w-48 bg-muted rounded-lg mx-auto" />
+        <div className="h-10 w-48 bg-muted rounded-lg" />
         
         {/* Search skeleton */}
         <div className="h-11 bg-muted rounded-lg w-full max-w-md" />
@@ -133,10 +146,13 @@ export function ScheduleTab() {
           ))}
         </div>
         
+        {/* Hero skeleton */}
+        <div className="h-[300px] bg-muted" />
+        
         {/* Cards skeleton */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[220px] bg-muted rounded-2xl" />
+            <div key={i} className="h-[180px] bg-muted" />
           ))}
         </div>
       </div>
@@ -150,16 +166,16 @@ export function ScheduleTab() {
   
   return (
     <div className="min-h-screen pb-24">
-      {/* Page Header - Clubhouse style */}
+      {/* Page Header - Event Schedule title */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-league-spartan text-2xl font-bold text-black tracking-tight">
+        <h1 className="font-league-spartan text-3xl font-bold text-black tracking-tight">
           Event Schedule
         </h1>
         <button 
           className="p-2 rounded-lg hover:bg-black/5 transition-colors"
-          aria-label="Grid view"
+          aria-label="More options"
         >
-          <LayoutGrid className="w-5 h-5 text-black" />
+          <MoreHorizontal className="w-5 h-5 text-black" />
         </button>
       </div>
       
@@ -174,12 +190,22 @@ export function ScheduleTab() {
         />
       </div>
 
-      {/* Filter Tabs */}
+      {/* Filter Tabs - Orange underline style matching explore page */}
       <ScheduleFilterPills
         activeFilter={filter}
         onFilterChange={setFilter}
         counts={filterStats}
       />
+
+      {/* Hero Card - Featured Tournament */}
+      {filter === 'all' && !search && featured && (
+        <div className="-mx-4 mb-6">
+          <ScheduleHeroCard 
+            tournament={featured.tournament} 
+            type={featured.type}
+          />
+        </div>
+      )}
 
       {/* No Live Message */}
       {filter === 'live' && filterStats.live === 0 && (
@@ -201,7 +227,7 @@ export function ScheduleTab() {
               />
 
               {/* Tournament Cards - Full width with spacing */}
-              <div className="space-y-4 mt-4">
+              <div className="space-y-3 mt-4 -mx-4">
                 {group.tournaments.map((tournament) => (
                   <ScheduleTournamentCard 
                     key={tournament.id}
