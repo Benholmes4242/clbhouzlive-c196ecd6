@@ -14,8 +14,9 @@ interface DatePickerSheetProps {
   isOpen: boolean;
   onClose: () => void;
   value: Date | null;
-  onChange: (date: Date) => void;
+  onChange: (date: Date | null) => void;
   minDate?: Date;
+  title?: string;
 }
 
 export function DatePickerSheet({ 
@@ -24,6 +25,7 @@ export function DatePickerSheet({
   value,
   onChange,
   minDate = new Date(),
+  title = 'Select Date',
 }: DatePickerSheetProps) {
   const [currentMonth, setCurrentMonth] = useState(() => value || new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(value);
@@ -119,7 +121,7 @@ export function DatePickerSheet({
             {/* Header */}
             <div className="flex items-center justify-between px-5 pb-4">
               <h2 className="text-[17px] font-semibold" style={{ color: '#1e293b' }}>
-                Select Date
+                {title}
               </h2>
               <button
                 onClick={onClose}
