@@ -254,30 +254,21 @@
 
 /* ========================================
    HUB OPEN STATE (Light)
+   Hub is now a standard page, these styles apply theming
    ======================================== */
 html.hub-open { 
   --bg-page: var(--hub-bg-start); 
 }
 
 .hub-open body,
-.hub-open #root,
-.hub-open .clubhouse-root {
+.hub-open #root {
   background: var(--hub-bg-start) !important;
   background-color: var(--hub-bg-start) !important;
 }
 
-/* Hide ALL page headers when hub is open */
-.hub-open header.chrome-header,
-.hub-open [data-chrome="header"],
-.hub-open [data-hides-on-scroll] {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
 /* ========================================
-   OVERLAY STACKING CONTEXT
+   OVERLAY STACKING CONTEXT (Non-Hub overlays only)
    ======================================== */
-.hub-glass-page,
 .camera-page,
 .post-page,
 [data-overlay="true"],

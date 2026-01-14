@@ -1,15 +1,14 @@
 /**
  * Hub Home Page - Golf OS Dashboard
- * Fixed dashboard layout with subtle time-of-day theming
+ * Standard page layout with subtle time-of-day theming
  */
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
-import { useHub } from '../useHub';
-import { prefersReduced } from '@/lib/ui/motion';
-import { useChromeState } from '@/hooks/useChromeState';
 import { useHubTimeOfDay } from '../home/hooks/useHubTimeOfDay';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { FadeInContent } from '@/components/ui/FadeInContent';
 
 // Hub components
 import { HubHeaderToday } from '../home/tiles/HubHeaderToday';
@@ -24,134 +23,14 @@ import { useHubDataReady } from '../home/hooks/useHubDataReady';
 
 import '../home/hubThemeLight.css';
 
-// Animation constants
-const HUB_ENTRY_DURATION = 500;
-const HUB_EXIT_DURATION = 500;
-const HUB_ENTRY_EASING = 'ease-in-out';
-const HUB_EXIT_EASING = 'ease-in-out';
-
 // Layout constants
 const DOCK_HEIGHT = 70;
 
 export function HubHomePage() {
-  const { close } = useHub();
   const isDataReady = useHubDataReady();
   const timeOfDayTheme = useHubTimeOfDay();
   
   useJoinRequestNotifications();
-
-  // Animation & swipe-to-dismiss state
-  const [dragStartY, setDragStartY] = useState<number | null>(null);
-  const [translateY, setTranslateY] = useState(() => {
-    if (typeof window === 'undefined') return 0;
-    const reduced = prefersReduced();
-    if (reduced) return 0;
-    return window.innerHeight;
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasEntered, setHasEntered] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return prefersReduced();
-  });
-  const [isExiting, setIsExiting] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
-  const [revealChrome, setRevealChrome] = useState(false);
-
-  const CHROME_REVEAL_OFFSET = 40;
-
-  useChromeState({
-    forceHidden: !revealChrome,
-    disabled: false,
-  });
-  
-  const sheetRef = useRef<HTMLDivElement | null>(null);
-  const DRAG_THRESHOLD = 120;
-
-  const animateAndClose = useCallback(() => {
-    const reduced = prefersReduced();
-
-    if (reduced) {
-      close();
-      return;
-    }
-
-    if (typeof window === 'undefined') {
-      close();
-      return;
-    }
-
-    setIsClosing(true);
-    setIsExiting(true);
-    setTranslateY(window.innerHeight);
-
-    window.setTimeout(() => {
-      setRevealChrome(true);
-    }, HUB_EXIT_DURATION - CHROME_REVEAL_OFFSET);
-
-    window.setTimeout(() => {
-      close();
-    }, HUB_EXIT_DURATION);
-  }, [close]);
-
-  // Touch handlers for swipe-to-dismiss
-  const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    if (isExiting) return;
-    setIsDragging(true);
-    setDragStartY(e.touches[0].clientY);
-  };
-
-  const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    if (!isDragging || dragStartY == null || isExiting) return;
-
-    const deltaY = e.touches[0].clientY - dragStartY;
-    if (deltaY <= 0) {
-      setTranslateY(0);
-      return;
-    }
-    setTranslateY(deltaY);
-  };
-
-  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
-    if (!isDragging || isExiting) return;
-
-    if (translateY > DRAG_THRESHOLD) {
-      animateAndClose();
-    } else {
-      setTranslateY(0);
-    }
-
-    setIsDragging(false);
-    setDragStartY(null);
-  };
-
-  // Escape key to close
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        animateAndClose();
-      }
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [animateAndClose]);
-
-  // Slide-in from bottom on mount
-  useEffect(() => {
-    const reduced = prefersReduced();
-
-    if (reduced || typeof window === 'undefined') {
-      setTranslateY(0);
-      setHasEntered(true);
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      setHasEntered(true);
-      setTranslateY(0);
-    });
-  }, []);
 
   // Track Hub open
   useEffect(() => {
@@ -164,48 +43,20 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div 
-      className="fixed inset-0 z-[9999] flex flex-col"
+    <PageRoot 
+      className="min-h-screen flex flex-col"
       style={{
-        height: '100svh',
-        overflow: 'hidden',
-        touchAction: 'none', // Prevent any scroll/bounce on the root
-        // Time-of-day background extends into safe area (behind status bar)
+        // Time-of-day background
         background: timeOfDayTheme.bg,
       }}
     >
-      {/* Glass Sheet - NO background here, let root show through */}
-      <div 
-        ref={sheetRef}
-        className="hub-glass-page flex-1 flex flex-col overflow-hidden"
-        style={{
-          // No background - let root time-of-day bg show through safe area
-          borderTop: '1px solid var(--hub-stroke)',
-          transform: `translateY(${translateY}px)`,
-          transition:
-            isDragging || !hasEntered || prefersReduced()
-              ? 'none'
-              : isExiting
-                ? `transform ${HUB_EXIT_DURATION}ms ${HUB_EXIT_EASING}`
-                : `transform ${HUB_ENTRY_DURATION}ms ${HUB_ENTRY_EASING}`,
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Grabber bar */}
-        <div className="hub-grabber" />
-
-        {/* 
-          FIXED LAYOUT - NO SCROLL
-          Content fills viewport, dock is anchored at bottom
-          NO background on content wrapper - let root show through
-        */}
+      <FadeInContent>
+        {/* Main content area - scrollable */}
         <div 
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)',
-            paddingBottom: 'calc(55px + 10px)', // dock height + 10px gap
+            paddingBottom: 'calc(55px + 10px + env(safe-area-inset-bottom, 0px))', // dock height + gap + safe area
           }}
         >
           <div className="px-5 flex flex-col gap-[8px] flex-1 min-h-0">
@@ -240,7 +91,7 @@ export function HubHomePage() {
 
         {/* Anchored Dock - at bottom */}
         <HubFloatingDock />
-      </div>
-    </div>
+      </FadeInContent>
+    </PageRoot>
   );
 }
