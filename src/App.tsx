@@ -492,7 +492,7 @@ function AppRoutes() {
         <Route path="/tourhub/college-golf/compare" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeComparePage /></Suspense>} />
         <Route path="/tourhub/college-golf/:collegeSlug" element={<Suspense fallback={<GenericPageSkeleton />}><CollegeProfilePage /></Suspense>} />
         
-        {/* Hub routes - only render in main Routes when NOT in overlay mode */}
+        {/* Hub routes - only when NOT using background location */}
         {!showHubOverlay && (
           <>
             <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
@@ -506,15 +506,16 @@ function AppRoutes() {
             <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
             <Route path="/hub/messages" element={<Suspense fallback={<HubSkeleton />}><HubMessagesListPage /></Suspense>} />
             <Route path="/hub/messages/:conversationId" element={<Suspense fallback={<HubSkeleton />}><HubChatPlaceholderPage /></Suspense>} />
-            <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
-            <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
-            <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
-            <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
-            <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
-            <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
-            <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
-            <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
-            <Route path="/hub/game/:id" element={<HubGameRedirect />} />
+          <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
+          <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
+          <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
+          <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
+          <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
+          <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
+          <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
+          <Route path="/hub/trip/:tripId" element={<Suspense fallback={<HubSkeleton />}><HubTripPage /></Suspense>} />
+          {/* Redirect /hub/game/:id to /game/:id */}
+          <Route path="/hub/game/:id" element={<HubGameRedirect />} />
           </>
         )}
         

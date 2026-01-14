@@ -6,7 +6,6 @@
  * - Conversation persistence to Supabase
  * - Pin/Delete from history
  * - 30-day auto-purge (server-side)
- * - 80% viewport height as per design spec
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -23,7 +22,7 @@ import { EchoComposer } from './EchoComposer';
 import { EchoEmptyState } from './EchoEmptyState';
 import { EchoHistoryTab } from './EchoHistoryTab';
 import { EchoTabPills, type EchoTab } from './EchoTabPills';
-import { HUB_SHEET, ECHO_ORANGE, ECHO_SHEET_HEIGHT } from './echoStyles';
+import { HUB_SHEET, ECHO_ORANGE } from './echoStyles';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -196,6 +195,7 @@ export function EchoSheetV2({
     haptic('light');
     resetConversation();
     setActiveTab('chat');
+    // Invalidate history to show any pending changes
     queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
   }, [resetConversation, queryClient]);
 
@@ -216,6 +216,7 @@ export function EchoSheetV2({
   const handleTabChange = useCallback((tab: EchoTab) => {
     setActiveTab(tab);
     if (tab === 'history') {
+      // Force refetch history when switching to it
       queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
       queryClient.refetchQueries({ queryKey: ['echo', 'conversations'] });
     }
@@ -231,78 +232,58 @@ export function EchoSheetV2({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with blur */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[10001] bg-black/40 backdrop-blur-sm"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[10001] bg-black/35 backdrop-blur-sm"
             onClick={handleClose}
-            aria-label="Close Echo"
           />
 
-          {/* Sheet - 80% viewport height */}
+          {/* Sheet */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ 
-              type: 'spring', 
-              damping: 30, 
-              stiffness: 350,
-              mass: 0.8
-            }}
+            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden",
+              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden",
               HUB_SHEET
             )}
-            style={{ 
-              height: ECHO_SHEET_HEIGHT, 
-              maxHeight: ECHO_SHEET_HEIGHT 
-            }}
+            style={{ height: '92svh', maxHeight: '92svh' }}
             onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Echo AI Assistant"
           >
-            {/* Grabber - swipe indicator */}
+            {/* Grabber */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div 
-                className="w-10 h-1 rounded-full bg-slate-300/80 transition-colors hover:bg-slate-400/80"
-                aria-hidden="true"
-              />
+              <div className="w-9 h-[3px] rounded-full bg-black/15" />
             </div>
 
             {/* Header */}
-            <header className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
-              <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
+              <div className="flex items-center gap-2">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
                   style={{ 
-                    background: `linear-gradient(145deg, ${ECHO_ORANGE}22 0%, ${ECHO_ORANGE}11 100%)`,
-                    border: `1.5px solid ${ECHO_ORANGE}30`,
-                    boxShadow: `0 2px 8px ${ECHO_ORANGE}15`,
+                    background: `linear-gradient(135deg, ${ECHO_ORANGE}1F 0%, ${ECHO_ORANGE}14 100%)`,
+                    border: `1px solid ${ECHO_ORANGE}26`,
                   }}
                 >
-                  <Sparkles className="w-4 h-4" style={{ color: ECHO_ORANGE }} />
+                  <Sparkles className="w-3.5 h-3.5" style={{ color: ECHO_ORANGE }} />
                 </div>
-                <h2 
-                  className="text-[18px] font-semibold text-slate-900" 
-                  style={{ letterSpacing: '-0.02em' }}
-                >
+                <h2 className="text-[17px] font-semibold text-slate-900" style={{ letterSpacing: '-0.01em' }}>
                   Echo
                 </h2>
               </div>
               
-              <div className="flex items-center gap-0.5">
-                {/* New chat button - 44x44 touch target */}
+              <div className="flex items-center gap-1">
+                {/* New chat button */}
                 {(hasMessages || activeTab === 'history') && (
                   <button
                     onClick={handleNewChat}
-                    className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl transition-all duration-150 hover:bg-black/5 active:scale-95"
+                    className="p-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
                     title="New chat"
-                    aria-label="Start new chat"
                   >
                     <Plus className="w-5 h-5 text-slate-600" />
                   </button>
@@ -313,34 +294,31 @@ export function EchoSheetV2({
                   <div className="relative">
                     <button
                       onClick={handleMenuClick}
-                      className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl transition-all duration-150 hover:bg-black/5 active:scale-95"
-                      aria-label="Chat options"
-                      aria-expanded={showMenu}
+                      className="p-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
                     >
                       <MoreVertical className="w-5 h-5 text-slate-600" />
                     </button>
                     
-                    {/* Dropdown menu */}
+                    {/* Dropdown */}
                     <AnimatePresence>
                       {showMenu && (
                         <motion.div
                           initial={{ opacity: 0, y: -8, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                          transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-1 w-48 rounded-2xl overflow-hidden bg-white/98 backdrop-blur-lg border border-black/8 shadow-xl z-[10003]"
+                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-white/95 backdrop-blur-md border border-black/10 shadow-lg z-[10003]"
                         >
                           <button
                             onClick={handleClearChat}
-                            className="w-full flex items-center gap-2.5 px-4 py-3 text-[14px] font-medium transition-colors hover:bg-slate-50 text-slate-700"
+                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-black/5 text-slate-900"
                           >
-                            <Trash2 className="w-4 h-4 text-slate-500" />
+                            <Trash2 className="w-4 h-4" />
                             Clear chat
                           </button>
                           {conversationId && (
                             <button
                               onClick={handleDeleteChatClick}
-                              className="w-full flex items-center gap-2.5 px-4 py-3 text-[14px] font-medium transition-colors hover:bg-red-50 text-red-600 border-t border-black/5"
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50 text-red-600 border-t border-black/5"
                             >
                               <Trash2 className="w-4 h-4" />
                               Delete this chat
@@ -352,78 +330,59 @@ export function EchoSheetV2({
                   </div>
                 )}
                 
-                {/* Close button - 44x44 touch target */}
+                {/* Close button */}
                 <button
                   onClick={handleClose}
-                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl transition-all duration-150 hover:bg-black/5 active:scale-95"
-                  aria-label="Close Echo"
+                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
                 >
                   <X className="w-5 h-5 text-slate-600" />
                 </button>
               </div>
-            </header>
+            </div>
 
-            {/* Tabs with animation */}
+            {/* Tabs */}
             <div className="px-5 pb-3 flex-shrink-0">
               <EchoTabPills activeTab={activeTab} onTabChange={handleTabChange} />
             </div>
 
             {/* Divider */}
-            <div className="h-px mx-5 flex-shrink-0 bg-gradient-to-r from-transparent via-black/8 to-transparent" />
+            <div className="h-px mx-5 flex-shrink-0 bg-black/10" />
 
             {/* Body - Tab content */}
-            <AnimatePresence mode="wait">
-              {activeTab === 'chat' ? (
-                <motion.div 
-                  key="chat"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex-1 flex flex-col overflow-hidden relative"
-                >
-                  {!hasMessages ? (
-                    <EchoEmptyState
-                      onChipClick={handleChipClick}
-                      onFocusInput={handleFocusInput}
-                    />
-                  ) : (
-                    <EchoMessageList
-                      messages={messages}
-                      isStreaming={isStreaming}
-                      streamingContent={streamingContent}
-                      onFollowUp={handleFollowUp}
-                    />
-                  )}
-
-                  {/* Composer - Always visible in chat tab */}
-                  <EchoComposer
-                    ref={composerInputRef}
-                    value={input}
-                    onChange={setInput}
-                    onSend={handleSend}
-                    onAbort={abortStream}
+            {activeTab === 'chat' ? (
+              <>
+                {!hasMessages ? (
+                  <EchoEmptyState
+                    onChipClick={handleChipClick}
+                    onFocusInput={handleFocusInput}
+                  />
+                ) : (
+                  <EchoMessageList
+                    messages={messages}
                     isStreaming={isStreaming}
-                    autoFocus={hasMessages}
+                    streamingContent={streamingContent}
+                    onFollowUp={handleFollowUp}
                   />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="history"
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex-1 flex flex-col overflow-hidden"
-                >
-                  <EchoHistoryTab
-                    onSelectConversation={handleSelectConversation}
-                    currentConversationId={conversationId}
-                    onDeleteCurrentConversation={handleDeleteCurrentConversation}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+
+                {/* Composer - Always visible in chat tab */}
+                <EchoComposer
+                  ref={composerInputRef}
+                  value={input}
+                  onChange={setInput}
+                  onSend={handleSend}
+                  onAbort={abortStream}
+                  isStreaming={isStreaming}
+                  autoFocus={hasMessages}
+                />
+              </>
+            ) : (
+              <EchoHistoryTab
+                onSelectConversation={handleSelectConversation}
+                currentConversationId={conversationId}
+                onDeleteCurrentConversation={handleDeleteCurrentConversation}
+              />
+            )}
           </motion.div>
 
           {/* Delete confirmation dialog */}

@@ -1,15 +1,15 @@
 /**
  * EchoHistoryTab - History view for Echo conversations
- * Polished with skeleton loading, empty states, and smooth animations
+ * Explicit light styling to match Hub sheets
  */
 
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Search, Pin, Trash2, MessageSquare, X, Sparkles, Plus } from 'lucide-react';
+import { Search, Pin, Trash2, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
-import { HUB_INPUT, HUB_CARD, HUB_SECTION_HEADER, ECHO_ORANGE, ECHO_ORANGE_DARK } from './echoStyles';
+import { HUB_INPUT, HUB_CARD, HUB_SECTION_HEADER, HUB_ICON_BUTTON } from './echoStyles';
 import {
   useEchoConversations,
   usePinConversation,
@@ -55,6 +55,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
 
   const handleConfirmDelete = () => {
     if (deleteTarget) {
+      // If deleting the currently open conversation, notify parent to reset chat
       if (deleteTarget === currentConversationId && onDeleteCurrentConversation) {
         onDeleteCurrentConversation();
       }
@@ -68,51 +69,49 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
     onSelectConversation(conversationId);
   };
 
-  const handleClearSearch = () => {
-    setSearch('');
-  };
-
   return (
-    <div className="flex-1 flex flex-col overflow-hidden" role="tabpanel" id="history-panel">
-      {/* Search input with clear button */}
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Search input */}
       <div className="px-5 py-3 flex-shrink-0">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search your chats..."
             className={cn(
-              "w-full h-11 pl-10 pr-10 rounded-xl text-[14px]",
+              "w-full h-10 pl-9 pr-4 rounded-xl text-[14px]",
               HUB_INPUT
             )}
-            aria-label="Search conversations"
           />
-          {search && (
-            <button
-              onClick={handleClearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-black/5 transition-colors"
-              aria-label="Clear search"
-            >
-              <X className="w-4 h-4 text-slate-400" />
-            </button>
-          )}
         </div>
       </div>
 
       {/* Conversation list */}
-      <div className="flex-1 overflow-y-auto px-5 pb-8">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         {isLoading ? (
-          <HistorySkeleton />
+          <div className="flex items-center justify-center py-12">
+            <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+          </div>
         ) : !conversations || conversations.length === 0 ? (
-          <HistoryEmptyState search={search} />
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mb-4", HUB_CARD)}>
+              <MessageSquare className="w-7 h-7 text-slate-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-800">
+              {search ? 'No chats found' : 'No chat history yet'}
+            </p>
+            <p className="text-xs text-slate-500 mt-1 max-w-[200px]">
+              {search ? 'Try a different search term' : 'Start a conversation in Chat to see it here'}
+            </p>
+          </div>
         ) : (
           <div className="space-y-2">
             {/* Pinned section */}
             {conversations.some(c => c.pinned) && (
               <>
-                <p className={cn("px-1 pt-1 pb-1", HUB_SECTION_HEADER)}>
+                <p className={cn("px-1 pt-1", HUB_SECTION_HEADER)}>
                   Pinned
                 </p>
                 <AnimatePresence mode="popLayout">
@@ -143,7 +142,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
             {conversations.some(c => !c.pinned) && (
               <>
                 {conversations.some(c => c.pinned) && (
-                  <p className={cn("px-1 pt-4 pb-1", HUB_SECTION_HEADER)}>
+                  <p className={cn("px-1 pt-3", HUB_SECTION_HEADER)}>
                     Recent
                   </p>
                 )}
@@ -198,68 +197,6 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
   );
 }
 
-/** Skeleton loading state */
-function HistorySkeleton() {
-  return (
-    <div className="space-y-3 pt-2">
-      {[1, 2, 3].map((i) => (
-        <div 
-          key={i} 
-          className={cn("p-4 rounded-2xl", HUB_CARD)}
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 space-y-2">
-              <div className="h-4 w-3/4 rounded-md bg-slate-200/80 animate-pulse" />
-              <div className="h-3 w-1/2 rounded-md bg-slate-200/60 animate-pulse" />
-            </div>
-            <div className="flex gap-1">
-              <div className="w-8 h-8 rounded-lg bg-slate-200/60 animate-pulse" />
-              <div className="w-8 h-8 rounded-lg bg-slate-200/60 animate-pulse" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/** Empty state component */
-function HistoryEmptyState({ search }: { search: string }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-16 text-center"
-    >
-      <div 
-        className={cn("w-18 h-18 rounded-2xl flex items-center justify-center mb-5", HUB_CARD)}
-        style={{ width: 72, height: 72 }}
-      >
-        {search ? (
-          <Search className="w-8 h-8 text-slate-300" />
-        ) : (
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{ 
-              background: `linear-gradient(145deg, ${ECHO_ORANGE}15 0%, ${ECHO_ORANGE}08 100%)`,
-            }}
-          >
-            <Sparkles className="w-6 h-6" style={{ color: ECHO_ORANGE }} />
-          </div>
-        )}
-      </div>
-      <p className="text-[15px] font-medium text-slate-700 mb-1">
-        {search ? 'No chats found' : 'No chat history yet'}
-      </p>
-      <p className="text-[13px] text-slate-500 max-w-[240px] leading-relaxed">
-        {search 
-          ? 'Try a different search term' 
-          : 'Start a conversation with Echo to see it here'}
-      </p>
-    </motion.div>
-  );
-}
-
 interface ConversationCardProps {
   conversation: EchoConversationRow;
   isActive: boolean;
@@ -284,54 +221,44 @@ function ConversationCard({
     <button
       onClick={onSelect}
       className={cn(
-        "w-full text-left p-3.5 rounded-2xl transition-all duration-150",
+        "w-full text-left p-3 rounded-2xl transition-all duration-150",
         HUB_CARD,
-        "hover:bg-white/90 hover:shadow-md",
+        "hover:bg-white/90",
         "active:scale-[0.99]",
-        isActive && "ring-2 ring-amber-500/20 border-amber-500/30 bg-amber-50/30"
+        isActive && "ring-2 ring-[hsl(var(--echo-accent,270_60%_60%))]/20 border-[hsl(var(--echo-accent,270_60%_60%))]/30"
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1">
+          <div className="flex items-center gap-1.5">
             {conversation.pinned && (
-              <Pin 
-                className="w-3 h-3 flex-shrink-0" 
-                style={{ color: ECHO_ORANGE }}
-                fill={ECHO_ORANGE}
-              />
+              <Pin className="w-3 h-3 text-[hsl(var(--echo-accent,270_60%_60%))] flex-shrink-0" />
             )}
             <h3 className="text-[14px] font-medium text-slate-900 truncate">
               {conversation.title || 'Untitled chat'}
             </h3>
           </div>
-          <p className="text-[12px] text-slate-500">
+          <p className="text-[12px] text-slate-500 mt-0.5">
             {timeAgo} ago • {messageCount} message{messageCount !== 1 ? 's' : ''}
           </p>
         </div>
 
-        {/* Action buttons with proper touch targets */}
-        <div className="flex items-center gap-0.5 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0">
           <button
             onClick={onPin}
             disabled={isPinning}
             className={cn(
-              "min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg transition-all duration-150",
+              "p-1.5 rounded-lg transition-colors",
               conversation.pinned 
-                ? "text-amber-600 hover:bg-amber-50" 
-                : "text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+                ? "text-[hsl(var(--echo-accent,270_60%_60%))] hover:bg-[hsl(var(--echo-accent,270_60%_60%))]/10" 
+                : "text-slate-400 hover:bg-black/5"
             )}
-            aria-label={conversation.pinned ? "Unpin chat" : "Pin chat"}
           >
-            <Pin 
-              className="w-4 h-4" 
-              fill={conversation.pinned ? 'currentColor' : 'none'}
-            />
+            <Pin className="w-4 h-4" />
           </button>
           <button
             onClick={onDelete}
-            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-all duration-150"
-            aria-label="Delete chat"
+            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>

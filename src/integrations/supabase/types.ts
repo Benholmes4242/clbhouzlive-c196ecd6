@@ -3006,24 +3006,6 @@ export type Database = {
           },
         ]
       }
-      echo_rate_limits: {
-        Row: {
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       echo_share_links: {
         Row: {
           created_at: string
@@ -11238,7 +11220,6 @@ export type Database = {
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
-      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       clone_real_profiles_to_mock: {
         Args: { limit_count?: number }
         Returns: number
