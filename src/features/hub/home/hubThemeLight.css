@@ -779,17 +779,9 @@ mark {
 }
 
 /* ========================================
-   GRABBER BAR (For child bottom sheets only - not Hub page)
-   Hub is now a standard page, but child sheets still use this
+   GRABBER BAR (Light - White on grey)
    ======================================== */
 .hub-grabber {
-  display: none; /* Hidden by default - Hub is a page now */
-}
-
-/* Show grabber only inside actual bottom sheets */
-.hub-sheet .hub-grabber,
-[data-vaul-drawer] .hub-grabber {
-  display: block;
   width: var(--hub-grabber-width);
   height: var(--hub-grabber-height);
   border-radius: 999px;
