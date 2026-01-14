@@ -1,11 +1,12 @@
 /**
- * ScheduleTournamentCard - Full-width cinematic card with flowing design
+ * ScheduleTournamentCard - Full-width cinematic event card
  * 
  * Features:
- * - Course image as background with softer gradient overlay
- * - Vignette effects for seamless transitions
- * - Subtle status badge
- * - Improved text hierarchy
+ * - Large hero image with gradient overlay
+ * - Full-bleed edge-to-edge design
+ * - Taller card height for impact
+ * - Text overlay with strong hierarchy
+ * - Neutral status badges (no orange)
  */
 
 import { Link } from 'react-router-dom';
@@ -21,19 +22,32 @@ interface ScheduleTournamentCardProps {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; pulse?: boolean }> = {
-    inprogress: { label: 'Live', pulse: true },
-    scheduled: { label: 'Upcoming' },
-    created: { label: 'Upcoming' },
-    closed: { label: 'Completed' },
+  const config: Record<string, { label: string; pulse?: boolean; className: string }> = {
+    inprogress: { 
+      label: 'Live', 
+      pulse: true,
+      className: 'bg-slate-800 text-white'
+    },
+    scheduled: { 
+      label: 'Upcoming',
+      className: 'bg-slate-700/80 text-white'
+    },
+    created: { 
+      label: 'Upcoming',
+      className: 'bg-slate-700/80 text-white'
+    },
+    closed: { 
+      label: 'Completed',
+      className: 'bg-slate-600/70 text-white/90'
+    },
   };
   
   const c = config[status] || config.created;
   
   return (
     <span className={cn(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium',
-      'bg-black/30 text-white/90 backdrop-blur-sm'
+      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-sm',
+      c.className
     )}>
       {c.pulse && (
         <span className="relative flex h-1.5 w-1.5">
@@ -62,17 +76,14 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn(
-        "block relative -mr-4 h-[140px]",
-        "transition-all duration-300 ease-out",
-        "hover:brightness-105",
+        "block relative w-full rounded-2xl overflow-hidden",
+        "transition-all duration-200 ease-out",
+        "active:scale-[0.98] hover:brightness-105",
         className
       )}
-      style={{
-        // Subtle inner shadow for softer edges
-        boxShadow: 'inset 0 0 40px rgba(0,0,0,0.08)'
-      }}
+      style={{ height: '220px' }}
     >
-      {/* Background Image or Grey Fallback - edge to edge */}
+      {/* Background Image or Slate Fallback */}
       {hasImage ? (
         <img 
           src={courseImage.imageUrl!}
@@ -80,62 +91,38 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-gray-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
       )}
       
-      {/* Top vignette - subtle fade in from top */}
-      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/25 to-transparent" />
+      {/* Gradient Overlay - Transparent to Dark (top to bottom) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       
-      {/* Bottom gradient overlay - slightly lighter */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-      
-      {/* Status Badge - Top Right, more subtle */}
-      <div className="absolute top-2.5 right-4 z-10">
+      {/* Status Badge - Top Right */}
+      <div className="absolute top-4 right-4 z-10">
         <StatusBadge status={tournament.status} />
       </div>
       
-      {/* Content - Bottom with internal padding */}
-      <div className="absolute inset-0 px-4 py-3 flex flex-col justify-end">
-        {/* Tournament Name */}
-        <h3 className="text-lg font-semibold text-white leading-tight line-clamp-1 mb-0.5">
+      {/* Content - Bottom with text hierarchy */}
+      <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col">
+        {/* Event Name - Headline */}
+        <h3 className="font-display text-xl font-semibold text-white leading-tight line-clamp-2 mb-2">
           {tournament.name}
         </h3>
         
-        {/* Date - slightly brighter */}
-        <p className="text-sm text-white/90 mb-0.5">
+        {/* Date - Medium weight */}
+        <p className="text-sm font-medium text-white/90 mb-1">
           {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
         </p>
         
-        {/* Venue - medium opacity */}
+        {/* Location - Smallest with icon */}
         {(tournament.venue_name || tournament.venue_city) && (
-          <div className="flex items-center gap-1.5 text-sm text-white/70 mb-1.5">
-            <MapPin className="w-3 h-3 shrink-0" />
+          <div className="flex items-center gap-1.5 text-sm text-white/70">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">
               {[tournament.venue_name, tournament.venue_city].filter(Boolean).join(' • ')}
             </span>
           </div>
         )}
-        
-        {/* Stats row - most subtle */}
-        <div className="flex flex-wrap items-center gap-1.5 text-sm text-white/60">
-          {tournament.purse && (
-            <span className="font-medium text-emerald-400/90">
-              ${(tournament.purse / 1_000_000).toFixed(1)}M
-            </span>
-          )}
-          {tournament.venue_par && (
-            <>
-              <span className="text-white/30">•</span>
-              <span>Par {tournament.venue_par}</span>
-            </>
-          )}
-          {tournament.venue_yardage && (
-            <>
-              <span className="text-white/30">•</span>
-              <span>{tournament.venue_yardage.toLocaleString()} yds</span>
-            </>
-          )}
-        </div>
       </div>
     </Link>
   );
