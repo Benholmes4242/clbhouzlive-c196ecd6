@@ -74,16 +74,16 @@ export function HubQuickActionsV3() {
 
   return (
     <>
-      {/* Single unified rail container */}
+      {/* Single unified rail container - premium glass effect */}
       <div 
         className="flex items-center rounded-full"
         style={{
-          height: '54px',
-          background: 'rgba(255, 255, 255, 0.80)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(15, 23, 42, 0.06)',
-          boxShadow: '0 8px 24px rgba(2, 6, 23, 0.06)',
+          height: '56px',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(15, 23, 42, 0.08)',
+          boxShadow: '0 10px 28px rgba(2, 6, 23, 0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
         }}
       >
         <Segment
