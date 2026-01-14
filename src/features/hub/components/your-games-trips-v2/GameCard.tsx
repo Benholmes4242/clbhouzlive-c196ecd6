@@ -48,10 +48,11 @@ export function GameCard({ game, variant, onTap }: GameCardProps) {
     return (
       <motion.button
         onClick={onTap}
-        className="w-full text-left rounded-2xl p-4 transition-all duration-150 active:scale-[0.99]"
+        className="w-full text-left rounded-2xl p-4 transition-all duration-150 active:scale-[0.98]"
         style={{
           background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
           border: '1px solid rgba(0, 0, 0, 0.05)',
+          borderLeft: '3px solid rgba(34, 197, 94, 0.5)',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04)',
         }}
         initial={{ opacity: 0, y: 8 }}
@@ -113,7 +114,7 @@ export function GameCard({ game, variant, onTap }: GameCardProps) {
   return (
     <button
       onClick={onTap}
-      className="w-full px-4 py-3.5 rounded-2xl text-left transition-all duration-150 active:scale-[0.99]"
+      className="w-full px-4 py-3.5 rounded-2xl text-left transition-all duration-150 active:scale-[0.98]"
       style={{
         background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
         border: '1px solid rgba(0, 0, 0, 0.04)',

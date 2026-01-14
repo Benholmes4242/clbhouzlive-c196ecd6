@@ -213,22 +213,14 @@ export function YourGamesTripsSheetV2({
               />
             </div>
 
-            {/* Header - premium styling */}
-            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
-              <div>
-                <h2 
-                  className="text-[18px] font-semibold leading-tight"
-                  style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
-                >
-                  Your Games & Trips
-                </h2>
-                <p 
-                  className="text-[12px] mt-0.5"
-                  style={{ color: 'rgba(100, 116, 139, 0.8)' }}
-                >
-                  Everything you've planned — games, trips and who's joined.
-                </p>
-              </div>
+            {/* Header - clean and minimal */}
+            <div className="flex items-center justify-between px-5 pb-4 flex-shrink-0">
+              <h2 
+                className="text-[20px] font-bold leading-tight"
+                style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
+              >
+                Your Games & Trips
+              </h2>
               
               <button
                 onClick={handleClose}
@@ -236,21 +228,13 @@ export function YourGamesTripsSheetV2({
               >
                 <X 
                   className="w-5 h-5"
-                  style={{ color: 'rgba(100, 116, 139, 0.6)' }}
+                  style={{ color: 'rgba(100, 116, 139, 0.5)' }}
                 />
               </button>
             </div>
 
-            {/* Gradient divider - soft fade */}
-            <div 
-              className="h-px mx-5 flex-shrink-0"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.06) 20%, rgba(0, 0, 0, 0.06) 80%, transparent 100%)',
-              }}
-            />
-
-            {/* Search - premium styling with inner shadow */}
-            <div className="px-5 pt-4 pb-3 flex-shrink-0">
+            {/* Search - premium card style */}
+            <div className="px-5 pb-4 flex-shrink-0">
               <SearchInput
                 value={searchInput}
                 onChange={setSearchInput}
