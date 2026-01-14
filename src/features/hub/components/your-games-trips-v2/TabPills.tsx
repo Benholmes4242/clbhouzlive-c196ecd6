@@ -30,7 +30,7 @@ export function TabPills({ activeTab, onTabChange }: TabPillsProps) {
             onClick={() => onTabChange(tab.key)}
             className="relative flex-1 py-2.5 px-4 text-[13px] font-semibold rounded-[10px] transition-colors duration-150"
             style={{
-              color: isActive ? '#1e293b' : 'rgba(100, 116, 139, 0.65)',
+              color: isActive ? '#1e293b' : '#64748b',
             }}
           >
             {isActive && (
@@ -38,8 +38,8 @@ export function TabPills({ activeTab, onTabChange }: TabPillsProps) {
                 layoutId="tab-pill-bg-v3"
                 className="absolute inset-0 rounded-[10px]"
                 style={{
-                  background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)',
+                  background: '#FFFFFF',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
                 }}
                 transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
               />

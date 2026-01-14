@@ -200,7 +200,7 @@ export function YourGamesTripsSheetV2({
             style={{
               height: '85svh',
               maxHeight: '85svh',
-              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
+              background: '#F8FAFC',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
               borderTop: '1px solid rgba(255, 255, 255, 0.9)',
             }}
@@ -245,7 +245,7 @@ export function YourGamesTripsSheetV2({
             <div className="px-5 pb-4 flex-shrink-0">
               <div 
                 className="p-1 rounded-[14px]"
-                style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                style={{ background: '#e2e8f0' }}
               >
                 <TabPills
                   activeTab={activeTab}

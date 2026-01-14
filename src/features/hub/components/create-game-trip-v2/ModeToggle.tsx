@@ -24,7 +24,7 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
     <div
       className="inline-flex rounded-[14px] p-[3px] w-full relative"
       style={{
-        background: 'rgba(0, 0, 0, 0.05)',
+        background: '#e2e8f0',
       }}
     >
       {/* Sliding indicator with refined shadow */}
@@ -49,7 +49,7 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
           onClick={() => handleChange(m)}
           className="relative z-10 flex-1 px-4 py-2.5 rounded-[11px] text-[14px] font-semibold transition-colors duration-200 capitalize"
           style={{
-            color: mode === m ? '#1e293b' : '#94a3b8',
+            color: mode === m ? '#1e293b' : '#64748b',
           }}
         >
           {m}

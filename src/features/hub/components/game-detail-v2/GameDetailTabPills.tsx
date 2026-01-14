@@ -28,7 +28,7 @@ export function GameDetailTabPills({
   return (
     <div 
       className="flex p-1 rounded-[12px]"
-      style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+      style={{ background: '#e2e8f0' }}
     >
       {tabs.map(tab => {
         const isActive = activeTab === tab.key;
@@ -38,7 +38,7 @@ export function GameDetailTabPills({
             onClick={() => onTabChange(tab.key)}
             className="relative flex-1 py-2 px-4 text-[13px] font-semibold rounded-[10px] transition-colors"
             style={{
-              color: isActive ? '#1e293b' : 'rgba(100, 116, 139, 0.65)',
+              color: isActive ? '#1e293b' : '#64748b',
             }}
           >
             {isActive && (

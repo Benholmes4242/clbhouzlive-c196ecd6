@@ -290,9 +290,7 @@ export function DiscoverGamesBottomSheetV2({
             style={{
               height: '90svh',
               maxHeight: '90svh',
-              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              background: '#F8FAFC',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
             }}
           >
