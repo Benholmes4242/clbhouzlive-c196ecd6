@@ -17,14 +17,10 @@ import { HubMessagesCard } from '../home/tiles/HubMessagesCard';
 import { ActiveGamesNearYouTile } from '../home/tiles/ActiveGamesNearYouTile';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { YourGamesGradientCTA } from '../home/tiles/YourGamesGradientCTA';
-import { HubFloatingDock } from '../home/tiles/HubFloatingDock';
 import { HubContentSkeleton } from '../home/tiles/HubContentSkeleton';
 import { useHubDataReady } from '../home/hooks/useHubDataReady';
 
 import '../home/hubThemeLight.css';
-
-// Layout constants
-const DOCK_HEIGHT = 70;
 
 export function HubHomePage() {
   const isDataReady = useHubDataReady();
@@ -56,7 +52,7 @@ export function HubHomePage() {
           className="flex-1 flex flex-col overflow-hidden"
           style={{
             paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)',
-            paddingBottom: 'calc(55px + 10px + env(safe-area-inset-bottom, 0px))', // dock height + gap + safe area
+            paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
           }}
         >
           <div className="px-5 flex flex-col gap-[8px] flex-1 min-h-0">
@@ -80,17 +76,14 @@ export function HubHomePage() {
                   <EchoTile />
                 </div>
 
-                {/* Zone 5: Full-width "Your Games" Gradient CTA - flex grow to fill remaining space with 10px gap to dock */}
-                <div className="flex-1 min-h-0 pb-[10px]">
+                {/* Zone 5: Full-width "Your Games" Gradient CTA */}
+                <div className="flex-1 min-h-0">
                   <YourGamesGradientCTA className="h-full" />
                 </div>
               </>
             )}
           </div>
         </div>
-
-        {/* Anchored Dock - at bottom */}
-        <HubFloatingDock />
       </FadeInContent>
     </PageRoot>
   );

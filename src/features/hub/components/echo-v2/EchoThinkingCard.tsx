@@ -1,11 +1,11 @@
 /**
- * EchoThinkingCard - Shimmer loading state
- * Explicit light styling to match Hub sheets
+ * EchoThinkingCard - "Echo is thinking" state with animated indicator
+ * Shows while waiting for first token to arrive
  */
 
 import React from 'react';
 import { Sparkles } from 'lucide-react';
-import { HUB_CARD } from './echoStyles';
+import { HUB_CARD, ECHO_ORANGE } from './echoStyles';
 import { cn } from '@/lib/utils';
 
 export function EchoThinkingCard() {
@@ -13,54 +13,45 @@ export function EchoThinkingCard() {
     <div className="flex gap-2.5">
       {/* Echo avatar */}
       <div 
-        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
         style={{ 
-          background: 'linear-gradient(135deg, hsl(var(--echo-accent, 270 60% 60%) / 0.12) 0%, hsl(var(--echo-accent-dark, 262 83% 58%) / 0.08) 100%)',
-          border: '1px solid hsl(var(--echo-accent, 270 60% 60%) / 0.15)',
+          background: `linear-gradient(135deg, ${ECHO_ORANGE}20 0%, ${ECHO_ORANGE}10 100%)`,
+          border: `1.5px solid ${ECHO_ORANGE}25`,
         }}
       >
-        <Sparkles className="w-3.5 h-3.5 animate-pulse text-[hsl(var(--echo-accent,270_60%_60%))]" />
+        <Sparkles className="w-4 h-4 animate-pulse" style={{ color: ECHO_ORANGE }} />
       </div>
 
       {/* Thinking card */}
       <div 
         className={cn(
-          "flex-1 rounded-2xl rounded-tl-md px-4 py-3",
+          "flex-1 rounded-2xl rounded-tl-md px-4 py-3.5",
           HUB_CARD
         )}
       >
-        {/* Shimmer lines */}
-        <div className="space-y-2">
-          <div 
-            className="h-3 rounded-full animate-pulse"
-            style={{ 
-              background: 'linear-gradient(90deg, hsl(var(--echo-accent, 270 60% 60%) / 0.08) 0%, hsl(var(--echo-accent, 270 60% 60%) / 0.15) 50%, hsl(var(--echo-accent, 270 60% 60%) / 0.08) 100%)',
-              width: '85%',
-            }}
-          />
-          <div 
-            className="h-3 rounded-full animate-pulse"
-            style={{ 
-              background: 'linear-gradient(90deg, hsl(var(--echo-accent, 270 60% 60%) / 0.08) 0%, hsl(var(--echo-accent, 270 60% 60%) / 0.15) 50%, hsl(var(--echo-accent, 270 60% 60%) / 0.08) 100%)',
-              width: '65%',
-              animationDelay: '0.1s',
-            }}
-          />
-          <div 
-            className="h-3 rounded-full animate-pulse"
-            style={{ 
-              background: 'linear-gradient(90deg, hsl(var(--echo-accent, 270 60% 60%) / 0.08) 0%, hsl(var(--echo-accent, 270 60% 60%) / 0.15) 50%, hsl(var(--echo-accent, 270 60% 60%) / 0.08) 100%)',
-              width: '45%',
-              animationDelay: '0.2s',
-            }}
-          />
+        {/* Animated typing indicator */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-2 h-2 rounded-full animate-bounce"
+                style={{
+                  backgroundColor: ECHO_ORANGE,
+                  opacity: 0.7,
+                  animationDelay: `${i * 0.15}s`,
+                  animationDuration: '0.8s',
+                }}
+              />
+            ))}
+          </div>
+          <span 
+            className="text-[13px] font-medium ml-2"
+            style={{ color: ECHO_ORANGE }}
+          >
+            Echo is thinking…
+          </span>
         </div>
-        
-        {/* Label */}
-        <p className="text-[11px] mt-2.5 flex items-center gap-1.5 text-[hsl(var(--echo-accent,270_60%_60%))]">
-          <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-          Echo is thinking…
-        </p>
       </div>
     </div>
   );

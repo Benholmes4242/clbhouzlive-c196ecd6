@@ -108,22 +108,22 @@ export function EchoMessageList({
     <div 
       ref={scrollRef}
       data-echo-scroll-container
-      className="flex-1 overflow-y-auto overscroll-contain px-5 pt-4"
+      className="flex-1 overflow-y-auto overscroll-contain px-5 pt-5"
       style={{ 
         WebkitOverflowScrolling: 'touch',
-        paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
+        paddingBottom: 'calc(110px + env(safe-area-inset-bottom, 0px))',
       }}
       onScroll={handleScroll}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         <AnimatePresence initial={false}>
           {messages.map((msg, index) => (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               {msg.role === 'user' ? (
                 <EchoUserBubble content={msg.content} />
@@ -143,8 +143,9 @@ export function EchoMessageList({
         {/* Streaming state: show EITHER thinking OR streaming response, never both */}
         {isStreaming && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
           >
             {streamingContent ? (
               <EchoResponseCard 
@@ -166,13 +167,14 @@ export function EchoMessageList({
       <AnimatePresence>
         {showNewMessagePill && (
           <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
             onClick={scrollToBottom}
-            className="fixed left-1/2 bottom-28 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-95 bg-slate-800 text-white shadow-lg"
+            className="fixed left-1/2 bottom-32 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[12px] font-semibold transition-all active:scale-95 bg-slate-900 text-white shadow-xl"
+            style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}
           >
-            <ChevronDown className="w-3.5 h-3.5" />
+            <ChevronDown className="w-4 h-4" />
             New message
           </motion.button>
         )}

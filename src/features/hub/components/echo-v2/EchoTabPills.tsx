@@ -6,7 +6,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
-import { HUB_TAB_RAIL } from './echoStyles';
+import { ECHO_ORANGE } from './echoStyles';
 
 export type EchoTab = 'chat' | 'history';
 
@@ -30,20 +30,17 @@ export function EchoTabPills({ activeTab, onTabChange }: EchoTabPillsProps) {
 
   return (
     <div 
-      className={cn(
-        "flex items-center gap-1 p-1 rounded-xl",
-        HUB_TAB_RAIL
-      )}
+      className="flex items-center gap-1 p-1 rounded-xl bg-black/[0.04]"
     >
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => handleTabClick(tab.id)}
           className={cn(
-            "flex-1 px-4 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150",
+            "flex-1 px-4 py-2 rounded-lg text-[13px] font-semibold transition-all duration-200",
             activeTab === tab.id
               ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-600 hover:text-slate-900"
+              : "text-slate-500 hover:text-slate-700"
           )}
         >
           {tab.label}
