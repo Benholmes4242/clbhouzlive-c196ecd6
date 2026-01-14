@@ -118,7 +118,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           // No safe area padding
           height: `${headerHeight}px`,
-          borderBottom: `1px solid ${getBorder()}`,
+          borderBottom: `0.5px solid ${getBorder()}`,
           boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
