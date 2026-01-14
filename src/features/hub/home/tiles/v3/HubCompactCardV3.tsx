@@ -62,20 +62,21 @@ export function HubCompactCardV3({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3.5 p-4 rounded-[20px] text-left transition-all duration-150 active:scale-[0.99]"
+      className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all duration-150 active:scale-[0.99]"
       style={{
-        background: 'var(--hub-card)',
-        border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 12px 32px rgba(0,0,0,0.09), inset 0 1px 0 rgba(255,255,255,0.5)',
-        minHeight: '86px',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)',
+        minHeight: '80px',
       }}
     >
-      {/* Icon badge - solid chip style with refined styling */}
-      <div 
-        className="h-11 w-11 rounded-[14px] flex items-center justify-center flex-shrink-0 relative"
-        style={{ 
-          background: calmer ? 'rgba(15, 23, 42, 0.05)' : iconBg,
-          border: calmer ? '1px solid rgba(15, 23, 42, 0.06)' : 'none',
+      {/* Icon container - gradient backgrounds */}
+      <div
+        className="w-12 h-12 rounded-[14px] flex items-center justify-center flex-shrink-0"
+        style={{
+          background: calmer
+            ? 'rgba(15, 23, 42, 0.05)'
+            : iconBg || 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
         }}
       >
         {icon}
@@ -83,19 +84,19 @@ export function HubCompactCardV3({
 
       {/* Main content */}
       <div className="flex-1 min-w-0">
-        <div 
-          className="text-[15px] font-semibold line-clamp-1"
-          style={{ color: 'var(--hub-text)' }}
+        <p
+          className="font-semibold text-[15px] line-clamp-1"
+          style={{ color: '#1e293b' }}
         >
           {title}
-        </div>
+        </p>
         {subtitle && (
-          <div 
+          <p
             className="text-[13px] mt-0.5 line-clamp-1"
-            style={{ color: 'var(--hub-text-dim)' }}
+            style={{ color: '#64748b' }}
           >
             {subtitle}
-          </div>
+          </p>
         )}
       </div>
 
@@ -124,19 +125,8 @@ export function HubCompactCardV3({
           </div>
         )}
         
-        {/* Chevron in premium faint circle */}
-        <div 
-          className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ 
-            background: 'rgba(15, 23, 42, 0.05)',
-            border: '1px solid rgba(15, 23, 42, 0.04)',
-          }}
-        >
-          <ChevronRight 
-            className="h-[18px] w-[18px]" 
-            style={{ color: 'var(--hub-text-dimmer)' }} 
-          />
-        </div>
+        {/* Chevron */}
+        <ChevronRight className="h-5 w-5 text-slate-300" />
       </div>
     </button>
   );

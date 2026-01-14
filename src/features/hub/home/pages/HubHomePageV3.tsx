@@ -45,8 +45,8 @@ export function HubHomePageV3() {
   const [createOpen, setCreateOpen] = useState(false);
   const [discoverOpen, setDiscoverOpen] = useState(false);
 
-  // Toggle bar state - null means no selection (reset after action)
-  const [activeToggle, setActiveToggle] = useState<ToggleKey | null>(null);
+  // Toggle bar state - "echo" is default selected
+  const [activeToggle, setActiveToggle] = useState<ToggleKey | null>('echo');
 
   // Track Hub open
   useEffect(() => {

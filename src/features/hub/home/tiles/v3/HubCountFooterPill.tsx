@@ -26,20 +26,17 @@ export function HubCountFooterPill({ gamesCount, tripsCount, onClick }: HubCount
   if (!text) return null;
 
   return (
-    <button
-      onClick={onClick}
-      className="flex justify-center py-2.5"
-    >
-      <div 
-        className="text-[12px] font-medium px-4 py-2 rounded-full transition-all duration-150 active:scale-[0.98]"
+    <div className="flex justify-center mt-4 mb-2">
+      <button
+        onClick={onClick}
+        className="text-[13px] px-4 py-2 rounded-full transition-all duration-150 active:scale-[0.98]"
         style={{
-          background: 'rgba(15, 23, 42, 0.03)',
-          border: '1px dashed rgba(15, 23, 42, 0.14)',
-          color: 'var(--hub-text-dim)',
+          background: 'rgba(0, 0, 0, 0.04)',
+          color: '#64748b',
         }}
       >
         {text}
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }
