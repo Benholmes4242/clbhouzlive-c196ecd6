@@ -6,7 +6,7 @@
  * - Conversation persistence to Supabase
  * - Pin/Delete from history
  * - 30-day auto-purge (server-side)
- * - 80% viewport height
+ * - 90% viewport height
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -248,7 +248,7 @@ export function EchoSheetV2({
             onClick={handleClose}
           />
 
-          {/* Sheet - 80% viewport height */}
+          {/* Sheet - 90% viewport height */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -258,7 +258,7 @@ export function EchoSheetV2({
               "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden",
               HUB_SHEET
             )}
-            style={{ height: '80svh', maxHeight: '80svh' }}
+            style={{ height: '90svh', maxHeight: '90svh' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Grabber */}
