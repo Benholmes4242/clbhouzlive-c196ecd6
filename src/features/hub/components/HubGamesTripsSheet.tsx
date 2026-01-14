@@ -128,7 +128,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   const handleDiscoverGames = () => {
     haptic('light');
     onClose();
-    closeHub();
+    // Navigate directly without calling closeHub() which would nav(-1) first
     navigate('/games/discover');
   };
 
