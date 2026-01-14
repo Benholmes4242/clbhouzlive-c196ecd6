@@ -209,17 +209,17 @@ export function TripDateRangeSheet({
                 </button>
               </div>
 
-              {/* Save button */}
+              {/* Save button - Brand orange gradient */}
               <button
                 onClick={handleSave}
                 disabled={!isValid}
                 className="w-full py-4 rounded-2xl text-[15px] font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                 style={{
                   background: isValid 
-                    ? 'linear-gradient(135deg, rgba(110, 146, 119, 0.95) 0%, rgba(90, 126, 99, 0.95) 100%)'
+                    ? 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)'
                     : 'rgba(0, 0, 0, 0.06)',
-                  color: isValid ? 'white' : '#94a3b8',
-                  boxShadow: isValid ? '0 4px 16px rgba(110, 146, 119, 0.25)' : 'none',
+                  color: isValid ? '#FFFFFF' : '#94a3b8',
+                  boxShadow: isValid ? '0 4px 16px rgba(249, 115, 22, 0.3)' : 'none',
                 }}
               >
                 Save Dates
