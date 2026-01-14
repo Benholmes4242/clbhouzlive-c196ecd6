@@ -179,12 +179,12 @@ export function ScheduleTab() {
 
       {/* Search Bar */}
       <div className="relative max-w-md mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
         <Input
           placeholder="Search tournaments, venues, or cities..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-background border-border focus:ring-2 focus:ring-black/10"
+          className="pl-9 bg-background border-border focus:ring-2 focus:ring-black/10 text-slate-500 placeholder:text-slate-500"
         />
       </div>
 

@@ -42,8 +42,8 @@ export function ScheduleFilterPills({
   const tabClass = (isActive: boolean) => cn(
     "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out whitespace-nowrap",
     isActive 
-      ? "text-foreground" 
-      : "text-muted-foreground hover:text-foreground",
+      ? "text-slate-800" 
+      : "text-slate-800/60 hover:text-slate-800",
     // Underline indicator - exact match to ProfileTabsNav
     "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out",
     isActive 

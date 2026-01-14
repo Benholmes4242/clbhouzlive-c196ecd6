@@ -26,12 +26,12 @@ export function ScheduleMonthHeader({
       {/* Header row */}
       <div className="flex items-center justify-between">
         {/* Month label - Clubhouse display font */}
-        <h3 className="font-display text-sm font-semibold text-black tracking-widest">
+        <h3 className="font-display text-sm font-semibold text-slate-800 tracking-widest">
           {monthLabel}
         </h3>
         
         {/* Event count - muted, right-aligned */}
-        <span className="text-xs font-normal text-muted-foreground">
+        <span className="text-xs font-normal text-slate-800">
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
