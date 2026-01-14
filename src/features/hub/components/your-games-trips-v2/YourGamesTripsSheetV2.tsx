@@ -198,8 +198,8 @@ export function YourGamesTripsSheetV2({
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${hasStackedSheet ? 'stacked-behind trip-stacked-behind' : ''}`}
             style={{
-              height: '85svh',
-              maxHeight: '85svh',
+              height: '95svh',
+              maxHeight: '95svh',
               background: '#F8FAFC',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
               borderTop: '1px solid rgba(255, 255, 255, 0.9)',

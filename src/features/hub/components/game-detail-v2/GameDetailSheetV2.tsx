@@ -141,8 +141,8 @@ export function GameDetailSheetV2({
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
             style={{
-              height: '92svh',
-              maxHeight: '92svh',
+              height: '95svh',
+              maxHeight: '95svh',
               background: '#F8FAFC',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
             }}

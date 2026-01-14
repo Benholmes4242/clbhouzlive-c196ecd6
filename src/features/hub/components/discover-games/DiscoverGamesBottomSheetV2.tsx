@@ -288,8 +288,8 @@ export function DiscoverGamesBottomSheetV2({
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden discover-games-sheet-wrapper ${hasStackedSheet ? 'stacked-behind' : ''}`}
             style={{
-              height: '90svh',
-              maxHeight: '90svh',
+              height: '95svh',
+              maxHeight: '95svh',
               background: '#F8FAFC',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
             }}
