@@ -49,7 +49,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           aria-label="Open navigation menu"
           aria-haspopup="dialog"
         >
-          <NineDotsIcon className="text-slate-800" size={20} />
+          <NineDotsIcon className="text-slate-800" size={24} />
         </motion.button>
         
         {/* Center: Dynamic title based on active section */}
@@ -63,7 +63,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
             {title}
           </motion.h1>
         ) : isSchedule ? (
-          <h1 className="flex-1 text-3xl font-bold font-league-spartan tracking-tight text-slate-800 text-center">
+          <h1 className="flex-1 text-4xl font-bold font-league-spartan tracking-tight text-slate-800 text-center uppercase">
             {title}
           </h1>
         ) : (
