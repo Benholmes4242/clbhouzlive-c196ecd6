@@ -1,17 +1,21 @@
 /**
- * ScheduleHeroCard - Full-width immersive hero (card-free design)
+ * ScheduleHeroCard - Premium immersive hero card (world-class polish)
  * 
  * Features:
- * - Edge-to-edge cinematic image (50vh / 300px min)
+ * - 230px height, 20px radius
  * - Strong gradient overlay for text legibility
- * - White text on image
- * - No card container, border, or shadow
+ * - Bold typography: 28-32px, weight 700-800, tight line-height
+ * - Glass-effect status badge with subtle blur
+ * - Micro-icons next to stats
+ * - Chevron tap affordance
+ * - Ken Burns subtle zoom animation on load
  */
 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { MapPin, Zap, Calendar, Clock, ChevronRight } from 'lucide-react';
+import { MapPin, Zap, Calendar, Clock, ChevronRight, DollarSign, Flag, Ruler } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 
@@ -41,19 +45,19 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
     live: { 
       text: 'Live now', 
       icon: <Zap className="w-3.5 h-3.5" />, 
-      className: 'bg-emerald-500 text-white',
+      className: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30',
       pulse: true
     },
     upcoming: { 
       text: 'Next up', 
       icon: <Calendar className="w-3.5 h-3.5" />, 
-      className: 'bg-white/20 backdrop-blur-sm text-white',
+      className: 'bg-white/20 backdrop-blur-md text-white border border-white/20',
       pulse: false
     },
     recent: { 
       text: 'Most recent', 
       icon: <Clock className="w-3.5 h-3.5" />, 
-      className: 'bg-black/60 backdrop-blur-sm text-white',
+      className: 'bg-black/50 backdrop-blur-md text-white border border-white/10',
       pulse: false
     },
   };
@@ -65,16 +69,27 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className="group block relative overflow-hidden"
+      className="group block relative overflow-hidden mx-4 active:scale-[0.99] transition-transform duration-200"
+      style={{ borderRadius: '20px' }}
     >
-      {/* Full-width immersive image container */}
-      <div className="relative h-[50vh] min-h-[300px] max-h-[400px] overflow-hidden">
-        {/* Course image or cinematic gradient fallback */}
+      {/* Premium hero container */}
+      <div 
+        className="relative overflow-hidden"
+        style={{ 
+          height: '230px',
+          borderRadius: '20px',
+          boxShadow: '0 20px 50px rgba(2, 6, 23, 0.15), 0 8px 20px rgba(0,0,0,0.08)',
+        }}
+      >
+        {/* Course image with Ken Burns animation or cinematic gradient fallback */}
         {hasImage ? (
-          <img 
+          <motion.img 
             src={courseImage.imageUrl!} 
             alt={tournament.venue_name || tournament.name}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ scale: 1.05 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 8, ease: 'easeOut' }}
           />
         ) : (
           <>
@@ -93,71 +108,111 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
                   </pattern>
                 </defs>
                 <rect width="400" height="300" fill="url(#schedule-hero-dots)" />
-                <path d="M0 180 Q100 150 200 180 T400 180" fill="none" stroke="white" strokeWidth="0.5" opacity="0.5" />
-                <path d="M0 220 Q100 190 200 220 T400 220" fill="none" stroke="white" strokeWidth="0.5" opacity="0.3" />
               </svg>
             </div>
           </>
         )}
         
-        {/* Strong gradient overlay from bottom for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+        {/* Strong gradient overlay - darker from bottom for text legibility */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.08) 100%)',
+          }}
+        />
+        
+        {/* Left gradient for extra text legibility */}
+        <div 
+          className="absolute left-0 top-0 bottom-0"
+          style={{
+            width: '60%',
+            background: 'linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 100%)',
+          }}
+        />
 
-        {/* Type Label - top left */}
-        <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
+        {/* Type Label - top left with glass effect */}
+        <div className="absolute top-4 left-4">
           <div className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium",
-            label.className,
-            label.pulse && "animate-pulse"
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide",
+            label.className
           )}>
-            {label.icon}
+            {label.pulse && (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              </span>
+            )}
+            {!label.pulse && label.icon}
             {label.text}
           </div>
         </div>
 
+        {/* Tap affordance - chevron in circle, bottom right */}
+        <div 
+          className="absolute right-4 bottom-4 w-8 h-8 rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity"
+          style={{
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <ChevronRight className="w-4 h-4 text-white transition-transform group-hover:translate-x-0.5" />
+        </div>
+
         {/* Content - bottom of image */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-          {/* Tournament Name */}
-          <h2 className="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors line-clamp-2 leading-tight mb-2">
+        <div className="absolute bottom-0 left-0 right-12 p-4 sm:p-5">
+          {/* Tournament Name - Bold headline */}
+          <h2 
+            className="font-extrabold text-white group-hover:text-white/95 transition-colors line-clamp-2 mb-2"
+            style={{ 
+              fontSize: '28px',
+              lineHeight: 1.1,
+              letterSpacing: '-0.5px',
+              textShadow: '0 4px 12px rgba(0,0,0,0.4)',
+            }}
+          >
             {tournament.name}
           </h2>
 
           {/* Dates */}
-          <p className="text-sm text-white/80 mb-2">
+          <p 
+            className="text-sm font-medium text-white/90 mb-2"
+            style={{ textShadow: '0 2px 6px rgba(0,0,0,0.3)' }}
+          >
             {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
           </p>
 
           {/* Venue */}
           {(tournament.venue_name || tournament.venue_city) && (
-            <div className="flex items-center gap-1.5 text-sm text-white/70 mb-4">
-              <MapPin className="w-4 h-4 shrink-0" />
+            <div className="flex items-center gap-1.5 text-sm text-white/75 mb-3">
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">
                 {[tournament.venue_name, tournament.venue_city, tournament.venue_country].filter(Boolean).join(' • ')}
               </span>
             </div>
           )}
 
-          {/* Stats and CTA row */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3 text-sm text-white/90">
-              {tournament.purse && (
+          {/* Stats row with micro-icons */}
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            {tournament.purse && (
+              <div className="flex items-center gap-1 text-white/90">
+                <DollarSign className="w-3.5 h-3.5 opacity-70" />
                 <span className="font-semibold">
-                  ${(tournament.purse / 1_000_000).toFixed(1)}M
+                  {(tournament.purse / 1_000_000).toFixed(1)}M
                 </span>
-              )}
-              {tournament.venue_par && (
-                <span className="text-white/70">Par {tournament.venue_par}</span>
-              )}
-              {tournament.venue_yardage && (
-                <span className="text-white/70">{tournament.venue_yardage.toLocaleString()} yds</span>
-              )}
-            </div>
-            
-            {/* View details link */}
-            <div className="flex items-center gap-1 text-white/80 text-sm font-medium group-hover:text-white transition-colors">
-              <span>View details</span>
-              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-            </div>
+              </div>
+            )}
+            {tournament.venue_par && (
+              <div className="flex items-center gap-1 text-white/75">
+                <Flag className="w-3.5 h-3.5 opacity-70" />
+                <span>Par {tournament.venue_par}</span>
+              </div>
+            )}
+            {tournament.venue_yardage && (
+              <div className="flex items-center gap-1 text-white/75">
+                <Ruler className="w-3.5 h-3.5 opacity-70" />
+                <span>{tournament.venue_yardage.toLocaleString()} yds</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
