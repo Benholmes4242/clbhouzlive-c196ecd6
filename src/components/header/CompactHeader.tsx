@@ -72,7 +72,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Theme-specific styling - using CSS variables
   const LIGHT_BG = 'hsl(210 40% 98% / 0.95)';
-  const LIGHT_BORDER = 'hsl(0 0% 0% / 0.06)';
+  const LIGHT_BORDER = 'hsl(215 25% 27% / 0.2)'; // slate-800/20 equivalent
   const DIM_BG = 'hsl(var(--clubhouse-dim-bg-header))';
   const DIM_BORDER = 'hsl(var(--clubhouse-border))';
   const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
@@ -119,7 +119,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           // No safe area padding
           height: `${headerHeight}px`,
           borderBottom: `1px solid ${getBorder()}`,
-          boxShadow: isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
+          boxShadow: 'none',
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
       >
