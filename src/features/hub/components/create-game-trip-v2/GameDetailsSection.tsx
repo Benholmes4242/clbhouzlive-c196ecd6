@@ -1,13 +1,15 @@
 /**
  * GameDetailsSection - Premium expandable details for Game mode
- * Smooth expand/collapse, refined input styling
+ * Smooth expand/collapse, custom date/time pickers
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, X, Calendar, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
+import { DatePickerSheet } from './DatePickerSheet';
+import { TimePickerSheet } from './TimePickerSheet';
 import type { HoleCount, GameType } from './types';
 
 interface GameDetailsSectionProps {
@@ -39,6 +41,9 @@ export function GameDetailsSection({
   notes,
   onNotesChange,
 }: GameDetailsSectionProps) {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -88,10 +93,15 @@ export function GameDetailsSection({
               className="pt-2 pb-3 px-3 space-y-3 rounded-xl"
               style={{ background: 'rgba(248, 250, 252, 0.8)' }}
             >
-              {/* Date & Time */}
+              {/* Date & Time - tappable buttons */}
               <div className="flex gap-2">
-                <div
-                  className="flex-1 flex items-center gap-2.5 px-3.5 py-3 rounded-xl"
+                {/* Date picker trigger */}
+                <button
+                  onClick={() => {
+                    haptic('light');
+                    setShowDatePicker(true);
+                  }}
+                  className="flex-1 flex items-center gap-2.5 px-3.5 py-3 rounded-xl transition-all active:scale-[0.98]"
                   style={{ 
                     background: '#FFFFFF',
                     border: '1px solid rgba(0, 0, 0, 0.04)',
@@ -99,18 +109,21 @@ export function GameDetailsSection({
                   }}
                 >
                   <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
-                  <input
-                    type="date"
-                    min={new Date().toISOString().split('T')[0]}
-                    value={gameDate ? format(gameDate, 'yyyy-MM-dd') : ''}
-                    onChange={(e) => onGameDateChange(e.target.value ? new Date(e.target.value) : null)}
-                    className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none min-w-0"
+                  <span 
+                    className="flex-1 text-left text-[14px] font-medium"
                     style={{ color: gameDate ? '#1e293b' : '#94a3b8' }}
-                    placeholder="Date"
-                  />
-                </div>
-                <div
-                  className="flex-1 flex items-center gap-2.5 px-3.5 py-3 rounded-xl"
+                  >
+                    {gameDate ? format(gameDate, 'EEE, MMM d') : 'Select date'}
+                  </span>
+                </button>
+
+                {/* Time picker trigger */}
+                <button
+                  onClick={() => {
+                    haptic('light');
+                    setShowTimePicker(true);
+                  }}
+                  className="flex-1 flex items-center gap-2.5 px-3.5 py-3 rounded-xl transition-all active:scale-[0.98]"
                   style={{ 
                     background: '#FFFFFF',
                     border: '1px solid rgba(0, 0, 0, 0.04)',
@@ -118,15 +131,13 @@ export function GameDetailsSection({
                   }}
                 >
                   <Clock className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
-                  <input
-                    type="time"
-                    value={gameTime}
-                    onChange={(e) => onGameTimeChange(e.target.value)}
-                    className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none min-w-0"
+                  <span 
+                    className="flex-1 text-left text-[14px] font-medium"
                     style={{ color: gameTime ? '#1e293b' : '#94a3b8' }}
-                    placeholder="Time"
-                  />
-                </div>
+                  >
+                    {gameTime || 'Select time'}
+                  </span>
+                </button>
               </div>
 
               {/* Holes */}
@@ -209,6 +220,23 @@ export function GameDetailsSection({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Date Picker Sheet */}
+      <DatePickerSheet
+        isOpen={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        value={gameDate}
+        onChange={(date) => onGameDateChange(date)}
+        minDate={new Date()}
+      />
+
+      {/* Time Picker Sheet */}
+      <TimePickerSheet
+        isOpen={showTimePicker}
+        onClose={() => setShowTimePicker(false)}
+        value={gameTime}
+        onChange={onGameTimeChange}
+      />
     </motion.div>
   );
 }
