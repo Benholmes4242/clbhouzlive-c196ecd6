@@ -79,15 +79,14 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
       className={cn(
-        "block relative w-full overflow-hidden mx-4",
+        "block relative w-full overflow-hidden",
         "transition-all duration-200 ease-out",
         "active:scale-[0.99]",
         className
       )}
       style={{ 
         height: '200px',
-        borderRadius: '16px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+        borderRadius: '0px',
       }}
     >
       {/* Background Image or Slate Fallback */}

@@ -63,7 +63,14 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
             {title}
           </motion.h1>
         ) : isSchedule ? (
-          <h1 className="flex-1 text-3xl font-bold font-league-spartan tracking-tight text-slate-800 text-center uppercase">
+          <h1 
+            className="flex-1 font-extrabold text-slate-800 text-center"
+            style={{ 
+              fontSize: '28px',
+              lineHeight: 1.1,
+              letterSpacing: '-0.5px',
+            }}
+          >
             {title}
           </h1>
         ) : (
