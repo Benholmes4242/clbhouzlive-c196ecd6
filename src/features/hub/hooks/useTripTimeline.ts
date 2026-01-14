@@ -65,7 +65,10 @@ export interface TripParticipant {
   rsvpStatus: string;
   profile?: {
     displayName: string;
+    username?: string;
     profilePhotoUrl?: string;
+    handicap?: number;
+    showHandicap?: boolean;
   };
 }
 
@@ -135,7 +138,7 @@ export function useTripTimeline(tripId: string | undefined) {
       if (userIds.length > 0) {
         const { data: profiles, error: pErr } = await supabase
           .from('user_profiles')
-          .select('id, display_name, profile_photo_url')
+          .select('id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap')
           .in('id', userIds);
         
         if (pErr) {
@@ -156,7 +159,10 @@ export function useTripTimeline(tripId: string | undefined) {
           rsvpStatus: row.rsvp_status,
           profile: profile ? {
             displayName: profile.display_name,
+            username: profile.username,
             profilePhotoUrl: profile.profile_photo_url,
+            handicap: profile.eg_handicap_index,
+            showHandicap: profile.show_handicap,
           } : undefined,
         };
       });

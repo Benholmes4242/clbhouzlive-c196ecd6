@@ -349,45 +349,99 @@ export function TripDetailContent({
         )}
 
         {activeTab === 'players' && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {participants.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8 text-sm">
-                No participants yet
+              <div className="flex flex-col items-center justify-center py-16 px-6">
+                {/* Icon container */}
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                  style={{
+                    background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                  }}
+                >
+                  <Users className="h-7 w-7 text-green-500" />
+                </div>
+                
+                {/* Title */}
+                <p className="text-[15px] font-semibold text-slate-700 mb-1">
+                  No players yet
+                </p>
+                
+                {/* Subtitle */}
+                <p className="text-[13px] text-slate-400 text-center">
+                  Invite friends to join this trip
+                </p>
               </div>
             ) : (
               participants.map((participant) => {
                 const profile = participant.profile;
-                const isParticipantHost = participant.role === 'host';
+                const isOrganizer = participant.role === 'host';
 
                 return (
                   <div
                     key={participant.id}
-                    className="flex items-center gap-3 p-3.5 rounded-2xl"
+                    className="flex items-center gap-3 p-4 rounded-2xl"
                     style={{
                       background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)',
                       border: '1px solid rgba(0, 0, 0, 0.04)',
                     }}
                   >
-                    <div className="relative">
+                    {/* Avatar with organizer badge */}
+                    <div className="relative flex-shrink-0">
                       <SquircleAvatar
                         src={profile?.profilePhotoUrl}
                         alt={profile?.displayName || 'Participant'}
-                        size={40}
+                        size={48}
+                        fallback={profile?.displayName?.[0] || '?'}
+                        className="border-2 border-white shadow-sm"
                       />
-                      {isParticipantHost && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground border-2 border-white">
-                          H
+                      {isOrganizer && (
+                        <div 
+                          className="absolute -bottom-0.5 -right-0.5 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white"
+                          style={{
+                            background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+                            borderRadius: '6px',
+                            border: '2px solid white',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                          }}
+                        >
+                          ★
                         </div>
                       )}
                     </div>
+                    
+                    {/* Player info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 font-medium text-sm">
-                        <span className="truncate">{profile?.displayName || 'Unknown'}</span>
-                        {isParticipantHost && <span className="text-[10px] text-primary">(Host)</span>}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-[15px] text-slate-800 truncate">
+                          {profile?.displayName || 'Unknown'}
+                        </span>
+                        {isOrganizer && (
+                          <span 
+                            className="px-2 py-0.5 text-[11px] font-semibold rounded-md"
+                            style={{
+                              background: 'rgba(59, 130, 246, 0.1)',
+                              color: '#2563EB',
+                            }}
+                          >
+                            Organizer
+                          </span>
+                        )}
+                        {profile?.handicap !== undefined && profile?.handicap !== null && profile?.showHandicap !== false && (
+                          <span className="text-[13px] text-slate-500">
+                            HCP {typeof profile.handicap === 'number' ? profile.handicap.toFixed(1) : profile.handicap}
+                          </span>
+                        )}
                       </div>
+                      {profile?.username && (
+                        <div className="text-[13px] text-slate-400 truncate">@{profile.username}</div>
+                      )}
                     </div>
-                    <RsvpStatusLabel status={participant.rsvpStatus} />
+                    
+                    {/* RSVP Status - use shared component with pill variant */}
+                    <RsvpStatusLabel status={participant.rsvpStatus} variant="pill" />
                   </div>
                 );
               })
