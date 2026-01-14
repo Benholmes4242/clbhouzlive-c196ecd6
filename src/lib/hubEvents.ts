@@ -8,7 +8,12 @@ export type HubEvent =
   | 'game:updated'
   | 'game:cancelled'
   | 'game:joined'
-  | 'game:left';
+  | 'game:left'
+  | 'trip:created'
+  | 'trip:updated'
+  | 'trip:cancelled'
+  | 'trip:joined'
+  | 'trip:left';
 
 export const hubEvents = new EventTarget();
 

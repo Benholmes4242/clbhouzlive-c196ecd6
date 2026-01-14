@@ -1,40 +1,41 @@
+/**
+ * useUserTripsRealtime - Realtime subscriptions for user's trips
+ * Mirrors useUserGamesRealtime for trips
+ */
+
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { hubEvents, type HubEvent } from '@/lib/hubEvents';
 
-export function useUserGamesRealtime() {
+export function useUserTripsRealtime() {
   const qc = useQueryClient();
 
   useEffect(() => {
-    // Supabase Realtime: DB → UI, filtered by user_id to avoid noisy updates
+    // Supabase Realtime: DB → UI
     const setupRealtimeListener = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
       const channel = supabase
-        .channel('games-and-participants')
-        // Games where user is host
+        .channel('trips-and-participants')
+        // Trips where user is creator
         .on('postgres_changes', { 
           event: '*', 
           schema: 'public', 
-          table: 'games',
-          filter: `host_user_id=eq.${user.id}`,
+          table: 'trips',
+          filter: `created_by=eq.${user.id}`,
         }, () => {
-          // FIX: Unified query keys - invalidate both upcoming and past
-          qc.invalidateQueries({ queryKey: ['user-games', 'upcoming'] });
-          qc.invalidateQueries({ queryKey: ['user-games', 'past'] });
+          qc.invalidateQueries({ queryKey: ['user-trips'] });
         })
-        // Participants where user is involved
+        // Trip participants where user is involved
         .on('postgres_changes', { 
           event: '*', 
           schema: 'public', 
-          table: 'game_participants',
+          table: 'trip_participants',
           filter: `user_id=eq.${user.id}`,
         }, () => {
-          // FIX: Unified query keys - invalidate both upcoming and past
-          qc.invalidateQueries({ queryKey: ['user-games', 'upcoming'] });
-          qc.invalidateQueries({ queryKey: ['user-games', 'past'] });
+          qc.invalidateQueries({ queryKey: ['user-trips'] });
         })
         .subscribe();
 
@@ -51,12 +52,8 @@ export function useUserGamesRealtime() {
 
   useEffect(() => {
     // Event Bridge: UI → UI (instant local updates)
-    const handler = () => {
-      // FIX: Unified query keys
-      qc.invalidateQueries({ queryKey: ['user-games', 'upcoming'] });
-      qc.invalidateQueries({ queryKey: ['user-games', 'past'] });
-    };
-    const types: HubEvent[] = ['game:created', 'game:updated', 'game:cancelled', 'game:joined', 'game:left'];
+    const handler = () => qc.invalidateQueries({ queryKey: ['user-trips'] });
+    const types: HubEvent[] = ['trip:created', 'trip:updated', 'trip:cancelled', 'trip:joined', 'trip:left'];
     
     types.forEach(t => hubEvents.addEventListener(t, handler));
     return () => types.forEach(t => hubEvents.removeEventListener(t, handler));

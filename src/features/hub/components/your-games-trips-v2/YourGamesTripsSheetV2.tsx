@@ -16,6 +16,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
+import { useDebounce } from '@/hooks/useDebounce';
 
 import { TabPills } from './TabPills';
 import { SearchInput } from './SearchInput';
@@ -24,6 +25,7 @@ import { PastTab } from './PastTab';
 import { TripsTab } from './TripsTab';
 import { GameDetailSheetV2 } from '../game-detail-v2';
 import { TripDetailSheetV2 } from '../trip/TripDetailSheetV2';
+import { useUserTripsRealtime } from '../../hooks/useUserTripsRealtime';
 import type { SheetTab } from './types';
 
 interface YourGamesTripsSheetV2Props {
@@ -42,7 +44,11 @@ export function YourGamesTripsSheetV2({
   onOpenCreateTrip,
 }: YourGamesTripsSheetV2Props) {
   const [activeTab, setActiveTab] = useState<SheetTab>(defaultTab);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300); // FIX: Add 300ms debounce
+  
+  // Enable trip realtime updates
+  useUserTripsRealtime();
   
   // Game detail sheet state
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -102,7 +108,7 @@ export function YourGamesTripsSheetV2({
     if (!isOpen) {
       const timer = setTimeout(() => {
         setActiveTab(defaultTab);
-        setSearchQuery('');
+        setSearchInput('');
         setSelectedGameId(null);
         setGameSheetOpen(false);
         setSelectedTripId(null);
@@ -145,7 +151,7 @@ export function YourGamesTripsSheetV2({
   const handleTabChange = useCallback((tab: SheetTab) => {
     haptic('light');
     setActiveTab(tab);
-    setSearchQuery(''); // Clear search on tab change
+    setSearchInput(''); // Clear search on tab change
   }, []);
 
   const handleCreateGame = useCallback(() => {
@@ -247,8 +253,8 @@ export function YourGamesTripsSheetV2({
             {/* Search - premium styling with inner shadow */}
             <div className="px-5 pt-4 pb-3 flex-shrink-0">
               <SearchInput
-                value={searchQuery}
-                onChange={setSearchQuery}
+                value={searchInput}
+                onChange={setSearchInput}
               />
             </div>
 
@@ -267,20 +273,20 @@ export function YourGamesTripsSheetV2({
             >
               {activeTab === 'upcoming' && (
                 <UpcomingTab
-                  searchQuery={searchQuery}
+                  searchQuery={debouncedSearch}
                   onCreateGame={handleCreateGame}
                   onGameTap={handleOpenGameDetail}
                 />
               )}
               {activeTab === 'past' && (
                 <PastTab
-                  searchQuery={searchQuery}
+                  searchQuery={debouncedSearch}
                   onGameTap={handleOpenGameDetail}
                 />
               )}
               {activeTab === 'trips' && (
                 <TripsTab
-                  searchQuery={searchQuery}
+                  searchQuery={debouncedSearch}
                   onCreateTrip={handleCreateTrip}
                   onTripTap={handleOpenTripDetail}
                 />
