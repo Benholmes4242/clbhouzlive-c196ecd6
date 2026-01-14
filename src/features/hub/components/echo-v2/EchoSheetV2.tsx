@@ -6,6 +6,7 @@
  * - Conversation persistence to Supabase
  * - Pin/Delete from history
  * - 30-day auto-purge (server-side)
+ * - 80% viewport height
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -67,6 +68,7 @@ export function EchoSheetV2({
     abortStream,
     resetConversation,
     loadConversation,
+    rateLimitCooldown,
   } = useEchoConversation({ resetOnMount: true });
 
   // Scroll-lock
@@ -137,11 +139,11 @@ export function EchoSheetV2({
 
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || rateLimitCooldown) return;
     
     sendMessage(trimmed);
     setInput('');
-  }, [input, isStreaming, sendMessage]);
+  }, [input, isStreaming, sendMessage, rateLimitCooldown]);
 
   // Safe chip/follow-up handler that respects streaming state
   const sendPrompt = useCallback((prompt: string) => {
@@ -149,9 +151,13 @@ export function EchoSheetV2({
       toast.info('Echo is still responding...');
       return;
     }
+    if (rateLimitCooldown) {
+      toast.warning(`Please wait ${rateLimitCooldown}s before sending`);
+      return;
+    }
     sendMessage(prompt);
     setInput('');
-  }, [isStreaming, sendMessage]);
+  }, [isStreaming, sendMessage, rateLimitCooldown]);
 
   const handleChipClick = useCallback((prompt: string) => {
     haptic('light');
@@ -238,54 +244,55 @@ export function EchoSheetV2({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[10001] bg-black/35 backdrop-blur-sm"
+            className="fixed inset-0 z-[10001] bg-black/40 backdrop-blur-sm"
             onClick={handleClose}
           />
 
-          {/* Sheet */}
+          {/* Sheet - 80% viewport height */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[28px] overflow-hidden",
+              "fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden",
               HUB_SHEET
             )}
-            style={{ height: '92svh', maxHeight: '92svh' }}
+            style={{ height: '80svh', maxHeight: '80svh' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-              <div className="w-9 h-[3px] rounded-full bg-black/15" />
+            <div className="flex justify-center pt-2.5 pb-1.5 flex-shrink-0">
+              <div className="w-10 h-1 rounded-full bg-black/12" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between px-5 pb-2.5 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
                 <div 
-                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
                   style={{ 
-                    background: `linear-gradient(135deg, ${ECHO_ORANGE}1F 0%, ${ECHO_ORANGE}14 100%)`,
-                    border: `1px solid ${ECHO_ORANGE}26`,
+                    background: `linear-gradient(135deg, ${ECHO_ORANGE}20 0%, ${ECHO_ORANGE}10 100%)`,
+                    border: `1.5px solid ${ECHO_ORANGE}30`,
+                    boxShadow: `0 2px 8px ${ECHO_ORANGE}15`,
                   }}
                 >
-                  <Sparkles className="w-3.5 h-3.5" style={{ color: ECHO_ORANGE }} />
+                  <Sparkles className="w-4 h-4" style={{ color: ECHO_ORANGE }} />
                 </div>
-                <h2 className="text-[17px] font-semibold text-slate-900" style={{ letterSpacing: '-0.01em' }}>
+                <h2 className="text-[18px] font-semibold text-slate-900 tracking-tight">
                   Echo
                 </h2>
               </div>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 {/* New chat button */}
                 {(hasMessages || activeTab === 'history') && (
                   <button
                     onClick={handleNewChat}
-                    className="p-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                    className="p-2.5 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
                     title="New chat"
                   >
-                    <Plus className="w-5 h-5 text-slate-600" />
+                    <Plus className="w-5 h-5 text-slate-500" />
                   </button>
                 )}
 
@@ -294,9 +301,9 @@ export function EchoSheetV2({
                   <div className="relative">
                     <button
                       onClick={handleMenuClick}
-                      className="p-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                      className="p-2.5 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
                     >
-                      <MoreVertical className="w-5 h-5 text-slate-600" />
+                      <MoreVertical className="w-5 h-5 text-slate-500" />
                     </button>
                     
                     {/* Dropdown */}
@@ -306,19 +313,20 @@ export function EchoSheetV2({
                           initial={{ opacity: 0, y: -8, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-white/95 backdrop-blur-md border border-black/10 shadow-lg z-[10003]"
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 top-full mt-1 w-44 rounded-xl overflow-hidden bg-white/98 backdrop-blur-md border border-black/10 shadow-lg z-[10003]"
                         >
                           <button
                             onClick={handleClearChat}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-black/5 text-slate-900"
+                            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-black/5 text-slate-800"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 text-slate-500" />
                             Clear chat
                           </button>
                           {conversationId && (
                             <button
                               onClick={handleDeleteChatClick}
-                              className="w-full flex items-center gap-2 px-3 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50 text-red-600 border-t border-black/5"
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium transition-all hover:bg-red-50 text-red-600 border-t border-black/5"
                             >
                               <Trash2 className="w-4 h-4" />
                               Delete this chat
@@ -333,20 +341,20 @@ export function EchoSheetV2({
                 {/* Close button */}
                 <button
                   onClick={handleClose}
-                  className="p-2 -mr-2 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
+                  className="p-2.5 -mr-1.5 rounded-full transition-all duration-150 hover:bg-black/5 active:scale-95"
                 >
-                  <X className="w-5 h-5 text-slate-600" />
+                  <X className="w-5 h-5 text-slate-500" />
                 </button>
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="px-5 pb-3 flex-shrink-0">
+            <div className="px-5 pb-2.5 flex-shrink-0">
               <EchoTabPills activeTab={activeTab} onTabChange={handleTabChange} />
             </div>
 
             {/* Divider */}
-            <div className="h-px mx-5 flex-shrink-0 bg-black/10" />
+            <div className="h-px mx-5 flex-shrink-0 bg-black/8" />
 
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (
@@ -374,6 +382,8 @@ export function EchoSheetV2({
                   onAbort={abortStream}
                   isStreaming={isStreaming}
                   autoFocus={hasMessages}
+                  disabled={!!rateLimitCooldown}
+                  cooldown={rateLimitCooldown}
                 />
               </>
             ) : (
