@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -6,10 +6,12 @@ import { Lock, Settings, Trophy, MoreVertical } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { toast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
+import { EliteGameCardSkeleton } from '@/components/achievements/EliteGameCardSkeleton';
 
 interface Achievement {
   id: string;
@@ -30,6 +32,18 @@ interface PinnedAchievementsProps {
   userProfilePhotoUrl?: string;
 }
 
+// Milestone tier info for deriving achievements
+const MILESTONE_TIERS: { threshold: number; name: string; subtitle: string }[] = [
+  { threshold: 5, name: '5 Club', subtitle: 'Rookie Club' },
+  { threshold: 10, name: '10 Club', subtitle: 'Fairway Club' },
+  { threshold: 20, name: '20 Club', subtitle: 'Founders Club' },
+  { threshold: 50, name: '50 Club', subtitle: 'Heritage Club' },
+  { threshold: 100, name: 'Century Club', subtitle: 'Century Club' },
+  { threshold: 200, name: '200 Club', subtitle: 'Elite Club' },
+  { threshold: 300, name: '300 Club', subtitle: 'Legendary Club' },
+  { threshold: 400, name: '400 Club', subtitle: 'Grand Slam Club' },
+];
+
 const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
   userId,
   isOwnProfile,
@@ -39,6 +53,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const { data: achievements = [] } = useUserAchievements(user?.id);
+  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(userId);
   const isMobile = useIsMobile();
   
   // State for pinned achievements settings
@@ -50,15 +65,20 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [showAchievementModal, setShowAchievementModal] = useState(false);
 
-  // Achievement data with tier mapping
-  const mockAchievements: Achievement[] = [
-    { id: '20-club', name: '20 Club', xp: 200, unlocked: true, description: 'Play 20 golf courses', tier: '20', subtitle: 'Founders Club' },
-    { id: '50-club', name: '50 Club', xp: 300, unlocked: true, description: 'Play 50 golf courses', tier: '50', subtitle: 'Heritage Club' },
-    { id: '100-club', name: 'Century Club', xp: 500, unlocked: false, description: 'Play 100 golf courses', tier: '100', subtitle: 'Century Club' },
-    { id: '5-club', name: '5 Club', xp: 100, unlocked: true, description: 'Play 5 golf courses', tier: '5', subtitle: 'Rookie Club' },
-    { id: '10-club', name: '10 Club', xp: 150, unlocked: true, description: 'Play 10 golf courses', tier: '10', subtitle: 'Fairway Club' },
-    { id: '200-club', name: '200 Club', xp: 600, unlocked: false, description: 'Play 200 golf courses', tier: '200', subtitle: 'Elite Club' },
-  ];
+  // Derive achievements from real Top 100 progress data
+  const totalPlayed = progressData?.totalTop100Played ?? 0;
+
+  const derivedAchievements: Achievement[] = useMemo(() => {
+    return MILESTONE_TIERS.map(tier => ({
+      id: `${tier.threshold}-club`,
+      name: tier.name,
+      xp: tier.threshold * 10,
+      unlocked: totalPlayed >= tier.threshold,
+      description: `Play ${tier.threshold} Top 100 golf courses`,
+      tier: String(tier.threshold) as EliteCardTier,
+      subtitle: tier.subtitle,
+    }));
+  }, [totalPlayed]);
 
   // Load user settings on mount
   useEffect(() => {
@@ -89,20 +109,23 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     loadUserSettings();
   }, [userId]);
 
-  // Get display achievements (pinned or top 4 by XP)
+  // Get display achievements: earned first (most recent/highest), then next target
   const getDisplayAchievements = (): Achievement[] => {
-    const unlockedAchievements = mockAchievements.filter(a => a.unlocked);
+    const earned = derivedAchievements.filter(a => a.unlocked);
+    const nextTarget = derivedAchievements.find(a => !a.unlocked);
     
+    // If pinned IDs exist, use them
     if (pinnedAchievementIds.length > 0) {
       const pinned = pinnedAchievementIds
-        .map(id => mockAchievements.find(a => a.id === id))
+        .map(id => derivedAchievements.find(a => a.id === id))
         .filter(Boolean) as Achievement[];
       return pinned.slice(0, 4);
     }
     
-    return unlockedAchievements
-      .sort((a, b) => b.xp - a.xp)
-      .slice(0, 4);
+    // Show last 3 earned + next target (up to 4 total)
+    const display: Achievement[] = [...earned.slice(-3)];
+    if (nextTarget) display.push(nextTarget);
+    return display.slice(0, 4);
   };
 
   // Check if section should be visible
@@ -217,12 +240,29 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     );
   };
 
+  // Loading skeleton
+  if (progressLoading) {
+    return (
+      <div className="w-full max-w-2xl mx-auto mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <Trophy className="w-6 h-6 text-foreground" />
+          <h3 className="text-3xl font-bold text-foreground">Achievements</h3>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map(i => (
+            <EliteGameCardSkeleton key={i} variant="compact" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!shouldShowSection()) {
     return null;
   }
 
   const displayAchievements = getDisplayAchievements();
-  const unlockedCount = mockAchievements.filter(a => a.unlocked).length;
+  const unlockedCount = derivedAchievements.filter(a => a.unlocked).length;
 
   return (
     <>
@@ -326,7 +366,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
             <div>
               <h4 className="font-semibold mb-3">Unlocked Achievements</h4>
               <div className="grid grid-cols-2 gap-3">
-                {mockAchievements
+                {derivedAchievements
                   .filter(a => a.unlocked)
                   .map(achievement => (
                     <div
@@ -366,7 +406,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
             <div>
               <h4 className="font-semibold mb-3 text-muted-foreground">Locked Achievements</h4>
               <div className="grid grid-cols-2 gap-3">
-                {mockAchievements
+                {derivedAchievements
                   .filter(a => !a.unlocked)
                   .map(achievement => (
                     <div
