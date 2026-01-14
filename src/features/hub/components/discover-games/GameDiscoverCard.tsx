@@ -106,9 +106,10 @@ export function GameDiscoverCard({
       onClick={onTap}
       className="w-full rounded-2xl p-4 transition-all duration-150 cursor-pointer active:scale-[0.98]"
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
         border: '1px solid rgba(0, 0, 0, 0.04)',
+        borderLeft: '3px solid rgba(34, 197, 94, 0.5)',
       }}
     >
       {/* Top row: Course + Visibility */}
