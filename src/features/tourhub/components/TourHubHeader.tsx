@@ -35,6 +35,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
 
   const { title, subtext } = HEADER_CONTENT[activeTab] || HEADER_CONTENT.overview;
   const isOverview = activeTab === 'overview';
+  const isSchedule = activeTab === 'schedule';
   
   return (
     <header className="pt-4 pb-3">
@@ -61,6 +62,10 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           >
             {title}
           </motion.h1>
+        ) : isSchedule ? (
+          <h1 className="flex-1 text-3xl font-bold font-league-spartan tracking-tight text-black text-center">
+            {title}
+          </h1>
         ) : (
           <h1 className="text-lg font-bold tracking-[-0.02em] text-foreground">
             {title}
