@@ -58,20 +58,17 @@ export function CTABar({ mode, isValid, isSubmitting, validationHint, onSubmit }
           className="w-full py-3.5 rounded-[14px] text-[15px] font-semibold transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           style={{
             background: isValid 
-              ? 'linear-gradient(135deg, #FF9650 0%, #FF7840 100%)'
+              ? '#e2e8f0'
               : 'rgba(0, 0, 0, 0.05)',
-            color: isValid ? 'white' : '#94a3b8',
+            color: isValid ? '#1e293b' : '#94a3b8',
             opacity: isSubmitting ? 0.85 : 1,
-            boxShadow: isValid 
-              ? '0 2px 12px rgba(255, 130, 60, 0.35), 0 1px 3px rgba(0, 0, 0, 0.1)'
-              : 'none',
             letterSpacing: '0.2px',
           }}
         >
           {isSubmitting ? (
             <>
               <motion.span 
-                className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
               />
