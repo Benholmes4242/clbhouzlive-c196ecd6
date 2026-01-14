@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MapPin } from 'lucide-react';
+import { X, MapPin, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCourseSearch, getSuggestions } from '@/hooks/useCourseSearch';
 import { getFlagCode } from '@/utils/countryFlags';
@@ -63,7 +63,6 @@ export function CourseSearchSheet({
   useEffect(() => {
     if (isOpen) {
       returnFocusRef.current = document.activeElement as HTMLElement;
-      // Lock body scroll
       const originalOverflow = document.body.style.overflow;
       const originalPaddingRight = document.body.style.paddingRight;
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -150,10 +149,14 @@ export function CourseSearchSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[10010] touch-none"
+            className="fixed inset-0 z-[10010] touch-none"
+            style={{
+              background: 'rgba(0, 0, 0, 0.4)',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+            }}
             onClick={onClose}
             onTouchMove={(e) => e.preventDefault()}
-            style={{ WebkitTouchCallout: 'none' }}
           />
 
           {/* Sheet */}
@@ -165,27 +168,28 @@ export function CourseSearchSheet({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'tween', duration: 0.2 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={`
               fixed z-[10011] overflow-hidden
               ${isMobile 
                 ? 'inset-x-0 bottom-0 rounded-t-[24px]' 
-                : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl rounded-xl'
+                : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl rounded-2xl'
               }
               flex flex-col
             `}
             style={{
               background: '#F8FAFC',
-              maxHeight: '60vh',
-              paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0
+              maxHeight: '65vh',
+              paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0,
+              boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.1)',
             }}
           >
             {/* Grabber handle */}
             {isMobile && (
-              <div className="flex justify-center pt-2.5 pb-1.5">
+              <div className="flex justify-center pt-2.5 pb-1">
                 <div 
-                  className="w-8 h-[3px] rounded-full"
-                  style={{ background: 'rgba(0, 0, 0, 0.12)' }}
+                  className="w-9 h-1 rounded-full"
+                  style={{ background: 'rgba(0, 0, 0, 0.1)' }}
                 />
               </div>
             )}
@@ -193,23 +197,28 @@ export function CourseSearchSheet({
             {/* Header */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text, #1e293b)' }}>
+                <h3 className="text-[17px] font-semibold" style={{ color: '#1e293b' }}>
                   Choose Golf Club
                 </h3>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-[0.92]"
+                  style={{ background: 'rgba(0, 0, 0, 0.04)' }}
                   aria-label="Close search"
                 >
-                  <X className="w-4 h-4" style={{ color: 'var(--hub-text-sub, #64748b)' }} />
+                  <X className="w-4 h-4" style={{ color: '#64748b' }} />
                 </button>
               </div>
               
               <div 
-                className="rounded-xl relative"
-                style={{ background: 'white' }}
+                className="rounded-xl relative flex items-center gap-2.5 px-3.5 py-3"
+                style={{ 
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(0, 0, 0, 0.06)',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
+                }}
               >
+                <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
                 <input
                   ref={inputRef}
                   type="text"
@@ -217,11 +226,8 @@ export function CourseSearchSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full px-4 py-3 pr-10 rounded-xl text-[15px] focus:outline-none"
-                  style={{ 
-                    background: 'white',
-                    color: 'var(--hub-text, #1e293b)',
-                  }}
+                  className="flex-1 text-[14px] bg-transparent outline-none"
+                  style={{ color: '#1e293b' }}
                   autoComplete="off"
                   autoCapitalize="off"
                   spellCheck="false"
@@ -229,10 +235,11 @@ export function CourseSearchSheet({
                 {query && (
                   <button
                     onClick={() => setQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 transition-all"
+                    className="p-1 rounded-full transition-all duration-150 active:scale-90"
+                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
                     aria-label="Clear search"
                   >
-                    <X className="w-4 h-4" style={{ color: '#94a3b8' }} />
+                    <X className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
                   </button>
                 )}
               </div>
@@ -241,13 +248,13 @@ export function CourseSearchSheet({
             {/* Results */}
             <div 
               ref={resultsRef}
-              className="flex-1 overflow-y-auto overscroll-contain px-2 py-2"
+              className="flex-1 overflow-y-auto overscroll-contain px-3 py-2"
             >
               {loading ? (
-                <SkeletonList rows={8} />
+                <SkeletonList rows={6} />
               ) : error ? (
                 <div className="p-8 text-center">
-                  <p className="text-sm text-muted-foreground mb-3">Trouble loading courses</p>
+                  <p className="text-[14px] mb-3" style={{ color: '#64748b' }}>Trouble loading courses</p>
                   <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
                     Retry
                   </Button>
@@ -266,15 +273,19 @@ export function CourseSearchSheet({
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {query ? "No matches found" : "Start typing to search courses"}
+                <div className="py-10 text-center">
+                  <div 
+                    className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                  >
+                    <MapPin className="w-6 h-6" style={{ color: '#94a3b8' }} />
+                  </div>
+                  <p className="text-[14px] font-medium" style={{ color: '#64748b' }}>
+                    {query ? "No courses found" : "Search for a course"}
                   </p>
-                  {!query && !suggestions.length && (
-                    <p className="text-xs text-muted-foreground">
-                      Your recent courses will appear here
-                    </p>
-                  )}
+                  <p className="text-[13px] mt-1" style={{ color: '#94a3b8' }}>
+                    {query ? "Try a different search term" : "Start typing to find courses"}
+                  </p>
                 </div>
               )}
             </div>
@@ -303,16 +314,17 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter, isAlreadyAdded }:
   };
 
   return (
-    <div
+    <motion.div
       role="button"
       tabIndex={0}
+      whileTap={!isAlreadyAdded ? { scale: 0.98 } : {}}
       className={`
-        p-3 rounded-lg cursor-pointer transition-all
-        ${isFocused ? 'ring-2 ring-slate-300' : ''}
+        p-3 rounded-xl cursor-pointer transition-all duration-150
+        ${isFocused ? 'ring-2 ring-slate-200' : ''}
         ${isAlreadyAdded ? 'opacity-50 cursor-not-allowed' : ''}
       `}
       style={{
-        background: isFocused ? 'rgba(100, 116, 139, 0.08)' : 'transparent',
+        background: isFocused ? 'rgba(0, 0, 0, 0.03)' : 'transparent',
       }}
       onClick={isAlreadyAdded ? undefined : onClick}
       onKeyDown={isAlreadyAdded ? undefined : handleKeyDown}
@@ -323,17 +335,23 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter, isAlreadyAdded }:
           <img 
             src={course.thumbnail_image} 
             alt="" 
-            className="w-12 h-12 rounded-md object-cover bg-muted flex-shrink-0"
+            className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
+            style={{ border: '1px solid rgba(0, 0, 0, 0.04)' }}
           />
         ) : (
-          <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-6 h-6 text-muted-foreground" />
+          <div 
+            className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+          >
+            <MapPin className="w-5 h-5" style={{ color: '#94a3b8' }} />
           </div>
         )}
         
         <div className="flex-1 min-w-0">
-          <div className="font-medium text-sm truncate" style={{ color: '#1e293b' }}>{course.name}</div>
-          <div className="text-xs flex items-center gap-1.5 mt-0.5" style={{ color: '#64748b' }}>
+          <div className="font-medium text-[14px] truncate" style={{ color: '#1e293b' }}>
+            {course.name}
+          </div>
+          <div className="text-[12px] flex items-center gap-1.5 mt-0.5" style={{ color: '#64748b' }}>
             <img 
               src={`https://flagicons.lipis.dev/flags/4x3/${getFlagCode(course.country).toLowerCase()}.svg`}
               alt={`${course.country} flag`}
@@ -341,33 +359,63 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter, isAlreadyAdded }:
             />
             <span className="truncate">{course.sub_country || course.region}</span>
             {course.rating && (
-              <span className="font-medium" style={{ color: '#1e293b' }}>• {course.rating.toFixed(1)}</span>
+              <span className="font-semibold" style={{ color: '#1e293b' }}>• {course.rating.toFixed(1)}</span>
             )}
           </div>
         </div>
 
         {isAlreadyAdded && (
-          <div className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
+          <div 
+            className="text-[11px] font-medium px-2 py-1 rounded-lg"
+            style={{ background: 'rgba(0, 0, 0, 0.04)', color: '#94a3b8' }}
+          >
             Added
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-function SkeletonList({ rows = 8 }: { rows?: number }) {
+function SkeletonList({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="space-y-2 p-2">
+    <div className="space-y-2 p-1">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3">
-          <div className="w-12 h-12 rounded-md bg-muted animate-pulse flex-shrink-0" />
+          <div 
+            className="w-12 h-12 rounded-xl flex-shrink-0"
+            style={{ 
+              background: 'linear-gradient(90deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.04) 100%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s infinite',
+            }}
+          />
           <div className="flex-1 space-y-2">
-            <div className="h-4 bg-muted rounded animate-pulse" />
-            <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+            <div 
+              className="h-4 rounded-lg w-3/4"
+              style={{ 
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.04) 100%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
+              }}
+            />
+            <div 
+              className="h-3 rounded-lg w-1/2"
+              style={{ 
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.04) 100%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
+              }}
+            />
           </div>
         </div>
       ))}
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
     </div>
   );
 }

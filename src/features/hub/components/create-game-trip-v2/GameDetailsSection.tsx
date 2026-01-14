@@ -1,14 +1,13 @@
 /**
- * GameDetailsSection - Expandable details for Game mode
- * Chevron rotates on expand, section background tinted, inputs card-like
+ * GameDetailsSection - Premium expandable details for Game mode
+ * Smooth expand/collapse, refined input styling
  */
 
 import React from 'react';
-import { Plus, ChevronDown, Calendar, Clock } from 'lucide-react';
+import { Plus, X, Calendar, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
-import { cn } from '@/lib/utils';
 import type { HoleCount, GameType } from './types';
 
 interface GameDetailsSectionProps {
@@ -44,7 +43,7 @@ export function GameDetailsSection({
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, ease: 'easeOut' }}
+      transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       {/* Toggle header */}
       <button
@@ -52,34 +51,28 @@ export function GameDetailsSection({
           haptic('light');
           onToggle();
         }}
-        className="w-full flex items-center justify-between py-3 text-left transition-all"
+        className="w-full flex items-center justify-between py-3 text-left transition-all group"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <motion.div
+            className="w-6 h-6 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(0, 0, 0, 0.04)' }}
             animate={{ rotate: isExpanded ? 45 : 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           >
-            <Plus 
-              className="w-4 h-4"
-              style={{ color: '#94a3b8' }}
-            />
+            {isExpanded ? (
+              <X className="w-3.5 h-3.5" style={{ color: '#64748b' }} />
+            ) : (
+              <Plus className="w-3.5 h-3.5" style={{ color: '#64748b' }} />
+            )}
           </motion.div>
           <span 
-            className="text-[14px]"
+            className="text-[14px] font-medium"
             style={{ color: '#64748b' }}
           >
-            Add details (optional)
+            {isExpanded ? 'Game details' : 'Add details (optional)'}
           </span>
         </div>
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown 
-            className="w-4 h-4"
-            style={{ color: '#94a3b8' }}
-          />
-        </motion.div>
       </button>
 
       <AnimatePresence>
@@ -88,21 +81,21 @@ export function GameDetailsSection({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="overflow-hidden"
           >
             <div 
-              className="pt-3 pb-2 px-3 space-y-4 rounded-xl"
+              className="pt-2 pb-3 px-3 space-y-3 rounded-xl"
               style={{ background: 'rgba(248, 250, 252, 0.8)' }}
             >
-              {/* Date & Time - combined visually into one row */}
+              {/* Date & Time */}
               <div className="flex gap-2">
                 <div
-                  className="flex-1 flex items-center gap-2.5 px-4 py-3.5 rounded-xl"
+                  className="flex-1 flex items-center gap-2.5 px-3.5 py-3 rounded-xl"
                   style={{ 
                     background: '#FFFFFF',
-                    border: '1px solid rgba(0, 0, 0, 0.05)',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+                    border: '1px solid rgba(0, 0, 0, 0.04)',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
                   }}
                 >
                   <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
@@ -111,17 +104,17 @@ export function GameDetailsSection({
                     min={new Date().toISOString().split('T')[0]}
                     value={gameDate ? format(gameDate, 'yyyy-MM-dd') : ''}
                     onChange={(e) => onGameDateChange(e.target.value ? new Date(e.target.value) : null)}
-                    className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none"
+                    className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none min-w-0"
                     style={{ color: gameDate ? '#1e293b' : '#94a3b8' }}
                     placeholder="Date"
                   />
                 </div>
                 <div
-                  className="flex-1 flex items-center gap-2.5 px-4 py-3.5 rounded-xl"
+                  className="flex-1 flex items-center gap-2.5 px-3.5 py-3 rounded-xl"
                   style={{ 
                     background: '#FFFFFF',
-                    border: '1px solid rgba(0, 0, 0, 0.05)',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+                    border: '1px solid rgba(0, 0, 0, 0.04)',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
                   }}
                 >
                   <Clock className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
@@ -129,7 +122,7 @@ export function GameDetailsSection({
                     type="time"
                     value={gameTime}
                     onChange={(e) => onGameTimeChange(e.target.value)}
-                    className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none"
+                    className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none min-w-0"
                     style={{ color: gameTime ? '#1e293b' : '#94a3b8' }}
                     placeholder="Time"
                   />
@@ -146,19 +139,19 @@ export function GameDetailsSection({
                       onHoleCountChange(num);
                     }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all"
+                    className="flex-1 py-2.5 rounded-xl text-[14px] font-semibold transition-all duration-150"
                     style={{
                       background: holeCount === num 
                         ? '#FFFFFF' 
                         : 'transparent',
                       border: holeCount === num
-                        ? '1px solid rgba(0, 0, 0, 0.08)'
+                        ? '1px solid rgba(0, 0, 0, 0.06)'
                         : '1px solid rgba(0, 0, 0, 0.06)',
                       color: holeCount === num 
                         ? '#1e293b' 
                         : '#94a3b8',
                       boxShadow: holeCount === num
-                        ? '0 2px 6px rgba(0, 0, 0, 0.04)'
+                        ? '0 1px 3px rgba(0, 0, 0, 0.04)'
                         : 'none',
                     }}
                   >
@@ -177,19 +170,19 @@ export function GameDetailsSection({
                       onGameTypeChange(type);
                     }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 py-3 rounded-xl text-[13px] font-semibold capitalize transition-all"
+                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold capitalize transition-all duration-150"
                     style={{
                       background: gameType === type 
                         ? '#FFFFFF' 
                         : 'transparent',
                       border: gameType === type
-                        ? '1px solid rgba(0, 0, 0, 0.08)'
+                        ? '1px solid rgba(0, 0, 0, 0.06)'
                         : '1px solid rgba(0, 0, 0, 0.06)',
                       color: gameType === type 
                         ? '#1e293b' 
                         : '#94a3b8',
                       boxShadow: gameType === type
-                        ? '0 2px 6px rgba(0, 0, 0, 0.04)'
+                        ? '0 1px 3px rgba(0, 0, 0, 0.04)'
                         : 'none',
                     }}
                   >
@@ -203,13 +196,13 @@ export function GameDetailsSection({
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
                 placeholder="Add notes..."
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl text-[14px] resize-none outline-none"
+                rows={2}
+                className="w-full px-3.5 py-3 rounded-xl text-[14px] resize-none outline-none transition-all focus:ring-2 focus:ring-slate-200"
                 style={{
                   background: '#FFFFFF',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  border: '1px solid rgba(0, 0, 0, 0.04)',
                   color: '#1e293b',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
                 }}
               />
             </div>

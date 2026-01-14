@@ -1,11 +1,12 @@
 /**
- * RestoreDraftDialog - Asks user if they want to restore a saved draft
+ * RestoreDraftDialog - Premium dialog for restoring saved drafts
+ * Refined styling, friendly tone, smooth animations
  */
 
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, RefreshCw, Trash2 } from 'lucide-react';
+import { FileText, ArrowRight, Trash2 } from 'lucide-react';
 
 interface RestoreDraftDialogProps {
   isOpen: boolean;
@@ -29,40 +30,48 @@ export function RestoreDraftDialog({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[10100]"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[10100]"
+            style={{
+              background: 'rgba(0, 0, 0, 0.4)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
           />
           
           {/* Dialog */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            exit={{ opacity: 0, scale: 0.92, y: 20 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 350 }}
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[10101] w-[90vw] max-w-[320px]"
           >
             <div
-              className="rounded-2xl overflow-hidden"
+              className="rounded-[20px] overflow-hidden"
               style={{
                 background: '#ffffff',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
               }}
             >
               {/* Header */}
-              <div className="px-6 pt-6 pb-4 text-center">
+              <div className="px-6 pt-6 pb-3 text-center">
                 <div 
-                  className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
-                  style={{ background: 'rgba(99, 102, 241, 0.1)' }}
+                  className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                  style={{ 
+                    background: 'linear-gradient(135deg, rgba(255, 150, 80, 0.15) 0%, rgba(255, 120, 64, 0.1) 100%)',
+                  }}
                 >
-                  <FileText className="w-7 h-7" style={{ color: '#6366f1' }} />
+                  <FileText className="w-7 h-7" style={{ color: '#FF8840' }} />
                 </div>
                 <h3 
-                  className="text-[18px] font-semibold mb-2"
+                  className="text-[18px] font-semibold mb-1.5"
                   style={{ color: '#1e293b' }}
                 >
                   Continue where you left off?
                 </h3>
                 <p 
-                  className="text-[14px]"
+                  className="text-[14px] leading-relaxed"
                   style={{ color: '#64748b' }}
                 >
                   You have an unsaved game draft from earlier.
@@ -70,21 +79,22 @@ export function RestoreDraftDialog({
               </div>
 
               {/* Actions */}
-              <div className="px-4 pb-4 space-y-2">
+              <div className="px-4 pb-5 pt-2 space-y-2">
                 <button
                   onClick={onContinueDraft}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[15px] font-semibold transition-all active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[15px] font-semibold transition-all duration-150 active:scale-[0.98]"
                   style={{
-                    background: '#6366f1',
+                    background: 'linear-gradient(135deg, #FF9650 0%, #FF7840 100%)',
                     color: '#ffffff',
+                    boxShadow: '0 2px 12px rgba(255, 130, 60, 0.3)',
                   }}
                 >
-                  <RefreshCw className="w-4 h-4" />
                   Continue Draft
+                  <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={onStartFresh}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[15px] font-medium transition-all active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[15px] font-medium transition-all duration-150 active:scale-[0.98]"
                   style={{
                     background: 'rgba(0, 0, 0, 0.04)',
                     color: '#64748b',
