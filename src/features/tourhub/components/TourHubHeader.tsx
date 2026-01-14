@@ -79,7 +79,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
       {/* Second row: Dynamic subtext or Schedule divider */}
       {isSchedule ? (
         <div className="flex justify-center mt-4 mb-2">
-          <div className="w-[80vw] h-px bg-slate-800/20" />
+          <div className="w-[80vw] border-t border-slate-800/20" />
         </div>
       ) : isOverview ? (
         <motion.p 

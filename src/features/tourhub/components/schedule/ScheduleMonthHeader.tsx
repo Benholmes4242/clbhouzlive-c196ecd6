@@ -38,7 +38,7 @@ export function ScheduleMonthHeader({
       
       {/* Subtle divider - exact match to Schedule title divider */}
       <div className="flex justify-center mt-4 mb-2">
-        <div className="w-[80vw] h-px bg-slate-800/20" />
+        <div className="w-[80vw] border-t border-slate-800/20" />
       </div>
     </div>
   );
