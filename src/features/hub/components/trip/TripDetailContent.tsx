@@ -324,24 +324,26 @@ export function TripDetailContent({
         )}
 
         {activeTab === 'messages' && (
-          <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-            <div 
-              className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-              style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+          <div className="flex flex-col items-center justify-center py-20 px-6">
+            {/* Icon container - soft gradient */}
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              }}
             >
-              <Flag className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.6)' }} />
+              <Flag className="h-7 w-7 text-slate-400" />
             </div>
-            <h3 
-              className="text-[15px] font-semibold mb-1"
-              style={{ color: '#1e293b' }}
-            >
+            
+            {/* Title */}
+            <p className="text-[16px] font-semibold text-slate-700 mb-1">
               Messages coming soon
-            </h3>
-            <p 
-              className="text-[13px]"
-              style={{ color: 'rgba(100, 116, 139, 0.7)' }}
-            >
-              Chat with your trip group
+            </p>
+            
+            {/* Subtitle */}
+            <p className="text-[13px] text-slate-400 text-center max-w-[240px]">
+              Chat with your trip group to plan your rounds
             </p>
           </div>
         )}
