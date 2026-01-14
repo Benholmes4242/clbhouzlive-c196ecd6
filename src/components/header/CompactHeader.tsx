@@ -143,7 +143,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />
-            {/* Wordmark - desktop only */}
             <span 
               className={cn(
                 "hidden md:inline font-semibold tracking-tight transition-colors duration-300 text-lg",
@@ -184,8 +183,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
                     useLightTheme 
                       ? isActive 
-                        ? "text-slate-800 bg-slate-900/8" 
-                        : "text-slate-600 hover:text-slate-800 hover:bg-slate-900/5"
+                        ? "text-slate-800 bg-slate-100/80" 
+                        : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
                       : isActive 
                         ? isDimmed 
                           ? "bg-white/5" 
@@ -216,7 +215,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-9 w-9", // Standardized search button size
                 useLightTheme
-                  ? "text-slate-600 hover:text-slate-800 hover:bg-slate-900/5"
+                  ? "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
                   : isDimmed 
                     ? "hover:bg-[hsl(var(--clubhouse-hover-bg))]" 
                     : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
