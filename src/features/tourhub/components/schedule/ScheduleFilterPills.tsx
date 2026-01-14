@@ -46,13 +46,13 @@ export function ScheduleFilterPills({
 
   return (
     <div 
-      className="py-2 mx-4"
+      className="py-2"
       role="tablist"
       aria-label="Filter tournaments"
     >
-      {/* Pill container with subtle background - full width to match hero card */}
+      {/* Pill container with subtle background - matches search bar width */}
       <div 
-        className="flex items-center justify-center gap-1 p-1 rounded-xl w-full"
+        className="flex items-center justify-center gap-1 p-1 rounded-xl max-w-md"
         style={{ background: '#e2e8f0' }}
       >
         {options.map((option) => {
