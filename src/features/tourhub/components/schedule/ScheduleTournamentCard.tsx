@@ -89,7 +89,7 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         // Full-bleed with pointed corners (no rounded)
         className
       )}
-      style={{ height: '180px' }}
+      style={{ height: '256px' }}
     >
       {/* Background Image or Slate Fallback */}
       {hasImage ? (
