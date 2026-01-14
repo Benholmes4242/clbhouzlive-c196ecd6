@@ -1,17 +1,19 @@
 /**
  * CreateGameTripSheetV2 - Main composer sheet for creating games/trips
- * Wired to real database creation
+ * Uses edge function for game creation to ensure notifications are sent
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
-import { useCreateGame } from '../../hooks/useCreateGame';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useCreateTrip } from '../../hooks/useCreateTrip';
+import { useGameDraftPersistence } from '../../hooks/useGameDraftPersistence';
 import { HubSharePanel, ShareEntityType } from '../share/HubSharePanel';
 
 import { ModeToggle } from './ModeToggle';
@@ -27,6 +29,7 @@ import { CTABar } from './CTABar';
 import { ChooseGolfClubSheetV2 } from './ChooseGolfClubSheetV2';
 import { AddPlayersSheetV2 } from './AddPlayersSheetV2';
 import { TripDateRangeSheet } from './TripDateRangeSheet';
+import { RestoreDraftDialog } from './RestoreDraftDialog';
 
 import type {
   SheetMode,
@@ -37,7 +40,6 @@ import type {
   SelectedCourse,
   SelectedPlayer,
   TripCourseStop,
-  GameDraft,
   TripDraft,
 } from './types';
 
@@ -48,6 +50,7 @@ interface CreateGameTripSheetV2Props {
 
 export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2Props) {
   const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
   
   // Mode state
   const [mode, setMode] = useState<SheetMode>('game');
@@ -85,10 +88,65 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
   const [createdEntityName, setCreatedEntityName] = useState<string>('');
   
   // Loading state
-  // Mutations
-  const createGameMutation = useCreateGame();
+  const [isCreating, setIsCreating] = useState(false);
+  
+  // Draft persistence
+  const {
+    hasDraft,
+    draft: pendingDraft,
+    showRestoreDialog,
+    setShowRestoreDialog,
+    saveDraft,
+    clearDraft,
+  } = useGameDraftPersistence();
+  
+  // Trip mutation
   const createTripMutation = useCreateTrip();
-  const isCreating = createGameMutation.isPending || createTripMutation.isPending;
+  
+  // Track if we've checked for draft on this open
+  const hasCheckedDraft = useRef(false);
+  
+  // Check for draft on mount
+  useEffect(() => {
+    if (isOpen && hasDraft && !hasCheckedDraft.current) {
+      hasCheckedDraft.current = true;
+      setShowRestoreDialog(true);
+    }
+    if (!isOpen) {
+      hasCheckedDraft.current = false;
+    }
+  }, [isOpen, hasDraft, setShowRestoreDialog]);
+  
+  // Save draft whenever form state changes (debounced via hook)
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    // Only save if there's meaningful data
+    if (gameCourse || tripItinerary.length > 0) {
+      saveDraft({
+        mode,
+        gameCourse,
+        gamePlayers,
+        gameVisibility,
+        gameDate: gameDate?.toISOString() || null,
+        gameTime,
+        gameHoles,
+        gameType,
+        gameNotes,
+        tripItinerary,
+        tripAttendees,
+        tripVisibility,
+        tripStartDate: tripStartDate?.toISOString() || null,
+        tripEndDate: tripEndDate?.toISOString() || null,
+        tripNotes,
+      });
+    }
+  }, [
+    isOpen, mode, gameCourse, gamePlayers, gameVisibility, 
+    gameDate, gameTime, gameHoles, gameType, gameNotes,
+    tripItinerary, tripAttendees, tripVisibility, tripStartDate, tripEndDate, tripNotes,
+    saveDraft
+  ]);
   
   // Lock body scroll when sheet is open
   useEffect(() => {
@@ -105,7 +163,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
     }
   }, [isOpen]);
   
-  // Reset state when sheet closes
+  // Reset state when sheet closes (but don't clear draft)
   useEffect(() => {
     if (!isOpen) {
       // Reset after animation completes
@@ -127,10 +185,38 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
         setTripEndDate(null);
         setTripDetailsExpanded(false);
         setTripNotes('');
+        setIsCreating(false);
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+  
+  // Handle restore draft
+  const handleRestoreDraft = useCallback(() => {
+    if (pendingDraft) {
+      setMode(pendingDraft.mode);
+      setGameCourse(pendingDraft.gameCourse);
+      setGamePlayers(pendingDraft.gamePlayers);
+      setGameVisibility(pendingDraft.gameVisibility);
+      setGameDate(pendingDraft.gameDate ? new Date(pendingDraft.gameDate) : null);
+      setGameTime(pendingDraft.gameTime);
+      setGameHoles(pendingDraft.gameHoles);
+      setGameType(pendingDraft.gameType);
+      setGameNotes(pendingDraft.gameNotes);
+      setTripItinerary(pendingDraft.tripItinerary);
+      setTripAttendees(pendingDraft.tripAttendees);
+      setTripVisibility(pendingDraft.tripVisibility);
+      setTripStartDate(pendingDraft.tripStartDate ? new Date(pendingDraft.tripStartDate) : null);
+      setTripEndDate(pendingDraft.tripEndDate ? new Date(pendingDraft.tripEndDate) : null);
+      setTripNotes(pendingDraft.tripNotes);
+    }
+    setShowRestoreDialog(false);
+  }, [pendingDraft, setShowRestoreDialog]);
+  
+  const handleStartFresh = useCallback(() => {
+    clearDraft();
+    setShowRestoreDialog(false);
+  }, [clearDraft, setShowRestoreDialog]);
   
   // Derived state
   const maxPlayers = 4;
@@ -232,31 +318,81 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
     setShowTripDatesPicker(false);
   }, []);
   
+  // Create game using edge function (ensures notifications are sent)
+  const handleCreateGame = useCallback(async () => {
+    if (!gameCourse) return;
+    
+    setIsCreating(true);
+    try {
+      // Build start time
+      let startTime = new Date().toISOString();
+      if (gameDate) {
+        const dateStr = gameDate.toISOString().split('T')[0];
+        const timeStr = gameTime || '09:00';
+        startTime = new Date(`${dateStr}T${timeStr}:00`).toISOString();
+      }
+      
+      // Call edge function instead of direct insert
+      const { data, error } = await supabase.functions.invoke('game-create', {
+        body: {
+          course_id: gameCourse.id,
+          course_name: gameCourse.name,
+          start_time: startTime,
+          visibility: gameVisibility,
+          slots_total: maxPlayers,
+          note: gameNotes || null,
+          holes: gameHoles,
+          game_type: gameType,
+          // Edge function expects tagged_user_ids and guest_participants
+          tagged_user_ids: gamePlayers
+            .filter(p => !p.isGuest)
+            .map(p => p.id),
+          guest_participants: gamePlayers
+            .filter(p => p.isGuest)
+            .map(p => ({ guest_name: p.name })),
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Clear draft on success
+      clearDraft();
+      
+      // Invalidate queries
+      queryClient.invalidateQueries({ queryKey: ['your-games-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['user-games'] });
+      
+      toast.success('Game created!');
+      
+      // Open share panel
+      if (data?.game_id || data?.game?.id) {
+        setCreatedEntityId(data.game_id || data.game.id);
+        setCreatedEntityType('game');
+        setCreatedEntityName(gameCourse.name);
+        setShowSharePanel(true);
+      } else {
+        onClose();
+      }
+    } catch (error) {
+      console.error('Failed to create game:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create game');
+    } finally {
+      setIsCreating(false);
+    }
+  }, [
+    gameCourse, gameDate, gameTime, gameVisibility, maxPlayers, 
+    gameNotes, gameHoles, gameType, gamePlayers,
+    clearDraft, queryClient, onClose
+  ]);
+  
   const handleCreate = useCallback(async () => {
     if (!canCreate) return;
     
-    try {
-      if (mode === 'game') {
-        const draft: GameDraft = {
-          courseId: gameCourse!.id,
-          playerIds: gamePlayers.filter(p => !p.isGuest).map(p => p.id),
-          guestPlayers: gamePlayers.filter(p => p.isGuest).map(p => p.name),
-          maxPlayers,
-          visibility: gameVisibility,
-          dateTime: gameDate && gameTime ? new Date(`${gameDate.toISOString().split('T')[0]}T${gameTime}`) : undefined,
-          holes: gameHoles,
-          gameType,
-          notes: gameNotes || undefined,
-        };
-        
-        const result = await createGameMutation.mutateAsync(draft);
-        
-        // Open share panel
-        setCreatedEntityId(result.gameId);
-        setCreatedEntityType('game');
-        setCreatedEntityName(gameCourse!.name);
-        setShowSharePanel(true);
-      } else {
+    if (mode === 'game') {
+      await handleCreateGame();
+    } else {
+      // Trip creation still uses the hook (can be migrated later)
+      try {
         const draft: TripDraft = {
           startDate: tripStartDate!,
           endDate: tripEndDate!,
@@ -269,21 +405,23 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
         
         const result = await createTripMutation.mutateAsync(draft);
         
+        // Clear draft on success
+        clearDraft();
+        
         // Open share panel
         setCreatedEntityId(result.tripId);
         setCreatedEntityType('trip');
         setCreatedEntityName(tripItinerary[0]?.courseName || 'Golf Trip');
         setShowSharePanel(true);
+      } catch (error) {
+        console.error('Creation failed:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to create');
       }
-    } catch (error) {
-      console.error('Creation failed:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to create');
     }
   }, [
-    canCreate, mode, gameCourse, gamePlayers, maxPlayers, gameVisibility,
-    gameDate, gameTime, gameHoles, gameType, gameNotes,
+    canCreate, mode, handleCreateGame,
     tripStartDate, tripEndDate, tripVisibility, tripAttendees, tripNotes, tripItinerary,
-    createGameMutation, createTripMutation
+    createTripMutation, clearDraft
   ]);
   
   const handleSharePanelClose = useCallback(() => {
@@ -295,6 +433,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
   if (!isOpen) return null;
   
   const portalRoot = document.getElementById('portal-root') || document.body;
+  const isSubmitting = isCreating || createTripMutation.isPending;
   
   return createPortal(
     <AnimatePresence>
@@ -494,7 +633,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             <CTABar
               mode={mode}
               isValid={canCreate}
-              isSubmitting={isCreating}
+              isSubmitting={isSubmitting}
               validationHint={validationHint}
               onSubmit={handleCreate}
             />
@@ -521,6 +660,13 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             startDate={tripStartDate}
             endDate={tripEndDate}
             onSave={handleTripDatesChange}
+          />
+          
+          {/* Restore Draft Dialog */}
+          <RestoreDraftDialog
+            isOpen={showRestoreDialog}
+            onContinueDraft={handleRestoreDraft}
+            onStartFresh={handleStartFresh}
           />
           
           {/* Share Panel - shown after creation */}

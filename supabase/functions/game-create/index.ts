@@ -46,10 +46,21 @@ Deno.serve(async (req) => {
       note,
       visibility = 'public',
       lat,
-      lng
+      lng,
+      // New fields
+      holes = 18,
+      game_type = 'casual',
     } = await req.json();
 
-    console.log('Creating game for user:', user.id, { course_name, start_time, slots_total, tagged_count: tagged_user_ids.length, guest_count: guest_participants.length });
+    console.log('Creating game for user:', user.id, { 
+      course_name, 
+      start_time, 
+      slots_total, 
+      tagged_count: tagged_user_ids.length, 
+      guest_count: guest_participants.length,
+      holes,
+      game_type 
+    });
 
     // Validate tagged players + guests don't exceed available seats
     const totalTagged = tagged_user_ids.length + guest_participants.length;
@@ -69,7 +80,7 @@ Deno.serve(async (req) => {
     const expires_at = new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
     // Create the game
-    const insertPayload = {
+    const insertPayload: Record<string, unknown> = {
       host_user_id: user.id,
       course_id,
       course_name,
@@ -81,8 +92,13 @@ Deno.serve(async (req) => {
       lat,
       lng,
       status: 'active',
-      visibility: visibility || 'public'
+      visibility: visibility || 'public',
     };
+
+    // Add holes and game_type if the columns exist (graceful handling)
+    // These fields are optional in the schema
+    if (holes) insertPayload.holes = holes;
+    if (game_type) insertPayload.game_type = game_type;
     
     console.log('Inserting game with payload:', { ...insertPayload, host_user_id: user.id });
     
@@ -146,9 +162,10 @@ Deno.serve(async (req) => {
 
       const hostName = hostProfile?.display_name || hostProfile?.username || 'Someone';
 
-      // Send notifications to tagged players
+      // Send in-app notifications AND queue push notifications
       for (const taggedUserId of tagged_user_ids) {
-        await supabase.from('notifications').insert({
+        // In-app notification
+        const notificationResult = await supabase.from('notifications').insert({
           user_id: taggedUserId,
           type: 'game_invite',
           title: 'Seat reserved for you',
@@ -160,16 +177,45 @@ Deno.serve(async (req) => {
             course_name: course_name || null,
             start_time
           }
-        });
+        }).select('id').single();
+
+        if (notificationResult.error) {
+          console.error('Error creating notification:', notificationResult.error);
+        } else {
+          console.log('Notification created for user:', taggedUserId);
+        }
+
+        // Queue push notification - get user's device tokens
+        const { data: devices } = await supabase
+          .from('user_push_devices')
+          .select('provider_id')
+          .eq('user_id', taggedUserId);
+
+        if (devices && devices.length > 0) {
+          for (const device of devices) {
+            await supabase.from('push_notification_queue').insert({
+              user_id: taggedUserId,
+              device_id: device.provider_id,
+              title: 'Game Invitation 🏌️',
+              body: `${hostName} wants you to join a round at ${course_name || 'a golf course'}`,
+              data: {
+                type: 'game_invite',
+                game_id: game.id,
+                host_id: user.id,
+              }
+            });
+          }
+          console.log('Push notifications queued for user:', taggedUserId, 'devices:', devices.length);
+        }
       }
     }
 
     // Insert guest participants
     if (guest_participants.length > 0) {
-      const guestParticipants = guest_participants.map((guest: { guest_name: string }) => ({
+      const guestParticipants = guest_participants.map((guest: { guest_name?: string; name?: string }) => ({
         game_id: game.id,
         user_id: null, // Explicitly set to null for guests
-        guest_name: guest.guest_name,
+        guest_name: guest.guest_name || guest.name, // Support both formats
         added_by_user_id: user.id,
         role: 'player',
         state: 'accepted', // Guests are auto-accepted
@@ -195,7 +241,7 @@ Deno.serve(async (req) => {
       .eq('game_id', game.id);
 
     return new Response(
-      JSON.stringify({ game, participants }),
+      JSON.stringify({ game, participants, game_id: game.id }),
       { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
