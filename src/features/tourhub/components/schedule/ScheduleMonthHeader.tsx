@@ -36,8 +36,8 @@ export function ScheduleMonthHeader({
         </span>
       </div>
       
-      {/* Subtle divider - matching Schedule title divider, breaking out of container */}
-      <div className="flex justify-center mt-3 -mx-4">
+      {/* Subtle divider - exact match to Schedule title divider */}
+      <div className="flex justify-center mt-4 mb-2">
         <div className="w-[80vw] h-px bg-slate-800/20" />
       </div>
     </div>
