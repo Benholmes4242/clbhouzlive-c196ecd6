@@ -208,14 +208,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
                 setNavRef(el);
               }}
-            className={cn(
-              "chrome-bottom-nav clubhouse-footer",
-              isClubhouseRoute
-                ? isDimmed
+              className={cn(
+                "chrome-bottom-nav clubhouse-footer",
+                isDimmed
                   ? "border-transparent backdrop-blur-0"
-                  : "border border-[hsl(var(--clubhouse-border))] border-b-0 backdrop-blur-xl"
-                : "border border-slate-200/60 border-b-0 backdrop-blur-xl"
-            )}
+                  : "backdrop-blur-xl"
+              )}
               data-chrome="bottom-nav"
               style={{
                 background: isDimmed 
@@ -223,6 +221,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   : isClubhouseRoute 
                     ? 'hsl(var(--clubhouse-bg-footer))'
                     : 'hsl(210 40% 98% / 0.95)',
+                borderTop: isDimmed ? 'none' : `0.5px solid ${isClubhouseRoute ? 'hsl(var(--clubhouse-border))' : 'hsl(215 20% 65% / 0.6)'}`,
                 backdropFilter: isDimmed ? 'none' : undefined,
                 WebkitBackdropFilter: isDimmed ? 'none' : undefined,
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
