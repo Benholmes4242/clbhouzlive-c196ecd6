@@ -1,13 +1,15 @@
 /**
  * AddPlayersSheetV2 - Bottom sheet for adding players
- * Search input, user list, Add Guest option
+ * Uses real user search from database, shows friends first
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Search, UserPlus, Check } from 'lucide-react';
+import { X, Search, UserPlus, Check, Users, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
+import { usePlayerSearch } from '../../hooks/usePlayerSearch';
+import { supabase } from '@/integrations/supabase/client';
 import type { SelectedPlayer } from './types';
 
 interface AddPlayersSheetV2Props {
@@ -18,15 +20,6 @@ interface AddPlayersSheetV2Props {
   maxPlayers?: number;
 }
 
-// Mock users for Phase 1
-const MOCK_USERS: SelectedPlayer[] = [
-  { id: '1', name: 'Alex Johnson', display_name: 'Alex', profile_photo_url: '' },
-  { id: '2', name: 'Sarah Williams', display_name: 'Sarah', profile_photo_url: '' },
-  { id: '3', name: 'Mike Thompson', display_name: 'Mike', profile_photo_url: '' },
-  { id: '4', name: 'Emily Davis', display_name: 'Emily', profile_photo_url: '' },
-  { id: '5', name: 'Chris Martin', display_name: 'Chris', profile_photo_url: '' },
-];
-
 export function AddPlayersSheetV2({ 
   isOpen, 
   onClose, 
@@ -34,22 +27,38 @@ export function AddPlayersSheetV2({
   onAddPlayer,
   maxPlayers = 4,
 }: AddPlayersSheetV2Props) {
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [guestName, setGuestName] = useState('');
   const [showGuestInput, setShowGuestInput] = useState(false);
 
-  const filteredUsers = MOCK_USERS.filter(user => 
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.display_name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get current user on mount
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id);
+    });
+  }, []);
+
+  const excludeIds = selectedPlayers.filter(p => !p.isGuest).map(p => p.id);
+  
+  const { friends, searchResults, isLoading } = usePlayerSearch({
+    currentUserId,
+    excludeIds,
+    searchQuery,
+  });
 
   const isSelected = (userId: string) => selectedPlayers.some(p => p.id === userId);
   const canAddMore = selectedPlayers.length < maxPlayers - 1;
 
-  const handleAddUser = useCallback((user: SelectedPlayer) => {
-    if (isSelected(user.id) || !canAddMore) return;
+  const handleAddUser = useCallback((player: { id: string; name: string; display_name?: string; profile_photo_url?: string }) => {
+    if (isSelected(player.id) || !canAddMore) return;
     haptic('light');
-    onAddPlayer(user);
+    onAddPlayer({
+      id: player.id,
+      name: player.name,
+      display_name: player.display_name,
+      profile_photo_url: player.profile_photo_url,
+    });
   }, [selectedPlayers, canAddMore, onAddPlayer]);
 
   const handleAddGuest = useCallback(() => {
@@ -69,7 +78,16 @@ export function AddPlayersSheetV2({
     e.stopPropagation();
   }, []);
 
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
+
   if (typeof document === 'undefined') return null;
+
+  const hasSearchQuery = searchQuery.trim().length > 0;
+  const showFriendsSection = friends.length > 0;
+  const showSearchResultsSection = hasSearchQuery && searchResults.length > 0;
+  const showNoResults = hasSearchQuery && !isLoading && friends.length === 0 && searchResults.length === 0;
 
   return createPortal(
     <AnimatePresence>
@@ -119,10 +137,10 @@ export function AddPlayersSheetV2({
                 </button>
               </div>
 
-              {/* Search */}
+              {/* Search with clear button */}
               <div className="px-5 pb-3">
                 <div
-                  className="flex items-center gap-2.5 px-4 py-3 rounded-xl"
+                  className="flex items-center gap-2.5 px-4 py-3 rounded-xl relative"
                   style={{
                     background: 'rgba(0, 0, 0, 0.04)',
                     border: '1px solid rgba(0, 0, 0, 0.04)',
@@ -133,10 +151,18 @@ export function AddPlayersSheetV2({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search players..."
+                    placeholder="Search friends or all users..."
                     className="flex-1 text-[14px] bg-transparent border-none outline-none"
                     style={{ color: 'var(--hub-text)' }}
                   />
+                  {searchQuery && (
+                    <button
+                      onClick={handleClearSearch}
+                      className="p-1 rounded-full hover:bg-black/5 transition-all"
+                    >
+                      <X className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -200,64 +226,164 @@ export function AddPlayersSheetV2({
                 </div>
               )}
 
-              {/* Users */}
-              <div className="space-y-1">
-                {filteredUsers.map(user => {
-                  const selected = isSelected(user.id);
-                  return (
-                    <button
-                      key={user.id}
-                      onClick={() => handleAddUser(user)}
-                      disabled={selected || !canAddMore}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all active:scale-[0.98] disabled:opacity-60"
-                      style={{
-                        background: selected ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
-                      }}
-                    >
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ 
-                          background: selected 
-                            ? 'rgba(16, 185, 129, 0.15)' 
-                            : 'rgba(0, 0, 0, 0.06)',
-                        }}
-                      >
-                        {user.profile_photo_url ? (
-                          <img src={user.profile_photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                        ) : (
-                          <span 
-                            className="text-[14px] font-semibold"
-                            style={{ color: selected ? '#10B981' : 'var(--hub-text-muted)' }}
-                          >
-                            {user.name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <div 
-                          className="text-[14px] font-medium"
-                          style={{ color: selected ? '#10B981' : 'var(--hub-text)' }}
-                        >
-                          {user.name}
-                        </div>
-                      </div>
-                      {selected && (
-                        <div 
-                          className="w-6 h-6 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(16, 185, 129, 0.15)' }}
-                        >
-                          <Check className="w-3.5 h-3.5" style={{ color: '#10B981' }} />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Loading state */}
+              {isLoading && (
+                <div className="py-8 text-center">
+                  <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin mx-auto" />
+                  <p className="text-[13px] mt-2" style={{ color: '#94a3b8' }}>Searching...</p>
+                </div>
+              )}
+
+              {/* Friends section */}
+              {!isLoading && showFriendsSection && (
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2 px-1">
+                    <Users className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
+                    <span className="text-[12px] font-semibold uppercase tracking-wide" style={{ color: '#94a3b8' }}>
+                      {hasSearchQuery ? 'Friends' : 'Your Friends'}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {friends.map(player => (
+                      <PlayerRow
+                        key={player.id}
+                        player={player}
+                        isSelected={isSelected(player.id)}
+                        canAdd={canAddMore}
+                        onAdd={() => handleAddUser(player)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Search results section (non-friends) */}
+              {!isLoading && showSearchResultsSection && (
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2 px-1">
+                    <Globe className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
+                    <span className="text-[12px] font-semibold uppercase tracking-wide" style={{ color: '#94a3b8' }}>
+                      All Users
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {searchResults.map(player => (
+                      <PlayerRow
+                        key={player.id}
+                        player={player}
+                        isSelected={isSelected(player.id)}
+                        canAdd={canAddMore}
+                        onAdd={() => handleAddUser(player)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* No results */}
+              {showNoResults && (
+                <div className="py-8 text-center">
+                  <p className="text-[14px]" style={{ color: '#64748b' }}>
+                    No users found for "{searchQuery}"
+                  </p>
+                  <p className="text-[13px] mt-1" style={{ color: '#94a3b8' }}>
+                    Try a different name or add as guest
+                  </p>
+                </div>
+              )}
+
+              {/* Empty state - no friends yet */}
+              {!isLoading && !hasSearchQuery && friends.length === 0 && (
+                <div className="py-8 text-center">
+                  <div 
+                    className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                  >
+                    <Users className="w-6 h-6" style={{ color: '#94a3b8' }} />
+                  </div>
+                  <p className="text-[14px] font-medium" style={{ color: '#64748b' }}>
+                    No friends yet
+                  </p>
+                  <p className="text-[13px] mt-1" style={{ color: '#94a3b8' }}>
+                    Search for users or add guests
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
         </>
       )}
     </AnimatePresence>,
     document.body
+  );
+}
+
+interface PlayerRowProps {
+  player: {
+    id: string;
+    name: string;
+    display_name?: string;
+    profile_photo_url?: string;
+    username?: string;
+  };
+  isSelected: boolean;
+  canAdd: boolean;
+  onAdd: () => void;
+}
+
+function PlayerRow({ player, isSelected, canAdd, onAdd }: PlayerRowProps) {
+  return (
+    <button
+      onClick={onAdd}
+      disabled={isSelected || !canAdd}
+      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all active:scale-[0.98] disabled:opacity-60"
+      style={{
+        background: isSelected ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
+      }}
+    >
+      <div 
+        className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden"
+        style={{ 
+          background: isSelected 
+            ? 'rgba(16, 185, 129, 0.15)' 
+            : 'rgba(0, 0, 0, 0.06)',
+        }}
+      >
+        {player.profile_photo_url ? (
+          <img src={player.profile_photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+        ) : (
+          <span 
+            className="text-[14px] font-semibold"
+            style={{ color: isSelected ? '#10B981' : 'var(--hub-text-muted)' }}
+          >
+            {player.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+      <div className="flex-1 text-left">
+        <div 
+          className="text-[14px] font-medium"
+          style={{ color: isSelected ? '#10B981' : 'var(--hub-text)' }}
+        >
+          {player.display_name || player.name}
+        </div>
+        {player.username && player.username !== player.display_name && (
+          <div 
+            className="text-[12px]"
+            style={{ color: '#94a3b8' }}
+          >
+            @{player.username}
+          </div>
+        )}
+      </div>
+      {isSelected && (
+        <div 
+          className="w-6 h-6 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(16, 185, 129, 0.15)' }}
+        >
+          <Check className="w-3.5 h-3.5" style={{ color: '#10B981' }} />
+        </div>
+      )}
+    </button>
   );
 }

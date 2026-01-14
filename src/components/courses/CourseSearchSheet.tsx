@@ -207,7 +207,7 @@ export function CourseSearchSheet({
               </div>
               
               <div 
-                className="rounded-xl"
+                className="rounded-xl relative"
                 style={{ background: 'white' }}
               >
                 <input
@@ -217,7 +217,7 @@ export function CourseSearchSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full px-4 py-3 rounded-xl text-[15px] focus:outline-none"
+                  className="w-full px-4 py-3 pr-10 rounded-xl text-[15px] focus:outline-none"
                   style={{ 
                     background: 'white',
                     color: 'var(--hub-text, #1e293b)',
@@ -226,6 +226,15 @@ export function CourseSearchSheet({
                   autoCapitalize="off"
                   spellCheck="false"
                 />
+                {query && (
+                  <button
+                    onClick={() => setQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 transition-all"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" style={{ color: '#94a3b8' }} />
+                  </button>
+                )}
               </div>
             </div>
 
