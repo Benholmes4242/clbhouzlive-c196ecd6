@@ -64,8 +64,8 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
         </h3>
 
         {/* Subcopy */}
-        <p className="text-[14px] leading-relaxed mb-6 text-slate-500 max-w-[280px] mx-auto">
-          Instant golf answers — distances, rules, course intel, gear, and trip planning.
+        <p className="text-[14px] leading-relaxed mb-6 text-slate-800 max-w-[280px] mx-auto">
+          Instant golf answers – distances, rules, course intel, gear, and trip planning.
         </p>
 
         {/* Prompt chips - single row */}
