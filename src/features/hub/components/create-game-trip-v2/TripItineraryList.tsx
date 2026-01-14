@@ -1,10 +1,11 @@
 /**
  * TripItineraryList - Timeline list of courses on the trip
  * Day badges as soft green pills, drag handle, course cards with hover lift
+ * V2: Added course removal with X button
  */
 
 import React from 'react';
-import { Plus, GripVertical, ChevronRight } from 'lucide-react';
+import { Plus, GripVertical, X } from 'lucide-react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
@@ -15,6 +16,7 @@ interface TripItineraryListProps {
   onAddCourse: () => void;
   onEditCourse: (stop: TripCourseStop) => void;
   onReorder?: (newOrder: TripCourseStop[]) => void;
+  onRemoveCourse?: (stopId: string) => void;
 }
 
 export function TripItineraryList({ 
@@ -22,8 +24,15 @@ export function TripItineraryList({
   onAddCourse, 
   onEditCourse,
   onReorder,
+  onRemoveCourse,
 }: TripItineraryListProps) {
   if (itinerary.length === 0) return null;
+
+  const handleRemove = (e: React.MouseEvent, stopId: string) => {
+    e.stopPropagation();
+    haptic('medium');
+    onRemoveCourse?.(stopId);
+  };
 
   return (
     <motion.div
@@ -52,13 +61,9 @@ export function TripItineraryList({
               value={stop}
               className="touch-none"
             >
-              <motion.button
+              <motion.div
                 whileTap={{ scale: 0.98 }}
                 whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}
-                onClick={() => {
-                  haptic('light');
-                  onEditCourse(stop);
-                }}
                 className="w-full flex items-center gap-3 p-3.5 rounded-xl text-left transition-all"
                 style={{
                   background: '#FFFFFF',
@@ -90,8 +95,14 @@ export function TripItineraryList({
                   </span>
                 </div>
 
-                {/* Course info */}
-                <div className="flex-1 min-w-0">
+                {/* Course info - tappable for edit */}
+                <button
+                  onClick={() => {
+                    haptic('light');
+                    onEditCourse(stop);
+                  }}
+                  className="flex-1 min-w-0 text-left"
+                >
                   <div 
                     className="text-[14px] font-semibold truncate"
                     style={{ color: '#1e293b' }}
@@ -119,10 +130,21 @@ export function TripItineraryList({
                       </>
                     )}
                   </div>
-                </div>
+                </button>
 
-                <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#cbd5e1' }} />
-              </motion.button>
+                {/* Remove button */}
+                <button
+                  onClick={(e) => handleRemove(e, stop.id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full flex-shrink-0 transition-all duration-150 active:scale-90"
+                  style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                  aria-label="Remove course"
+                >
+                  <X 
+                    className="w-4 h-4 transition-colors" 
+                    style={{ color: '#94a3b8' }} 
+                  />
+                </button>
+              </motion.div>
             </Reorder.Item>
           ))}
         </AnimatePresence>

@@ -312,6 +312,17 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
     console.log('Edit trip course:', stop);
   }, []);
   
+  const handleRemoveTripCourse = useCallback((stopId: string) => {
+    setTripItinerary(prev => {
+      const filtered = prev.filter(stop => stop.id !== stopId);
+      // Re-index day numbers after removal
+      return filtered.map((stop, index) => ({
+        ...stop,
+        dayIndex: index
+      }));
+    });
+  }, []);
+  
   const handleTripDatesChange = useCallback((start: Date, end: Date) => {
     setTripStartDate(start);
     setTripEndDate(end);
@@ -600,6 +611,7 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
                       onAddCourse={handleAddTripCourse}
                       onEditCourse={handleEditTripCourse}
                       onReorder={(newItinerary) => setTripItinerary(newItinerary)}
+                      onRemoveCourse={handleRemoveTripCourse}
                     />
                     
                     {/* Who's attending */}
