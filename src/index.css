@@ -1,5 +1,8 @@
 /* SF Pro fonts are used via system font stack - native on Apple devices, fallbacks on others */
 /* No external font loading needed - improves performance */
+
+/* League Spartan - Bold display font for special headings */
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
 @import './components/ai-chat/ai-chat-fixes.css';
 @import './styles/liquid-glass.css';
 @import './styles/profile-spacing.css';

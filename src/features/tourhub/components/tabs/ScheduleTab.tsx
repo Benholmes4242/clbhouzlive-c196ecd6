@@ -152,7 +152,7 @@ export function ScheduleTab() {
     <div className="min-h-screen pb-24">
       {/* Page Header - Clubhouse style */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-semibold text-black tracking-tight">
+        <h1 className="font-league-spartan text-2xl font-bold text-black tracking-tight">
           Event Schedule
         </h1>
         <button 
