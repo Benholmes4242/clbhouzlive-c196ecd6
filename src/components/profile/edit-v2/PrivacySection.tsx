@@ -17,28 +17,29 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        icon={<Shield className="w-5 h-5 text-primary" />}
+        icon={<Shield className="w-5 h-5" />}
         title="Privacy"
         subtitle="Control who can see your profile"
+        sectionType="privacy"
       />
 
       <div className={cn(
         "flex items-center justify-between p-4 rounded-xl border transition-all",
         isPublic 
           ? "bg-primary/5 border-primary/20" 
-          : "bg-muted/30 border-border"
+          : "bg-[#F8FAFC] border-[#e2e8f0]"
       )}>
         <div className="flex items-center gap-3">
           {isPublic ? (
             <Globe className="w-5 h-5 text-primary" />
           ) : (
-            <Lock className="w-5 h-5 text-muted-foreground" />
+            <Lock className="w-5 h-5 text-[#64748b]" />
           )}
           <div className="space-y-0.5">
-            <Label htmlFor="public-profile" className="text-sm font-semibold text-foreground cursor-pointer">
+            <Label htmlFor="public-profile" className="text-sm font-semibold text-[#1e293b] cursor-pointer">
               {isPublic ? 'Public Profile' : 'Private Profile'}
             </Label>
-            <p className="text-xs text-muted-foreground max-w-xs">
+            <p className="text-xs text-[#64748b] max-w-xs">
               {isPublic 
                 ? 'Anyone on Clbhouz can view your posts and golf journey.'
                 : 'Only approved followers can see your profile.'
@@ -50,7 +51,7 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
           id="public-profile"
           checked={isPublic}
           onCheckedChange={onChange}
-          className="data-[state=checked]:bg-primary"
+          className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-[#e2e8f0]"
         />
       </div>
     </div>

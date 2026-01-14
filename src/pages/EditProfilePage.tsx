@@ -409,8 +409,8 @@ const EditProfilePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#64748b]" />
       </div>
     );
   }
@@ -432,22 +432,22 @@ const EditProfilePage: React.FC = () => {
   const hasProfilePhoto = !!(formData.profilePhotoPreview || profile?.profile_photo_url);
 
   return (
-    <PageRoot className="min-h-screen flex flex-col bg-background">
+    <PageRoot className="min-h-screen flex flex-col bg-[#F8FAFC]">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border/40">
+      <header className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur border-b border-[#e2e8f0]">
         <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-0">
           {/* Back link */}
           <button
             type="button"
             onClick={handleBack}
-            className="inline-flex items-center gap-0.5 text-sm text-slate-500 hover:text-slate-400 mb-2"
+            className="inline-flex items-center gap-0.5 text-sm text-[#64748b] hover:text-[#1e293b] mb-2"
           >
             ‹ {getBackLabel()}
           </button>
           
           {/* Title */}
-          <h1 className="text-xl font-semibold text-center">Personalise your profile</h1>
-          <p className="text-sm text-muted-foreground text-center mt-0.5">
+          <h1 className="text-xl font-semibold text-center text-[#1e293b]">Personalise your profile</h1>
+          <p className="text-sm text-[#64748b] text-center mt-0.5">
             Update your photos, golf info and links in one place.
           </p>
           
@@ -597,13 +597,13 @@ const EditProfilePage: React.FC = () => {
       </main>
 
       {/* Sticky Footer - Enhanced with dirty state feedback */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur shadow-lg">
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-[#e2e8f0] bg-white/95 backdrop-blur shadow-lg">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-4">
           <button
             type="button"
             onClick={handleBack}
             disabled={saving}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+            className="text-sm font-medium text-[#64748b] hover:text-[#1e293b] transition-colors px-4 py-2"
           >
             Cancel
           </button>

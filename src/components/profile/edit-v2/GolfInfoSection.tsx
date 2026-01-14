@@ -275,9 +275,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   return (
     <div className="space-y-5">
       <SectionHeader
-        icon={<MapPin className="w-5 h-5 text-primary" />}
+        icon={<MapPin className="w-5 h-5" />}
         title="Golf Information"
         subtitle="Connect with nearby golfers and show club activity"
+        sectionType="golf"
       />
 
       <div className="space-y-5">

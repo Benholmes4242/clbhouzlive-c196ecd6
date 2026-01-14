@@ -164,13 +164,13 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg sm:max-w-xl p-0 gap-0 overflow-hidden">
-        <DialogHeader className="px-4 py-3 border-b">
-          <DialogTitle>{title}</DialogTitle>
+      <DialogContent className="max-w-lg sm:max-w-xl p-0 gap-0 overflow-hidden bg-white">
+        <DialogHeader className="px-4 py-3 border-b border-[#e2e8f0]">
+          <DialogTitle className="text-[#1e293b]">{title}</DialogTitle>
         </DialogHeader>
 
-        {/* Cropper area */}
-        <div className="relative h-[300px] sm:h-[350px] bg-black">
+        {/* Cropper area - dark background for contrast */}
+        <div className="relative h-[300px] sm:h-[350px] bg-[#1e293b]">
           <Cropper
             image={image}
             crop={crop}
@@ -187,19 +187,19 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         </div>
 
         {/* Controls */}
-        <div className="px-4 py-4 space-y-4 bg-background">
-          {/* Zoom slider */}
+        <div className="px-4 py-4 space-y-4 bg-white">
+          {/* Zoom slider - orange accent */}
           <div className="flex items-center gap-3">
-            <ZoomOut className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <ZoomOut className="w-4 h-4 text-[#64748b] flex-shrink-0" />
             <Slider
               value={[zoom]}
               onValueChange={([value]) => setZoom(value)}
               min={1}
               max={3}
               step={0.1}
-              className="flex-1"
+              className="flex-1 [&_[role=slider]]:bg-primary [&_.bg-primary]:bg-primary"
             />
-            <ZoomIn className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <ZoomIn className="w-4 h-4 text-[#64748b] flex-shrink-0" />
           </div>
 
           {/* Action buttons */}
@@ -209,7 +209,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="gap-1.5"
+              className="gap-1.5 text-[#64748b] hover:text-[#1e293b]"
             >
               <RotateCcw className="w-4 h-4" />
               Reset
@@ -222,6 +222,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 size="sm"
                 onClick={handleCancel}
                 disabled={isSaving}
+                className="border-[#e2e8f0] text-[#64748b] hover:text-[#1e293b]"
               >
                 <X className="w-4 h-4 mr-1" />
                 Cancel
@@ -231,7 +232,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 size="sm"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="gap-1.5"
+                className="gap-1.5 bg-primary text-white hover:bg-primary/90"
               >
                 <Check className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Apply'}

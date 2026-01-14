@@ -58,9 +58,10 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        icon={<FileText className="w-5 h-5 text-primary" />}
+        icon={<FileText className="w-5 h-5" />}
         title="Bio & Websites"
         subtitle="Tell people about yourself"
+        sectionType="bio"
       />
 
       <div className="space-y-5">

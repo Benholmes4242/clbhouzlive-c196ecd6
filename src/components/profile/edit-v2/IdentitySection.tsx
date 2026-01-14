@@ -20,9 +20,10 @@ export const IdentitySection: React.FC<IdentitySectionProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        icon={<User className="w-5 h-5 text-primary" />}
+        icon={<User className="w-5 h-5" />}
         title="Basic Info"
         subtitle="How you appear on Clbhouz"
+        sectionType="basic"
       />
 
       <div className="space-y-5">

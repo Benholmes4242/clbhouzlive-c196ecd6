@@ -22,10 +22,13 @@ export const ProfileSnapshotPreview: React.FC<ProfileSnapshotPreviewProps> = ({
   const hasHomeClub = homeClub && homeClub.trim() !== '';
   
   return (
-    <div className="rounded-2xl bg-white/80 border border-slate-100 p-4 flex items-center gap-3">
+    <div 
+      className="rounded-2xl bg-white border border-[#e2e8f0] p-4 flex items-center gap-3"
+      style={{ boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)' }}
+    >
       {/* Avatar - squircle spec: 1/1.05 aspect, 34% radius */}
       <div 
-        className="overflow-hidden bg-[#F8FAFC] border border-border/50 flex-shrink-0 flex items-center justify-center"
+        className="overflow-hidden bg-[#F8FAFC] border border-[#e2e8f0] flex-shrink-0 flex items-center justify-center"
         style={{
           width: '56px',
           aspectRatio: '1 / 1.05',
@@ -39,7 +42,7 @@ export const ProfileSnapshotPreview: React.FC<ProfileSnapshotPreviewProps> = ({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center text-muted-foreground">
+          <div className="h-full w-full flex items-center justify-center text-[#64748b]">
             <User className="w-6 h-6" />
           </div>
         )}
@@ -47,24 +50,24 @@ export const ProfileSnapshotPreview: React.FC<ProfileSnapshotPreviewProps> = ({
       
       {/* Info: Name + Club */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold text-slate-900 truncate">
+        <div className="text-sm font-semibold text-[#1e293b] truncate">
           {displayName || 'Your name'}
         </div>
         {hasHomeClub && (
-          <div className="text-xs text-slate-500 truncate">
+          <div className="text-xs text-[#64748b] truncate">
             {homeClub}
           </div>
         )}
       </div>
 
-      {/* HCP badge - matches profile-hcp-pill styling from ProfileHeaderCard */}
+      {/* HCP badge - matches profile-hcp-pill styling with design system colors */}
       {hasHandicap && (
         <div 
           className="ml-2 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide"
           style={{
-            background: '#EDEFF2',
-            color: '#5E666D',
-            border: '1px solid rgba(31, 36, 40, 0.06)',
+            background: '#e2e8f0',
+            color: '#64748b',
+            border: '1px solid #e2e8f0',
           }}
         >
           HCP {handicap}

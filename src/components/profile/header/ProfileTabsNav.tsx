@@ -35,11 +35,12 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   };
 
   // Tab trigger class matching Top100Hub/Discover pages exactly
-  const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50";
+  // Tab styling aligned with design system - inactive: #64748b, active: #1e293b
+  const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-[#1e293b] text-[#64748b] hover:text-[#1e293b] transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50";
 
   return (
     <section 
-      className="mt-6 border-b border-border/30"
+      className="mt-6 border-b border-[#e2e8f0] bg-[#F8FAFC]"
       onPointerDown={handlePointerDown}
     >
       <div className="px-4">
