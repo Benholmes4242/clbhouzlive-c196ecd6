@@ -7,7 +7,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Plane, Users } from 'lucide-react';
 import { useHubHeroData, HeroGameData, HeroTripData, HeroFallbackData } from '../hooks/useHubHeroData';
-import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
+import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
 import { SlotsPill } from '@/features/nearby/components/your-games/SlotsPill';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
@@ -382,7 +382,7 @@ export function UpNextHeroTile() {
         />
       </div>
 
-      <HubYourGamesSheet
+      <YourGamesTripsSheetV2
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
       />
