@@ -359,8 +359,8 @@ export function EchoSheetV2({
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (
               <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                {/* Chat content area - empty state centers, messages scroll */}
-                <div className={`flex-1 flex flex-col min-h-0 ${!hasMessages ? 'justify-center' : ''}`}>
+                {/* Chat content area - empty state at top, messages scroll */}
+                <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
                   {!hasMessages ? (
                     <EchoEmptyState
                       onChipClick={handleChipClick}
