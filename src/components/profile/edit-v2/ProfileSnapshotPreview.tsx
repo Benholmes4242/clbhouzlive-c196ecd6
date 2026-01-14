@@ -57,9 +57,16 @@ export const ProfileSnapshotPreview: React.FC<ProfileSnapshotPreviewProps> = ({
         )}
       </div>
 
-      {/* Handicap badge */}
+      {/* HCP badge - matches profile-hcp-pill styling from ProfileHeaderCard */}
       {hasHandicap && (
-        <div className="ml-2 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700">
+        <div 
+          className="ml-2 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide"
+          style={{
+            background: '#EDEFF2',
+            color: '#5E666D',
+            border: '1px solid rgba(31, 36, 40, 0.06)',
+          }}
+        >
           HCP {handicap}
         </div>
       )}
