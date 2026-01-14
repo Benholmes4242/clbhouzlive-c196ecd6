@@ -215,16 +215,16 @@ const ProfileQuestView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-slate-50">
+      <PageRoot className="min-h-screen bg-[#F8FAFC]">
         <div className="flex items-center justify-center min-h-screen">
-          <div className="w-8 h-8 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
         </div>
       </PageRoot>
     );
   }
 
   return (
-    <PageRoot className="min-h-screen bg-slate-50">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       {/* Header - Back CTA top left, centered title + subtitle */}
       <div className="relative safe-top px-4 pt-4">
         {/* Back link */}
