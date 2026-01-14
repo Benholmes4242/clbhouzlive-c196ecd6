@@ -41,11 +41,18 @@ export function RestoreDraftDialog({
           
           {/* Dialog */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 20 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[10101] w-[90vw] max-w-[320px]"
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.92 }}
+            transition={{ type: 'tween', duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed z-[10101]"
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 'calc(100% - 48px)',
+              maxWidth: '320px',
+            }}
           >
             <div
               className="rounded-[20px] overflow-hidden"
