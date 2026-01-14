@@ -1,7 +1,6 @@
 /**
- * PlayersCard - Tappable composer card for adding players
- * Shows chips when players selected, + Add affordance
- * Ghost chip when at max
+ * PlayersCard - Premium composer card for adding players
+ * Refined chips, smooth animations, clear visual hierarchy
  */
 
 import React from 'react';
@@ -36,16 +35,16 @@ export function PlayersCard({
       <motion.button
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.18, ease: 'easeOut' }}
-        whileTap={{ scale: 0.98, opacity: 0.9 }}
+        transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+        whileTap={{ scale: 0.985 }}
         onClick={() => {
           haptic('light');
           onOpenPicker();
         }}
         className="w-full p-4 rounded-2xl text-left transition-all"
         style={{
-          background: 'rgba(100, 116, 139, 0.06)',
-          border: '1px solid rgba(100, 116, 139, 0.1)',
+          background: 'rgba(100, 116, 139, 0.05)',
+          border: '1px solid rgba(100, 116, 139, 0.08)',
         }}
       >
         <div className="flex items-center gap-3.5">
@@ -62,7 +61,7 @@ export function PlayersCard({
             {mode === 'game' ? "Who's playing?" : "Who's attending?"}
           </span>
           <div 
-            className="w-8 h-8 rounded-full flex items-center justify-center"
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-200"
             style={{ background: 'rgba(100, 116, 139, 0.08)' }}
           >
             <Plus className="w-4 h-4" style={{ color: '#64748b' }} />
@@ -77,11 +76,11 @@ export function PlayersCard({
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, ease: 'easeOut' }}
+      transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="p-4 rounded-2xl"
       style={{
-        background: 'rgba(100, 116, 139, 0.06)',
-        border: '1px solid rgba(100, 116, 139, 0.1)',
+        background: 'rgba(100, 116, 139, 0.05)',
+        border: '1px solid rgba(100, 116, 139, 0.08)',
       }}
     >
       <div className="flex items-start gap-3.5">
@@ -92,23 +91,25 @@ export function PlayersCard({
           <Users className="w-5 h-5" style={{ color: '#64748b' }} />
         </div>
         
-        <div className="flex-1 min-w-0 pt-1">
-          <div className="flex flex-wrap gap-2.5 items-center">
+        <div className="flex-1 min-w-0 pt-0.5">
+          <div className="flex flex-wrap gap-2 items-center">
             <AnimatePresence mode="popLayout">
               {displayedPlayers.map(player => (
                 <motion.div
                   key={player.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.85 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="inline-flex items-center gap-1.5 pl-2 pr-1.5 py-1.5"
+                  exit={{ opacity: 0, scale: 0.85 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  layout
+                  className="inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1"
                   style={{
                     background: player.isGuest 
-                      ? 'rgba(147, 51, 234, 0.1)' 
-                      : 'rgba(16, 185, 129, 0.1)',
+                      ? 'rgba(147, 51, 234, 0.08)' 
+                      : 'rgba(16, 185, 129, 0.08)',
                     border: player.isGuest
-                      ? '1px solid rgba(147, 51, 234, 0.2)'
-                      : '1px solid rgba(16, 185, 129, 0.2)',
+                      ? '1px solid rgba(147, 51, 234, 0.15)'
+                      : '1px solid rgba(16, 185, 129, 0.15)',
                     borderRadius: '10px',
                   }}
                 >
@@ -120,10 +121,10 @@ export function PlayersCard({
                     />
                   ) : (
                     <div 
-                      className="w-5 h-5 flex items-center justify-center text-[10px] font-semibold rounded-md"
+                      className="w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-md"
                       style={{ 
-                        background: player.isGuest ? 'rgba(147, 51, 234, 0.15)' : 'rgba(16, 185, 129, 0.15)', 
-                        color: player.isGuest ? '#9333EA' : '#10B981',
+                        background: player.isGuest ? 'rgba(147, 51, 234, 0.12)' : 'rgba(16, 185, 129, 0.12)', 
+                        color: player.isGuest ? '#9333EA' : '#059669',
                       }}
                     >
                       {(player.display_name || player.name || '?').charAt(0).toUpperCase()}
@@ -131,7 +132,7 @@ export function PlayersCard({
                   )}
                   <span 
                     className="text-[13px] font-semibold"
-                    style={{ color: player.isGuest ? '#9333EA' : '#10B981' }}
+                    style={{ color: player.isGuest ? '#7C3AED' : '#059669' }}
                   >
                     {player.display_name || player.name}
                   </span>
@@ -140,14 +141,14 @@ export function PlayersCard({
                       haptic('light');
                       onRemovePlayer(player.id);
                     }}
-                    className="w-5 h-5 flex items-center justify-center rounded-md transition-all active:scale-90"
+                    className="w-5 h-5 flex items-center justify-center rounded-md transition-all duration-150 active:scale-90"
                     style={{ 
-                      background: player.isGuest ? 'rgba(147, 51, 234, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                      background: player.isGuest ? 'rgba(147, 51, 234, 0.1)' : 'rgba(16, 185, 129, 0.1)',
                     }}
                   >
                     <X 
                       className="w-3 h-3" 
-                      style={{ color: player.isGuest ? '#9333EA' : '#10B981' }} 
+                      style={{ color: player.isGuest ? '#9333EA' : '#059669' }} 
                     />
                   </button>
                 </motion.div>
@@ -157,8 +158,8 @@ export function PlayersCard({
             {extraCount > 0 && (
               <button
                 onClick={onOpenPicker}
-                className="inline-flex items-center px-3 py-1.5 rounded-full transition-colors active:opacity-70"
-                style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+                className="inline-flex items-center px-2.5 py-1.5 rounded-lg transition-colors active:opacity-70"
+                style={{ background: 'rgba(0, 0, 0, 0.04)' }}
               >
                 <span className="text-[12px] font-medium" style={{ color: '#64748b' }}>
                   +{extraCount} more
@@ -171,14 +172,14 @@ export function PlayersCard({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="inline-flex items-center px-3 py-1.5 rounded-full"
+                className="inline-flex items-center px-2.5 py-1.5 rounded-lg"
                 style={{ 
-                  background: 'rgba(0, 0, 0, 0.03)',
+                  background: 'rgba(0, 0, 0, 0.02)',
                   border: '1px dashed rgba(0, 0, 0, 0.1)',
                 }}
               >
                 <span className="text-[12px] font-medium" style={{ color: '#94a3b8' }}>
-                  Max players reached
+                  Full group
                 </span>
               </motion.div>
             )}
@@ -189,9 +190,9 @@ export function PlayersCard({
                   haptic('light');
                   onOpenPicker();
                 }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full transition-all active:scale-[0.96]"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all duration-150 active:scale-[0.96]"
                 style={{
-                  border: '1px dashed rgba(0, 0, 0, 0.15)',
+                  border: '1px dashed rgba(0, 0, 0, 0.12)',
                 }}
               >
                 <Plus className="w-3 h-3" style={{ color: '#94a3b8' }} />

@@ -1,6 +1,6 @@
 /**
- * ModeToggle - Segmented pill toggle for Game/Trip mode
- * Glass container, raised selected state, animated sliding pill
+ * ModeToggle - Premium segmented pill toggle for Game/Trip mode
+ * Glass container, raised selected state, spring-animated sliding pill
  */
 
 import React from 'react';
@@ -22,41 +22,37 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
 
   return (
     <div
-      className="inline-flex rounded-2xl p-1 w-full relative"
+      className="inline-flex rounded-[14px] p-[3px] w-full relative"
       style={{
         background: 'rgba(0, 0, 0, 0.05)',
       }}
     >
-      {/* Sliding indicator */}
+      {/* Sliding indicator with refined shadow */}
       <motion.div
-        className="absolute top-1 bottom-1 rounded-xl"
+        className="absolute rounded-[11px]"
         style={{
-          width: 'calc(50% - 4px)',
+          top: '3px',
+          bottom: '3px',
+          width: 'calc(50% - 3px)',
           background: '#FFFFFF',
-          border: '1px solid rgba(0, 0, 0, 0.06)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 0.5px 0 rgba(255, 255, 255, 1)',
         }}
         animate={{
-          left: mode === 'game' ? '4px' : 'calc(50% + 0px)',
+          left: mode === 'game' ? '3px' : 'calc(50%)',
         }}
-        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
       />
       
       {(['game', 'trip'] as SheetMode[]).map((m) => (
         <button
           key={m}
           onClick={() => handleChange(m)}
-          className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-[14px] font-semibold transition-all duration-200 capitalize"
+          className="relative z-10 flex-1 px-4 py-2.5 rounded-[11px] text-[14px] font-semibold transition-colors duration-200 capitalize"
           style={{
-            color: mode === m ? '#1e293b' : 'rgba(100, 116, 139, 0.6)',
+            color: mode === m ? '#1e293b' : '#94a3b8',
           }}
         >
-          <motion.span
-            animate={{ opacity: mode === m ? 1 : 0.6 }}
-            transition={{ duration: 0.15 }}
-          >
-            {m}
-          </motion.span>
+          {m}
         </button>
       ))}
     </div>
