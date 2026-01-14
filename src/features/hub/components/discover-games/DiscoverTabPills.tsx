@@ -20,16 +20,11 @@ const tabs: { key: DiscoverTab; label: string }[] = [
 ];
 
 export function DiscoverTabPills({ activeTab, onTabChange }: DiscoverTabPillsProps) {
-  const handleTabChange = (tab: DiscoverTab) => {
-    haptic('light');
-    onTabChange(tab);
-  };
-
   return (
-    <div 
-      className="inline-flex items-center gap-1 p-1 rounded-full relative"
+    <div
+      className="flex p-1 rounded-[12px]"
       style={{
-        background: 'transparent',
+        background: 'rgba(0, 0, 0, 0.04)',
       }}
     >
       {tabs.map((tab) => {
@@ -37,25 +32,27 @@ export function DiscoverTabPills({ activeTab, onTabChange }: DiscoverTabPillsPro
         return (
           <button
             key={tab.key}
-            onClick={() => handleTabChange(tab.key)}
-            className="px-4 py-1.5 rounded-full text-[13px] font-medium relative z-10 transition-colors duration-150"
+            onClick={() => {
+              haptic('light');
+              onTabChange(tab.key);
+            }}
+            className="relative flex-1 py-2 px-4 text-[13px] font-semibold rounded-[10px] transition-colors duration-150"
             style={{
-              color: isActive ? '#1e293b' : 'rgba(71, 85, 105, 0.6)',
+              color: isActive ? '#1e293b' : 'rgba(100, 116, 139, 0.65)',
             }}
           >
             {isActive && (
               <motion.div
                 layoutId="discover-tab-pill"
-                className="absolute inset-0 rounded-full -z-10"
+                className="absolute inset-0 rounded-[10px]"
                 style={{
-                  background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)',
-                  border: '1px solid rgba(0, 0, 0, 0.04)',
+                  background: '#FFFFFF',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
                 }}
-                transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
               />
             )}
-            {tab.label}
+            <span className="relative z-10">{tab.label}</span>
           </button>
         );
       })}
