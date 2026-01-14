@@ -30,7 +30,8 @@ export function EchoTabPills({ activeTab, onTabChange }: EchoTabPillsProps) {
 
   return (
     <div 
-      className="flex items-center gap-1 p-1 rounded-xl bg-black/[0.04]"
+      className="flex items-center gap-1 p-1 rounded-xl"
+      style={{ background: '#e2e8f0' }}
     >
       {tabs.map((tab) => (
         <button
