@@ -5,6 +5,9 @@
  * - RequestNoteModal wired for games & trips
  * - TripDetailSheetV2 for trip details
  * - Time-of-day filter chips
+ * - Search debounce (300ms)
+ * - Real-time updates
+ * - Premium warm styling
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -12,9 +15,11 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2 } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
+import { useDebounce } from '@/hooks/useDebounce';
 
 import { useDiscoverGamesV2, type DiscoverGamesFilters, type DiscoverWhen, type DiscoverVisibility } from '../../hooks/useDiscoverGamesV2';
 import { useDiscoverTrips } from '../../hooks/useDiscoverTrips';
+import { useDiscoverRealtime } from '../../hooks/useDiscoverRealtime';
 import { useRequestJoinGame } from '../../hooks/useRequestJoinGame';
 import { useRequestJoinTrip } from '../../hooks/useRequestJoinTrip';
 import { GameDetailSheetV2 } from '../game-detail-v2';
@@ -40,7 +45,8 @@ export function DiscoverGamesBottomSheetV2({
   onClose,
 }: DiscoverGamesBottomSheetV2Props) {
   // Filter state
-  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
   const [dateFilter, setDateFilter] = useState<DateFilterValue>({ mode: 'preset', preset: 'any' });
   const [visibility, setVisibility] = useState<DiscoverVisibility>('all');
   const [activeTab, setActiveTab] = useState<DiscoverTab>('games');
@@ -53,6 +59,9 @@ export function DiscoverGamesBottomSheetV2({
   // Trip detail sheet state
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [tripSheetOpen, setTripSheetOpen] = useState(false);
+
+  // Enable real-time updates
+  useDiscoverRealtime();
   
   // Request note modal state
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -81,7 +90,7 @@ export function DiscoverGamesBottomSheetV2({
   }
   
   const filters: DiscoverGamesFilters = {
-    search,
+    search: debouncedSearch,
     when: dateFilter.mode === 'preset' ? dateFilter.preset : 'any',
     visibility,
     customStartAt: finalStartAt,
@@ -178,7 +187,7 @@ export function DiscoverGamesBottomSheetV2({
   useEffect(() => {
     if (!isOpen) {
       const timer = setTimeout(() => {
-        setSearch('');
+        setSearchInput('');
         setDateFilter({ mode: 'preset', preset: 'any' });
         setVisibility('all');
         setActiveTab('games');
@@ -281,7 +290,7 @@ export function DiscoverGamesBottomSheetV2({
             style={{
               height: '90svh',
               maxHeight: '90svh',
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
@@ -306,22 +315,14 @@ export function DiscoverGamesBottomSheetV2({
               />
             </div>
 
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-3 flex-shrink-0">
-              <div>
-                <h2 
-                  className="text-[18px] font-semibold leading-tight"
-                  style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
-                >
-                  Discover
-                </h2>
-                <p 
-                  className="text-[12px] mt-0.5"
-                  style={{ color: 'rgba(100, 116, 139, 0.8)' }}
-                >
-                  Find games and trips to join near you
-                </p>
-              </div>
+            {/* Header - clean and minimal */}
+            <div className="flex items-center justify-between px-5 pb-4 flex-shrink-0">
+              <h2 
+                className="text-[20px] font-bold leading-tight"
+                style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
+              >
+                Discover
+              </h2>
               
               <button
                 onClick={handleClose}
@@ -329,32 +330,24 @@ export function DiscoverGamesBottomSheetV2({
               >
                 <X 
                   className="w-5 h-5"
-                  style={{ color: 'rgba(100, 116, 139, 0.6)' }}
+                  style={{ color: 'rgba(100, 116, 139, 0.5)' }}
                 />
               </button>
             </div>
 
-            {/* Gradient divider */}
-            <div 
-              className="h-px mx-5 flex-shrink-0"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.06) 20%, rgba(0, 0, 0, 0.06) 80%, transparent 100%)',
-              }}
-            />
-
             {/* Tabs */}
-            <div className="px-5 pt-4 pb-2 flex-shrink-0">
+            <div className="px-5 pb-3 flex-shrink-0">
               <DiscoverTabPills
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
               />
             </div>
 
-            {/* Search */}
-            <div className="px-5 pb-2 flex-shrink-0">
+            {/* Search - premium card style */}
+            <div className="px-5 pb-3 flex-shrink-0">
               <DiscoverSearchInput
-                value={search}
-                onChange={setSearch}
+                value={searchInput}
+                onChange={setSearchInput}
               />
             </div>
 
@@ -395,11 +388,12 @@ export function DiscoverGamesBottomSheetV2({
               ) : isError ? (
                 <DiscoverEmptyState 
                   type="error"
+                  entityType={activeTab}
                   onRetry={() => activeTab === 'games' ? gamesQuery.refetch() : tripsQuery.refetch()}
                 />
               ) : activeTab === 'games' ? (
                 games.length === 0 ? (
-                  <DiscoverEmptyState type="empty" />
+                  <DiscoverEmptyState type="empty" entityType="games" />
                 ) : (
                   <div className="space-y-3">
                     {games.map((game) => (
@@ -421,7 +415,7 @@ export function DiscoverGamesBottomSheetV2({
                 )
               ) : (
                 trips.length === 0 ? (
-                  <DiscoverEmptyState type="empty" />
+                  <DiscoverEmptyState type="empty" entityType="trips" />
                 ) : (
                   <div className="space-y-3">
                     {trips.map((trip) => (

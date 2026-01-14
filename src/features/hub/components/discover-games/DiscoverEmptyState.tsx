@@ -1,16 +1,20 @@
 /**
- * DiscoverEmptyState - Empty and error states for discover games
+ * DiscoverEmptyState - Empty and error states for discover games & trips
+ * Tab-aware messaging
  */
 
 import React from 'react';
-import { Search, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, AlertCircle, RefreshCw, Plane } from 'lucide-react';
 
 interface DiscoverEmptyStateProps {
   type: 'empty' | 'error';
+  entityType?: 'games' | 'trips';
   onRetry?: () => void;
 }
 
-export function DiscoverEmptyState({ type, onRetry }: DiscoverEmptyStateProps) {
+export function DiscoverEmptyState({ type, entityType = 'games', onRetry }: DiscoverEmptyStateProps) {
+  const isTrips = entityType === 'trips';
+  
   if (type === 'error') {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -30,7 +34,7 @@ export function DiscoverEmptyState({ type, onRetry }: DiscoverEmptyStateProps) {
           className="text-[13px] mb-4"
           style={{ color: 'rgba(100, 116, 139, 0.7)' }}
         >
-          We couldn't load games. Please try again.
+          We couldn't load {isTrips ? 'trips' : 'games'}. Please try again.
         </p>
         {onRetry && (
           <button
@@ -55,19 +59,26 @@ export function DiscoverEmptyState({ type, onRetry }: DiscoverEmptyStateProps) {
         className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
         style={{ background: 'rgba(100, 116, 139, 0.08)' }}
       >
-        <Search className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.5)' }} />
+        {isTrips ? (
+          <Plane className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.5)' }} />
+        ) : (
+          <Search className="w-6 h-6" style={{ color: 'rgba(100, 116, 139, 0.5)' }} />
+        )}
       </div>
       <h3 
         className="text-[15px] font-semibold mb-1"
         style={{ color: '#1e293b' }}
       >
-        No games found
+        No {isTrips ? 'trips' : 'games'} found
       </h3>
       <p 
         className="text-[13px]"
         style={{ color: 'rgba(100, 116, 139, 0.7)' }}
       >
-        Try adjusting your filters or check back later for new games.
+        {isTrips 
+          ? 'No trips match your search criteria. Check back later!'
+          : 'Try adjusting your filters or check back later for new games.'
+        }
       </p>
     </div>
   );

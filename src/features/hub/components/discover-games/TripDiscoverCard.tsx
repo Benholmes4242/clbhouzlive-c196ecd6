@@ -107,9 +107,10 @@ export function TripDiscoverCard({
       onClick={onTap}
       className="w-full rounded-2xl overflow-hidden transition-all duration-150 cursor-pointer active:scale-[0.98]"
       style={{
-        background: 'rgba(255, 255, 255, 0.8)',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
         border: '1px solid rgba(0, 0, 0, 0.04)',
+        borderLeft: '3px solid rgba(59, 130, 246, 0.5)',
       }}
     >
       {/* Cover image if available */}
@@ -166,18 +167,13 @@ export function TripDiscoverCard({
           </p>
         )}
 
-        {/* Slots + Participants */}
+        {/* Participants */}
         <div className="flex items-center gap-3 mb-3">
           <div 
-            className={cn(
-              "flex items-center gap-1.5 px-2 py-1 rounded-full text-[12px] font-medium",
-              isFull 
-                ? "bg-gray-100 text-gray-500"
-                : "bg-emerald-50 text-emerald-700"
-            )}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[12px] font-medium bg-blue-50 text-blue-700"
           >
             <Users className="w-3.5 h-3.5" />
-            {isFull ? 'Full' : `${trip.slotsOpen} spot${trip.slotsOpen !== 1 ? 's' : ''} left`}
+            Open
           </div>
           <span 
             className="text-[12px]"
