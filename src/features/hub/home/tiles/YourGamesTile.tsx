@@ -11,7 +11,7 @@ import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequest
 import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
-import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
+import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
 import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
@@ -334,7 +334,7 @@ export function YourGamesTile() {
       </div>
       </div>
       
-      <HubYourGamesSheet
+      <YourGamesTripsSheetV2
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
       />

@@ -13,7 +13,7 @@ import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequest
 import { supabase } from '@/integrations/supabase/client';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { MapPin, Users, Clock } from 'lucide-react';
-import { HubYourGamesSheet } from '@/features/hub/components/HubYourGamesSheet';
+import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
 
 type GamePreview = {
   id: string;
@@ -278,7 +278,7 @@ export function HubGamesPreview() {
         )}
       </div>
       
-      <HubYourGamesSheet 
+      <YourGamesTripsSheetV2 
         isOpen={gamesHubOpen} 
         onClose={() => {
           setGamesHubOpen(false);
