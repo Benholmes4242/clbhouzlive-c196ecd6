@@ -46,7 +46,7 @@ interface TripDetailContentProps {
   onInviteSuccess?: () => void;
 }
 
-// V2 Glass Card component for details - matches GameDetailContent exactly
+// V2 Glass Card component for details - warm polish styling
 function DetailCard({ 
   icon: Icon, 
   title, 
@@ -62,20 +62,22 @@ function DetailCard({
     <div 
       className="flex items-center gap-3.5 p-4 rounded-2xl transition-all"
       style={{
-        background: 'rgba(255, 255, 255, 0.7)',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
-        border: '1px solid rgba(0, 0, 0, 0.03)',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
       }}
     >
       <div 
         className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
         style={{
-          background: accent ? 'rgba(59, 130, 246, 0.08)' : 'rgba(0, 0, 0, 0.03)',
+          background: accent 
+            ? 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)' 
+            : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
         }}
       >
         <Icon 
           className="w-5 h-5" 
-          style={{ color: accent ? 'rgb(59, 130, 246)' : 'rgba(30, 41, 59, 0.45)' }} 
+          style={{ color: accent ? 'rgb(59, 130, 246)' : 'rgba(30, 41, 59, 0.5)' }} 
         />
       </div>
       <div className="flex-1 min-w-0">
@@ -264,14 +266,14 @@ export function TripDetailContent({
               <div 
                 className="p-4 rounded-2xl"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.7)',
+                  background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
                   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
-                  border: '1px solid rgba(0, 0, 0, 0.03)',
+                  border: '1px solid rgba(0, 0, 0, 0.04)',
                 }}
               >
                 <div 
-                  className="text-[11px] font-medium uppercase tracking-wide mb-1.5"
-                  style={{ color: 'rgba(30, 41, 59, 0.4)' }}
+                  className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1.5"
+                  style={{ color: 'rgba(100, 116, 139, 0.5)' }}
                 >
                   Trip description
                 </div>
@@ -287,7 +289,7 @@ export function TripDetailContent({
             {/* Timeline section */}
             <div className="pt-3">
               <div 
-                className="text-[11px] font-semibold uppercase tracking-wider mb-3"
+                className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3"
                 style={{ color: 'rgba(100, 116, 139, 0.5)' }}
               >
                 Rounds
@@ -344,9 +346,9 @@ export function TripDetailContent({
                     key={participant.id}
                     className="flex items-center gap-3 p-3.5 rounded-2xl"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.7)',
+                      background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
                       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-                      border: '1px solid rgba(0, 0, 0, 0.03)',
+                      border: '1px solid rgba(0, 0, 0, 0.04)',
                     }}
                   >
                     <div className="relative">
@@ -376,11 +378,11 @@ export function TripDetailContent({
         )}
       </div>
 
-      {/* Footer with RSVP buttons - matches Game sheet */}
+      {/* Footer with RSVP buttons - warm polish styling */}
       <div 
         className="absolute bottom-0 left-0 right-0 px-5 py-3"
         style={{ 
-          background: 'rgba(249, 250, 251, 0.95)',
+          background: 'linear-gradient(180deg, rgba(253, 252, 251, 0.95) 0%, rgba(245, 243, 240, 0.98) 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderTop: '1px solid rgba(0,0,0,0.06)',

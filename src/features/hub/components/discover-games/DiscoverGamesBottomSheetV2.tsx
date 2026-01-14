@@ -23,7 +23,7 @@ import { useDiscoverRealtime } from '../../hooks/useDiscoverRealtime';
 import { useRequestJoinGame } from '../../hooks/useRequestJoinGame';
 import { useRequestJoinTrip } from '../../hooks/useRequestJoinTrip';
 import { GameDetailSheetV2 } from '../game-detail-v2';
-import { TripDetailSheetV2 } from '../trip-detail-v2';
+import { TripDetailSheetV2 } from '../trip/TripDetailSheetV2';
 import { DiscoverSearchInput } from './DiscoverSearchInput';
 import { DiscoverDatePicker, type DateFilterValue, dateFilterToQueryParams } from './DiscoverDatePicker';
 import { DiscoverVisibilityChip } from './DiscoverVisibilityChip';
@@ -456,14 +456,12 @@ export function DiscoverGamesBottomSheetV2({
             />
           )}
 
-          {/* Trip Detail Sheet (stacked) */}
+          {/* Trip Detail Sheet (stacked) - uses full trip detail with tabs */}
           {selectedTripId && (
             <TripDetailSheetV2
               isOpen={tripSheetOpen}
               onClose={handleCloseTripDetail}
               tripId={selectedTripId}
-              onRequestJoin={() => handleOpenTripRequestModal(selectedTripId)}
-              isRequesting={pendingRequestId === selectedTripId && joinTripMutation.isPending}
             />
           )}
 

@@ -143,7 +143,7 @@ export function GameDetailSheetV2({
             style={{
               height: '92svh',
               maxHeight: '92svh',
-              backgroundColor: '#F9FAFB',
+              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
             }}
           >
