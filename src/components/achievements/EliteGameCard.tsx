@@ -1,84 +1,29 @@
 /**
- * EliteGameCard - Premium Achievement Card (EA/Strava Energy)
+ * EliteGameCard - Warm Light Achievement Card
  * 
- * Canonical design based on the Global Elite 150 Club mock:
- * - Landscape rectangle with rounded corners
- * - Left-anchored hero badge (flat metallic coin/medallion)
- * - Tier-based visual escalation (color, glow, animation)
- * - Premium collectible game-reward aesthetic
+ * Clean, warm design aligned with Hub design system:
+ * - Light backgrounds with warm gradients
+ * - Two variants: 'large' (journey map) and 'compact' (grids)
+ * - Subtle hover effects only (no shimmer/glow animations)
  * 
- * Tier System:
- * - Entry (5/10/20): Clean, soft glow, bronze→silver→champagne
- * - Progression (50/100): Stronger glow, subtle animated gradient
- * - Elite (150/200): Rare feel, double-layer borders, aura
- * - Legendary (300/400): Mythic tier, animated edge, alive feel
- * 
- * Performance Rules:
- * - Animations OFF by default (enableAnimations=false in lists)
- * - Animations ON only in focus views (single card hero)
- * - Particles OFF everywhere except unlock moment + single-card hero
- * - CSS-only animations (no per-frame JS loops)
- * - Respects prefers-reduced-motion
- * - Memoized rendering
- * 
- * Also supports regional completion cards (GBI, EU, USA, WORLD)
+ * Tier System (warm light colors):
+ * - 5 Club: Warm copper/peach
+ * - 10 Club: Cool silver/slate
+ * - 20 Club: Classic gold
+ * - 50 Club: Steel blue
+ * - 100 Club: Premium black & gold
+ * - 200 Club: Warm stone
+ * - 300 Club: Royal violet
+ * - 400 Club: Radiant amber/gold
  */
 
-import React, { useMemo, memo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
-
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// HOOKS
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-
-/**
- * Hook to respect prefers-reduced-motion - updates if user changes preference
- */
-function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
-  });
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
-
-  return prefersReducedMotion;
-}
-
-/**
- * Hook for intersection-based visibility gating (only animate when visible)
- */
-function useIsVisible(threshold = 0.4): [React.RefObject<HTMLDivElement>, boolean] {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setIsVisible(true); // fallback: assume visible
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return [ref, isVisible];
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -88,208 +33,197 @@ export type EliteCardTier =
   | '5' | '10' | '20' | '50' | '100' | '150' | '200' | '300' | '400'
   | 'GBI' | 'EU' | 'USA' | 'WORLD';
 
-export type CardQuality = 'low' | 'medium' | 'high';
+export type CardVariant = 'large' | 'compact';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// TIER VISUAL CONFIGURATION
+// TIER VISUAL CONFIGURATION - WARM LIGHT COLORS
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 interface TierVisualConfig {
-  // Badge (coin/medallion) styling
-  badgeGradient: string;
-  badgeGlow: string;
-  badgeTextColor: string;
-  badgeBorderColor: string;
-  // Card styling
   cardBg: string;
   cardBorder: string;
-  cardGlow: string;
-  // Text colors
+  badgeGradient: string;
   titleColor: string;
-  clubLabelColor: string;
-  descriptorColor: string;
-  // Animation flags
-  glowIntensity: number;
-  hasAnimatedBorder: boolean;
-  hasParticles: boolean;
-  animationSpeed: number;
-  // Unique effect type for each tier
-  effectType: 'sunrise' | 'mist' | 'shimmer' | 'ember' | 'obsidian' | 'aurora' | 'crystal' | 'nebula' | 'divine' | 'emerald' | 'royal' | 'crimson' | 'cosmic';
+  subtitleColor: string;
+  progressTrack: string;
+  progressFill: string;
 }
 
-// Base tier configs - stable references
-const ENTRY_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.2, hasAnimatedBorder: false, hasParticles: false, animationSpeed: 0,
-  titleColor: '#F5F5F0', clubLabelColor: '#E8DCC8', descriptorColor: '#A0A0A0',
-};
-
-const PROGRESSION_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.3, hasAnimatedBorder: true, hasParticles: false, animationSpeed: 12,
-  titleColor: '#FFFFFF', clubLabelColor: '#FFE4A0', descriptorColor: '#B0B0B0',
-};
-
-const ELITE_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.4, hasAnimatedBorder: true, hasParticles: true, animationSpeed: 10,
-  titleColor: '#FFFFFF', clubLabelColor: '#A8E6CF', descriptorColor: '#C0C0C0',
-};
-
-const LEGENDARY_BASE: Partial<TierVisualConfig> = {
-  glowIntensity: 0.5, hasAnimatedBorder: true, hasParticles: true, animationSpeed: 8,
-  titleColor: '#FFFFFF', clubLabelColor: '#FFD700', descriptorColor: '#D0D0D0',
-};
-
-// Milestone tier configs - LIGHTER, MORE VIBRANT, UNIQUE THEMES
+// Milestone tier configs - WARM, LIGHT, FRIENDLY
 const MILESTONE_CONFIGS: Record<number, TierVisualConfig> = {
-  // 5 CLUB - Warm Sunrise: Copper/peach tones, hopeful morning light
+  // 5 CLUB - Warm copper/peach
   5: {
-    ...ENTRY_BASE as TierVisualConfig,
-    effectType: 'sunrise',
-    badgeGradient: 'linear-gradient(145deg, #D4A574 0%, #C08050 50%, #A06030 100%)',
-    badgeGlow: 'rgba(220, 160, 100, 0.6)', badgeTextColor: '#FFF5E8', badgeBorderColor: '#E8B080',
-    cardBg: 'linear-gradient(135deg, #2A2420 0%, #352D28 50%, #3D332C 100%)',
-    cardBorder: 'linear-gradient(135deg, #E8B080 0%, #C08050 100%)', cardGlow: 'rgba(220, 160, 100, 0.35)',
+    cardBg: 'linear-gradient(135deg, #FFFBF7 0%, #FFF5EB 100%)',
+    cardBorder: '#E8D4C4',
+    badgeGradient: 'linear-gradient(145deg, #D4A574 0%, #C08050 100%)',
+    titleColor: '#92610A',
+    subtitleColor: '#B8860B',
+    progressTrack: '#F5E6D3',
+    progressFill: '#D4A574',
   },
-  // 10 CLUB - Cool Mist: Clean silver with morning dew/mist feel
+  
+  // 10 CLUB - Cool silver/slate
   10: {
-    ...ENTRY_BASE as TierVisualConfig,
-    effectType: 'mist',
-    badgeGradient: 'linear-gradient(145deg, #C8D0D8 0%, #A8B4C0 50%, #8898A8 100%)',
-    badgeGlow: 'rgba(180, 200, 220, 0.6)', badgeTextColor: '#FFFFFF', badgeBorderColor: '#B8C8D8',
-    cardBg: 'linear-gradient(135deg, #1E2428 0%, #2A3238 50%, #323C44 100%)',
-    cardBorder: 'linear-gradient(135deg, #B8C8D8 0%, #8898A8 100%)', cardGlow: 'rgba(180, 200, 220, 0.35)',
+    cardBg: 'linear-gradient(135deg, #F8FAFA 0%, #F1F5F9 100%)',
+    cardBorder: '#CBD5E1',
+    badgeGradient: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)',
+    titleColor: '#475569',
+    subtitleColor: '#64748B',
+    progressTrack: '#E2E8F0',
+    progressFill: '#94A3B8',
   },
-  // 20 CLUB - Golden Shimmer: Rich champagne gold, elegant
+  
+  // 20 CLUB - Classic gold
   20: {
-    ...ENTRY_BASE as TierVisualConfig, glowIntensity: 0.25,
-    effectType: 'shimmer',
-    badgeGradient: 'linear-gradient(145deg, #F0D890 0%, #E5C158 50%, #D4AF37 100%)',
-    badgeGlow: 'rgba(240, 210, 120, 0.65)', badgeTextColor: '#FFFAE0', badgeBorderColor: '#F5D870',
-    cardBg: 'linear-gradient(135deg, #282418 0%, #342C1E 50%, #3C3424 100%)',
-    cardBorder: 'linear-gradient(135deg, #F5D870 0%, #D4AF37 100%)', cardGlow: 'rgba(240, 210, 120, 0.4)',
+    cardBg: 'linear-gradient(135deg, #FFFDF5 0%, #FEF9E7 100%)',
+    cardBorder: '#E8D888',
+    badgeGradient: 'linear-gradient(145deg, #F0C850 0%, #D4AF37 100%)',
+    titleColor: '#92740C',
+    subtitleColor: '#B8960B',
+    progressTrack: '#F5EED3',
+    progressFill: '#D4AF37',
   },
-  // 50 CLUB - Warm Ember: Deep amber/whiskey with firelight
+  
+  // 50 CLUB - Steel blue
   50: {
-    ...PROGRESSION_BASE as TierVisualConfig,
-    effectType: 'ember',
-    badgeGradient: 'linear-gradient(145deg, #FFB347 0%, #FF8C00 50%, #E07000 100%)',
-    badgeGlow: 'rgba(255, 160, 60, 0.7)', badgeTextColor: '#FFF8E0', badgeBorderColor: '#FFB040',
-    cardBg: 'linear-gradient(135deg, #2C2018 0%, #3A2A1E 50%, #443222 100%)',
-    cardBorder: 'linear-gradient(135deg, #FFB040 0%, #E07000 100%)', cardGlow: 'rgba(255, 160, 60, 0.45)',
+    cardBg: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+    cardBorder: '#94A3B8',
+    badgeGradient: 'linear-gradient(145deg, #64748B 0%, #475569 100%)',
+    titleColor: '#334155',
+    subtitleColor: '#475569',
+    progressTrack: '#E2E8F0',
+    progressFill: '#64748B',
   },
-  // 100 CLUB - Obsidian Prestige: Sleek black & gold, premium contrast
+  
+  // 100 CLUB - Premium black & gold
   100: {
-    ...PROGRESSION_BASE as TierVisualConfig, glowIntensity: 0.35,
-    effectType: 'obsidian',
-    badgeGradient: 'linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 50%, #0A0A0A 100%)',
-    badgeGlow: 'rgba(212, 175, 55, 0.7)', badgeTextColor: '#FFD700', badgeBorderColor: '#D4AF37',
-    cardBg: 'linear-gradient(135deg, #151515 0%, #1E1E1E 50%, #252525 100%)',
-    cardBorder: 'linear-gradient(135deg, #D4AF37 0%, #AA8822 50%, #D4AF37 100%)', cardGlow: 'rgba(212, 175, 55, 0.5)',
+    cardBg: 'linear-gradient(135deg, #1E1E1E 0%, #2D2D2D 100%)',
+    cardBorder: '#D4AF37',
+    badgeGradient: 'linear-gradient(145deg, #F0C850 0%, #D4AF37 100%)',
+    titleColor: '#FFFFFF',
+    subtitleColor: '#D4AF37',
+    progressTrack: '#404040',
+    progressFill: '#D4AF37',
   },
-  // 150 CLUB - Aurora Emerald: Northern lights with emerald green
+  
+  // 150 CLUB - Emerald green
   150: {
-    ...ELITE_BASE as TierVisualConfig,
-    effectType: 'aurora',
-    badgeGradient: 'linear-gradient(145deg, #50C878 0%, #2E8B57 50%, #228B22 100%)',
-    badgeGlow: 'rgba(80, 200, 120, 0.75)', badgeTextColor: '#E0FFE8', badgeBorderColor: '#60D880',
-    cardBg: 'linear-gradient(135deg, #0E1F18 0%, #162820 50%, #1E3428 100%)',
-    cardBorder: 'linear-gradient(135deg, #60D880 0%, #2E8B57 100%)', cardGlow: 'rgba(80, 200, 120, 0.5)',
+    cardBg: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+    cardBorder: '#86EFAC',
+    badgeGradient: 'linear-gradient(145deg, #4ADE80 0%, #22C55E 100%)',
+    titleColor: '#166534',
+    subtitleColor: '#22C55E',
+    progressTrack: '#D1FAE5',
+    progressFill: '#22C55E',
   },
-  // 200 CLUB - Crystal Sapphire: Ice blue with crystalline shimmer
+  
+  // 200 CLUB - Warm stone
   200: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.45,
-    effectType: 'crystal',
-    badgeGradient: 'linear-gradient(145deg, #60A0E0 0%, #3080D0 50%, #2060A0 100%)',
-    badgeGlow: 'rgba(100, 160, 240, 0.75)', badgeTextColor: '#E8F4FF', badgeBorderColor: '#70B0F0',
-    cardBg: 'linear-gradient(135deg, #101828 0%, #182030 50%, #202838 100%)',
-    cardBorder: 'linear-gradient(135deg, #70B0F0 0%, #3080D0 100%)', cardGlow: 'rgba(100, 160, 240, 0.5)',
+    cardBg: 'linear-gradient(135deg, #FAF9F7 0%, #F5F3F0 100%)',
+    cardBorder: '#D6D3D1',
+    badgeGradient: 'linear-gradient(145deg, #A8A29E 0%, #78716C 100%)',
+    titleColor: '#44403C',
+    subtitleColor: '#57534E',
+    progressTrack: '#E7E5E4',
+    progressFill: '#78716C',
   },
-  // 300 CLUB - Royal Nebula: Deep purple with cosmic energy
+  
+  // 300 CLUB - Royal violet
   300: {
-    ...LEGENDARY_BASE as TierVisualConfig,
-    effectType: 'nebula',
-    badgeGradient: 'linear-gradient(145deg, #B060D0 0%, #8040A0 50%, #602080 100%)',
-    badgeGlow: 'rgba(160, 100, 200, 0.8)', badgeTextColor: '#F8E8FF', badgeBorderColor: '#C080E0',
-    cardBg: 'linear-gradient(135deg, #1A1020 0%, #241830 50%, #2E2040 100%)',
-    cardBorder: 'linear-gradient(135deg, #C080E0 0%, #8040A0 100%)', cardGlow: 'rgba(160, 100, 200, 0.55)',
+    cardBg: 'linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%)',
+    cardBorder: '#C4B5FD',
+    badgeGradient: 'linear-gradient(145deg, #8B5CF6 0%, #7C3AED 100%)',
+    titleColor: '#5B21B6',
+    subtitleColor: '#7C3AED',
+    progressTrack: '#EDE9FE',
+    progressFill: '#8B5CF6',
   },
-  // 400 CLUB - Divine Gold: Pure radiant gold with heavenly light
+  
+  // 400 CLUB - Radiant amber/gold
   400: {
-    ...LEGENDARY_BASE as TierVisualConfig, glowIntensity: 0.6,
-    effectType: 'divine',
-    badgeGradient: 'linear-gradient(145deg, #FFE878 0%, #FFD700 30%, #F0C000 70%, #FFD700 100%)',
-    badgeGlow: 'rgba(255, 220, 80, 0.85)', badgeTextColor: '#FFFEF0', badgeBorderColor: '#FFE040',
-    cardBg: 'linear-gradient(135deg, #1E1A0E 0%, #2A2414 50%, #342C1A 100%)',
-    cardBorder: 'linear-gradient(135deg, #FFE040 0%, #FFD700 50%, #FFE878 100%)', cardGlow: 'rgba(255, 220, 80, 0.6)',
+    cardBg: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+    cardBorder: '#FCD34D',
+    badgeGradient: 'linear-gradient(145deg, #FBBF24 0%, #F59E0B 100%)',
+    titleColor: '#B45309',
+    subtitleColor: '#D97706',
+    progressTrack: '#FEF3C7',
+    progressFill: '#F59E0B',
   },
 };
 
-// Regional tier configs - unique themes for each region
+// Regional tier configs - WARM LIGHT COLORS
 const REGIONAL_CONFIGS: Record<string, TierVisualConfig> = {
-  // GBI - Emerald Isle: Rich green with Celtic heritage feel
+  // GB & Ireland - Fresh green
   GBI: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.4,
-    effectType: 'emerald',
-    badgeGradient: 'linear-gradient(145deg, #40A060 0%, #2E8B57 50%, #1E6040 100%)',
-    badgeGlow: 'rgba(60, 160, 90, 0.7)', badgeTextColor: '#E0FFE8', badgeBorderColor: '#50B070',
-    cardBg: 'linear-gradient(135deg, #0E1E14 0%, #162820 50%, #1E3428 100%)',
-    cardBorder: 'linear-gradient(135deg, #50B070 0%, #2E8B57 100%)', cardGlow: 'rgba(60, 160, 90, 0.45)',
+    cardBg: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+    cardBorder: '#86EFAC',
+    badgeGradient: 'linear-gradient(145deg, #4ADE80 0%, #22C55E 100%)',
+    titleColor: '#166534',
+    subtitleColor: '#22C55E',
+    progressTrack: '#D1FAE5',
+    progressFill: '#22C55E',
   },
-  // EU - Royal Blue: Continental elegance with European flair
+  
+  // Europe - Cool blue
   EU: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.4,
-    effectType: 'royal',
-    badgeGradient: 'linear-gradient(145deg, #4080C0 0%, #2E5B9C 50%, #1E4080 100%)',
-    badgeGlow: 'rgba(80, 130, 200, 0.7)', badgeTextColor: '#E8F0FF', badgeBorderColor: '#5090D0',
-    cardBg: 'linear-gradient(135deg, #101820 0%, #182030 50%, #202838 100%)',
-    cardBorder: 'linear-gradient(135deg, #5090D0 0%, #2E5B9C 100%)', cardGlow: 'rgba(80, 130, 200, 0.45)',
+    cardBg: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+    cardBorder: '#93C5FD',
+    badgeGradient: 'linear-gradient(145deg, #60A5FA 0%, #3B82F6 100%)',
+    titleColor: '#1E40AF',
+    subtitleColor: '#3B82F6',
+    progressTrack: '#DBEAFE',
+    progressFill: '#3B82F6',
   },
-  // USA - Crimson Spirit: Bold red with American confidence
+  
+  // USA - Heritage red
   USA: {
-    ...ELITE_BASE as TierVisualConfig, glowIntensity: 0.4,
-    effectType: 'crimson',
-    badgeGradient: 'linear-gradient(145deg, #E04040 0%, #C02020 50%, #901010 100%)',
-    badgeGlow: 'rgba(220, 80, 80, 0.7)', badgeTextColor: '#FFE8E8', badgeBorderColor: '#E05050',
-    cardBg: 'linear-gradient(135deg, #201414 0%, #2C1A1A 50%, #382020 100%)',
-    cardBorder: 'linear-gradient(135deg, #E05050 0%, #C02020 100%)', cardGlow: 'rgba(220, 80, 80, 0.45)',
+    cardBg: 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)',
+    cardBorder: '#FCA5A5',
+    badgeGradient: 'linear-gradient(145deg, #F87171 0%, #EF4444 100%)',
+    titleColor: '#B91C1C',
+    subtitleColor: '#EF4444',
+    progressTrack: '#FEE2E2',
+    progressFill: '#EF4444',
   },
-  // WORLD - Cosmic Infinity: Universal purple/gold with global prestige
+  
+  // Worldwide - Royal purple
   WORLD: {
-    ...LEGENDARY_BASE as TierVisualConfig, glowIntensity: 0.5,
-    effectType: 'cosmic',
-    badgeGradient: 'linear-gradient(145deg, #8060C0 0%, #6040A0 50%, #402080 100%)',
-    badgeGlow: 'rgba(130, 100, 200, 0.8)', badgeTextColor: '#F0E8FF', badgeBorderColor: '#9070D0',
-    cardBg: 'linear-gradient(135deg, #141020 0%, #1C1830 50%, #242040 100%)',
-    cardBorder: 'linear-gradient(135deg, #9070D0 0%, #FFD700 100%)', cardGlow: 'rgba(130, 100, 200, 0.55)',
+    cardBg: 'linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%)',
+    cardBorder: '#C4B5FD',
+    badgeGradient: 'linear-gradient(145deg, #A78BFA 0%, #8B5CF6 100%)',
+    titleColor: '#6D28D9',
+    subtitleColor: '#8B5CF6',
+    progressTrack: '#EDE9FE',
+    progressFill: '#8B5CF6',
   },
 };
 
-// Locked state config - desaturated 70%, badge hollow/etched, same layout
+// Locked state config - light, subtle appearance
 const LOCKED_CONFIG: TierVisualConfig = {
-  effectType: 'mist',
-  badgeGradient: 'linear-gradient(145deg, #3A3A40 0%, #252530 50%, #1A1A22 100%)',
-  badgeGlow: 'rgba(80, 80, 95, 0.15)', badgeTextColor: '#5A5A68', badgeBorderColor: '#4A4A58',
-  cardBg: 'linear-gradient(135deg, #151518 0%, #1E1E24 50%, #131316 100%)',
-  cardBorder: 'linear-gradient(135deg, #3A3A45 0%, #4A4A58 100%)', cardGlow: 'rgba(80, 80, 95, 0.08)',
-  titleColor: '#8A8A98', clubLabelColor: '#5A5A68', descriptorColor: '#4A4A58',
-  glowIntensity: 0, hasAnimatedBorder: false, hasParticles: false, animationSpeed: 0,
+  cardBg: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+  cardBorder: '#E2E8F0',
+  badgeGradient: 'linear-gradient(145deg, #E2E8F0 0%, #CBD5E1 100%)',
+  titleColor: '#94A3B8',
+  subtitleColor: '#CBD5E1',
+  progressTrack: '#E2E8F0',
+  progressFill: '#CBD5E1',
 };
 
 // Club names
 const CLUB_NAMES: Record<string, string> = {
-  '5': 'Rookie Club', '10': 'Fairway Club', '20': 'Founders Club', '50': 'Heritage Club',
-  '100': 'Century Club', '150': 'Global Elite', '200': 'Clubhouse Elite', '300': 'Club Champion', '400': 'World Master',
+  '5': '5 Club', '10': '10 Club', '20': '20 Club', '50': '50 Club',
+  '100': '100 Club', '150': '150 Club', '200': '200 Club', '300': '300 Club', '400': '400 Club',
   'GBI': 'GB & Ireland', 'EU': 'Continental Europe', 'USA': 'USA Top 100', 'WORLD': 'Worldwide',
 };
 
-const CLUB_DESCRIPTORS: Record<string, string> = {
-  '5': 'First steps', '10': 'Finding fairways', '20': 'Building legacy', '50': 'Proper pedigree',
-  '100': 'Rare achievement', '150': 'Worldwide dominance', '200': 'Elite status', '300': 'Legendary', '400': 'Ultimate mastery',
-  'GBI': 'Links mastery', 'EU': 'Continental conquest', 'USA': 'American dream', 'WORLD': 'Global domination',
+const TIER_NAMES: Record<string, string> = {
+  '5': 'Rookie Club', '10': 'Fairway Club', '20': 'Founders Club', '50': 'Heritage Club',
+  '100': 'Century Club', '150': 'Global Elite', '200': 'Elite Club', '300': 'Legendary Club', '400': 'Grand Slam',
 };
 
-// Regional icon helper - coin-style crests
-function getRegionalIcon(tier: string, size: string = 'w-7 h-7'): React.ReactNode {
-  const iconClass = cn(size, 'text-current drop-shadow-sm');
+// Regional icon helper
+function getRegionalIcon(tier: string, size: string = 'w-5 h-5'): React.ReactNode {
+  const iconClass = cn(size, 'text-white');
   switch (tier) {
     case 'GBI': return <FaLandmarkDome className={iconClass} />;
     case 'EU': return <GiEuropeanFlag className={iconClass} />;
@@ -299,19 +233,15 @@ function getRegionalIcon(tier: string, size: string = 'w-7 h-7'): React.ReactNod
   }
 }
 
-// Milestone tier resolver - maps any threshold to nearest defined tier
+// Milestone tier resolver
 function resolveMilestoneConfig(threshold: number): TierVisualConfig {
-  // Discrete tiers we support
-  const tiers = [5, 10, 20, 50, 100, 150, 200, 300, 400];
-  
-  // Find exact match first
   if (MILESTONE_CONFIGS[threshold]) return MILESTONE_CONFIGS[threshold];
   
-  // Bucket ranges: Entry (5-20), Progression (50-100), Elite (150-200), Legendary (300-400)
-  if (threshold <= 20) return MILESTONE_CONFIGS[Math.max(5, ...tiers.filter(t => t <= threshold))];
-  if (threshold <= 100) return MILESTONE_CONFIGS[Math.max(50, ...tiers.filter(t => t <= threshold && t >= 50))];
-  if (threshold <= 200) return MILESTONE_CONFIGS[Math.max(150, ...tiers.filter(t => t <= threshold && t >= 150))];
-  return MILESTONE_CONFIGS[Math.max(300, ...tiers.filter(t => t <= threshold && t >= 300))] || MILESTONE_CONFIGS[400];
+  const tiers = [5, 10, 20, 50, 100, 150, 200, 300, 400];
+  const closestTier = tiers.reduce((prev, curr) => 
+    Math.abs(curr - threshold) < Math.abs(prev - threshold) ? curr : prev
+  );
+  return MILESTONE_CONFIGS[closestTier] || MILESTONE_CONFIGS[20];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -325,18 +255,20 @@ export interface EliteGameCardProps {
   earned: boolean;
   /** Current progress count */
   currentProgress?: number;
-  /** Target for progress (used for regional: played/total) */
+  /** Target for progress */
   targetProgress?: number;
   /** Number of regions completed (for milestone cards) */
   regionsCompleted?: number;
-  /** Compact mode for grids (simplified, same shape) */
+  /** Card variant: 'large' for journey map, 'compact' for grids */
+  variant?: CardVariant;
+  /** @deprecated Use variant instead */
   compact?: boolean;
-  /** Enable animations (OFF by default for lists, ON for focus views) */
+  /** Enable animations (hover only) */
   enableAnimations?: boolean;
   /** Show as ghost/placeholder card */
   isGhost?: boolean;
-  /** Quality mode: low (lists), medium (default), high (focus views) */
-  quality?: CardQuality;
+  /** @deprecated Not used in new design */
+  quality?: 'low' | 'medium' | 'high';
   /** Additional CSS classes */
   className?: string;
   /** Click handler */
@@ -348,7 +280,7 @@ export interface EliteGameCardProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// ELITE GAME CARD COMPONENT (Memoized)
+// ELITE GAME CARD COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
@@ -356,25 +288,24 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   earned,
   currentProgress = 0,
   targetProgress,
-  regionsCompleted,
+  variant = 'large',
   compact = false,
-  enableAnimations = false, // OFF by default for performance
+  enableAnimations = true,
   isGhost = false,
-  quality = 'medium',
   className,
   onClick,
   title: titleOverride,
   subtitle: subtitleOverride,
 }) => {
-  // Hooks - must be called unconditionally
-  const prefersReducedMotion = useReducedMotion();
-  const [cardRef, isVisible] = useIsVisible(0.4);
+  // Determine variant from props (support legacy compact prop)
+  const cardVariant: CardVariant = compact ? 'compact' : variant;
+  const isCompact = cardVariant === 'compact';
   
   // Determine if this is a milestone or regional card
   const isRegional = ['GBI', 'EU', 'USA', 'WORLD'].includes(tier);
   const threshold = isRegional ? (targetProgress || 100) : parseInt(tier, 10);
   
-  // Get tier config - using resolver for continuous tier support
+  // Get tier config
   const earnedConfig = useMemo(() => {
     if (isRegional) return REGIONAL_CONFIGS[tier] || REGIONAL_CONFIGS['GBI'];
     return resolveMilestoneConfig(threshold);
@@ -386,656 +317,181 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
     return earnedConfig;
   }, [earned, isGhost, earnedConfig]);
   
-  // Locked tier config for subtle tier identity (tinted rim/progress)
-  const lockedTierConfig = earnedConfig;
-  
   // Get display text
-  const clubName = titleOverride || CLUB_NAMES[tier] || `${tier} Club`;
-  const descriptor = subtitleOverride || CLUB_DESCRIPTORS[tier] || 
-    (isRegional ? REGION_TAGLINES?.[tier.toLowerCase()] : MILESTONE_TAGLINES?.[threshold]) || '';
+  const displayName = titleOverride || CLUB_NAMES[tier] || `${tier} Club`;
+  const tierName = TIER_NAMES[tier] || '';
+  const subtitle = subtitleOverride || (isRegional ? REGION_TAGLINES?.[tier.toLowerCase()] : MILESTONE_TAGLINES?.[threshold]) || tierName;
   
   // Progress calculation
   const target = targetProgress || threshold;
   const progressPercent = earned ? 100 : Math.min(100, (currentProgress / target) * 100);
   const remaining = earned ? 0 : Math.max(0, target - currentProgress);
   
-  // Animation states - respect reduced motion + quality mode + visibility
-  const isLowQuality = quality === 'low';
-  const isHighQuality = quality === 'high';
-  const animationsAllowed = enableAnimations && !prefersReducedMotion && !isLowQuality && isVisible;
-  const shouldAnimate = animationsAllowed && earned && !isGhost && config.animationSpeed > 0;
-  const showParticles = shouldAnimate && config.hasParticles && isHighQuality;
+  // Hover animation props
+  const hoverProps = enableAnimations && !isGhost ? { scale: 1.02, y: -2 } : {};
   
-  // Card dimensions based on compact mode
-  const cardHeight = compact ? 'h-[72px]' : 'h-[100px]';
-  const badgeSize = compact ? 'w-11 h-11' : 'w-[64px] h-[64px]';
-  const numberSize = compact ? 'text-sm font-bold' : 'text-xl font-bold';
-  
-  // Hover states - only for earned cards
-  const hoverProps = animationsAllowed && earned && !isGhost 
-    ? { scale: 1.01, y: -1 } 
-    : {};
-  
-  return (
-    <motion.div
-      ref={cardRef}
-      className={cn(
-        'relative rounded-xl overflow-hidden select-none w-full',
-        cardHeight,
-        onClick && 'cursor-pointer',
-        isGhost && 'opacity-50',
-        className
-      )}
-      style={{
-        background: config.cardBg,
-        boxShadow: earned && !isGhost 
-          ? `0 0 30px ${config.cardGlow}, 0 0 60px ${config.cardGlow}50, 0 4px 20px rgba(0,0,0,0.4)` 
-          : '0 2px 8px rgba(0,0,0,0.2)',
-      }}
-      onClick={onClick}
-      initial={false}
-      whileHover={hoverProps}
-      whileTap={animationsAllowed && onClick ? { scale: 0.99 } : {}}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-    >
-      {/* ═══ UNIQUE BACKGROUND EFFECTS - Different for each tier ═══ */}
-      {earned && !isGhost && (
-        <>
-          {/* Primary ambient glow - warm and inviting */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-            style={{
-              background: `
-                radial-gradient(ellipse 140% 100% at 10% 50%, ${config.badgeGlow} 0%, transparent 50%),
-                radial-gradient(ellipse 100% 100% at 90% 30%, ${config.cardGlow} 0%, transparent 40%)
-              `,
-              opacity: 0.7,
-            }}
-          />
-          
-          {/* SUNRISE effect - VISIBLE warm diagonal rays beaming across */}
-          {config.effectType === 'sunrise' && (
-            <>
-              {/* Main sunrise rays */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `
-                    linear-gradient(125deg, rgba(255,180,100,0.7) 0%, rgba(255,150,80,0.4) 20%, transparent 45%),
-                    linear-gradient(145deg, rgba(255,200,120,0.5) 5%, rgba(255,160,90,0.3) 25%, transparent 50%),
-                    linear-gradient(110deg, rgba(255,220,160,0.4) 0%, transparent 30%)
-                  `,
-                }}
-              />
-              {/* Warm horizon glow at bottom */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `linear-gradient(0deg, rgba(255,140,60,0.25) 0%, transparent 40%)`,
-                }}
-              />
-            </>
-          )}
-          
-          {/* MIST effect - VISIBLE soft horizontal cloud layers */}
-          {config.effectType === 'mist' && (
-            <>
-              {/* Layered mist bands */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `
-                    linear-gradient(180deg, rgba(200,220,250,0.5) 0%, rgba(180,200,230,0.25) 15%, transparent 35%),
-                    linear-gradient(180deg, transparent 50%, rgba(190,210,240,0.2) 70%, rgba(200,220,250,0.35) 100%)
-                  `,
-                }}
-              />
-              {/* Subtle vertical depth */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `radial-gradient(ellipse 150% 100% at 50% 0%, rgba(220,235,255,0.3) 0%, transparent 50%)`,
-                }}
-              />
-            </>
-          )}
-          
-          {/* SHIMMER effect - VISIBLE diagonal golden light streaks */}
-          {config.effectType === 'shimmer' && (
-            <>
-              {/* Multiple shimmer streaks */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `
-                    linear-gradient(115deg, transparent 15%, rgba(255,230,130,0.6) 25%, rgba(255,220,100,0.4) 35%, transparent 50%),
-                    linear-gradient(125deg, transparent 40%, rgba(255,210,80,0.45) 55%, rgba(255,200,60,0.3) 65%, transparent 80%),
-                    linear-gradient(105deg, rgba(255,240,180,0.35) 0%, transparent 20%)
-                  `,
-                }}
-              />
-              {/* Bottom gold reflection */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `linear-gradient(0deg, rgba(255,200,80,0.2) 0%, transparent 30%)`,
-                }}
-              />
-            </>
-          )}
-          
-          {/* EMBER effect - VISIBLE warm flickering fire glow */}
-          {config.effectType === 'ember' && (
-            <>
-              {/* Hot ember spots */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `
-                    radial-gradient(ellipse 70% 50% at 15% 65%, rgba(255,100,30,0.6) 0%, rgba(255,80,20,0.3) 30%, transparent 55%),
-                    radial-gradient(ellipse 50% 60% at 75% 35%, rgba(255,140,50,0.45) 0%, transparent 45%),
-                    radial-gradient(ellipse 40% 40% at 45% 80%, rgba(255,60,10,0.35) 0%, transparent 40%)
-                  `,
-                }}
-              />
-              {/* Warm ambient glow */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `linear-gradient(180deg, transparent 40%, rgba(255,120,40,0.25) 100%)`,
-                }}
-              />
-            </>
-          )}
-          
-          {/* OBSIDIAN effect - VISIBLE sleek black with prominent gold edges */}
-          {config.effectType === 'obsidian' && (
-            <>
-              {/* Gold corner accents */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `
-                    linear-gradient(135deg, rgba(255,215,0,0.4) 0%, rgba(212,175,55,0.2) 10%, transparent 25%),
-                    linear-gradient(-135deg, rgba(255,215,0,0.35) 0%, transparent 20%),
-                    linear-gradient(45deg, transparent 75%, rgba(212,175,55,0.3) 90%, rgba(255,215,0,0.4) 100%)
-                  `,
-                }}
-              />
-              {/* Deep black center vignette */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-                style={{
-                  background: `radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, rgba(0,0,0,0.4) 100%)`,
-                }}
-              />
-            </>
-          )}
-          
-          {/* AURORA effect - flowing green waves */}
-          {config.effectType === 'aurora' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  linear-gradient(170deg, rgba(80,200,120,0.4) 0%, transparent 30%),
-                  linear-gradient(190deg, rgba(40,160,80,0.25) 20%, transparent 50%),
-                  linear-gradient(160deg, transparent 40%, rgba(60,180,100,0.2) 60%, transparent 80%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* CRYSTAL effect - icy blue facets */}
-          {config.effectType === 'crystal' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  linear-gradient(120deg, rgba(150,200,255,0.35) 0%, transparent 25%),
-                  linear-gradient(60deg, transparent 50%, rgba(100,180,255,0.25) 70%, transparent 85%),
-                  linear-gradient(180deg, rgba(180,220,255,0.15) 0%, transparent 40%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* NEBULA effect - cosmic purple swirls */}
-          {config.effectType === 'nebula' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 100% 80% at 30% 30%, rgba(160,100,200,0.4) 0%, transparent 40%),
-                  radial-gradient(ellipse 80% 100% at 70% 70%, rgba(120,80,180,0.3) 0%, transparent 40%),
-                  linear-gradient(45deg, rgba(200,120,255,0.15) 0%, transparent 50%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* DIVINE effect - heavenly golden rays */}
-          {config.effectType === 'divine' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 120% 80% at 20% 50%, rgba(255,220,80,0.5) 0%, transparent 40%),
-                  linear-gradient(30deg, transparent 0%, rgba(255,240,150,0.3) 20%, transparent 40%),
-                  linear-gradient(-20deg, transparent 0%, rgba(255,230,100,0.25) 15%, transparent 35%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* EMERALD effect - lush green depth */}
-          {config.effectType === 'emerald' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 100% 100% at 25% 50%, rgba(60,160,90,0.45) 0%, transparent 45%),
-                  linear-gradient(150deg, rgba(80,180,100,0.2) 0%, transparent 40%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* ROYAL effect - majestic blue elegance */}
-          {config.effectType === 'royal' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 100% 100% at 25% 50%, rgba(80,130,200,0.45) 0%, transparent 45%),
-                  linear-gradient(135deg, rgba(100,150,220,0.2) 0%, transparent 30%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* CRIMSON effect - bold red power */}
-          {config.effectType === 'crimson' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 100% 100% at 25% 50%, rgba(220,80,80,0.45) 0%, transparent 45%),
-                  linear-gradient(160deg, rgba(200,60,60,0.2) 0%, transparent 40%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* COSMIC effect - universal purple/gold fusion */}
-          {config.effectType === 'cosmic' && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
-              style={{
-                background: `
-                  radial-gradient(ellipse 100% 80% at 30% 40%, rgba(130,100,200,0.45) 0%, transparent 40%),
-                  radial-gradient(ellipse 60% 60% at 75% 60%, rgba(255,200,60,0.25) 0%, transparent 35%),
-                  linear-gradient(45deg, rgba(160,120,220,0.15) 0%, transparent 50%)
-                `,
-              }}
-            />
-          )}
-          
-          {/* Sparkle particles - ONLY for Elite+ effects (aurora, crystal, nebula, divine, cosmic, emerald, royal, crimson) */}
-          {['aurora', 'crystal', 'nebula', 'divine', 'cosmic', 'emerald', 'royal', 'crimson'].includes(config.effectType) && (
-            <div 
-              className="absolute inset-0 pointer-events-none rounded-xl"
-              style={{
-                backgroundImage: `
-                  radial-gradient(2px 2px at 12% 18%, ${config.badgeBorderColor}80 0%, transparent 100%),
-                  radial-gradient(1.5px 1.5px at 28% 52%, ${config.badgeBorderColor}60 0%, transparent 100%),
-                  radial-gradient(2px 2px at 45% 15%, ${config.badgeBorderColor}70 0%, transparent 100%),
-                  radial-gradient(1px 1px at 72% 72%, ${config.badgeBorderColor}50 0%, transparent 100%),
-                  radial-gradient(2px 2px at 85% 38%, ${config.badgeBorderColor}65 0%, transparent 100%),
-                  radial-gradient(1.5px 1.5px at 58% 45%, ${config.badgeBorderColor}45 0%, transparent 100%)
-                `,
-              }}
-            />
-          )}
-        </>
-      )}
-      
-      {/* ═══ TOP SPECULAR HIGHLIGHT - Bright edge shine ═══ */}
-      {earned && !isGhost && (
-        <>
-          {/* Sharp top edge highlight line */}
-          <div 
-            className="absolute inset-x-0 top-0 h-[2px] pointer-events-none rounded-t-xl"
-            style={{
-              background: `linear-gradient(90deg, transparent 5%, ${config.badgeBorderColor}90 20%, ${config.badgeBorderColor} 50%, ${config.badgeBorderColor}90 80%, transparent 95%)`,
-            }}
-          />
-          {/* Soft glow below the edge */}
-          <div 
-            className="absolute inset-x-0 top-0 h-[30%] pointer-events-none rounded-t-xl"
-            style={{
-              background: `linear-gradient(180deg, ${config.badgeBorderColor}40 0%, ${config.badgeBorderColor}15 30%, transparent 100%)`,
-            }}
-          />
-        </>
-      )}
-      
-      {/* Subtle animated background pulse */}
-      {shouldAnimate && !isLowQuality && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none rounded-xl"
-          style={{ 
-            background: `radial-gradient(ellipse at 20% 50%, ${config.badgeGlow}40 0%, transparent 50%)`,
-          }}
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: config.animationSpeed, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      )}
-      
-      {/* Particles - visible in all modes */}
-      {showParticles && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full"
-              style={{ 
-                left: `${12 + i * 15}%`, 
-                top: `${20 + (i % 3) * 25}%`,
-                width: i % 2 === 0 ? '2px' : '1.5px',
-                height: i % 2 === 0 ? '2px' : '1.5px',
-                background: `${config.badgeBorderColor}`,
-                boxShadow: `0 0 4px ${config.badgeGlow}`,
-              }}
-              animate={{ y: [0, -8, 0], opacity: [0.4, 0.8, 0.4] }}
-              transition={{ duration: 3 + i * 0.4, delay: i * 0.2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          ))}
-        </div>
-      )}
-      
-      {/* ═══ GLOWING BORDER - Much more prominent ═══ */}
-      <div
-        className="absolute inset-0 rounded-xl pointer-events-none"
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // COMPACT VARIANT
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  if (isCompact) {
+    return (
+      <motion.div
+        className={cn(
+          "flex flex-col items-center justify-center p-3 rounded-xl border text-center cursor-pointer",
+          isGhost && "opacity-60",
+          className
+        )}
         style={{
-          padding: earned ? '1.5px' : '1px',
-          background: earned && !isGhost ? config.cardBorder : LOCKED_CONFIG.cardBorder,
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          opacity: earned ? 1 : 0.6,
+          background: config.cardBg,
+          borderColor: config.cardBorder,
+          minHeight: '90px',
         }}
-      />
-      {/* Border glow effect */}
-      {earned && !isGhost && (
-        <div
-          className="absolute -inset-[1px] rounded-xl pointer-events-none"
-          style={{
-            boxShadow: `inset 0 0 8px ${config.badgeGlow}60, 0 0 12px ${config.badgeGlow}40`,
-            opacity: threshold >= 150 ? 1 : 0.7,
-          }}
-        />
-      )}
-      
-      {/* Border sweep animation */}
-      {shouldAnimate && config.hasAnimatedBorder && isHighQuality && (
-        <motion.div
-          className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden"
-          style={{ 
-            background: `linear-gradient(90deg, transparent 0%, ${config.badgeBorderColor} 50%, transparent 100%)`, 
-            opacity: 0.25,
-          }}
-          animate={{ x: ['-100%', '200%'] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear', repeatDelay: 3 }}
-        />
-      )}
-      
-      {/* Content */}
-      <div className={cn('relative z-10 h-full flex items-center gap-3', compact ? 'px-2.5' : 'px-3.5')}>
-        {/* Badge with pedestal - coin on plinth style */}
-        <div className="relative flex-shrink-0 flex flex-col items-center">
-          {/* ═══ POWERFUL BADGE HALO - Visible, luminous, impressive ═══ */}
-          {earned && !isGhost && (
-            <>
-              {/* Outer glow field - creates the "powered" atmosphere */}
-              <div
-                className="absolute rounded-full pointer-events-none"
-                style={{ 
-                  width: compact ? '80px' : '100px',
-                  height: compact ? '80px' : '100px',
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  background: `radial-gradient(circle, ${config.badgeGlow} 0%, ${config.badgeGlow}60 30%, transparent 70%)`, 
-                  filter: threshold >= 150 ? 'blur(15px)' : threshold >= 50 ? 'blur(12px)' : 'blur(10px)',
-                  opacity: threshold >= 150 ? 0.9 : threshold >= 50 ? 0.7 : 0.5,
-                }}
-              />
-              {/* Mid glow - more concentrated */}
-              <div
-                className="absolute rounded-full pointer-events-none"
-                style={{ 
-                  width: compact ? '60px' : '75px',
-                  height: compact ? '60px' : '75px',
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  background: `radial-gradient(circle, ${config.badgeGlow} 0%, transparent 60%)`, 
-                  filter: threshold >= 150 ? 'blur(8px)' : 'blur(6px)',
-                  opacity: threshold >= 150 ? 1 : 0.8,
-                }}
-              />
-              {/* Halo ring effect */}
-              <div
-                className="absolute rounded-full pointer-events-none"
-                style={{ 
-                  width: compact ? '70px' : '90px',
-                  height: compact ? '70px' : '90px',
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  background: `radial-gradient(circle, transparent 40%, ${config.badgeBorderColor}50 55%, ${config.badgeBorderColor}30 65%, transparent 75%)`, 
-                  filter: 'blur(3px)',
-                  opacity: threshold >= 150 ? 0.8 : threshold >= 50 ? 0.6 : 0.4,
-                }}
-              />
-            </>
+        onClick={onClick}
+        whileHover={hoverProps}
+        whileTap={enableAnimations ? { scale: 0.98 } : {}}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      >
+        {/* Badge circle */}
+        <div 
+          className="relative w-9 h-9 rounded-full flex items-center justify-center mb-2"
+          style={{ background: config.badgeGradient }}
+        >
+          {isRegional ? (
+            getRegionalIcon(tier, 'w-4 h-4')
+          ) : (
+            <span className="text-white font-bold text-sm">{threshold}</span>
           )}
           
-          {/* Coin/medallion badge */}
-          <div
-            className={cn('relative rounded-full flex items-center justify-center z-10', badgeSize)}
-            style={{
-              background: earned && !isGhost ? config.badgeGradient : LOCKED_CONFIG.badgeGradient,
-              boxShadow: earned && !isGhost
-                ? `inset 0 2px 6px rgba(255,255,255,0.2), inset 0 -3px 8px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.4)`
-                : 'inset 0 1px 2px rgba(255,255,255,0.05), inset 0 -1px 3px rgba(0,0,0,0.2)',
-            }}
-          >
-            {/* Outer ring - premium coin rim */}
-            <div
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ 
-                border: `2px solid ${earned && !isGhost ? config.badgeBorderColor : lockedTierConfig?.badgeBorderColor || LOCKED_CONFIG.badgeBorderColor}`,
-                opacity: earned && !isGhost ? 0.4 : 0.15,
-              }}
-            />
-            {/* Inner rim - coin edge detail */}
-            <div
-              className="absolute inset-1.5 rounded-full pointer-events-none"
-              style={{ 
-                border: `1.5px solid ${earned && !isGhost ? config.badgeBorderColor : lockedTierConfig?.badgeBorderColor || LOCKED_CONFIG.badgeBorderColor}`, 
-                opacity: earned && !isGhost ? 0.5 : 0.2,
-              }}
-            />
-            
-            {/* Badge content - large number */}
-            {earned && !isGhost ? (
-              isRegional ? (
-                <div style={{ color: config.badgeTextColor }}>
-                  {getRegionalIcon(tier, compact ? 'w-5 h-5' : 'w-7 h-7')}
-                </div>
-              ) : (
-                <span 
-                  className={cn(compact ? 'text-lg font-bold' : 'text-2xl font-bold', 'tracking-tight')} 
-                  style={{ color: config.badgeTextColor, textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}
-                >
-                  {threshold}
-                </span>
-              )
-            ) : (
-              // Locked: show number faded, not lock icon
-              <span 
-                className={cn(compact ? 'text-lg font-bold' : 'text-2xl font-bold', 'tracking-tight')} 
-                style={{ color: 'rgba(255,255,255,0.25)', textShadow: 'none' }}
-              >
-                {isRegional ? '?' : threshold}
-              </span>
-            )}
-          </div>
+          {/* Earned checkmark */}
+          {earned && !isGhost && (
+            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center border-2 border-white">
+              <Check className="w-2.5 h-2.5 text-white" />
+            </div>
+          )}
           
-          {/* Pedestal/plinth base - only visible on non-compact */}
-          {!compact && (
-            <div 
-              className="relative -mt-1.5 w-full flex justify-center z-0"
-              style={{ transform: 'perspective(100px) rotateX(5deg)' }}
-            >
-              {/* Pedestal top surface */}
-              <div 
-                className="h-2 rounded-b-sm"
-                style={{
-                  width: compact ? '80%' : '85%',
-                  background: earned && !isGhost 
-                    ? `linear-gradient(to bottom, ${config.badgeBorderColor}40 0%, rgba(0,0,0,0.5) 100%)`
-                    : 'linear-gradient(to bottom, rgba(100,100,100,0.3) 0%, rgba(0,0,0,0.4) 100%)',
-                  boxShadow: earned && !isGhost 
-                    ? `0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 ${config.badgeBorderColor}30`
-                    : '0 2px 4px rgba(0,0,0,0.3)',
-                }}
-              />
+          {/* Locked icon */}
+          {!earned && !isGhost && (
+            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+              <Lock className="w-2 h-2 text-slate-400" />
             </div>
           )}
         </div>
         
-        {/* Text content */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
-          {/* Title - always hero text, clear hierarchy */}
-          <h3
-            className={cn('font-semibold tracking-tight truncate', compact ? 'text-sm' : 'text-base')}
-            style={{ color: earned && !isGhost ? config.titleColor : LOCKED_CONFIG.titleColor }}
-          >
-            {clubName}
-          </h3>
-          
-          {/* Tier label + descriptor - never competes with title */}
-          <div className={cn('flex items-center gap-1.5 mt-0.5', compact ? 'text-[9px]' : 'text-[10px]')}>
-            <span 
-              className="font-semibold uppercase tracking-wider" 
-              style={{ color: earned && !isGhost ? config.clubLabelColor : LOCKED_CONFIG.clubLabelColor }}
-            >
-              {isRegional ? 'COMPLETE' : `${threshold} CLUB`}
-            </span>
-            {!compact && descriptor && (
-              <>
-                <span style={{ color: earned && !isGhost ? config.descriptorColor : LOCKED_CONFIG.descriptorColor }}>•</span>
-                <span 
-                  className="truncate" 
-                  style={{ color: earned && !isGhost ? config.descriptorColor : LOCKED_CONFIG.descriptorColor }}
-                >
-                  {descriptor}
-                </span>
-              </>
-            )}
+        {/* Label */}
+        <span 
+          className="text-xs font-semibold"
+          style={{ color: config.titleColor }}
+        >
+          {isRegional ? tier : `${threshold} Club`}
+        </span>
+        
+        {/* Status */}
+        {earned && !isGhost && (
+          <span className="text-[10px] text-green-600 font-medium">Unlocked</span>
+        )}
+        {!earned && !isGhost && (
+          <span className="text-[10px] text-slate-400">{remaining} to go</span>
+        )}
+      </motion.div>
+    );
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // LARGE VARIANT (Journey Map)
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  return (
+    <motion.div
+      className={cn(
+        "flex items-center gap-4 p-4 rounded-2xl border cursor-pointer w-full",
+        isGhost && "opacity-60",
+        className
+      )}
+      style={{
+        background: config.cardBg,
+        borderColor: config.cardBorder,
+        boxShadow: earned && !isGhost ? '0 2px 8px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+      onClick={onClick}
+      whileHover={hoverProps}
+      whileTap={enableAnimations ? { scale: 0.99 } : {}}
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+    >
+      {/* Badge circle */}
+      <div 
+        className="relative flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
+        style={{ background: config.badgeGradient }}
+      >
+        {isRegional ? (
+          getRegionalIcon(tier, 'w-6 h-6')
+        ) : (
+          <span className="text-white font-bold text-lg">{threshold}</span>
+        )}
+        
+        {/* Earned checkmark */}
+        {earned && !isGhost && (
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-white shadow-sm">
+            <Check className="w-3 h-3 text-white" />
           </div>
-          
-          {/* Data chips - courses/regions (not form field style) */}
-          {!compact && (
-            <div className="flex items-center gap-2 mt-1.5 text-[9px]">
-              <div 
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded" 
-                style={{ 
-                  background: 'rgba(255,255,255,0.05)', 
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                <span style={{ color: earned && !isGhost ? config.titleColor : LOCKED_CONFIG.titleColor, fontWeight: 500 }}>
-                  {earned ? target : currentProgress} / {target}
-                </span>
-                <span style={{ color: earned && !isGhost ? config.descriptorColor : LOCKED_CONFIG.descriptorColor }}>
-                  Courses
-                </span>
-              </div>
-              
-              {regionsCompleted !== undefined && !isRegional && (
-                <div 
-                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded" 
-                  style={{ 
-                    background: 'rgba(255,255,255,0.05)', 
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  <span style={{ color: earned && !isGhost ? config.titleColor : LOCKED_CONFIG.titleColor, fontWeight: 500 }}>
-                    {regionsCompleted}
-                  </span>
-                  <span style={{ color: earned && !isGhost ? config.descriptorColor : LOCKED_CONFIG.descriptorColor }}>
-                    Regions
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Earned pill OR Progress bar (locked state) */}
-          {!compact && (
-            <div className="mt-1.5">
-              {earned && !isGhost ? (
-                <div
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold"
-                  style={{ 
-                    background: `${config.badgeGlow}`, 
-                    border: `1px solid ${config.badgeBorderColor}30`, 
-                    color: config.clubLabelColor,
-                  }}
-                >
-                  <Check className="w-2.5 h-2.5" />
-                  Earned
-                </div>
-              ) : (
-                // Locked: show progress bar with remaining count
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="h-1 rounded-full overflow-hidden flex-1 max-w-[100px]" 
-                    style={{ background: 'rgba(255,255,255,0.08)' }}
-                  >
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{ 
-                        background: `linear-gradient(90deg, ${lockedTierConfig?.clubLabelColor || '#666'}50, ${lockedTierConfig?.badgeBorderColor || '#555'}50)`,
-                      }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progressPercent}%` }}
-                      transition={{ duration: 0.6, ease: 'easeOut' }}
-                    />
-                  </div>
-                  <span className="text-[9px]" style={{ color: LOCKED_CONFIG.descriptorColor }}>
-                    {remaining} to go
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        )}
+        
+        {/* Locked icon */}
+        {!earned && !isGhost && (
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+            <Lock className="w-2.5 h-2.5 text-slate-400" />
+          </div>
+        )}
       </div>
       
-      {/* Light streak for legendary tier - subtle */}
-      {shouldAnimate && threshold >= 300 && isHighQuality && (
-        <motion.div
-          className="absolute w-[180%] h-px bg-gradient-to-r from-transparent via-white/8 to-transparent pointer-events-none"
-          style={{ top: '35%', left: '-40%', transform: 'rotate(-12deg)' }}
-          animate={{ x: ['-40%', '80%'] }}
-          transition={{ duration: 7, repeat: Infinity, ease: 'linear', repeatDelay: 5 }}
-        />
-      )}
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <h3 
+          className="font-semibold text-base truncate"
+          style={{ color: config.titleColor }}
+        >
+          {displayName}
+        </h3>
+        <p 
+          className="text-sm truncate"
+          style={{ color: config.subtitleColor }}
+        >
+          {subtitle}
+        </p>
+        
+        {/* Progress for in-progress cards */}
+        {!earned && !isGhost && (
+          <div className="mt-2 flex items-center gap-2">
+            <div 
+              className="flex-1 h-1.5 rounded-full overflow-hidden max-w-[100px]"
+              style={{ background: config.progressTrack }}
+            >
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: config.progressFill }}
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </div>
+            <span className="text-xs" style={{ color: config.subtitleColor }}>
+              {currentProgress} / {target}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      {/* Status badge */}
+      <div className="flex-shrink-0">
+        {earned && !isGhost && (
+          <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+            Earned
+          </span>
+        )}
+        {!earned && !isGhost && (
+          <span className="text-xs font-medium text-slate-500">
+            {remaining} to go
+          </span>
+        )}
+      </div>
     </motion.div>
   );
 });

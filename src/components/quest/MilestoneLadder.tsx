@@ -174,8 +174,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         )}
       </motion.button>
 
-      {/* Milestone card - z-10 ensures it covers the connector line */}
-      <div className="flex-1 mb-4 relative z-10" onClick={onClick}>
+      {/* Milestone card - z-10 ensures it covers the connector line, w-full + min-w-0 fixes overflow */}
+      <div className="flex-1 mb-4 relative z-10 min-w-0 w-full" onClick={onClick}>
         <EliteGameCard
           tier={isRegional && milestone.regionSlug 
             ? REGION_TO_TIER[milestone.regionSlug] 
@@ -267,8 +267,8 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
 
   return (
-    <div className="relative">
-      <div className="relative pl-2">
+    <div className="relative overflow-hidden">
+      <div className="relative pl-2 pr-0">
         <div className="space-y-0">
           {coreMilestones.map((milestone, index) => (
             <MilestoneNode
