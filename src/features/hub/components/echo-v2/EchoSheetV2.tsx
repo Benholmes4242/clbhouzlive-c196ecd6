@@ -359,19 +359,22 @@ export function EchoSheetV2({
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (
               <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                {!hasMessages ? (
-                  <EchoEmptyState
-                    onChipClick={handleChipClick}
-                    onFocusInput={handleFocusInput}
-                  />
-                ) : (
-                  <EchoMessageList
-                    messages={messages}
-                    isStreaming={isStreaming}
-                    streamingContent={streamingContent}
-                    onFollowUp={handleFollowUp}
-                  />
-                )}
+                {/* Chat content area - empty state centers, messages scroll */}
+                <div className={`flex-1 flex flex-col min-h-0 ${!hasMessages ? 'justify-center' : ''}`}>
+                  {!hasMessages ? (
+                    <EchoEmptyState
+                      onChipClick={handleChipClick}
+                      onFocusInput={handleFocusInput}
+                    />
+                  ) : (
+                    <EchoMessageList
+                      messages={messages}
+                      isStreaming={isStreaming}
+                      streamingContent={streamingContent}
+                      onFollowUp={handleFollowUp}
+                    />
+                  )}
+                </div>
 
                 {/* Composer - Always visible in chat tab */}
                 <EchoComposer

@@ -1,6 +1,6 @@
 /**
  * HubWhatsHappeningV3 - "WHAT'S HAPPENING" section
- * Shows active games near user with compact card style
+ * Sport-status driven cards with active indicators
  */
 
 import React, { useState } from 'react';
@@ -39,7 +39,7 @@ export function HubWhatsHappeningV3() {
       <div className="space-y-2">
         <HubSectionHeader title="What's Happening" />
         <div 
-          className="h-20 rounded-[20px] animate-pulse"
+          className="h-[82px] rounded-[20px] animate-pulse"
           style={{ background: 'var(--hub-skeleton-base)' }}
         />
       </div>
@@ -57,24 +57,38 @@ export function HubWhatsHappeningV3() {
 
         {displayGames.length === 0 ? (
           <HubCompactCardV3
-            icon={<MapPin className="h-4 w-4" style={{ color: 'var(--hub-text-dim)' }} />}
+            icon={<MapPin className="h-4.5 w-4.5" style={{ color: 'var(--hub-text-dim)' }} />}
             title="No active games nearby"
             subtitle="Create one to be the first"
             onClick={() => setCreateOpen(true)}
           />
         ) : (
-          <div className="flex flex-col gap-2">
-            {displayGames.map((game) => {
-              const slotsLabel = `${(game.slots_total || 0) - (game.slots_open || 0)}/${game.slots_total || 0}`;
+          <div className="flex flex-col gap-2.5">
+            {displayGames.map((game, index) => {
+              const filled = (game.slots_total || 0) - (game.slots_open || 0);
+              const total = game.slots_total || 0;
+              const slotsLabel = `${filled}/${total}`;
+              const isAlmostFull = filled >= total - 1;
+              const isLive = isToday(new Date(game.start_time));
               
               return (
                 <HubCompactCardV3
                   key={game.id}
-                  icon={<MapPin className="h-4 w-4" style={{ color: 'var(--hub-badge-green-text)' }} />}
-                  iconBg="var(--hub-badge-green-bg)"
+                  icon={
+                    <MapPin 
+                      className="h-4.5 w-4.5" 
+                      style={{ color: '#10B981' }} 
+                    />
+                  }
+                  iconBg="linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.08) 100%)"
                   title={game.course_name || 'Golf Course'}
                   subtitle={formatShortDate(game.start_time)}
-                  rightPill={{ text: slotsLabel, variant: 'success' }}
+                  rightPill={{ 
+                    text: slotsLabel, 
+                    variant: isLive ? 'live' : 'success' 
+                  }}
+                  showDot={isLive || isAlmostFull}
+                  dotColor={isLive ? '#EF4444' : '#22C55E'}
                   onClick={openGamesHub}
                 />
               );

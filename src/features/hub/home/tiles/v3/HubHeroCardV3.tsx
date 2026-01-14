@@ -1,12 +1,11 @@
 /**
- * HubHeroCardV3 - Premium full-bleed hero card
- * 190-220px height, 22-26px radius, dark overlay gradient
- * Shows: Trip (priority), Game, or Fallback
+ * HubHeroCardV3 - Premium full-bleed hero card (LIV-inspired)
+ * 220-240px height, bold typography, strong gradient overlays
  */
 
 import React, { useState, useCallback } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-import { MapPin, Plane } from 'lucide-react';
+import { MapPin, Plane, ChevronRight } from 'lucide-react';
 import { useHubHeroDataV3, HeroGameData, HeroTripData, HeroFallbackData } from '../../hooks/useHubHeroDataV3';
 import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
 import { haptic } from '@/utils/haptics';
@@ -27,15 +26,18 @@ function formatTripDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'd')}–${format(end, 'd MMM yyyy')}`;
 }
 
-// V3 Type pill - top left
+// V3 Type pill - sporty solid fill style
 function TypePill({ type }: { type: 'TRIP' | 'GAME' }) {
   return (
     <div 
-      className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider"
       style={{
-        background: type === 'TRIP' ? 'rgba(59, 130, 246, 0.90)' : 'rgba(16, 185, 129, 0.90)',
+        height: '30px',
+        background: type === 'TRIP' 
+          ? 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)' 
+          : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
         color: '#fff',
-        backdropFilter: 'blur(4px)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
       }}
     >
       {type}
@@ -52,19 +54,20 @@ function GameHeroContent({ data }: { data: HeroGameData }) {
       </div>
       <div className="absolute left-5 bottom-5 right-5 text-white">
         <div 
-          className="text-[26px] font-bold leading-tight line-clamp-2 drop-shadow-md"
+          className="font-extrabold leading-[1.08] line-clamp-2 drop-shadow-lg"
           style={{ 
-            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-            letterSpacing: '-0.3px',
+            fontSize: '32px',
+            textShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            letterSpacing: '-0.5px',
           }}
         >
           {data.courseName}
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <MapPin className="w-3.5 h-3.5 opacity-80" />
+        <div className="flex items-center gap-2 mt-2.5">
+          <MapPin className="w-4 h-4 opacity-90" />
           <span 
-            className="text-[14px] font-medium opacity-95 drop-shadow-sm"
-            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}
+            className="text-[15px] font-semibold opacity-95"
+            style={{ textShadow: '0 2px 6px rgba(0,0,0,0.4)' }}
           >
             {formatGameDate(data.startTimeISO)}
           </span>
@@ -83,19 +86,20 @@ function TripHeroContent({ data }: { data: HeroTripData }) {
       </div>
       <div className="absolute left-5 bottom-5 right-5 text-white">
         <div 
-          className="text-[26px] font-bold leading-tight line-clamp-2 drop-shadow-md"
+          className="font-extrabold leading-[1.08] line-clamp-2 drop-shadow-lg"
           style={{ 
-            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-            letterSpacing: '-0.3px',
+            fontSize: '32px',
+            textShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            letterSpacing: '-0.5px',
           }}
         >
           {data.tripName}
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <Plane className="w-3.5 h-3.5 opacity-80" />
+        <div className="flex items-center gap-2 mt-2.5">
+          <Plane className="w-4 h-4 opacity-90" />
           <span 
-            className="text-[14px] font-medium opacity-95 drop-shadow-sm"
-            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}
+            className="text-[15px] font-semibold opacity-95"
+            style={{ textShadow: '0 2px 6px rgba(0,0,0,0.4)' }}
           >
             {formatTripDateRange(data.startDate, data.endDate)}
             {data.location && ` · ${data.location}`}
@@ -112,26 +116,27 @@ function FallbackHeroContent({ data }: { data: HeroFallbackData }) {
     <>
       <div className="absolute left-5 bottom-5 right-5 text-white">
         <div 
-          className="text-[11px] font-semibold uppercase tracking-wide opacity-80 mb-1"
-          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}
+          className="text-[11px] font-bold uppercase tracking-wider opacity-85 mb-1.5"
+          style={{ textShadow: '0 2px 6px rgba(0,0,0,0.5)' }}
         >
           Plan your next round
         </div>
         <div 
-          className="text-[26px] font-bold leading-tight line-clamp-2 drop-shadow-md"
+          className="font-extrabold leading-[1.08] line-clamp-2 drop-shadow-lg"
           style={{ 
-            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-            letterSpacing: '-0.3px',
+            fontSize: '32px',
+            textShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            letterSpacing: '-0.5px',
           }}
         >
           {data.courseName}
         </div>
         {data.courseLocation && (
-          <div className="flex items-center gap-2 mt-2">
-            <MapPin className="w-3.5 h-3.5 opacity-80" />
+          <div className="flex items-center gap-2 mt-2.5">
+            <MapPin className="w-4 h-4 opacity-90" />
             <span 
-              className="text-[14px] font-medium opacity-90"
-              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}
+              className="text-[15px] font-semibold opacity-95"
+              style={{ textShadow: '0 2px 6px rgba(0,0,0,0.4)' }}
             >
               {data.courseLocation}
             </span>
@@ -161,7 +166,7 @@ export function HubHeroCardV3() {
       <div 
         className="relative overflow-hidden animate-pulse"
         style={{
-          height: '200px',
+          height: '230px',
           borderRadius: '24px',
           background: 'var(--hub-skeleton-base)',
         }}
@@ -186,10 +191,10 @@ export function HubHeroCardV3() {
         onClick={handleClick}
         className="relative w-full overflow-hidden text-left transition-all duration-200 active:scale-[0.99]"
         style={{
-          height: '200px',
+          height: '230px',
           borderRadius: '24px',
-          boxShadow: '0 16px 48px rgba(2, 6, 23, 0.12)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 20px 50px rgba(2, 6, 23, 0.15), 0 8px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
         }}
       >
         {/* Background image */}
@@ -213,22 +218,33 @@ export function HubHeroCardV3() {
           />
         )}
 
-        {/* Dark overlay gradient - stronger for better text legibility */}
+        {/* Strong bottom gradient overlay for text legibility */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.08) 100%)',
           }}
         />
         
-        {/* Left gradient for text legibility */}
+        {/* Left gradient for extra text legibility */}
         <div 
           className="absolute left-0 top-0 bottom-0"
           style={{
-            width: '70%',
-            background: 'linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 100%)',
+            width: '65%',
+            background: 'linear-gradient(90deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0) 100%)',
           }}
         />
+
+        {/* Subtle tap affordance - chevron in circle */}
+        <div 
+          className="absolute right-4 bottom-4 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <ChevronRight className="w-4 h-4 text-white/80" />
+        </div>
 
         {/* Content based on type */}
         {data.type === 'game' && <GameHeroContent data={data} />}

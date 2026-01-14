@@ -17,6 +17,7 @@ interface EchoEmptyStateProps {
 const PROMPT_CHIPS = [
   "What's the best play from 155y?",
   'Explain stableford scoring',
+  'Course tips for Portrush',
   'Build a 3-day NI golf trip',
 ];
 
@@ -33,7 +34,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
 
   return (
     <div 
-      className="flex-1 flex flex-col items-center px-5 pt-5 pb-4 overflow-y-auto"
+      className="flex flex-col items-center justify-center px-5 py-4"
     >
       {/* Hero glass card */}
       <div 

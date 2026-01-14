@@ -1,7 +1,7 @@
 /**
- * HubQuickActionsV3 - Pill bar with 3 quick actions
- * Messages, Echo, Create (Moment)
- * Glass/frosted feel, centered row
+ * HubQuickActionsV3 - Premium unified rail with 3 segments
+ * Messages, Echo (accent highlighted), Create
+ * Single container with glass effect, equal-width segments
  */
 
 import React, { useState } from 'react';
@@ -10,34 +10,40 @@ import { HubMessagesSheet } from '@/features/hub/components/HubMessagesSheet';
 import { HubEchoSheet } from '@/features/hub/components/HubEchoSheet';
 import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
+import { cn } from '@/lib/utils';
 
-interface QuickActionButtonProps {
+interface SegmentProps {
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
+  isAccent?: boolean;
   badge?: number;
 }
 
-function QuickActionButton({ icon, label, onClick, badge }: QuickActionButtonProps) {
+function Segment({ icon, label, onClick, isAccent, badge }: SegmentProps) {
   return (
     <button
       onClick={() => {
         haptic('light');
         onClick();
       }}
-      className="flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-150 active:scale-[0.97] relative"
-      style={{
-        background: 'rgba(255, 255, 255, 0.75)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        border: '1px solid rgba(15, 23, 42, 0.06)',
-        boxShadow: '0 4px 12px rgba(2, 6, 23, 0.05)',
-      }}
+      className={cn(
+        "flex-1 flex items-center justify-center gap-2 py-3 transition-all duration-150 active:scale-[0.97] relative rounded-full",
+        isAccent && "mx-0.5"
+      )}
+      style={isAccent ? {
+        background: 'rgba(255, 142, 61, 0.12)',
+      } : undefined}
     >
-      <span style={{ color: 'var(--hub-text-dim)' }}>{icon}</span>
+      <span 
+        className="transition-colors"
+        style={{ color: isAccent ? '#FF8E3D' : 'var(--hub-text-dim)' }}
+      >
+        {icon}
+      </span>
       <span 
         className="text-[13px] font-semibold"
-        style={{ color: 'var(--hub-text)' }}
+        style={{ color: isAccent ? '#FF8E3D' : 'var(--hub-text)' }}
       >
         {label}
       </span>
@@ -45,7 +51,7 @@ function QuickActionButton({ icon, label, onClick, badge }: QuickActionButtonPro
       {/* Badge */}
       {badge !== undefined && badge > 0 && (
         <span 
-          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center text-[9px] font-bold"
+          className="absolute -top-1 right-1/4 h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center text-[9px] font-bold"
           style={{
             background: 'rgba(255, 142, 61, 0.95)',
             color: '#fff',
@@ -68,20 +74,35 @@ export function HubQuickActionsV3() {
 
   return (
     <>
-      <div className="flex items-center justify-center gap-2 py-3">
-        <QuickActionButton
-          icon={<MessageSquare className="h-4 w-4" />}
+      {/* Single unified rail container */}
+      <div 
+        className="flex items-center rounded-full"
+        style={{
+          height: '54px',
+          background: 'rgba(255, 255, 255, 0.80)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(15, 23, 42, 0.06)',
+          boxShadow: '0 8px 24px rgba(2, 6, 23, 0.06)',
+        }}
+      >
+        <Segment
+          icon={<MessageSquare className="h-[18px] w-[18px]" />}
           label="Messages"
           onClick={() => setMessagesOpen(true)}
           badge={unreadCount}
         />
-        <QuickActionButton
-          icon={<Sparkles className="h-4 w-4" />}
+        
+        {/* Echo segment with accent highlight */}
+        <Segment
+          icon={<Sparkles className="h-[18px] w-[18px]" />}
           label="Echo"
           onClick={() => setEchoOpen(true)}
+          isAccent
         />
-        <QuickActionButton
-          icon={<Plus className="h-4 w-4" />}
+        
+        <Segment
+          icon={<Plus className="h-[18px] w-[18px]" />}
           label="Create"
           onClick={() => setCreateOpen(true)}
         />
