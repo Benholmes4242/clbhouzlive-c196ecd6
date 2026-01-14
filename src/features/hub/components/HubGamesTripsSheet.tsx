@@ -175,7 +175,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[28px] overflow-hidden"
             style={{
-              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
+              background: '#F8FAFC',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
               borderTop: '1px solid rgba(255, 255, 255, 0.9)',
               overscrollBehavior: 'contain',
