@@ -279,7 +279,7 @@ export function EchoSheetV2({
                 >
                   <Sparkles className="w-4 h-4" style={{ color: ECHO_ORANGE }} />
                 </div>
-                <h2 className="text-[18px] font-semibold text-slate-900 tracking-tight">
+                <h2 className="text-[18px] font-semibold text-slate-800 tracking-tight">
                   Echo
                 </h2>
               </div>

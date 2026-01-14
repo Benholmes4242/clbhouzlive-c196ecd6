@@ -59,7 +59,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
         </div>
 
         {/* Title */}
-        <h3 className="text-[22px] font-semibold mb-2 text-slate-900 tracking-tight">
+        <h3 className="text-[22px] font-semibold mb-2 text-slate-800 tracking-tight">
           Ask Echo
         </h3>
 
@@ -78,7 +78,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
               style={{
                 background: 'rgba(255,255,255,0.9)',
                 border: '1px solid rgba(0,0,0,0.08)',
-                color: '#475569',
+                color: '#1e293b',
               }}
             >
               {chip}
