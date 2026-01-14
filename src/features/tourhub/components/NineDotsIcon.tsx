@@ -28,7 +28,7 @@ export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
       
       {/* Row 2 */}
       <circle cx="4" cy="10" r="1.8" fill="currentColor" />
-      <circle cx="10" cy="10" r="1.8" fill="currentColor" />
+      <circle cx="10" cy="10" r="1.8" fill="#F79E1B" />
       <circle cx="16" cy="10" r="1.8" fill="currentColor" />
       
       {/* Row 3 */}
