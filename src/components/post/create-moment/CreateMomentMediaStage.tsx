@@ -211,28 +211,28 @@ export default function CreateMomentMediaStage({
         {/* Bottom scrim - subtle */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent z-10" />
 
-        {/* Media counter - top left - matching bottom pill style */}
+        {/* Media counter - centered below header row */}
         <div 
-          className="absolute left-2 z-20 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium text-white"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+          className="absolute left-1/2 -translate-x-1/2 z-20 cm-glass-pill"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 52px)' }}
         >
           {activeIndex + 1}/{media.length}
         </div>
 
-        {/* Achievement badges overlay - below media counter */}
+        {/* Achievement badges overlay - top left below header */}
         <AchievementBadgesOverlay 
           badgeIds={selectedBadges} 
-          className="top-10 left-2" 
+          className="left-4 top-[calc(env(safe-area-inset-top,0px)+52px)]"
         />
 
-        {/* Remove media button - top right - circle container */}
+        {/* Remove media button - positioned below header row on right */}
         <button
           onClick={() => onRemoveMedia(currentItem?.id || '')}
-          className="absolute right-2 z-20 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+          className="absolute right-4 z-20 w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-all hover:bg-black/70 active:scale-95"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 52px)' }}
           aria-label="Remove current media"
         >
-          <X className="w-3 h-3 text-white" />
+          <X className="w-3.5 h-3.5 text-white/90" />
         </button>
 
 

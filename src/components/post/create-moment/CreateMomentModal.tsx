@@ -1067,13 +1067,13 @@ export default function CreateMomentModal({
             background: 'var(--cm-surface-alt)',
           }}
         >
-          {/* Header bar with grabber, save draft, and drafts access */}
+          {/* Header bar with grabber, save draft, and drafts access - Dark glass style */}
           <div 
             data-ecm-handle="true"
             className="absolute left-0 right-0 flex items-center justify-between px-4 py-3 z-30"
             style={{ top: 'env(safe-area-inset-top, 0px)' }}
           >
-            {/* Left: Drafts button (if has drafts) */}
+            {/* Left: Drafts button (if has drafts) - Glass style */}
             <div className="w-10">
               {draftCount > 0 && (
                 <button
@@ -1083,36 +1083,31 @@ export default function CreateMomentModal({
                     console.log('[Drafts] Icon clicked, opening sheet');
                     setShowDraftsSheet(true);
                   }}
-                  className="relative flex items-center justify-center w-9 h-9 rounded-full transition-colors z-40"
-                  style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
+                  className="cm-glass-button relative z-40"
                   aria-label="View drafts"
                 >
-                  <FileEdit size={16} style={{ color: 'var(--cm-text-secondary)' }} />
-                  <span 
-                    className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-semibold rounded-full"
-                    style={{ background: 'var(--cm-surface-slate)', color: 'white' }}
-                  >
+                  <FileEdit size={16} className="text-white/90" />
+                  <span className="cm-glass-badge absolute -top-1 -right-1">
                     {draftCount}
                   </span>
                 </button>
               )}
             </div>
             
-            {/* Center: Grabber */}
-            <div className="cm-grabber" />
+            {/* Center: Grabber - glass style */}
+            <div className="w-9 h-1 rounded-full bg-white/30 backdrop-blur-sm" />
             
-            {/* Right: Scheduled + Save Draft buttons */}
-            <div className="flex items-center gap-1.5">
+            {/* Right: Scheduled + Save Draft buttons - Glass style */}
+            <div className="flex items-center gap-2">
               {/* Scheduled posts button */}
               {scheduledCount > 0 && (
                 <button
                   onClick={() => setShowScheduledPostsSheet(true)}
-                  className="flex items-center justify-center w-9 h-9 rounded-full transition-colors relative"
-                  style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
+                  className="cm-glass-button relative"
                   aria-label={`View ${scheduledCount} scheduled posts`}
                 >
-                  <Clock size={16} style={{ color: 'var(--cm-text-secondary)' }} />
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-[10px] font-semibold text-primary-foreground flex items-center justify-center">
+                  <Clock size={16} className="text-white/90" />
+                  <span className="cm-glass-badge absolute -top-1 -right-1">
                     {scheduledCount > 9 ? '9+' : scheduledCount}
                   </span>
                 </button>
@@ -1123,11 +1118,10 @@ export default function CreateMomentModal({
                 <button
                   onClick={handleSaveDraft}
                   disabled={isSavingDraft || !canCreateDraft}
-                  className="flex items-center justify-center w-9 h-9 rounded-full transition-colors disabled:opacity-50"
-                  style={{ background: 'var(--cm-surface-card)', border: '1px solid var(--cm-border-subtle)' }}
+                  className="cm-glass-button"
                   aria-label="Save draft"
                 >
-                  <Bookmark size={16} style={{ color: 'var(--cm-text-secondary)' }} />
+                  <Bookmark size={16} className="text-white/90" />
                 </button>
               )}
             </div>
