@@ -20,7 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
   DropdownMenu,
@@ -707,20 +707,30 @@ const ProfilePageV2: React.FC = () => {
         )}
 
         {/* Tabs row - fixed height 44px with consistent alignment */}
-        <section className="px-4 pt-2 pb-2">
-          <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0 px-0 py-0 h-[44px] gap-0">
-              {tabs.map((tab) => (
-                <TabsTrigger
+        {/* Hub-style toggle bar - matches schedule page */}
+        <section className="flex justify-center py-3 bg-[#F8FAFC]">
+          <div 
+            className="inline-flex items-center gap-1 p-1 rounded-full"
+            style={{ background: '#e2e8f0' }}
+          >
+            {tabs.map((tab) => {
+              const isActive = activeSection === tab.id;
+              return (
+                <button
                   key={tab.id}
-                  value={tab.id}
-                  className="relative text-sm px-3 py-0 h-full font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                  onClick={() => setActiveSection(tab.id)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
+                    isActive 
+                      ? "bg-white text-[#1e293b] shadow-sm" 
+                      : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                  )}
                 >
                   {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+                </button>
+              );
+            })}
+          </div>
         </section>
 
         {/* Tab Content - 14px gap from tabs to grid */}
