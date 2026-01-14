@@ -15,11 +15,9 @@ interface EchoEmptyStateProps {
 }
 
 const PROMPT_CHIPS = [
-  { text: "What's the best play from 155y?", row: 1 },
-  { text: 'Explain stableford scoring', row: 1 },
-  { text: 'How far does Rory hit a 5 iron?', row: 2 },
-  { text: 'Course tips for Portrush', row: 2 },
-  { text: 'Build a 3-day NI golf trip', row: 3 },
+  "What's the best play from 155y?",
+  'Explain stableford scoring',
+  'Build a 3-day NI golf trip',
 ];
 
 export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProps) {
@@ -35,7 +33,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
 
   return (
     <div 
-      className="flex-1 flex flex-col items-center justify-center px-5 py-6 overflow-y-auto"
+      className="flex-1 flex flex-col items-center px-5 pt-5 pb-4 overflow-y-auto"
     >
       {/* Hero glass card */}
       <div 
@@ -71,25 +69,21 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
           Instant golf answers — distances, rules, course intel, gear, and trip planning.
         </p>
 
-        {/* Prompt chips section */}
-        <div className="space-y-2">
-          {[1, 2, 3].map((row) => (
-            <div key={row} className="flex flex-wrap justify-center gap-2">
-              {PROMPT_CHIPS.filter(c => c.row === row).map((chip) => (
-                <button
-                  key={chip.text}
-                  onClick={() => handleChipClick(chip.text)}
-                  className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-[0.97] hover:bg-slate-100"
-                  style={{
-                    background: 'rgba(255,255,255,0.9)',
-                    border: '1px solid rgba(0,0,0,0.08)',
-                    color: '#475569',
-                  }}
-                >
-                  {chip.text}
-                </button>
-              ))}
-            </div>
+        {/* Prompt chips - single row */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {PROMPT_CHIPS.map((chip) => (
+            <button
+              key={chip}
+              onClick={() => handleChipClick(chip)}
+              className="px-3 py-1.5 rounded-full text-[12px] font-medium transition-all active:scale-[0.97] hover:bg-slate-100"
+              style={{
+                background: 'rgba(255,255,255,0.9)',
+                border: '1px solid rgba(0,0,0,0.08)',
+                color: '#475569',
+              }}
+            >
+              {chip}
+            </button>
           ))}
         </div>
       </div>
