@@ -19,7 +19,7 @@ const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
     title: 'The Global Golf Season', 
     subtext: 'Every tour. Every event. Every moment that defines professional golf.' 
   },
-  schedule: { title: '', subtext: '' },
+  schedule: { title: 'Events', subtext: '' },
   players: { title: 'Players', subtext: 'Tour roster' },
   leaderboards: { title: 'Leaders', subtext: 'Season rankings' },
   summary: { title: 'Summary', subtext: 'Tournament recap' },
@@ -48,7 +48,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
           aria-label="Open navigation menu"
           aria-haspopup="dialog"
         >
-          <NineDotsIcon className="text-foreground/60" size={20} />
+          <NineDotsIcon className="text-black" size={20} />
         </motion.button>
         
         {/* Center: Dynamic title based on active section */}
