@@ -114,7 +114,7 @@ export function AddPlayersSheetV2({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className="fixed inset-x-0 bottom-0 z-[10006] rounded-t-[24px] overflow-hidden flex flex-col"
             style={{
               height: '70vh',
