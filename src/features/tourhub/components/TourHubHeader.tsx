@@ -40,7 +40,7 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
   return (
     <header className="pt-4 pb-3">
       {/* Top row: 9-dot icon (left) + Title */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between">
         {/* Left: 9-dot menu button */}
         <motion.button
           whileTap={{ scale: 0.92 }}
