@@ -167,6 +167,16 @@ export function ScheduleTab() {
   return (
     <div className="min-h-screen pb-24">
       
+      {/* Hero Card - Featured Tournament (above search) */}
+      {filter === 'all' && !search && featured && (
+        <div className="-mx-4 mb-6">
+          <ScheduleHeroCard 
+            tournament={featured.tournament} 
+            type={featured.type}
+          />
+        </div>
+      )}
+
       {/* Search Bar */}
       <div className="relative max-w-md mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -184,16 +194,6 @@ export function ScheduleTab() {
         onFilterChange={setFilter}
         counts={filterStats}
       />
-
-      {/* Hero Card - Featured Tournament */}
-      {filter === 'all' && !search && featured && (
-        <div className="-mx-4 mb-6">
-          <ScheduleHeroCard 
-            tournament={featured.tournament} 
-            type={featured.type}
-          />
-        </div>
-      )}
 
       {/* No Live Message */}
       {filter === 'live' && filterStats.live === 0 && (
