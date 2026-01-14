@@ -306,7 +306,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           "font-semibold text-sm",
           "transition-all duration-200",
           isOutstanding 
-            ? "bg-[#D2B461] text-black hover:bg-[#E5D084]"
+            ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/25 hover:from-amber-500 hover:to-amber-600"
             : "bg-white/15 text-white hover:bg-white/25"
         )}
       >
