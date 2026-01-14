@@ -287,14 +287,9 @@ export function TripDetailSheetV2({
               />
             </div>
 
-            {/* Header - frosted glass chrome - MATCHES GAME SHEET */}
+            {/* Header */}
             <div 
               className="flex items-center gap-3 px-4 pt-1 pb-3 flex-shrink-0"
-              style={{
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-              }}
             >
               <button
                 onClick={handleClose}
