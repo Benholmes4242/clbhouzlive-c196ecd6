@@ -51,8 +51,8 @@ export function HubWhatsHappeningV3() {
       <div className="space-y-2">
         <HubSectionHeader 
           title="What's Happening" 
-          actionLabel={allGames.length > 3 ? "View all" : undefined}
-          onAction={allGames.length > 3 ? openGamesHub : undefined}
+          actionLabel="View all"
+          onAction={openGamesHub}
         />
 
         {displayGames.length === 0 ? (
