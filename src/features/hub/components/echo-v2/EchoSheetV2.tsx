@@ -358,7 +358,7 @@ export function EchoSheetV2({
 
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (
-              <>
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {!hasMessages ? (
                   <EchoEmptyState
                     onChipClick={handleChipClick}
@@ -385,7 +385,7 @@ export function EchoSheetV2({
                   disabled={!!rateLimitCooldown}
                   cooldown={rateLimitCooldown}
                 />
-              </>
+              </div>
             ) : (
               <EchoHistoryTab
                 onSelectConversation={handleSelectConversation}
