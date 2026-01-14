@@ -190,7 +190,7 @@ export function YourGamesTripsSheetV2({
             onClick={handleClose}
           />
 
-          {/* Sheet - frosted glass container */}
+          {/* Sheet - premium warm gradient container */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -200,10 +200,9 @@ export function YourGamesTripsSheetV2({
             style={{
               height: '85svh',
               maxHeight: '85svh',
-              background: 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
               boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.9)',
             }}
           >
             {/* Grabber - thinner, lighter */}
@@ -258,12 +257,17 @@ export function YourGamesTripsSheetV2({
               />
             </div>
 
-            {/* Tabs - V2 pills with breathing room */}
+            {/* Tabs - V2 pills with subtle background container */}
             <div className="px-5 pb-4 flex-shrink-0">
-              <TabPills
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-              />
+              <div 
+                className="p-1 rounded-[14px]"
+                style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+              >
+                <TabPills
+                  activeTab={activeTab}
+                  onTabChange={handleTabChange}
+                />
+              </div>
             </div>
 
             {/* Content - scrollable area */}

@@ -53,13 +53,11 @@ export function TripCard({ trip, variant, onTap }: TripCardProps) {
     return (
       <motion.button
         onClick={onTap}
-        className="w-full text-left rounded-[18px] p-4 transition-all duration-150 active:scale-[0.99]"
+        className="w-full text-left rounded-2xl p-4 transition-all duration-150 active:scale-[0.99]"
         style={{
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255, 255, 255, 0.5)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03)',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04)',
         }}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,13 +113,11 @@ export function TripCard({ trip, variant, onTap }: TripCardProps) {
   return (
     <button
       onClick={onTap}
-      className="w-full px-3.5 py-3 rounded-[16px] text-left transition-all duration-150 active:scale-[0.99]"
+      className="w-full px-4 py-3.5 rounded-2xl text-left transition-all duration-150 active:scale-[0.99]"
       style={{
-        background: 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
       }}
     >
       {/* Row 1: Trip name + Status chip */}

@@ -35,25 +35,25 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 pl-3 pr-3 py-3 rounded-[20px] text-left transition-all duration-150 active:scale-[0.99] active:opacity-90"
+      className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all duration-150 active:scale-[0.99] active:opacity-95"
       style={{
         background: isPrimary 
-          ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.06) 0%, rgba(255, 180, 100, 0.03) 100%)'
-          : 'rgba(255, 255, 255, 0.85)',
+          ? 'linear-gradient(180deg, #FFFAF5 0%, #FEF7F0 100%)'
+          : 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
         border: '1px solid rgba(0, 0, 0, 0.04)',
         boxShadow: isPrimary
-          ? '0 2px 8px rgba(255, 140, 60, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03)'
-          : '0 1px 3px rgba(0, 0, 0, 0.03)',
+          ? '0 2px 8px rgba(255, 140, 60, 0.08), 0 4px 16px rgba(0, 0, 0, 0.03)'
+          : '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
       }}
     >
-      {/* Icon circle */}
+      {/* Icon container - gradient circle with subtle shadow */}
       <div 
-        className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+        className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
         style={{
           background: isPrimary 
-            ? 'linear-gradient(135deg, rgba(255, 140, 60, 0.14) 0%, rgba(255, 160, 90, 0.08) 100%)'
-            : 'rgba(0, 0, 0, 0.03)',
-          border: '1px solid rgba(0, 0, 0, 0.04)',
+            ? 'linear-gradient(135deg, #FFF9F5 0%, #FEF3EC 100%)'
+            : 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}
       >
         {icon}
@@ -63,22 +63,22 @@ function MenuCard({ icon, title, subtitle, onClick, isPrimary }: MenuCardProps) 
       <div className="flex-1 min-w-0">
         <div 
           className="text-[15px] font-semibold leading-tight"
-          style={{ color: 'var(--hub-text)' }}
+          style={{ color: '#1e293b' }}
         >
           {title}
         </div>
         <div 
-          className="text-[12.5px] mt-px truncate"
-          style={{ color: 'var(--hub-text-dim)', opacity: 0.65 }}
+          className="text-[13px] mt-0.5 truncate"
+          style={{ color: '#64748b' }}
         >
           {subtitle}
         </div>
       </div>
 
-      {/* Chevron - consistent positioning */}
+      {/* Chevron */}
       <ChevronRight 
-        className="flex-shrink-0 w-4 h-4 mr-0.5"
-        style={{ color: 'var(--hub-text-dim)', opacity: 0.3 }}
+        className="flex-shrink-0 w-5 h-5"
+        style={{ color: 'rgba(148, 163, 184, 0.6)' }}
       />
     </button>
   );
@@ -167,7 +167,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             onClick={onClose}
           />
 
-          {/* Sheet - anchored to bottom, sits halfway up hero */}
+          {/* Sheet - anchored to bottom, premium warm gradient */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -175,9 +175,9 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
             className="fixed inset-x-0 bottom-0 z-[10002] rounded-t-[28px] overflow-hidden"
             style={{
-              background: '#F8FAFC',
-              boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.08), 0 -1px 0 rgba(255, 255, 255, 0.5) inset',
-              borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+              background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
+              boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.12), 0 -2px 10px rgba(0, 0, 0, 0.06)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.9)',
               overscrollBehavior: 'contain',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
@@ -210,39 +210,39 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
             {/* Requests section - only show if there are pending requests */}
             {pendingRequestsCount > 0 && (
               <>
-                <div className="px-5 pb-1.5">
+                <div className="px-5 pb-2">
                   <span 
-                    className="text-[10px] font-medium uppercase tracking-wide"
-                    style={{ color: 'var(--hub-text-dim)', opacity: 0.4 }}
+                    className="text-[10px] font-bold uppercase tracking-[0.1em]"
+                    style={{ color: 'rgba(100, 116, 139, 0.5)' }}
                   >
                     Requests
                   </span>
                 </div>
-                <div className="px-5 pb-3">
+                <div className="px-5 pb-4">
                   <button
                     onClick={handleRequests}
-                    className="w-full flex items-center gap-3 pl-3 pr-3 py-3 rounded-[20px] text-left transition-all duration-150 active:scale-[0.99] active:opacity-90"
+                    className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all duration-150 active:scale-[0.99] active:opacity-95"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(99, 102, 241, 0.03) 100%)',
-                      border: '1px solid rgba(59, 130, 246, 0.1)',
-                      boxShadow: '0 2px 8px rgba(59, 130, 246, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03)',
+                      background: 'linear-gradient(180deg, #F8FAFF 0%, #F0F4FF 100%)',
+                      border: '1px solid rgba(59, 130, 246, 0.08)',
+                      boxShadow: '0 2px 8px rgba(59, 130, 246, 0.06), 0 4px 16px rgba(0, 0, 0, 0.03)',
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center relative"
+                      className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center relative"
                       style={{
-                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(99, 102, 241, 0.08) 100%)',
-                        border: '1px solid rgba(59, 130, 246, 0.15)',
+                        background: 'linear-gradient(135deg, #EEF4FF 0%, #E0EBFF 100%)',
+                        boxShadow: '0 1px 3px rgba(59, 130, 246, 0.08)',
                       }}
                     >
-                      <Inbox className="w-[18px] h-[18px]" style={{ color: '#3b82f6' }} />
+                      <Inbox className="w-5 h-5" style={{ color: '#3b82f6' }} />
                       {/* Badge */}
                       <span 
-                        className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-bold px-1"
+                        className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] rounded-full flex items-center justify-center text-[11px] font-bold px-1.5"
                         style={{
                           background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
                           color: 'white',
-                          boxShadow: '0 2px 6px rgba(59, 130, 246, 0.4)',
+                          boxShadow: '0 2px 8px rgba(59, 130, 246, 0.4)',
                         }}
                       >
                         {pendingRequestsCount}
@@ -251,54 +251,54 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
                     <div className="flex-1 min-w-0">
                       <div 
                         className="text-[15px] font-semibold leading-tight"
-                        style={{ color: 'var(--hub-text)' }}
+                        style={{ color: '#1e293b' }}
                       >
                         Join Requests
                       </div>
                       <div 
-                        className="text-[12.5px] mt-px truncate"
-                        style={{ color: 'var(--hub-text-dim)', opacity: 0.65 }}
+                        className="text-[13px] mt-0.5 truncate"
+                        style={{ color: '#64748b' }}
                       >
                         Approve players wanting to join your games
                       </div>
                     </div>
                     <ChevronRight 
-                      className="flex-shrink-0 w-4 h-4 mr-0.5"
-                      style={{ color: 'var(--hub-text-dim)', opacity: 0.3 }}
+                      className="flex-shrink-0 w-5 h-5"
+                      style={{ color: 'rgba(148, 163, 184, 0.6)' }}
                     />
                   </button>
                 </div>
               </>
             )}
 
-            {/* Section label - subtle */}
-            <div className="px-5 pb-1.5">
+            {/* Section label - refined */}
+            <div className="px-5 pb-2">
               <span 
-                className="text-[10px] font-medium uppercase tracking-wide"
-                style={{ color: 'var(--hub-text-dim)', opacity: 0.4 }}
+                className="text-[10px] font-bold uppercase tracking-[0.1em]"
+                style={{ color: 'rgba(100, 116, 139, 0.5)' }}
               >
                 Quick actions
               </span>
             </div>
 
-            {/* Cards - tighter gaps */}
-            <div className="px-5 pb-5 flex flex-col gap-2">
+            {/* Cards - premium spacing */}
+            <div className="px-5 pb-6 flex flex-col gap-2.5">
               <MenuCard
-                icon={<Search className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-sub)' }} />}
+                icon={<Search className="w-5 h-5" style={{ color: '#64748b' }} />}
                 title="Discover Games"
                 subtitle="Find games near you or join one"
                 onClick={handleDiscoverGames}
               />
 
               <MenuCard
-                icon={<CalendarDays className="w-[18px] h-[18px]" style={{ color: 'var(--hub-text-sub)' }} />}
+                icon={<CalendarDays className="w-5 h-5" style={{ color: '#10b981' }} />}
                 title="Your Games & Trips"
                 subtitle="Upcoming games and trips"
                 onClick={handleYourGamesTrips}
               />
 
               <MenuCard
-                icon={<Plus className="w-[18px] h-[18px]" style={{ color: 'rgba(180, 90, 30, 0.85)' }} />}
+                icon={<Plus className="w-5 h-5" style={{ color: '#ea580c' }} />}
                 title="Create Game or Trip"
                 subtitle="Set up a game, invite players, or plan a trip"
                 onClick={handleCreateGameTrip}
