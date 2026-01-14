@@ -1,6 +1,5 @@
 /**
- * RegionChips - Tab-style region filters matching schedule page tabs exactly
- * Uses orange underline indicator (same as Schedule tabs)
+ * RegionChips - Segmented control region filters matching Schedule page tabs
  */
 
 import { cn } from '@/lib/utils';
@@ -12,23 +11,26 @@ interface RegionChipsProps {
   onRegionChange: (region: RegionType) => void;
 }
 
-const regions: { value: RegionType; label: string }[] = [
-  { value: 'all', label: 'All Regions' },
-  { value: 'united-states', label: 'United States' },
-  { value: 'europe', label: 'Europe' },
-  { value: 'asia-pacific', label: 'Asia-Pacific' },
-  { value: 'rest-of-world', label: 'Rest of World' },
+const regions: { value: RegionType; label: string; shortLabel: string }[] = [
+  { value: 'all', label: 'All Regions', shortLabel: 'All' },
+  { value: 'united-states', label: 'United States', shortLabel: 'USA' },
+  { value: 'europe', label: 'Europe', shortLabel: 'Europe' },
+  { value: 'asia-pacific', label: 'Asia-Pacific', shortLabel: 'Asia' },
+  { value: 'rest-of-world', label: 'Rest of World', shortLabel: 'Other' },
 ];
 
 export function RegionChips({ activeRegion, onRegionChange }: RegionChipsProps) {
   return (
     <div 
-      className="py-3"
+      className="py-2"
       role="tablist"
       aria-label="Filter by region"
     >
-      {/* Grid layout matching schedule page - 5 columns, centered */}
-      <div className="grid w-full grid-cols-5 bg-transparent border-0 px-0 py-0 gap-0">
+      {/* Full-width segmented control - matching Schedule page */}
+      <div 
+        className="flex items-stretch rounded-xl overflow-hidden"
+        style={{ background: '#e2e8f0' }}
+      >
         {regions.map((region) => {
           const isActive = activeRegion === region.value;
 
@@ -39,21 +41,14 @@ export function RegionChips({ activeRegion, onRegionChange }: RegionChipsProps) 
               aria-selected={isActive}
               onClick={() => onRegionChange(region.value)}
               className={cn(
-                // Exact same styling as schedule page tabs
-                "relative text-sm px-2 py-2.5 font-medium",
-                "bg-transparent border-0 shadow-none rounded-none",
-                "transition-colors duration-200 ease-out",
-                "inline-flex items-center justify-center text-center",
-                // Orange underline using after pseudo-element
-                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                "after:transition-all after:duration-200 after:ease-out",
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                "min-h-[44px]", // Accessibility touch target
                 isActive 
-                  ? "text-foreground after:w-full after:opacity-[0.85]" 
-                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                  ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                  : "text-slate-500 hover:text-slate-700"
               )}
             >
-              {region.label}
+              {region.shortLabel}
             </button>
           );
         })}

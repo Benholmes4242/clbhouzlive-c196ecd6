@@ -260,7 +260,7 @@ export function PlayersTab() {
   const hasNoRegionResults = processedPlayers.length === 0 && region !== 'all';
 
   return (
-    <div className="space-y-6 bg-[#F8FAFC] -mx-4 px-4 py-6 min-h-screen">
+    <div className="space-y-6 -mx-4 px-4 py-6 min-h-screen" style={{ background: '#f8fafc' }}>
       {/* Spotlight Reel - Premium hero carousel */}
       {players && players.length > 0 && worldRankedPlayers.length > 0 && (
         <SpotlightReel 
@@ -269,19 +269,20 @@ export function PlayersTab() {
         />
       )}
 
-      {/* Search Bar - Enhanced */}
+      {/* Search Bar - Matching Schedule page */}
       <div className="relative pt-2">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <Input
           placeholder="Search players, colleges, countries..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-11 h-11 bg-background/80 backdrop-blur-sm border-border/50 rounded-xl text-[15px] placeholder:text-muted-foreground/50"
+          className="pl-11 h-12 bg-white border-slate-200 rounded-xl text-[14px] text-slate-800 placeholder:text-slate-400"
+          style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
         />
       </div>
 
-      {/* Editorial Tabs - Glass bar with sliding indicator */}
-      <div className="sticky top-0 z-20 bg-[#F8FAFC]/95 backdrop-blur-sm -mx-1 px-1 py-2">
+      {/* Editorial Tabs - Segmented control matching Schedule page */}
+      <div className="sticky top-0 z-20 -mx-1 px-1 py-2" style={{ background: 'rgba(248, 250, 252, 0.95)', backdropFilter: 'blur(8px)' }}>
         <EditorialTabs
           activeFilter={filter}
           onFilterChange={setFilter}
@@ -291,13 +292,13 @@ export function PlayersTab() {
 
       {/* Tab Context Description */}
       <div className="flex items-start gap-2">
-        <p className="text-sm text-muted-foreground/80 leading-relaxed">
+        <p className="text-sm text-slate-500 leading-relaxed">
           {currentContext.description}
         </p>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="shrink-0 p-0.5 text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+              <button className="shrink-0 p-0.5 text-slate-400 hover:text-slate-600 transition-colors">
                 <Info className="w-3.5 h-3.5" />
               </button>
             </TooltipTrigger>
@@ -310,7 +311,7 @@ export function PlayersTab() {
 
       {/* Sort Control + Count */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground/70 font-medium">
+        <p className="text-sm text-slate-500 font-medium">
           {processedPlayers.length} player{processedPlayers.length !== 1 ? 's' : ''}
         </p>
         <PlayerSortControl value={sort} onChange={setSort} />
@@ -324,7 +325,7 @@ export function PlayersTab() {
 
       {/* Region active helper text */}
       {region !== 'all' && processedPlayers.length > 0 && (
-        <p className="text-xs text-muted-foreground/60">
+        <p className="text-xs text-slate-400">
           Showing players from {getRegionLabel(region)}
         </p>
       )}
@@ -332,19 +333,19 @@ export function PlayersTab() {
       {/* Player List - Identity Cards */}
       {hasNoRankingData ? (
         <div className="text-center py-16 space-y-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-slate-600">
             World ranking data is currently unavailable.
           </p>
-          <p className="text-xs text-muted-foreground/60">
+          <p className="text-xs text-slate-400">
             Check back later for updated rankings.
           </p>
         </div>
       ) : hasNoRegionResults ? (
         <div className="text-center py-16 space-y-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-slate-600">
             No players found for this region and category.
           </p>
-          <p className="text-xs text-muted-foreground/60">
+          <p className="text-xs text-slate-400">
             Try selecting a different region or category.
           </p>
         </div>
@@ -362,10 +363,10 @@ export function PlayersTab() {
         </div>
       ) : (
         <div className="text-center py-16 space-y-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-slate-600">
             No players found
           </p>
-          <p className="text-xs text-muted-foreground/60">
+          <p className="text-xs text-slate-400">
             Try adjusting your search or filters
           </p>
         </div>
@@ -373,7 +374,7 @@ export function PlayersTab() {
 
       {/* Human pagination message */}
       {processedPlayers.length > 200 && (
-        <p className="text-center text-sm text-muted-foreground/60 py-6">
+        <p className="text-center text-sm text-slate-400 py-6">
           Showing 200 of {processedPlayers.length} players. Use search to find specific players.
         </p>
       )}

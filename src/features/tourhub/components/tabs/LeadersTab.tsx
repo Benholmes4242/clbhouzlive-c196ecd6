@@ -330,10 +330,16 @@ export function LeadersTab() {
       >
         {/* Row 1: Season Performance */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 px-1">
+          <p 
+            className="font-extrabold text-slate-800 uppercase mb-2"
+            style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+          >
             Season Performance
           </p>
-          <div className="flex overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div 
+            className="flex items-stretch rounded-xl overflow-hidden"
+            style={{ background: '#e2e8f0' }}
+          >
             {seasonCategories.map((cat) => {
               const isSelected = selectedCategory.key === cat.key;
               return (
@@ -343,16 +349,11 @@ export function LeadersTab() {
                   aria-selected={isSelected}
                   onClick={() => handleCategoryChange(cat)}
                   className={cn(
-                    "relative text-sm px-3 py-2 font-medium whitespace-nowrap",
-                    "bg-transparent border-0 shadow-none rounded-none",
-                    "transition-colors duration-200 ease-out",
-                    "inline-flex items-center justify-center gap-1",
-                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                    "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                    "after:transition-all after:duration-200 after:ease-out",
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                    "min-h-[44px]",
                     isSelected 
-                      ? "text-foreground after:w-full after:opacity-[0.85]" 
-                      : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                      : "text-slate-500 hover:text-slate-700"
                   )}
                 >
                   {cat.shortLabel}
@@ -364,10 +365,16 @@ export function LeadersTab() {
 
         {/* Row 2: Ball Striking & Short Game */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 px-1">
+          <p 
+            className="font-extrabold text-slate-800 uppercase mb-2"
+            style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+          >
             Ball Striking & Short Game
           </p>
-          <div className="flex overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div 
+            className="flex items-stretch rounded-xl overflow-hidden"
+            style={{ background: '#e2e8f0' }}
+          >
             {statsCategories.map((cat) => {
               const isSelected = selectedCategory.key === cat.key;
               return (
@@ -377,16 +384,11 @@ export function LeadersTab() {
                   aria-selected={isSelected}
                   onClick={() => handleCategoryChange(cat)}
                   className={cn(
-                    "relative text-sm px-3 py-2 font-medium whitespace-nowrap",
-                    "bg-transparent border-0 shadow-none rounded-none",
-                    "transition-colors duration-200 ease-out",
-                    "inline-flex items-center justify-center gap-1",
-                    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                    "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                    "after:transition-all after:duration-200 after:ease-out",
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                    "min-h-[44px]",
                     isSelected 
-                      ? "text-foreground after:w-full after:opacity-[0.85]" 
-                      : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                      : "text-slate-500 hover:text-slate-700"
                   )}
                 >
                   {cat.shortLabel}
