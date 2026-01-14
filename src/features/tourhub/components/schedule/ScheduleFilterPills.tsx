@@ -50,9 +50,9 @@ export function ScheduleFilterPills({
       role="tablist"
       aria-label="Filter tournaments"
     >
-      {/* Pill container with subtle background - matches search bar width */}
+      {/* Full-width segmented control */}
       <div 
-        className="flex items-center justify-center gap-1 p-1 rounded-xl max-w-md"
+        className="flex items-stretch rounded-xl overflow-hidden"
         style={{ background: '#e2e8f0' }}
       >
         {options.map((option) => {
@@ -65,11 +65,11 @@ export function ScheduleFilterPills({
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
               className={cn(
-                "relative px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
-                "min-h-[44px] min-w-[44px]", // Accessibility touch target
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                "min-h-[44px]", // Accessibility touch target
                 isActive 
-                  ? "bg-white text-slate-800 shadow-sm" 
-                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                  ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                  : "text-slate-500 hover:text-slate-700"
               )}
             >
               <span className="flex items-center justify-center gap-1.5">
