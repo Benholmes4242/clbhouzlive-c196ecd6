@@ -37,6 +37,7 @@ import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
 import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
 import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
+import { QuestPageSkeleton } from '@/components/quest/QuestPageSkeleton';
 import { MomentumCard } from '@/components/quest/MomentumCard';
 import { LeaderboardCard } from '@/components/quest/LeaderboardCard';
 import { CLUB_STEPS } from '@/lib/top100Club';
@@ -214,13 +215,7 @@ const ProfileQuestView: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <PageRoot className="min-h-screen bg-[#F8FAFC]">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-        </div>
-      </PageRoot>
-    );
+    return <QuestPageSkeleton />;
   }
 
   return (

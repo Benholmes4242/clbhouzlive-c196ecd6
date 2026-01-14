@@ -4,10 +4,11 @@
  */
 
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getRegionTheme, type Top100ListSlug } from '@/lib/regionTheme';
 import { cn } from '@/lib/utils';
+import { QuestEmptyState } from './QuestEmptyState';
 
 export interface RegionProgress {
   id: string;
@@ -129,6 +130,26 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
       navigate(route);
     }
   };
+
+  // Empty state when no regional progress exists
+  if (!regions || regions.length === 0) {
+    return (
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+          Regional Progress
+        </h2>
+        <QuestEmptyState
+          icon={<Globe className="w-8 h-8 text-[#64748b]" />}
+          title="Explore the World"
+          description="Track your progress across GB&I, Europe, USA and worldwide Top 100 lists"
+          action={{
+            label: "View Top 100 Lists",
+            onClick: () => navigate('/top100'),
+          }}
+        />
+      </section>
+    );
+  }
 
   return (
     <section>

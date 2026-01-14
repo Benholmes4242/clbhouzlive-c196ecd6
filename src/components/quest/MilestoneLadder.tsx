@@ -8,13 +8,15 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Check, Lock, Trophy, Crown } from 'lucide-react';
+import { Check, Lock, Trophy, Crown, Flag } from 'lucide-react';
 import { MILESTONE_TIER_META } from '@/config/achievements';
 import { getRingColorForThreshold } from '@/lib/globalAchievementMilestoneSystem';
 import { type Top100ListSlug } from '@/lib/regionTheme';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { MILESTONE_TAGLINES, REGION_TAGLINES, REGION_FULL_NAMES } from '@/config/achievementTaglines';
+import { QuestEmptyState } from './QuestEmptyState';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // MILESTONE DATA TYPES
@@ -245,6 +247,8 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   onMilestoneClick,
   regionCompletions = [],
 }) => {
+  const navigate = useNavigate();
+  
   // Build core milestones from single source of truth
   const coreMilestones = useMemo(() => buildMilestoneItems(totalPlayed), [totalPlayed]);
   
@@ -265,6 +269,21 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   
   // Check if all core milestones are complete (400 Club achieved)
   const coreComplete = coreMilestones.every(m => m.isUnlocked);
+
+  // Empty state for users with 0 courses
+  if (totalPlayed === 0 && coreMilestones.length > 0) {
+    return (
+      <QuestEmptyState
+        icon={<Flag className="w-8 h-8 text-[#64748b]" />}
+        title="Begin Your Journey"
+        description="Log your first Top 100 course to start climbing the milestone ladder"
+        action={{
+          label: "Explore Courses",
+          onClick: () => navigate('/top100'),
+        }}
+      />
+    );
+  }
 
   return (
     <div className="relative overflow-hidden">
