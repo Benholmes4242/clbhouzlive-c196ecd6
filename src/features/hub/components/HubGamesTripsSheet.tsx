@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
 import { useHub } from '../useHub';
 import { YourGamesTripsSheetV2 } from './your-games-trips-v2';
+import { DiscoverGamesBottomSheetV2 } from './discover-games';
 import { RequestsSheet } from './requests';
 import { useHostPendingRequests } from '../hooks/useHostPendingRequests';
 import '../home/hubThemeLight.css';
@@ -92,6 +93,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   
   // State for nested sheets
   const [yourGamesTripsOpen, setYourGamesTripsOpen] = useState(false);
+  const [discoverOpen, setDiscoverOpen] = useState(false);
   const [requestsOpen, setRequestsOpen] = useState(false);
   
   // Get pending requests count
@@ -128,8 +130,7 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
   const handleDiscoverGames = () => {
     haptic('light');
     onClose();
-    // Navigate directly without calling closeHub() which would nav(-1) first
-    navigate('/games/discover');
+    setDiscoverOpen(true);
   };
 
   const handleYourGamesTrips = () => {
@@ -322,6 +323,12 @@ export function HubGamesTripsSheet({ isOpen, onClose, onOpenCreate }: HubGamesTr
         onClose={() => setYourGamesTripsOpen(false)}
         onOpenCreateGame={onOpenCreate}
         onOpenCreateTrip={onOpenCreate}
+      />
+      
+      {/* Discover Games Sheet */}
+      <DiscoverGamesBottomSheetV2
+        isOpen={discoverOpen}
+        onClose={() => setDiscoverOpen(false)}
       />
       
       {/* Requests Sheet */}
