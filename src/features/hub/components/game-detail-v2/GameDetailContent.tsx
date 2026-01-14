@@ -9,7 +9,8 @@
  */
 
 import React, { useState } from 'react';
-import { MapPin, Users, Clock, MoreVertical, Bell, UserPlus, Flag, ExternalLink, Calendar } from 'lucide-react';
+import { MapPin, Users, Clock, MoreVertical, Bell, UserPlus, Flag, ExternalLink, Calendar, Users2 } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
@@ -71,20 +72,24 @@ interface GameDetailContentProps {
   onOpenFullPage?: () => void;
 }
 
-// RSVP status label component
+// RSVP status label component - premium pill styling
 function RsvpStatusLabel({ status }: { status: RsvpStatus | string | null }) {
-  const labels: Record<string, { text: string; color: string }> = {
-    going: { text: 'Joined', color: 'text-green-600' },
-    maybe: { text: 'Maybe', color: 'text-yellow-600' },
-    declined: { text: "Can't go", color: 'text-red-500' },
-    invited: { text: 'Invited', color: 'text-blue-500' },
+  const labels: Record<string, { text: string; color: string; bg: string }> = {
+    going: { text: 'Joined', color: '#059669', bg: 'rgba(5, 150, 105, 0.1)' },
+    maybe: { text: 'Maybe', color: '#D97706', bg: 'rgba(217, 119, 6, 0.1)' },
+    declined: { text: "Can't go", color: '#DC2626', bg: 'rgba(220, 38, 38, 0.1)' },
+    invited: { text: 'Invited', color: '#6366F1', bg: 'rgba(99, 102, 241, 0.1)' },
+    requested: { text: 'Requested', color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.1)' },
   };
   
   const config = status ? labels[status] : null;
   if (!config) return null;
   
   return (
-    <span className={`text-xs font-medium ${config.color}`}>
+    <span 
+      className="px-2.5 py-1 rounded-lg text-[12px] font-semibold flex-shrink-0"
+      style={{ color: config.color, background: config.bg }}
+    >
       {config.text}
     </span>
   );
@@ -322,10 +327,29 @@ export function GameDetailContent({
         )}
 
         {activeTab === 'participants' && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {participants.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8 text-sm">
-                No participants yet
+              <div className="flex flex-col items-center justify-center py-16 px-6">
+                {/* Icon container */}
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                  style={{
+                    background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                  }}
+                >
+                  <Users2 className="h-7 w-7 text-green-500" />
+                </div>
+                
+                {/* Title */}
+                <p className="text-[15px] font-semibold text-slate-700 mb-1">
+                  No players yet
+                </p>
+                
+                {/* Subtitle */}
+                <p className="text-[13px] text-slate-400 text-center">
+                  Invite friends to join this game
+                </p>
               </div>
             ) : (
               participants.map((participant) => {
@@ -335,37 +359,66 @@ export function GameDetailContent({
                 return (
                   <div
                     key={participant.id}
-                    className="flex items-center gap-3 p-3.5 rounded-2xl"
+                    className="flex items-center gap-3 p-4 rounded-2xl"
                     style={{
                       background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02)',
                       border: '1px solid rgba(0, 0, 0, 0.04)',
                     }}
                   >
-                    <div className="relative">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                        {profile?.display_name?.[0] || '?'}
-                      </div>
+                    {/* Avatar with host badge */}
+                    <div className="relative flex-shrink-0">
+                      <SquircleAvatar
+                        src={profile?.profile_photo_url || undefined}
+                        alt={profile?.display_name || 'Player'}
+                        size={48}
+                        fallback={profile?.display_name?.[0] || '?'}
+                        className="border-2 border-white shadow-sm"
+                      />
                       {isParticipantHost && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground border-2 border-white">
+                        <div 
+                          className="absolute -bottom-0.5 -right-0.5 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white"
+                          style={{
+                            background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
+                            borderRadius: '6px',
+                            border: '2px solid white',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                          }}
+                        >
                           H
                         </div>
                       )}
                     </div>
+                    
+                    {/* Player info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 font-medium text-sm">
-                        <span className="truncate">{profile?.display_name || 'Unknown'}</span>
-                        {isParticipantHost && <span className="text-[10px] text-primary">(Host)</span>}
-                        <HcpBadge 
-                          value={profile?.handicap} 
-                          show={profile?.show_handicap ?? true}
-                          className="text-muted-foreground text-[10px]"
-                        />
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-[15px] text-slate-800 truncate">
+                          {profile?.display_name || 'Unknown'}
+                        </span>
+                        {isParticipantHost && (
+                          <span 
+                            className="px-2 py-0.5 text-[11px] font-semibold rounded-md"
+                            style={{
+                              background: 'rgba(249, 115, 22, 0.1)',
+                              color: '#EA580C',
+                            }}
+                          >
+                            Host
+                          </span>
+                        )}
+                        {profile?.handicap !== undefined && profile?.handicap !== null && profile?.show_handicap !== false && (
+                          <span className="text-[13px] text-slate-500">
+                            HCP {typeof profile.handicap === 'number' ? profile.handicap.toFixed(1) : profile.handicap}
+                          </span>
+                        )}
                       </div>
                       {profile?.username && (
-                        <div className="text-xs text-muted-foreground truncate">@{profile.username}</div>
+                        <div className="text-[13px] text-slate-400 truncate">@{profile.username}</div>
                       )}
                     </div>
+                    
+                    {/* RSVP Status */}
                     <RsvpStatusLabel status={participant.rsvp_status || null} />
                   </div>
                 );
