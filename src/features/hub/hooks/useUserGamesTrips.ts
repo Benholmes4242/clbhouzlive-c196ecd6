@@ -200,7 +200,7 @@ export function useUserPastGames() {
 
       const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
 
-      // Get completed games where user is host
+      // Get completed games where user is host - also fetch course info if course_name is null
       const { data: hostedGames, error: hostError } = await supabase
         .from('games')
         .select(`
@@ -212,7 +212,10 @@ export function useUserPastGames() {
           status,
           trip_id,
           visibility,
-          host_user_id
+          host_user_id,
+          golf_courses:course_id (
+            name
+          )
         `)
         .eq('host_user_id', user.id)
         .or(`status.eq.completed,start_time.lt.${sixHoursAgo}`)
@@ -235,7 +238,10 @@ export function useUserPastGames() {
             status,
             trip_id,
             visibility,
-            host_user_id
+            host_user_id,
+            golf_courses:course_id (
+              name
+            )
           )
         `)
         .eq('user_id', user.id)
@@ -250,33 +256,65 @@ export function useUserPastGames() {
       participantGames?.forEach(p => {
         const g = p.games as any;
         if (g && !gameMap.has(g.id)) {
-          const startTime = new Date(g.start_time);
-          const now = new Date();
-          if (g.status === 'completed' || startTime < new Date(Date.now() - 6 * 60 * 60 * 1000)) {
+          if (g.status === 'completed' || new Date(g.start_time) < new Date(Date.now() - 6 * 60 * 60 * 1000)) {
             gameMap.set(g.id, g);
           }
         }
       });
 
+      const allGameIds = Array.from(gameMap.keys());
+      if (allGameIds.length === 0) return [];
+
+      // FIX: Fetch participant counts for past games (was hardcoded to 0)
+      const { data: participants, error: participantsError } = await supabase
+        .from('game_participants')
+        .select('game_id, user_id, rsvp_status')
+        .in('game_id', allGameIds);
+
+      if (participantsError) {
+        console.error('[useUserPastGames] Error fetching participants:', participantsError);
+        // Non-fatal, continue with 0 counts
+      }
+
+      // Group counts by game_id
+      const countsByGame: Record<string, { going: number; maybe: number; declined: number; invited: number }> = {};
+      participants?.forEach(p => {
+        if (!countsByGame[p.game_id]) {
+          countsByGame[p.game_id] = { going: 0, maybe: 0, declined: 0, invited: 0 };
+        }
+        if (p.rsvp_status === 'going') countsByGame[p.game_id].going++;
+        else if (p.rsvp_status === 'maybe') countsByGame[p.game_id].maybe++;
+        else if (p.rsvp_status === 'declined') countsByGame[p.game_id].declined++;
+        else if (p.rsvp_status === 'invited') countsByGame[p.game_id].invited++;
+      });
+
       const games: UserGame[] = Array.from(gameMap.values())
-        .map((g): UserGame => ({
-          id: g.id,
-          courseName: g.course_name || 'Unknown Course',
-          courseId: g.course_id,
-          startsAt: g.start_time,
-          endsAt: g.ends_at,
-          status: 'completed',
-          tripId: g.trip_id,
-          visibility: g.visibility || 'friends',
-          currentUserRsvp: null,
-          goingCount: 0,
-          maybeCount: 0,
-          declinedCount: 0,
-          invitedCount: 0,
-          hostUserId: g.host_user_id,
-          isHost: g.host_user_id === user.id,
-          remindersEnabled: false,
-        }))
+        .map((g): UserGame => {
+          const counts = countsByGame[g.id] || { going: 0, maybe: 0, declined: 0, invited: 0 };
+          const myParticipant = participants?.find(p => p.game_id === g.id && p.user_id === user.id);
+          
+          // Get course name from course_name or fallback to golf_courses join
+          const courseName = g.course_name || (g.golf_courses as any)?.name || 'Unknown Course';
+          
+          return {
+            id: g.id,
+            courseName,
+            courseId: g.course_id,
+            startsAt: g.start_time,
+            endsAt: g.ends_at,
+            status: 'completed',
+            tripId: g.trip_id,
+            visibility: g.visibility || 'friends',
+            currentUserRsvp: myParticipant?.rsvp_status as RsvpStatus || (g.host_user_id === user.id ? 'going' : null),
+            goingCount: counts.going + (g.host_user_id === user.id && !participants?.some(p => p.game_id === g.id && p.user_id === user.id) ? 1 : 0),
+            maybeCount: counts.maybe,
+            declinedCount: counts.declined,
+            invitedCount: counts.invited,
+            hostUserId: g.host_user_id,
+            isHost: g.host_user_id === user.id,
+            remindersEnabled: false,
+          };
+        })
         .sort((a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());
 
       return games;
