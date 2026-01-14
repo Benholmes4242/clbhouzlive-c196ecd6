@@ -1,6 +1,6 @@
 /**
  * HubYourWorldV3 - "YOUR WORLD" section
- * Shows user's upcoming trips and games with compact cards
+ * Calmer, more premium variant of compact cards
  */
 
 import React, { useState } from 'react';
@@ -112,7 +112,7 @@ export function HubYourWorldV3() {
       <div className="space-y-2">
         <HubSectionHeader title="Your World" />
         <div 
-          className="h-20 rounded-[20px] animate-pulse"
+          className="h-[82px] rounded-[20px] animate-pulse"
           style={{ background: 'var(--hub-skeleton-base)' }}
         />
       </div>
@@ -130,25 +130,26 @@ export function HubYourWorldV3() {
 
         {uniqueItems.length === 0 ? (
           <HubCompactCardV3
-            icon={<Calendar className="h-4 w-4" style={{ color: 'var(--hub-text-dim)' }} />}
+            icon={<Calendar className="h-4.5 w-4.5" style={{ color: 'var(--hub-text-dim)' }} />}
             title="Your golf diary"
             subtitle="Trips, matches, and games"
             onClick={openSheet}
+            calmer
           />
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {uniqueItems.map((item) => (
               <HubCompactCardV3
                 key={item.id}
                 icon={
                   item.type === 'game' 
-                    ? <MapPin className="h-4 w-4" style={{ color: 'var(--hub-badge-green-text)' }} />
-                    : <Plane className="h-4 w-4" style={{ color: '#3B82F6' }} />
+                    ? <MapPin className="h-4.5 w-4.5" style={{ color: '#64748B' }} />
+                    : <Plane className="h-4.5 w-4.5" style={{ color: '#64748B' }} />
                 }
-                iconBg={item.type === 'game' ? 'var(--hub-badge-green-bg)' : 'rgba(59, 130, 246, 0.12)'}
                 title={item.title}
                 subtitle={item.subtitle}
                 onClick={openSheet}
+                calmer
               />
             ))}
           </div>
