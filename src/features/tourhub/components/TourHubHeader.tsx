@@ -19,7 +19,7 @@ const HEADER_CONTENT: Record<TourHubTab, { title: string; subtext: string }> = {
     title: 'The Global Golf Season', 
     subtext: 'Every tour. Every event. Every moment that defines professional golf.' 
   },
-  schedule: { title: 'Schedule', subtext: 'All events' },
+  schedule: { title: '', subtext: '' },
   players: { title: 'Players', subtext: 'Tour roster' },
   leaderboards: { title: 'Leaders', subtext: 'Season rankings' },
   summary: { title: 'Summary', subtext: 'Tournament recap' },
