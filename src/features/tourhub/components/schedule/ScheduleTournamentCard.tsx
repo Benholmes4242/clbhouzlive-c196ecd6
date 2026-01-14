@@ -85,7 +85,7 @@ export function ScheduleTournamentCard({ tournament, className }: ScheduleTourna
         className
       )}
       style={{ 
-        height: '200px',
+        height: '253px',
         borderRadius: '0px',
       }}
     >
