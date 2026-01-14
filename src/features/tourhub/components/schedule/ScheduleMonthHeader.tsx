@@ -40,7 +40,7 @@ export function ScheduleMonthHeader({
         <span 
           className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
           style={{ 
-            background: 'rgba(30, 41, 59, 0.08)',
+            background: '#e2e8f0',
             color: '#64748b',
           }}
         >
