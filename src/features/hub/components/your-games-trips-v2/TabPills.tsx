@@ -21,31 +21,25 @@ const TABS: { key: SheetTab; label: string }[] = [
 
 export function TabPills({ activeTab, onTabChange }: TabPillsProps) {
   return (
-    <div 
-      className="flex gap-1 p-1 rounded-[14px]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.04)',
-        border: '1px solid rgba(0, 0, 0, 0.02)',
-      }}
-    >
+    <div className="flex gap-1">
       {TABS.map(tab => {
         const isActive = activeTab === tab.key;
         return (
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className="relative flex-1 py-2 px-4 text-[13px] font-semibold rounded-[10px] transition-colors duration-150"
+            className="relative flex-1 py-2.5 px-4 text-[13px] font-semibold rounded-[10px] transition-colors duration-150"
             style={{
               color: isActive ? '#1e293b' : 'rgba(100, 116, 139, 0.65)',
             }}
           >
             {isActive && (
               <motion.div
-                layoutId="tab-pill-bg-v2"
+                layoutId="tab-pill-bg-v3"
                 className="absolute inset-0 rounded-[10px]"
                 style={{
-                  background: '#ffffff',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                  background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)',
                 }}
                 transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
               />
