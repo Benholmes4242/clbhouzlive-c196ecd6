@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { Camera, User, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ImageCropperModal } from './ImageCropperModal';
 
 interface ProfilePhotoCardProps {
   currentUrl?: string | null;
@@ -8,12 +9,17 @@ interface ProfilePhotoCardProps {
   onFileChange: (file: File | null) => void;
 }
 
+// Profile photo aspect ratio: squircle spec (1:1.05)
+const PROFILE_ASPECT_RATIO = 1 / 1.05;
+
 export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   currentUrl,
   previewUrl,
   onFileChange,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [cropperImage, setCropperImage] = useState<string | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
 
   const displayUrl = previewUrl || currentUrl;
 
@@ -22,8 +28,32 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create a preview URL for the cropper
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropperImage(reader.result as string);
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleCropComplete = useCallback((croppedBlob: Blob) => {
+    // Convert blob to File for upload
+    const file = new File([croppedBlob], 'profile-photo.jpg', { type: 'image/jpeg' });
     onFileChange(file);
+    setCropperImage(null);
+  }, [onFileChange]);
+
+  const handleCropperClose = (open: boolean) => {
+    if (!open) {
+      setCropperImage(null);
+    }
+    setShowCropper(open);
   };
 
   return (
@@ -36,7 +66,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Large profile photo preview */}
+        {/* Large profile photo preview - matches ProfileAvatarRing lg size (144px) */}
         <div className="relative">
           <button
             type="button"
@@ -49,7 +79,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
                 "border-4 border-background shadow-xl"
               )}
               style={{
-                width: '100px',
+                width: '144px',
                 aspectRatio: '1 / 1.05',
                 borderRadius: '34%',
               }}
@@ -66,23 +96,23 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
                     className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                     style={{ borderRadius: '34%' }}
                   >
-                    <Camera className="w-6 h-6 text-white" />
+                    <Camera className="w-8 h-8 text-white" />
                   </div>
                 </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                  <User className="w-10 h-10 text-muted-foreground/50" />
+                  <User className="w-14 h-14 text-muted-foreground/50" />
                 </div>
               )}
             </div>
             
             {/* Upload button badge */}
             <div className={cn(
-              "absolute -bottom-1 -right-1 w-8 h-8 rounded-full shadow-lg flex items-center justify-center",
+              "absolute -bottom-1 -right-1 w-10 h-10 rounded-full shadow-lg flex items-center justify-center",
               "bg-primary text-primary-foreground",
               "group-hover:scale-110 transition-transform"
             )}>
-              <Plus className="w-4 h-4" />
+              <Plus className="w-5 h-5" />
             </div>
           </button>
         </div>
@@ -117,6 +147,19 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         onChange={handleChange}
         className="hidden"
       />
+
+      {/* Image Cropper Modal */}
+      {cropperImage && (
+        <ImageCropperModal
+          open={showCropper}
+          onOpenChange={handleCropperClose}
+          image={cropperImage}
+          aspectRatio={PROFILE_ASPECT_RATIO}
+          cropShape="round"
+          title="Crop Profile Photo"
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 };

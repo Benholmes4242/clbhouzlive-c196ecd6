@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -9,6 +9,16 @@ import { toast } from 'sonner';
 import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // Section components
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
@@ -37,8 +47,8 @@ interface FormData {
   displayName: string;
   username: string;
   homeClub: string;
-  homeClubId: string | null;  // Links to golf_clubs.id (primary_club_id)
-  collegeNormalized: string | null;  // Links to college_media.normalized_name
+  homeClubId: string | null;
+  collegeNormalized: string | null;
   handicap: string;
   bio: string;
   websites: string[];
@@ -51,6 +61,25 @@ interface FormData {
   headerPhotoPreview: string | null;
 }
 
+// Initial form state factory
+const createInitialFormData = (profile: any): FormData => ({
+  displayName: profile?.display_name || '',
+  username: profile?.username || '',
+  homeClub: profile?.home_club || '',
+  homeClubId: profile?.primary_club_id || null,
+  collegeNormalized: profile?.college_normalized || null,
+  handicap: profile?.eg_handicap_index?.toString() || '',
+  bio: profile?.bio || '',
+  websites: profile?.websites || [],
+  isPublic: profile?.is_public ?? true,
+  homeClubVisibility: profile?.home_club_visibility || 'public',
+  additionalClubsVisibility: profile?.additional_clubs_visibility || 'followers',
+  profilePhoto: null,
+  headerPhoto: null,
+  profilePhotoPreview: null,
+  headerPhotoPreview: null,
+});
+
 const EditProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,6 +89,10 @@ const EditProfilePage: React.FC = () => {
   // Section refs for scroll-to
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeSection, setActiveSection] = useState('photos');
+
+  // Unsaved changes confirmation dialog
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
+  const pendingNavigationRef = useRef<string | null>(null);
 
   // Determine back destination
   const getBackDestination = () => {
@@ -91,23 +124,8 @@ const EditProfilePage: React.FC = () => {
     enabled: !!user?.id,
   });
 
-  const [formData, setFormData] = useState<FormData>({
-    displayName: '',
-    username: '',
-    homeClub: '',
-    homeClubId: null,
-    collegeNormalized: null,
-    handicap: '',
-    bio: '',
-    websites: [],
-    isPublic: true,
-    homeClubVisibility: 'public',
-    additionalClubsVisibility: 'followers',
-    profilePhoto: null,
-    headerPhoto: null,
-    profilePhotoPreview: null,
-    headerPhotoPreview: null,
-  });
+  const [formData, setFormData] = useState<FormData>(createInitialFormData(null));
+  const [initialFormData, setInitialFormData] = useState<FormData | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -115,27 +133,39 @@ const EditProfilePage: React.FC = () => {
   // Initialize form data when profile loads
   useEffect(() => {
     if (profile) {
-      setFormData({
-        displayName: profile.display_name || '',
-        username: profile.username || '',
-        homeClub: profile.home_club || '',
-        homeClubId: profile.primary_club_id || null,  // Load from primary_club_id
-        collegeNormalized: (profile as any).college_normalized || null,  // Load college
-        handicap: profile.eg_handicap_index?.toString() || '',
-        bio: profile.bio || '',
-        websites: profile.websites || [],
-        isPublic: profile.is_public ?? true,
-        homeClubVisibility: (profile as any).home_club_visibility || 'public',
-        additionalClubsVisibility: (profile as any).additional_clubs_visibility || 'followers',
-        profilePhoto: null,
-        headerPhoto: null,
-        profilePhotoPreview: null,
-        headerPhotoPreview: null,
-      });
+      const initial = createInitialFormData(profile);
+      setFormData(initial);
+      setInitialFormData(initial);
     }
   }, [profile]);
 
   const isUsernameSet = profile?.username && profile.username.trim() !== '';
+
+  // Check if form has unsaved changes (dirty state)
+  const isDirty = useMemo(() => {
+    if (!initialFormData) return false;
+    
+    // Check text fields
+    if (formData.displayName !== initialFormData.displayName) return true;
+    if (formData.username !== initialFormData.username) return true;
+    if (formData.homeClub !== initialFormData.homeClub) return true;
+    if (formData.homeClubId !== initialFormData.homeClubId) return true;
+    if (formData.collegeNormalized !== initialFormData.collegeNormalized) return true;
+    if (formData.handicap !== initialFormData.handicap) return true;
+    if (formData.bio !== initialFormData.bio) return true;
+    if (formData.isPublic !== initialFormData.isPublic) return true;
+    if (formData.homeClubVisibility !== initialFormData.homeClubVisibility) return true;
+    if (formData.additionalClubsVisibility !== initialFormData.additionalClubsVisibility) return true;
+    
+    // Check arrays
+    if (JSON.stringify(formData.websites) !== JSON.stringify(initialFormData.websites)) return true;
+    
+    // Check file uploads
+    if (formData.profilePhoto !== null) return true;
+    if (formData.headerPhoto !== null) return true;
+    
+    return false;
+  }, [formData, initialFormData]);
 
   // Section order for scroll-spy
   const sectionOrder = ['photos', 'basic', 'golf', 'bio', 'privacy'];
@@ -265,8 +295,8 @@ const EditProfilePage: React.FC = () => {
       const updateData: any = {
         display_name: formData.displayName || null,
         home_club: formData.homeClub || null,
-        primary_club_id: formData.homeClubId || null,  // Store club ID from golf_clubs
-        college_normalized: formData.collegeNormalized || null,  // Store college
+        primary_club_id: formData.homeClubId || null,
+        college_normalized: formData.collegeNormalized || null,
         eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
         bio: formData.bio || null,
         websites: normalizeWebsites(formData.websites),
@@ -339,10 +369,31 @@ const EditProfilePage: React.FC = () => {
     }
   }, [user?.id, formData, isUsernameSet, normalizeWebsites, queryClient, navigate]);
 
-  // Handle cancel/back
+  // Handle cancel/back with dirty check
   const handleBack = useCallback(() => {
-    navigate(getBackDestination());
-  }, [navigate, location]);
+    const destination = getBackDestination();
+    
+    if (isDirty) {
+      pendingNavigationRef.current = destination;
+      setShowDiscardDialog(true);
+    } else {
+      navigate(destination);
+    }
+  }, [navigate, isDirty, getBackDestination]);
+
+  // Handle discard confirmation
+  const handleDiscardConfirm = useCallback(() => {
+    setShowDiscardDialog(false);
+    if (pendingNavigationRef.current) {
+      navigate(pendingNavigationRef.current);
+      pendingNavigationRef.current = null;
+    }
+  }, [navigate]);
+
+  const handleDiscardCancel = useCallback(() => {
+    setShowDiscardDialog(false);
+    pendingNavigationRef.current = null;
+  }, []);
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -545,7 +596,7 @@ const EditProfilePage: React.FC = () => {
         </div>
       </main>
 
-      {/* Sticky Footer - Enhanced */}
+      {/* Sticky Footer - Enhanced with dirty state feedback */}
       <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur shadow-lg">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-4">
           <button
@@ -560,13 +611,14 @@ const EditProfilePage: React.FC = () => {
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving || saveSuccess}
+            disabled={saving || saveSuccess || !isDirty}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-8 h-12 text-sm font-semibold transition-all",
-              "bg-[#e2e8f0] text-slate-700",
-              "hover:bg-slate-300 hover:shadow-lg hover:scale-[1.02]",
-              "disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100",
-              saveSuccess && "bg-emerald-500 text-white"
+              isDirty && !saving && !saveSuccess
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02]"
+                : "bg-[#e2e8f0] text-slate-500",
+              saveSuccess && "bg-emerald-500 text-white",
+              "disabled:cursor-not-allowed disabled:hover:scale-100"
             )}
           >
             <AnimatePresence mode="wait">
@@ -611,6 +663,24 @@ const EditProfilePage: React.FC = () => {
           </button>
         </div>
       </footer>
+
+      {/* Discard Changes Confirmation Dialog */}
+      <AlertDialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDiscardCancel}>Stay</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDiscardConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Discard Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageRoot>
   );
 };

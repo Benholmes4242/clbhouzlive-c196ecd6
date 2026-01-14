@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
-import { Camera, Plus } from 'lucide-react';
+import React, { useRef, useState, useCallback } from 'react';
+import { Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SectionHeader } from './SectionHeader';
+import { ImageCropperModal } from './ImageCropperModal';
 
 interface HeaderPhotoCardProps {
   currentUrl?: string | null;
@@ -9,12 +9,17 @@ interface HeaderPhotoCardProps {
   onFileChange: (file: File | null) => void;
 }
 
+// Header aspect ratio: full width x 250px height (approximately 16:5 for mobile)
+const HEADER_ASPECT_RATIO = 16 / 5;
+
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
   previewUrl,
   onFileChange,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [cropperImage, setCropperImage] = useState<string | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
 
   const displayUrl = previewUrl || currentUrl;
 
@@ -23,8 +28,32 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create a preview URL for the cropper
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropperImage(reader.result as string);
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleCropComplete = useCallback((croppedBlob: Blob) => {
+    // Convert blob to File for upload
+    const file = new File([croppedBlob], 'header-photo.jpg', { type: 'image/jpeg' });
     onFileChange(file);
+    setCropperImage(null);
+  }, [onFileChange]);
+
+  const handleCropperClose = (open: boolean) => {
+    if (!open) {
+      setCropperImage(null);
+    }
+    setShowCropper(open);
   };
 
   return (
@@ -52,7 +81,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         onClick={handleClick}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
-          "h-[180px] flex flex-col items-center justify-center",
+          "h-[250px] flex flex-col items-center justify-center",
           "group",
           displayUrl 
             ? "border-transparent" 
@@ -64,7 +93,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <img
               src={displayUrl}
               alt="Header preview"
-              className="h-full w-full object-cover object-bottom rounded-xl"
+              className="h-full w-full object-cover object-center rounded-xl"
             />
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-xl">
@@ -81,7 +110,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               Upload header photo
             </p>
             <p className="text-xs text-muted-foreground">
-              Recommended: 1600×600px • JPG, PNG or WebP
+              Recommended: 1600×500px • JPG, PNG or WebP
             </p>
           </div>
         )}
@@ -94,6 +123,19 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         onChange={handleChange}
         className="hidden"
       />
+
+      {/* Image Cropper Modal */}
+      {cropperImage && (
+        <ImageCropperModal
+          open={showCropper}
+          onOpenChange={handleCropperClose}
+          image={cropperImage}
+          aspectRatio={HEADER_ASPECT_RATIO}
+          cropShape="rect"
+          title="Crop Header Photo"
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 };
