@@ -61,8 +61,8 @@ export function TripsTab({ searchQuery, onCreateTrip, onTripTap }: TripsTabProps
       {nextUp && (
         <div>
           <h4 
-            className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3 px-0.5"
-            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+            className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.55)' }}
           >
             Next Up
           </h4>
@@ -78,8 +78,8 @@ export function TripsTab({ searchQuery, onCreateTrip, onTripTap }: TripsTabProps
       {upcomingList.length > 0 && (
         <div>
           <h4 
-            className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3 px-0.5"
-            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+            className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.55)' }}
           >
             Upcoming
           </h4>
@@ -108,8 +108,8 @@ export function TripsTab({ searchQuery, onCreateTrip, onTripTap }: TripsTabProps
       {filteredPast.length > 0 && (
         <div>
           <h4 
-            className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3 px-0.5"
-            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+            className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.55)' }}
           >
             Past
           </h4>

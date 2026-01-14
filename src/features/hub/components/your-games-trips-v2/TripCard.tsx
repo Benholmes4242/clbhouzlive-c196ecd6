@@ -33,14 +33,14 @@ function formatDateRange(startDate: string, endDate: string): string {
   return `${format(start, 'MMM d, yyyy')} – ${format(end, 'MMM d, yyyy')}`;
 }
 
-function getStatusChip(status: string): { label: string; bg: string; color: string } | null {
+function getStatusChip(status: string): { label: string; bg: string; color: string; pulse?: boolean } | null {
   switch (status) {
     case 'ongoing':
-      return { label: 'Ongoing', bg: 'rgba(34, 197, 94, 0.1)', color: 'rgba(22, 163, 74, 0.85)' };
+      return { label: 'Ongoing', bg: 'rgba(34, 197, 94, 0.12)', color: 'rgba(22, 163, 74, 0.9)', pulse: true };
     case 'upcoming':
-      return { label: 'Upcoming', bg: 'rgba(59, 130, 246, 0.08)', color: 'rgba(37, 99, 235, 0.75)' };
+      return { label: 'Upcoming', bg: 'rgba(59, 130, 246, 0.1)', color: 'rgba(37, 99, 235, 0.8)' };
     case 'completed':
-      return { label: 'Completed', bg: 'rgba(100, 116, 139, 0.08)', color: 'rgba(71, 85, 105, 0.75)' };
+      return { label: 'Completed', bg: 'rgba(100, 116, 139, 0.06)', color: 'rgba(100, 116, 139, 0.65)' };
     default:
       return null;
   }
@@ -78,7 +78,7 @@ export function TripCard({ trip, variant, onTap }: TripCardProps) {
           
           {statusChip && (
             <span 
-              className="flex-shrink-0 px-2.5 py-0.5 text-[10px] font-medium rounded-full"
+              className={`flex-shrink-0 px-2.5 py-0.5 text-[10px] font-semibold rounded-full ${statusChip.pulse ? 'animate-pulse' : ''}`}
               style={{ background: statusChip.bg, color: statusChip.color }}
             >
               {statusChip.label}
@@ -136,7 +136,7 @@ export function TripCard({ trip, variant, onTap }: TripCardProps) {
         <div className="flex items-center gap-2 flex-shrink-0">
           {statusChip && (
             <span 
-              className="px-2 py-0.5 text-[10px] font-medium rounded-full"
+              className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${statusChip.pulse ? 'animate-pulse' : ''}`}
               style={{ background: statusChip.bg, color: statusChip.color }}
             >
               {statusChip.label}

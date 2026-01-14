@@ -102,20 +102,24 @@ export function PastTab({ searchQuery, onGameTap }: PastTabProps) {
         </AnimatePresence>
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* Confirmation Dialog - Premium styled */}
       <AlertDialog open={!!gameToRemove} onOpenChange={() => setGameToRemove(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-[20px] p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove this game?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will remove it from your list. Other players won't be notified.
+            <AlertDialogTitle className="text-[17px] font-semibold text-center">
+              Remove this game?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[14px] text-center text-slate-500">
+              This will remove it from your past games. Other players won't be notified.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-row gap-3 mt-4">
+            <AlertDialogCancel className="flex-1 m-0 rounded-[12px] border-slate-200 text-slate-600 font-medium">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleRemoveConfirm}
-              className="bg-red-500 hover:bg-red-600"
+              className="flex-1 m-0 rounded-[12px] bg-red-500 hover:bg-red-600 text-white font-medium"
             >
               Remove
             </AlertDialogAction>

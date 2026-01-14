@@ -18,10 +18,11 @@ function Shimmer() {
 export function HeroCardSkeleton() {
   return (
     <div 
-      className="w-full rounded-[20px] p-4 overflow-hidden relative"
+      className="w-full rounded-[18px] p-4 overflow-hidden relative"
       style={{
-        background: 'rgba(255, 255, 255, 0.6)',
-        border: '1px solid rgba(0, 0, 0, 0.04)',
+        background: 'rgba(255, 255, 255, 0.7)',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
       }}
     >
       <Shimmer />
@@ -56,28 +57,31 @@ export function HeroCardSkeleton() {
 export function RowSkeleton() {
   return (
     <div 
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[14px] overflow-hidden relative"
+      className="w-full px-3.5 py-3 rounded-[16px] overflow-hidden relative"
       style={{
-        background: 'rgba(255, 255, 255, 0.5)',
-        border: '1px solid rgba(0, 0, 0, 0.03)',
+        background: 'rgba(255, 255, 255, 0.6)',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
       }}
     >
       <Shimmer />
       
-      <div className="flex-1">
-        <div 
-          className="h-4 w-2/3 rounded-md mb-1.5"
-          style={{ background: 'rgba(0, 0, 0, 0.05)' }}
-        />
-        <div 
-          className="h-3 w-1/2 rounded-md"
-          style={{ background: 'rgba(0, 0, 0, 0.04)' }}
-        />
-      </div>
-      
+      {/* Title skeleton */}
       <div 
-        className="h-4 w-4 rounded-full"
+        className="h-4 w-3/4 rounded-md mb-2"
+        style={{ background: 'rgba(0, 0, 0, 0.05)' }}
+      />
+      
+      {/* Date skeleton */}
+      <div 
+        className="h-3.5 w-1/2 rounded-md mb-2"
         style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+      />
+      
+      {/* Bottom row skeleton */}
+      <div 
+        className="h-3 w-20 rounded-md"
+        style={{ background: 'rgba(0, 0, 0, 0.03)' }}
       />
     </div>
   );
