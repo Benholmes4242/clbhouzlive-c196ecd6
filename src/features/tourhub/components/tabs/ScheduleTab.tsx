@@ -166,10 +166,6 @@ export function ScheduleTab() {
   
   return (
     <div className="min-h-screen pb-24">
-      {/* Page Header - Event Schedule title (centered) */}
-      <h1 className="font-league-spartan text-3xl font-bold text-black tracking-tight text-center mb-6">
-        Event Schedule
-      </h1>
       
       {/* Search Bar */}
       <div className="relative max-w-md mb-4">
