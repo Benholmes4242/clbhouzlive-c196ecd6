@@ -18,6 +18,7 @@ import { haptic } from '@/utils/haptics';
 
 import { useGameDetail } from '@/features/game/hooks/useGameDetail';
 import { useGameRsvp } from '@/features/hub/hooks/useGameRsvp';
+import { useGameDetailRealtime } from '@/features/hub/hooks/useDetailRealtime';
 import { GameDetailContent } from './GameDetailContent';
 import { GameDetailSkeleton } from './GameDetailSkeleton';
 
@@ -44,6 +45,9 @@ export function GameDetailSheetV2({
   // Data hooks
   const { game, participants, isLoading, currentUserId, refetch } = useGameDetail(isOpen ? gameId : null);
   const { data: rsvpData, isLoading: rsvpLoading, setRsvp, isUpdating: rsvpUpdating } = useGameRsvp(isOpen ? gameId : undefined);
+  
+  // Real-time updates
+  useGameDetailRealtime(isOpen ? gameId : null);
 
   // Lock body scroll when sheet is open
   useEffect(() => {

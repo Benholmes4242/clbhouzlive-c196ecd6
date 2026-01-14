@@ -32,6 +32,7 @@ import {
 
 import { useTripTimeline } from '../../hooks/useTripTimeline';
 import { useCancelTrip, useLeaveTrip } from '../../hooks/useTripActions';
+import { useTripDetailRealtime } from '../../hooks/useDetailRealtime';
 import { TripDetailContent } from './TripDetailContent';
 import { TripDetailSkeleton } from './TripDetailSkeleton';
 import { GameDetailSheetV2 } from '../game-detail-v2/GameDetailSheetV2';
@@ -80,6 +81,9 @@ export function TripDetailSheetV2({
     hasMultipleDays, 
     hasTodayInTrip 
   } = useTripTimeline(isOpen ? tripId : undefined);
+
+  // Real-time updates
+  useTripDetailRealtime(isOpen ? tripId : null);
 
   // Action hooks
   const cancelTrip = useCancelTrip();

@@ -4,11 +4,12 @@
  * - Header actions row (Invite button + overflow menu)
  * - Tab pills (Details, Messages, Players)
  * - Glass cards for details
- * - RSVP footer
+ * - RSVP footer with status buttons
  */
 
 import React, { useState } from 'react';
-import { MapPin, Users, Calendar, MoreVertical, UserPlus, ExternalLink, Pencil, Share2, LogOut, Trash2, Flag, Globe, Lock, UserCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MapPin, Users, Calendar, MoreVertical, UserPlus, ExternalLink, Pencil, Share2, LogOut, Trash2, Flag, Globe, Lock, UserCheck, Check, HelpCircle, X } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,8 +19,12 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { haptic } from '@/utils/haptics';
 import { TripDetailTabPills, type TripDetailTab } from './TripDetailTabPills';
 import { TripTimeline } from './TripTimeline';
+import { InviteToTripModal } from '../invite/InviteToTripModal';
+import { RsvpStatusLabel } from '../shared-detail/RsvpStatusLabel';
+import { useTripRsvp, type TripRsvpStatus } from '../../hooks/useTripRsvp';
 import type { TripData, TripParticipant, TripTimelineItem } from '../../hooks/useTripTimeline';
 
 interface TripDetailContentProps {
@@ -38,6 +43,7 @@ interface TripDetailContentProps {
   onGameTap?: (gameId: string) => void;
   onShowRemoveDialog?: () => void;
   onShowLeaveDialog?: () => void;
+  onInviteSuccess?: () => void;
 }
 
 // V2 Glass Card component for details - matches GameDetailContent exactly
@@ -108,14 +114,32 @@ export function TripDetailContent({
   onGameTap,
   onShowRemoveDialog,
   onShowLeaveDialog,
+  onInviteSuccess,
 }: TripDetailContentProps) {
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  
   const dayCount = differenceInDays(trip.endDate, trip.startDate) + 1;
   const joinedCount = participants.filter(p => p.rsvpStatus === 'going').length;
+  const maybeCount = participants.filter(p => p.rsvpStatus === 'maybe').length;
+  const invitedCount = participants.filter(p => p.rsvpStatus === 'invited').length;
+  
+  // Get current user's RSVP status
+  const currentUserParticipant = participants.find(p => p.userId === currentUserId);
+  const currentUserRsvp = currentUserParticipant?.rsvpStatus as TripRsvpStatus | null;
+  
+  // RSVP hook for updating status
+  const { setRsvp, isUpdating } = useTripRsvp(trip.id);
   
   const visibilityIcon = trip.visibility === 'invite' ? Lock : 
                          trip.visibility === 'friends' ? UserCheck : Globe;
   const visibilityLabel = trip.visibility === 'invite' ? 'Invite only' : 
                           trip.visibility === 'friends' ? 'Friends' : 'Public';
+
+  const handleRsvpChange = (status: TripRsvpStatus) => {
+    if (isUpdating) return;
+    haptic('light');
+    setRsvp(status);
+  };
 
   return (
     <>
@@ -125,6 +149,10 @@ export function TripDetailContent({
         <Button
           variant="outline"
           size="sm"
+          onClick={() => {
+            haptic('light');
+            setInviteModalOpen(true);
+          }}
           className="h-8 gap-1.5 text-xs rounded-full border-black/10 hover:bg-black/5"
         >
           <UserPlus className="w-3.5 h-3.5" />
@@ -348,7 +376,7 @@ export function TripDetailContent({
         )}
       </div>
 
-      {/* Footer - matches Game sheet */}
+      {/* Footer with RSVP buttons - matches Game sheet */}
       <div 
         className="absolute bottom-0 left-0 right-0 px-5 py-3"
         style={{ 
@@ -358,42 +386,83 @@ export function TripDetailContent({
           borderTop: '1px solid rgba(0,0,0,0.06)',
         }}
       >
-        <div className="flex items-center gap-3">
-          <div className="flex -space-x-2">
-            {participants.slice(0, 5).map(p => (
-              <SquircleAvatar
-                key={p.id}
-                src={p.profile?.profilePhotoUrl}
-                alt={p.profile?.displayName || 'Participant'}
-                size={28}
-                className="border-2 border-white"
-              />
-            ))}
+        {isHost ? (
+          // Host view - show counts + "You're organizing" message
+          <div className="space-y-2">
+            <div 
+              className="flex items-center gap-2 text-[12px]"
+              style={{ color: 'rgba(30, 41, 59, 0.6)' }}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>
+                {joinedCount} going
+                {maybeCount > 0 && ` · ${maybeCount} maybe`}
+                {invitedCount > 0 && ` · ${invitedCount} invited`}
+              </span>
+            </div>
+            <p 
+              className="text-[11px] text-center"
+              style={{ color: 'rgba(30, 41, 59, 0.45)' }}
+            >
+              You're organizing this trip
+            </p>
           </div>
-          <span className="text-sm text-muted-foreground">
-            {joinedCount} joined
-          </span>
-        </div>
-      </div>
-    </>
-  );
-}
+        ) : (
+          // Participant view - show RSVP buttons
+          <div className="space-y-3">
+            {/* Counts summary */}
+            <div 
+              className="flex items-center gap-2 text-[12px]"
+              style={{ color: 'rgba(30, 41, 59, 0.6)' }}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>
+                {joinedCount} going
+                {maybeCount > 0 && ` · ${maybeCount} maybe`}
+                {invitedCount > 0 && ` · ${invitedCount} invited`}
+              </span>
+            </div>
 
-// RSVP status label component
-function RsvpStatusLabel({ status }: { status: string | null }) {
-  const labels: Record<string, { text: string; color: string }> = {
-    going: { text: 'Joined', color: 'text-green-600' },
-    maybe: { text: 'Maybe', color: 'text-yellow-600' },
-    declined: { text: "Can't go", color: 'text-red-500' },
-    invited: { text: 'Invited', color: 'text-blue-500' },
-  };
-  
-  const config = status ? labels[status] : null;
-  if (!config) return null;
-  
-  return (
-    <span className={`text-xs font-medium ${config.color}`}>
-      {config.text}
-    </span>
+            {/* RSVP buttons */}
+            <div className="flex gap-2">
+              {[
+                { status: 'going' as const, label: 'Joined', icon: <Check className="w-4 h-4" />, activeColor: 'rgba(34, 197, 94, 0.9)', activeBg: 'rgba(34, 197, 94, 0.12)' },
+                { status: 'maybe' as const, label: 'Maybe', icon: <HelpCircle className="w-4 h-4" />, activeColor: 'rgba(234, 179, 8, 0.9)', activeBg: 'rgba(234, 179, 8, 0.12)' },
+                { status: 'declined' as const, label: "Can't go", icon: <X className="w-4 h-4" />, activeColor: 'rgba(239, 68, 68, 0.8)', activeBg: 'rgba(239, 68, 68, 0.1)' },
+              ].map(option => {
+                const isActive = currentUserRsvp === option.status;
+                
+                return (
+                  <motion.button
+                    key={option.status}
+                    onClick={() => handleRsvpChange(option.status)}
+                    disabled={isUpdating}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-[13px] font-medium transition-all duration-150 disabled:opacity-50"
+                    style={{
+                      background: isActive ? option.activeBg : 'rgba(0, 0, 0, 0.04)',
+                      color: isActive ? option.activeColor : 'rgba(30, 41, 59, 0.55)',
+                      border: `1px solid ${isActive ? option.activeColor.replace('0.9', '0.2').replace('0.8', '0.15') : 'rgba(0, 0, 0, 0.06)'}`,
+                    }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    {option.icon}
+                    {option.label}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Invite Modal */}
+      <InviteToTripModal
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        tripId={trip.id}
+        tripName={trip.name}
+        onInviteSuccess={onInviteSuccess}
+      />
+    </>
   );
 }
