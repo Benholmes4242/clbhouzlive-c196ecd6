@@ -8,6 +8,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { nanoid } from 'nanoid';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import type { EchoMessage } from '../state/echoTypes';
 import { useAIStream } from './useAIStream';
 import { 
@@ -22,6 +23,14 @@ interface UseEchoConversationOptions {
   resetOnMount?: boolean;
 }
 
+// Rate limit cooldown state
+interface RateLimitState {
+  isLimited: boolean;
+  errorType?: string;
+  retryAfter?: number;
+  cooldownEnd?: number;
+}
+
 export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const resetOnMount = opts?.resetOnMount ?? false;
   const queryClient = useQueryClient();
@@ -32,6 +41,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const [streamingContent, setStreamingContent] = useState('');
   const [wasAborted, setWasAborted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [rateLimitState, setRateLimitState] = useState<RateLimitState>({ isLimited: false });
   
   const { sendMessage: sendToAI, abort } = useAIStream();
   const firstUserMessageRef = useRef<string | null>(null);
@@ -57,6 +67,23 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       firstUserMessageRef.current = null;
     }
   }, [resetOnMount]);
+
+  // Rate limit cooldown timer
+  useEffect(() => {
+    if (rateLimitState.isLimited && rateLimitState.cooldownEnd) {
+      const remaining = rateLimitState.cooldownEnd - Date.now();
+      if (remaining <= 0) {
+        setRateLimitState({ isLimited: false });
+        return;
+      }
+
+      const timer = setTimeout(() => {
+        setRateLimitState({ isLimited: false });
+      }, remaining);
+
+      return () => clearTimeout(timer);
+    }
+  }, [rateLimitState]);
 
   // Load conversation from database
   const loadConversation = useCallback(async (convId: string) => {
@@ -89,6 +116,15 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
 
   const sendMessage = useCallback(async (content: string) => {
     if (isStreaming || !userId) return;
+
+    // Check rate limit cooldown
+    if (rateLimitState.isLimited) {
+      const remaining = rateLimitState.cooldownEnd 
+        ? Math.ceil((rateLimitState.cooldownEnd - Date.now()) / 1000)
+        : 0;
+      toast.warning(`⛳ Still on cooldown! Wait ${remaining}s before sending.`);
+      return;
+    }
 
     const userMessage: EchoMessage = {
       id: nanoid(),
@@ -162,13 +198,42 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
               queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
             }
           },
-          onError: async (error) => {
+          onError: async (error: string, errorType?: string, retryAfter?: number) => {
+            // Handle rate limit errors specially
+            if (errorType?.startsWith('RATE_LIMIT')) {
+              const cooldownMs = errorType === 'RATE_LIMIT_MINUTE' 
+                ? (retryAfter || 60) * 1000
+                : errorType === 'RATE_LIMIT_HOUR'
+                  ? (retryAfter || 60) * 60 * 1000
+                  : 0;
+
+              setRateLimitState({
+                isLimited: true,
+                errorType,
+                retryAfter,
+                cooldownEnd: Date.now() + cooldownMs,
+              });
+
+              // Show toast with specific message
+              toast.warning(error, {
+                duration: 5000,
+                icon: '⛳',
+              });
+
+              // Remove the user message since it wasn't processed
+              setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+              setIsStreaming(false);
+              setStreamingContent('');
+              return;
+            }
+
+            // Handle other errors
             const errorMessage: EchoMessage = {
               id: assistantMessageId,
               role: 'assistant',
-              content: 'Sorry, I encountered an error. Please try again.',
+              content: error || 'Sorry, I encountered an error. Please try again.',
               createdAt: new Date().toISOString(),
-              meta: { error },
+              meta: { error: errorType || error },
             };
             setMessages(prev => [...prev, errorMessage]);
             setIsStreaming(false);
@@ -187,7 +252,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient]);
+  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitState]);
 
   const abortStream = useCallback(async () => {
     abort();
@@ -236,5 +301,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     resetConversation,
     wasAborted,
     loadConversation,
+    rateLimitState,
   };
 }
