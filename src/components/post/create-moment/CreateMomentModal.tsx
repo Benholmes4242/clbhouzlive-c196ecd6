@@ -1059,18 +1059,6 @@ export default function CreateMomentModal({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Grabber Bar - at very top of page */}
-        <div 
-          data-ecm-handle="true"
-          className="flex-shrink-0 flex items-center justify-center py-3 z-30"
-          style={{ 
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-            background: 'var(--cm-surface-alt)',
-          }}
-        >
-          <div className="w-10 h-1 rounded-full bg-white/40" />
-        </div>
-
         {/* Media Stage - grey background flows to top, FULL-BLEED */}
         <section
           id="media" 
@@ -1079,10 +1067,11 @@ export default function CreateMomentModal({
             background: 'var(--cm-surface-alt)',
           }}
         >
-          {/* Header bar with save draft and drafts access - Dark glass style */}
+          {/* Header bar with grabber, save draft, and drafts access - Dark glass style */}
           <div 
+            data-ecm-handle="true"
             className="absolute left-0 right-0 flex items-center justify-between px-4 py-3 z-30"
-            style={{ top: '0px' }}
+            style={{ top: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Left: Drafts button (if has drafts) - Glass style */}
             <div className="w-10">
@@ -1105,8 +1094,8 @@ export default function CreateMomentModal({
               )}
             </div>
             
-            {/* Center: Empty spacer */}
-            <div className="flex-1" />
+            {/* Center: Grabber - glass style */}
+            <div className="w-9 h-1 rounded-full bg-white/30 backdrop-blur-sm" />
             
             {/* Right: Scheduled + Save Draft buttons - Glass style */}
             <div className="flex items-center gap-2">
