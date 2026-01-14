@@ -40,7 +40,7 @@ function StatusBadge({ status }: { status: string }) {
     closed: { 
       label: 'Completed',
       icon: <Check className="w-3 h-3" />,
-      className: 'bg-slate-700/80 text-white/90'
+      className: 'bg-black/50 backdrop-blur-md text-white border border-white/10'
     },
   };
   

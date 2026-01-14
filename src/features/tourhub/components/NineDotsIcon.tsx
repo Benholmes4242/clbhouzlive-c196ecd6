@@ -21,20 +21,20 @@ export function NineDotsIcon({ className, size = 20 }: NineDotsIconProps) {
       fill="none" 
       className={className}
     >
-      {/* Row 1 */}
-      <circle cx="4" cy="4" r="1.8" fill="currentColor" />
+      {/* Row 1 - Diagonal pattern: orange, current, orange */}
+      <circle cx="4" cy="4" r="1.8" fill="#F79E1B" />
       <circle cx="10" cy="4" r="1.8" fill="currentColor" />
-      <circle cx="16" cy="4" r="1.8" fill="currentColor" />
+      <circle cx="16" cy="4" r="1.8" fill="#F79E1B" />
       
-      {/* Row 2 */}
+      {/* Row 2 - current, orange, current */}
       <circle cx="4" cy="10" r="1.8" fill="currentColor" />
       <circle cx="10" cy="10" r="1.8" fill="#F79E1B" />
       <circle cx="16" cy="10" r="1.8" fill="currentColor" />
       
-      {/* Row 3 */}
-      <circle cx="4" cy="16" r="1.8" fill="currentColor" />
+      {/* Row 3 - orange, current, orange */}
+      <circle cx="4" cy="16" r="1.8" fill="#F79E1B" />
       <circle cx="10" cy="16" r="1.8" fill="currentColor" />
-      <circle cx="16" cy="16" r="1.8" fill="currentColor" />
+      <circle cx="16" cy="16" r="1.8" fill="#F79E1B" />
     </svg>
   );
 }
