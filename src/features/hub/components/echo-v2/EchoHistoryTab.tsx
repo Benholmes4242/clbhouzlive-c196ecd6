@@ -119,7 +119,7 @@ export function EchoHistoryTab({ onSelectConversation, currentConversationId, on
                 <Sparkles className="w-7 h-7" style={{ color: `${ECHO_ORANGE}60` }} />
               )}
             </div>
-            <p className="text-[15px] font-medium text-slate-700">
+            <p className="text-[15px] font-medium text-slate-800">
               {search ? 'No chats found' : 'No chat history yet'}
             </p>
             <p className="text-[13px] text-slate-400 mt-1.5 max-w-[220px]">

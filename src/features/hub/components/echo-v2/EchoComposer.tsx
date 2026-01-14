@@ -70,9 +70,7 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
     <div 
       className="absolute bottom-0 left-0 right-0 px-4 pt-3"
       style={{ 
-        background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.97) 25%, rgba(255,255,255,1) 100%)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        background: 'linear-gradient(180deg, transparent 0%, #F8FAFC 25%, #F8FAFC 100%)',
         paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
       }}
     >
@@ -89,7 +87,10 @@ export const EchoComposer = forwardRef<HTMLInputElement, EchoComposerProps>(({
           onKeyDown={handleKeyDown}
           placeholder={cooldown ? `Wait ${cooldown}s...` : placeholder}
           disabled={isStreaming || disabled}
-          className="flex-1 bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400"
+          className={cn(
+            "flex-1 bg-transparent border-none outline-none text-[15px]",
+            value.trim() ? "text-slate-800" : "text-slate-800 placeholder:text-slate-500"
+          )}
           style={{ caretColor: ECHO_ORANGE }}
           autoComplete="off"
           autoCorrect="off"
