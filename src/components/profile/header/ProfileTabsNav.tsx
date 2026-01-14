@@ -37,39 +37,36 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 
   return (
     <section 
-      className="py-2 bg-[#F8FAFC]"
+      className="flex justify-center py-3 bg-[#F8FAFC]"
       onPointerDown={handlePointerDown}
     >
-      <div className="px-4">
-        {/* Full-width segmented control - matches ScheduleFilterPills exactly */}
-        <div 
-          className="flex items-stretch rounded-xl overflow-hidden"
-          style={{ background: '#e2e8f0' }}
-        >
-          {tabs.map((tab) => {
-            const isActive = activeSection === tab.id;
-            
-            return (
-              <button
-                key={tab.id}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => handleTabClick(tab.id)}
-                disabled={disabled}
-                className={cn(
-                  "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
-                  "min-h-[44px]", // Accessibility touch target
-                  isActive 
-                    ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
-                    : "text-slate-500 hover:text-slate-700",
-                  disabled && "pointer-events-none opacity-50"
-                )}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+      {/* Hub-style pill toggle bar */}
+      <div 
+        className="inline-flex items-center gap-1 p-1 rounded-full"
+        style={{ background: '#e2e8f0' }}
+      >
+        {tabs.map((tab) => {
+          const isActive = activeSection === tab.id;
+          
+          return (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => handleTabClick(tab.id)}
+              disabled={disabled}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
+                isActive 
+                  ? "bg-white text-[#1e293b] shadow-sm" 
+                  : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50",
+                disabled && "pointer-events-none opacity-50"
+              )}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
     </section>
   );
