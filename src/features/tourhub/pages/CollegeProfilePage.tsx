@@ -14,6 +14,11 @@ import { useCollegeStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 /**
  * College Profile Page - Premium alumni page with franchise identity
@@ -105,16 +110,27 @@ export function CollegeProfilePage() {
             {/* Action Buttons */}
             <div className="flex items-center justify-center gap-3 mb-10">
               <FollowCollegeButton normalizedName={collegeSlug || ''} />
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={handleCompareClick}
-                disabled={!firstRival}
-              >
-                <GitCompare className="w-4 h-4" />
-                Compare
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={handleCompareClick}
+                      disabled={!firstRival}
+                    >
+                      <GitCompare className="w-4 h-4" />
+                      Compare
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {!firstRival && (
+                  <TooltipContent>
+                    <p>No rivals to compare</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
             </div>
             
             {/* Rivalries */}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
@@ -108,7 +108,16 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   }
   
   if (!enrichedRivalries?.length) {
-    return null;
+    return (
+      <div className={cn('flex items-center justify-center py-8 px-4', className)}>
+        <div className="flex flex-col items-center text-center">
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
+            <Users className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <p className="text-sm text-muted-foreground">No rivals defined yet</p>
+        </div>
+      </div>
+    );
   }
   
   return (
