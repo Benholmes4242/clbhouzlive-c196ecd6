@@ -136,13 +136,11 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             : isCurrent
               ? 'var(--quest-accent-green)'
               : 'white',
-          border: `2px solid ${
-            milestone.isUnlocked
-              ? accentColor
-              : isCurrent
-                ? 'var(--quest-accent-green)'
-                : 'rgb(226 232 240 / 0.6)'
-          }`,
+          border: milestone.isUnlocked
+            ? `2px solid ${accentColor}`
+            : isCurrent
+              ? '2px solid var(--quest-accent-green)'
+              : '2px solid #e2e8f0',
           boxShadow: milestone.isUnlocked
             ? `0 0 16px ${accentColor}30`
             : isCurrent
@@ -159,7 +157,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         ) : isCurrent ? (
           <Trophy className="w-4 h-4 text-white" />
         ) : (
-          <Lock className="w-4 h-4" style={{ color: 'var(--quest-text-tertiary)' }} />
+          <Lock className="w-5 h-5 text-[#94A3B8]" />
         )}
 
         {/* Pulse for current */}
