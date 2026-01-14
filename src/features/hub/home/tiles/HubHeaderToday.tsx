@@ -39,35 +39,35 @@ export function HubHeaderToday() {
   };
 
   return (
-    <header className="pt-1 pb-1" style={{ overflow: 'visible' }}>
+    <header className="pt-2 pb-2" style={{ overflow: 'visible' }}>
       <div className="flex items-center justify-between gap-3">
-        {/* Greeting - V2 responsive sizing */}
+        {/* Greeting - Premium typography with refined weight */}
         <h1 
-          className="font-semibold truncate"
+          className="font-bold truncate"
           style={{ 
             color: 'var(--hub-text)',
-            fontSize: 'clamp(18px, 5vw, 22px)',
+            fontSize: 'clamp(20px, 5.5vw, 24px)',
             maxWidth: '75%',
-            lineHeight: '1.4', // Extra room for descenders on mobile
-            letterSpacing: '-0.2px',
+            lineHeight: '1.35',
+            letterSpacing: '-0.4px',
             overflow: 'visible',
           }}
         >
           {greeting}, {firstName}
         </h1>
 
-        {/* V2 Pill-style home button - soft surface + subtle border + shadow */}
+        {/* V3 Premium home button - refined glass effect with inner highlight */}
         <button
-          className="h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center transition-all duration-150 active:scale-[0.97]"
+          className="h-11 w-11 flex-shrink-0 rounded-full flex items-center justify-center transition-all duration-150 active:scale-[0.96]"
           style={{
             background: 'var(--hub-surface)',
             border: '1px solid var(--hub-stroke)',
-            boxShadow: 'var(--hub-shadow-soft)',
+            boxShadow: '0 4px 14px rgba(2, 6, 23, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
           }}
           onClick={handleHomeAction}
           aria-label="Home"
         >
-          <Home className="h-[18px] w-[18px]" style={{ color: 'var(--hub-text-dim)' }} />
+          <Home className="h-[19px] w-[19px]" style={{ color: 'var(--hub-text-dim)' }} />
         </button>
       </div>
     </header>

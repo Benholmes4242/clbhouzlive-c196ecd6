@@ -48,22 +48,25 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
     <>
       <button 
         onClick={openSheet}
-        className={`w-full rounded-[18px] p-3.5 text-left transition-all duration-150 active:scale-[0.99] relative ${className || ''}`}
+        className={`w-full rounded-[20px] p-4 text-left transition-all duration-150 active:scale-[0.99] relative ${className || ''}`}
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-tile)', // Medium shadow for primary tile
-          minHeight: '60px',
+          boxShadow: '0 8px 24px rgba(2, 6, 23, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+          minHeight: '68px',
         }}
       >
-        <div className="flex items-center gap-3">
-          {/* V2 Icon container - rounded square */}
+        <div className="flex items-center gap-3.5">
+          {/* V3 Icon container - rounded square with subtle gradient */}
           <div 
-            className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
-            style={{ background: 'var(--hub-surface-2)' }}
+            className="w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--hub-surface-2) 0%, var(--hub-surface) 100%)',
+              border: '1px solid var(--hub-stroke-subtle)',
+            }}
           >
             <MessageSquare 
-              className="w-[18px] h-[18px]" 
+              className="w-[19px] h-[19px]" 
               style={{ color: 'var(--hub-text-dim)' }} 
             />
           </div>
@@ -97,22 +100,23 @@ export function HubMessagesCard({ className }: HubMessagesCardProps) {
             </div>
           </div>
 
-          {/* V2 Badge + Chevron - tighter spacing */}
-          <div className="flex items-center gap-2 flex-shrink-0 ml-1">
+          {/* V3 Badge + Chevron - refined styling */}
+          <div className="flex items-center gap-2.5 flex-shrink-0 ml-1">
             {hasMessages && (
               <div 
-                className="h-[22px] min-w-[22px] px-2 rounded-full flex items-center justify-center text-[11px] font-bold"
+                className="h-[24px] min-w-[24px] px-2.5 rounded-full flex items-center justify-center text-[11px] font-bold"
                 style={{
-                  background: 'rgba(255, 142, 61, 0.18)',
-                  color: 'rgba(255, 142, 61, 0.95)',
-                  border: '1px solid rgba(255, 142, 61, 0.18)',
+                  background: 'rgba(255, 142, 61, 0.16)',
+                  color: '#EA580C',
+                  border: '1px solid rgba(255, 142, 61, 0.25)',
+                  boxShadow: '0 2px 6px rgba(255, 142, 61, 0.12)',
                 }}
               >
                 {messages.unreadCount}
               </div>
             )}
             <ChevronRight 
-              className="w-4 h-4 flex-shrink-0" 
+              className="w-[18px] h-[18px] flex-shrink-0" 
               style={{ color: 'var(--hub-text-dimmer)' }} 
             />
           </div>

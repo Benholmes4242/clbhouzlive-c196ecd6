@@ -62,41 +62,49 @@ export function ActiveGamesNearYouTile() {
     <>
       <button
         onClick={openGamesHub}
-        className="w-full h-[140px] rounded-[18px] p-4 text-left transition-all duration-150 active:scale-[0.99] flex flex-col relative overflow-hidden"
+        className="w-full h-[148px] rounded-[20px] p-4 text-left transition-all duration-150 active:scale-[0.98] flex flex-col relative overflow-hidden"
         style={{
           background: 'var(--hub-card)',
           border: '1px solid var(--hub-card-border)',
-          boxShadow: 'var(--hub-shadow-soft)',
+          boxShadow: '0 6px 18px rgba(2, 6, 23, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
         }}
       >
-        {/* Title */}
+        {/* Subtle gradient overlay at top for depth */}
         <div 
-          className="text-[14px] font-semibold"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(400px 100px at 80% 0%, rgba(16, 185, 129, 0.06), transparent 60%)',
+          }}
+        />
+        
+        {/* Title - refined typography */}
+        <div 
+          className="text-[14px] font-bold relative z-10"
           style={{ 
             color: 'var(--hub-text)',
-            lineHeight: '1.1',
+            lineHeight: '1.15',
             letterSpacing: '-0.2px',
           }}
         >
           Active Games<br/>Near You
         </div>
 
-        {/* Badge - top right */}
+        {/* Badge - top right with improved styling */}
         {gamesCount > 0 && (
           <div 
-            className="absolute top-3 right-3 h-5 min-w-[20px] px-2 rounded-full flex items-center justify-center text-[10px] font-bold"
+            className="absolute top-3.5 right-3.5 h-5 min-w-[22px] px-2 rounded-full flex items-center justify-center text-[10px] font-bold z-10"
             style={{
               background: 'var(--hub-badge-green-bg)',
               color: 'var(--hub-badge-green-text)',
               border: '1px solid var(--hub-badge-green-border)',
+              boxShadow: '0 2px 6px rgba(16, 185, 129, 0.15)',
             }}
           >
             {gamesCount}
           </div>
         )}
 
-        {/* Game details - with spacing from title */}
-        <div className="mt-auto">
+        <div className="mt-auto relative z-10">
           {isLoading ? (
             <div 
               className="h-3 w-20 rounded animate-pulse"
@@ -109,7 +117,7 @@ export function ActiveGamesNearYouTile() {
             >
               {/* Course name */}
               <div 
-                className="text-[11px] leading-tight line-clamp-1"
+                className="text-[11.5px] font-medium leading-tight line-clamp-1"
                 style={{ color: 'var(--hub-text-dim)' }}
               >
                 {nearbyGame.course_name || 'Golf Course'}
@@ -123,14 +131,14 @@ export function ActiveGamesNearYouTile() {
                 {formatShortDate(nearbyGame.start_time)}
               </div>
 
-              {/* Mini progress pill */}
+              {/* Mini progress pill - improved styling */}
               <div 
-                className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold mt-1.5"
+                className="inline-flex items-center justify-center rounded-full text-[10px] font-semibold mt-2"
                 style={{
-                  background: 'rgba(15, 23, 42, 0.04)',
-                  color: 'rgba(15, 23, 42, 0.75)',
-                  border: '1px solid rgba(15, 23, 42, 0.06)',
-                  padding: '2px 8px',
+                  background: 'rgba(15, 23, 42, 0.05)',
+                  color: 'rgba(15, 23, 42, 0.70)',
+                  border: '1px solid rgba(15, 23, 42, 0.08)',
+                  padding: '3px 10px',
                   borderRadius: '999px',
                 }}
               >
