@@ -73,7 +73,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
         </p>
 
         {/* Prompt chips section */}
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
           {[1, 2, 3].map((row) => (
             <div key={row} className="flex flex-wrap justify-center gap-2">
               {PROMPT_CHIPS.filter(c => c.row === row).map((chip) => (
@@ -93,6 +93,19 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
             </div>
           ))}
         </div>
+
+        {/* Primary CTA */}
+        <button
+          onClick={handleCTAClick}
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[15px] font-semibold transition-all active:scale-[0.98] text-white"
+          style={{
+            background: `linear-gradient(135deg, ${ECHO_ORANGE} 0%, #D97706 100%)`,
+            boxShadow: `0 4px 16px ${ECHO_ORANGE}40`,
+          }}
+        >
+          Start a conversation
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
