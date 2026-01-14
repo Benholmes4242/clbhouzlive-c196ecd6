@@ -181,8 +181,8 @@ export default function ScheduleSheet({
                           transition-colors mx-auto
                           ${!date ? "invisible" : ""}
                           ${!isValid ? "text-slate-600 cursor-not-allowed" : "hover:bg-slate-700 text-white"}
-                          ${isSelected ? "bg-amber-500 text-slate-900 font-semibold hover:bg-amber-400" : ""}
-                          ${isToday && !isSelected ? "ring-1 ring-amber-500/50" : ""}
+                          ${isSelected ? "bg-slate-200 text-slate-900 font-semibold hover:bg-slate-300" : ""}
+                          ${isToday && !isSelected ? "ring-1 ring-slate-400/50" : ""}
                         `}
                       >
                         {date?.getDate()}
@@ -204,7 +204,7 @@ export default function ScheduleSheet({
                   <select
                     value={selectedHour}
                     onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-slate-500/50 focus:ring-1 focus:ring-slate-500/30 transition-all"
                   >
                     {Array.from({ length: 24 }, (_, i) => (
                       <option key={i} value={i}>
@@ -219,7 +219,7 @@ export default function ScheduleSheet({
                   <select
                     value={selectedMinute}
                     onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                    className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base font-medium appearance-none cursor-pointer focus:border-slate-500/50 focus:ring-1 focus:ring-slate-500/30 transition-all"
                   >
                     {[0, 15, 30, 45].map(m => (
                       <option key={m} value={m}>
@@ -236,15 +236,15 @@ export default function ScheduleSheet({
               </div>
               
               {/* Selected DateTime Summary */}
-              <div className="mt-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+              <div className="mt-6 p-3 bg-slate-700/50 border border-slate-600/50 rounded-xl">
                 <div className="flex items-center gap-2 text-sm">
-                  <Calendar size={16} className="text-amber-500" />
+                  <Calendar size={16} className="text-slate-300" />
                   <span className="font-medium text-white">
                     {format(scheduledDateTime, "EEEE, MMMM d, yyyy")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm mt-1">
-                  <Clock size={16} className="text-amber-500" />
+                  <Clock size={16} className="text-slate-300" />
                   <span className="font-medium text-white">
                     {format(scheduledDateTime, "h:mm a")}
                   </span>
@@ -263,7 +263,7 @@ export default function ScheduleSheet({
               <button
                 onClick={handleSchedule}
                 disabled={!isValidScheduleTime || isScheduling}
-                className="w-full py-3.5 rounded-xl bg-amber-500 text-slate-900 font-semibold text-base hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-xl bg-slate-200 text-slate-900 font-semibold text-base hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isScheduling ? "Scheduling..." : "Schedule Post"}
               </button>
