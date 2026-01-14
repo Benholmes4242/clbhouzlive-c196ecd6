@@ -34,7 +34,7 @@ export function EchoEmptyState({ onChipClick, onFocusInput }: EchoEmptyStateProp
 
   return (
     <div 
-      className="flex flex-col items-center justify-center px-5 py-4"
+      className="flex flex-col items-center px-5 pt-4 pb-4"
     >
       {/* Hero glass card */}
       <div 
