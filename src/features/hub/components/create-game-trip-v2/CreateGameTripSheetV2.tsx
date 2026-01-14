@@ -481,8 +481,8 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
             }}
             className="fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden"
             style={{
-              height: '80svh',
-              maxHeight: '80svh',
+              height: '95svh',
+              maxHeight: '95svh',
               backgroundColor: '#F8FAFC',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
             }}
