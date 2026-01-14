@@ -59,8 +59,8 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-foreground">Profile Photo</h3>
-        <p className="text-xs text-muted-foreground">
+        <h3 className="text-sm font-semibold text-[#1e293b]">Profile Photo</h3>
+        <p className="text-xs text-[#64748b]">
           Your photo appears as a squircle across Clbhouz
         </p>
       </div>
@@ -121,10 +121,10 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         <div className="flex-1">
           {!displayUrl ? (
             <div>
-              <p className="text-sm font-medium text-foreground mb-0.5">
+              <p className="text-sm font-medium text-[#1e293b] mb-0.5">
                 Add a profile photo
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-[#64748b]">
                 Square images work best
               </p>
             </div>

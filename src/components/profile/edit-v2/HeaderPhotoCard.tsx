@@ -60,8 +60,8 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Header Photo</h3>
-          <p className="text-xs text-muted-foreground">
+          <h3 className="text-sm font-semibold text-[#1e293b]">Header Photo</h3>
+          <p className="text-xs text-[#64748b]">
             Appears at the top of your profile
           </p>
         </div>
@@ -106,10 +106,10 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
               <Camera className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-sm font-medium text-foreground mb-1">
+            <p className="text-sm font-medium text-[#1e293b] mb-1">
               Upload header photo
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#64748b]">
               Recommended: 1600×500px • JPG, PNG or WebP
             </p>
           </div>

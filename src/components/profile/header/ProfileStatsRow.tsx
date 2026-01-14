@@ -34,10 +34,10 @@ const StatItem: React.FC<StatItemProps> = ({
       <AnimatedNumber 
         value={value}
         delay={delay}
-        className="profile-stat-number text-base font-semibold"
+        className="text-[#1e293b] text-base font-bold"
         minCh={1}
       />
-      <span className="profile-stat-label mt-1 text-[11px] uppercase tracking-[0.06em]">
+      <span className="mt-1 text-[11px] uppercase tracking-[0.05em] text-[#64748b]">
         {label}
       </span>
     </div>

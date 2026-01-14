@@ -26,6 +26,7 @@ const sectionIcons: Record<string, React.ElementType> = {
 /**
  * SectionJumpStrip - Tab-style navigation with icons
  * Uses underline active state with orange accent
+ * Updated with design system colors
  */
 export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
   sections,
@@ -35,7 +36,7 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
 }) => {
   return (
     <div 
-      className="discover-header relative w-full"
+      className="discover-header relative w-full bg-[#F8FAFC]"
       role="tablist"
       aria-label="Profile sections"
     >
@@ -57,8 +58,8 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
                   "transition-all duration-[120ms] ease-out",
                   "active:scale-[0.97] motion-reduce:active:scale-100",
                   isActive 
-                    ? "active text-foreground" 
-                    : "text-muted-foreground hover:text-foreground/80 motion-reduce:transition-none"
+                    ? "active text-[#1e293b]" 
+                    : "text-[#64748b] hover:text-[#1e293b]/80 motion-reduce:transition-none"
                 )}
               >
                 {Icon && <Icon className="w-3.5 h-3.5" />}

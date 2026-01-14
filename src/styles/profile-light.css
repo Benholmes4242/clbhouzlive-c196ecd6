@@ -8,38 +8,38 @@
    ========================= */
 
 .profile-theme-light {
-  /* Page background */
-  --profile-page: #F4F5F7;
+  /* Page background - Updated to match design system */
+  --profile-page: #F8FAFC;
   
-  /* Text hierarchy */
-  --profile-text-primary: #1F2428;
-  --profile-text-secondary: #5E666D;
-  --profile-text-tertiary: #97A1AA;
+  /* Text hierarchy - Aligned with design system */
+  --profile-text-primary: #1e293b;
+  --profile-text-secondary: #64748b;
+  --profile-text-tertiary: #64748b;
   
   /* Accent */
   --profile-accent: #F7931E;
   
-  /* Card surfaces */
+  /* Card surfaces - Updated with subtle shadow */
   --profile-card: #FFFFFF;
-  --profile-card-border: rgba(31, 36, 40, 0.08);
-  --profile-card-shadow: 0 6px 18px rgba(31, 36, 40, 0.06);
+  --profile-card-border: #e2e8f0;
+  --profile-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   
-  /* Pills/chips */
-  --profile-pill-inactive: #EDEFF2;
-  --profile-pill-hover: #E8EAEC;
+  /* Pills/chips - Updated to match design system */
+  --profile-pill-inactive: #e2e8f0;
+  --profile-pill-hover: #cbd5e1;
   --profile-pill-active: #3A3F46;
   
-  /* Progress */
-  --profile-progress-track: #EDEFF2;
+  /* Progress - Updated */
+  --profile-progress-track: #e2e8f0;
   --profile-progress-fill: #F7931E;
   
   /* Dividers */
-  --profile-divider: rgba(31, 36, 40, 0.08);
-  --profile-stroke: rgba(31, 36, 40, 0.10);
+  --profile-divider: #e2e8f0;
+  --profile-stroke: #e2e8f0;
   
   /* Icon chips (back/share/settings) */
   --profile-icon-chip-bg: rgba(255, 255, 255, 0.92);
-  --profile-icon-chip-border: rgba(31, 36, 40, 0.10);
+  --profile-icon-chip-border: #e2e8f0;
   
   /* Apply to page */
   background: var(--profile-page);
@@ -63,9 +63,9 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(244, 245, 247, 0.05) 0%,
-    rgba(244, 245, 247, 0.65) 55%,
-    rgba(244, 245, 247, 0.95) 100%
+    rgba(248, 250, 252, 0.05) 0%,
+    rgba(248, 250, 252, 0.65) 55%,
+    rgba(248, 250, 252, 0.95) 100%
   );
   pointer-events: none;
 }
@@ -99,17 +99,17 @@
   color: var(--profile-text-tertiary); 
 }
 
-/* Stat row */
+/* Stat row - Updated to match design system */
 .profile-theme-light .profile-stat-number { 
   color: var(--profile-text-primary); 
   font-weight: 700; 
 }
 
 .profile-theme-light .profile-stat-label { 
-  color: var(--profile-text-tertiary); 
-  letter-spacing: 0.08em; 
+  color: var(--profile-text-secondary); 
+  letter-spacing: 0.05em; 
   text-transform: uppercase; 
-  font-size: 12px; 
+  font-size: 11px; 
 }
 
 /* Pills */
