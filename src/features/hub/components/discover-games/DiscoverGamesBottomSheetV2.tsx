@@ -315,14 +315,22 @@ export function DiscoverGamesBottomSheetV2({
               />
             </div>
 
-            {/* Header - clean and minimal */}
-            <div className="flex items-center justify-between px-5 pb-4 flex-shrink-0">
-              <h2 
-                className="text-[20px] font-bold leading-tight"
-                style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
-              >
-                Discover
-              </h2>
+            {/* Header with subtitle */}
+            <div className="flex items-start justify-between px-5 pb-4 flex-shrink-0">
+              <div>
+                <h2 
+                  className="text-[20px] font-bold leading-tight"
+                  style={{ color: '#1e293b', letterSpacing: '-0.02em' }}
+                >
+                  Discover
+                </h2>
+                <p 
+                  className="text-[13px] mt-0.5"
+                  style={{ color: 'rgba(100, 116, 139, 0.7)' }}
+                >
+                  Find games and trips to join
+                </p>
+              </div>
               
               <button
                 onClick={handleClose}
