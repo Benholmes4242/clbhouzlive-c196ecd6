@@ -41,8 +41,9 @@ export function TripItineraryList({
       transition={{ duration: 0.18, ease: 'easeOut' }}
       className="space-y-3"
     >
+      {/* Section header - matches VISIBILITY label styling */}
       <span 
-        className="text-[12px] font-medium tracking-wide uppercase block px-1"
+        className="text-[11px] font-semibold tracking-[0.05em] uppercase block px-1"
         style={{ color: '#94a3b8' }}
       >
         Courses on this trip
@@ -132,16 +133,16 @@ export function TripItineraryList({
                   </div>
                 </button>
 
-                {/* Remove button */}
+                {/* Remove button - subtle, hover reveals intent */}
                 <button
                   onClick={(e) => handleRemove(e, stop.id)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full flex-shrink-0 transition-all duration-150 active:scale-90"
-                  style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                  className="w-8 h-8 flex items-center justify-center rounded-full flex-shrink-0 transition-all duration-150 active:scale-90 hover:bg-red-50 group/remove"
+                  style={{ background: 'rgba(0, 0, 0, 0.03)' }}
                   aria-label="Remove course"
                 >
                   <X 
-                    className="w-4 h-4 transition-colors" 
-                    style={{ color: '#94a3b8' }} 
+                    className="w-4 h-4 transition-colors group-hover/remove:text-red-500" 
+                    style={{ color: '#cbd5e1' }} 
                   />
                 </button>
               </motion.div>

@@ -49,26 +49,28 @@ export function CTABar({ mode, isValid, isSubmitting, validationHint, onSubmit }
           )}
         </AnimatePresence>
 
-        {/* CTA Button */}
+        {/* CTA Button - Brand orange gradient when valid */}
         <motion.button
           onClick={onSubmit}
           disabled={!isValid || isSubmitting}
           whileTap={isValid && !isSubmitting ? { scale: 0.98 } : {}}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="w-full py-3.5 rounded-[14px] text-[15px] font-semibold transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-4 rounded-2xl text-[15px] font-semibold transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           style={{
             background: isValid 
-              ? '#e2e8f0'
-              : 'rgba(0, 0, 0, 0.05)',
-            color: isValid ? '#1e293b' : '#94a3b8',
+              ? 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)'
+              : 'rgba(0, 0, 0, 0.06)',
+            color: isValid ? '#FFFFFF' : '#94a3b8',
             opacity: isSubmitting ? 0.85 : 1,
-            letterSpacing: '0.2px',
+            boxShadow: isValid 
+              ? '0 4px 16px rgba(249, 115, 22, 0.3)' 
+              : 'none',
           }}
         >
           {isSubmitting ? (
             <>
               <motion.span 
-                className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full"
+                className="w-4 h-4 border-2 border-orange-200 border-t-white rounded-full"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
               />
