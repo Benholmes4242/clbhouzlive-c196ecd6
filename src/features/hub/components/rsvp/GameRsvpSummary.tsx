@@ -38,13 +38,13 @@ export function GameRsvpSummary({
 
       {/* Attendance counts */}
       <span 
-        className="flex items-center gap-1 text-[12px]"
-        style={{ color: 'rgba(30, 41, 59, 0.5)' }}
+        className="flex items-center gap-1 text-[11px] font-medium"
+        style={{ color: 'rgba(100, 116, 139, 0.65)' }}
       >
         <Users className="w-3.5 h-3.5" />
         {formatRsvpCount(goingCount, 'going')}
         {variant === 'expanded' && maybeCount > 0 && (
-          <span className="opacity-80"> · {maybeCount} maybe</span>
+          <span className="opacity-85"> · {maybeCount} maybe</span>
         )}
       </span>
     </div>

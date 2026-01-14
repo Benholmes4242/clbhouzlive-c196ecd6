@@ -51,8 +51,8 @@ export function UpcomingTab({ searchQuery, onCreateGame, onGameTap }: UpcomingTa
       {nextUp && (
         <div>
           <h4 
-            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
-            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+            className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.55)' }}
           >
             Next Up
           </h4>
@@ -68,8 +68,8 @@ export function UpcomingTab({ searchQuery, onCreateGame, onGameTap }: UpcomingTa
       {upcomingList.length > 0 && (
         <div>
           <h4 
-            className="text-[10px] font-semibold uppercase tracking-wider mb-3 px-0.5"
-            style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+            className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3 px-0.5"
+            style={{ color: 'rgba(100, 116, 139, 0.55)' }}
           >
             Upcoming
           </h4>
