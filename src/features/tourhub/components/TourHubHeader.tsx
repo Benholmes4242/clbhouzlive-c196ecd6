@@ -76,8 +76,12 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
         <div className="w-11" />
       </div>
       
-      {/* Second row: Dynamic subtext */}
-      {isOverview ? (
+      {/* Second row: Dynamic subtext or Schedule divider */}
+      {isSchedule ? (
+        <div className="flex justify-center mt-4 mb-2">
+          <div className="w-[80vw] h-px bg-slate-800/20" />
+        </div>
+      ) : isOverview ? (
         <motion.p 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -86,11 +90,11 @@ export function TourHubHeader({ activeTab = 'overview', onMenuOpen }: TourHubHea
         >
           {subtext}
         </motion.p>
-      ) : (
+      ) : subtext ? (
         <p className="mt-2 text-center text-[13px] text-muted-foreground">
           {subtext}
         </p>
-      )}
+      ) : null}
     </header>
   );
 }
