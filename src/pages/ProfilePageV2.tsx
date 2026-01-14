@@ -706,11 +706,10 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Tabs row - fixed height 44px with consistent alignment */}
-        {/* Hub-style toggle bar - matches schedule page */}
-        <section className="flex justify-center py-3 bg-[#F8FAFC]">
+        {/* Segmented control tabs - matches schedule page exactly */}
+        <section className="px-4 py-2">
           <div 
-            className="inline-flex items-center gap-1 p-1 rounded-full"
+            className="flex items-stretch rounded-xl overflow-hidden"
             style={{ background: '#e2e8f0' }}
           >
             {tabs.map((tab) => {
@@ -720,10 +719,10 @@ const ProfilePageV2: React.FC = () => {
                   key={tab.id}
                   onClick={() => setActiveSection(tab.id)}
                   className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
+                    "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px]",
                     isActive 
-                      ? "bg-white text-[#1e293b] shadow-sm" 
-                      : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
+                      ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                      : "text-slate-500 hover:text-slate-700"
                   )}
                 >
                   {tab.label}
