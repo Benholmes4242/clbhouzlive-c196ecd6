@@ -6,6 +6,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
@@ -336,12 +337,21 @@ export function CreateGameTripSheetV2({ isOpen, onClose }: CreateGameTripSheetV2
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',
             }}
           >
-            {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+            {/* Header with grabber and close button */}
+            <div className="flex items-center justify-between pt-3 pb-2 px-5 flex-shrink-0">
+              <div className="w-8" /> {/* Spacer for centering */}
               <div 
                 className="w-10 h-1 rounded-full"
                 style={{ background: 'rgba(0, 0, 0, 0.12)' }}
               />
+              <button
+                onClick={onClose}
+                className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-[0.96]"
+                style={{ background: 'rgba(0, 0, 0, 0.04)' }}
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" style={{ color: '#64748b' }} />
+              </button>
             </div>
             
             {/* Scrollable content */}

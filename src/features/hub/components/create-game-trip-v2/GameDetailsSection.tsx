@@ -108,6 +108,7 @@ export function GameDetailsSection({
                   <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#94a3b8' }} />
                   <input
                     type="date"
+                    min={new Date().toISOString().split('T')[0]}
                     value={gameDate ? format(gameDate, 'yyyy-MM-dd') : ''}
                     onChange={(e) => onGameDateChange(e.target.value ? new Date(e.target.value) : null)}
                     className="flex-1 text-[14px] font-medium bg-transparent border-none outline-none appearance-none"
