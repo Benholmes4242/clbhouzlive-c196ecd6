@@ -9,7 +9,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Search, MoreHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { TourHubEmptyState } from '../TourHubEmptyState';
@@ -166,18 +166,10 @@ export function ScheduleTab() {
   
   return (
     <div className="min-h-screen pb-24">
-      {/* Page Header - Event Schedule title */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-league-spartan text-3xl font-bold text-black tracking-tight">
-          Event Schedule
-        </h1>
-        <button 
-          className="p-2 rounded-lg hover:bg-black/5 transition-colors"
-          aria-label="More options"
-        >
-          <MoreHorizontal className="w-5 h-5 text-black" />
-        </button>
-      </div>
+      {/* Page Header - Event Schedule title (centered) */}
+      <h1 className="font-league-spartan text-3xl font-bold text-black tracking-tight text-center mb-6">
+        Event Schedule
+      </h1>
       
       {/* Search Bar */}
       <div className="relative max-w-md mb-4">
