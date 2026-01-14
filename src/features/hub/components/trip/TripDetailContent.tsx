@@ -46,18 +46,37 @@ interface TripDetailContentProps {
   onInviteSuccess?: () => void;
 }
 
-// V2 Glass Card component for details - warm polish styling
+// V2 Glass Card component for details - warm polish styling with color variants
+type IconVariant = 'blue' | 'green' | 'gray';
+
 function DetailCard({ 
   icon: Icon, 
   title, 
   subtitle,
-  accent = false,
+  variant = 'gray',
 }: { 
   icon: React.ElementType; 
   title: string; 
   subtitle?: string;
-  accent?: boolean;
+  variant?: IconVariant;
 }) {
+  const iconStyles: Record<IconVariant, { bg: string; color: string }> = {
+    blue: {
+      bg: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+      color: 'rgb(59, 130, 246)',
+    },
+    green: {
+      bg: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+      color: 'rgb(34, 197, 94)',
+    },
+    gray: {
+      bg: 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
+      color: 'rgba(30, 41, 59, 0.5)',
+    },
+  };
+
+  const style = iconStyles[variant];
+
   return (
     <div 
       className="flex items-center gap-3.5 p-4 rounded-2xl transition-all"
@@ -68,16 +87,12 @@ function DetailCard({
       }}
     >
       <div 
-        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{
-          background: accent 
-            ? 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)' 
-            : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
-        }}
+        className="w-12 h-12 rounded-[14px] flex items-center justify-center flex-shrink-0"
+        style={{ background: style.bg }}
       >
         <Icon 
           className="w-5 h-5" 
-          style={{ color: accent ? 'rgb(59, 130, 246)' : 'rgba(30, 41, 59, 0.5)' }} 
+          style={{ color: style.color }} 
         />
       </div>
       <div className="flex-1 min-w-0">
@@ -244,7 +259,7 @@ export function TripDetailContent({
               icon={Calendar}
               title={`${format(trip.startDate, 'EEEE, MMMM d')} – ${format(trip.endDate, 'MMMM d, yyyy')}`}
               subtitle={`${dayCount} ${dayCount === 1 ? 'day' : 'days'}`}
-              accent
+              variant="blue"
             />
 
             {/* Players Card */}
@@ -252,6 +267,7 @@ export function TripDetailContent({
               icon={Users}
               title={`${joinedCount} ${joinedCount === 1 ? 'player' : 'players'} joined`}
               subtitle={participants.length > joinedCount ? `${participants.length - joinedCount} invited` : undefined}
+              variant="green"
             />
 
             {/* Visibility Card */}

@@ -90,18 +90,37 @@ function RsvpStatusLabel({ status }: { status: RsvpStatus | string | null }) {
   );
 }
 
-// V2 Glass Card component for details - warm polish styling
+// V2 Glass Card component for details - warm polish styling with color variants
+type IconVariant = 'blue' | 'green' | 'gray';
+
 function DetailCard({ 
   icon: Icon, 
   title, 
   subtitle,
-  accent = false,
+  variant = 'gray',
 }: { 
   icon: React.ElementType; 
   title: string; 
   subtitle?: string;
-  accent?: boolean;
+  variant?: IconVariant;
 }) {
+  const iconStyles: Record<IconVariant, { bg: string; color: string }> = {
+    blue: {
+      bg: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+      color: 'rgb(59, 130, 246)',
+    },
+    green: {
+      bg: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+      color: 'rgb(34, 197, 94)',
+    },
+    gray: {
+      bg: 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
+      color: 'rgba(30, 41, 59, 0.5)',
+    },
+  };
+
+  const style = iconStyles[variant];
+
   return (
     <div 
       className="flex items-center gap-3.5 p-4 rounded-2xl transition-all"
@@ -112,16 +131,12 @@ function DetailCard({
       }}
     >
       <div 
-        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{
-          background: accent 
-            ? 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)' 
-            : 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
-        }}
+        className="w-12 h-12 rounded-[14px] flex items-center justify-center flex-shrink-0"
+        style={{ background: style.bg }}
       >
         <Icon 
           className="w-5 h-5" 
-          style={{ color: accent ? 'rgb(59, 130, 246)' : 'rgba(30, 41, 59, 0.5)' }} 
+          style={{ color: style.color }} 
         />
       </div>
       <div className="flex-1 min-w-0">
@@ -253,7 +268,7 @@ export function GameDetailContent({
               <DetailCard
                 icon={MapPin}
                 title={game.course_name}
-                accent
+                variant="blue"
               />
             )}
 
@@ -262,6 +277,7 @@ export function GameDetailContent({
               icon={Calendar}
               title={format(new Date(game.start_time), 'EEEE, MMMM d, yyyy')}
               subtitle={format(new Date(game.start_time), 'h:mm a')}
+              variant="blue"
             />
 
             {/* Slots Card */}
@@ -269,27 +285,28 @@ export function GameDetailContent({
               icon={Users}
               title={`${slotsFilled}/${game.slots_total} players`}
               subtitle={slotsAvailableText}
+              variant="green"
             />
 
-            {/* Note */}
+            {/* Note - warm amber tint */}
             {game.note && (
               <div 
                 className="p-4 rounded-2xl"
                 style={{
-                  background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+                  background: 'linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%)',
                   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02)',
-                  border: '1px solid rgba(0, 0, 0, 0.04)',
+                  border: '1px solid rgba(251, 191, 36, 0.15)',
                 }}
               >
                 <div 
                   className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1.5"
-                  style={{ color: 'rgba(100, 116, 139, 0.5)' }}
+                  style={{ color: 'rgba(146, 64, 14, 0.6)' }}
                 >
                   Note from host
                 </div>
                 <p 
                   className="text-[14px] leading-relaxed"
-                  style={{ color: '#1e293b' }}
+                  style={{ color: '#78350f' }}
                 >
                   {game.note}
                 </p>
