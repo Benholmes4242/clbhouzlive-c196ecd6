@@ -27,10 +27,8 @@ export function GameDetailTabPills({
 
   return (
     <div 
-      className="flex gap-1.5 p-1 rounded-[14px]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.04)',
-      }}
+      className="flex p-1 rounded-[12px]"
+      style={{ background: 'rgba(0, 0, 0, 0.04)' }}
     >
       {tabs.map(tab => {
         const isActive = activeTab === tab.key;
@@ -38,9 +36,9 @@ export function GameDetailTabPills({
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className="relative flex-1 py-1.5 px-3 text-[13px] font-medium rounded-[10px] transition-colors duration-150"
+            className="relative flex-1 py-2 px-4 text-[13px] font-semibold rounded-[10px] transition-colors"
             style={{
-              color: isActive ? '#1e293b' : 'rgba(30, 41, 59, 0.55)',
+              color: isActive ? '#1e293b' : 'rgba(100, 116, 139, 0.65)',
             }}
           >
             {isActive && (
@@ -48,10 +46,10 @@ export function GameDetailTabPills({
                 layoutId="game-detail-tab-pill-bg"
                 className="absolute inset-0 rounded-[10px]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  background: '#FFFFFF',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
                 }}
-                transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
               />
             )}
             <span className="relative z-10">{tab.label}</span>

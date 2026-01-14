@@ -265,20 +265,20 @@ export function TripDetailSheetV2({
             }
           `}</style>
 
-          {/* Sheet - MATCHES GAME SHEET EXACTLY: height, corners, grabber */}
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
-            style={{
-              height: '92svh',
-              maxHeight: '92svh',
-              backgroundColor: '#F9FAFB',
-              boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
-            }}
-          >
+            {/* Sheet - warm cream background polish */}
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
+              className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
+              style={{
+                height: '92svh',
+                maxHeight: '92svh',
+                background: 'linear-gradient(180deg, #FDFCFB 0%, #F5F3F0 100%)',
+                boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
+              }}
+            >
             {/* Grabber - MATCHES GAME SHEET: w-9 h-[3px] */}
             <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
               <div 
