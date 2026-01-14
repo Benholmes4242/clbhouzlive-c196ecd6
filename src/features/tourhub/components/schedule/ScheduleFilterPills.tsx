@@ -1,9 +1,16 @@
 /**
- * ScheduleFilterPills - Tab-style filters with orange underline (matching Explore page)
- * Matches ProfileTabsNav / StickyFilterBar style exactly
+ * ScheduleFilterPills - Polished filter tabs with pill background active state
+ * 
+ * Features:
+ * - Prominent pill background for active state
+ * - Pulsing dot indicator for Live tab when events are active
+ * - 44px min height for adequate tap targets
+ * - Smooth animations when switching tabs
+ * - Sufficient contrast for inactive tabs with hover/press states
  */
 
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export type ScheduleFilterType = 'all' | 'upcoming' | 'live' | 'completed';
 
@@ -38,26 +45,13 @@ export function ScheduleFilterPills({
 
   const showLiveDot = counts.live > 0;
 
-  // Tab trigger class matching ProfileTabsNav / StickyFilterBar exactly
-  const tabClass = (isActive: boolean) => cn(
-    "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out whitespace-nowrap",
-    isActive 
-      ? "text-slate-800" 
-      : "text-slate-800/60 hover:text-slate-800",
-    // Underline indicator - exact match to ProfileTabsNav
-    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out",
-    isActive 
-      ? "after:w-full after:opacity-[0.85]" 
-      : "after:w-0 after:opacity-0"
-  );
-
   return (
     <div 
-      className="py-1"
+      className="py-2"
       role="tablist"
       aria-label="Filter tournaments"
     >
-      {/* Centered tabs container matching ProfileTabsNav / StickyFilterBar */}
+      {/* Grid layout for even spacing */}
       <div className="grid w-full" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
         {options.map((option) => {
           const isActive = activeFilter === option.value;
@@ -68,17 +62,38 @@ export function ScheduleFilterPills({
               role="tab"
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
-              className={cn(tabClass(isActive), "inline-flex items-center justify-center gap-1.5")}
-            >
-              <span>{option.label}</span>
-              
-              {/* Live indicator dot */}
-              {option.hasLiveIndicator && showLiveDot && (
-                <span className={cn(
-                  "w-1.5 h-1.5 rounded-full animate-pulse",
-                  isActive ? "bg-[hsl(var(--tab-orange))]" : "bg-slate-400"
-                )} />
+              className={cn(
+                // Base styles - 44px min height for tap targets
+                "relative min-h-[44px] px-3 py-2.5 rounded-full text-sm font-semibold",
+                "inline-flex items-center justify-center gap-1.5",
+                "transition-all duration-200 ease-out",
+                // Active state - pill background
+                isActive 
+                  ? "bg-slate-800 text-white shadow-sm" 
+                  : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-100 active:bg-slate-200 active:scale-[0.98]"
               )}
+            >
+              {/* Animated content wrapper */}
+              <motion.span
+                initial={false}
+                animate={{ 
+                  scale: isActive ? 1.02 : 1,
+                }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="flex items-center gap-1.5"
+              >
+                <span>{option.label}</span>
+                
+                {/* Live indicator dot - pulsing when live events exist */}
+                {option.hasLiveIndicator && showLiveDot && (
+                  <span className={cn(
+                    "w-2 h-2 rounded-full",
+                    isActive 
+                      ? "bg-emerald-400 animate-[pulse_1.5s_ease-in-out_infinite]" 
+                      : "bg-emerald-500 animate-[pulse_1.5s_ease-in-out_infinite]"
+                  )} />
+                )}
+              </motion.span>
             </button>
           );
         })}
