@@ -69,15 +69,13 @@ export function ScheduleHeroCard({ tournament, type }: ScheduleHeroCardProps) {
   return (
     <Link
       to={`/tourhub/tournament/${tournament.id}`}
-      className="group block relative overflow-hidden mx-4 active:scale-[0.99] transition-transform duration-200"
-      style={{ borderRadius: '20px' }}
+      className="group block relative overflow-hidden active:scale-[0.99] transition-transform duration-200"
     >
-      {/* Premium hero container */}
+      {/* Premium hero container - full bleed, pointed corners */}
       <div 
         className="relative overflow-hidden"
         style={{ 
-          height: '230px',
-          borderRadius: '20px',
+          height: '253px',
           boxShadow: '0 20px 50px rgba(2, 6, 23, 0.15), 0 8px 20px rgba(0,0,0,0.08)',
         }}
       >
