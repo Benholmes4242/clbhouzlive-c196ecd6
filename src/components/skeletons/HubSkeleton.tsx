@@ -1,58 +1,80 @@
 /**
  * HubSkeleton
- * Minimal skeleton that renders Hub chrome instantly while content loads
+ * Standard page skeleton for Hub - matches page-based architecture
+ * Uses same styling as other page skeletons (CoursesListSkeleton, GenericPageSkeleton)
  */
 
 import { Skeleton } from "@/components/ui/skeleton"
 
+function SkeletonBar({ width, height = 'h-4' }: { width: string; height?: string }) {
+  return (
+    <Skeleton className={`${width} ${height} rounded-full`} />
+  );
+}
+
+function SkeletonCircle({ size }: { size: string }) {
+  return (
+    <Skeleton className={`${size} rounded-full`} />
+  );
+}
+
+function SkeletonBlock({ className }: { className?: string }) {
+  return (
+    <Skeleton className={`rounded-[22px] ${className || ''}`} />
+  );
+}
+
 export function HubSkeleton() {
   return (
-    <div className="fixed inset-0 z-[9999]">
-      {/* Glass Sheet - matches Hub structure */}
-      <div
-        className="hub-glass-page fixed inset-0"
+    <div className="min-h-screen bg-background page-with-header">
+      {/* Main content area */}
+      <main 
+        className="px-5 flex flex-col gap-[8px]"
         style={{
-          background: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
+          paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
         }}
       >
-        {/* Grabber bar */}
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 rounded-full"
-          style={{
-            top: 'calc(8px + env(safe-area-inset-top, 0px))',
-            width: 36,
-            height: 5,
-            background: 'rgba(255, 255, 255, 0.25)',
-          }}
-        />
+        {/* Header skeleton - greeting + icon */}
+        <div className="flex items-center justify-between py-2">
+          <SkeletonBar width="w-[60%]" height="h-8" />
+          <SkeletonCircle size="h-10 w-10" />
+        </div>
 
-        {/* Content skeleton */}
-        <main className="w-full overflow-y-auto h-screen pt-[env(safe-area-inset-top,0px)] px-3.5">
-          <div className="pt-6 space-y-3.5">
-            {/* Hero tile skeleton - matches 165px height */}
-            <Skeleton 
-              className="w-full rounded-[26px] bg-white/8" 
-              style={{ height: '165px' }}
-            />
-            
-            {/* Secondary tile skeleton */}
-            <Skeleton 
-              className="w-full rounded-sq-md bg-white/8" 
-              style={{ height: '200px' }}
-            />
-            
-            {/* Grid of square tiles */}
-            <div className="grid grid-cols-2 gap-3.5">
-              <Skeleton className="w-full rounded-sq-md bg-white/8" style={{ aspectRatio: '1' }} />
-              <Skeleton className="w-full rounded-sq-md bg-white/8" style={{ aspectRatio: '1' }} />
+        {/* Hero tile skeleton - matches 165px height */}
+        <SkeletonBlock className="h-[165px] w-full" />
+
+        {/* Messages card skeleton */}
+        <div className="rounded-[22px] p-4 bg-muted/30 border border-border/50">
+          <div className="flex items-center gap-3">
+            <SkeletonCircle size="h-10 w-10" />
+            <div className="flex-1 space-y-2">
+              <SkeletonBar width="w-24" height="h-5" />
+              <SkeletonBar width="w-full" height="h-3" />
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+
+        {/* Two-card grid skeleton */}
+        <div className="grid grid-cols-2 gap-[8px]">
+          <SkeletonBlock className="h-[130px]" />
+          <SkeletonBlock className="h-[130px]" />
+        </div>
+
+        {/* Your Games card skeleton */}
+        <div className="rounded-[22px] p-4 bg-muted/30 border border-border/50">
+          <div className="flex items-center gap-4">
+            <SkeletonCircle size="h-10 w-10" />
+            <div className="flex-1 space-y-2">
+              <SkeletonBar width="w-28" height="h-5" />
+              <SkeletonBar width="w-full" height="h-3" />
+            </div>
+          </div>
+        </div>
+
+        {/* Additional content skeleton */}
+        <SkeletonBlock className="h-[100px] w-full" />
+      </main>
     </div>
   )
 }
