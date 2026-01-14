@@ -7,9 +7,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { nanoid } from 'nanoid';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import type { EchoMessage } from '../state/echoTypes';
-import { useAIStream } from './useAIStream';
+import { useAIStream, type RateLimitError } from './useAIStream';
 import { 
   createConversation, 
   insertMessage, 
@@ -22,6 +23,26 @@ interface UseEchoConversationOptions {
   resetOnMount?: boolean;
 }
 
+// Rate limit error messages with golf theme
+const RATE_LIMIT_MESSAGES: Record<RateLimitError, { title: string; description: string }> = {
+  RATE_LIMIT_MINUTE: {
+    title: "Taking a breather! ⛳",
+    description: "You're sending messages too quickly. Wait a few seconds."
+  },
+  RATE_LIMIT_HOUR: {
+    title: "Hourly limit reached",
+    description: "You've hit your hourly quota. Try again in a few minutes."
+  },
+  RATE_LIMIT_DAY: {
+    title: "Daily limit reached",
+    description: "You've reached your daily limit. Come back tomorrow!"
+  },
+  PROVIDER_RATE_LIMIT: {
+    title: "Echo is busy",
+    description: "Our AI service is handling high traffic. Try again in a moment."
+  }
+};
+
 export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const resetOnMount = opts?.resetOnMount ?? false;
   const queryClient = useQueryClient();
@@ -32,10 +53,12 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const [streamingContent, setStreamingContent] = useState('');
   const [wasAborted, setWasAborted] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [rateLimitCooldown, setRateLimitCooldown] = useState<number | null>(null);
   
   const { sendMessage: sendToAI, abort } = useAIStream();
   const firstUserMessageRef = useRef<string | null>(null);
   const messagesRef = useRef<EchoMessage[]>([]);
+  const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Keep messagesRef in sync
   useEffect(() => {
@@ -57,6 +80,15 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       firstUserMessageRef.current = null;
     }
   }, [resetOnMount]);
+
+  // Cleanup cooldown timer
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearTimeout(cooldownTimerRef.current);
+      }
+    };
+  }, []);
 
   // Load conversation from database
   const loadConversation = useCallback(async (convId: string) => {
@@ -88,7 +120,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   }, []);
 
   const sendMessage = useCallback(async (content: string) => {
-    if (isStreaming || !userId) return;
+    if (isStreaming || !userId || rateLimitCooldown) return;
 
     const userMessage: EchoMessage = {
       id: nanoid(),
@@ -162,7 +194,42 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
               queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
             }
           },
-          onError: async (error) => {
+          onError: async (error, errorType) => {
+            // Handle rate limit errors specially
+            if (errorType && errorType in RATE_LIMIT_MESSAGES) {
+              const rateLimitType = errorType as RateLimitError;
+              const { title, description } = RATE_LIMIT_MESSAGES[rateLimitType];
+              
+              toast.warning(title, {
+                description,
+                duration: 5000,
+              });
+
+              // Set cooldown for minute limits
+              if (rateLimitType === 'RATE_LIMIT_MINUTE') {
+                setRateLimitCooldown(10); // 10 second cooldown
+                
+                // Countdown timer
+                const countdown = () => {
+                  setRateLimitCooldown(prev => {
+                    if (prev === null || prev <= 1) {
+                      return null;
+                    }
+                    cooldownTimerRef.current = setTimeout(countdown, 1000);
+                    return prev - 1;
+                  });
+                };
+                cooldownTimerRef.current = setTimeout(countdown, 1000);
+              }
+
+              // Remove the user message since we couldn't process it
+              setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+              setIsStreaming(false);
+              setStreamingContent('');
+              return;
+            }
+
+            // Regular error handling
             const errorMessage: EchoMessage = {
               id: assistantMessageId,
               role: 'assistant',
@@ -187,7 +254,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient]);
+  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown]);
 
   const abortStream = useCallback(async () => {
     abort();
@@ -223,7 +290,13 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     setStreamingContent('');
     setIsStreaming(false);
     setWasAborted(false);
+    setRateLimitCooldown(null);
     firstUserMessageRef.current = null;
+    
+    if (cooldownTimerRef.current) {
+      clearTimeout(cooldownTimerRef.current);
+      cooldownTimerRef.current = null;
+    }
   }, []);
 
   return {
@@ -236,5 +309,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     resetConversation,
     wasAborted,
     loadConversation,
+    rateLimitCooldown,
   };
 }
