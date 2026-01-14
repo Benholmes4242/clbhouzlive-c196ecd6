@@ -77,13 +77,48 @@ function StoryTile({ icon: Icon, iconColor, title, value, subtitle, to, delay = 
   return content;
 }
 
+function StoryTileSkeleton({ delay = 0 }: { delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay }}
+      className={cn(
+        "flex flex-col p-3 rounded-xl",
+        "bg-card/60 backdrop-blur-sm",
+        "border border-border/40"
+      )}
+    >
+      <div className="flex items-center gap-1.5 mb-2">
+        <div className="w-3.5 h-3.5 rounded bg-muted animate-pulse" />
+        <div className="h-2.5 w-12 bg-muted rounded animate-pulse" />
+      </div>
+      <div className="h-4 w-16 bg-muted rounded animate-pulse mb-1" />
+      <div className="h-3 w-10 bg-muted rounded animate-pulse" />
+    </motion.div>
+  );
+}
+
 export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStoryStripProps) {
   // Get this week's data for this college
-  const { data: movers } = useCollegeWeeklyMovers({ limit: 50 });
-  const { data: allStats } = useCollegeSeasonStats();
+  const { data: movers, isLoading: moversLoading } = useCollegeWeeklyMovers({ limit: 50 });
+  const { data: allStats, isLoading: statsLoading } = useCollegeSeasonStats();
   const { data: rivals } = useCollegeRivalries(normalizedName);
-  const { data: alumni } = useCollegeAlumni(normalizedName, { orderBy: 'earnings', limit: 1 });
+  const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(normalizedName, { orderBy: 'earnings', limit: 1 });
   const { data: collegeMap } = useCollegeMediaMap();
+
+  const isLoading = moversLoading || statsLoading || alumniLoading;
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return (
+      <div className={cn('grid grid-cols-3 gap-2', className)}>
+        <StoryTileSkeleton delay={0} />
+        <StoryTileSkeleton delay={0.05} />
+        <StoryTileSkeleton delay={0.1} />
+      </div>
+    );
+  }
 
   // Find this college in movers
   const thisMover = movers?.find(m => m.normalized_name === normalizedName);

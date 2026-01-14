@@ -11,7 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trophy, DollarSign, Scissors, Target, ArrowRight, Check } from 'lucide-react';
+import { X, Trophy, DollarSign, Scissors, Target, ArrowRight, Check, Users, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -171,8 +171,8 @@ export function CollegeCompareSheet({
   const [activeMetric, setActiveMetric] = useState<CompareMetric>('earnings');
   const [selectedCollege2, setSelectedCollege2] = useState(college2);
   
-  const { data: allStats } = useCollegeSeasonStats();
-  const { data: collegeMap } = useCollegeMediaMap();
+  const { data: allStats, isLoading: statsLoading, error: statsError } = useCollegeSeasonStats();
+  const { data: collegeMap, isLoading: mediaLoading, error: mediaError } = useCollegeMediaMap();
 
   // Sync selectedCollege2 when college2 prop changes (opening from different rival)
   useEffect(() => {
@@ -185,6 +185,10 @@ export function CollegeCompareSheet({
   const stats2 = allStats?.find(s => s.normalized_name === selectedCollege2);
   const media1 = collegeMap?.get(college1) || null;
   const media2 = collegeMap?.get(selectedCollege2) || null;
+
+  // Error state - college1 data failed to load or is invalid
+  const hasError = (statsError || mediaError) || (!statsLoading && !mediaLoading && !stats1 && college1);
+  const hasNoRivals = rivals.length === 0;
 
   const getValue = (stats: typeof stats1, metric: CompareMetric): number => {
     if (!stats) return 0;
@@ -204,7 +208,17 @@ export function CollegeCompareSheet({
     onCollegeChange?.(rivalSlug);
   };
   
-  const hasValidComparison = college1 && selectedCollege2;
+  const hasValidComparison = college1 && selectedCollege2 && !hasNoRivals;
+
+  // Log error for debugging
+  if (hasError) {
+    console.error('CollegeCompareSheet: Failed to load college data', { 
+      college1, 
+      statsError, 
+      mediaError,
+      stats1Exists: !!stats1 
+    });
+  }
 
   return (
     <AnimatePresence>
@@ -249,8 +263,37 @@ export function CollegeCompareSheet({
               </button>
             </div>
             
+            {/* Error State */}
+            {hasError && (
+              <div className="flex flex-col items-center justify-center py-12 px-6">
+                <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
+                  <AlertCircle className="w-6 h-6 text-destructive" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">Unable to load college data</p>
+                <p className="text-xs text-muted-foreground text-center mb-4">
+                  There was an error loading the comparison data.
+                </p>
+                <Button variant="outline" size="sm" onClick={onClose}>
+                  Close
+                </Button>
+              </div>
+            )}
+
+            {/* No Rivals Empty State */}
+            {!hasError && hasNoRivals && (
+              <div className="flex flex-col items-center justify-center py-12 px-6">
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                  <Users className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">No rivals defined yet</p>
+                <p className="text-xs text-muted-foreground text-center">
+                  This college has no defined rivals to compare against.
+                </p>
+              </div>
+            )}
+
             {/* Select Rival Row */}
-            {rivals.length > 0 && (
+            {!hasError && rivals.length > 0 && (
               <div className="px-4 pb-4">
                 <p className="text-xs font-medium text-muted-foreground mb-2">Select Rival</p>
                 <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
@@ -267,28 +310,30 @@ export function CollegeCompareSheet({
               </div>
             )}
             
-            {/* Metric Tabs */}
-            <div className="flex gap-2 px-4 pb-4">
-              {METRICS.map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveMetric(key)}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg",
-                    "text-xs font-medium transition-all",
-                    activeMetric === key
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
-                </button>
-              ))}
-            </div>
+            {/* Metric Tabs - only show when we have rivals */}
+            {!hasError && !hasNoRivals && (
+              <div className="flex gap-2 px-4 pb-4">
+                {METRICS.map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveMetric(key)}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg",
+                      "text-xs font-medium transition-all",
+                      activeMetric === key
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
             
-            {/* Comparison */}
-            {hasValidComparison ? (
+            {/* Comparison - only show when we have valid data */}
+            {!hasError && !hasNoRivals && hasValidComparison && (
               <div className="flex items-center justify-around px-6 py-6">
                 <CollegeSide
                   college={media1}
@@ -309,27 +354,25 @@ export function CollegeCompareSheet({
                   isWinner={value2 > value1}
                 />
               </div>
-            ) : (
-              <div className="flex items-center justify-center py-12">
-                <p className="text-sm text-muted-foreground">Select a rival to compare</p>
-              </div>
             )}
             
-            {/* CTA */}
-            <div className="px-4 pb-8">
-              {hasValidComparison ? (
-                <Link to={`/tourhub/college-golf/compare?c1=${college1}&c2=${selectedCollege2}`}>
-                  <Button className="w-full gap-2" onClick={onClose}>
-                    Full Comparison
-                    <ArrowRight className="w-4 h-4" />
+            {/* CTA - only show when we have rivals and no error */}
+            {!hasError && !hasNoRivals && (
+              <div className="px-4 pb-8">
+                {hasValidComparison ? (
+                  <Link to={`/tourhub/college-golf/compare?c1=${college1}&c2=${selectedCollege2}`}>
+                    <Button className="w-full gap-2" onClick={onClose}>
+                      Full Comparison
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button className="w-full gap-2" disabled>
+                    Select a rival to compare
                   </Button>
-                </Link>
-              ) : (
-                <Button className="w-full gap-2" disabled>
-                  Select a rival to compare
-                </Button>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </motion.div>
         </>
       )}
