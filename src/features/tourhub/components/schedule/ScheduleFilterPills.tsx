@@ -1,6 +1,6 @@
 /**
- * ScheduleFilterPills - Tab-style filters with neutral slate styling
- * No orange accents - uses black underline for active state
+ * ScheduleFilterPills - Tab-style filters with orange underline (matching Explore page)
+ * Matches ProfileTabsNav / StickyFilterBar style exactly
  */
 
 import { cn } from '@/lib/utils';
@@ -38,14 +38,27 @@ export function ScheduleFilterPills({
 
   const showLiveDot = counts.live > 0;
 
+  // Tab trigger class matching ProfileTabsNav / StickyFilterBar exactly
+  const tabClass = (isActive: boolean) => cn(
+    "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none transition-colors duration-200 ease-out whitespace-nowrap",
+    isActive 
+      ? "text-foreground" 
+      : "text-muted-foreground hover:text-foreground",
+    // Underline indicator - exact match to ProfileTabsNav
+    "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out",
+    isActive 
+      ? "after:w-full after:opacity-[0.85]" 
+      : "after:w-0 after:opacity-0"
+  );
+
   return (
     <div 
-      className="py-3"
+      className="py-1"
       role="tablist"
       aria-label="Filter tournaments"
     >
-      {/* Horizontal scroll on mobile */}
-      <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+      {/* Centered tabs container matching ProfileTabsNav / StickyFilterBar */}
+      <div className="grid w-full" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
         {options.map((option) => {
           const isActive = activeFilter === option.value;
 
@@ -55,22 +68,15 @@ export function ScheduleFilterPills({
               role="tab"
               aria-selected={isActive}
               onClick={() => onFilterChange(option.value)}
-              className={cn(
-                "relative px-4 py-2 text-sm font-medium rounded-lg",
-                "transition-all duration-200 ease-out whitespace-nowrap",
-                "inline-flex items-center justify-center gap-1.5",
-                isActive 
-                  ? "bg-black text-white" 
-                  : "bg-transparent text-muted-foreground hover:bg-black/5 hover:text-foreground"
-              )}
+              className={cn(tabClass(isActive), "inline-flex items-center justify-center gap-1.5")}
             >
-              {option.label}
+              <span>{option.label}</span>
               
               {/* Live indicator dot */}
               {option.hasLiveIndicator && showLiveDot && (
                 <span className={cn(
                   "w-1.5 h-1.5 rounded-full animate-pulse",
-                  isActive ? "bg-white" : "bg-slate-500"
+                  isActive ? "bg-[hsl(var(--tab-orange))]" : "bg-slate-400"
                 )} />
               )}
             </button>
