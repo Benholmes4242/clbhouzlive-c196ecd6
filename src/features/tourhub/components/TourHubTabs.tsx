@@ -67,15 +67,19 @@ const tournamentTabs: { value: TournamentDetailTab; label: string; icon: string 
 export function TournamentDetailTabs({ activeTab, onTabChange, className }: TournamentDetailTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TournamentDetailTab)}>
-      <div className={cn("w-full max-w-full overflow-x-auto whitespace-nowrap overscroll-x-contain scrollbar-hide", className)}>
-        <TabsList className="inline-flex h-11 items-center justify-start gap-1 bg-muted/50 p-1 rounded-xl w-max">
+      <div className={cn("w-full max-w-full", className)}>
+        {/* Segmented control - matching Schedule page */}
+        <TabsList 
+          className="flex items-stretch h-auto gap-0 p-0 rounded-xl overflow-hidden border-0 w-full"
+          style={{ background: '#e2e8f0' }}
+        >
           {tournamentTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="flex-none px-3 sm:px-4 py-2 text-sm font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all gap-1.5 items-center"
+              className="flex-1 py-2.5 text-[13px] font-semibold whitespace-nowrap min-h-[44px] rounded-none border-0 data-[state=active]:bg-white data-[state=active]:text-slate-800 data-[state=active]:shadow-sm data-[state=active]:m-1 data-[state=active]:rounded-lg data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:text-slate-700 data-[state=inactive]:bg-transparent transition-all duration-200"
             >
-              <span className="text-sm hidden sm:inline">{tab.icon}</span>
+              <span className="text-sm hidden sm:inline mr-1">{tab.icon}</span>
               {tab.label}
             </TabsTrigger>
           ))}

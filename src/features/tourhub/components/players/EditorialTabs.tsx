@@ -1,5 +1,5 @@
 /**
- * EditorialTabs - Premium glass bar tabs with sliding underline
+ * EditorialTabs - Premium segmented control tabs matching Schedule page
  * 
  * Tabs:
  * - The Field (All Players)
@@ -8,8 +8,6 @@
  * - Next Wave (Rookies)
  */
 
-import { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export type PlayerFilterType = 'all' | 'top-ranked' | 'most-active' | 'rookies';
@@ -33,57 +31,17 @@ const TABS: { value: PlayerFilterType; label: string; countKey: keyof NonNullabl
 ];
 
 export function EditorialTabs({ activeFilter, onFilterChange, counts }: EditorialTabsProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
-  // Update indicator position when active tab changes
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const activeButton = containerRef.current.querySelector(`[data-tab="${activeFilter}"]`) as HTMLElement;
-    if (activeButton) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const buttonRect = activeButton.getBoundingClientRect();
-      
-      setIndicatorStyle({
-        left: buttonRect.left - containerRect.left,
-        width: buttonRect.width,
-      });
-    }
-  }, [activeFilter]);
-
   return (
     <div 
-      className={cn(
-        "relative",
-        "bg-background/60 backdrop-blur-md",
-        "border border-border/40",
-        "rounded-xl",
-        "p-1"
-      )}
+      className="py-2"
+      role="tablist"
+      aria-label="Filter players"
     >
-      {/* Glass bar container */}
-      <div
-        ref={containerRef}
-        className="relative flex"
-        role="tablist"
-        aria-label="Filter players"
+      {/* Full-width segmented control - matching Schedule page */}
+      <div 
+        className="flex items-stretch rounded-xl overflow-hidden"
+        style={{ background: '#e2e8f0' }}
       >
-        {/* Sliding indicator */}
-        <motion.div
-          className={cn(
-            "absolute bottom-0 h-[2px] rounded-full",
-            "bg-[hsl(var(--tab-orange))]",
-            "shadow-[0_0_8px_hsl(var(--tab-orange)/0.4)]"
-          )}
-          initial={false}
-          animate={{
-            left: indicatorStyle.left,
-            width: indicatorStyle.width,
-          }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        />
-
         {TABS.map((tab) => {
           const isActive = activeFilter === tab.value;
           const count = counts?.[tab.countKey];
@@ -91,26 +49,23 @@ export function EditorialTabs({ activeFilter, onFilterChange, counts }: Editoria
           return (
             <button
               key={tab.value}
-              data-tab={tab.value}
               role="tab"
               aria-selected={isActive}
               onClick={() => onFilterChange(tab.value)}
               className={cn(
-                "relative flex-1 px-3 py-2.5",
-                "text-sm font-medium",
-                "transition-colors duration-200",
-                "rounded-lg",
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                "min-h-[44px]", // Accessibility touch target
                 isActive 
-                  ? "text-foreground" 
-                  : "text-muted-foreground hover:text-foreground/80"
+                  ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                  : "text-slate-500 hover:text-slate-700"
               )}
             >
-              <span className="relative z-10 flex items-center justify-center gap-1.5">
+              <span className="flex items-center justify-center gap-1.5">
                 {tab.label}
                 {count !== undefined && count > 0 && (
                   <span className={cn(
                     "text-[10px] font-normal tabular-nums",
-                    isActive ? "text-muted-foreground" : "text-muted-foreground/60"
+                    isActive ? "text-slate-500" : "text-slate-400"
                   )}>
                     {count > 999 ? '999+' : count}
                   </span>

@@ -53,14 +53,17 @@ export function LeadersPhotoCards({ leaders }: LeadersPhotoCardsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header - matching Schedule page section headers */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
+        <h3 
+          className="font-extrabold text-slate-800 uppercase"
+          style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+        >
           Season Leaders
         </h3>
         <Link 
           to="/tourhub?tab=leaderboards"
-          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+          className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1 transition-colors"
         >
           All leaders <ArrowRight className="w-3 h-3" />
         </Link>

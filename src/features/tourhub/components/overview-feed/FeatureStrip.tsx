@@ -88,9 +88,12 @@ export function FeatureStrip({ topPlayers = [] }: FeatureStripProps) {
 
   return (
     <div className="-mx-4 sm:-mx-6">
-      {/* Header - renamed to Season Headlines */}
+      {/* Header - matching Schedule page section headers */}
       <div className="px-4 sm:px-6 pb-6">
-        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
+        <h3 
+          className="font-extrabold text-slate-800 uppercase"
+          style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+        >
           Season Headlines
         </h3>
       </div>

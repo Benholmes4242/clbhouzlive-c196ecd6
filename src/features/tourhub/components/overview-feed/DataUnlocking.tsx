@@ -39,16 +39,19 @@ export function DataUnlocking({ items }: DataUnlockingProps) {
 
   return (
     <div className="pt-8 mt-4">
-      {/* Header */}
+      {/* Header - matching Schedule page section headers */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
-          <Lock className="w-4 h-4 text-muted-foreground/70" />
+        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+          <Lock className="w-4 h-4 text-slate-400" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">
+          <p 
+            className="font-extrabold text-slate-800 uppercase"
+            style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+          >
             More Coming Soon
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-500">
             Live leaderboards, tee times & hole stats
           </p>
         </div>
@@ -88,12 +91,12 @@ export function DataUnlocking({ items }: DataUnlockingProps) {
                 </div>
                 
                 {/* Label */}
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-sm font-medium text-slate-600">
                   {item.label}
                 </p>
                 
                 {/* Description */}
-                <p className="text-[11px] text-muted-foreground/60 mt-0.5">
+                <p className="text-[11px] text-slate-400 mt-0.5">
                   {config.description}
                 </p>
               </div>
@@ -103,7 +106,7 @@ export function DataUnlocking({ items }: DataUnlockingProps) {
       </div>
       
       {/* Subtle footer text */}
-      <p className="text-[11px] text-muted-foreground/50 text-center mt-5">
+      <p className="text-[11px] text-slate-400 text-center mt-5">
         Live data feeds will unlock automatically when available
       </p>
     </div>

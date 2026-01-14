@@ -78,21 +78,27 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header - matching Schedule page section headers */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
+        <h3 
+          className="font-extrabold text-slate-800 uppercase"
+          style={{ fontSize: '13px', letterSpacing: '0.08em' }}
+        >
           Top Players
         </h3>
         <Link 
           to="/tourhub?tab=leaderboards"
-          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+          className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1 transition-colors"
         >
           All leaders <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
 
-      {/* Improved Tab styling - underline + soft accent */}
-      <div className="grid w-full grid-cols-3 border-b border-border/30">
+      {/* Tab styling - segmented control matching Schedule page */}
+      <div 
+        className="flex items-stretch rounded-xl overflow-hidden"
+        style={{ background: '#e2e8f0' }}
+      >
         {sortOptions.map((opt) => {
           const isActive = sortBy === opt.value;
           return (
@@ -100,25 +106,14 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
               key={opt.value}
               onClick={() => setSortBy(opt.value)}
               className={cn(
-                "w-full inline-flex items-center justify-center",
-                "relative text-sm px-3 py-3 font-medium whitespace-nowrap",
-                "bg-transparent border-0 shadow-none rounded-none",
-                "transition-all duration-200 ease-out",
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap",
+                "min-h-[44px]",
+                isActive 
+                  ? "bg-white text-slate-800 shadow-sm m-1 rounded-lg" 
+                  : "text-slate-500 hover:text-slate-700"
               )}
             >
               {opt.label}
-              {/* Underline indicator */}
-              <motion.span
-                layoutId="player-tab-indicator"
-                className={cn(
-                  "absolute bottom-0 left-0 right-0 h-[2px] rounded-full",
-                  isActive ? "bg-primary" : "bg-transparent"
-                )}
-                transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
-              />
             </button>
           );
         })}
