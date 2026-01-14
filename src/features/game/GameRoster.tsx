@@ -26,7 +26,14 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50">
+    <div 
+      className="flex items-center gap-3 px-4 py-3 mx-4 mt-4 rounded-[14px]"
+      style={{
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+    >
       <div className="flex items-center gap-1">
         {sortedParticipants.map((participant, index) => {
           const profile = participant.user_profiles;
@@ -47,7 +54,12 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
                 className="border-2 border-background"
               />
               {isHost && (
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-primary-foreground border border-background">
+                <div 
+                  className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-[6px] flex items-center justify-center text-[10px] font-bold text-white border border-white"
+                  style={{
+                    background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
+                  }}
+                >
                   H
                 </div>
               )}
@@ -55,16 +67,18 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
           );
         })}
       </div>
-      <div className="flex-1 flex items-center gap-2 text-sm text-muted-foreground">
-        <span>{sortedParticipants.length} {sortedParticipants.length === 1 ? 'player' : 'players'}</span>
-        <div className="flex items-center gap-1 flex-wrap">
+      <div className="flex-1 flex items-center gap-2">
+        <span className="font-semibold text-[14px] text-slate-800">
+          {sortedParticipants.length} {sortedParticipants.length === 1 ? 'player' : 'players'}
+        </span>
+        <div className="flex items-center gap-1 flex-wrap text-[13px] text-slate-500">
           {sortedParticipants.map((p, i) => (
             <React.Fragment key={p.id}>
               {i > 0 && <span>•</span>}
               <HcpBadge 
                 value={p.user_profiles?.handicap} 
                 show={p.user_profiles?.show_handicap ?? true}
-                className="text-muted-foreground"
+                className="text-slate-500"
               />
             </React.Fragment>
           ))}
