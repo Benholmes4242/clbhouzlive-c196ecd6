@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -11,7 +11,7 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Matches SegmentedTabs styling from Explore page
+ * ProfileTabsNav - Hub-style toggle bar
  * Captures scroll position at click time before any state changes
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
@@ -30,39 +30,35 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   };
 
   // Pass captured scroll snapshot when tab changes
-  const handleValueChange = (newTabId: string) => {
-    onTabChange(newTabId, scrollSnapshotRef.current);
+  const handleTabClick = (tabId: string) => {
+    if (disabled) return;
+    onTabChange(tabId, scrollSnapshotRef.current);
   };
-
-  // Tab trigger class matching Top100Hub/Discover pages exactly
-  // Tab styling aligned with design system - inactive: #64748b, active: #1e293b
-  const tabTriggerClass = "relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-[#1e293b] text-[#64748b] hover:text-[#1e293b] transition-colors duration-200 ease-out after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50";
 
   return (
     <section 
-      className="mt-6 border-b border-[#e2e8f0] bg-[#F8FAFC]"
+      className="py-3 bg-[#F8FAFC]"
       onPointerDown={handlePointerDown}
     >
-      <div className="px-4">
-        <Tabs value={activeSection} onValueChange={handleValueChange} className="w-full">
-          <TabsList 
-            className="grid w-full bg-transparent border-0 px-0 py-0 gap-0"
-            style={{ 
-              gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
-            }}
-          >
-            {tabs.map((tab) => (
-              <TabsTrigger 
-                key={tab.id}
-                value={tab.id}
-                disabled={disabled}
-                className={tabTriggerClass}
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+      <div className="flex justify-center px-4">
+        <div className="inline-flex items-center gap-1 p-1 bg-[#e2e8f0] rounded-full">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              disabled={disabled}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150",
+                activeSection === tab.id
+                  ? "bg-white text-[#1e293b] shadow-sm"
+                  : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50",
+                disabled && "pointer-events-none opacity-50"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );
