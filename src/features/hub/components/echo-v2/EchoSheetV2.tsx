@@ -358,9 +358,10 @@ export function EchoSheetV2({
 
             {/* Body - Tab content */}
             {activeTab === 'chat' ? (
-              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
                 {!hasMessages ? (
-                  <div className="flex-1 min-h-0 flex items-center justify-center px-5 py-4">
+                  /* Empty state - absolutely centered in the available space above composer */
+                  <div className="absolute inset-0 bottom-[72px] flex items-center justify-center px-5">
                     <EchoEmptyState
                       onChipClick={handleChipClick}
                       onFocusInput={handleFocusInput}
@@ -376,17 +377,19 @@ export function EchoSheetV2({
                 )}
 
                 {/* Composer - Always visible in chat tab */}
-                <EchoComposer
-                  ref={composerInputRef}
-                  value={input}
-                  onChange={setInput}
-                  onSend={handleSend}
-                  onAbort={abortStream}
-                  isStreaming={isStreaming}
-                  autoFocus={hasMessages}
-                  disabled={!!rateLimitCooldown}
-                  cooldown={rateLimitCooldown}
-                />
+                <div className="mt-auto flex-shrink-0">
+                  <EchoComposer
+                    ref={composerInputRef}
+                    value={input}
+                    onChange={setInput}
+                    onSend={handleSend}
+                    onAbort={abortStream}
+                    isStreaming={isStreaming}
+                    autoFocus={hasMessages}
+                    disabled={!!rateLimitCooldown}
+                    cooldown={rateLimitCooldown}
+                  />
+                </div>
               </div>
             ) : (
               <EchoHistoryTab
