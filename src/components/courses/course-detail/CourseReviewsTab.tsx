@@ -23,6 +23,7 @@ import { ReviewMediaItem } from '../review/ReviewMediaStrip';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { useUnifiedFullscreen } from '@/hooks/useUnifiedFullscreen';
 import type { ExploreContentItem } from '@/components/explore/types';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 export type SortOption = 'recent' | 'highest' | 'helpful';
 
@@ -615,6 +616,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </div>
         </section>
       )}
+      
+      <ScrollToTopGlass />
     </div>
   );
 };

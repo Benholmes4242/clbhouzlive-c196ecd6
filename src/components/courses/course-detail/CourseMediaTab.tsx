@@ -20,6 +20,7 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useLazyTiles } from '@/components/shared/grid/useLazyTiles';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { toast } from 'sonner';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { MediaItem } from '@/types/media';
 
@@ -397,6 +398,8 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       )}
 
       {/* Unified Fullscreen Player - rendered via context provider in App.tsx */}
+      
+      <ScrollToTopGlass />
     </div>
   );
 };

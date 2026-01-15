@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -297,6 +298,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </Button>
         </section>
       ) : null}
+      
+      <ScrollToTopGlass />
     </div>
   );
 };
