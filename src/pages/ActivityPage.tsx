@@ -234,18 +234,24 @@ const ActivityPage: React.FC = () => {
           </p>
         </section>
 
-        {/* Filter tabs - Apple-style segmented control */}
+        {/* Filter tabs - Match Profile page style */}
         <div className="mb-4">
-          <div className="grid w-full grid-cols-4 rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]">
+          <div 
+            className="grid w-full grid-cols-4 gap-1 p-1 rounded-xl"
+            style={{ background: '#e2e8f0' }}
+            role="tablist"
+          >
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard",
+                  "py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap",
                   activeTab === tab.id
-                    ? "bg-background shadow-sm text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-white text-[#1e293b] shadow-sm"
+                    : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                 )}
               >
                 {tab.label}
@@ -284,9 +290,15 @@ const ActivityPage: React.FC = () => {
           <div className="w-full mt-4 space-y-0">
             {/* All caught up banner */}
             {isAllCaughtUp && (
-              <div className="flex flex-col items-center py-4 text-center">
-                <span className="text-sm font-medium text-foreground">You're all caught up</span>
-                <span className="text-xs text-muted-foreground mt-0.5">No further new notifications.</span>
+              <div className="flex flex-col items-center py-6 px-4">
+                <div className="flex items-center gap-2 text-[#64748b]">
+                  <div className="h-px w-8 bg-[#e2e8f0]" />
+                  <span className="text-xs font-medium">You're all caught up</span>
+                  <div className="h-px w-8 bg-[#e2e8f0]" />
+                </div>
+                <p className="text-xs text-[#94a3b8] mt-1">
+                  No further new notifications.
+                </p>
               </div>
             )}
 

@@ -183,18 +183,24 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
           </header>
 
           <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
-            {/* Filter tabs */}
-            <div className="mb-4 overflow-x-auto scrollbar-hide">
-              <div className="inline-flex rounded-sq-pill bg-muted/70 border border-border/40 p-1 gap-0.5">
+            {/* Filter tabs - Match Profile page style */}
+            <div className="mb-4">
+              <div 
+                className="grid w-full grid-cols-4 gap-1 p-1 rounded-xl"
+                style={{ background: '#e2e8f0' }}
+                role="tablist"
+              >
                 {ACTIVITY_TABS.map((tab) => (
                   <button
                     key={tab.id}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "px-3 py-1.5 text-sm rounded-sq-pill whitespace-nowrap transition-all duration-200",
+                      "py-2 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap",
                       activeTab === tab.id
-                        ? "bg-background text-foreground shadow-sm font-medium"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "bg-white text-[#1e293b] shadow-sm"
+                        : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
                     )}
                   >
                     {tab.label}
