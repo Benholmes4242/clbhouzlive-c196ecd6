@@ -3,7 +3,7 @@
  * Calmer, more premium variant of compact cards
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MapPin, Plane, Calendar } from 'lucide-react';
 import { useHubHeroDataV3 } from '../../hooks/useHubHeroDataV3';
 import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
@@ -12,7 +12,7 @@ import { HubCompactCardV3 } from './HubCompactCardV3';
 import { HubGamesTripsCard } from './HubGamesTripsCard';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { haptic } from '@/utils/haptics';
-import { HUB_DEMO_MODE, MOCK_DIARY_ITEMS } from '../../hubDemoConfig';
+
 
 function formatGameDate(isoDate: string): string {
   const date = new Date(isoDate);
@@ -31,10 +31,7 @@ export function HubYourWorldV3() {
   const { data: heroData, isLoading } = useHubHeroDataV3();
   const [sheetOpen, setSheetOpen] = useState(false);
   
-  // Use mock data in demo mode
-  const diaryItems = HUB_DEMO_MODE ? MOCK_DIARY_ITEMS : [];
-  
-  // Build display items from hero data + any additional items
+  // Build display items from hero data (real data only, no demo mode)
   const displayItems: Array<{
     type: 'game' | 'trip';
     id: string;
@@ -79,18 +76,6 @@ export function HubYourWorldV3() {
     });
   }
 
-  // Also use diary items from demo mode
-  if (HUB_DEMO_MODE && diaryItems.length > 0) {
-    diaryItems.slice(0, 2).forEach((item, i) => {
-      displayItems.push({
-        type: item.type,
-        id: `diary-${i}`,
-        title: item.title,
-        subtitle: item.subtitle,
-      });
-    });
-  }
-
   // Deduplicate by title (simple approach)
   const uniqueItems = displayItems.filter((item, index, self) =>
     index === self.findIndex(t => t.title === item.title)
@@ -101,11 +86,9 @@ export function HubYourWorldV3() {
     setSheetOpen(true);
   };
 
-  // Count remaining items (for demo, use mock data)
-  const gamesCount = HUB_DEMO_MODE ? MOCK_DIARY_ITEMS.filter(i => i.type === 'game').length : 0;
-  const tripsCount = HUB_DEMO_MODE ? MOCK_DIARY_ITEMS.filter(i => i.type === 'trip').length : 0;
-  const moreGames = Math.max(0, gamesCount - 1);
-  const moreTrips = Math.max(0, tripsCount - 1);
+  // Count based on real data
+  const gamesCount = displayItems.filter(i => i.type === 'game').length;
+  const tripsCount = displayItems.filter(i => i.type === 'trip').length;
 
   if (isLoading) {
     return (

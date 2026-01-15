@@ -3,11 +3,12 @@
  * 220-240px height, bold typography, strong gradient overlays
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { format, isToday, isTomorrow } from 'date-fns';
-import { MapPin, Plane, ChevronRight } from 'lucide-react';
+import { MapPin, Plane, ChevronRight, Plus, Calendar } from 'lucide-react';
 import { useHubHeroDataV3, HeroGameData, HeroTripData, HeroFallbackData } from '../../hooks/useHubHeroDataV3';
 import { YourGamesTripsSheetV2 } from '@/features/hub/components/your-games-trips-v2';
+import { CreateGameTripSheetV2 } from '@/features/hub/components/create-game-trip-v2';
 import { haptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 
@@ -148,9 +149,75 @@ function FallbackHeroContent({ data }: { data: HeroFallbackData }) {
   );
 }
 
+// Empty state for when user has no games/trips
+function HeroEmptyState({ onCreateGame }: { onCreateGame: () => void }) {
+  return (
+    <div 
+      className="relative w-full overflow-hidden"
+      style={{
+        height: '250px',
+        borderRadius: '20px',
+        background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
+        boxShadow: '0 24px 60px rgba(2, 6, 23, 0.18), 0 12px 24px rgba(0,0,0,0.10)',
+      }}
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-6 right-6 w-32 h-32 rounded-full border-2 border-white/30" />
+        <div className="absolute bottom-6 left-6 w-24 h-24 rounded-full border-2 border-white/30" />
+        <div className="absolute top-1/2 right-8 -translate-y-1/2 w-20 h-20 rounded-full bg-white/10" />
+      </div>
+      
+      {/* Decorative golf ball */}
+      <div className="absolute top-1/2 right-8 -translate-y-1/2 w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-white/90 shadow-lg" />
+      </div>
+      
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col justify-between p-6">
+        <div>
+          <div 
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-semibold mb-4"
+            style={{ background: 'rgba(255,255,255,0.2)' }}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            No upcoming games
+          </div>
+          
+          <h2 
+            className="text-2xl font-bold text-white mb-2 drop-shadow-lg"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
+          >
+            Plan Your Next Round
+          </h2>
+          
+          <p className="text-white/80 text-sm max-w-[240px]">
+            Create a game to invite friends and organise your next round of golf
+          </p>
+        </div>
+        
+        {/* CTA */}
+        <div>
+          <button
+            onClick={() => {
+              haptic('light');
+              onCreateGame();
+            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 text-sm font-semibold rounded-full hover:bg-white/90 transition-colors shadow-lg active:scale-[0.98]"
+          >
+            <Plus className="w-4 h-4" />
+            Create Game
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HubHeroCardV3() {
   const { data: heroData, isLoading } = useHubHeroDataV3();
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -176,7 +243,19 @@ export function HubHeroCardV3() {
   }
 
   const data = heroData?.primary;
-  if (!data) return null;
+  
+  // Show empty state if no data (no games, trips, or fallback)
+  if (!data) {
+    return (
+      <>
+        <HeroEmptyState onCreateGame={() => setCreateOpen(true)} />
+        <CreateGameTripSheetV2
+          isOpen={createOpen}
+          onClose={() => setCreateOpen(false)}
+        />
+      </>
+    );
+  }
 
   const imageUrl = (() => {
     if (imageError) return FALLBACK_HERO;
@@ -259,6 +338,11 @@ export function HubHeroCardV3() {
       <YourGamesTripsSheetV2
         isOpen={gamesHubOpen}
         onClose={() => setGamesHubOpen(false)}
+      />
+      
+      <CreateGameTripSheetV2
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
       />
     </>
   );
