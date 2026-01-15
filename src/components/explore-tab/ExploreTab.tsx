@@ -295,7 +295,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
             
             {/* Filter button row */}
             <div className="px-4 pt-4 pb-2 bg-white flex items-center justify-between border-b border-[#e2e8f0]">
-              <h2 className="text-lg font-bold text-[#1e293b]">Discover</h2>
+              <h2 className="text-lg font-bold text-[#1e293b]">Discover Courses</h2>
               <FilterButton />
             </div>
             
