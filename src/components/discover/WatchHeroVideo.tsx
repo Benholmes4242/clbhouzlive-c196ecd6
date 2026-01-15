@@ -53,16 +53,31 @@ export function WatchHeroVideo({
   if (isLoading) {
     return (
       <div className="px-4 pt-4">
-        <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden">
-          <Skeleton className="absolute inset-0" />
+        <Skeleton className="w-full aspect-[16/9] rounded-2xl" />
+        <div className="flex items-center gap-2.5 mt-3">
+          <Skeleton className="w-9 h-9 rounded-full" />
+          <div className="space-y-1.5">
+            <Skeleton className="w-24 h-4 rounded" />
+            <Skeleton className="w-16 h-3 rounded" />
+          </div>
         </div>
       </div>
     );
   }
 
-  // No video available
+  // Empty state - No video available
   if (!video || video.media.length === 0) {
-    return null;
+    return (
+      <div className="px-4 pt-4">
+        <div className="w-full aspect-[16/9] rounded-2xl bg-gradient-to-br from-muted/50 to-muted flex flex-col items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-background/80 flex items-center justify-center mb-3 shadow-sm">
+            <Heart className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <p className="text-foreground font-semibold">No trending videos yet</p>
+          <p className="text-muted-foreground text-sm">Be the first to post!</p>
+        </div>
+      </div>
+    );
   }
 
   const primaryMedia = video.media[0];

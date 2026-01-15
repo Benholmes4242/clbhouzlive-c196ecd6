@@ -8,18 +8,22 @@
  * - Autoplay pattern: first + every 3rd (0, 3, 6, 9...)
  * - Loading skeletons
  * - Empty state
+ * - Error state with retry
  */
 
 import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Video } from 'lucide-react';
+import { Video, AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { WatchShortCard } from './WatchShortCard';
 import { WatchShort } from '@/hooks/useWatchShorts';
 
 interface WatchShortsGridProps {
   shorts: WatchShort[];
   isLoading: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   onVideoTap: (video: WatchShort, index: number, allVideos: WatchShort[]) => void;
   onLoadMore: () => void;
   hasMore: boolean;
@@ -29,6 +33,8 @@ interface WatchShortsGridProps {
 export function WatchShortsGrid({
   shorts,
   isLoading,
+  isError,
+  onRetry,
   onVideoTap,
   onLoadMore,
   hasMore,
@@ -45,6 +51,31 @@ export function WatchShortsGrid({
       onLoadMore();
     }
   }, [inView, hasMore, isLoadingMore, onLoadMore]);
+
+  // Error state with retry
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+          <AlertCircle className="w-7 h-7 text-destructive" />
+        </div>
+        <p className="text-foreground font-semibold mb-1">Something went wrong</p>
+        <p className="text-muted-foreground text-sm text-center mb-4">
+          We couldn't load the videos
+        </p>
+        {onRetry && (
+          <Button 
+            variant="outline" 
+            onClick={onRetry}
+            className="rounded-full"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Try again
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   // Loading skeleton
   if (isLoading && shorts.length === 0) {
