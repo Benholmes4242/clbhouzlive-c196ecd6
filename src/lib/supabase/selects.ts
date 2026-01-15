@@ -91,13 +91,14 @@ export const POST_DETAIL_SELECT = `
 
 // ============================================================================
 // PROFILE SELECTS
+// Note: These use actual user_profiles table columns
 // ============================================================================
 
 /** Minimal profile for avatars and mentions */
 export const PROFILE_MINIMAL_SELECT = `
   id,
   username,
-  avatar_url
+  profile_photo_url
 ` as const;
 
 /** Profile card data (hover cards, lists) */
@@ -105,11 +106,9 @@ export const PROFILE_CARD_SELECT = `
   id,
   username,
   display_name,
-  avatar_url,
+  profile_photo_url,
   bio,
-  is_verified,
-  follower_count,
-  following_count
+  is_verified_golfer
 ` as const;
 
 /** Full profile for profile pages */
@@ -117,36 +116,17 @@ export const PROFILE_FULL_SELECT = `
   id,
   username,
   display_name,
-  avatar_url,
-  cover_image_url,
+  profile_photo_url,
+  cover_photo_url,
   bio,
   location,
-  website,
-  is_verified,
-  is_pro,
-  follower_count,
-  following_count,
-  post_count,
-  handicap,
-  home_course,
-  created_at
-` as const;
-
-/** Profile for settings/edit */
-export const PROFILE_SETTINGS_SELECT = `
-  id,
-  username,
-  display_name,
-  avatar_url,
-  cover_image_url,
-  bio,
-  location,
-  website,
-  handicap,
-  home_course,
-  email_notifications,
-  push_notifications,
-  privacy_settings
+  is_verified_golfer,
+  is_verified_business,
+  is_creator,
+  eg_handicap_index,
+  home_club,
+  created_at,
+  is_public
 ` as const;
 
 // ============================================================================

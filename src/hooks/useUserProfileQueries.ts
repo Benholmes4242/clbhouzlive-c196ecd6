@@ -7,18 +7,46 @@ import { useSupabaseSession } from './useSupabaseSession';
 const isUuid = (v: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
 
+// Phase 2 Perf: Specific column selects for reduced payload
+// These match the actual user_profiles table columns
+const PROFILE_PAGE_SELECT = `
+  id,
+  username,
+  display_name,
+  profile_photo_url,
+  bio,
+  location,
+  is_verified_golfer,
+  is_verified_business,
+  is_creator,
+  created_at,
+  is_public,
+  home_club,
+  eg_handicap_index
+`;
+
+const PROFILE_CARD_SELECT = `
+  id,
+  username,
+  display_name,
+  profile_photo_url,
+  bio,
+  is_verified_golfer
+`;
+
 export const useUserProfileQueries = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useSupabaseSession();
 
   // Fetch user profile data - supports both UUID (id) and username
+  // Phase 2 Perf: Using specific column select instead of select('*')
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['user-profile', username],
     queryFn: async () => {
       if (!username) return null;
       
       // Detect if param is UUID or username and query accordingly
-      const query = supabase.from('user_profiles').select('*');
+      const query = supabase.from('user_profiles').select(PROFILE_PAGE_SELECT);
       const { data, error } = await (isUuid(username) 
         ? query.eq('id', username) 
         : query.eq('username', username)
@@ -35,6 +63,7 @@ export const useUserProfileQueries = () => {
   });
 
   // Fetch current user profile data
+  // Phase 2 Perf: Using PROFILE_CARD for current user (less data needed)
   const { data: currentUser, isLoading: currentUserLoading } = useQuery({
     queryKey: ['current-user', user?.id],
     queryFn: async () => {
@@ -42,7 +71,7 @@ export const useUserProfileQueries = () => {
       
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('*')
+        .select(PROFILE_CARD_SELECT)
         .eq('id', user.id)
         .single();
       
