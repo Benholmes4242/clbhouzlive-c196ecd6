@@ -5,7 +5,7 @@
 
 // Enable verification bypass button in admin panel (test mode only)
 // Set to false for production deployments
-export const ENABLE_VERIFICATION_BYPASS = true;
+export const ENABLE_VERIFICATION_BYPASS = false;
 
 // Enable mock videos in Videos tab sections (for UI testing)
 // Set to false for production deployments

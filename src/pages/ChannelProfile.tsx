@@ -16,12 +16,14 @@ export default function ChannelProfile() {
       setLoading(true);
       try {
         if (isMockChannelsEnabled) {
+          // Mock data for development/testing only
           const mock = getMockChannel(slug);
           if (mounted) setChannel(mock);
         } else {
-          // TODO: real fetch here once channels exist
-          const mock = getMockChannel(slug);
-          if (mounted) setChannel(mock);
+          // TODO: Implement real channel fetch from Supabase
+          // For now, redirect to discover page since channels aren't live yet
+          nav('/discover', { replace: true });
+          return;
         }
       } finally {
         if (mounted) setLoading(false);
