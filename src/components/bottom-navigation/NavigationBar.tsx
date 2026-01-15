@@ -7,16 +7,28 @@ interface NavigationBarProps {
   onTabClick: (tab: { id: string; path: string | null; isAction?: boolean }) => void;
   variant?: 'default' | 'clubhouse';
   isDimmed?: boolean;
+  /**
+   * When NavigationBar is wrapped by GlobalBottomNavigation (which already draws a hairline),
+   * set this to false to avoid a double-thick border.
+   */
+  showBorder?: boolean;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default', isDimmed = false }) => {
+const NavigationBar: React.FC<NavigationBarProps> = ({
+  activeTab,
+  onTabClick,
+  variant = 'default',
+  isDimmed = false,
+  showBorder = true,
+}) => {
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
+  const borderColor = isClubhouseTheme ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)';
   
   return (
-    <nav 
+    <nav
       className="w-full h-[55px] flex items-center justify-around"
-      style={{ borderTop: '0.5px solid hsl(215 25% 27% / 0.2)' }}
+      style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
     >
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
