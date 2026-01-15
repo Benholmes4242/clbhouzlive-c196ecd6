@@ -173,29 +173,64 @@ async function fetchNextTrip(userId: string): Promise<HeroTripData | null> {
     if (!joinedTrips || joinedTrips.length === 0) return null;
 
     const trip = joinedTrips[0];
+    
+    // Try to find a matching course image if trip has no cover
+    let imageUrl = trip.cover_image_url;
+    if (!imageUrl) {
+      imageUrl = await findCourseImageByName(trip.name);
+    }
+    
     return {
       type: 'trip',
       tripId: trip.id,
       tripName: trip.name,
       startDate: trip.start_date,
       endDate: trip.end_date,
-      location: null, // trips table doesn't have location
+      location: null,
       primaryCourseName: trip.name,
-      primaryCourseImageUrl: trip.cover_image_url || FALLBACK_HERO_IMAGE,
+      primaryCourseImageUrl: imageUrl || FALLBACK_HERO_IMAGE,
     };
   }
 
   const trip = trips[0];
+  
+  // Try to find a matching course image if trip has no cover
+  let imageUrl = trip.cover_image_url;
+  if (!imageUrl) {
+    imageUrl = await findCourseImageByName(trip.name);
+  }
+  
   return {
     type: 'trip',
     tripId: trip.id,
     tripName: trip.name,
     startDate: trip.start_date,
     endDate: trip.end_date,
-    location: null, // trips table doesn't have location
+    location: null,
     primaryCourseName: trip.name,
-    primaryCourseImageUrl: trip.cover_image_url || FALLBACK_HERO_IMAGE,
+    primaryCourseImageUrl: imageUrl || FALLBACK_HERO_IMAGE,
   };
+}
+
+// Helper to find a course image by searching for course name similar to trip name
+async function findCourseImageByName(tripName: string): Promise<string | null> {
+  // Extract potential course name from trip name (remove "Trip" suffix and similar)
+  const cleanName = tripName
+    .replace(/\s*trip\s*/gi, '')
+    .replace(/\s*golf\s*/gi, '')
+    .trim();
+  
+  if (!cleanName) return null;
+  
+  // Search for courses with similar names
+  const { data: courses } = await supabase
+    .from('golf_courses')
+    .select('thumbnail_image')
+    .ilike('name', `%${cleanName}%`)
+    .not('thumbnail_image', 'is', null)
+    .limit(1);
+  
+  return courses?.[0]?.thumbnail_image || null;
 }
 
 async function fetchFallbackCourse(): Promise<HeroFallbackData | null> {
